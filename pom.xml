@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.machinecode</groupId>
+    <artifactId>nock</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>jsl</module>
+    </modules>
+
+    <properties>
+        <version.javax.batch.batch-api.version>1.0</version.javax.batch.batch-api.version>
+        <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
+
+        <!-- Test dependencies -->
+        <version.junit.junit>4.10</version.junit.junit>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.batch</groupId>
+                <artifactId>javax.batch-api</artifactId>
+                <version>${version.javax.batch.batch-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.trove4j</groupId>
+                <artifactId>trove4j</artifactId>
+                <version>${version.net.sf.trove4j.trove4j}</version>
+            </dependency>
+
+            <!-- Test dependencies -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version.junit.junit}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

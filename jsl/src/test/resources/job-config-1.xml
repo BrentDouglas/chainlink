@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<job xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
+     id="i1" restartable="true" version="1.0">
+    <properties>
+        <property name="first" value="first-value"/>
+    </properties>
+    <listeners>
+        <listener ref="">
+            <properties>
+                <property name="" value=""/>
+            </properties>
+        </listener>
+    </listeners>
+    <decision id="i2" ref="">
+        <properties>
+            <property name="" value=""/>
+        </properties>
+        <end on="" exit-status="" />
+        <fail on="" exit-status=""/>
+        <next on="" to=""/>
+        <stop on="" exit-status="" restart=""/>
+    </decision>
+    <flow id="i3" next="">
+        <end on="" exit-status="" />
+        <fail on="" exit-status=""/>
+        <next on="" to=""/>
+        <stop on="" exit-status="" restart=""/>
+    </flow>
+    <split id="i4" next="">
+        <flow id="i6" next="">
+            <step id="i7" next="" allow-start-if-complete="" start-limit="">
+                <chunk checkpoint-policy="" item-count="" retry-limit="" skip-limit="" time-limit="">
+                    <reader ref="">
+                        <properties>
+                            <property name="" value=""/>
+                        </properties>
+                    </reader>
+                    <processor ref="">
+                        <properties>
+                            <property name="" value=""/>
+                        </properties>
+                    </processor>
+                    <writer ref="">
+                        <properties>
+                            <property name="" value=""/>
+                        </properties>
+                    </writer>
+                    <checkpoint-algorithm ref="">
+                        <properties>
+                            <property name="" value=""/>
+                        </properties>
+                    </checkpoint-algorithm>
+                    <skippable-exception-classes>
+                        <include class="one"/>
+                        <include class="two"/>
+                        <exclude class="three"/>
+                        <exclude class="four"/>
+                    </skippable-exception-classes>
+                    <retryable-exception-classes>
+                        <include class="one"/>
+                        <include class="two"/>
+                        <exclude class="three"/>
+                        <exclude class="four"/>
+                    </retryable-exception-classes>
+                    <no-rollback-exception-classes>
+                        <include class="one"/>
+                        <include class="two"/>
+                        <exclude class="three"/>
+                        <exclude class="four"/>
+                    </no-rollback-exception-classes>
+                </chunk>
+            </step>
+            <end on="" exit-status="" />
+            <fail on="" exit-status=""/>
+            <next on="" to=""/>
+            <stop on="" exit-status="" restart=""/>
+        </flow>
+        <flow id="i8" next="">
+            <decision id="i9" ref="">
+                <properties>
+                    <property name="" value=""/>
+                </properties>
+                <end on="" exit-status="" />
+                <fail on="" exit-status=""/>
+                <next on="" to=""/>
+                <stop on="" exit-status="" restart=""/>
+            </decision>
+            <step id="i10">
+                <batchlet ref="" >
+                    <properties>
+                        <property name="" value=""/>
+                    </properties>
+                </batchlet>
+                <end on="" exit-status="" />
+                <fail on="" exit-status=""/>
+                <next on="" to=""/>
+                <stop on="" exit-status="" restart=""/>
+            </step>
+            <end on="" exit-status="" />
+            <fail on="" exit-status=""/>
+            <next on="" to=""/>
+            <stop on="" exit-status="" restart=""/>
+        </flow>
+    </split>
+    <step id="i5">
+        <batchlet ref="" >
+            <properties>
+                <property name="" value=""/>
+            </properties>
+        </batchlet>
+        <end on="" exit-status="" />
+        <fail on="" exit-status=""/>
+        <next on="" to=""/>
+        <stop on="" exit-status="" restart=""/>
+    </step>
+ </job>

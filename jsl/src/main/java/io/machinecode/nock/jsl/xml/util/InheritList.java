@@ -1,0 +1,44 @@
+package io.machinecode.nock.jsl.xml.util;
+
+import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.type.XmlType;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Brent Douglas <brent.n.douglas@gmail.com>
+ */
+public class InheritList<T extends XmlType<T> & Copyable<T>> extends ForwardingList<T> implements List<T> {
+
+    public InheritList(final Repository repository, final List<T> delegate) {
+        super(new ArrayList<T>(delegate.size()));
+        for (final T that : delegate) {
+            if (that instanceof Inheritable) {
+                final Inheritable inheritable = (Inheritable)that;
+                if (inheritable.isAbstract() != null && inheritable.isAbstract()) {
+                    continue;
+                }
+            }
+            this.delegate.add(that.inherit(repository));
+        }
+    }
+
+    public InheritList(final Repository repository, final List<T>... delegates) {
+        super(new ArrayList<T>());
+        for (final List<T> delegate : delegates) {
+            if (delegate == null) {
+                continue;
+            }
+            for (final T that : delegate) {
+                if (that instanceof Inheritable) {
+                    final Inheritable inheritable = (Inheritable)that;
+                    if (inheritable.isAbstract() != null && inheritable.isAbstract()) {
+                        continue;
+                    }
+                }
+                this.delegate.add(that.inherit(repository));
+            }
+        }
+    }
+}

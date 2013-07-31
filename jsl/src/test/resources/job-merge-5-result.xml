@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<job xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
+     id="job1" version="1.0">
+    <listeners>
+        <listener ref="StepAuditor"/>
+    </listeners>
+    <step id="s1" next="s2">
+        <batchlet ref="Doit"/>
+    </step>
+    <step id="s2">
+        <batchlet ref="Doit2"/>
+    </step>
+</job>
