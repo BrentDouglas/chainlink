@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml.type;
 
+import io.machinecode.nock.jsl.api.type.Flow;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
@@ -25,7 +26,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @javax.xml.bind.annotation.XmlType(name = "flow")
 @XmlAccessorType(NONE)
-public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow> {
+public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow>, Flow {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)
@@ -51,6 +52,7 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow> {
     private List<XmlTransition> transitions = new ArrayList<XmlTransition>();
 
 
+    @Override
     public String getId() {
         return id;
     }
@@ -60,6 +62,7 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow> {
         return this;
     }
 
+    @Override
     public String getNext() {
         return next;
     }
@@ -69,6 +72,7 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow> {
         return this;
     }
 
+    @Override
     public List<XmlType> getTypes() {
         return types;
     }
@@ -78,6 +82,7 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow> {
         return this;
     }
 
+    @Override
     public List<XmlTransition> getTransitions() {
         return transitions;
     }

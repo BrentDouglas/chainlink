@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
+import io.machinecode.nock.jsl.api.Job;
 import io.machinecode.nock.jsl.xml.type.XmlDecision;
 import io.machinecode.nock.jsl.xml.type.XmlFlow;
 import io.machinecode.nock.jsl.xml.type.XmlSplit;
@@ -25,7 +26,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlRootElement(namespace = NAMESPACE, name = "job")
 @XmlAccessorType(NONE)
-public class XmlJob extends Inheritable<XmlJob> {
+public class XmlJob extends Inheritable<XmlJob> implements Job {
 
     public static final String NAMESPACE = "http://xmlns.jcp.org/xml/ns/javaee";
 
@@ -54,6 +55,7 @@ public class XmlJob extends Inheritable<XmlJob> {
     private List<XmlType> types = new ArrayList<XmlType>(0);
 
 
+    @Override
     public String getId() {
         return id;
     }
@@ -63,6 +65,7 @@ public class XmlJob extends Inheritable<XmlJob> {
         return this;
     }
 
+    @Override
     public String getVersion() {
         return version;
     }
@@ -72,6 +75,7 @@ public class XmlJob extends Inheritable<XmlJob> {
         return this;
     }
 
+    @Override
     public Boolean isRestartable() {
         return restartable;
     }
@@ -81,6 +85,7 @@ public class XmlJob extends Inheritable<XmlJob> {
         return this;
     }
 
+    @Override
     public XmlProperties getProperties() {
         return properties;
     }
@@ -90,6 +95,7 @@ public class XmlJob extends Inheritable<XmlJob> {
         return this;
     }
 
+    @Override
     public XmlListeners getListeners() {
         return listeners;
     }
@@ -99,6 +105,7 @@ public class XmlJob extends Inheritable<XmlJob> {
         return this;
     }
 
+    @Override
     public List<XmlType> getTypes() {
         return types;
     }

@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
+import io.machinecode.nock.jsl.api.Listeners;
 import io.machinecode.nock.jsl.xml.util.MergeableList;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -16,11 +17,12 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlListeners extends MergeableList<XmlListeners> {
+public class XmlListeners extends MergeableList<XmlListeners> implements Listeners {
 
     @XmlElement(name = "listener", namespace = NAMESPACE, required = false)
     private List<XmlListener> listeners = new ArrayList<XmlListener>(0);
 
+    @Override
     public List<XmlListener> getListeners() {
         return listeners;
     }

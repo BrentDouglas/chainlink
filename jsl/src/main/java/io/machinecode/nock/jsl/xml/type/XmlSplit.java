@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml.type;
 
+import io.machinecode.nock.jsl.api.type.Split;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -18,7 +19,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @javax.xml.bind.annotation.XmlType(name = "split")
 @XmlAccessorType(NONE)
-public class XmlSplit implements XmlType<XmlSplit> {
+public class XmlSplit implements XmlType<XmlSplit>, Split {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)
@@ -31,6 +32,7 @@ public class XmlSplit implements XmlType<XmlSplit> {
     private List<XmlFlow> flows = new ArrayList<XmlFlow>();
 
 
+    @Override
     public String getId() {
         return id;
     }
@@ -40,6 +42,7 @@ public class XmlSplit implements XmlType<XmlSplit> {
         return this;
     }
 
+    @Override
     public String getNext() {
         return next;
     }
@@ -49,6 +52,7 @@ public class XmlSplit implements XmlType<XmlSplit> {
         return this;
     }
 
+    @Override
     public List<XmlFlow> getFlows() {
         return flows;
     }

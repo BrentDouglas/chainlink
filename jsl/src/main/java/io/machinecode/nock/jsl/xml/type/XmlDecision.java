@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml.type;
 
+import io.machinecode.nock.jsl.api.type.Decision;
 import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
@@ -25,7 +26,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @javax.xml.bind.annotation.XmlType(name = "decision")
 @XmlAccessorType(NONE)
-public class XmlDecision implements XmlType<XmlDecision> {
+public class XmlDecision implements XmlType<XmlDecision>, Decision {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)
@@ -46,6 +47,7 @@ public class XmlDecision implements XmlType<XmlDecision> {
     private List<XmlTransition> transitions = new ArrayList<XmlTransition>();
 
 
+    @Override
     public String getId() {
         return id;
     }
@@ -55,6 +57,7 @@ public class XmlDecision implements XmlType<XmlDecision> {
         return this;
     }
 
+    @Override
     public String getRef() {
         return ref;
     }
@@ -64,6 +67,7 @@ public class XmlDecision implements XmlType<XmlDecision> {
         return this;
     }
 
+    @Override
     public XmlProperties getProperties() {
         return properties;
     }
@@ -73,6 +77,7 @@ public class XmlDecision implements XmlType<XmlDecision> {
         return this;
     }
 
+    @Override
     public List<XmlTransition> getTransitions() {
         return transitions;
     }

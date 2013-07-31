@@ -15,7 +15,7 @@ public abstract class PartitionImpl<T extends Mapper> implements Partition<T> {
     private final Analyser analyser;
     private final PartitionReducer reducer;
 
-    public PartitionImpl(final Partition<T> that) {
+    public PartitionImpl(final Partition<? extends T> that) {
         this.collector = new CollectorImpl(that.getCollector());
         this.analyser = new AnalyserImpl(that.getAnalyzer());
         this.reducer = new PartitionReducerImpl(that.getReducer());

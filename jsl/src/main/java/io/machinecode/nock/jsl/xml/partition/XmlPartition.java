@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml.partition;
 
+import io.machinecode.nock.jsl.api.partition.Partition;
 import io.machinecode.nock.jsl.xml.util.Copyable;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -14,13 +15,13 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlPartition implements Copyable<XmlPartition> {
+public class XmlPartition implements Copyable<XmlPartition>, Partition {
 
     @XmlElements({
             @XmlElement(name = "plan", namespace = NAMESPACE, required = false, type = XmlPartitionPlan.class),
             @XmlElement(name = "mapper", namespace = NAMESPACE, required = false, type = XmlPartitionMapper.class)
     })
-    private Copyable planOrMapper;
+    private XmlMapper mapper;
 
     @XmlElement(name = "collector", namespace = NAMESPACE, required = false)
     private XmlCollector collector;
@@ -31,27 +32,17 @@ public class XmlPartition implements Copyable<XmlPartition> {
     @XmlElement(name = "reducer", namespace = NAMESPACE, required = false)
     private XmlPartitionReducer reducer;
 
-    public Copyable getPlanOrMapper() {
-        return planOrMapper;
+    @Override
+    public XmlMapper getMapper() {
+        return mapper;
     }
 
-    public XmlPartitionPlan getPlan() {
-        return planOrMapper instanceof XmlPartitionPlan
-                ? (XmlPartitionPlan) planOrMapper
-                : null;
-    }
-
-    public XmlPartitionMapper getMapper() {
-        return planOrMapper instanceof XmlPartitionMapper
-                ? (XmlPartitionMapper) planOrMapper
-                : null;
-    }
-
-    public XmlPartition setPlanOrMapper(final Copyable planOrMapper) {
-        this.planOrMapper = planOrMapper;
+    public XmlPartition setMapper(final XmlMapper mapper) {
+        this.mapper = mapper;
         return this;
     }
 
+    @Override
     public XmlCollector getCollector() {
         return collector;
     }
@@ -61,6 +52,7 @@ public class XmlPartition implements Copyable<XmlPartition> {
         return this;
     }
 
+    @Override
     public XmlAnalyser getAnalyzer() {
         return analyzer;
     }
@@ -70,6 +62,7 @@ public class XmlPartition implements Copyable<XmlPartition> {
         return this;
     }
 
+    @Override
     public XmlPartitionReducer getReducer() {
         return reducer;
     }
@@ -86,7 +79,7 @@ public class XmlPartition implements Copyable<XmlPartition> {
 
     @Override
     public XmlPartition copy(final XmlPartition that) {
-        that.setPlanOrMapper(Util.copy(this.planOrMapper));
+        that.setMapper(Util.copy(this.mapper));
         that.setCollector(Util.copy(this.collector));
         that.setAnalyzer(Util.copy(this.analyzer));
         that.setReducer(Util.copy(this.reducer));

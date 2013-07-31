@@ -10,7 +10,7 @@ public class MapperPartitionImpl extends PartitionImpl<PartitionMapper> implemen
 
     private final PartitionMapper mapper;
 
-    public MapperPartitionImpl(final Partition<PartitionMapper> that) {
+    public MapperPartitionImpl(final Partition<? extends PartitionMapper> that) {
         super(that);
         this.mapper = new PartitionMapperImpl(that.getMapper());
     }

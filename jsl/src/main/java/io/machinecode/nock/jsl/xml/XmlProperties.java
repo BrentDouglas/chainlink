@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
+import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.xml.util.MergeableList;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -15,11 +16,12 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlProperties extends MergeableList<XmlProperties> {
+public class XmlProperties extends MergeableList<XmlProperties> implements Properties {
 
     @XmlElement(name = "property", namespace = NAMESPACE, required = false)
     private List<XmlProperty> properties = new ArrayList<XmlProperty>(0);
 
+    @Override
     public List<XmlProperty> getProperties() {
         return properties;
     }

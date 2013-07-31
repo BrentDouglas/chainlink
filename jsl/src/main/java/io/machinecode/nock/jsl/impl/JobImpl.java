@@ -17,7 +17,7 @@ public class JobImpl implements Job {
     private final Boolean restartable;
     private final Properties properties;
     private final Listeners listeners;
-    private final List<Type> types;
+    private final List<? extends Type> types;
 
     public JobImpl(final Job job) {
         this.id = job.getId();
@@ -54,7 +54,7 @@ public class JobImpl implements Job {
     }
 
     @Override
-    public List<Type> getTypes() {
+    public List<? extends Type> getTypes() {
         return this.types;
     }
 }

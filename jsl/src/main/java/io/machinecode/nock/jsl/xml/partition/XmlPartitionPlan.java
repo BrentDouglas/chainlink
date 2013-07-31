@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.partition;
 
+import io.machinecode.nock.jsl.api.partition.PartitionPlan;
 import io.machinecode.nock.jsl.xml.XmlProperties;
-import io.machinecode.nock.jsl.xml.util.Copyable;
 import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,7 +15,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlPartitionPlan implements Copyable<XmlPartitionPlan> {
+public class XmlPartitionPlan implements XmlMapper<XmlPartitionPlan>, PartitionPlan {
 
     @XmlAttribute(name = "partitions", required = false)
     private String partitions;
@@ -26,7 +26,7 @@ public class XmlPartitionPlan implements Copyable<XmlPartitionPlan> {
     @XmlElement(name = "properties", namespace = NAMESPACE, required = false)
     private XmlProperties properties;
 
-
+    @Override
     public String getPartitions() {
         return partitions;
     }
@@ -36,6 +36,7 @@ public class XmlPartitionPlan implements Copyable<XmlPartitionPlan> {
         return this;
     }
 
+    @Override
     public String getThreads() {
         return threads;
     }
@@ -45,6 +46,7 @@ public class XmlPartitionPlan implements Copyable<XmlPartitionPlan> {
         return this;
     }
 
+    @Override
     public XmlProperties getProperties() {
         return properties;
     }

@@ -1,5 +1,7 @@
 package io.machinecode.nock.jsl.xml.type;
 
+import io.machinecode.nock.jsl.api.type.Step;
+import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlListeners;
 import io.machinecode.nock.jsl.xml.XmlPart;
@@ -12,7 +14,6 @@ import io.machinecode.nock.jsl.xml.transition.XmlNext;
 import io.machinecode.nock.jsl.xml.transition.XmlStop;
 import io.machinecode.nock.jsl.xml.transition.XmlTransition;
 import io.machinecode.nock.jsl.xml.util.Inheritable;
-import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.batch.operations.JobStartException;
@@ -32,7 +33,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @javax.xml.bind.annotation.XmlType(name = "step")
 @XmlAccessorType(NONE)
-public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
+public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep>, Step {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)
@@ -71,6 +72,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
     private List<XmlTransition> transitions = new ArrayList<XmlTransition>();
 
 
+    @Override
     public String getId() {
         return id;
     }
@@ -80,6 +82,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
         return this;
     }
 
+    @Override
     public String getNext() {
         return next;
     }
@@ -89,6 +92,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
         return this;
     }
 
+    @Override
     public String getStartLimit() {
         return startLimit;
     }
@@ -98,6 +102,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
         return this;
     }
 
+    @Override
     public String getAllowStartIfComplete() {
         return allowStartIfComplete;
     }
@@ -107,6 +112,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
         return this;
     }
 
+    @Override
     public XmlListeners getListeners() {
         return listeners;
     }
@@ -116,6 +122,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
         return this;
     }
 
+    @Override
     public XmlProperties getProperties() {
         return properties;
     }
@@ -125,6 +132,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
         return this;
     }
 
+    @Override
     public XmlPart getPart() {
         return part;
     }
@@ -146,6 +154,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
         return this;
     }
 
+    @Override
     public List<XmlTransition> getTransitions() {
         return transitions;
     }
@@ -155,6 +164,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep> {
         return this;
     }
 
+    @Override
     public XmlPartition getPartition() {
         return partition;
     }

@@ -10,7 +10,7 @@ public class PlanPartitionImpl extends PartitionImpl<PartitionPlan> implements P
 
     private final PartitionPlan mapper;
 
-    public PlanPartitionImpl(final Partition<PartitionPlan> that) {
+    public PlanPartitionImpl(final Partition<? extends PartitionPlan> that) {
         super(that);
         this.mapper = new PartitionPlanImpl(that.getMapper());
     }
