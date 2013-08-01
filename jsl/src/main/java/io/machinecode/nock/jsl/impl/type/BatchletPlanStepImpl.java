@@ -3,7 +3,7 @@ package io.machinecode.nock.jsl.impl.type;
 import io.machinecode.nock.jsl.api.Batchlet;
 import io.machinecode.nock.jsl.api.partition.Partition;
 import io.machinecode.nock.jsl.api.partition.PartitionPlan;
-import io.machinecode.nock.jsl.api.type.Step;
+import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.impl.BatchletImpl;
 import io.machinecode.nock.jsl.impl.partition.PlanPartitionImpl;
 
@@ -17,8 +17,8 @@ public class BatchletPlanStepImpl extends StepImpl<Batchlet, PartitionPlan> impl
 
     public BatchletPlanStepImpl(final Step<Batchlet, PartitionPlan> that) {
         super(that);
-        this.part = new BatchletImpl(that.getPart());
-        this.partition = new PlanPartitionImpl(that.getPartition());
+        this.part = that.getPart() == null ? null : new BatchletImpl(that.getPart());
+        this.partition = that.getPartition() == null ? null : new PlanPartitionImpl(that.getPartition());
     }
 
     @Override

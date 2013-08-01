@@ -1,8 +1,8 @@
 package io.machinecode.nock.jsl.fluent.type;
 
+import io.machinecode.nock.jsl.api.execution.Execution;
 import io.machinecode.nock.jsl.api.transition.Transition;
-import io.machinecode.nock.jsl.api.type.Flow;
-import io.machinecode.nock.jsl.api.type.Type;
+import io.machinecode.nock.jsl.api.execution.Flow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,10 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentFlow extends FluentType<FluentFlow> implements Flow {
+public class FluentFlow extends FluentExecution<FluentFlow> implements Flow {
 
     private String next;
-    private final List<Type> types = new ArrayList<Type>(0);
+    private final List<Execution> executions = new ArrayList<Execution>(0);
     private final List<Transition> transitions = new ArrayList<Transition>(0);
 
     @Override
@@ -27,12 +27,12 @@ public class FluentFlow extends FluentType<FluentFlow> implements Flow {
     }
 
     @Override
-    public List<Type> getTypes() {
-        return this.types;
+    public List<Execution> getExecutions() {
+        return this.executions;
     }
 
-    public FluentFlow addType(final Type type) {
-        this.types.add(type);
+    public FluentFlow addExecution(final Execution execution) {
+        this.executions.add(execution);
         return this;
     }
 

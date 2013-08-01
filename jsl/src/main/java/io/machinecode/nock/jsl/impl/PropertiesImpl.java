@@ -2,8 +2,9 @@ package io.machinecode.nock.jsl.impl;
 
 import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.Property;
+import io.machinecode.nock.jsl.impl.Util.Transformer;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,17 +12,33 @@ import java.util.List;
  */
 public class PropertiesImpl implements Properties {
 
+    private static final Transformer<Property> PROPERTY_TRANSFORMER = new Transformer<Property>() {
+        @Override
+        public Property transform(final Property that) {
+            return new PropertyImpl(that);
+        }
+    };
+
+    private final String partition;
     private final List<Property> properties;
 
     public PropertiesImpl(final Properties that) {
-        this.properties = new ArrayList<Property>(that.getProperties().size());
-        for (final Property property : that.getProperties()) {
-            this.properties.add(new PropertyImpl(property));
+        if (that == null) {
+            this.partition = null;
+            this.properties = Collections.emptyList();
+        } else  {
+            this.partition = that.getPartition();
+            this.properties = Util.immutableCopy(that.getProperties(), PROPERTY_TRANSFORMER);
         }
     }
 
     @Override
     public List<Property> getProperties() {
         return this.properties;
+    }
+
+    @Override
+    public String getPartition() {
+        return this.partition;
     }
 }

@@ -1,15 +1,23 @@
 package io.machinecode.nock.jsl.impl.type;
 
-import io.machinecode.nock.jsl.api.type.Flow;
-import io.machinecode.nock.jsl.api.type.Split;
+import io.machinecode.nock.jsl.api.execution.Flow;
+import io.machinecode.nock.jsl.api.execution.Split;
+import io.machinecode.nock.jsl.impl.Util;
+import io.machinecode.nock.jsl.impl.Util.Transformer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class SplitImpl extends TypeImpl implements Split {
+public class SplitImpl extends ExecutionImpl implements Split {
+
+    private static final Transformer<Flow> FLOW_TRANSFORMER = new Transformer<Flow>() {
+        @Override
+        public Flow transform(final Flow that) {
+            return new FlowImpl(that);
+        }
+    };
 
     private final String next;
     private final List<Flow> flows;
@@ -17,10 +25,7 @@ public class SplitImpl extends TypeImpl implements Split {
     public SplitImpl(final Split that) {
         super(that);
         this.next = that.getNext();
-        this.flows = new ArrayList<Flow>(that.getFlows().size());
-        for (final Flow flow : that.getFlows()) {
-            this.flows.add(new FlowImpl(flow));
-        }
+        this.flows = Util.immutableCopy(that.getFlows(), FLOW_TRANSFORMER);
     }
 
     @Override

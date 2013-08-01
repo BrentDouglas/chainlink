@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.type;
 
-import io.machinecode.nock.jsl.api.type.Decision;
+import io.machinecode.nock.jsl.api.execution.Decision;
 import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@javax.xml.bind.annotation.XmlType(name = "decision")
+@XmlType(name = "decision")
 @XmlAccessorType(NONE)
-public class XmlDecision implements XmlType<XmlDecision>, Decision {
+public class XmlDecision implements XmlExecution<XmlDecision>, Decision {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)

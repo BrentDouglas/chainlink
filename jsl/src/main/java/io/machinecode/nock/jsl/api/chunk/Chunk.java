@@ -8,15 +8,20 @@ import io.machinecode.nock.jsl.api.Properties;
  */
 public interface Chunk extends Part {
 
+    public static final class CheckpointPolicy {
+        public static final String ITEM = "item";
+        public static final String CUSTOM = "custom";
+    }
+
     String getCheckpointPolicy();
 
-    String getItemCount();
+    int getItemCount();
 
-    String getTimeLimit();
+    int getTimeLimit();
 
-    String getSkipLimit();
+    int getSkipLimit();
 
-    String getRetryLimit();
+    int getRetryLimit();
 
     ItemReader getReader();
 

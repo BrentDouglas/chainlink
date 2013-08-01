@@ -9,23 +9,23 @@ import io.machinecode.nock.jsl.impl.PropertiesImpl;
  */
 public class PartitionPlanImpl implements PartitionPlan {
 
-    private final String partitions;
-    private final String threads;
+    private final int partitions;
+    private final int threads;
     private final Properties properties;
 
     public PartitionPlanImpl(final PartitionPlan that) {
         this.partitions = that.getPartitions();
-        this.threads = that.getThreads();
+        this.threads = that.getThreads() == null ? that.getPartitions() : that.getThreads();
         this.properties = new PropertiesImpl(that.getProperties());
     }
 
     @Override
-    public String getPartitions() {
+    public int getPartitions() {
         return this.partitions;
     }
 
     @Override
-    public String getThreads() {
+    public Integer getThreads() {
         return this.threads;
     }
 

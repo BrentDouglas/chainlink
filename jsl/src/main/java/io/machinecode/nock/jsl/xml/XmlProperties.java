@@ -5,6 +5,7 @@ import io.machinecode.nock.jsl.xml.util.MergeableList;
 import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,21 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public class XmlProperties extends MergeableList<XmlProperties> implements Properties {
 
+    @XmlAttribute(name = "partition", required = false)
+    private String partition;
+
     @XmlElement(name = "property", namespace = NAMESPACE, required = false)
     private List<XmlProperty> properties = new ArrayList<XmlProperty>(0);
+
+    @Override
+    public String getPartition() {
+        return partition;
+    }
+
+    public XmlProperties setPartition(final String partition) {
+        this.partition = partition;
+        return this;
+    }
 
     @Override
     public List<XmlProperty> getProperties() {

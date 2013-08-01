@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.util;
 
 import io.machinecode.nock.jsl.xml.Repository;
-import io.machinecode.nock.jsl.xml.type.XmlType;
+import io.machinecode.nock.jsl.xml.type.XmlExecution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class Util {
     public static <X extends Copyable<X>> CopyList<X> copyList(final List<X>... that) {
         return that == null ? null : new CopyList<X>(that);
     }
-    public static <X extends XmlType<X> & Copyable<X>> InheritList<X> inheritingList(final Repository repository, final List<X> that) {
+    public static <X extends XmlExecution<X> & Copyable<X>> InheritList<X> inheritingList(final Repository repository, final List<X> that) {
         return that == null ? null : new InheritList<X>(repository, that);
     }
 

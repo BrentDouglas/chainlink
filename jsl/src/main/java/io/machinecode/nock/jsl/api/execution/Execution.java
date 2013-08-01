@@ -1,9 +1,9 @@
-package io.machinecode.nock.jsl.api.type;
+package io.machinecode.nock.jsl.api.execution;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Type {
+public interface Execution {
 
     String getId();
 }

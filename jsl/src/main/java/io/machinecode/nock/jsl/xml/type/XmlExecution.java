@@ -1,13 +1,13 @@
 package io.machinecode.nock.jsl.xml.type;
 
-import io.machinecode.nock.jsl.api.type.Type;
+import io.machinecode.nock.jsl.api.execution.Execution;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.util.Copyable;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface XmlType<T extends XmlType<T>> extends Copyable<T>, Type {
+public interface XmlExecution<T extends XmlExecution<T>> extends Copyable<T>, Execution {
 
     @Override
     String getId();

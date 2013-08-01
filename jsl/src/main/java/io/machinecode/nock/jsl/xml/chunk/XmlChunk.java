@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml.chunk;
 
+import io.machinecode.nock.jsl.api.chunk.Chunk;
 import io.machinecode.nock.jsl.xml.XmlPart;
 import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.util.Util;
@@ -15,22 +16,22 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlChunk implements XmlPart<XmlChunk> {
+public class XmlChunk implements XmlPart<XmlChunk>, Chunk {
 
     @XmlAttribute(name = "checkpoint-policy", required = false)
-    private String checkpointPolicy;
+    private String checkpointPolicy = CheckpointPolicy.ITEM;
 
     @XmlAttribute(name = "item-count", required = false)
-    private String itemCount;
+    private int itemCount = 10;
 
     @XmlAttribute(name = "time-limit", required = false)
-    private String timeLimit;
+    private int timeLimit = 0;
 
     @XmlAttribute(name = "skip-limit", required = false)
-    private String skipLimit;
+    private int skipLimit = 0;
 
     @XmlAttribute(name = "retry-limit", required = false)
-    private String retryLimit;
+    private int retryLimit = 0;
 
     @XmlElement(name = "reader", namespace = NAMESPACE, required = true)
     private XmlItemReader reader;
@@ -66,38 +67,38 @@ public class XmlChunk implements XmlPart<XmlChunk> {
         return this;
     }
 
-    public String getItemCount() {
+    public int getItemCount() {
         return itemCount;
     }
 
-    public XmlChunk setItemCount(final String itemCount) {
+    public XmlChunk setItemCount(final int itemCount) {
         this.itemCount = itemCount;
         return this;
     }
 
-    public String getTimeLimit() {
+    public int getTimeLimit() {
         return timeLimit;
     }
 
-    public XmlChunk setTimeLimit(final String timeLimit) {
+    public XmlChunk setTimeLimit(final int timeLimit) {
         this.timeLimit = timeLimit;
         return this;
     }
 
-    public String getSkipLimit() {
+    public int getSkipLimit() {
         return skipLimit;
     }
 
-    public XmlChunk setSkipLimit(final String skipLimit) {
+    public XmlChunk setSkipLimit(final int skipLimit) {
         this.skipLimit = skipLimit;
         return this;
     }
 
-    public String getRetryLimit() {
+    public int getRetryLimit() {
         return retryLimit;
     }
 
-    public XmlChunk setRetryLimit(final String retryLimit) {
+    public XmlChunk setRetryLimit(final int retryLimit) {
         this.retryLimit = retryLimit;
         return this;
     }

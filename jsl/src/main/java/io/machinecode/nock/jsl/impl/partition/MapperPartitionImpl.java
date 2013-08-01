@@ -12,7 +12,7 @@ public class MapperPartitionImpl extends PartitionImpl<PartitionMapper> implemen
 
     public MapperPartitionImpl(final Partition<? extends PartitionMapper> that) {
         super(that);
-        this.mapper = new PartitionMapperImpl(that.getMapper());
+        this.mapper = that.getMapper() == null ? null : new PartitionMapperImpl(that.getMapper());
     }
 
     @Override

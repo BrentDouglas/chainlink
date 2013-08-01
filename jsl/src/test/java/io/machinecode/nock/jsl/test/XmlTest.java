@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.test;
 
+import io.machinecode.nock.jsl.api.chunk.Chunk.CheckpointPolicy;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlJob;
 import io.machinecode.nock.jsl.xml.XmlListener;
@@ -55,17 +56,17 @@ public class XmlTest {
 
     private static void testJob1(final XmlJob job) {
         Assert.assertEquals("job1", job.getId());
-        Assert.assertEquals(2, job.getTypes().size());
+        Assert.assertEquals(2, job.getExecutions().size());
         Assert.assertNull(job.getListeners());
         Assert.assertNull(job.getProperties());
         Assert.assertEquals("1.0", job.getVersion());
         testInheritance(job);
 
-        final XmlStep step1 = (XmlStep)job.getTypes().get(0);
+        final XmlStep step1 = (XmlStep)job.getExecutions().get(0);
         Assert.assertEquals("s1", step1.getId());
         Assert.assertEquals("s2", step1.getNext());
-        Assert.assertNull(step1.getAllowStartIfComplete());
-        Assert.assertNull(step1.getStartLimit());
+        Assert.assertFalse(step1.isAllowStartIfComplete());
+        Assert.assertEquals(0, step1.getStartLimit());
         Assert.assertNull(step1.getListeners());
         Assert.assertNull(step1.getProperties());
         testInheritance(step1);
@@ -75,11 +76,11 @@ public class XmlTest {
         Assert.assertEquals("Doit", batchlet1.getRef());
         Assert.assertNull(batchlet1.getProperties());
 
-        final XmlStep step2 = (XmlStep)job.getTypes().get(1);
+        final XmlStep step2 = (XmlStep)job.getExecutions().get(1);
         Assert.assertEquals("s2", step2.getId());
         Assert.assertNull(step2.getNext());
-        Assert.assertNull(step2.getAllowStartIfComplete());
-        Assert.assertNull(step2.getStartLimit());
+        Assert.assertFalse(step2.isAllowStartIfComplete());
+        Assert.assertEquals(0, step2.getStartLimit());
         Assert.assertNull(step2.getListeners());
         Assert.assertNull(step2.getProperties());
         testInheritance(step2);
@@ -105,24 +106,24 @@ public class XmlTest {
 
     private static void testJob2(final XmlJob job) {
         Assert.assertEquals("job1", job.getId());
-        Assert.assertEquals(1, job.getTypes().size());
+        Assert.assertEquals(1, job.getExecutions().size());
         Assert.assertNull(job.getListeners());
         Assert.assertNull(job.getProperties());
         Assert.assertEquals("1.0", job.getVersion());
         testInheritance(job);
 
-        final XmlFlow flow1 = (XmlFlow)job.getTypes().get(0);
+        final XmlFlow flow1 = (XmlFlow)job.getExecutions().get(0);
         Assert.assertEquals("f1", flow1.getId());
-        Assert.assertEquals(2, flow1.getTypes().size());
+        Assert.assertEquals(2, flow1.getExecutions().size());
         Assert.assertEquals(1, flow1.getTransitions().size());
         Assert.assertNull(flow1.getNext());
         testInheritance(flow1);
 
-        final XmlStep step1 = (XmlStep)flow1.getTypes().get(0);
+        final XmlStep step1 = (XmlStep)flow1.getExecutions().get(0);
         Assert.assertEquals("s1", step1.getId());
         Assert.assertEquals("s2", step1.getNext());
-        Assert.assertEquals("true", step1.getAllowStartIfComplete());
-        Assert.assertNull(step1.getStartLimit());
+        Assert.assertTrue(step1.isAllowStartIfComplete());
+        Assert.assertEquals(0, step1.getStartLimit());
         Assert.assertNull(step1.getListeners());
         Assert.assertNull(step1.getProperties());
         testInheritance(step1);
@@ -132,11 +133,11 @@ public class XmlTest {
         Assert.assertEquals("Doit", batchlet1.getRef());
         Assert.assertNull(batchlet1.getProperties());
 
-        final XmlStep step2 = (XmlStep)flow1.getTypes().get(1);
+        final XmlStep step2 = (XmlStep)flow1.getExecutions().get(1);
         Assert.assertEquals("s2", step2.getId());
         Assert.assertNull(step2.getNext());
-        Assert.assertNull(step2.getAllowStartIfComplete());
-        Assert.assertNull(step2.getStartLimit());
+        Assert.assertFalse(step2.isAllowStartIfComplete());
+        Assert.assertEquals(0, step2.getStartLimit());
         Assert.assertNull(step2.getListeners());
         Assert.assertNull(step2.getProperties());
         testInheritance(step2);
@@ -168,18 +169,18 @@ public class XmlTest {
 
     private static void testJob3(final XmlJob job) {
         Assert.assertEquals("job1", job.getId());
-        Assert.assertEquals(2, job.getTypes().size());
+        Assert.assertEquals(2, job.getExecutions().size());
         Assert.assertNotNull(job.getListeners());
         Assert.assertEquals(1, job.getListeners().getListeners().size());
         Assert.assertNull(job.getProperties());
         Assert.assertEquals("1.0", job.getVersion());
         testInheritance(job);
 
-        final XmlStep step1 = (XmlStep)job.getTypes().get(0);
+        final XmlStep step1 = (XmlStep)job.getExecutions().get(0);
         Assert.assertEquals("s1", step1.getId());
         Assert.assertEquals("s2", step1.getNext());
-        Assert.assertNull(step1.getAllowStartIfComplete());
-        Assert.assertNull(step1.getStartLimit());
+        Assert.assertFalse(step1.isAllowStartIfComplete());
+        Assert.assertEquals(0, step1.getStartLimit());
         Assert.assertNull(step1.getListeners());
         Assert.assertNull(step1.getProperties());
         testInheritance(step1);
@@ -189,11 +190,11 @@ public class XmlTest {
         Assert.assertEquals("Doit", batchlet1.getRef());
         Assert.assertNull(batchlet1.getProperties());
 
-        final XmlStep step2 = (XmlStep)job.getTypes().get(1);
+        final XmlStep step2 = (XmlStep)job.getExecutions().get(1);
         Assert.assertEquals("s2", step2.getId());
         Assert.assertNull(step2.getNext());
-        Assert.assertNull(step2.getAllowStartIfComplete());
-        Assert.assertNull(step2.getStartLimit());
+        Assert.assertFalse(step2.isAllowStartIfComplete());
+        Assert.assertEquals(0, step2.getStartLimit());
         Assert.assertNull(step2.getListeners());
         Assert.assertNull(step2.getProperties());
         testInheritance(step2);
@@ -253,24 +254,24 @@ public class XmlTest {
 
     private static void testJob6(final XmlJob job) {
         Assert.assertEquals("job1", job.getId());
-        Assert.assertEquals(2, job.getTypes().size());
+        Assert.assertEquals(2, job.getExecutions().size());
         Assert.assertNull(job.getListeners());
         Assert.assertNull(job.getProperties());
         Assert.assertEquals("1.0", job.getVersion());
         testInheritance(job);
 
-        final XmlFlow flow1 = (XmlFlow)job.getTypes().get(0);
+        final XmlFlow flow1 = (XmlFlow)job.getExecutions().get(0);
         Assert.assertEquals("f1", flow1.getId());
-        Assert.assertEquals(2, flow1.getTypes().size());
+        Assert.assertEquals(2, flow1.getExecutions().size());
         Assert.assertEquals(1, flow1.getTransitions().size());
         Assert.assertEquals("s3", flow1.getNext());
         testInheritance(flow1);
 
-        final XmlStep step1 = (XmlStep)flow1.getTypes().get(0);
+        final XmlStep step1 = (XmlStep)flow1.getExecutions().get(0);
         Assert.assertEquals("s1", step1.getId());
         Assert.assertEquals("s2", step1.getNext());
-        Assert.assertEquals("true", step1.getAllowStartIfComplete());
-        Assert.assertNull(step1.getStartLimit());
+        Assert.assertTrue(step1.isAllowStartIfComplete());
+        Assert.assertEquals(0, step1.getStartLimit());
         Assert.assertNull(step1.getListeners());
         Assert.assertNull(step1.getProperties());
         testInheritance(step1);
@@ -280,11 +281,11 @@ public class XmlTest {
         Assert.assertEquals("Doit", batchlet1.getRef());
         Assert.assertNull(batchlet1.getProperties());
 
-        final XmlStep step2 = (XmlStep)flow1.getTypes().get(1);
+        final XmlStep step2 = (XmlStep)flow1.getExecutions().get(1);
         Assert.assertEquals("s2", step2.getId());
         Assert.assertNull(step2.getNext());
-        Assert.assertNull(step2.getAllowStartIfComplete());
-        Assert.assertNull(step2.getStartLimit());
+        Assert.assertFalse(step2.isAllowStartIfComplete());
+        Assert.assertEquals(0, step2.getStartLimit());
         Assert.assertNull(step2.getListeners());
         Assert.assertNull(step2.getProperties());
         testInheritance(step2);
@@ -298,11 +299,11 @@ public class XmlTest {
         Assert.assertEquals("ERROR", fail1.getOn());
         Assert.assertNull(fail1.getExitStatus());
 
-        final XmlStep step3 = (XmlStep)job.getTypes().get(1);
+        final XmlStep step3 = (XmlStep)job.getExecutions().get(1);
         Assert.assertEquals("s3", step3.getId());
         Assert.assertNull(step3.getNext());
-        Assert.assertNull(step3.getAllowStartIfComplete());
-        Assert.assertNull(step3.getStartLimit());
+        Assert.assertFalse(step3.isAllowStartIfComplete());
+        Assert.assertEquals(0, step3.getStartLimit());
         Assert.assertNull(step3.getListeners());
         Assert.assertNull(step3.getProperties());
         testInheritance(step3);
@@ -334,17 +335,17 @@ public class XmlTest {
 
     private static void testJob7(final XmlJob job) {
         Assert.assertEquals("job1", job.getId());
-        Assert.assertEquals(1, job.getTypes().size());
+        Assert.assertEquals(1, job.getExecutions().size());
         Assert.assertNull(job.getListeners());
         Assert.assertNull(job.getProperties());
         Assert.assertEquals("1.0", job.getVersion());
         testInheritance(job);
 
-        final XmlStep step1 = (XmlStep)job.getTypes().get(0);
+        final XmlStep step1 = (XmlStep)job.getExecutions().get(0);
         Assert.assertEquals("s1", step1.getId());
         Assert.assertNull(step1.getNext());
-        Assert.assertNull(step1.getAllowStartIfComplete());
-        Assert.assertNull(step1.getStartLimit());
+        Assert.assertFalse(step1.isAllowStartIfComplete());
+        Assert.assertEquals(0, step1.getStartLimit());
         Assert.assertNull(step1.getListeners());
         Assert.assertNotNull(step1.getProperties());
         Assert.assertEquals(4, step1.getProperties().getProperties().size());
@@ -357,11 +358,11 @@ public class XmlTest {
 
         final XmlChunk chunk1 = step1.getChunk();
         Assert.assertNotNull(chunk1);
-        Assert.assertNull(chunk1.getCheckpointPolicy());
-        Assert.assertEquals("100", chunk1.getItemCount());
-        Assert.assertNull(chunk1.getTimeLimit());
-        Assert.assertNull(chunk1.getSkipLimit());
-        Assert.assertNull(chunk1.getRetryLimit());
+        Assert.assertEquals(CheckpointPolicy.ITEM, chunk1.getCheckpointPolicy());
+        Assert.assertEquals(100, chunk1.getItemCount());
+        Assert.assertEquals(0, chunk1.getTimeLimit());
+        Assert.assertEquals(0, chunk1.getSkipLimit());
+        Assert.assertEquals(0, chunk1.getRetryLimit());
         Assert.assertNotNull(chunk1.getReader());
         Assert.assertNotNull(chunk1.getProcessor());
         Assert.assertNotNull(chunk1.getWriter());

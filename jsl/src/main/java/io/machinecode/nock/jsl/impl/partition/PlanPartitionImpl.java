@@ -12,7 +12,7 @@ public class PlanPartitionImpl extends PartitionImpl<PartitionPlan> implements P
 
     public PlanPartitionImpl(final Partition<? extends PartitionPlan> that) {
         super(that);
-        this.mapper = new PartitionPlanImpl(that.getMapper());
+        this.mapper = that.getMapper() == null ? null : new PartitionPlanImpl(that.getMapper());
     }
 
     @Override

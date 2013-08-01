@@ -18,30 +18,30 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 public class XmlPartitionPlan implements XmlMapper<XmlPartitionPlan>, PartitionPlan {
 
     @XmlAttribute(name = "partitions", required = false)
-    private String partitions;
+    private int partitions = 1;
 
     @XmlAttribute(name = "threads", required = false)
-    private String threads;
+    private Integer threads;
 
     @XmlElement(name = "properties", namespace = NAMESPACE, required = false)
     private XmlProperties properties;
 
     @Override
-    public String getPartitions() {
+    public int getPartitions() {
         return partitions;
     }
 
-    public XmlPartitionPlan setPartitions(final String partitions) {
+    public XmlPartitionPlan setPartitions(final int partitions) {
         this.partitions = partitions;
         return this;
     }
 
     @Override
-    public String getThreads() {
+    public Integer getThreads() {
         return threads;
     }
 
-    public XmlPartitionPlan setThreads(final String threads) {
+    public XmlPartitionPlan setThreads(final Integer threads) {
         this.threads = threads;
         return this;
     }

@@ -11,7 +11,18 @@ import java.util.List;
  */
 public class FluentProperties<T extends FluentProperties<T>> implements Properties {
 
+    private String partition;
     private final List<Property> properties = new ArrayList<Property>(0);
+
+    @Override
+    public String getPartition() {
+        return partition;
+    }
+
+    public T setPartition(final String partition) {
+        this.partition = partition;
+        return (T)this;
+    }
 
     @Override
     public List<Property> getProperties() {

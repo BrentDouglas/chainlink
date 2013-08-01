@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.api.type;
+package io.machinecode.nock.jsl.api.execution;
 
 import io.machinecode.nock.jsl.api.PropertyReference;
 import io.machinecode.nock.jsl.api.transition.Transition;
@@ -12,7 +12,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public interface Decision extends Type, PropertyReference {
+public interface Decision extends Execution, PropertyReference {
 
     List<? extends Transition> getTransitions();
 }

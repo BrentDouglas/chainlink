@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.fluent.type;
 
-import io.machinecode.nock.jsl.api.type.Flow;
-import io.machinecode.nock.jsl.api.type.Split;
+import io.machinecode.nock.jsl.api.execution.Flow;
+import io.machinecode.nock.jsl.api.execution.Split;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentSplit extends FluentType<FluentSplit> implements Split {
+public class FluentSplit extends FluentExecution<FluentSplit> implements Split {
 
     private String next;
     private List<Flow> flows = new ArrayList<Flow>(0);

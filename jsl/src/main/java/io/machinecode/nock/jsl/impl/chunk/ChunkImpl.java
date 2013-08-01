@@ -15,10 +15,10 @@ import io.machinecode.nock.jsl.impl.PropertiesImpl;
 public class ChunkImpl implements Chunk {
 
     private final String checkpointPolicy;
-    private final String itemCount;
-    private final String timeLimit;
-    private final String skipLimit;
-    private final String retryLimit;
+    private final int itemCount;
+    private final int timeLimit;
+    private final int skipLimit;
+    private final int retryLimit;
     private final ItemReader reader;
     private final ItemProcessor processor;
     private final ItemWriter writer;
@@ -34,10 +34,10 @@ public class ChunkImpl implements Chunk {
         this.timeLimit = that.getTimeLimit();
         this.skipLimit = that.getSkipLimit();
         this.retryLimit = that.getRetryLimit();
-        this.reader = new ItemReaderImpl(that.getReader());
+        this.reader = new ItemReaderImpl(that.getReader()); //TODO Should not be null but needs validation
         this.processor = new ItemProcessorImpl(that.getProcessor());
         this.writer = new ItemWriterImpl(that.getWriter());
-        this.checkpointAlgorithm = new CheckpointAlgorithmImpl(that.getCheckpointAlgorithm());
+        this.checkpointAlgorithm = that.getCheckpointAlgorithm() == null ? null : new CheckpointAlgorithmImpl(that.getCheckpointAlgorithm());
         this.skippableExceptionClasses = new ExceptionClassFilterImpl(that.getSkippableExceptionClasses());
         this.retryableExceptionClasses = new ExceptionClassFilterImpl(that.getRetryableExceptionClasses());
         this.noRollbackExceptionClasses = new ExceptionClassFilterImpl(that.getNoRollbackExceptionClasses());
@@ -50,22 +50,22 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public String getItemCount() {
+    public int getItemCount() {
         return this.itemCount;
     }
 
     @Override
-    public String getTimeLimit() {
+    public int getTimeLimit() {
         return this.timeLimit;
     }
 
     @Override
-    public String getSkipLimit() {
+    public int getSkipLimit() {
         return this.skipLimit;
     }
 
     @Override
-    public String getRetryLimit() {
+    public int getRetryLimit() {
         return this.retryLimit;
     }
 

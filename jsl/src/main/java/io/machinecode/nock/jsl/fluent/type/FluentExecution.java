@@ -1,11 +1,11 @@
 package io.machinecode.nock.jsl.fluent.type;
 
-import io.machinecode.nock.jsl.api.type.Type;
+import io.machinecode.nock.jsl.api.execution.Execution;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class FluentType<T extends FluentType<T>> implements Type {
+public abstract class FluentExecution<T extends FluentExecution<T>> implements Execution {
 
     private String id;
 

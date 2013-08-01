@@ -1,10 +1,12 @@
 package io.machinecode.nock.jsl.xml.chunk;
 
-import io.machinecode.nock.jsl.xml.util.Mergeable;
+import io.machinecode.nock.jsl.api.chunk.ExceptionClassFilter;
+import io.machinecode.nock.jsl.xml.util.MergeableList;
 import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.List;
 
 import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
@@ -13,29 +15,29 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlExceptionClassFilter implements Mergeable<XmlExceptionClassFilter> {
+public class XmlExceptionClassFilter extends MergeableList<XmlExceptionClassFilter> implements ExceptionClassFilter {
 
     @XmlElement(name = "include", namespace = NAMESPACE, required = false)
-    private XmlClasses includes;
+    private List<XmlExceptionClass> includes;
 
     @XmlElement(name = "exclude", namespace = NAMESPACE, required = false)
-    private XmlClasses excludes;
+    private List<XmlExceptionClass> excludes;
 
 
-    public XmlClasses getIncludes() {
+    public List<XmlExceptionClass> getIncludes() {
         return includes;
     }
 
-    public XmlExceptionClassFilter setIncludes(final XmlClasses includes) {
+    public XmlExceptionClassFilter setIncludes(final List<XmlExceptionClass> includes) {
         this.includes = includes;
         return this;
     }
 
-    public XmlClasses getExcludes() {
+    public List<XmlExceptionClass> getExcludes() {
         return excludes;
     }
 
-    public XmlExceptionClassFilter setExcludes(final XmlClasses excludes) {
+    public XmlExceptionClassFilter setExcludes(final List<XmlExceptionClass> excludes) {
         this.excludes = excludes;
         return this;
     }
@@ -47,15 +49,17 @@ public class XmlExceptionClassFilter implements Mergeable<XmlExceptionClassFilte
 
     @Override
     public XmlExceptionClassFilter copy(final XmlExceptionClassFilter that) {
-        that.setIncludes(Util.copy(this.includes));
-        that.setExcludes(Util.copy(this.excludes));
+        that.setIncludes(Util.copyList(this.includes));
+        that.setExcludes(Util.copyList(this.excludes));
         return that;
     }
 
     @Override
     public XmlExceptionClassFilter merge(final XmlExceptionClassFilter that) {
-        this.setIncludes(Util.merge(this.includes, that.includes));
-        this.setExcludes(Util.merge(this.excludes, that.includes));
+        if (this.merge) {
+            this.includes = Util.listRule(this.includes, that.includes);
+            this.excludes = Util.listRule(this.excludes, that.includes);
+        }
         return this;
     }
 }

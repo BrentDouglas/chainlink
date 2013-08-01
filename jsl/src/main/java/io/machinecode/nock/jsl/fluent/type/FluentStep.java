@@ -7,7 +7,7 @@ import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.partition.Mapper;
 import io.machinecode.nock.jsl.api.partition.Partition;
 import io.machinecode.nock.jsl.api.transition.Transition;
-import io.machinecode.nock.jsl.api.type.Step;
+import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.fluent.FluentListeners;
 import io.machinecode.nock.jsl.fluent.FluentProperties;
 import io.machinecode.nock.jsl.fluent.FluentProperty;
@@ -18,11 +18,11 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class FluentStep<T extends Part, U extends Mapper> extends FluentType<FluentStep<T, U>> implements Step <T, U> {
+public abstract class FluentStep<T extends Part, U extends Mapper> extends FluentExecution<FluentStep<T, U>> implements Step <T, U> {
 
     private String next;
-    private String startLimit;
-    private String allowStartIfComplete;
+    private int startLimit = 0;
+    private boolean allowStartIfComplete = false;
     private final FluentListeners listeners = new FluentListeners();
     private final FluentProperties properties = new FluentProperties();
     private final List<Transition> transitions = new ArrayList<Transition>(0);
@@ -40,21 +40,21 @@ public abstract class FluentStep<T extends Part, U extends Mapper> extends Fluen
     }
 
     @Override
-    public String getStartLimit() {
+    public int getStartLimit() {
         return this.startLimit;
     }
 
-    public FluentStep<T, U> setStartLimit(final String startLimit) {
+    public FluentStep<T, U> setStartLimit(final int startLimit) {
         this.startLimit = startLimit;
         return this;
     }
 
     @Override
-    public String getAllowStartIfComplete() {
+    public boolean isAllowStartIfComplete() {
         return this.allowStartIfComplete;
     }
 
-    public FluentStep<T, U> setAllowStartIfComplete(final String allowStartIfComplete) {
+    public FluentStep<T, U> setAllowStartIfComplete(final boolean allowStartIfComplete) {
         this.allowStartIfComplete = allowStartIfComplete;
         return this;
     }

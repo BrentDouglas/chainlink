@@ -3,13 +3,13 @@ package io.machinecode.nock.jsl.test;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.nock.jsl.xml.XmlJob;
+import io.machinecode.nock.jsl.xml.type.XmlExecution;
 import io.machinecode.nock.jsl.xml.type.XmlFlow;
 import io.machinecode.nock.jsl.xml.type.XmlSplit;
 import io.machinecode.nock.jsl.xml.type.XmlStep;
 import io.machinecode.nock.jsl.xml.util.Inheritable;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.ParentNotFoundException;
-import io.machinecode.nock.jsl.xml.type.XmlType;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -94,13 +94,13 @@ public class TestRepository implements Repository {
             throw new RuntimeException(e);
         }
         repository.values.put(job.getId(), job);
-        for (final XmlType type : job.getTypes()) {
+        for (final XmlExecution type : job.getExecutions()) {
             addType(type);
         }
         return job;
     }
 
-    private void addType(final XmlType that) {
+    private void addType(final XmlExecution that) {
         if (that instanceof XmlFlow) {
             addFlow((XmlFlow) that);
         }
@@ -116,7 +116,7 @@ public class TestRepository implements Repository {
 
     private void addFlow(final XmlFlow that) {
         values.put(that.getId(), that);
-        for (final XmlType type : that.getTypes()) {
+        for (final XmlExecution type : that.getExecutions()) {
             addType(type);
         }
     }

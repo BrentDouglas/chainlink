@@ -5,7 +5,7 @@ import io.machinecode.nock.jsl.xml.type.XmlDecision;
 import io.machinecode.nock.jsl.xml.type.XmlFlow;
 import io.machinecode.nock.jsl.xml.type.XmlSplit;
 import io.machinecode.nock.jsl.xml.type.XmlStep;
-import io.machinecode.nock.jsl.xml.type.XmlType;
+import io.machinecode.nock.jsl.xml.type.XmlExecution;
 import io.machinecode.nock.jsl.xml.util.Inheritable;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -35,10 +35,10 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
     private String id;
 
     @XmlAttribute(name = "version", required = false)
-    private String version;
+    private String version = "1.0";
 
     @XmlAttribute(name = "restartable", required = false)
-    private Boolean restartable;
+    private boolean restartable = true;
 
     @XmlElement(name = "properties", namespace = NAMESPACE, required = false, type = XmlProperties.class)
     private XmlProperties properties;
@@ -52,7 +52,7 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
             @XmlElement(name = "split", required = false, namespace = NAMESPACE, type = XmlSplit.class),
             @XmlElement(name = "step", required = false, namespace = NAMESPACE, type = XmlStep.class)
     })
-    private List<XmlType> types = new ArrayList<XmlType>(0);
+    private List<XmlExecution> executions = new ArrayList<XmlExecution>(0);
 
 
     @Override
@@ -76,11 +76,11 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
     }
 
     @Override
-    public Boolean isRestartable() {
+    public boolean isRestartable() {
         return restartable;
     }
 
-    public XmlJob setRestartable(final Boolean restartable) {
+    public XmlJob setRestartable(final boolean restartable) {
         this.restartable = restartable;
         return this;
     }
@@ -106,12 +106,12 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
     }
 
     @Override
-    public List<XmlType> getTypes() {
-        return types;
+    public List<XmlExecution> getExecutions() {
+        return executions;
     }
 
-    public XmlJob setTypes(final List<XmlType> types) {
-        this.types = types;
+    public XmlJob setExecutions(final List<XmlExecution> executions) {
+        this.executions = executions;
         return this;
     }
 
@@ -121,7 +121,7 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
         if (copy.parent != null) {
             final XmlJob that = repository.findParent(XmlJob.class, copy);
 
-            that.getTypes().clear(); // 4.6.1.1
+            that.getExecutions().clear(); // 4.6.1.1
 
             copy.inheritingElementRule(that); // 4.6.1.2
 
@@ -132,7 +132,7 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
             copy.version = Util.attributeRule(copy.version, that.version); // 4.4.1
             copy.restartable = Util.attributeRule(copy.restartable, that.restartable); // 4.4.1
         }
-        copy.types = Util.inheritingList(repository, this.types);
+        copy.executions = Util.inheritingList(repository, this.executions);
         return copy;
     }
 
@@ -149,7 +149,7 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
         that.setRestartable(this.restartable);
         that.setProperties(Util.copy(this.properties));
         that.setListeners(Util.copy(this.listeners));
-        that.setTypes(Util.copyList(this.types));
+        that.setExecutions(Util.copyList(this.executions));
         return that;
     }
 }

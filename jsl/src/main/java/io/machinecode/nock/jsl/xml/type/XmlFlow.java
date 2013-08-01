@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.type;
 
-import io.machinecode.nock.jsl.api.type.Flow;
+import io.machinecode.nock.jsl.api.execution.Flow;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@javax.xml.bind.annotation.XmlType(name = "flow")
+@XmlType(name = "flow")
 @XmlAccessorType(NONE)
-public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow>, Flow {
+public class XmlFlow extends Inheritable<XmlFlow> implements XmlExecution<XmlFlow>, Flow {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)
@@ -41,7 +42,7 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow>, F
             @XmlElement(name = "split", namespace = NAMESPACE, required = false, type = XmlSplit.class),
             @XmlElement(name = "step", namespace = NAMESPACE, required = false, type = XmlStep.class)
     })
-    private List<XmlType> types = new ArrayList<XmlType>();
+    private List<XmlExecution> executions = new ArrayList<XmlExecution>();
 
     @XmlElements({
             @XmlElement(name = "end", namespace = NAMESPACE, required = false, type = XmlEnd.class),
@@ -73,12 +74,12 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow>, F
     }
 
     @Override
-    public List<XmlType> getTypes() {
-        return types;
+    public List<XmlExecution> getExecutions() {
+        return executions;
     }
 
-    public XmlFlow setTypes(final List<XmlType> types) {
-        this.types = types;
+    public XmlFlow setExecutions(final List<XmlExecution> executions) {
+        this.executions = executions;
         return this;
     }
 
@@ -100,7 +101,7 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow>, F
 
             that.transitions.clear(); // 4.6.3.1 Drop parent transitions
 
-            copy.types.clear(); // 4.6.3.2
+            copy.executions.clear(); // 4.6.3.2
 
             copy.inheritingElementRule(that); // 4.6.3.3
 
@@ -108,9 +109,9 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow>, F
             copy.id = Util.attributeRule(copy.id, that.id); // 4.1
             copy.next = Util.attributeRule(copy.next, that.next); // 4.1
 
-            copy.types = Util.inheritingList(repository, that.types);
+            copy.executions = Util.inheritingList(repository, that.executions);
         } else {
-            copy.types = Util.inheritingList(repository, this.types);
+            copy.executions = Util.inheritingList(repository, this.executions);
         }
 
         return copy;
@@ -126,7 +127,7 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlType<XmlFlow>, F
         super.copy(that);
         that.setId(this.id);
         that.setNext(this.next);
-        that.setTypes(Util.copyList(this.types)); //TODO Skip these on inherit call
+        that.setExecutions(Util.copyList(this.executions)); //TODO Skip these on inherit call
         that.setTransitions(Util.copyList(this.transitions));
         return that;
     }

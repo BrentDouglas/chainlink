@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.api.type;
+package io.machinecode.nock.jsl.api.execution;
 
 import io.machinecode.nock.jsl.api.Listeners;
 import io.machinecode.nock.jsl.api.Part;
@@ -16,13 +16,13 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public interface Step<T extends Part, U extends Mapper> extends Type {
+public interface Step<T extends Part, U extends Mapper> extends Execution {
 
     String getNext();
 
-    String getStartLimit();
+    int getStartLimit();
 
-    String getAllowStartIfComplete();
+    boolean isAllowStartIfComplete();
 
     Listeners getListeners();
 

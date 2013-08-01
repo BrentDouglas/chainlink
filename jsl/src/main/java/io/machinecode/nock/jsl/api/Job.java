@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.api;
 
-import io.machinecode.nock.jsl.api.type.Type;
+import io.machinecode.nock.jsl.api.execution.Execution;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.List;
@@ -19,11 +19,11 @@ public interface Job {
 
     String getVersion();
 
-    Boolean isRestartable();
+    boolean isRestartable();
 
     Properties getProperties();
 
     Listeners getListeners();
 
-    List<? extends Type> getTypes();
+    List<? extends Execution> getExecutions();
 }

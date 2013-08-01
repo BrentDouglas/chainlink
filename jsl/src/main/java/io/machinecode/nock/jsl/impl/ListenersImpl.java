@@ -3,8 +3,9 @@ package io.machinecode.nock.jsl.impl;
 
 import io.machinecode.nock.jsl.api.Listener;
 import io.machinecode.nock.jsl.api.Listeners;
+import io.machinecode.nock.jsl.impl.Util.Transformer;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,12 +13,20 @@ import java.util.List;
  */
 public class ListenersImpl implements Listeners {
 
+    private static final Transformer<Listener> LISTENER_TRANSFORMER = new Transformer<Listener>() {
+        @Override
+        public Listener transform(final Listener that) {
+            return new ListenerImpl(that);
+        }
+    };
+
     private final List<Listener> listeners;
 
     public ListenersImpl(final Listeners that) {
-        this.listeners = new ArrayList<Listener>(that.getListeners().size());
-        for (final Listener listener : that.getListeners()) {
-            this.listeners.add(new ListenerImpl(listener));
+        if (that == null) {
+            this.listeners = Collections.emptyList();
+        } else {
+            this.listeners = Util.immutableCopy(that.getListeners(), LISTENER_TRANSFORMER);
         }
     }
 

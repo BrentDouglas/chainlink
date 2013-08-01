@@ -3,7 +3,7 @@ package io.machinecode.nock.jsl.impl.type;
 import io.machinecode.nock.jsl.api.chunk.Chunk;
 import io.machinecode.nock.jsl.api.partition.Partition;
 import io.machinecode.nock.jsl.api.partition.PartitionMapper;
-import io.machinecode.nock.jsl.api.type.Step;
+import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.impl.chunk.ChunkImpl;
 import io.machinecode.nock.jsl.impl.partition.MapperPartitionImpl;
 
@@ -17,8 +17,8 @@ public class ChunkMapperStepImpl extends StepImpl<Chunk, PartitionMapper> implem
 
     public ChunkMapperStepImpl(final Step<Chunk, PartitionMapper> that) {
         super(that);
-        this.part = new ChunkImpl(that.getPart());
-        this.partition = new MapperPartitionImpl(that.getPartition());
+        this.part = that.getPart() == null ? null : new ChunkImpl(that.getPart());
+        this.partition = that.getPartition() == null ? null : new MapperPartitionImpl(that.getPartition());
     }
 
     @Override

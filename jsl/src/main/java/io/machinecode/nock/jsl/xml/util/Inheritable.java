@@ -1,10 +1,10 @@
 package io.machinecode.nock.jsl.xml.util;
 
 import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.type.XmlExecution;
 import io.machinecode.nock.jsl.xml.type.XmlFlow;
 import io.machinecode.nock.jsl.xml.type.XmlSplit;
 import io.machinecode.nock.jsl.xml.type.XmlStep;
-import io.machinecode.nock.jsl.xml.type.XmlType;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -82,7 +82,7 @@ public abstract class Inheritable<T extends Inheritable<T>> implements Copyable<
         this.jslName = null;
     }
 
-    public static void inheritType(final XmlType that, final Repository repository) {
+    public static void inheritType(final XmlExecution that, final Repository repository) {
         if (that instanceof XmlFlow) {
             ((XmlFlow)that).inherit(repository);
         }
@@ -90,7 +90,7 @@ public abstract class Inheritable<T extends Inheritable<T>> implements Copyable<
             ((XmlStep)that).inherit(repository);
         }
         if (that instanceof XmlSplit) {
-            for (final XmlType type : ((XmlSplit)that).getFlows()) {
+            for (final XmlExecution type : ((XmlSplit)that).getFlows()) {
                 inheritType(type, repository);
             }
         }

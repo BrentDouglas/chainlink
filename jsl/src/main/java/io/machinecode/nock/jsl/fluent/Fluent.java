@@ -2,7 +2,7 @@ package io.machinecode.nock.jsl.fluent;
 
 import io.machinecode.nock.jsl.fluent.chunk.FluentCheckpointAlgorithm;
 import io.machinecode.nock.jsl.fluent.chunk.FluentChunk;
-import io.machinecode.nock.jsl.fluent.chunk.FluentClasses;
+import io.machinecode.nock.jsl.fluent.chunk.FluentExceptionClass;
 import io.machinecode.nock.jsl.fluent.chunk.FluentExceptionClassFilter;
 import io.machinecode.nock.jsl.fluent.chunk.FluentItemProcessor;
 import io.machinecode.nock.jsl.fluent.chunk.FluentItemReader;
@@ -85,7 +85,7 @@ public class Fluent {
         return new FluentChunkPlanStep();
     }
 
-    // Type
+    // Execution
 
     public static FluentEnd end() {
         return new FluentEnd();
@@ -143,8 +143,8 @@ public class Fluent {
         return new FluentChunk();
     }
 
-    public static FluentClasses classes() {
-        return new FluentClasses();
+    public static FluentExceptionClass classes() {
+        return new FluentExceptionClass();
     }
 
     public static FluentExceptionClassFilter filter() {

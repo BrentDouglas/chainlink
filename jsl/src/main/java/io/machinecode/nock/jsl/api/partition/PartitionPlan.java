@@ -7,9 +7,9 @@ import io.machinecode.nock.jsl.api.Properties;
  */
 public interface PartitionPlan extends Mapper {
 
-    String getPartitions();
+    int getPartitions();
 
-    String getThreads();
+    Integer getThreads();
 
     Properties getProperties();
 }

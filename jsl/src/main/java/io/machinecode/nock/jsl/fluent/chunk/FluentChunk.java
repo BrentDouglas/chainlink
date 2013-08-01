@@ -14,11 +14,11 @@ import io.machinecode.nock.jsl.fluent.FluentProperties;
  */
 public class FluentChunk implements Chunk {
 
-    private String checkpointPolicy;
-    private String itemCount;
-    private String timeLimit;
-    private String skipLimit;
-    private String retryLimit;
+    private String checkpointPolicy = CheckpointPolicy.ITEM;
+    private int itemCount = 10;
+    private int timeLimit = 0;
+    private int skipLimit = 0;
+    private int retryLimit = 0;
     private ItemReader reader;
     private ItemProcessor processor;
     private ItemWriter writer;
@@ -40,41 +40,41 @@ public class FluentChunk implements Chunk {
     }
 
     @Override
-    public String getItemCount() {
+    public int getItemCount() {
         return this.itemCount;
     }
 
-    public FluentChunk setItemCount(final String itemCount) {
+    public FluentChunk setItemCount(final int itemCount) {
         this.itemCount = itemCount;
         return this;
     }
 
     @Override
-    public String getTimeLimit() {
+    public int getTimeLimit() {
         return this.timeLimit;
     }
 
-    public FluentChunk setTimeLimit(final String timeLimit) {
+    public FluentChunk setTimeLimit(final int timeLimit) {
         this.timeLimit = timeLimit;
         return this;
     }
 
     @Override
-    public String getSkipLimit() {
+    public int getSkipLimit() {
         return this.skipLimit;
     }
 
-    public FluentChunk setSkipLimit(final String skipLimit) {
+    public FluentChunk setSkipLimit(final int skipLimit) {
         this.skipLimit = skipLimit;
         return this;
     }
 
     @Override
-    public String getRetryLimit() {
+    public int getRetryLimit() {
         return this.retryLimit;
     }
 
-    public FluentChunk setRetryLimit(final String retryLimit) {
+    public FluentChunk setRetryLimit(final int retryLimit) {
         this.retryLimit = retryLimit;
         return this;
     }

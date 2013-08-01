@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.type;
 
-import io.machinecode.nock.jsl.api.type.Split;
+import io.machinecode.nock.jsl.api.execution.Split;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +18,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@javax.xml.bind.annotation.XmlType(name = "split")
+@XmlType(name = "split")
 @XmlAccessorType(NONE)
-public class XmlSplit implements XmlType<XmlSplit>, Split {
+public class XmlSplit implements XmlExecution<XmlSplit>, Split {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)

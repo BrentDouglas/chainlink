@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.fluent.type;
 
 import io.machinecode.nock.jsl.api.transition.Transition;
-import io.machinecode.nock.jsl.api.type.Decision;
+import io.machinecode.nock.jsl.api.execution.Decision;
 import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
 
 import java.util.ArrayList;

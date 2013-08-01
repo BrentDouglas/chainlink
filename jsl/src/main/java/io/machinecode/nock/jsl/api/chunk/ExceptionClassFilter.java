@@ -1,11 +1,13 @@
 package io.machinecode.nock.jsl.api.chunk;
 
+import java.util.List;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public interface ExceptionClassFilter {
 
-    Classes getIncludes();
+    List<? extends ExceptionClass> getIncludes();
 
-    Classes getExcludes();
+    List<? extends ExceptionClass> getExcludes();
 }

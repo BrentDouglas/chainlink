@@ -3,7 +3,10 @@ package io.machinecode.nock.jsl.impl;
 import io.machinecode.nock.jsl.api.Job;
 import io.machinecode.nock.jsl.api.Listeners;
 import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.type.Type;
+import io.machinecode.nock.jsl.api.execution.Execution;
+import io.machinecode.nock.jsl.impl.type.ExecutionImpl;
+import io.machinecode.nock.jsl.validation.InvalidJobDefinitionException;
+import io.machinecode.nock.jsl.validation.JobValidator;
 
 import java.util.List;
 
@@ -14,18 +17,19 @@ public class JobImpl implements Job {
 
     private final String id;
     private final String version;
-    private final Boolean restartable;
+    private final boolean restartable;
     private final Properties properties;
     private final Listeners listeners;
-    private final List<? extends Type> types;
+    private final List<? extends Execution> executions;
 
-    public JobImpl(final Job job) {
-        this.id = job.getId();
-        this.version = job.getVersion();
-        this.restartable = job.isRestartable();
-        this.properties = new PropertiesImpl(job.getProperties());
-        this.listeners = new ListenersImpl(job.getListeners());
-        this.types = Util.immutableCopy(job.getTypes()); //TODO
+    public JobImpl(final Job that) throws InvalidJobDefinitionException {
+        JobValidator.INSTANCE.validate(that);
+        this.id = that.getId();
+        this.version = that.getVersion();
+        this.restartable = that.isRestartable();
+        this.properties = new PropertiesImpl(that.getProperties());
+        this.listeners = new ListenersImpl(that.getListeners());
+        this.executions = ExecutionImpl.immutableCopyExecutions(that.getExecutions());
     }
 
     @Override
@@ -39,7 +43,7 @@ public class JobImpl implements Job {
     }
 
     @Override
-    public Boolean isRestartable() {
+    public boolean isRestartable() {
         return this.restartable;
     }
 
@@ -54,7 +58,7 @@ public class JobImpl implements Job {
     }
 
     @Override
-    public List<? extends Type> getTypes() {
-        return this.types;
+    public List<? extends Execution> getExecutions() {
+        return this.executions;
     }
 }

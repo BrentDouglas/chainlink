@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.type;
 
-import io.machinecode.nock.jsl.api.type.Step;
+import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlListeners;
@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +32,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@javax.xml.bind.annotation.XmlType(name = "step")
+@XmlType(name = "step")
 @XmlAccessorType(NONE)
-public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep>, Step {
+public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlStep>, Step {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)
@@ -43,10 +44,10 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep>, S
     private String next;
 
     @XmlAttribute(name = "start-limit", required = false)
-    private String startLimit;
+    private int startLimit = 0;
 
     @XmlAttribute(name = "allow-start-if-complete", required = false)
-    private String allowStartIfComplete;
+    private boolean allowStartIfComplete = false;
 
     @XmlElement(name = "listeners", namespace = NAMESPACE, required = false)
     private XmlListeners listeners;
@@ -93,21 +94,21 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlType<XmlStep>, S
     }
 
     @Override
-    public String getStartLimit() {
+    public int getStartLimit() {
         return startLimit;
     }
 
-    public XmlStep setStartLimit(final String startLimit) {
+    public XmlStep setStartLimit(final int startLimit) {
         this.startLimit = startLimit;
         return this;
     }
 
     @Override
-    public String getAllowStartIfComplete() {
+    public boolean isAllowStartIfComplete() {
         return allowStartIfComplete;
     }
 
-    public XmlStep setAllowStartIfComplete(final String allowStartIfComplete) {
+    public XmlStep setAllowStartIfComplete(final boolean allowStartIfComplete) {
         this.allowStartIfComplete = allowStartIfComplete;
         return this;
     }

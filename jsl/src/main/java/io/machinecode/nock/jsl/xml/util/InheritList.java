@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.util;
 
 import io.machinecode.nock.jsl.xml.Repository;
-import io.machinecode.nock.jsl.xml.type.XmlType;
+import io.machinecode.nock.jsl.xml.type.XmlExecution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class InheritList<T extends XmlType<T> & Copyable<T>> extends ForwardingList<T> implements List<T> {
+public class InheritList<T extends XmlExecution<T> & Copyable<T>> extends ForwardingList<T> implements List<T> {
 
     public InheritList(final Repository repository, final List<T> delegate) {
         super(new ArrayList<T>(delegate.size()));
