@@ -27,7 +27,7 @@ public class FluentExceptionClassFilter implements ExceptionClassFilter {
 
     public FluentExceptionClassFilter setIncludes(final Class<? extends Throwable>... includes) {
         for (final Class<? extends Throwable> include : includes) {
-            this.includes.add(new FluentExceptionClass().setClassName(include.getSimpleName()));
+            this.includes.add(new FluentExceptionClass().setClassName(include.getCanonicalName()));
         }
         return this;
     }
@@ -38,7 +38,7 @@ public class FluentExceptionClassFilter implements ExceptionClassFilter {
     }
 
     public FluentExceptionClassFilter setInclude(final Class<? extends Throwable> include) {
-        this.includes.add(new FluentExceptionClass().setClassName(include.getSimpleName()));
+        this.includes.add(new FluentExceptionClass().setClassName(include.getCanonicalName()));
         return this;
     }
 
@@ -56,7 +56,7 @@ public class FluentExceptionClassFilter implements ExceptionClassFilter {
 
     public FluentExceptionClassFilter setExcludes(final Class<? extends Throwable>... excludes) {
         for (final Class<? extends Throwable> exclude : excludes) {
-            this.excludes.add(new FluentExceptionClass().setClassName(exclude.getSimpleName()));
+            this.excludes.add(new FluentExceptionClass().setClassName(exclude.getCanonicalName()));
         }
         return this;
     }
@@ -67,7 +67,7 @@ public class FluentExceptionClassFilter implements ExceptionClassFilter {
     }
 
     public FluentExceptionClassFilter setExclude(final Class<? extends Throwable> exclude) {
-        this.excludes.add(new FluentExceptionClass().setClassName(exclude.getSimpleName()));
+        this.excludes.add(new FluentExceptionClass().setClassName(exclude.getCanonicalName()));
         return this;
     }
 }

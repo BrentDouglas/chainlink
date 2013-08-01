@@ -1,9 +1,10 @@
-package io.machinecode.nock.jsl.impl.type;
+package io.machinecode.nock.jsl.impl.execution;
 
+import io.machinecode.nock.jsl.api.execution.Execution;
 import io.machinecode.nock.jsl.api.execution.Flow;
 import io.machinecode.nock.jsl.api.execution.Split;
 import io.machinecode.nock.jsl.impl.Util;
-import io.machinecode.nock.jsl.impl.Util.Transformer;
+import io.machinecode.nock.jsl.impl.Util.NextTransformer;
 
 import java.util.List;
 
@@ -12,19 +13,19 @@ import java.util.List;
  */
 public class SplitImpl extends ExecutionImpl implements Split {
 
-    private static final Transformer<Flow> FLOW_TRANSFORMER = new Transformer<Flow>() {
+    private static final NextTransformer<Flow> FLOW_TRANSFORMER = new NextTransformer<Flow>() {
         @Override
-        public Flow transform(final Flow that) {
-            return new FlowImpl(that);
+        public Flow transform(final Flow that, final Flow next) {
+            return new FlowImpl(that, next);
         }
     };
 
     private final String next;
     private final List<Flow> flows;
 
-    public SplitImpl(final Split that) {
+    public SplitImpl(final Split that, final Execution execution) {
         super(that);
-        this.next = that.getNext();
+        this.next = that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext();
         this.flows = Util.immutableCopy(that.getFlows(), FLOW_TRANSFORMER);
     }
 

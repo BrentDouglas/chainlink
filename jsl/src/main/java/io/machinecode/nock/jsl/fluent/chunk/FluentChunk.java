@@ -1,13 +1,11 @@
 package io.machinecode.nock.jsl.fluent.chunk;
 
-import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.chunk.CheckpointAlgorithm;
 import io.machinecode.nock.jsl.api.chunk.Chunk;
 import io.machinecode.nock.jsl.api.chunk.ExceptionClassFilter;
 import io.machinecode.nock.jsl.api.chunk.ItemProcessor;
 import io.machinecode.nock.jsl.api.chunk.ItemReader;
 import io.machinecode.nock.jsl.api.chunk.ItemWriter;
-import io.machinecode.nock.jsl.fluent.FluentProperties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -26,7 +24,6 @@ public class FluentChunk implements Chunk {
     private ExceptionClassFilter skippableExceptionClasses;
     private ExceptionClassFilter retryableExceptionClasses;
     private ExceptionClassFilter noRollbackExceptionClasses;
-    private final FluentProperties properties = new FluentProperties();
 
 
     @Override
@@ -146,16 +143,6 @@ public class FluentChunk implements Chunk {
 
     public FluentChunk setNoRollbackExceptionClasses(final ExceptionClassFilter noRollbackExceptionClasses) {
         this.noRollbackExceptionClasses = noRollbackExceptionClasses;
-        return this;
-    }
-
-    @Override
-    public Properties getProperties() {
-        return this.properties;
-    }
-
-    public FluentChunk addProperty(final String name, final String value) {
-        this.properties.addProperty(name, value);
         return this;
     }
 }

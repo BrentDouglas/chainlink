@@ -20,6 +20,8 @@ public class SplitValidator extends Validator<Split> {
     public void doValidate(final Split that, final ValidationContext context) {
         if (that.getId() == null) {
             context.addProblem("Attribute 'id' is required.");
+        } else {
+            context.addId(that.getId());
         }
 
         if (that.getFlows() != null) {

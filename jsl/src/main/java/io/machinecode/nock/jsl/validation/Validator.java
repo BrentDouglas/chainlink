@@ -25,7 +25,7 @@ public abstract class Validator<T> {
      * @param parent
      */
     public void validate(T that, final ValidationContext parent) {
-        final ValidationContext child = new ValidationContext(element);
+        final ValidationContext child = new ValidationContext(element, parent);
         parent.addChild(child);
         doValidate(that, child);
     }

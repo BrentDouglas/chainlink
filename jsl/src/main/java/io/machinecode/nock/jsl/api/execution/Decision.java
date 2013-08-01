@@ -14,5 +14,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public interface Decision extends Execution, PropertyReference {
 
+    String ELEMENT = "decision";
+
     List<? extends Transition> getTransitions();
 }

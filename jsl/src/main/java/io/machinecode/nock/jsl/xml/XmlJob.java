@@ -1,11 +1,12 @@
 package io.machinecode.nock.jsl.xml;
 
 import io.machinecode.nock.jsl.api.Job;
-import io.machinecode.nock.jsl.xml.type.XmlDecision;
-import io.machinecode.nock.jsl.xml.type.XmlFlow;
-import io.machinecode.nock.jsl.xml.type.XmlSplit;
-import io.machinecode.nock.jsl.xml.type.XmlStep;
-import io.machinecode.nock.jsl.xml.type.XmlExecution;
+import io.machinecode.nock.jsl.impl.JobImpl;
+import io.machinecode.nock.jsl.xml.execution.XmlDecision;
+import io.machinecode.nock.jsl.xml.execution.XmlFlow;
+import io.machinecode.nock.jsl.xml.execution.XmlSplit;
+import io.machinecode.nock.jsl.xml.execution.XmlStep;
+import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 import io.machinecode.nock.jsl.xml.util.Inheritable;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -151,5 +152,9 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
         that.setListeners(Util.copy(this.listeners));
         that.setExecutions(Util.copyList(this.executions));
         return that;
+    }
+
+    public JobImpl build() {
+        return new JobImpl(this);
     }
 }

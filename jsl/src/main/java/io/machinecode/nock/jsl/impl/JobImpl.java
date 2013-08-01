@@ -4,7 +4,8 @@ import io.machinecode.nock.jsl.api.Job;
 import io.machinecode.nock.jsl.api.Listeners;
 import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.execution.Execution;
-import io.machinecode.nock.jsl.impl.type.ExecutionImpl;
+import io.machinecode.nock.jsl.impl.execution.ExecutionImpl;
+import io.machinecode.nock.jsl.validation.CycleCrawler;
 import io.machinecode.nock.jsl.validation.InvalidJobDefinitionException;
 import io.machinecode.nock.jsl.validation.JobValidator;
 
@@ -30,6 +31,7 @@ public class JobImpl implements Job {
         this.properties = new PropertiesImpl(that.getProperties());
         this.listeners = new ListenersImpl(that.getListeners());
         this.executions = ExecutionImpl.immutableCopyExecutions(that.getExecutions());
+        CycleCrawler.crawl(this);
     }
 
     @Override

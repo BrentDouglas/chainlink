@@ -1,7 +1,6 @@
 package io.machinecode.nock.jsl.api.chunk;
 
 import io.machinecode.nock.jsl.api.Part;
-import io.machinecode.nock.jsl.api.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -36,6 +35,4 @@ public interface Chunk extends Part {
     ExceptionClassFilter getRetryableExceptionClasses();
 
     ExceptionClassFilter getNoRollbackExceptionClasses();
-
-    Properties getProperties();
 }

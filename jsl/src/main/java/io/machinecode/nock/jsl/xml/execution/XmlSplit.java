@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.xml.type;
+package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.jsl.api.execution.Split;
 import io.machinecode.nock.jsl.xml.Repository;

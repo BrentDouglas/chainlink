@@ -24,9 +24,8 @@ public class PartitionPlanValidator extends Validator<PartitionPlan> {
         if (that.getPartitions() < 0) {
             context.addProblem("Attribute 'partitions' must be positive. Found '" + that.getPartitions() + "'.");
         }
-        if (that.getThreads() == null) {
-            context.addProblem("Attribute 'threads' must not be null");
-        } else if (that.getThreads() < 0) {
+        //This can be null and will get set in the PartitionPlanImpl constructor
+        if (that.getThreads() != null && that.getThreads() < 0) {
             context.addProblem("Attribute 'threads' must be positive. Found '" + that.getThreads() + "'.");
         }
     }

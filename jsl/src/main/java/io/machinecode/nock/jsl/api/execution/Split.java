@@ -11,6 +11,8 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public interface Split extends Execution {
 
+    String ELEMENT = "split";
+
     String getNext();
 
     List<? extends Flow> getFlows();

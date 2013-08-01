@@ -1,8 +1,8 @@
-package io.machinecode.nock.jsl.impl.type;
+package io.machinecode.nock.jsl.impl.execution;
 
 import io.machinecode.nock.jsl.api.execution.Execution;
-import io.machinecode.nock.jsl.api.transition.Transition;
 import io.machinecode.nock.jsl.api.execution.Flow;
+import io.machinecode.nock.jsl.api.transition.Transition;
 import io.machinecode.nock.jsl.impl.transition.TransitionImpl;
 
 import java.util.List;
@@ -16,9 +16,9 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     private final List<Execution> executions;
     private final List<Transition> transitions;
 
-    public FlowImpl(final Flow that) {
+    public FlowImpl(final Flow that, final Execution execution) {
         super(that);
-        this.next = that.getNext();
+        this.next = that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext();
         this.executions = ExecutionImpl.immutableCopyExecutions(that.getExecutions());
         this.transitions = TransitionImpl.immutableCopyTransitions(that.getTransitions());
     }

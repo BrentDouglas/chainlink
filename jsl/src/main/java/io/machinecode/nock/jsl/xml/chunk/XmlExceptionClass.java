@@ -7,7 +7,6 @@ import io.machinecode.nock.jsl.xml.util.Util;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
@@ -16,9 +15,10 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public class XmlExceptionClass implements Mergeable<XmlExceptionClass>, ExceptionClass {
 
-    @XmlAttribute(name = "class", namespace = NAMESPACE, required = true)
+    @XmlAttribute(name = "class", required = true)
     private String className;
 
+    @Override
     public String getClassName() {
         return className;
     }

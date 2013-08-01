@@ -7,6 +7,7 @@ import io.machinecode.nock.jsl.validation.PartValidator;
 import io.machinecode.nock.jsl.validation.PropertiesValidator;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;
+import io.machinecode.nock.jsl.validation.partition.PartitionValidator;
 import io.machinecode.nock.jsl.validation.transition.TransitionValidator;
 
 /**
@@ -24,6 +25,11 @@ public class StepValidator extends Validator<Step> {
     public void doValidate(final Step that, final ValidationContext context) {
         if (that.getId() == null) {
             context.addProblem("Attribute 'id' is required.");
+        } else {
+            context.addId(that.getId());
+        }
+        if (that.getStartLimit() < 0) {
+            context.addProblem("Attribute 'start-limit' must be positive. Found '" + that.getStartLimit() + "'.");
         }
 
         if (that.getTransitions() != null) {
@@ -39,7 +45,7 @@ public class StepValidator extends Validator<Step> {
             PartValidator.validate(that.getPart(), context);
         }
         if (that.getPartition() != null) {
-            //TODO
+            PartitionValidator.INSTANCE.validate(that.getPartition(), context);
         }
         if (that.getListeners() != null) {
             ListenersValidator.INSTANCE.validate(that.getListeners(), context);
@@ -48,8 +54,5 @@ public class StepValidator extends Validator<Step> {
             PropertiesValidator.INSTANCE.validate(that.getProperties(), context);
         }
         //TODO Traverse that.next for cycles
-        if (that.getStartLimit() < 0) {
-            context.addProblem("Attribute 'start-limit' must be positive. Found '" + that.getStartLimit() + "'.");
-        }
     }
 }

@@ -2,7 +2,6 @@ package io.machinecode.nock.jsl.xml.chunk;
 
 import io.machinecode.nock.jsl.api.chunk.Chunk;
 import io.machinecode.nock.jsl.xml.XmlPart;
-import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -53,9 +52,6 @@ public class XmlChunk implements XmlPart<XmlChunk>, Chunk {
 
     @XmlElement(name = "no-rollback-exception-classes", namespace = NAMESPACE, required = false)
     private XmlExceptionClassFilter noRollbackExceptionClasses;
-
-    @XmlElement(name = "properties", namespace = NAMESPACE, required = false)
-    private XmlProperties properties;
 
 
     public String getCheckpointPolicy() {
@@ -166,15 +162,6 @@ public class XmlChunk implements XmlPart<XmlChunk>, Chunk {
         return this;
     }
 
-    public XmlProperties getProperties() {
-        return properties;
-    }
-
-    public XmlChunk setProperties(final XmlProperties properties) {
-        this.properties = properties;
-        return this;
-    }
-
     @Override
     public XmlChunk copy() {
         return copy(new XmlChunk());
@@ -194,7 +181,6 @@ public class XmlChunk implements XmlPart<XmlChunk>, Chunk {
         that.setSkippableExceptionClasses(Util.copy(this.skippableExceptionClasses));
         that.setRetryableExceptionClasses(Util.copy(this.retryableExceptionClasses));
         that.setNoRollbackExceptionClasses(Util.copy(this.noRollbackExceptionClasses));
-        that.setProperties(Util.copy(this.properties));
         return that;
     }
 
@@ -212,7 +198,6 @@ public class XmlChunk implements XmlPart<XmlChunk>, Chunk {
         this.setSkippableExceptionClasses(Util.merge(this.skippableExceptionClasses, that.skippableExceptionClasses));
         this.setRetryableExceptionClasses(Util.merge(this.retryableExceptionClasses, that.retryableExceptionClasses));
         this.setNoRollbackExceptionClasses(Util.merge(this.noRollbackExceptionClasses, that.noRollbackExceptionClasses));
-        this.setProperties(Util.merge(this.properties, that.properties));
         return this;
     }
 }

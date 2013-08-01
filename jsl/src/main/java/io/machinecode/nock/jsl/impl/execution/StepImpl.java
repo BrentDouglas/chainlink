@@ -1,8 +1,9 @@
-package io.machinecode.nock.jsl.impl.type;
+package io.machinecode.nock.jsl.impl.execution;
 
 import io.machinecode.nock.jsl.api.Listeners;
 import io.machinecode.nock.jsl.api.Part;
 import io.machinecode.nock.jsl.api.Properties;
+import io.machinecode.nock.jsl.api.execution.Execution;
 import io.machinecode.nock.jsl.api.partition.Mapper;
 import io.machinecode.nock.jsl.api.transition.Transition;
 import io.machinecode.nock.jsl.api.execution.Step;
@@ -24,9 +25,9 @@ public abstract class StepImpl<T extends Part, U extends Mapper> extends Executi
     private final Properties properties;
     private final List<Transition> transitions;
 
-    public StepImpl(final Step<T, U> that) {
+    public StepImpl(final Step<T, U> that, final Execution execution) {
         super(that);
-        this.next = that.getNext();
+        this.next = that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext();
         this.startLimit = that.getStartLimit();
         this.allowStartIfComplete = that.isAllowStartIfComplete();
         this.listeners = new ListenersImpl(that.getListeners());

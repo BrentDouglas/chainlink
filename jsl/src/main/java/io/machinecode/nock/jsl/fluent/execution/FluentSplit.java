@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.fluent.type;
+package io.machinecode.nock.jsl.fluent.execution;
 
 import io.machinecode.nock.jsl.api.execution.Flow;
 import io.machinecode.nock.jsl.api.execution.Split;

@@ -1,7 +1,10 @@
 package io.machinecode.nock.jsl.validation;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -10,6 +13,7 @@ public class ValidationContext {
     public static final String ERROR = "FAIL  ";
     public static final String PLAIN = "      ";
 
+    private final Set<String> ids;
     private final List<String> problems = new ArrayList<String>(0);
     private final List<ValidationContext> children = new ArrayList<ValidationContext>(0);
     private final String element;
@@ -17,6 +21,12 @@ public class ValidationContext {
 
     public ValidationContext(final String element) {
         this.element = element;
+        this.ids = new THashSet<String>(0);
+    }
+
+    public ValidationContext(final String element, final ValidationContext parent) {
+        this.element = element;
+        this.ids = parent.ids;
     }
 
     public final StringBuilder toTree(final StringBuilder builder) {
@@ -41,11 +51,11 @@ public class ValidationContext {
                 final String problem = problems.get(i);
                 builder.append(PLAIN);
                 if (i == 0) {
-                    ws(builder, depth, "|  ", "|  ", "\\->    ");
+                    ws(builder, depth, "|  ", "|  ", "\\->   ");
                 } else if (i == problems.size() - 1) {
-                    ws(builder, depth, "|  ", "|  ", " \\->   ");
+                    ws(builder, depth, "|  ", "|  ", " \\->  ");
                 } else {
-                    ws(builder, depth, "|  ", "|  ", " |->   ");
+                    ws(builder, depth, "|  ", "|  ", " |->  ");
                 }
                 ++i;
                 builder.append(problem)
@@ -66,6 +76,12 @@ public class ValidationContext {
     public void addProblem(final String problem) {
         this.problems.add(problem);
         failed = true;
+    }
+
+    public void addId(final String id) {
+        if (!this.ids.add(id)) {
+            addProblem("id '" + id + "' defined multiple times.");
+        }
     }
 
     void addChild(final ValidationContext child) {

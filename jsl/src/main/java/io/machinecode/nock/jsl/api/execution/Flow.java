@@ -13,6 +13,8 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public interface Flow extends Execution {
 
+    String ELEMENT = "flow";
+
     String getNext();
 
     List<? extends Execution> getExecutions();

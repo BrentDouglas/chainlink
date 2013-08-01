@@ -1,13 +1,11 @@
 package io.machinecode.nock.jsl.impl.chunk;
 
-import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.chunk.CheckpointAlgorithm;
 import io.machinecode.nock.jsl.api.chunk.Chunk;
 import io.machinecode.nock.jsl.api.chunk.ExceptionClassFilter;
 import io.machinecode.nock.jsl.api.chunk.ItemProcessor;
 import io.machinecode.nock.jsl.api.chunk.ItemReader;
 import io.machinecode.nock.jsl.api.chunk.ItemWriter;
-import io.machinecode.nock.jsl.impl.PropertiesImpl;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -26,7 +24,6 @@ public class ChunkImpl implements Chunk {
     private final ExceptionClassFilter skippableExceptionClasses;
     private final ExceptionClassFilter retryableExceptionClasses;
     private final ExceptionClassFilter noRollbackExceptionClasses;
-    private final Properties properties;
 
     public ChunkImpl(final Chunk that) {
         this.checkpointPolicy = that.getCheckpointPolicy();
@@ -41,7 +38,6 @@ public class ChunkImpl implements Chunk {
         this.skippableExceptionClasses = new ExceptionClassFilterImpl(that.getSkippableExceptionClasses());
         this.retryableExceptionClasses = new ExceptionClassFilterImpl(that.getRetryableExceptionClasses());
         this.noRollbackExceptionClasses = new ExceptionClassFilterImpl(that.getNoRollbackExceptionClasses());
-        this.properties = new PropertiesImpl(that.getProperties());
     }
 
     @Override
@@ -102,10 +98,5 @@ public class ChunkImpl implements Chunk {
     @Override
     public ExceptionClassFilter getNoRollbackExceptionClasses() {
         return this.noRollbackExceptionClasses;
-    }
-
-    @Override
-    public Properties getProperties() {
-        return this.properties;
     }
 }

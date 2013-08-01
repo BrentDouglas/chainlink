@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.util;
 
 import io.machinecode.nock.jsl.xml.Repository;
-import io.machinecode.nock.jsl.xml.type.XmlExecution;
+import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 
 import java.util.ArrayList;
 import java.util.List;

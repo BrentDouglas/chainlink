@@ -1,10 +1,10 @@
 package io.machinecode.nock.jsl.xml.util;
 
 import io.machinecode.nock.jsl.xml.Repository;
-import io.machinecode.nock.jsl.xml.type.XmlExecution;
-import io.machinecode.nock.jsl.xml.type.XmlFlow;
-import io.machinecode.nock.jsl.xml.type.XmlSplit;
-import io.machinecode.nock.jsl.xml.type.XmlStep;
+import io.machinecode.nock.jsl.xml.execution.XmlExecution;
+import io.machinecode.nock.jsl.xml.execution.XmlFlow;
+import io.machinecode.nock.jsl.xml.execution.XmlSplit;
+import io.machinecode.nock.jsl.xml.execution.XmlStep;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

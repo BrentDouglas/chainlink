@@ -22,6 +22,8 @@ public class FlowValidator extends Validator<Flow> {
     public void doValidate(final Flow that, final ValidationContext context) {
         if (that.getId() == null) {
             context.addProblem("Attribute 'id' is required.");
+        } else {
+            context.addId(that.getId());
         }
 
         if (that.getTransitions() != null) {

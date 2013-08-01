@@ -34,7 +34,28 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
+    public static <T> List<T> immutableCopy(final List<? extends T> that, final NextTransformer<T> transformer) {
+        if (that == null) {
+            return Collections.<T>emptyList();
+        }
+        final List<T> list = new ArrayList<T>(that.size());
+        for (int i = 0, j = 1; i < that.size(); ++i, ++j) {
+            final T value = that.get(i);
+            final T next = j < that.size() ? that.get(j) : null;
+
+            final T replaced = transformer.transform(value, next);
+            if (replaced != null) {
+                list.add(replaced);
+            }
+        }
+        return Collections.unmodifiableList(list);
+    }
+
     public interface Transformer<T> {
         T transform(final T that);
+    }
+
+    public interface NextTransformer<T> {
+        T transform(final T that, final T next);
     }
 }

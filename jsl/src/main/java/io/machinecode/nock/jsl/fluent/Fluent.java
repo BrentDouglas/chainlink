@@ -18,13 +18,13 @@ import io.machinecode.nock.jsl.fluent.transition.FluentEnd;
 import io.machinecode.nock.jsl.fluent.transition.FluentFail;
 import io.machinecode.nock.jsl.fluent.transition.FluentNext;
 import io.machinecode.nock.jsl.fluent.transition.FluentStop;
-import io.machinecode.nock.jsl.fluent.type.FluentBatchletMapperStep;
-import io.machinecode.nock.jsl.fluent.type.FluentBatchletPlanStep;
-import io.machinecode.nock.jsl.fluent.type.FluentChunkMapperStep;
-import io.machinecode.nock.jsl.fluent.type.FluentChunkPlanStep;
-import io.machinecode.nock.jsl.fluent.type.FluentDecision;
-import io.machinecode.nock.jsl.fluent.type.FluentFlow;
-import io.machinecode.nock.jsl.fluent.type.FluentSplit;
+import io.machinecode.nock.jsl.fluent.execution.FluentBatchletMapperStep;
+import io.machinecode.nock.jsl.fluent.execution.FluentBatchletPlanStep;
+import io.machinecode.nock.jsl.fluent.execution.FluentChunkMapperStep;
+import io.machinecode.nock.jsl.fluent.execution.FluentChunkPlanStep;
+import io.machinecode.nock.jsl.fluent.execution.FluentDecision;
+import io.machinecode.nock.jsl.fluent.execution.FluentFlow;
+import io.machinecode.nock.jsl.fluent.execution.FluentSplit;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

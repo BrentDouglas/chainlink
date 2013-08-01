@@ -22,6 +22,8 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
         super.validate(that, context);
         if (that.getId() == null) {
             context.addProblem("Attribute 'id' is required.");
+        } else {
+            context.addId(that.getId());
         }
 
         if (that.getTransitions() != null) {

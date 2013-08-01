@@ -1,6 +1,10 @@
 package io.machinecode.nock.jsl.test;
 
+import io.machinecode.nock.jsl.api.Job;
+import io.machinecode.nock.jsl.api.chunk.Chunk;
 import io.machinecode.nock.jsl.api.chunk.Chunk.CheckpointPolicy;
+import io.machinecode.nock.jsl.api.execution.Step;
+import io.machinecode.nock.jsl.api.partition.PartitionPlan;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlJob;
 import io.machinecode.nock.jsl.xml.XmlListener;
@@ -11,8 +15,8 @@ import io.machinecode.nock.jsl.xml.chunk.XmlItemReader;
 import io.machinecode.nock.jsl.xml.chunk.XmlItemWriter;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlStop;
-import io.machinecode.nock.jsl.xml.type.XmlFlow;
-import io.machinecode.nock.jsl.xml.type.XmlStep;
+import io.machinecode.nock.jsl.xml.execution.XmlFlow;
+import io.machinecode.nock.jsl.xml.execution.XmlStep;
 import io.machinecode.nock.jsl.xml.util.Inheritable;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -370,7 +374,6 @@ public class XmlTest {
         Assert.assertNull(chunk1.getSkippableExceptionClasses());
         Assert.assertNull(chunk1.getRetryableExceptionClasses());
         Assert.assertNull(chunk1.getNoRollbackExceptionClasses());
-        Assert.assertNull(chunk1.getProperties());
 
         final XmlItemReader reader1 = chunk1.getReader();
         Assert.assertEquals("PostingReader", reader1.getRef());
@@ -386,5 +389,36 @@ public class XmlTest {
         Assert.assertNotNull(writer1.getProperties());
         Assert.assertEquals(1, writer1.getProperties().getProperties().size());
         testProperty(writer1.getProperties().getProperties(), 0, "outfile", "#{jobProperties['step1.outfile']}?:out.txt");
+    }
+
+    @Test
+    public void defaultValueTest() throws JAXBException {
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-default-1.xml"));
+        XmlJob job = repo.getJob();
+
+        job = job.inherit(repo);
+
+        testDefaults(job.build());
+    }
+
+    public static void testDefaults(final Job job) {
+        Assert.assertEquals("1.0", job.getVersion());
+        Assert.assertTrue(job.isRestartable());
+
+        final Step step = (Step)job.getExecutions().get(0);
+        Assert.assertEquals("step2", step.getNext());
+        Assert.assertFalse(step.isAllowStartIfComplete());
+        Assert.assertEquals(0, step.getStartLimit());
+
+        final PartitionPlan plan = (PartitionPlan) step.getPartition().getMapper();
+        Assert.assertEquals(1, plan.getPartitions());
+        Assert.assertEquals(1, (int)plan.getThreads());
+
+        final Chunk chunk = (Chunk) step.getPart();
+        Assert.assertEquals(CheckpointPolicy.ITEM, chunk.getCheckpointPolicy());
+        Assert.assertEquals(10, chunk.getItemCount());
+        Assert.assertEquals(0, chunk.getSkipLimit());
+        Assert.assertEquals(0, chunk.getRetryLimit());
+        Assert.assertEquals(0, chunk.getTimeLimit());
     }
 }

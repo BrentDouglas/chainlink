@@ -19,6 +19,8 @@ public class JobValidator extends Validator<Job> {
     public void doValidate(final Job that, final ValidationContext context) {
         if (that.getId() == null) {
             context.addProblem("Attribute 'id' is required.");
+        } else {
+            context.addId(that.getId());
         }
         if (that.getListeners() != null) {
             ListenersValidator.INSTANCE.validate(that.getListeners(), context);

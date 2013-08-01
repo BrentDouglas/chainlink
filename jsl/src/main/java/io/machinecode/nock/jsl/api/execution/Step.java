@@ -18,6 +18,8 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public interface Step<T extends Part, U extends Mapper> extends Execution {
 
+    String ELEMENT = "step";
+
     String getNext();
 
     int getStartLimit();

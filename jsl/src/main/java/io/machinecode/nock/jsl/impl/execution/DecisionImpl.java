@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.impl.type;
+package io.machinecode.nock.jsl.impl.execution;
 
 import io.machinecode.nock.jsl.api.transition.Transition;
 import io.machinecode.nock.jsl.api.execution.Decision;

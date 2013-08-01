@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<job xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
+     id="job1" version="1.0">
+    <properties>
+        <property name="job-prop" value="job-value"/>
+    </properties>
+    <listeners>
+        <listener ref="something"/>
+    </listeners>
+    <step id="step1">
+        <chunk>
+            <reader ref="Reader2">
+                <properties>
+                    <property name="" value=""/>
+                </properties>
+            </reader>
+            <processor ref="Processor2"/>
+            <writer ref="PostingWriter">
+                <properties>
+                    <property name="Writer2" value=""/>
+                </properties>
+            </writer>
+            <checkpoint-algorithm ref="other-checkpoint-algorithm"></checkpoint-algorithm>
+            <skippable-exception-classes>
+                <include class="java.lang.Exception"/>
+                <exclude class="java.lang.Throwable"/>
+                <exclude class="javax.xml.bind.JAXBException"/>
+            </skippable-exception-classes>
+            <retryable-exception-classes>
+                <include class="java.lang.Exception"/>
+                <exclude class="java.lang.Throwable"/>
+                <exclude class="javax.xml.bind.JAXBException"/>
+            </retryable-exception-classes>
+            <no-rollback-exception-classes>
+                <include class="java.lang.Exception"/>
+                <exclude class="java.lang.Throwable"/>
+                <exclude class="javax.xml.bind.JAXBException"/>
+            </no-rollback-exception-classes>
+        </chunk>
+        <partition>
+            <plan></plan>
+        </partition>
+    </step>
+    <step id="step2">
+    </step>
+</job>

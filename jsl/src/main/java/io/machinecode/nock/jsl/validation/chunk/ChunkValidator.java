@@ -2,7 +2,6 @@ package io.machinecode.nock.jsl.validation.chunk;
 
 import io.machinecode.nock.jsl.api.chunk.Chunk;
 import io.machinecode.nock.jsl.api.chunk.Chunk.CheckpointPolicy;
-import io.machinecode.nock.jsl.validation.PropertiesValidator;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;
 
@@ -52,18 +51,14 @@ public class ChunkValidator extends Validator<Chunk> {
 
         //Nullable
 
-        if (that.getProperties() == null) {
-            PropertiesValidator.INSTANCE.validate(that.getProperties(), context);
-        }
-
         if (that.getCheckpointAlgorithm() != null) {
             CheckpointAlgorithmValidator.INSTANCE.validate(that.getCheckpointAlgorithm(), context);
         }
         if (that.getNoRollbackExceptionClasses() != null) {
-            ExecutionClassFilterValidator.RETRYABLE.validate(that.getNoRollbackExceptionClasses(), context);
+            ExecutionClassFilterValidator.NO_ROLLBACK.validate(that.getNoRollbackExceptionClasses(), context);
         }
         if (that.getSkippableExceptionClasses() != null) {
-            ExecutionClassFilterValidator.RETRYABLE.validate(that.getSkippableExceptionClasses(), context);
+            ExecutionClassFilterValidator.SKIPPABLE.validate(that.getSkippableExceptionClasses(), context);
         }
         if (that.getRetryableExceptionClasses() != null) {
             ExecutionClassFilterValidator.RETRYABLE.validate(that.getRetryableExceptionClasses(), context);

@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.xml.type;
+package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.xml.Repository;
@@ -219,6 +219,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
         that.setProperties(Util.copy(this.properties));
         that.setListeners(Util.copy(this.listeners));
         that.setPart(Util.copy(this.part));
+        that.setPartition(Util.copy(this.partition));
         that.setTransitions(Util.copyList(this.transitions));
         return that;
     }
