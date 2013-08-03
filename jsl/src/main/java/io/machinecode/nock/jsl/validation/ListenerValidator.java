@@ -16,7 +16,7 @@ public class ListenerValidator extends Validator<Listener> {
     @Override
     public void doValidate(final Listener that, final ValidationContext context) {
         if (that.getRef() == null) {
-            context.addProblem("Attribute 'ref' is required");
+            context.addProblem(Problem.attributeRequired("ref"));
         }
         if (that.getProperties() != null) {
             PropertiesValidator.INSTANCE.validate(that.getProperties(), context);

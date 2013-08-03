@@ -1,6 +1,7 @@
 package io.machinecode.nock.jsl.validation.transition;
 
 import io.machinecode.nock.jsl.api.transition.Next;
+import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;
 
@@ -18,10 +19,10 @@ public class NextValidator extends Validator<Next> {
     @Override
     public void doValidate(final Next that, final ValidationContext context) {
         if (that.getOn() == null) {
-            context.addProblem("Attribute 'on' is required");
+            context.addProblem(Problem.attributeRequired("on"));
         }
         if (that.getTo() == null) {
-            context.addProblem("Attribute 'to' is required");
+            context.addProblem(Problem.attributeRequired("to"));
         }
     }
 }

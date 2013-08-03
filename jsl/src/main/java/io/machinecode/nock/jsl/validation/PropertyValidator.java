@@ -16,10 +16,10 @@ public class PropertyValidator extends Validator<Property> {
     @Override
     public void doValidate(final Property that, final ValidationContext context) {
         if (that.getName() == null) {
-            context.addProblem("Attribute 'name' is required");
+            context.addProblem(Problem.attributeRequired("name"));
         }
         if (that.getValue() == null) {
-            context.addProblem("Attribute 'value' is required");
+            context.addProblem(Problem.attributeRequired("value"));
         }
     }
 }

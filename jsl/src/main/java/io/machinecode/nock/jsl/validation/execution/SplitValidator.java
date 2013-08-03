@@ -2,6 +2,7 @@ package io.machinecode.nock.jsl.validation.execution;
 
 import io.machinecode.nock.jsl.api.execution.Flow;
 import io.machinecode.nock.jsl.api.execution.Split;
+import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;
 
@@ -19,7 +20,7 @@ public class SplitValidator extends Validator<Split> {
     @Override
     public void doValidate(final Split that, final ValidationContext context) {
         if (that.getId() == null) {
-            context.addProblem("Attribute 'id' is required.");
+            context.addProblem(Problem.attributeRequired("id"));
         } else {
             context.addId(that.getId());
         }
@@ -27,7 +28,7 @@ public class SplitValidator extends Validator<Split> {
         if (that.getFlows() != null) {
             for (final Flow flow : that.getFlows()) {
                 if (flow == null) {
-                    context.addProblem("Must not have null 'flow' element.");
+                    context.addProblem(Problem.notNullElement("flow"));
                 }
                 FlowValidator.INSTANCE.validate(flow, context);
             }

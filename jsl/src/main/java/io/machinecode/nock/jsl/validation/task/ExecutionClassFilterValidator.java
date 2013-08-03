@@ -2,6 +2,7 @@ package io.machinecode.nock.jsl.validation.task;
 
 import io.machinecode.nock.jsl.api.task.ExceptionClass;
 import io.machinecode.nock.jsl.api.task.ExceptionClassFilter;
+import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;
 
@@ -23,22 +24,22 @@ public class ExecutionClassFilterValidator extends Validator<ExceptionClassFilte
         if (that.getIncludes() != null) {
             for (final ExceptionClass clazz : that.getIncludes()) {
                 if (clazz == null) {
-                    context.addProblem("Must not have null 'includes' element.");
+                    context.addProblem(Problem.notNullElement("includes"));
                     continue;
                 }
                 if (clazz.getClassName() == null) {
-                    context.addProblem("Attribute 'class' must not be null.");
+                    context.addProblem(Problem.attributeRequired("class"));
                 }
             }
         }
         if (that.getExcludes() != null) {
             for (final ExceptionClass clazz : that.getExcludes()) {
                 if (clazz == null) {
-                    context.addProblem("Must not have null 'excludes' element.");
+                    context.addProblem(Problem.notNullElement("excludes"));
                     continue;
                 }
                 if (clazz.getClassName() == null) {
-                    context.addProblem("Attribute 'class' must not be null.");
+                    context.addProblem(Problem.attributeRequired("class"));
                 }
             }
         }

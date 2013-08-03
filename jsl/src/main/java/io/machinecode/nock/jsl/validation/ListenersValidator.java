@@ -18,7 +18,7 @@ public class ListenersValidator extends Validator<Listeners> {
     public void doValidate(final Listeners that, final ValidationContext context) {
         for(final Listener listener : that.getListeners()) {
             if (listener == null) {
-                context.addProblem("Must not have null 'listener' element.");
+                context.addProblem(Problem.notNullElement("listener"));
                 continue;
             }
             ListenerValidator.INSTANCE.validate(listener, context);

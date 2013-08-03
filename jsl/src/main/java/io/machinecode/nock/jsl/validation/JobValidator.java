@@ -18,7 +18,7 @@ public class JobValidator extends Validator<Job> {
     @Override
     public void doValidate(final Job that, final ValidationContext context) {
         if (that.getId() == null) {
-            context.addProblem("Attribute 'id' is required.");
+            context.addProblem(Problem.attributeRequired("id"));
         } else {
             context.addId(that.getId());
         }
@@ -30,14 +30,14 @@ public class JobValidator extends Validator<Job> {
         }
         for (final Execution execution : that.getExecutions()) {
             if (execution == null) {
-                context.addProblem("Must not have null 'execution' element.");
+                context.addProblem(Problem.notNullElement("execution"));
                 continue;
             }
             ExcecutionValidator.validate(execution, context);
         }
 
         if (!"1.0".equals(that.getVersion())) {
-            context.addProblem("Attribute 'version' must match '1.0'.");
+            context.addProblem(Problem.attributeMatches("version", that.getVersion(), "1.0"));
         }
     }
 }

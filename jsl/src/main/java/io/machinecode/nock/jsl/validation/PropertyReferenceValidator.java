@@ -14,7 +14,7 @@ public abstract class PropertyReferenceValidator<T extends PropertyReference> ex
     @Override
     public void doValidate(final T that, final ValidationContext context) {
         if (that.getRef() == null) {
-            context.addProblem("Attribute 'ref 'is required.");
+            context.addProblem(Problem.attributeRequired("ref"));
         }
         if (that.getProperties() != null) {
             PropertiesValidator.INSTANCE.validate(that.getProperties(), context);

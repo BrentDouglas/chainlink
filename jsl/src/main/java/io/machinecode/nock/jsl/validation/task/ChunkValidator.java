@@ -2,6 +2,7 @@ package io.machinecode.nock.jsl.validation.task;
 
 import io.machinecode.nock.jsl.api.task.Chunk;
 import io.machinecode.nock.jsl.api.task.Chunk.CheckpointPolicy;
+import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;
 
@@ -19,34 +20,34 @@ public class ChunkValidator extends Validator<Chunk> {
     @Override
     public void doValidate(final Chunk that, final ValidationContext context) {
         if (that.getCheckpointPolicy() == null) {
-            context.addProblem("Attribute 'checkpoint-policy' is required.");
+            context.addProblem(Problem.attributeRequired("checkpoint-policy"));
         }
         if (!CheckpointPolicy.ITEM.equals(that.getCheckpointPolicy())
                 && !CheckpointPolicy.CUSTOM.equals(that.getCheckpointPolicy())) {
-            context.addProblem("Attribute 'checkpoint-policy' must match '" + CheckpointPolicy.ITEM + "' or '" + CheckpointPolicy.CUSTOM + "'. Found '" + that.getCheckpointPolicy() + "'.");
+            context.addProblem(Problem.attributeMatches("checkpoint-policy", that.getCheckpointPolicy(), CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM));
         }
 
         if (that.getItemCount() < 0) {
-            context.addProblem("Attribute 'item-count' must be positive. Found '" + that.getItemCount() + "'.");
+            context.addProblem(Problem.attributePositive("item-count", that.getItemCount()));
         }
         if (that.getTimeLimit() < 0) {
-            context.addProblem("Attribute 'time-limit' must be positive. Found '" + that.getTimeLimit() + "'.");
+            context.addProblem(Problem.attributePositive("time-limit", that.getTimeLimit()));
         }
         if (that.getSkipLimit() < 0) {
-            context.addProblem("Attribute 'skip-limit' must be positive. Found '" + that.getSkipLimit() + "'.");
+            context.addProblem(Problem.attributePositive("skip-limit", that.getSkipLimit()));
         }
         if (that.getRetryLimit() < 0) {
-            context.addProblem("Attribute 'retry-limit' must be positive. Found '" + that.getRetryLimit() + "'.");
+            context.addProblem(Problem.attributePositive("retry-limit", that.getRetryLimit()));
         }
 
         if (that.getReader() == null) {
-            context.addProblem("Element 'reader' must not be null.");
+            context.addProblem(Problem.notNullElement("reader"));
         }
         if (that.getProcessor() == null) {
-            context.addProblem("Element 'processor' must not be null.");
+            context.addProblem(Problem.notNullElement("processor"));
         }
         if (that.getWriter() == null) {
-            context.addProblem("Element 'writer' must not be null.");
+            context.addProblem(Problem.notNullElement("writer"));
         }
 
         //Nullable

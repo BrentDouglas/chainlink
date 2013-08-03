@@ -3,6 +3,7 @@ package io.machinecode.nock.jsl.validation.execution;
 import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.api.transition.Transition;
 import io.machinecode.nock.jsl.validation.ListenersValidator;
+import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.task.TaskValidator;
 import io.machinecode.nock.jsl.validation.PropertiesValidator;
 import io.machinecode.nock.jsl.validation.ValidationContext;
@@ -24,18 +25,18 @@ public class StepValidator extends Validator<Step> {
     @Override
     public void doValidate(final Step that, final ValidationContext context) {
         if (that.getId() == null) {
-            context.addProblem("Attribute 'id' is required.");
+            context.addProblem(Problem.attributeRequired("id"));
         } else {
             context.addId(that.getId());
         }
         if (that.getStartLimit() < 0) {
-            context.addProblem("Attribute 'start-limit' must be positive. Found '" + that.getStartLimit() + "'.");
+            context.addProblem(Problem.attributePositive("start-limit", that.getStartLimit()));
         }
 
         if (that.getTransitions() != null) {
             for (final Object transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem("Must not have null 'transition' element.");
+                    context.addProblem(Problem.notNullElement("transition"));
                 }
                 TransitionValidator.validate((Transition) transition, context);
             }

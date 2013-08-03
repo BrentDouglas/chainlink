@@ -65,20 +65,18 @@ public class CycleContext {
 
     public final StringBuilder toTree(final StringBuilder builder) {
         if (this.failed) {
-            builder.append("Cycle detected:")
-                    .append(System.lineSeparator())
+            builder.append(Problem.cycleDetected())
                     .append(System.lineSeparator());
-            for (final CycleContext problem : this.cycle) {
+            for (int i = 0; i < this.cycle.size() - 1; ++i) {
+                final CycleContext problem = this.cycle.get(i);
                 builder.append(problem.id)
                         .append(" -> ")
                         .append(problem.next)
-                        .append(" (")
+                        .append(" <")
                         .append(problem.element)
-                        .append(')')
+                        .append('>')
                         .append(System.lineSeparator());
             }
-            builder.append(System.lineSeparator())
-                    .append(System.lineSeparator());
         }
         for (final CycleContext context : children) {
             context.toTree(builder);

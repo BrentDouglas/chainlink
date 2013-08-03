@@ -18,7 +18,7 @@ public class PropertiesValidator extends Validator<Properties> {
     public void doValidate(final Properties that, final ValidationContext context) {
         for(final Property property : that.getProperties()) {
             if (property == null) {
-                context.addProblem("Must not have null 'property' must element.");
+                context.addProblem(Problem.notNullElement("property"));
                 continue;
             }
             PropertyValidator.INSTANCE.validate(property, context);

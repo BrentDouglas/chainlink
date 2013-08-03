@@ -13,7 +13,7 @@ public abstract class Validator<T> {
 
     public final void validate(T that) {
         final ValidationContext context = new ValidationContext(element);
-        validate(that, context);
+        doValidate(that, context);
         if (context.hasFailed()) {
             throw new InvalidJobDefinitionException(context);
         }

@@ -2,6 +2,7 @@ package io.machinecode.nock.jsl.validation.execution;
 
 import io.machinecode.nock.jsl.api.execution.Decision;
 import io.machinecode.nock.jsl.api.transition.Transition;
+import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.PropertyReferenceValidator;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.transition.TransitionValidator;
@@ -21,7 +22,7 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
     public void doValidate(final Decision that, final ValidationContext context) {
         super.validate(that, context);
         if (that.getId() == null) {
-            context.addProblem("Attribute 'id' is required.");
+            context.addProblem(Problem.attributeRequired("id"));
         } else {
             context.addId(that.getId());
         }
@@ -29,7 +30,7 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
         if (that.getTransitions() != null) {
             for (final Transition transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem("Must not have null 'transitions' element.");
+                    context.addProblem(Problem.notNullElement("transitions"));
                 }
                 TransitionValidator.validate(transition, context);
             }
