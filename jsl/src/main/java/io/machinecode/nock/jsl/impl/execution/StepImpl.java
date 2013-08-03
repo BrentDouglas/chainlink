@@ -1,10 +1,10 @@
 package io.machinecode.nock.jsl.impl.execution;
 
 import io.machinecode.nock.jsl.api.Listeners;
-import io.machinecode.nock.jsl.api.Part;
+import io.machinecode.nock.jsl.api.task.Task;
 import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.execution.Execution;
-import io.machinecode.nock.jsl.api.partition.Mapper;
+import io.machinecode.nock.jsl.api.partition.Strategy;
 import io.machinecode.nock.jsl.api.transition.Transition;
 import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.impl.ListenersImpl;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class StepImpl<T extends Part, U extends Mapper> extends ExecutionImpl implements Step<T, U> {
+public abstract class StepImpl<T extends Task, U extends Strategy> extends ExecutionImpl implements Step<T, U> {
 
     private final String next;
     private final int startLimit;

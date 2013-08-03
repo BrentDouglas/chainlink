@@ -2,27 +2,27 @@ package io.machinecode.nock.jsl.fluent.partition;
 
 import io.machinecode.nock.jsl.api.partition.Analyser;
 import io.machinecode.nock.jsl.api.partition.Collector;
-import io.machinecode.nock.jsl.api.partition.Mapper;
+import io.machinecode.nock.jsl.api.partition.Strategy;
 import io.machinecode.nock.jsl.api.partition.Partition;
-import io.machinecode.nock.jsl.api.partition.PartitionReducer;
+import io.machinecode.nock.jsl.api.partition.Reducer;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class FluentPartition<T extends Mapper> implements Partition<T> {
+public abstract class FluentPartition<T extends Strategy> implements Partition<T> {
 
-    private T mapper;
+    private T strategy;
     private Collector collector;
     private Analyser analyser;
-    private PartitionReducer reducer;
+    private Reducer reducer;
 
     @Override
-    public T getMapper() {
-        return this.mapper;
+    public T getStrategy() {
+        return this.strategy;
     }
 
-    public FluentPartition<T> setMapper(final T mapper) {
-        this.mapper = mapper;
+    public FluentPartition<T> setStrategy(final T strategy) {
+        this.strategy = strategy;
         return this;
     }
 
@@ -47,11 +47,11 @@ public abstract class FluentPartition<T extends Mapper> implements Partition<T> 
     }
 
     @Override
-    public PartitionReducer getReducer() {
+    public Reducer getReducer() {
         return this.reducer;
     }
 
-    public FluentPartition<T> setReducer(final PartitionReducer reducer) {
+    public FluentPartition<T> setReducer(final Reducer reducer) {
         this.reducer = reducer;
         return this;
     }

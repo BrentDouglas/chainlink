@@ -18,10 +18,10 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 public class XmlPartition implements Copyable<XmlPartition>, Partition {
 
     @XmlElements({
-            @XmlElement(name = "plan", namespace = NAMESPACE, required = false, type = XmlPartitionPlan.class),
-            @XmlElement(name = "mapper", namespace = NAMESPACE, required = false, type = XmlPartitionMapper.class)
+            @XmlElement(name = "plan", namespace = NAMESPACE, required = false, type = XmlPlan.class),
+            @XmlElement(name = "mapper", namespace = NAMESPACE, required = false, type = XmlMapper.class)
     })
-    private XmlMapper mapper;
+    private XmlStrategy strategy;
 
     @XmlElement(name = "collector", namespace = NAMESPACE, required = false)
     private XmlCollector collector;
@@ -30,15 +30,15 @@ public class XmlPartition implements Copyable<XmlPartition>, Partition {
     private XmlAnalyser analyzer;
 
     @XmlElement(name = "reducer", namespace = NAMESPACE, required = false)
-    private XmlPartitionReducer reducer;
+    private XmlReducer reducer;
 
     @Override
-    public XmlMapper getMapper() {
-        return mapper;
+    public XmlStrategy getStrategy() {
+        return strategy;
     }
 
-    public XmlPartition setMapper(final XmlMapper mapper) {
-        this.mapper = mapper;
+    public XmlPartition setStrategy(final XmlStrategy strategy) {
+        this.strategy = strategy;
         return this;
     }
 
@@ -63,11 +63,11 @@ public class XmlPartition implements Copyable<XmlPartition>, Partition {
     }
 
     @Override
-    public XmlPartitionReducer getReducer() {
+    public XmlReducer getReducer() {
         return reducer;
     }
 
-    public XmlPartition setReducer(final XmlPartitionReducer reducer) {
+    public XmlPartition setReducer(final XmlReducer reducer) {
         this.reducer = reducer;
         return this;
     }
@@ -79,7 +79,7 @@ public class XmlPartition implements Copyable<XmlPartition>, Partition {
 
     @Override
     public XmlPartition copy(final XmlPartition that) {
-        that.setMapper(Util.copy(this.mapper));
+        that.setStrategy(Util.copy(this.strategy));
         that.setCollector(Util.copy(this.collector));
         that.setAnalyzer(Util.copy(this.analyzer));
         that.setReducer(Util.copy(this.reducer));

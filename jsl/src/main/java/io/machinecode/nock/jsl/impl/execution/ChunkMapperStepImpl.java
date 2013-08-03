@@ -1,34 +1,34 @@
 package io.machinecode.nock.jsl.impl.execution;
 
-import io.machinecode.nock.jsl.api.chunk.Chunk;
+import io.machinecode.nock.jsl.api.task.Chunk;
 import io.machinecode.nock.jsl.api.execution.Execution;
 import io.machinecode.nock.jsl.api.partition.Partition;
-import io.machinecode.nock.jsl.api.partition.PartitionMapper;
+import io.machinecode.nock.jsl.api.partition.Mapper;
 import io.machinecode.nock.jsl.api.execution.Step;
-import io.machinecode.nock.jsl.impl.chunk.ChunkImpl;
+import io.machinecode.nock.jsl.impl.task.ChunkImpl;
 import io.machinecode.nock.jsl.impl.partition.MapperPartitionImpl;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ChunkMapperStepImpl extends StepImpl<Chunk, PartitionMapper> implements Step<Chunk, PartitionMapper> {
+public class ChunkMapperStepImpl extends StepImpl<Chunk, Mapper> implements Step<Chunk, Mapper> {
 
-    private final Chunk part;
-    private final Partition<PartitionMapper> partition;
+    private final Chunk task;
+    private final Partition<Mapper> partition;
 
-    public ChunkMapperStepImpl(final Step<Chunk, PartitionMapper> that, final Execution execution) {
+    public ChunkMapperStepImpl(final Step<Chunk, Mapper> that, final Execution execution) {
         super(that, execution);
-        this.part = that.getPart() == null ? null : new ChunkImpl(that.getPart());
+        this.task = that.getTask() == null ? null : new ChunkImpl(that.getTask());
         this.partition = that.getPartition() == null ? null : new MapperPartitionImpl(that.getPartition());
     }
 
     @Override
-    public Chunk getPart() {
-        return this.part;
+    public Chunk getTask() {
+        return this.task;
     }
 
     @Override
-    public Partition<PartitionMapper> getPartition() {
+    public Partition<Mapper> getPartition() {
         return this.partition;
     }
 }

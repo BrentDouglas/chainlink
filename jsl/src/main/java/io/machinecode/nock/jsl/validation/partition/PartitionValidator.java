@@ -18,10 +18,10 @@ public class PartitionValidator extends Validator<Partition> {
     @Override
     public void doValidate(final Partition that, final ValidationContext context) {
         if (that.getReducer() != null) {
-            PartitionReducerValidator.INSTANCE.validate(that.getReducer(), context);
+            ReducerValidator.INSTANCE.validate(that.getReducer(), context);
         }
-        if (that.getMapper() != null) {
-            MapperValidator.validate(that.getMapper(), context);
+        if (that.getStrategy() != null) {
+            StrategyValidator.validate(that.getStrategy(), context);
         }
         if (that.getAnalyzer() != null) {
             AnalyserValidator.INSTANCE.validate(that.getAnalyzer(), context);

@@ -3,7 +3,7 @@ package io.machinecode.nock.jsl.validation.execution;
 import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.api.transition.Transition;
 import io.machinecode.nock.jsl.validation.ListenersValidator;
-import io.machinecode.nock.jsl.validation.PartValidator;
+import io.machinecode.nock.jsl.validation.task.TaskValidator;
 import io.machinecode.nock.jsl.validation.PropertiesValidator;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;
@@ -41,8 +41,8 @@ public class StepValidator extends Validator<Step> {
             }
         }
 
-        if (that.getPart() != null) {
-            PartValidator.validate(that.getPart(), context);
+        if (that.getTask() != null) {
+            TaskValidator.validate(that.getTask(), context);
         }
         if (that.getPartition() != null) {
             PartitionValidator.INSTANCE.validate(that.getPartition(), context);

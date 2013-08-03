@@ -1,18 +1,18 @@
 package io.machinecode.nock.jsl.test;
 
 import io.machinecode.nock.jsl.api.Job;
-import io.machinecode.nock.jsl.api.chunk.Chunk;
-import io.machinecode.nock.jsl.api.chunk.Chunk.CheckpointPolicy;
+import io.machinecode.nock.jsl.api.partition.Plan;
+import io.machinecode.nock.jsl.api.task.Chunk;
+import io.machinecode.nock.jsl.api.task.Chunk.CheckpointPolicy;
 import io.machinecode.nock.jsl.api.execution.Step;
-import io.machinecode.nock.jsl.api.partition.PartitionPlan;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlJob;
 import io.machinecode.nock.jsl.xml.XmlListener;
 import io.machinecode.nock.jsl.xml.XmlProperty;
-import io.machinecode.nock.jsl.xml.chunk.XmlChunk;
-import io.machinecode.nock.jsl.xml.chunk.XmlItemProcessor;
-import io.machinecode.nock.jsl.xml.chunk.XmlItemReader;
-import io.machinecode.nock.jsl.xml.chunk.XmlItemWriter;
+import io.machinecode.nock.jsl.xml.task.XmlChunk;
+import io.machinecode.nock.jsl.xml.task.XmlItemProcessor;
+import io.machinecode.nock.jsl.xml.task.XmlItemReader;
+import io.machinecode.nock.jsl.xml.task.XmlItemWriter;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlStop;
 import io.machinecode.nock.jsl.xml.execution.XmlFlow;
@@ -410,11 +410,11 @@ public class XmlTest {
         Assert.assertFalse(step.isAllowStartIfComplete());
         Assert.assertEquals(0, step.getStartLimit());
 
-        final PartitionPlan plan = (PartitionPlan) step.getPartition().getMapper();
+        final Plan plan = (Plan) step.getPartition().getStrategy();
         Assert.assertEquals(1, plan.getPartitions());
         Assert.assertEquals(1, (int)plan.getThreads());
 
-        final Chunk chunk = (Chunk) step.getPart();
+        final Chunk chunk = (Chunk) step.getTask();
         Assert.assertEquals(CheckpointPolicy.ITEM, chunk.getCheckpointPolicy());
         Assert.assertEquals(10, chunk.getItemCount());
         Assert.assertEquals(0, chunk.getSkipLimit());

@@ -2,9 +2,9 @@ package io.machinecode.nock.jsl.fluent.execution;
 
 import io.machinecode.nock.jsl.api.Listener;
 import io.machinecode.nock.jsl.api.Listeners;
-import io.machinecode.nock.jsl.api.Part;
+import io.machinecode.nock.jsl.api.task.Task;
 import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.partition.Mapper;
+import io.machinecode.nock.jsl.api.partition.Strategy;
 import io.machinecode.nock.jsl.api.partition.Partition;
 import io.machinecode.nock.jsl.api.transition.Transition;
 import io.machinecode.nock.jsl.api.execution.Step;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class FluentStep<T extends Part, U extends Mapper> extends FluentExecution<FluentStep<T, U>> implements Step <T, U> {
+public abstract class FluentStep<T extends Task, U extends Strategy> extends FluentExecution<FluentStep<T, U>> implements Step <T, U> {
 
     private String next;
     private int startLimit = 0;
@@ -26,7 +26,7 @@ public abstract class FluentStep<T extends Part, U extends Mapper> extends Fluen
     private final FluentListeners listeners = new FluentListeners();
     private final FluentProperties properties = new FluentProperties();
     private final List<Transition> transitions = new ArrayList<Transition>(0);
-    private T part;
+    private T task;
     private Partition<U> partition;
 
     @Override
@@ -80,12 +80,12 @@ public abstract class FluentStep<T extends Part, U extends Mapper> extends Fluen
     }
 
     @Override
-    public T getPart() {
-        return this.part;
+    public T getTask() {
+        return this.task;
     }
 
-    public FluentStep<T, U> setPart(final T part) {
-        this.part = part;
+    public FluentStep<T, U> setTask(final T task) {
+        this.task = task;
         return this;
     }
 

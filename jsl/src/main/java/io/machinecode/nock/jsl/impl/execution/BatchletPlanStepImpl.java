@@ -1,34 +1,34 @@
 package io.machinecode.nock.jsl.impl.execution;
 
-import io.machinecode.nock.jsl.api.Batchlet;
+import io.machinecode.nock.jsl.api.partition.Plan;
+import io.machinecode.nock.jsl.api.task.Batchlet;
 import io.machinecode.nock.jsl.api.execution.Execution;
 import io.machinecode.nock.jsl.api.partition.Partition;
-import io.machinecode.nock.jsl.api.partition.PartitionPlan;
 import io.machinecode.nock.jsl.api.execution.Step;
-import io.machinecode.nock.jsl.impl.BatchletImpl;
+import io.machinecode.nock.jsl.impl.task.BatchletImpl;
 import io.machinecode.nock.jsl.impl.partition.PlanPartitionImpl;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class BatchletPlanStepImpl extends StepImpl<Batchlet, PartitionPlan> implements Step<Batchlet, PartitionPlan> {
+public class BatchletPlanStepImpl extends StepImpl<Batchlet, Plan> implements Step<Batchlet, Plan> {
 
-    private final Batchlet part;
-    private final Partition<PartitionPlan> partition;
+    private final Batchlet task;
+    private final Partition<Plan> partition;
 
-    public BatchletPlanStepImpl(final Step<Batchlet, PartitionPlan> that, final Execution execution) {
+    public BatchletPlanStepImpl(final Step<Batchlet, Plan> that, final Execution execution) {
         super(that, execution);
-        this.part = that.getPart() == null ? null : new BatchletImpl(that.getPart());
+        this.task = that.getTask() == null ? null : new BatchletImpl(that.getTask());
         this.partition = that.getPartition() == null ? null : new PlanPartitionImpl(that.getPartition());
     }
 
     @Override
-    public Batchlet getPart() {
-        return this.part;
+    public Batchlet getTask() {
+        return this.task;
     }
 
     @Override
-    public Partition<PartitionPlan> getPartition() {
+    public Partition<Plan> getPartition() {
         return this.partition;
     }
 }

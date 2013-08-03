@@ -10,8 +10,8 @@ import java.util.Set;
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
 public class ValidationContext {
-    public static final String ERROR = "FAIL  ";
-    public static final String PLAIN = "      ";
+    public static final String ERROR = "FAILURE  ";
+    public static final String PLAIN = "         ";
 
     private final Set<String> ids;
     private final List<String> problems = new ArrayList<String>(0);

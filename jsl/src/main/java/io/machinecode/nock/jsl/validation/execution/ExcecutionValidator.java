@@ -10,7 +10,9 @@ import io.machinecode.nock.jsl.validation.ValidationContext;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class ExcecutionValidator {
+public final class ExcecutionValidator {
+
+    private ExcecutionValidator(){}
 
     public static void validate(final Execution that, final ValidationContext context) {
         if (that instanceof Split) {

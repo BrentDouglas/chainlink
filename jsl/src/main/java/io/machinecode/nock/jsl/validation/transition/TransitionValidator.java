@@ -10,7 +10,9 @@ import io.machinecode.nock.jsl.validation.ValidationContext;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class TransitionValidator {
+public final class TransitionValidator {
+
+    private TransitionValidator(){}
 
     public static void validate(final Transition that, final ValidationContext context) {
         if (that instanceof Stop) {

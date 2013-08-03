@@ -4,9 +4,9 @@ import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlListeners;
-import io.machinecode.nock.jsl.xml.XmlPart;
+import io.machinecode.nock.jsl.xml.task.XmlTask;
 import io.machinecode.nock.jsl.xml.XmlProperties;
-import io.machinecode.nock.jsl.xml.chunk.XmlChunk;
+import io.machinecode.nock.jsl.xml.task.XmlChunk;
 import io.machinecode.nock.jsl.xml.partition.XmlPartition;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
@@ -59,7 +59,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
             @XmlElement(name = "batchlet", namespace = NAMESPACE, required = false, type = XmlBatchlet.class),
             @XmlElement(name = "chunk", namespace = NAMESPACE, required = false, type = XmlChunk.class)
     })
-    private XmlPart part;
+    private XmlTask task;
 
     @XmlElement(name = "partition", namespace = NAMESPACE, required = false, type = XmlPartition.class)
     private XmlPartition partition;
@@ -134,24 +134,24 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
     }
 
     @Override
-    public XmlPart getPart() {
-        return part;
+    public XmlTask getTask() {
+        return task;
     }
 
     public XmlBatchlet getBatchlet() {
-        return part instanceof XmlBatchlet
-                ? (XmlBatchlet)part
+        return task instanceof XmlBatchlet
+                ? (XmlBatchlet) task
                 : null;
     }
 
     public XmlChunk getChunk() {
-        return part instanceof XmlChunk
-                ? (XmlChunk) part
+        return task instanceof XmlChunk
+                ? (XmlChunk) task
                 : null;
     }
 
-    public XmlStep setPart(final XmlPart part) {
-        this.part = part;
+    public XmlStep setTask(final XmlTask task) {
+        this.task = task;
         return this;
     }
 
@@ -195,11 +195,11 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
             copy.listeners = Util.merge(copy.listeners, that.listeners);
             copy.transitions = Util.listRule(copy.transitions, that.transitions);
             // 4.1
-            if (copy.part instanceof XmlChunk && that.part instanceof XmlBatchlet
-                    || copy.part instanceof XmlBatchlet && that.part instanceof XmlChunk) {
+            if (copy.task instanceof XmlChunk && that.task instanceof XmlBatchlet
+                    || copy.task instanceof XmlBatchlet && that.task instanceof XmlChunk) {
                 throw new JobStartException();
             }
-            copy.part = Util.recursiveElementRule(copy.part, that.part, repository); // 4.4.1
+            copy.task = Util.recursiveElementRule(copy.task, that.task, repository); // 4.4.1
         }
         return copy;
     }
@@ -218,7 +218,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
         that.setAllowStartIfComplete(this.allowStartIfComplete);
         that.setProperties(Util.copy(this.properties));
         that.setListeners(Util.copy(this.listeners));
-        that.setPart(Util.copy(this.part));
+        that.setTask(Util.copy(this.task));
         that.setPartition(Util.copy(this.partition));
         that.setTransitions(Util.copyList(this.transitions));
         return that;

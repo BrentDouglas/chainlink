@@ -1,9 +1,9 @@
 package io.machinecode.nock.jsl.api.execution;
 
 import io.machinecode.nock.jsl.api.Listeners;
-import io.machinecode.nock.jsl.api.Part;
+import io.machinecode.nock.jsl.api.task.Task;
 import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.partition.Mapper;
+import io.machinecode.nock.jsl.api.partition.Strategy;
 import io.machinecode.nock.jsl.api.partition.Partition;
 import io.machinecode.nock.jsl.api.transition.Transition;
 
@@ -16,7 +16,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public interface Step<T extends Part, U extends Mapper> extends Execution {
+public interface Step<T extends Task, U extends Strategy> extends Execution {
 
     String ELEMENT = "step";
 
@@ -30,7 +30,7 @@ public interface Step<T extends Part, U extends Mapper> extends Execution {
 
     Properties getProperties();
 
-    T getPart();
+    T getTask();
 
     List<? extends Transition> getTransitions();
 
