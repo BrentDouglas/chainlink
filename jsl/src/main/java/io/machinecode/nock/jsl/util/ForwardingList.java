@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.xml.util;
+package io.machinecode.nock.jsl.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +11,7 @@ import java.util.ListIterator;
  */
 public class ForwardingList<T> implements List<T> {
 
-    final ArrayList<T> delegate;
+    protected final ArrayList<T> delegate;
 
     public ForwardingList(final ArrayList<T> delegate) {
         this.delegate = delegate;

@@ -49,7 +49,7 @@ public final class TransitionCrawler {
         final TransitionContext context = parent.addChild(new TransitionContext(Decision.ELEMENT, that.getId(), null, parent));
         for (final Transition transition : that.getTransitions()) {
             if (transition instanceof Next) {
-                context.addTransition(Next.ELEMENT, ((Next) transition).getTo());
+                context.addTransition(Next.ELEMENT, null, ((Next) transition).getTo());
             }
         }
     }
@@ -58,7 +58,7 @@ public final class TransitionCrawler {
         final TransitionContext context = parent.addChild(new TransitionContext(Step.ELEMENT, that.getId(), that.getNext(), parent));
         for (final Transition transition : that.getTransitions()) {
             if (transition instanceof Next) {
-                context.addTransition(Next.ELEMENT, ((Next) transition).getTo());
+                context.addTransition(Next.ELEMENT, null, ((Next) transition).getTo());
             }
         }
     }
@@ -70,7 +70,7 @@ public final class TransitionCrawler {
         }
         for (final Transition transition : that.getTransitions()) {
             if (transition instanceof Next) {
-                context.addTransition(Next.ELEMENT, ((Next) transition).getTo());
+                context.addTransition(Next.ELEMENT, null, ((Next) transition).getTo());
             }
         }
     }

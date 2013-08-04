@@ -3,7 +3,7 @@ package io.machinecode.nock.jsl.validation;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.jsl.api.execution.Flow;
-import io.machinecode.nock.jsl.util.Pair;
+import io.machinecode.nock.jsl.util.Triplet;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -20,7 +20,7 @@ public class TransitionContext extends ValidationContext<TransitionContext> {
     private final String next;
     private final Map<String, TransitionContext> jobScope;
     private final Map<String, TransitionContext> localScope;
-    private final List<Pair<String, String>> transitions;
+    private final List<Triplet<String, String, String>> transitions;
 
     public TransitionContext(final String element, final String id) {
         super(element);
@@ -28,14 +28,14 @@ public class TransitionContext extends ValidationContext<TransitionContext> {
         this.next = null;
         this.jobScope = new THashMap<String, TransitionContext>(0);
         this.localScope = this.jobScope;
-        this.transitions = new ArrayList<Pair<String, String>>(0);
+        this.transitions = new ArrayList<Triplet<String, String, String>>(0);
     }
 
     public TransitionContext(final String element, final String id, final String next, final TransitionContext parent) {
         super(element, parent);
         this.id = id;
         this.next = next;
-        this.transitions = new ArrayList<Pair<String, String>>(0);
+        this.transitions = new ArrayList<Triplet<String, String, String>>(0);
         if (Flow.ELEMENT.equals(element)) {
             this.localScope = new THashMap<String, TransitionContext>(0);
         } else {
@@ -46,12 +46,12 @@ public class TransitionContext extends ValidationContext<TransitionContext> {
         }
         this.jobScope = parent.jobScope;
         this.jobScope.put(id, this);
-        parent.addTransition(element, next);
+        parent.addTransition(element, id, next);
     }
 
-    void addTransition(final String element, final String next) {
+    void addTransition(final String element, final String id, final String next) {
         if (next != null) {
-            this.transitions.add(Pair.of(element, next));
+            this.transitions.add(Triplet.of(element, id, next));
         }
     }
 
@@ -99,9 +99,9 @@ public class TransitionContext extends ValidationContext<TransitionContext> {
         boolean ret = false;
         //Root node
         TransitionContext that = this;
-        for (final Pair<String, String> entry : transitions) {
-            if (!localScope.containsKey(entry.getValue())) {
-                addProblem(Problem.invalidTransition(that.id, entry.getKey(), entry.getValue()));
+        for (final Triplet<String, String, String> entry : transitions) {
+            if (!localScope.containsKey(entry.getC())) {
+                addProblem(Problem.invalidTransition(element(entry.getA(), entry.getB(), entry.getC(), new StringBuilder()).toString()));
                 ret = true;
             }
         }
@@ -115,6 +115,10 @@ public class TransitionContext extends ValidationContext<TransitionContext> {
 
     @Override
     protected StringBuilder element(final StringBuilder builder) {
+        return element(this.element, this.id, this.next, builder);
+    }
+
+    public static StringBuilder element(final String element, final String id, final String next, final StringBuilder builder) {
         builder.append('<')
                 .append(element);
         if (id != null) {

@@ -1,6 +1,7 @@
 package io.machinecode.nock.jsl.test;
 
 import io.machinecode.nock.jsl.api.Job;
+import io.machinecode.nock.jsl.api.task.Chunk.CheckpointPolicy;
 import io.machinecode.nock.jsl.fluent.Jsl;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -105,7 +106,7 @@ public class FluentTest {
                                 .setSkipLimit(3)
                                 .setRetryLimit(3)
                                 .setTimeLimit(24)
-                                .setCheckpointPolicy("custom")
+                                .setCheckpointPolicy(CheckpointPolicy.CUSTOM)
                                 .setCheckpointAlgorithm(Jsl.checkpointAlgorithm()
                                         .setRef("checkpoint-algorithm")
                                         .addProperty("", "")
@@ -159,7 +160,7 @@ public class FluentTest {
                                 .setSkipLimit(3)
                                 .setRetryLimit(3)
                                 .setTimeLimit(24)
-                                .setCheckpointPolicy("item")
+                                .setCheckpointPolicy(CheckpointPolicy.ITEM)
                                 .setCheckpointAlgorithm(Jsl.checkpointAlgorithm()
                                         .setRef("other-checkpoint-algorithm")
                                         .addProperty("", "")

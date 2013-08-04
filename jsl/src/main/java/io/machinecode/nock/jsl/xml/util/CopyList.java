@@ -1,5 +1,7 @@
 package io.machinecode.nock.jsl.xml.util;
 
+import io.machinecode.nock.jsl.util.ForwardingList;
+
 import java.util.ArrayList;
 import java.util.List;
 

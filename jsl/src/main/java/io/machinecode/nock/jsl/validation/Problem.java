@@ -53,7 +53,7 @@ public final class Problem {
         return new Formatter().format(PROBLEMS.getString("cycle.detected")).toString();
     }
 
-    public static String invalidTransition(final String executionId, final String fromElement, final String to) {
-        return new Formatter().format(PROBLEMS.getString("invalid.transition"), executionId, fromElement, to).toString();
+    public static String invalidTransition(final String element) {
+        return new Formatter().format(PROBLEMS.getString("invalid.transition"), element).toString();
     }
 }

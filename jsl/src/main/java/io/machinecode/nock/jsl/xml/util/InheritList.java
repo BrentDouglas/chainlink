@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml.util;
 
+import io.machinecode.nock.jsl.util.ForwardingList;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 
