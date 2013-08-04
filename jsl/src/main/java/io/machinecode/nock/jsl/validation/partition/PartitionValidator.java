@@ -12,7 +12,7 @@ public class PartitionValidator extends Validator<Partition> {
     public static final PartitionValidator INSTANCE = new PartitionValidator();
 
     protected PartitionValidator() {
-        super("partition");
+        super(Partition.ELEMENT);
     }
 
     @Override

@@ -11,6 +11,6 @@ public class ItemReaderValidator extends PropertyReferenceValidator<ItemReader> 
     public static final ItemReaderValidator INSTANCE = new ItemReaderValidator();
 
     protected ItemReaderValidator() {
-        super("reader");
+        super(ItemReader.ELEMENT);
     }
 }

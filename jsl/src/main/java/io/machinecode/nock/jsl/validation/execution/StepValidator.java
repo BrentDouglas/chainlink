@@ -19,7 +19,7 @@ public class StepValidator extends Validator<Step> {
     public static final StepValidator INSTANCE = new StepValidator();
 
     protected StepValidator() {
-        super("step");
+        super(Step.ELEMENT);
     }
 
     @Override

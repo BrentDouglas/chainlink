@@ -45,11 +45,15 @@ public final class Problem {
         return new Formatter().format(PROBLEMS.getString("matches.attribute"), attribute, Strings.join(matches), value).toString();
     }
 
+    public static String nonUniqueId(final String id) {
+        return new Formatter().format(PROBLEMS.getString("non.unique.id"), id).toString();
+    }
+
     public static String cycleDetected() {
         return new Formatter().format(PROBLEMS.getString("cycle.detected")).toString();
     }
 
-    public static String nonUniqueId(final String id) {
-        return new Formatter().format(PROBLEMS.getString("non.unique.id"), id).toString();
+    public static String invalidTransition(final String executionId, final String fromElement, final String to) {
+        return new Formatter().format(PROBLEMS.getString("invalid.transition"), executionId, fromElement, to).toString();
     }
 }

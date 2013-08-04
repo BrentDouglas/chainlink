@@ -11,6 +11,6 @@ public class AnalyserValidator extends PropertyReferenceValidator<Analyser> {
     public static final AnalyserValidator INSTANCE = new AnalyserValidator();
 
     protected AnalyserValidator() {
-        super("analyser");
+        super(Analyser.ELEMENT);
     }
 }

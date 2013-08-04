@@ -5,6 +5,8 @@ package io.machinecode.nock.jsl.api.partition;
  */
 public interface Partition<T extends Strategy> {
 
+    String ELEMENT = "partition";
+
     T getStrategy();
 
     Collector getCollector();

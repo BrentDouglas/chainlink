@@ -9,11 +9,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public interface Split extends Execution {
+public interface Split extends TransitionExecution {
 
     String ELEMENT = "split";
-
-    String getNext();
 
     List<? extends Flow> getFlows();
 }

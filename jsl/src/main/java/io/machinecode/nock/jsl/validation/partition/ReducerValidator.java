@@ -11,6 +11,6 @@ public class ReducerValidator extends PropertyReferenceValidator<Reducer> {
     public static final ReducerValidator INSTANCE = new ReducerValidator();
 
     protected ReducerValidator() {
-        super("reducer");
+        super(Reducer.ELEMENT);
     }
 }

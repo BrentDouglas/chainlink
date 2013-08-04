@@ -14,7 +14,7 @@ public class ChunkValidator extends Validator<Chunk> {
     public static final ChunkValidator INSTANCE = new ChunkValidator();
 
     protected ChunkValidator() {
-        super("chunk");
+        super(Chunk.ELEMENT);
     }
 
     @Override

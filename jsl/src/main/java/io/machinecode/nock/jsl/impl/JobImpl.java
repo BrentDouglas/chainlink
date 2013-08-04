@@ -5,8 +5,8 @@ import io.machinecode.nock.jsl.api.Listeners;
 import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.execution.Execution;
 import io.machinecode.nock.jsl.impl.execution.ExecutionImpl;
-import io.machinecode.nock.jsl.validation.CycleCrawler;
-import io.machinecode.nock.jsl.validation.InvalidJobDefinitionException;
+import io.machinecode.nock.jsl.validation.TransitionCrawler;
+import io.machinecode.nock.jsl.validation.InvalidJobException;
 import io.machinecode.nock.jsl.validation.JobValidator;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class JobImpl implements Job {
     private final Listeners listeners;
     private final List<? extends Execution> executions;
 
-    public JobImpl(final Job that) throws InvalidJobDefinitionException {
+    public JobImpl(final Job that) throws InvalidJobException {
         JobValidator.INSTANCE.validate(that);
         this.id = that.getId();
         this.version = that.getVersion();
@@ -31,7 +31,7 @@ public class JobImpl implements Job {
         this.properties = new PropertiesImpl(that.getProperties());
         this.listeners = new ListenersImpl(that.getListeners());
         this.executions = ExecutionImpl.immutableCopyExecutions(that.getExecutions());
-        CycleCrawler.crawl(this);
+        TransitionCrawler.crawl(this);
     }
 
     @Override

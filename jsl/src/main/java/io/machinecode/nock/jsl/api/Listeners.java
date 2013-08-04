@@ -12,5 +12,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public interface Listeners {
 
+    String ELEMENT = "listeners";
+
     List<? extends Listener> getListeners();
 }

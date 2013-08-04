@@ -11,6 +11,6 @@ public class BatchletValidator extends PropertyReferenceValidator<Batchlet> {
     public static final BatchletValidator INSTANCE = new BatchletValidator();
 
     protected BatchletValidator() {
-        super("batchlet");
+        super(Batchlet.ELEMENT);
     }
 }

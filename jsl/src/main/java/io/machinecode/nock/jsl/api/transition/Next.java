@@ -5,5 +5,7 @@ package io.machinecode.nock.jsl.api.transition;
  */
 public interface Next extends Transition {
 
+    String ELEMENT = "next";
+
     String getTo();
 }

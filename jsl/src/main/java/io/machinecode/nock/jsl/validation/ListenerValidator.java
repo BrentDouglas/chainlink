@@ -10,7 +10,7 @@ public class ListenerValidator extends Validator<Listener> {
     public static final ListenerValidator INSTANCE = new ListenerValidator();
 
     protected ListenerValidator() {
-        super("listener");
+        super(Listener.ELEMENT);
     }
 
     @Override

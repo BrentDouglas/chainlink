@@ -15,7 +15,7 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
     public static final DecisionValidator INSTANCE = new DecisionValidator();
 
     protected DecisionValidator() {
-        super("decision");
+        super(Decision.ELEMENT);
     }
 
     @Override

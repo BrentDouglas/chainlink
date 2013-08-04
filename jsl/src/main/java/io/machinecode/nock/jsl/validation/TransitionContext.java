@@ -2,7 +2,10 @@ package io.machinecode.nock.jsl.validation;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.nock.jsl.api.execution.Flow;
+import io.machinecode.nock.jsl.util.Pair;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,29 +14,45 @@ import java.util.Set;
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class TransitionContext {
+public class TransitionContext extends ValidationContext<TransitionContext> {
 
-    private final String element;
     private final String id;
     private final String next;
-    private final List<TransitionContext> children = new LinkedList<TransitionContext>();
-    private boolean failed;
-    private List<TransitionContext> cycle;
-    private final Map<String, TransitionContext> jump;
+    private final Map<String, TransitionContext> jobScope;
+    private final Map<String, TransitionContext> localScope;
+    private final List<Pair<String, String>> transitions;
 
-    public TransitionContext() {
-        this.element = null;
-        this.id = null;
+    public TransitionContext(final String element, final String id) {
+        super(element);
+        this.id = id;
         this.next = null;
-        this.jump = new THashMap<String, TransitionContext>();
+        this.jobScope = new THashMap<String, TransitionContext>(0);
+        this.localScope = this.jobScope;
+        this.transitions = new ArrayList<Pair<String, String>>(0);
     }
 
     public TransitionContext(final String element, final String id, final String next, final TransitionContext parent) {
-        this.element = element;
+        super(element, parent);
         this.id = id;
         this.next = next;
-        this.jump = parent.jump;
-        this.jump.put(id, this);
+        this.transitions = new ArrayList<Pair<String, String>>(0);
+        if (Flow.ELEMENT.equals(element)) {
+            this.localScope = new THashMap<String, TransitionContext>(0);
+        } else {
+            this.localScope = parent.localScope;
+        }
+        if (parent.localScope != this.localScope) {
+            parent.localScope.put(id, this);
+        }
+        this.jobScope = parent.jobScope;
+        this.jobScope.put(id, this);
+        parent.addTransition(element, next);
+    }
+
+    void addTransition(final String element, final String next) {
+        if (next != null) {
+            this.transitions.add(Pair.of(element, next));
+        }
     }
 
     public final boolean hasCycle() {
@@ -45,11 +64,24 @@ public class TransitionContext {
             TransitionContext that = this;
             cycle.add(that);
             trail.add(that.id);
-            while ((that = jump.get(that.next)) != null) {
+            while ((that = jobScope.get(that.next)) != null) {
                 cycle.add(that);
                 if (!trail.add(that.id)) {
-                    this.cycle = cycle;
-                    this.failed = true;
+                    addProblem(Problem.cycleDetected());
+                    for (final TransitionContext problem : cycle) {
+                        final StringBuilder builder = new StringBuilder()
+                                .append("  ")
+                                .append(problem.id)
+                                .append(" -> ")
+                                .append(problem.next);
+                        addProblem(problem.element(builder).toString());
+                    }
+                    final StringBuilder builder = new StringBuilder()
+                            .append("  ")
+                            .append(that.id)
+                            .append(" -> ")
+                            .append(that.next);
+                    addProblem(that.element(builder).toString());
                     ret = true;
                     break;
                 }
@@ -63,30 +95,38 @@ public class TransitionContext {
         return ret;
     }
 
-    public final StringBuilder toTree(final StringBuilder builder) {
-        if (this.failed) {
-            builder.append("Cycle detected:")
-                    .append(System.lineSeparator())
-                    .append(System.lineSeparator());
-            for (final TransitionContext problem : this.cycle) {
-                builder.append(problem.id)
-                        .append(" -> ")
-                        .append(problem.next)
-                        .append(" (")
-                        .append(problem.element)
-                        .append(')')
-                        .append(System.lineSeparator());
+    public final boolean hasInvalidTransfer() {
+        boolean ret = false;
+        //Root node
+        TransitionContext that = this;
+        for (final Pair<String, String> entry : transitions) {
+            if (!localScope.containsKey(entry.getValue())) {
+                addProblem(Problem.invalidTransition(that.id, entry.getKey(), entry.getValue()));
+                ret = true;
             }
-            builder.append(System.lineSeparator())
-                    .append(System.lineSeparator());
         }
-        for (final TransitionContext context : children) {
-            context.toTree(builder);
+
+        for (final TransitionContext child : children) {
+            ret = child.hasInvalidTransfer() || ret;
         }
-        return builder;
+
+        return ret;
     }
 
-    public void addChild(final TransitionContext child) {
-        this.children.add(child);
+    @Override
+    protected StringBuilder element(final StringBuilder builder) {
+        builder.append('<')
+                .append(element);
+        if (id != null) {
+            builder.append(" id=\"")
+                    .append(id)
+                    .append('"');
+        }
+        if (next != null) {
+            builder.append(" next=\"")
+                    .append(next)
+                    .append('"');
+        }
+        return builder.append('>');
     }
 }

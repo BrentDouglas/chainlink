@@ -11,6 +11,6 @@ public class MapperValidator extends PropertyReferenceValidator<Mapper> {
     public static final MapperValidator INSTANCE = new MapperValidator();
 
     protected MapperValidator() {
-        super("mapper");
+        super(Mapper.ELEMENT);
     }
 }

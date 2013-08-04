@@ -11,7 +11,7 @@ public class PropertiesValidator extends Validator<Properties> {
     public static final PropertiesValidator INSTANCE = new PropertiesValidator();
 
     protected PropertiesValidator() {
-        super("properties");
+        super(Properties.ELEMENT);
     }
 
     @Override

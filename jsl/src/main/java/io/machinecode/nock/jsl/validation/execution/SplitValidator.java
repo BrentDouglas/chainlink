@@ -14,7 +14,7 @@ public class SplitValidator extends Validator<Split> {
     public static final SplitValidator INSTANCE = new SplitValidator();
 
     protected SplitValidator() {
-        super("split");
+        super(Split.ELEMENT);
     }
 
     @Override

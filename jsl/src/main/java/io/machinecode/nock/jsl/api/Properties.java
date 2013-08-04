@@ -11,6 +11,8 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public interface Properties {
 
+    String ELEMENT = "properties";
+
     List<? extends Property> getProperties();
 
     String getPartition();

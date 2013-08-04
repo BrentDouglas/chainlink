@@ -11,6 +11,6 @@ public class ItemWriterValidator extends PropertyReferenceValidator<ItemWriter> 
     public static final ItemWriterValidator INSTANCE = new ItemWriterValidator();
 
     protected ItemWriterValidator() {
-        super("writer");
+        super(ItemWriter.ELEMENT);
     }
 }

@@ -13,7 +13,7 @@ public class StopValidator extends Validator<Stop> {
     public static final StopValidator INSTANCE = new StopValidator();
 
     protected StopValidator() {
-        super("stop");
+        super(Stop.ELEMENT);
     }
 
     @Override

@@ -11,6 +11,6 @@ public class CheckpointAlgorithmValidator extends PropertyReferenceValidator<Che
     public static final CheckpointAlgorithmValidator INSTANCE = new CheckpointAlgorithmValidator();
 
     protected CheckpointAlgorithmValidator() {
-        super("checkpoint-algorithm");
+        super(CheckpointAlgorithm.ELEMENT);
     }
 }

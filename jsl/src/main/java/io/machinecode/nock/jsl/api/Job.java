@@ -13,6 +13,8 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public interface Job {
 
+    String ELEMENT = "job";
+
     String NAMESPACE = "http://xmlns.jcp.org/xml/ns/javaee";
 
     String getId();

@@ -7,6 +7,8 @@ import io.machinecode.nock.jsl.api.Properties;
  */
 public interface Plan extends Strategy {
 
+    String ELEMENT = "plan";
+
     int getPartitions();
 
     Integer getThreads();

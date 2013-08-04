@@ -13,7 +13,7 @@ public class EndValidator extends Validator<End> {
     public static final EndValidator INSTANCE = new EndValidator();
 
     protected EndValidator() {
-        super("end");
+        super(End.ELEMENT);
     }
 
     @Override

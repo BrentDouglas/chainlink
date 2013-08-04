@@ -5,5 +5,7 @@ package io.machinecode.nock.jsl.api.task;
  */
 public interface ExceptionClass {
 
+    String ELEMENT = "class";
+
     String getClassName();
 }

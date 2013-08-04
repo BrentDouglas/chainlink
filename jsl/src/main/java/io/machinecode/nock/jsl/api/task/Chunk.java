@@ -5,6 +5,8 @@ package io.machinecode.nock.jsl.api.task;
  */
 public interface Chunk extends Task {
 
+    String ELEMENT = "chunk";
+
     public static final class CheckpointPolicy {
         public static final String ITEM = "item";
         public static final String CUSTOM = "custom";

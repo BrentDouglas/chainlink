@@ -7,4 +7,6 @@ import io.machinecode.nock.jsl.api.PropertyReference;
  */
 public interface Batchlet extends Task, PropertyReference {
 
+    String ELEMENT = "batchlet";
+
 }

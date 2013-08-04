@@ -10,7 +10,7 @@ public class PropertyValidator extends Validator<Property> {
     public static final PropertyValidator INSTANCE = new PropertyValidator();
 
     protected PropertyValidator() {
-        super("property");
+        super(Property.ELEMENT);
     }
 
     @Override

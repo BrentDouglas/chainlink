@@ -16,11 +16,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public interface Step<T extends Task, U extends Strategy> extends Execution {
+public interface Step<T extends Task, U extends Strategy> extends TransitionExecution {
 
     String ELEMENT = "step";
-
-    String getNext();
 
     int getStartLimit();
 

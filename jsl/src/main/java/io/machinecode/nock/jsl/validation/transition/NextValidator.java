@@ -13,7 +13,7 @@ public class NextValidator extends Validator<Next> {
     public static final NextValidator INSTANCE = new NextValidator();
 
     protected NextValidator() {
-        super("next");
+        super(Next.ELEMENT);
     }
 
     @Override

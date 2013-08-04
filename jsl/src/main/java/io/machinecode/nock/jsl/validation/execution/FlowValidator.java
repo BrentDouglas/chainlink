@@ -16,7 +16,7 @@ public class FlowValidator extends Validator<Flow> {
     public static final FlowValidator INSTANCE = new FlowValidator();
 
     protected FlowValidator() {
-        super("flow");
+        super(Flow.ELEMENT);
     }
 
     @Override

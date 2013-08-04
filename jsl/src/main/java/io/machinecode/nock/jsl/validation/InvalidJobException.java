@@ -3,11 +3,11 @@ package io.machinecode.nock.jsl.validation;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class CycleException extends RuntimeException {
+public class InvalidJobException extends RuntimeException {
 
-    private final CycleContext context;
+    private final ValidationContext context;
 
-    public CycleException(final CycleContext context) {
+    public InvalidJobException(final ValidationContext context) {
         this.context = context;
     }
 

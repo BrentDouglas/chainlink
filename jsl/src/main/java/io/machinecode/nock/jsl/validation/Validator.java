@@ -15,7 +15,7 @@ public abstract class Validator<T> {
         final ValidationContext context = new ValidationContext(element);
         doValidate(that, context);
         if (context.hasFailed()) {
-            throw new InvalidJobDefinitionException(context);
+            throw new InvalidJobException(context);
         }
     }
 

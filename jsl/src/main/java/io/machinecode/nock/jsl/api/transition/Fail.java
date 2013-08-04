@@ -5,5 +5,7 @@ package io.machinecode.nock.jsl.api.transition;
  */
 public interface Fail extends Transition {
 
+    String ELEMENT = "fail";
+
     String getExitStatus();
 }

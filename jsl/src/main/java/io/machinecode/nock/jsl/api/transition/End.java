@@ -5,5 +5,7 @@ package io.machinecode.nock.jsl.api.transition;
  */
 public interface End extends Transition {
 
+    String ELEMENT = "end";
+
     String getExitStatus();
 }

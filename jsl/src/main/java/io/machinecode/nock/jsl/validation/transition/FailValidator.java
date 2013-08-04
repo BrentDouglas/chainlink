@@ -13,7 +13,7 @@ public class FailValidator extends Validator<Fail> {
     public static final FailValidator INSTANCE = new FailValidator();
 
     protected FailValidator() {
-        super("fail");
+        super(Fail.ELEMENT);
     }
 
     @Override

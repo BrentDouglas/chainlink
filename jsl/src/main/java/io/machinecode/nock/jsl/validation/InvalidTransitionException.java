@@ -3,11 +3,11 @@ package io.machinecode.nock.jsl.validation;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class InvalidJobDefinitionException extends RuntimeException {
+public class InvalidTransitionException extends RuntimeException {
 
-    private final ValidationContext context;
+    private final TransitionContext context;
 
-    public InvalidJobDefinitionException(final ValidationContext context) {
+    public InvalidTransitionException(final TransitionContext context) {
         this.context = context;
     }
 

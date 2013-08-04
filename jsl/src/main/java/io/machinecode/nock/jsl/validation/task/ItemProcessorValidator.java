@@ -11,6 +11,6 @@ public class ItemProcessorValidator extends PropertyReferenceValidator<ItemProce
     public static final ItemProcessorValidator INSTANCE = new ItemProcessorValidator();
 
     protected ItemProcessorValidator() {
-        super("processor");
+        super(ItemProcessor.ELEMENT);
     }
 }

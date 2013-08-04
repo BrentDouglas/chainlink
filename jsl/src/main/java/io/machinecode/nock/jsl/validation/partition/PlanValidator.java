@@ -14,7 +14,7 @@ public class PlanValidator extends Validator<Plan> {
     public static final PlanValidator INSTANCE = new PlanValidator();
 
     protected PlanValidator() {
-        super("plan");
+        super(Plan.ELEMENT);
     }
 
     @Override

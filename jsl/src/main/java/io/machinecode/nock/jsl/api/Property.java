@@ -5,6 +5,8 @@ package io.machinecode.nock.jsl.api;
  */
 public interface Property {
 
+    String ELEMENT = "property";
+
     String getName();
 
     String getValue();

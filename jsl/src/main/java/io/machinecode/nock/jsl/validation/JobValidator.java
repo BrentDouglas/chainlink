@@ -12,7 +12,7 @@ public class JobValidator extends Validator<Job> {
     public static final JobValidator INSTANCE = new JobValidator();
 
     protected JobValidator() {
-        super("job");
+        super(Job.ELEMENT);
     }
 
     @Override

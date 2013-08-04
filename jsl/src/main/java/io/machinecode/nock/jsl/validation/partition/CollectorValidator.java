@@ -11,6 +11,6 @@ public class CollectorValidator extends PropertyReferenceValidator<Collector> {
     public static final CollectorValidator INSTANCE = new CollectorValidator();
 
     protected CollectorValidator() {
-        super("collector");
+        super(Collector.ELEMENT);
     }
 }
