@@ -11,6 +11,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "PartitionReducer", propOrder = {
+//        "properties"
+//})
 public class XmlReducer extends XmlPropertyReference<XmlReducer> implements Reducer {
 
     @Override

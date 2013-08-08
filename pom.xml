@@ -4,16 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.machinecode</groupId>
-    <artifactId>nock</artifactId>
+    <groupId>io.machinecode.nock</groupId>
+    <artifactId>nock-parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
     <modules>
         <module>jsl</module>
+        <module>core</module>
+        <module>test</module>
     </modules>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <version.javax.batch.batch-api.version>1.0</version.javax.batch.batch-api.version>
         <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
 
@@ -25,8 +30,15 @@
         <dependencies>
             <dependency>
                 <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-jsl</artifactId>
+                <version>${project.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.nock</groupId>
                 <artifactId>nock-core</artifactId>
                 <version>${project.version}</version>
+                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>javax.batch</groupId>

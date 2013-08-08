@@ -8,21 +8,24 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlSchemaType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@XmlType(name = "split")
 @XmlAccessorType(NONE)
+//@XmlType(name = "Split", propOrder = {
+//        "flows"
+//})
 public class XmlSplit implements XmlExecution<XmlSplit>, Split {
 
     @XmlID
+    @XmlSchemaType(name = "ID")
     @XmlAttribute(name = "id", required = true)
     private String id;
 

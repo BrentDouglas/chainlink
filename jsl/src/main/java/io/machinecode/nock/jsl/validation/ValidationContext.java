@@ -37,10 +37,6 @@ public class ValidationContext<T extends ValidationContext<T>> {
         ws(builder, depth, section, section, section, last);
     }
 
-    protected void ws(final StringBuilder builder, final int depth, final String first, final String section, final String last) {
-        ws(builder, depth, first, section, section, last);
-    }
-
     protected void ws(final StringBuilder builder, final int depth, final String first, final String section, final String secondLast, final String last) {
         for (int i = 0; i < depth; i++) {
             builder.append(i == (depth - 1)
@@ -73,7 +69,6 @@ public class ValidationContext<T extends ValidationContext<T>> {
                 } else {
                     ws(builder, depth, "|  ", "|     {  ");
                 }
-                //ws(builder, depth, "|  ", "|  ", "|  *  ");
                 ++i;
                 builder.append(problem)
                         .append(System.lineSeparator());
@@ -93,8 +88,7 @@ public class ValidationContext<T extends ValidationContext<T>> {
     }
 
     protected StringBuilder toTreeChildren(final StringBuilder builder, final int depth) {
-        for (int i = 0; i < children.size(); ++i) {
-            final ValidationContext context = children.get(i);
+        for (final ValidationContext<?> context : children) {
             context.toTree(builder, depth + 1);
         }
         return builder;
@@ -106,7 +100,7 @@ public class ValidationContext<T extends ValidationContext<T>> {
     }
 
     public void addId(final String id) {
-        final ValidationContext old;
+        final ValidationContext<?> old;
         if ((old = this.ids.put(id, this)) != null) {
             addProblem(Problem.nonUniqueId(id));
             old.addProblem(Problem.nonUniqueId(id));
@@ -122,7 +116,7 @@ public class ValidationContext<T extends ValidationContext<T>> {
         if (failed) {
             return true;
         }
-        for (final ValidationContext context : children) {
+        for (final ValidationContext<?> context : children) {
             if (context.hasFailed()) {
                 return true;
             }

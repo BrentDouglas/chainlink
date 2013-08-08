@@ -11,6 +11,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "Batchlet", propOrder = {
+//        "properties"
+//})
 public class XmlBatchlet extends XmlPropertyReference<XmlBatchlet> implements XmlTask<XmlBatchlet>, Batchlet {
 
     @Override

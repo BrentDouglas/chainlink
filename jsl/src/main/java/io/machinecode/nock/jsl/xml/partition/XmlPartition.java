@@ -8,13 +8,19 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "Partition", propOrder = {
+//        "strategy",
+//        "collector",
+//        "analyzer",
+//        "reducer"
+//})
 public class XmlPartition implements Copyable<XmlPartition>, Partition {
 
     @XmlElements({

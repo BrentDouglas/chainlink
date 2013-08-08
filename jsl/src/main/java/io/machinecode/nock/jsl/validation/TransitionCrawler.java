@@ -14,7 +14,7 @@ import io.machinecode.nock.jsl.api.transition.Transition;
  */
 public final class TransitionCrawler {
 
-    public static void crawl(final Job that) {
+    public static void validateTransitions(final Job that) {
         final TransitionContext context = new TransitionContext(Job.ELEMENT, that.getId());
         for (final Execution execution : that.getExecutions()) {
             crawl(execution, context);

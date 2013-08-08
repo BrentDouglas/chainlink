@@ -10,7 +10,6 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@XmlAccessorType(NONE)
 public interface Flow extends TransitionExecution {
 
     String ELEMENT = "flow";

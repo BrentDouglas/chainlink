@@ -11,6 +11,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "Collector", propOrder = {
+//        "properties"
+//})
 public class XmlCollector extends XmlPropertyReference<XmlCollector> implements Collector {
 
     @Override

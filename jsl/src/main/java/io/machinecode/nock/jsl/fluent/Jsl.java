@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.fluent;
 
+import io.machinecode.nock.jsl.fluent.partition.FluentMapper;
 import io.machinecode.nock.jsl.fluent.task.FluentBatchlet;
 import io.machinecode.nock.jsl.fluent.task.FluentCheckpointAlgorithm;
 import io.machinecode.nock.jsl.fluent.task.FluentChunk;
@@ -11,7 +12,6 @@ import io.machinecode.nock.jsl.fluent.task.FluentItemWriter;
 import io.machinecode.nock.jsl.fluent.partition.FluentAnalyser;
 import io.machinecode.nock.jsl.fluent.partition.FluentCollector;
 import io.machinecode.nock.jsl.fluent.partition.FluentMapperPartition;
-import io.machinecode.nock.jsl.fluent.partition.FluentPartitionMapper;
 import io.machinecode.nock.jsl.fluent.partition.FluentPlan;
 import io.machinecode.nock.jsl.fluent.partition.FluentReducer;
 import io.machinecode.nock.jsl.fluent.partition.FluentPlanPartition;
@@ -162,7 +162,7 @@ public class Jsl {
         return new FluentMapperPartition();
     }
 
-    public static FluentPartitionMapper strategyAsMapper() {
+    public static FluentMapper strategyAsMapper() {
         return mapper();
     }
 
@@ -170,8 +170,8 @@ public class Jsl {
         return plan();
     }
 
-    public static FluentPartitionMapper mapper() {
-        return new FluentPartitionMapper();
+    public static FluentMapper mapper() {
+        return new FluentMapper();
     }
 
     public static FluentPlan plan() {

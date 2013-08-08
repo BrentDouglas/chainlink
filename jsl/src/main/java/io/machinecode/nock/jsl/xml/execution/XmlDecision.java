@@ -1,8 +1,8 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.jsl.api.execution.Decision;
-import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
@@ -15,21 +15,25 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlSchemaType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@XmlType(name = "decision")
 @XmlAccessorType(NONE)
+//@XmlType(name = "Decision", propOrder = {
+//        "properties",
+//        "transitions"
+//})
 public class XmlDecision implements XmlExecution<XmlDecision>, Decision {
 
     @XmlID
+    @XmlSchemaType(name = "ID")
     @XmlAttribute(name = "id", required = true)
     private String id;
 

@@ -9,9 +9,11 @@ public interface Plan extends Strategy {
 
     String ELEMENT = "plan";
 
-    int getPartitions();
+    String ONE = "1";
 
-    Integer getThreads();
+    String getPartitions();
+
+    String getThreads();
 
     Properties getProperties();
 }

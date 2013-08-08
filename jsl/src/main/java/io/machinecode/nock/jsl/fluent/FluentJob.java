@@ -5,7 +5,6 @@ import io.machinecode.nock.jsl.api.Listener;
 import io.machinecode.nock.jsl.api.Listeners;
 import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.execution.Execution;
-import io.machinecode.nock.jsl.impl.JobImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ public class FluentJob implements Job {
 
     private String id;
     private String version = "1.0";
-    private boolean restartable = true;
+    private String restartable = "true";
     private final FluentProperties properties = new FluentProperties();
     private final FluentListeners listeners = new FluentListeners();
     private final List<Execution> executions = new ArrayList<Execution>(0);
@@ -43,11 +42,11 @@ public class FluentJob implements Job {
     }
 
     @Override
-    public boolean isRestartable() {
+    public String isRestartable() {
         return this.restartable;
     }
 
-    public FluentJob setRestartable(final boolean restartable) {
+    public FluentJob setRestartable(final String restartable) {
         this.restartable = restartable;
         return this;
     }
@@ -80,9 +79,5 @@ public class FluentJob implements Job {
     public FluentJob addExecution(final Execution execution) {
         this.executions.add(execution);
         return this;
-    }
-
-    public JobImpl build() {
-        return new JobImpl(this);
     }
 }

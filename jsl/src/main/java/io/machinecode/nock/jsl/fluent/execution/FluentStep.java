@@ -21,10 +21,10 @@ import java.util.List;
 public abstract class FluentStep<T extends Task, U extends Strategy> extends FluentExecution<FluentStep<T, U>> implements Step <T, U> {
 
     private String next;
-    private int startLimit = 0;
-    private boolean allowStartIfComplete = false;
-    private final FluentListeners listeners = new FluentListeners();
+    private String startLimit = ZERO;
+    private String allowStartIfComplete = "false";
     private final FluentProperties properties = new FluentProperties();
+    private final FluentListeners listeners = new FluentListeners();
     private final List<Transition> transitions = new ArrayList<Transition>(0);
     private T task;
     private Partition<U> partition;
@@ -40,32 +40,22 @@ public abstract class FluentStep<T extends Task, U extends Strategy> extends Flu
     }
 
     @Override
-    public int getStartLimit() {
+    public String getStartLimit() {
         return this.startLimit;
     }
 
-    public FluentStep<T, U> setStartLimit(final int startLimit) {
+    public FluentStep<T, U> setStartLimit(final String startLimit) {
         this.startLimit = startLimit;
         return this;
     }
 
     @Override
-    public boolean isAllowStartIfComplete() {
+    public String getAllowStartIfComplete() {
         return this.allowStartIfComplete;
     }
 
-    public FluentStep<T, U> setAllowStartIfComplete(final boolean allowStartIfComplete) {
+    public FluentStep<T, U> setAllowStartIfComplete(final String allowStartIfComplete) {
         this.allowStartIfComplete = allowStartIfComplete;
-        return this;
-    }
-
-    @Override
-    public Listeners getListeners() {
-        return this.listeners;
-    }
-
-    public FluentStep<T, U> addListener(final Listener listener) {
-        this.listeners.addListener(listener);
         return this;
     }
 
@@ -76,6 +66,16 @@ public abstract class FluentStep<T extends Task, U extends Strategy> extends Flu
 
     public FluentStep<T, U> addProperty(final String name, final String value) {
         this.properties.getProperties().add(new FluentProperty().setName(name).setValue(value));
+        return this;
+    }
+
+    @Override
+    public Listeners getListeners() {
+        return this.listeners;
+    }
+
+    public FluentStep<T, U> addListener(final Listener listener) {
+        this.listeners.addListener(listener);
         return this;
     }
 

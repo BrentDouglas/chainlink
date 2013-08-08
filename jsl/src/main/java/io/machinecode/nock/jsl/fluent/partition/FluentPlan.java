@@ -9,27 +9,27 @@ import io.machinecode.nock.jsl.fluent.FluentProperties;
  */
 public class FluentPlan implements Plan {
 
-    private int partitions = 1;
-    private Integer threads;
+    private String partitions = ONE;
+    private String threads;
     private final FluentProperties properties = new FluentProperties();
 
 
     @Override
-    public int getPartitions() {
+    public String getPartitions() {
         return this.partitions;
     }
 
-    public FluentPlan setPartitions(final int partitions) {
+    public FluentPlan setPartitions(final String partitions) {
         this.partitions = partitions;
         return this;
     }
 
     @Override
-    public Integer getThreads() {
+    public String getThreads() {
         return this.threads;
     }
 
-    public FluentPlan setThreads(final Integer threads) {
+    public FluentPlan setThreads(final String threads) {
         this.threads = threads;
         return this;
     }

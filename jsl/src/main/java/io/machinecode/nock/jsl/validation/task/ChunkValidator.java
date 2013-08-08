@@ -27,18 +27,18 @@ public class ChunkValidator extends Validator<Chunk> {
             context.addProblem(Problem.attributeMatches("checkpoint-policy", that.getCheckpointPolicy(), CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM));
         }
 
-        if (that.getItemCount() < 0) {
-            context.addProblem(Problem.attributePositive("item-count", that.getItemCount()));
-        }
-        if (that.getTimeLimit() < 0) {
-            context.addProblem(Problem.attributePositive("time-limit", that.getTimeLimit()));
-        }
-        if (that.getSkipLimit() < 0) {
-            context.addProblem(Problem.attributePositive("skip-limit", that.getSkipLimit()));
-        }
-        if (that.getRetryLimit() < 0) {
-            context.addProblem(Problem.attributePositive("retry-limit", that.getRetryLimit()));
-        }
+        //if (that.getItemCount() < 0) {
+        //    context.addProblem(Problem.attributePositive("item-count", that.getItemCount()));
+        //}
+        //if (that.getTimeLimit() < 0) {
+        //    context.addProblem(Problem.attributePositive("time-limit", that.getTimeLimit()));
+        //}
+        //if (that.getSkipLimit() < 0) {
+        //    context.addProblem(Problem.attributePositive("skip-limit", that.getSkipLimit()));
+        //}
+        //if (that.getRetryLimit() < 0) {
+        //    context.addProblem(Problem.attributePositive("retry-limit", that.getRetryLimit()));
+        //}
 
         if (that.getReader() == null) {
             context.addProblem(Problem.notNullElement("reader"));

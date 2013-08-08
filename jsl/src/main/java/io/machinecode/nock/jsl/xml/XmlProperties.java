@@ -10,13 +10,16 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "Properties", propOrder = {
+//        "properties"
+//})
 public class XmlProperties extends MergeableList<XmlProperties> implements Properties {
 
     @XmlAttribute(name = "partition", required = false)

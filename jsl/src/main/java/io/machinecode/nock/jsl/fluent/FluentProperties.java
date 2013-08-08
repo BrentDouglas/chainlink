@@ -2,6 +2,7 @@ package io.machinecode.nock.jsl.fluent;
 
 import io.machinecode.nock.jsl.api.Properties;
 import io.machinecode.nock.jsl.api.Property;
+import io.machinecode.nock.jsl.util.ForwardingList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,14 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentProperties<T extends FluentProperties<T>> implements Properties {
+public class FluentProperties<T extends FluentProperties<T>> extends ForwardingList<Property> implements Properties {
 
     private String partition;
-    private final List<Property> properties = new ArrayList<Property>(0);
+    //private final List<Property> properties = new ArrayList<Property>(0);
+
+    public FluentProperties() {
+        super(new ArrayList<Property>());
+    }
 
     @Override
     public String getPartition() {
@@ -26,16 +31,16 @@ public class FluentProperties<T extends FluentProperties<T>> implements Properti
 
     @Override
     public List<Property> getProperties() {
-        return this.properties;
+        return this.delegate;
     }
 
     public T addProperty(final Property property) {
-        this.properties.add(property);
+        this.delegate.add(property);
         return (T) this;
     }
 
     public T addProperty(final String name, final String value) {
-        this.properties.add(new FluentProperty().setName(name).setValue(value));
+        this.delegate.add(new FluentProperty().setName(name).setValue(value));
         return (T) this;
     }
 }

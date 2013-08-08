@@ -1,7 +1,6 @@
 package io.machinecode.nock.jsl.validation.partition;
 
 import io.machinecode.nock.jsl.api.partition.Plan;
-import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.PropertiesValidator;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;
@@ -22,12 +21,12 @@ public class PlanValidator extends Validator<Plan> {
         if (that.getProperties() != null) {
             PropertiesValidator.INSTANCE.validate(that.getProperties(), context);
         }
-        if (that.getPartitions() < 0) {
-            context.addProblem(Problem.attributePositive("partitions", that.getPartitions()));
-        }
+        //if (that.getPartitions() < 0) {
+        //    context.addProblem(Problem.attributePositive("partitions", that.getPartitions()));
+        //}
         //This can be null and will get set in the PlanImpl constructor
-        if (that.getThreads() != null && that.getThreads() < 0) {
-            context.addProblem(Problem.attributePositive("threads", that.getThreads()));
-        }
+        //if (that.getThreads() != null && that.getThreads() < 0) {
+        //    context.addProblem(Problem.attributePositive("threads", that.getThreads()));
+        //}
     }
 }

@@ -1,32 +1,30 @@
 package io.machinecode.nock.jsl.api.execution;
 
 import io.machinecode.nock.jsl.api.Listeners;
-import io.machinecode.nock.jsl.api.task.Task;
 import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.partition.Strategy;
 import io.machinecode.nock.jsl.api.partition.Partition;
+import io.machinecode.nock.jsl.api.partition.Strategy;
+import io.machinecode.nock.jsl.api.task.Task;
 import io.machinecode.nock.jsl.api.transition.Transition;
 
-import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.List;
-
-import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@XmlAccessorType(NONE)
 public interface Step<T extends Task, U extends Strategy> extends TransitionExecution {
 
     String ELEMENT = "step";
 
-    int getStartLimit();
+    String ZERO = "0";
 
-    boolean isAllowStartIfComplete();
+    String getStartLimit();
 
-    Listeners getListeners();
+    String getAllowStartIfComplete();
 
     Properties getProperties();
+
+    Listeners getListeners();
 
     T getTask();
 

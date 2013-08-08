@@ -1,12 +1,11 @@
 package io.machinecode.nock.jsl.xml;
 
 import io.machinecode.nock.jsl.api.Job;
-import io.machinecode.nock.jsl.impl.JobImpl;
 import io.machinecode.nock.jsl.xml.execution.XmlDecision;
+import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 import io.machinecode.nock.jsl.xml.execution.XmlFlow;
 import io.machinecode.nock.jsl.xml.execution.XmlSplit;
 import io.machinecode.nock.jsl.xml.execution.XmlStep;
-import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 import io.machinecode.nock.jsl.xml.util.Inheritable;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -16,10 +15,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
@@ -27,19 +27,23 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlRootElement(namespace = NAMESPACE, name = "job")
 @XmlAccessorType(NONE)
+//@XmlType(name = "Job", propOrder = {
+//        "properties",
+//        "listeners",
+//        "executions"
+//})
 public class XmlJob extends Inheritable<XmlJob> implements Job {
 
-    public static final String NAMESPACE = "http://xmlns.jcp.org/xml/ns/javaee";
-
     @XmlID
+    @XmlSchemaType(name = "ID")
     @XmlAttribute(name = "id", required = true)
     private String id;
 
     @XmlAttribute(name = "version", required = false)
-    private String version = "1.0";
+    private static final String version = "1.0"; //fixed
 
     @XmlAttribute(name = "restartable", required = false)
-    private boolean restartable = true;
+    private String restartable = "true";
 
     @XmlElement(name = "properties", namespace = NAMESPACE, required = false, type = XmlProperties.class)
     private XmlProperties properties;
@@ -71,17 +75,12 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
         return version;
     }
 
-    public XmlJob setVersion(final String version) {
-        this.version = version;
-        return this;
-    }
-
     @Override
-    public boolean isRestartable() {
+    public String isRestartable() {
         return restartable;
     }
 
-    public XmlJob setRestartable(final boolean restartable) {
+    public XmlJob setRestartable(final String restartable) {
         this.restartable = restartable;
         return this;
     }
@@ -130,7 +129,6 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
             copy.properties = Util.merge(copy.properties, that.properties);
             copy.listeners = Util.merge(copy.listeners, that.listeners);
             // 4.1
-            copy.version = Util.attributeRule(copy.version, that.version); // 4.4.1
             copy.restartable = Util.attributeRule(copy.restartable, that.restartable); // 4.4.1
         }
         copy.executions = Util.inheritingList(repository, this.executions);
@@ -146,15 +144,10 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
     public XmlJob copy(final XmlJob that) {
         super.copy(that);
         that.setId(this.id);
-        that.setVersion(this.version);
         that.setRestartable(this.restartable);
         that.setProperties(Util.copy(this.properties));
         that.setListeners(Util.copy(this.listeners));
         that.setExecutions(Util.copyList(this.executions));
         return that;
-    }
-
-    public JobImpl build() {
-        return new JobImpl(this);
     }
 }

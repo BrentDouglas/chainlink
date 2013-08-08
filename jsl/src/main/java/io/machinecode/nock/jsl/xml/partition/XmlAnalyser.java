@@ -11,6 +11,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "Analyser", propOrder = {
+//        "properties"
+//})
 public class XmlAnalyser extends XmlPropertyReference<XmlAnalyser> implements Analyser {
 
     @Override

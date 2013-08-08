@@ -29,9 +29,9 @@ public class StepValidator extends Validator<Step> {
         } else {
             context.addId(that.getId());
         }
-        if (that.getStartLimit() < 0) {
-            context.addProblem(Problem.attributePositive("start-limit", that.getStartLimit()));
-        }
+        //if (that.getStartLimit() < 0) {
+        //    context.addProblem(Problem.attributePositive("start-limit", that.getStartLimit()));
+        //}
 
         if (that.getTransitions() != null) {
             for (final Object transition : that.getTransitions()) {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
+     id="parent1" version="1.0">
+    <listeners>
+        <listener ref="StepAuditor"/>
+    </listeners>
+    <!-- This job runs step1, then step2 -->
+    <step id="step1" next="step2">
+        <batchlet ref="Doit"/>
+    </step>
+    <step id="step2">
+        <batchlet ref="Doit2"/>
+    </step>
+</job>

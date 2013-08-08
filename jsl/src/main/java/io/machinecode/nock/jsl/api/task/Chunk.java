@@ -7,6 +7,9 @@ public interface Chunk extends Task {
 
     String ELEMENT = "chunk";
 
+    String TEN = "10";
+    String ZERO = "0";
+
     public static final class CheckpointPolicy {
         public static final String ITEM = "item";
         public static final String CUSTOM = "custom";
@@ -14,13 +17,13 @@ public interface Chunk extends Task {
 
     String getCheckpointPolicy();
 
-    int getItemCount();
+    String getItemCount();
 
-    int getTimeLimit();
+    String getTimeLimit();
 
-    int getSkipLimit();
+    String getSkipLimit();
 
-    int getRetryLimit();
+    String getRetryLimit();
 
     ItemReader getReader();
 

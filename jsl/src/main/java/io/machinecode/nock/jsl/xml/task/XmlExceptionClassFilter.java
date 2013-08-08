@@ -8,13 +8,17 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "ExceptionClassFilter", propOrder = {
+//        "includes",
+//        "excludes"
+//})
 public class XmlExceptionClassFilter extends MergeableList<XmlExceptionClassFilter> implements ExceptionClassFilter {
 
     @XmlElement(name = "include", namespace = NAMESPACE, required = false)

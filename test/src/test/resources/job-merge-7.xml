@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
+     id="job1" version="1.0">
+    <step id="step1" abstract="true">
+        <properties>
+            <property name="debug" value="false"/>
+        </properties>
+        <chunk item-count="50"> <!-- ref="Postings" was in spec but is not a valid attribute -->
+            <reader ref="PostingReader">
+                <properties>
+                    <property name="infile"
+                              value="#{jobProperties['step1.infile']}?:in.txt"/>
+                </properties>
+            </reader>
+            <processor ref="PostingProcessing"/>
+            <writer ref="PostingWriter">
+                <properties>
+                    <property name="outfile"
+                              value="#{jobProperties['step1.outfile']}?:out.txt"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+    <!-- This job runs s1 -->
+    <step id="s1" parent="step1">
+        <properties merge="true">
+            <property name="debug" value="true"/>
+            <property name="step1.infile" value="postings.out.txt"/>
+            <property name="step1.outfile" value="postings.out.txt"/>
+        </properties>
+        <chunk item-count="100"/> <!-- ref="Postings" was in spec but is not a valid attribute -->
+    </step>
+</job>

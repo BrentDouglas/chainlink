@@ -11,6 +11,7 @@ import static javax.xml.bind.annotation.XmlAccessType.FIELD;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(FIELD)
+//@XmlType(name = "Next")
 public class XmlNext implements XmlTransition<XmlNext>, Next {
 
     @XmlAttribute(name = "on", required = true)

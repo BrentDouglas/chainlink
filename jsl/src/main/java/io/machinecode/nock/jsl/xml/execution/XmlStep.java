@@ -4,10 +4,10 @@ import io.machinecode.nock.jsl.api.execution.Step;
 import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlListeners;
-import io.machinecode.nock.jsl.xml.task.XmlTask;
 import io.machinecode.nock.jsl.xml.XmlProperties;
-import io.machinecode.nock.jsl.xml.task.XmlChunk;
 import io.machinecode.nock.jsl.xml.partition.XmlPartition;
+import io.machinecode.nock.jsl.xml.task.XmlChunk;
+import io.machinecode.nock.jsl.xml.task.XmlTask;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
@@ -22,21 +22,28 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlSchemaType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@XmlType(name = "step")
 @XmlAccessorType(NONE)
+//@XmlType(name = "Step", propOrder = {
+//        "properties",
+//        "listeners",
+//        "task",
+//        "partition",
+//        "transitions"
+//})
 public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlStep>, Step {
 
     @XmlID
+    @XmlSchemaType(name = "ID")
     @XmlAttribute(name = "id", required = true)
     private String id;
 
@@ -44,16 +51,16 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
     private String next;
 
     @XmlAttribute(name = "start-limit", required = false)
-    private int startLimit = 0;
+    private String startLimit = ZERO;
 
     @XmlAttribute(name = "allow-start-if-complete", required = false)
-    private boolean allowStartIfComplete = false;
-
-    @XmlElement(name = "listeners", namespace = NAMESPACE, required = false)
-    private XmlListeners listeners;
+    private String allowStartIfComplete = "false";
 
     @XmlElement(name = "properties", namespace = NAMESPACE, required = false)
     private XmlProperties properties;
+
+    @XmlElement(name = "listeners", namespace = NAMESPACE, required = false)
+    private XmlListeners listeners;
 
     @XmlElements({
             @XmlElement(name = "batchlet", namespace = NAMESPACE, required = false, type = XmlBatchlet.class),
@@ -94,32 +101,22 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
     }
 
     @Override
-    public int getStartLimit() {
+    public String getStartLimit() {
         return startLimit;
     }
 
-    public XmlStep setStartLimit(final int startLimit) {
+    public XmlStep setStartLimit(final String startLimit) {
         this.startLimit = startLimit;
         return this;
     }
 
     @Override
-    public boolean isAllowStartIfComplete() {
+    public String getAllowStartIfComplete() {
         return allowStartIfComplete;
     }
 
-    public XmlStep setAllowStartIfComplete(final boolean allowStartIfComplete) {
+    public XmlStep setAllowStartIfComplete(final String allowStartIfComplete) {
         this.allowStartIfComplete = allowStartIfComplete;
-        return this;
-    }
-
-    @Override
-    public XmlListeners getListeners() {
-        return listeners;
-    }
-
-    public XmlStep setListeners(final XmlListeners listeners) {
-        this.listeners = listeners;
         return this;
     }
 
@@ -130,6 +127,16 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
 
     public XmlStep setProperties(final XmlProperties properties) {
         this.properties = properties;
+        return this;
+    }
+
+    @Override
+    public XmlListeners getListeners() {
+        return listeners;
+    }
+
+    public XmlStep setListeners(final XmlListeners listeners) {
+        this.listeners = listeners;
         return this;
     }
 

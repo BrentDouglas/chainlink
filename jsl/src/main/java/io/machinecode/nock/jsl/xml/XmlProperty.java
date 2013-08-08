@@ -12,6 +12,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "Property")
 public class XmlProperty implements Copyable<XmlProperty>, Property {
 
     @XmlAttribute(name = "name", required = true)

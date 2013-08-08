@@ -1,7 +1,6 @@
 package io.machinecode.nock.jsl.xml.transition;
 
 import io.machinecode.nock.jsl.api.transition.Fail;
-import io.machinecode.nock.jsl.xml.TerminatingAttributes;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -11,7 +10,8 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlFail extends TerminatingAttributes<XmlFail> implements XmlTransition<XmlFail>, Fail {
+//@XmlType(name = "Fail")
+public class XmlFail extends XmlTerminatingTransition<XmlFail> implements XmlTransition<XmlFail>, Fail {
 
     @Override
     public XmlFail copy() {

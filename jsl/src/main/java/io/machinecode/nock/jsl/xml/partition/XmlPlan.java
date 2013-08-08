@@ -8,40 +8,43 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "PartitionPlan", propOrder = {
+//        "properties"
+//})
 public class XmlPlan implements XmlStrategy<XmlPlan>, Plan {
 
     @XmlAttribute(name = "partitions", required = false)
-    private int partitions = 1;
+    private String partitions = ONE;
 
     @XmlAttribute(name = "threads", required = false)
-    private Integer threads;
+    private String threads;
 
     @XmlElement(name = "properties", namespace = NAMESPACE, required = false)
     private XmlProperties properties;
 
     @Override
-    public int getPartitions() {
+    public String getPartitions() {
         return partitions;
     }
 
-    public XmlPlan setPartitions(final int partitions) {
+    public XmlPlan setPartitions(final String partitions) {
         this.partitions = partitions;
         return this;
     }
 
     @Override
-    public Integer getThreads() {
+    public String getThreads() {
         return threads;
     }
 
-    public XmlPlan setThreads(final Integer threads) {
+    public XmlPlan setThreads(final String threads) {
         this.threads = threads;
         return this;
     }

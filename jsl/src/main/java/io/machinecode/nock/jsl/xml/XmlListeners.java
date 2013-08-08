@@ -6,17 +6,19 @@ import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "Listeners", propOrder = {
+//        "listeners"
+//})
 public class XmlListeners extends MergeableList<XmlListeners> implements Listeners {
 
     @XmlElement(name = "listener", namespace = NAMESPACE, required = false)

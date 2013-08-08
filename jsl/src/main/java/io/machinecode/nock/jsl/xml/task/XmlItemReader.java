@@ -11,6 +11,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
+//@XmlType(name = "ItemReader", propOrder = {
+//        "properties"
+//})
 public class XmlItemReader extends XmlPropertyReference<XmlItemReader> implements ItemReader {
 
     @Override

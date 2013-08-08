@@ -1,13 +1,13 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.jsl.api.execution.Flow;
+import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
 import io.machinecode.nock.jsl.xml.transition.XmlStop;
 import io.machinecode.nock.jsl.xml.transition.XmlTransition;
 import io.machinecode.nock.jsl.xml.util.Inheritable;
-import io.machinecode.nock.jsl.xml.Repository;
 import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,21 +15,25 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlSchemaType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.xml.XmlJob.NAMESPACE;
+import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@XmlType(name = "flow")
 @XmlAccessorType(NONE)
+//@XmlType(name = "Flow", propOrder = {
+//        "executions",
+//        "transitions"
+//})
 public class XmlFlow extends Inheritable<XmlFlow> implements XmlExecution<XmlFlow>, Flow {
 
     @XmlID
+    @XmlSchemaType(name = "ID")
     @XmlAttribute(name = "id", required = true)
     private String id;
 
