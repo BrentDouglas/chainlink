@@ -5,5 +5,5 @@ package io.machinecode.nock.core.expression;
  */
 public interface PropertyResolver {
 
-    String resolve(String value);
+    CharSequence resolve(CharSequence value);
 }
