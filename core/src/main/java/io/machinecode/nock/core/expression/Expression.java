@@ -1,11 +1,12 @@
 package io.machinecode.nock.core.expression;
 
+import io.machinecode.nock.jsl.util.MutablePair;
 import io.machinecode.nock.jsl.util.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -27,12 +28,26 @@ public class Expression {
     private static final String PARTITION_PLAN = "partitionPlan";
 
     private static final PropertyResolver SYSTEM_PROPERTY_RESOLVER = new PropertyResolver() {
+
+        private final List<MutablePair<String,String>> properties;
+
+        {
+            this.properties = new ArrayList<MutablePair<String, String>>();
+            for (final Entry<Object, Object> entry : System.getProperties().entrySet()) {
+                final Object key = entry.getKey();
+                final Object value = entry.getValue();
+                this.properties.add(MutablePair.of(
+                        key instanceof String ? (String)key : key.toString(),
+                        value instanceof String ? (String)value : value.toString()
+                ));
+            }
+        }
+
         @Override
         public String resolve(final String value) {
-            return get(value, System.getProperties());
+            return get(value, properties);
         }
     };
-
 
     private static String resolve(final String unresolved, final String type, final PropertyResolver from) {
         final String beforeProperty = EXPRESSION_START + type + PROPERTY_START;
@@ -79,48 +94,33 @@ public class Expression {
         return EMPTY;
     }
 
-    private static String get(final String value, final Properties parameters) {
-        for (final Entry<Object, Object> entry : parameters.entrySet()) {
-            if (value.equals(entry.getKey().toString())) {
-                return entry.getValue().toString();
-            }
-        }
-        return EMPTY;
-    }
-
-    public static <T extends Pair<String, String>> String resolveBuildTime(final String that, final List<T> properties) {
+    public static <T extends Pair<String, String>> String resolveBuildTime(String that, final JobPropertyContext context) {
         if (that == null) {
             return null;
         }
-        final String then = resolve(that, JOB_PROPERTIES, new PropertyResolver() {
+        that = resolve(that, JOB_PROPERTIES, new PropertyResolver() {
             @Override
             public String resolve(final String value) {
-                return get(value, properties);
+                return get(value, context.getProperties());
             }
         });
-        return resolve(then, SYSTEM_PROPERTIES, SYSTEM_PROPERTY_RESOLVER);
-    }
-
-    public static String resolveStartTime(final String that, final Properties parameters) {
-        if (that == null) {
-            return null;
-        }
-        return resolve(that, JOB_PARAMETERS, new PropertyResolver() {
+        that = resolve(that, JOB_PARAMETERS, new PropertyResolver() {
             @Override
             public String resolve(final String value) {
-                return get(value, parameters);
+                return get(value, context.getParameters());
             }
         });
+        return resolve(that, SYSTEM_PROPERTIES, SYSTEM_PROPERTY_RESOLVER);
     }
 
-    public static <T extends Pair<String, String>> String resolvePartition(final String that, final List<T> properties) {
+    public static <T extends Pair<String, String>> String resolvePartition(final String that, final PartitionPropertyContext context) {
         if (that == null) {
             return null;
         }
         return resolve(that, PARTITION_PLAN, new PropertyResolver() {
             @Override
             public String resolve(final String value) {
-                return get(value, properties);
+                return get(value, context.getProperties());
             }
         });
     }

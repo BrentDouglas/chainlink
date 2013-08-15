@@ -7,6 +7,8 @@ import io.machinecode.nock.jsl.fluent.Jsl;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import java.util.Properties;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
@@ -191,7 +193,7 @@ public class FluentTest {
                                         .addProperty("", "")
                                 )
                         )
-                ));
+                ), new Properties());
 
         Assert.assertEquals("i1", job.getId());
     }
@@ -254,7 +256,7 @@ public class FluentTest {
                         )
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
-                ));
+                ), new Properties());
 
         XmlTest.testDefaults(job);
     }

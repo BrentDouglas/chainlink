@@ -7,6 +7,8 @@ import io.machinecode.nock.jsl.validation.InvalidJobException;
 import io.machinecode.nock.jsl.validation.InvalidTransitionException;
 import org.junit.Test;
 
+import java.util.Properties;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
@@ -24,7 +26,7 @@ public class FluentProblemTest {
                 ).addExecution(Jsl.stepWithBatchletAndMapper()
                         .setId("step1")
                 );
-        JobFactory.INSTANCE.produceBuildTime(job);
+        JobFactory.INSTANCE.produceBuildTime(job, new Properties());
     }
 
     @Test(expected = InvalidTransitionException.class)
@@ -40,7 +42,7 @@ public class FluentProblemTest {
                         .setId("step2")
                         .setNext("step1")
                 );
-        JobFactory.INSTANCE.produceBuildTime(job);
+        JobFactory.INSTANCE.produceBuildTime(job, new Properties());
     }
 
     @Test(expected = InvalidTransitionException.class)
@@ -63,6 +65,6 @@ public class FluentProblemTest {
                 ).addExecution(Jsl.stepWithBatchletAndMapper()
                         .setId("step2")
                 );
-        JobFactory.INSTANCE.produceBuildTime(job);
+        JobFactory.INSTANCE.produceBuildTime(job, new Properties());
     }
 }

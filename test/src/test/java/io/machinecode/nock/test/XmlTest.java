@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -399,7 +400,7 @@ public class XmlTest {
 
         job = job.inherit(repo);
 
-        testDefaults(JobFactory.INSTANCE.produceBuildTime(job));
+        testDefaults(JobFactory.INSTANCE.produceBuildTime(job, new Properties()));
     }
 
     public static void testDefaults(final Job job) {

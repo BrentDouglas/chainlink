@@ -1,7 +1,7 @@
 package io.machinecode.nock.core.util;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.nock.core.expression.JobPropertyContext;
+import io.machinecode.nock.core.expression.PropertyContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +53,7 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
-    public static <T, U extends T> List<U> immutableCopy(final List<? extends T> that, final JobPropertyContext context, final ExpressionTransformer<T, U> transformer) {
+    public static <T, U extends T, V extends PropertyContext> List<U> immutableCopy(final List<? extends T> that, final V context, final ExpressionTransformer<T, U, V> transformer) {
         if (that == null) {
             return Collections.emptyList();
         }
@@ -67,7 +67,7 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
-    public static <T, U extends T> List<U> immutableCopy(final List<? extends T> that, final JobPropertyContext context, final NextExpressionTransformer<T, U> transformer) {
+    public static <T, U extends T, V extends PropertyContext> List<U> immutableCopy(final List<? extends T> that, final V context, final NextExpressionTransformer<T, U, V> transformer) {
         if (that == null) {
             return Collections.emptyList();
         }
@@ -123,12 +123,12 @@ public class Util {
         U transform(final T that, final T next);
     }
 
-    public interface ExpressionTransformer<T, U extends T> {
-        U transform(final T that, final JobPropertyContext context);
+    public interface ExpressionTransformer<T, U extends T, V extends PropertyContext> {
+        U transform(final T that, final V context);
     }
 
-    public interface NextExpressionTransformer<T, U> {
-        U transform(final T that, final T next, final JobPropertyContext context);
+    public interface NextExpressionTransformer<T, U, V extends PropertyContext> {
+        U transform(final T that, final T next, final V context);
     }
 
     public interface ParametersTransformer<T, U extends T> {

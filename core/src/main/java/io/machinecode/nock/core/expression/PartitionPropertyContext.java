@@ -11,16 +11,16 @@ import java.util.List;
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class PartitionPropertyContext {
+public class PartitionPropertyContext implements PropertyContext {
 
-    private final List<MutablePair<String,String>> jobProperties;
+    private final List<MutablePair<String,String>> properties;
 
     public PartitionPropertyContext() {
-        this.jobProperties = new ArrayList<MutablePair<String, String>>();
+        this.properties = new ArrayList<MutablePair<String, String>>();
     }
 
     public PartitionPropertyContext(final PartitionPropertyContext parent) {
-        this.jobProperties = parent == null ? new ArrayList<MutablePair<String, String>>() : parent.jobProperties;
+        this.properties = parent == null ? new ArrayList<MutablePair<String, String>>() : parent.properties;
     }
 
     public void addProperties(final Properties properties) {
@@ -30,10 +30,10 @@ public class PartitionPropertyContext {
     }
 
     public void addProperty(final Property property) {
-        jobProperties.add(MutablePair.of(property.getName(), property.getValue()));
+        properties.add(MutablePair.of(property.getName(), property.getValue()));
     }
 
     public List<MutablePair<String, String>> getProperties() {
-        return Collections.unmodifiableList(jobProperties);
+        return Collections.unmodifiableList(properties);
     }
 }
