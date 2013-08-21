@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.validation.partition;
 
-import io.machinecode.nock.jsl.api.partition.Analyser;
+import io.machinecode.nock.spi.element.partition.Analyser;
 import io.machinecode.nock.jsl.validation.PropertyReferenceValidator;
 
 /**

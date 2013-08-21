@@ -22,7 +22,7 @@ public class Util {
         return that == null ? Collections.<T>emptySet() : Collections.unmodifiableSet(new THashSet<T>(that));
     }
 
-    public static <T, U extends T> List<U> immutableCopy(final List<? extends T> that, final Transformer<T, U> transformer) {
+    public static <T, U> List<U> immutableCopy(final List<? extends T> that, final Transformer<T, U> transformer) {
         if (that == null) {
             return Collections.emptyList();
         }
@@ -36,16 +36,16 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
-    public static <T, U extends T> List<T> immutableCopy(final List<? extends T> that, final NextTransformer<T, U> transformer) {
+    public static <T, U> List<U> immutableCopy(final List<? extends T> that, final NextTransformer<T, U> transformer) {
         if (that == null) {
             return Collections.emptyList();
         }
-        final List<T> list = new ArrayList<T>(that.size());
+        final List<U> list = new ArrayList<U>(that.size());
         for (int i = 0, j = 1; i < that.size(); ++i, ++j) {
             final T value = that.get(i);
             final T next = j < that.size() ? that.get(j) : null;
 
-            final T replaced = transformer.transform(value, next);
+            final U replaced = transformer.transform(value, next);
             if (replaced != null) {
                 list.add(replaced);
             }
@@ -53,7 +53,7 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
-    public static <T, U extends T, V extends PropertyContext> List<U> immutableCopy(final List<? extends T> that, final V context, final ExpressionTransformer<T, U, V> transformer) {
+    public static <T, U, V extends PropertyContext> List<U> immutableCopy(final List<? extends T> that, final V context, final ExpressionTransformer<T, U, V> transformer) {
         if (that == null) {
             return Collections.emptyList();
         }
@@ -67,7 +67,7 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
-    public static <T, U extends T, V extends PropertyContext> List<U> immutableCopy(final List<? extends T> that, final V context, final NextExpressionTransformer<T, U, V> transformer) {
+    public static <T, U, V extends PropertyContext> List<U> immutableCopy(final List<? extends T> that, final V context, final NextExpressionTransformer<T, U, V> transformer) {
         if (that == null) {
             return Collections.emptyList();
         }
@@ -84,7 +84,7 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
-    public static <T, U extends T> List<U> immutableCopy(final List<? extends T> that, final Properties parameters, final ParametersTransformer<T, U> transformer) {
+    public static <T, U> List<U> immutableCopy(final List<? extends T> that, final Properties parameters, final ParametersTransformer<T, U> transformer) {
         if (that == null) {
             return Collections.emptyList();
         }
@@ -98,7 +98,7 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
-    public static <T, U extends T> List<U> immutableCopy(final List<? extends T> that, final Properties parameters, final NextParametersTransformer<T, U> transformer) {
+    public static <T, U> List<U> immutableCopy(final List<? extends T> that, final Properties parameters, final NextParametersTransformer<T, U> transformer) {
         if (that == null) {
             return Collections.emptyList();
         }
@@ -115,15 +115,15 @@ public class Util {
         return Collections.unmodifiableList(list);
     }
 
-    public interface Transformer<T, U extends T> {
+    public interface Transformer<T, U> {
         U transform(final T that);
     }
 
-    public interface NextTransformer<T, U extends T> {
+    public interface NextTransformer<T, U> {
         U transform(final T that, final T next);
     }
 
-    public interface ExpressionTransformer<T, U extends T, V extends PropertyContext> {
+    public interface ExpressionTransformer<T, U, V extends PropertyContext> {
         U transform(final T that, final V context);
     }
 
@@ -131,7 +131,7 @@ public class Util {
         U transform(final T that, final T next, final V context);
     }
 
-    public interface ParametersTransformer<T, U extends T> {
+    public interface ParametersTransformer<T, U> {
         U transform(final T that, final Properties parameters);
     }
 

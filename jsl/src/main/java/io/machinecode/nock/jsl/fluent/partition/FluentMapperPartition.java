@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.partition;
 
-import io.machinecode.nock.jsl.api.partition.Mapper;
+import io.machinecode.nock.spi.element.partition.Mapper;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

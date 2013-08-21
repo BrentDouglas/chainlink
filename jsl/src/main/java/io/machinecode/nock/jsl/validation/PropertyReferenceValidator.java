@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.validation;
 
-import io.machinecode.nock.jsl.api.PropertyReference;
+import io.machinecode.nock.spi.element.PropertyReference;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

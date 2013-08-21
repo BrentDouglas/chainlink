@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.transition;
 
-import io.machinecode.nock.jsl.api.transition.Fail;
+import io.machinecode.nock.spi.element.transition.Fail;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

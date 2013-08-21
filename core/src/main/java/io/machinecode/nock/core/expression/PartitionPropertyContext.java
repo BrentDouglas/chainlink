@@ -1,7 +1,7 @@
 package io.machinecode.nock.core.expression;
 
-import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.Property;
+import io.machinecode.nock.spi.element.Properties;
+import io.machinecode.nock.spi.element.Property;
 import io.machinecode.nock.jsl.util.MutablePair;
 
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ public class PartitionPropertyContext implements PropertyContext {
         properties.add(MutablePair.of(property.getName(), property.getValue()));
     }
 
+    @Override
     public List<MutablePair<String, String>> getProperties() {
         return Collections.unmodifiableList(properties);
     }

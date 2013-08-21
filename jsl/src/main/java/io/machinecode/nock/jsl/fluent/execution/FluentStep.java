@@ -1,13 +1,13 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.jsl.api.Listener;
-import io.machinecode.nock.jsl.api.Listeners;
-import io.machinecode.nock.jsl.api.task.Task;
-import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.partition.Strategy;
-import io.machinecode.nock.jsl.api.partition.Partition;
-import io.machinecode.nock.jsl.api.transition.Transition;
-import io.machinecode.nock.jsl.api.execution.Step;
+import io.machinecode.nock.spi.element.Listener;
+import io.machinecode.nock.spi.element.Listeners;
+import io.machinecode.nock.spi.element.task.Task;
+import io.machinecode.nock.spi.element.Properties;
+import io.machinecode.nock.spi.element.partition.Strategy;
+import io.machinecode.nock.spi.element.partition.Partition;
+import io.machinecode.nock.spi.element.transition.Transition;
+import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.jsl.fluent.FluentListeners;
 import io.machinecode.nock.jsl.fluent.FluentProperties;
 import io.machinecode.nock.jsl.fluent.FluentProperty;

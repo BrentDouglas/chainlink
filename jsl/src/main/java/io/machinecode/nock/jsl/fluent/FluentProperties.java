@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.fluent;
 
-import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.Property;
+import io.machinecode.nock.spi.element.Properties;
+import io.machinecode.nock.spi.element.Property;
 import io.machinecode.nock.jsl.util.ForwardingList;
 
 import java.util.ArrayList;

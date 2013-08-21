@@ -1,13 +1,13 @@
 package io.machinecode.nock.jsl.validation;
 
-import io.machinecode.nock.jsl.api.Job;
-import io.machinecode.nock.jsl.api.execution.Decision;
-import io.machinecode.nock.jsl.api.execution.Execution;
-import io.machinecode.nock.jsl.api.execution.Flow;
-import io.machinecode.nock.jsl.api.execution.Split;
-import io.machinecode.nock.jsl.api.execution.Step;
-import io.machinecode.nock.jsl.api.transition.Next;
-import io.machinecode.nock.jsl.api.transition.Transition;
+import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.spi.element.execution.Decision;
+import io.machinecode.nock.spi.element.execution.Execution;
+import io.machinecode.nock.spi.element.execution.Flow;
+import io.machinecode.nock.spi.element.execution.Split;
+import io.machinecode.nock.spi.element.execution.Step;
+import io.machinecode.nock.spi.element.transition.Next;
+import io.machinecode.nock.spi.element.transition.Transition;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

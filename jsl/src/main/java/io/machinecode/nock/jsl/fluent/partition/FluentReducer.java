@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.partition;
 
-import io.machinecode.nock.jsl.api.partition.Reducer;
+import io.machinecode.nock.spi.element.partition.Reducer;
 import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
 
 /**

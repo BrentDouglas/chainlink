@@ -1,8 +1,8 @@
 package io.machinecode.nock.jsl.fluent;
 
 
-import io.machinecode.nock.jsl.api.Listener;
-import io.machinecode.nock.jsl.api.Listeners;
+import io.machinecode.nock.spi.element.Listener;
+import io.machinecode.nock.spi.element.Listeners;
 
 import java.util.ArrayList;
 import java.util.List;

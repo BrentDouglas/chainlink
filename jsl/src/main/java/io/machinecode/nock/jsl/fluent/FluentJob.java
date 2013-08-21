@@ -1,10 +1,10 @@
 package io.machinecode.nock.jsl.fluent;
 
-import io.machinecode.nock.jsl.api.Job;
-import io.machinecode.nock.jsl.api.Listener;
-import io.machinecode.nock.jsl.api.Listeners;
-import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.execution.Execution;
+import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.spi.element.Listener;
+import io.machinecode.nock.spi.element.Listeners;
+import io.machinecode.nock.spi.element.Properties;
+import io.machinecode.nock.spi.element.execution.Execution;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,13 +1,11 @@
 package io.machinecode.nock.test;
 
 import io.machinecode.nock.core.factory.JobFactory;
-import io.machinecode.nock.jsl.api.Job;
-import io.machinecode.nock.jsl.api.task.Chunk.CheckpointPolicy;
 import io.machinecode.nock.jsl.fluent.Jsl;
+import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.spi.element.task.Chunk.CheckpointPolicy;
 import junit.framework.Assert;
 import org.junit.Test;
-
-import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -16,7 +14,7 @@ public class FluentTest {
 
     @Test
     public void fluentJobTest() {
-        final Job job = JobFactory.INSTANCE.produceBuildTime(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -193,7 +191,7 @@ public class FluentTest {
                                         .addProperty("", "")
                                 )
                         )
-                ), new Properties());
+                ));
 
         Assert.assertEquals("i1", job.getId());
     }
@@ -201,19 +199,19 @@ public class FluentTest {
 
     @Test
     public void defaultValuesTest() {
-        final Job job = JobFactory.INSTANCE.produceBuildTime(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
                 .setId("i1")
-                //.setRestartable(false)
-                //.setVersion("1.0")
+                        //.setRestartable(false)
+                        //.setVersion("1.0")
                 .addProperty("job-prop", "job-value")
                 .addListener(Jsl.listener()
                         .setRef("something")
                         .addProperty("name", "value")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step1")
-                        //.setNext("step2")
-                        //.setAllowStartIfComplete(false)
-                        //.setStartLimit(0)
+                                //.setNext("step2")
+                                //.setAllowStartIfComplete(false)
+                                //.setStartLimit(0)
                         .setPartition(Jsl.partitionWithPlan()
                                 .setStrategy(Jsl.plan()
                                         //.setPartitions(1)
@@ -256,7 +254,7 @@ public class FluentTest {
                         )
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
-                ), new Properties());
+                ));
 
         XmlTest.testDefaults(job);
     }

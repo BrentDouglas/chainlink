@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.transition;
 
-import io.machinecode.nock.jsl.api.transition.Stop;
+import io.machinecode.nock.spi.element.transition.Stop;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

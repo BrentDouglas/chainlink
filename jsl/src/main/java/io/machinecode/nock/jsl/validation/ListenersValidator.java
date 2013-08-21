@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.validation;
 
-import io.machinecode.nock.jsl.api.Listener;
-import io.machinecode.nock.jsl.api.Listeners;
+import io.machinecode.nock.spi.element.Listener;
+import io.machinecode.nock.spi.element.Listeners;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

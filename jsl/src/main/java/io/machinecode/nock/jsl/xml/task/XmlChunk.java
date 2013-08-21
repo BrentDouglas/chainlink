@@ -1,13 +1,13 @@
 package io.machinecode.nock.jsl.xml.task;
 
-import io.machinecode.nock.jsl.api.task.Chunk;
+import io.machinecode.nock.spi.element.task.Chunk;
 import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
+import static io.machinecode.nock.spi.element.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**

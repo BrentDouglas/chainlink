@@ -29,6 +29,10 @@ public final class Problem {
         return PROBLEMS.getString(key);
     }
 
+    public static String executionsRequired() {
+        return new Formatter().format(PROBLEMS.getString("executions.required")).toString();
+    }
+
     public static String notNullElement(final String element) {
         return new Formatter().format(PROBLEMS.getString("not.null.element"), element).toString();
     }

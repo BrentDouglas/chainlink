@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.jsl.api.Property;
+import io.machinecode.nock.spi.element.Property;
 import io.machinecode.nock.jsl.xml.util.Copyable;
 
 import javax.xml.bind.annotation.XmlAccessorType;

@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.task;
 
-import io.machinecode.nock.jsl.api.task.ExceptionClassFilter;
+import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
 import io.machinecode.nock.jsl.xml.util.MergeableList;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
+import static io.machinecode.nock.spi.element.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**

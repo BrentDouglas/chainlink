@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.partition;
 
-import io.machinecode.nock.jsl.api.partition.Partition;
+import io.machinecode.nock.spi.element.partition.Partition;
 import io.machinecode.nock.jsl.xml.util.Copyable;
 import io.machinecode.nock.jsl.xml.util.Util;
 
@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
-import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
+import static io.machinecode.nock.spi.element.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**

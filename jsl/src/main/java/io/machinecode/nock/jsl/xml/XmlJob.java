@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.jsl.api.Job;
+import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.jsl.xml.execution.XmlDecision;
 import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 import io.machinecode.nock.jsl.xml.execution.XmlFlow;
@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.nock.jsl.api.Job.NAMESPACE;
+import static io.machinecode.nock.spi.element.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**

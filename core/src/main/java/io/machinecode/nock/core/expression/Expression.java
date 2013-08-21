@@ -202,7 +202,7 @@ public class Expression {
         return EMPTY;
     }
 
-    public static <T extends Pair<String, String>> String resolveBuildTime(final String that, final JobPropertyContext context) {
+    public static <T extends Pair<String, String>> String resolveDescriptorProperty(final String that, final JobPropertyContext context) {
         if (that == null) {
             return null;
         }
@@ -212,16 +212,23 @@ public class Expression {
                 return get(value, context.getProperties());
             }
         });
-        then = principleValueExpression(then, JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, 0, new PropertyResolver() {
-            @Override
-            public String resolve(final CharSequence value) {
-                return get(value, context.getParameters());
-            }
-        });
         return principleValueExpression(then, SYSTEM_PROPERTIES, SYSTEM_PROPERTIES_LENGTH, 0, SYSTEM_PROPERTY_RESOLVER).toString();
     }
 
-    public static <T extends Pair<String, String>> String resolvePartition(final String that, final PartitionPropertyContext context) {
+    public static <T extends Pair<String, String>> String resolveExecutionProperty(final String that, final JobParameterContext context) {
+        if (that == null) {
+            return null;
+        }
+        return principleValueExpression(that, JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, 0, new PropertyResolver() {
+            @Override
+            public String resolve(final CharSequence value) {
+                return get(value, context.getProperties());
+            }
+        }).toString();
+    }
+
+
+    public static <T extends Pair<String, String>> String resolvePartitionProperty(final String that, final PartitionPropertyContext context) {
         if (that == null) {
             return null;
         }

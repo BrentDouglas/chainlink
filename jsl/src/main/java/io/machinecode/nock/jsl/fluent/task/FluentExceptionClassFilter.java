@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.task;
 
-import io.machinecode.nock.jsl.api.task.ExceptionClassFilter;
+import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
 
 import java.util.ArrayList;
 import java.util.List;

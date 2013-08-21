@@ -1,10 +1,10 @@
 package io.machinecode.nock.jsl.fluent.partition;
 
-import io.machinecode.nock.jsl.api.partition.Analyser;
-import io.machinecode.nock.jsl.api.partition.Collector;
-import io.machinecode.nock.jsl.api.partition.Strategy;
-import io.machinecode.nock.jsl.api.partition.Partition;
-import io.machinecode.nock.jsl.api.partition.Reducer;
+import io.machinecode.nock.spi.element.partition.Analyser;
+import io.machinecode.nock.spi.element.partition.Collector;
+import io.machinecode.nock.spi.element.partition.Strategy;
+import io.machinecode.nock.spi.element.partition.Partition;
+import io.machinecode.nock.spi.element.partition.Reducer;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

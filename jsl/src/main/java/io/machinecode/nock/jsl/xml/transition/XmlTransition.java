@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.transition;
 
-import io.machinecode.nock.jsl.api.transition.Transition;
+import io.machinecode.nock.spi.element.transition.Transition;
 import io.machinecode.nock.jsl.xml.util.Copyable;
 
 /**

@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.task;
 
-import io.machinecode.nock.jsl.api.task.ItemWriter;
+import io.machinecode.nock.spi.element.task.ItemWriter;
 import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
 
 /**

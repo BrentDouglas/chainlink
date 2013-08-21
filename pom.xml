@@ -13,6 +13,7 @@
         <module>jsl</module>
         <module>core</module>
         <module>test</module>
+        <module>spi</module>
     </modules>
 
     <properties>
@@ -38,6 +39,12 @@
             <dependency>
                 <groupId>io.machinecode.nock</groupId>
                 <artifactId>nock-core</artifactId>
+                <version>${project.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-spi</artifactId>
                 <version>${project.version}</version>
                 <type>jar</type>
             </dependency>

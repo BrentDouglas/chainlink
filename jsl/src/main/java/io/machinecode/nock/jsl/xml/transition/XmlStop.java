@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.transition;
 
-import io.machinecode.nock.jsl.api.transition.Stop;
+import io.machinecode.nock.spi.element.transition.Stop;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

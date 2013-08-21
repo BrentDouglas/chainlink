@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.validation.partition;
 
-import io.machinecode.nock.jsl.api.partition.Plan;
+import io.machinecode.nock.spi.element.partition.Plan;
 import io.machinecode.nock.jsl.validation.PropertiesValidator;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;

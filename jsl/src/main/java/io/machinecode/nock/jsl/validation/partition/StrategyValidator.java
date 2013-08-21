@@ -1,8 +1,8 @@
 package io.machinecode.nock.jsl.validation.partition;
 
-import io.machinecode.nock.jsl.api.partition.Plan;
-import io.machinecode.nock.jsl.api.partition.Strategy;
-import io.machinecode.nock.jsl.api.partition.Mapper;
+import io.machinecode.nock.spi.element.partition.Plan;
+import io.machinecode.nock.spi.element.partition.Strategy;
+import io.machinecode.nock.spi.element.partition.Mapper;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 
 /**

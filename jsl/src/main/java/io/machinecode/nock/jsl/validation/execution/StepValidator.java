@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.validation.execution;
 
-import io.machinecode.nock.jsl.api.execution.Step;
-import io.machinecode.nock.jsl.api.transition.Transition;
+import io.machinecode.nock.spi.element.execution.Step;
+import io.machinecode.nock.spi.element.transition.Transition;
 import io.machinecode.nock.jsl.validation.ListenersValidator;
 import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.task.TaskValidator;

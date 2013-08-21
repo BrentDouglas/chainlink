@@ -1,11 +1,6 @@
 package io.machinecode.nock.test;
 
 import io.machinecode.nock.core.factory.JobFactory;
-import io.machinecode.nock.jsl.api.Job;
-import io.machinecode.nock.jsl.api.execution.Step;
-import io.machinecode.nock.jsl.api.partition.Plan;
-import io.machinecode.nock.jsl.api.task.Chunk;
-import io.machinecode.nock.jsl.api.task.Chunk.CheckpointPolicy;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlJob;
 import io.machinecode.nock.jsl.xml.XmlListener;
@@ -19,12 +14,16 @@ import io.machinecode.nock.jsl.xml.task.XmlItemWriter;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlStop;
 import io.machinecode.nock.jsl.xml.util.Inheritable;
+import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.spi.element.execution.Step;
+import io.machinecode.nock.spi.element.partition.Plan;
+import io.machinecode.nock.spi.element.task.Chunk;
+import io.machinecode.nock.spi.element.task.Chunk.CheckpointPolicy;
 import junit.framework.Assert;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -400,7 +399,7 @@ public class XmlTest {
 
         job = job.inherit(repo);
 
-        testDefaults(JobFactory.INSTANCE.produceBuildTime(job, new Properties()));
+        testDefaults(JobFactory.INSTANCE.produceDescriptor(job));
     }
 
     public static void testDefaults(final Job job) {

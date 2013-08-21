@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.validation;
 
-import io.machinecode.nock.jsl.api.Job;
-import io.machinecode.nock.jsl.api.execution.Execution;
+import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.jsl.validation.execution.ExcecutionValidator;
 
 /**
@@ -22,22 +22,27 @@ public class JobValidator extends Validator<Job> {
         } else {
             context.addId(that.getId());
         }
+        if (!"1.0".equals(that.getVersion())) {
+            context.addProblem(Problem.attributeMatches("version", that.getVersion(), "1.0"));
+        }
+
         if (that.getListeners() != null) {
             ListenersValidator.INSTANCE.validate(that.getListeners(), context);
         }
         if (that.getProperties() != null) {
             PropertiesValidator.INSTANCE.validate(that.getProperties(), context);
         }
-        for (final Execution execution : that.getExecutions()) {
-            if (execution == null) {
-                context.addProblem(Problem.notNullElement("execution"));
-                continue;
-            }
-            ExcecutionValidator.validate(execution, context);
-        }
 
-        if (!"1.0".equals(that.getVersion())) {
-            context.addProblem(Problem.attributeMatches("version", that.getVersion(), "1.0"));
+        if (that.getExecutions() == null | that.getExecutions().isEmpty()) {
+            context.addProblem(Problem.executionsRequired());
+        } else {
+            for (final Execution execution : that.getExecutions()) {
+                if (execution == null) {
+                    context.addProblem(Problem.notNullElement("execution"));
+                    continue;
+                }
+                ExcecutionValidator.validate(execution, context);
+            }
         }
     }
 }

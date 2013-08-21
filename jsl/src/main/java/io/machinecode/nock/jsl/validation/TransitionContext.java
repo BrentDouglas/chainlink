@@ -2,7 +2,7 @@ package io.machinecode.nock.jsl.validation;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.nock.jsl.api.execution.Flow;
+import io.machinecode.nock.spi.element.execution.Flow;
 import io.machinecode.nock.jsl.util.Triplet;
 
 import java.util.ArrayList;

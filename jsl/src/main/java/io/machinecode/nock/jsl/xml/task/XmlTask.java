@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.task;
 
-import io.machinecode.nock.jsl.api.task.Task;
+import io.machinecode.nock.spi.element.task.Task;
 import io.machinecode.nock.jsl.xml.util.Mergeable;
 
 import javax.xml.bind.annotation.XmlType;

@@ -1,10 +1,10 @@
 package io.machinecode.nock.jsl.validation.execution;
 
-import io.machinecode.nock.jsl.api.execution.Decision;
-import io.machinecode.nock.jsl.api.execution.Execution;
-import io.machinecode.nock.jsl.api.execution.Flow;
-import io.machinecode.nock.jsl.api.execution.Split;
-import io.machinecode.nock.jsl.api.execution.Step;
+import io.machinecode.nock.spi.element.execution.Decision;
+import io.machinecode.nock.spi.element.execution.Execution;
+import io.machinecode.nock.spi.element.execution.Flow;
+import io.machinecode.nock.spi.element.execution.Split;
+import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 
 /**

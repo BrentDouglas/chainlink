@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.partition;
 
-import io.machinecode.nock.jsl.api.partition.Strategy;
+import io.machinecode.nock.spi.element.partition.Strategy;
 import io.machinecode.nock.jsl.xml.util.Copyable;
 
 /**

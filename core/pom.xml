@@ -17,6 +17,10 @@
             <artifactId>nock-jsl</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.machinecode.nock</groupId>
+            <artifactId>nock-spi</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.batch</groupId>
             <artifactId>javax.batch-api</artifactId>
         </dependency>

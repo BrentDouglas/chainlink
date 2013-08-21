@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.partition;
 
-import io.machinecode.nock.jsl.api.partition.Mapper;
+import io.machinecode.nock.spi.element.partition.Mapper;
 import io.machinecode.nock.jsl.xml.XmlPropertyReference;
 
 import javax.xml.bind.annotation.XmlAccessorType;

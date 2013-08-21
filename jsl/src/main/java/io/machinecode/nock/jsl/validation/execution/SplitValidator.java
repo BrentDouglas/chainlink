@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.validation.execution;
 
-import io.machinecode.nock.jsl.api.execution.Flow;
-import io.machinecode.nock.jsl.api.execution.Split;
+import io.machinecode.nock.spi.element.execution.Flow;
+import io.machinecode.nock.spi.element.execution.Split;
 import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;

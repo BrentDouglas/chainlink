@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.validation.transition;
 
-import io.machinecode.nock.jsl.api.transition.Next;
+import io.machinecode.nock.spi.element.transition.Next;
 import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;

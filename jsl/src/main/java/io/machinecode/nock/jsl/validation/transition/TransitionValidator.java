@@ -1,10 +1,10 @@
 package io.machinecode.nock.jsl.validation.transition;
 
-import io.machinecode.nock.jsl.api.transition.End;
-import io.machinecode.nock.jsl.api.transition.Fail;
-import io.machinecode.nock.jsl.api.transition.Next;
-import io.machinecode.nock.jsl.api.transition.Stop;
-import io.machinecode.nock.jsl.api.transition.Transition;
+import io.machinecode.nock.spi.element.transition.End;
+import io.machinecode.nock.spi.element.transition.Fail;
+import io.machinecode.nock.spi.element.transition.Next;
+import io.machinecode.nock.spi.element.transition.Stop;
+import io.machinecode.nock.spi.element.transition.Transition;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 
 /**

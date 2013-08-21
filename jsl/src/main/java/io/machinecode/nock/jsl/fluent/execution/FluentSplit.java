@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.jsl.api.execution.Flow;
-import io.machinecode.nock.jsl.api.execution.Split;
+import io.machinecode.nock.spi.element.execution.Flow;
+import io.machinecode.nock.spi.element.execution.Split;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.validation.task;
 
-import io.machinecode.nock.jsl.api.task.Chunk;
-import io.machinecode.nock.jsl.api.task.Chunk.CheckpointPolicy;
+import io.machinecode.nock.spi.element.task.Chunk;
+import io.machinecode.nock.spi.element.task.Chunk.CheckpointPolicy;
 import io.machinecode.nock.jsl.validation.Problem;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 import io.machinecode.nock.jsl.validation.Validator;

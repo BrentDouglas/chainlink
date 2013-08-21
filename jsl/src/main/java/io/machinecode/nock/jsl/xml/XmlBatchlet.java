@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.jsl.api.task.Batchlet;
+import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.jsl.xml.task.XmlTask;
 
 import javax.xml.bind.annotation.XmlAccessorType;

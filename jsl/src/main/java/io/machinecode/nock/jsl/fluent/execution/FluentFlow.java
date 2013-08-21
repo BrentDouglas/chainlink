@@ -1,8 +1,8 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.jsl.api.execution.Execution;
-import io.machinecode.nock.jsl.api.transition.Transition;
-import io.machinecode.nock.jsl.api.execution.Flow;
+import io.machinecode.nock.spi.element.execution.Execution;
+import io.machinecode.nock.spi.element.transition.Transition;
+import io.machinecode.nock.spi.element.execution.Flow;
 
 import java.util.ArrayList;
 import java.util.List;

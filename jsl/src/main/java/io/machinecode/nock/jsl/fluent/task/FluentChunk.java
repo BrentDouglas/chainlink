@@ -1,11 +1,11 @@
 package io.machinecode.nock.jsl.fluent.task;
 
-import io.machinecode.nock.jsl.api.task.CheckpointAlgorithm;
-import io.machinecode.nock.jsl.api.task.Chunk;
-import io.machinecode.nock.jsl.api.task.ExceptionClassFilter;
-import io.machinecode.nock.jsl.api.task.ItemProcessor;
-import io.machinecode.nock.jsl.api.task.ItemReader;
-import io.machinecode.nock.jsl.api.task.ItemWriter;
+import io.machinecode.nock.spi.element.task.CheckpointAlgorithm;
+import io.machinecode.nock.spi.element.task.Chunk;
+import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
+import io.machinecode.nock.spi.element.task.ItemProcessor;
+import io.machinecode.nock.spi.element.task.ItemReader;
+import io.machinecode.nock.spi.element.task.ItemWriter;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

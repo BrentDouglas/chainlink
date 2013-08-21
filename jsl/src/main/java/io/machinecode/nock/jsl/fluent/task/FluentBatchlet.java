@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.task;
 
-import io.machinecode.nock.jsl.api.task.Batchlet;
+import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
 
 /**

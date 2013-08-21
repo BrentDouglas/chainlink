@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.fluent.partition;
 
-import io.machinecode.nock.jsl.api.Properties;
-import io.machinecode.nock.jsl.api.partition.Plan;
+import io.machinecode.nock.spi.element.Properties;
+import io.machinecode.nock.spi.element.partition.Plan;
 import io.machinecode.nock.jsl.fluent.FluentProperties;
 
 /**

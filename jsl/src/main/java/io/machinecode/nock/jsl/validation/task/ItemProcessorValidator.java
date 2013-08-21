@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.validation.task;
 
-import io.machinecode.nock.jsl.api.task.ItemProcessor;
+import io.machinecode.nock.spi.element.task.ItemProcessor;
 import io.machinecode.nock.jsl.validation.PropertyReferenceValidator;
 
 /**

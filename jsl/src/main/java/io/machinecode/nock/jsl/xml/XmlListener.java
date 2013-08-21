@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.jsl.api.Listener;
+import io.machinecode.nock.spi.element.Listener;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 

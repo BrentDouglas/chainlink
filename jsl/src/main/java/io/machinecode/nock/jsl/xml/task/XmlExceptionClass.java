@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.task;
 
-import io.machinecode.nock.jsl.api.task.ExceptionClass;
+import io.machinecode.nock.spi.element.task.ExceptionClass;
 import io.machinecode.nock.jsl.xml.util.Mergeable;
 import io.machinecode.nock.jsl.xml.util.Util;
 

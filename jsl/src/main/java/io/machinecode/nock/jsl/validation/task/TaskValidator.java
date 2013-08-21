@@ -1,8 +1,8 @@
 package io.machinecode.nock.jsl.validation.task;
 
-import io.machinecode.nock.jsl.api.task.Batchlet;
-import io.machinecode.nock.jsl.api.task.Chunk;
-import io.machinecode.nock.jsl.api.task.Task;
+import io.machinecode.nock.spi.element.task.Batchlet;
+import io.machinecode.nock.spi.element.task.Chunk;
+import io.machinecode.nock.spi.element.task.Task;
 import io.machinecode.nock.jsl.validation.ValidationContext;
 
 /**
