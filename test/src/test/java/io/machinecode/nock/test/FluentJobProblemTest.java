@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentProblemTest {
+public class FluentJobProblemTest {
 
     @Test(expected = InvalidJobException.class)
     public void multipleIdTest() {

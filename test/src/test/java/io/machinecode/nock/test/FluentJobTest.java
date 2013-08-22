@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentTest {
+public class FluentJobTest {
 
     @Test
     public void fluentJobTest() {
@@ -256,6 +256,6 @@ public class FluentTest {
                         .setId("step2")
                 ));
 
-        XmlTest.testDefaults(job);
+        XmlJobTest.testDefaults(job);
     }
 }

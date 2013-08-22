@@ -28,9 +28,9 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class XmlTest {
+public class XmlJobTest {
 
-    private static ClassLoader classLoader = XmlTest.class.getClassLoader();
+    private static ClassLoader classLoader = XmlJobTest.class.getClassLoader();
 
     private static void testInheritance(final Inheritable inheritable) {
         Assert.assertNull(inheritable.isAbstract());
@@ -40,7 +40,7 @@ public class XmlTest {
 
     @Test
     public void jobConfigTest() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-config-1.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-config-1.xml"));
         final XmlJob job = repo.getJob();
 
         Assert.assertEquals("i1", job.getId());
@@ -48,9 +48,9 @@ public class XmlTest {
 
     @Test
     public void jobMergeTest1() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-merge-1.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-merge-1.xml"));
         XmlJob job = repo.getJob();
-        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job-merge-1-result.xml"));
+        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job/job-merge-1-result.xml"));
 
         job = job.inherit(repo);
         result = result.inherit(repo);
@@ -98,9 +98,9 @@ public class XmlTest {
 
     @Test
     public void jobMergeTest2() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-merge-2.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-merge-2.xml"));
         XmlJob job = repo.getJob();
-        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job-merge-2-result.xml"));
+        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job/job-merge-2-result.xml"));
 
         job = job.inherit(repo);
         result = result.inherit(repo);
@@ -160,10 +160,10 @@ public class XmlTest {
 
     @Test
     public void jobMergeTest3() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-merge-3-1.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-merge-3-1.xml"));
         XmlJob first = repo.getJob();
-        XmlJob second = repo.add("Child.parent", classLoader.getResourceAsStream("job-merge-3-2.xml"));
-        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job-merge-3-result.xml"));
+        XmlJob second = repo.add("Child.parent", classLoader.getResourceAsStream("job/job-merge-3-2.xml"));
+        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job/job-merge-3-result.xml"));
 
         second = second.inherit(repo);
         result = result.inherit(repo);
@@ -215,10 +215,10 @@ public class XmlTest {
 
     @Test
     public void jobMergeTest4() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-merge-4-1.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-merge-4-1.xml"));
         XmlJob first = repo.getJob();
-        XmlJob second = repo.add("Child.parent", classLoader.getResourceAsStream("job-merge-4-2.xml"));
-        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job-merge-4-result.xml"));
+        XmlJob second = repo.add("Child.parent", classLoader.getResourceAsStream("job/job-merge-4-2.xml"));
+        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job/job-merge-4-result.xml"));
 
         second = second.inherit(repo);
         result = result.inherit(repo);
@@ -230,10 +230,10 @@ public class XmlTest {
 
     @Test
     public void jobMergeTest5() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-merge-5-1.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-merge-5-1.xml"));
         XmlJob first = repo.getJob();
-        XmlJob second = repo.add("Child.parent", classLoader.getResourceAsStream("job-merge-5-2.xml"));
-        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job-merge-5-result.xml"));
+        XmlJob second = repo.add("Child.parent", classLoader.getResourceAsStream("job/job-merge-5-2.xml"));
+        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job/job-merge-5-result.xml"));
 
         second = second.inherit(repo);
         result = result.inherit(repo);
@@ -245,10 +245,10 @@ public class XmlTest {
 
     @Test
     public void jobMergeTest6() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-merge-6-1.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-merge-6-1.xml"));
         XmlJob first = repo.getJob();
-        XmlJob second = repo.add("Child.parent", classLoader.getResourceAsStream("job-merge-6-2.xml"));
-        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job-merge-6-result.xml"));
+        XmlJob second = repo.add("Child.parent", classLoader.getResourceAsStream("job/job-merge-6-2.xml"));
+        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job/job-merge-6-result.xml"));
 
         second = second.inherit(repo);
         result = result.inherit(repo);
@@ -321,9 +321,9 @@ public class XmlTest {
 
     @Test
     public void jobMergeTest7() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-merge-7.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-merge-7.xml"));
         XmlJob job = repo.getJob();
-        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job-merge-7-result.xml"));
+        XmlJob result = repo.add("Result.parent", classLoader.getResourceAsStream("job/job-merge-7-result.xml"));
 
         job = job.inherit(repo);
         result = result.inherit(repo);
@@ -394,7 +394,7 @@ public class XmlTest {
 
     @Test
     public void defaultValueTest() throws JAXBException {
-        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job-default-1.xml"));
+        final TestRepository repo = new TestRepository("Job.parent", classLoader.getResourceAsStream("job/job-default-1.xml"));
         XmlJob job = repo.getJob();
 
         job = job.inherit(repo);
