@@ -19,7 +19,7 @@ public class ExpressionTest {
 
     @Test
     public void validJobPropertyTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -29,7 +29,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['job-prop']}")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step3")
-                ));
+                ), PARAMETERS);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3", step.getNext());
@@ -37,7 +37,7 @@ public class ExpressionTest {
 
     @Test
     public void validJobPropertyWithValidDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -47,7 +47,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['job-prop']}?:step2;")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step3")
-                ));
+                ), PARAMETERS);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3", step.getNext());
@@ -55,7 +55,7 @@ public class ExpressionTest {
 
     @Test
     public void validJobPropertyWithInvalidDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -65,7 +65,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['job-prop']}?:step2")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step3?:step2") //Stop throwing validation exception
-                ));
+                ), PARAMETERS);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3?:step2", step.getNext());
@@ -73,7 +73,7 @@ public class ExpressionTest {
 
     @Test
     public void validDefaultJobPropertyTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -83,7 +83,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not-a-property']}?:step2;")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
-                ));
+                ), PARAMETERS);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -91,7 +91,7 @@ public class ExpressionTest {
 
     @Test
     public void invalidDefaultJobPropertyTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -101,7 +101,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not-a-property']}?:step2")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("?:step2")
-                ));
+                ), PARAMETERS);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("?:step2", step1.getNext());
@@ -109,7 +109,7 @@ public class ExpressionTest {
 
     @Test
     public void multiplePropsTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -121,7 +121,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not-a-property']}#{jobProperties['prop1']}?:#{jobProperties['prop2']}#{jobProperties['prop3']};")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
-                ));
+                ), PARAMETERS);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -129,7 +129,7 @@ public class ExpressionTest {
 
     @Test
     public void multiplePropsDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -140,7 +140,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not']}#{jobProperties['not']}?:#{jobProperties['prop1']}#{jobProperties['not']}#{jobProperties['prop2']}#{jobProperties['not']};")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
-                ));
+                ), PARAMETERS);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -148,7 +148,7 @@ public class ExpressionTest {
 
     @Test
     public void multiplePropsStringLiteralTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -159,7 +159,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not']} #{jobProperties['not']}?:#{jobProperties['prop1']}#{jobProperties['not']}#{jobProperties['prop2']}#{jobProperties['not']};")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId(" ")
-                ));
+                ), PARAMETERS);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals(" ", step1.getNext());
@@ -167,7 +167,7 @@ public class ExpressionTest {
 
     @Test
     public void multiplePropsStringLiteralDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -178,7 +178,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not']}#{jobProperties['not']}?:#{jobProperties['prop1']}blah#{jobProperties['not']};")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("stepblah")
-                ));
+                ), PARAMETERS);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("stepblah", step1.getNext());
@@ -186,7 +186,7 @@ public class ExpressionTest {
 
     @Test
     public void onlyDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -197,7 +197,7 @@ public class ExpressionTest {
                         .setNext("?:step2;")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
-                ));
+                ), PARAMETERS);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -205,7 +205,7 @@ public class ExpressionTest {
 
     @Test(expected = IllegalExpressionException.class)
     public void valueAfterDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -217,6 +217,6 @@ public class ExpressionTest {
                         .setNext("blah?:default;INVALID PART")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
-                ));
+                ), PARAMETERS);
     }
 }

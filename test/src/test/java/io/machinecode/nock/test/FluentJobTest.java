@@ -14,7 +14,7 @@ public class FluentJobTest {
 
     @Test
     public void fluentJobTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -191,7 +191,7 @@ public class FluentJobTest {
                                         .addProperty("", "")
                                 )
                         )
-                ));
+                ), ExpressionTest.PARAMETERS);
 
         Assert.assertEquals("i1", job.getId());
     }
@@ -199,7 +199,7 @@ public class FluentJobTest {
 
     @Test
     public void defaultValuesTest() {
-        final Job job = JobFactory.INSTANCE.produceDescriptor(Jsl.job()
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                         //.setRestartable(false)
                         //.setVersion("1.0")
@@ -254,7 +254,7 @@ public class FluentJobTest {
                         )
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
-                ));
+                ), ExpressionTest.PARAMETERS);
 
         XmlJobTest.testDefaults(job);
     }

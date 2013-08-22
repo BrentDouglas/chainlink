@@ -399,7 +399,7 @@ public class XmlJobTest {
 
         job = job.inherit(repo);
 
-        testDefaults(JobFactory.INSTANCE.produceDescriptor(job));
+        testDefaults(JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS));
     }
 
     public static void testDefaults(final Job job) {

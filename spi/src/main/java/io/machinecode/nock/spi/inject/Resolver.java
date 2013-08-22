@@ -7,5 +7,5 @@ import io.machinecode.nock.spi.context.Context;
  */
 public interface Resolver {
 
-    <T> T resolve(String id, Class<T> clazz, Context context);
+    <T> T resolve(String id, Class<T> clazz);
 }

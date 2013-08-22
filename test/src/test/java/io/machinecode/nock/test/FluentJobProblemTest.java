@@ -24,7 +24,7 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.stepWithBatchletAndMapper()
                         .setId("step1")
                 );
-        JobFactory.INSTANCE.produceDescriptor(job);
+        JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
     }
 
     @Test(expected = InvalidTransitionException.class)
@@ -40,7 +40,7 @@ public class FluentJobProblemTest {
                         .setId("step2")
                         .setNext("step1")
                 );
-        JobFactory.INSTANCE.produceDescriptor(job);
+        JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
     }
 
     @Test(expected = InvalidTransitionException.class)
@@ -63,6 +63,6 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.stepWithBatchletAndMapper()
                         .setId("step2")
                 );
-        JobFactory.INSTANCE.produceDescriptor(job);
+        JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
     }
 }

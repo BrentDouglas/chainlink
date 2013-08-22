@@ -1,6 +1,5 @@
 package io.machinecode.nock.core.inject;
 
-import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.inject.Resolvable;
 
 /**
@@ -19,7 +18,7 @@ public class ResolvableClass<T> implements Resolvable<Class<T>> {
     }
 
     @Override
-    public Class<T> resolve(final Context context, final ClassLoader loader) throws ClassNotFoundException {
+    public Class<T> resolve(final ClassLoader loader) throws ClassNotFoundException {
         return (Class<T>) loader.loadClass(this.fqcn);
     }
 

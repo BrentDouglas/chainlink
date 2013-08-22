@@ -1,6 +1,5 @@
 package io.machinecode.nock.core.inject;
 
-import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.inject.Resolvable;
 
 import java.security.AccessController;
@@ -21,8 +20,8 @@ public class ResolvableService<T> implements Resolvable<List<T>> {
     }
 
     @Override
-    public List<T> resolve(final Context context, final ClassLoader loader) throws ClassNotFoundException {
-        final Class<T> clazz = this.clazz.resolve(context, loader);
+    public List<T> resolve(final ClassLoader loader) throws ClassNotFoundException {
+        final Class<T> clazz = this.clazz.resolve(loader);
         final ServiceLoader<T> resolvers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<T>>() {
             public ServiceLoader<T> run() {
                 return ServiceLoader.load(clazz, loader);

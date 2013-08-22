@@ -1,6 +1,5 @@
 package io.machinecode.nock.core.inject;
 
-import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.inject.Resolvable;
 import io.machinecode.nock.spi.inject.Resolver;
 
@@ -22,15 +21,15 @@ public class ResolvableReference<T> implements Resolvable<T> {
     }
 
     @Override
-    public T resolve(final Context context, final ClassLoader loader) throws ClassNotFoundException {
+    public T resolve(final ClassLoader loader) throws ClassNotFoundException {
         final ServiceLoader<Resolver> resolvers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<Resolver>>() {
             public ServiceLoader<Resolver> run() {
                 return ServiceLoader.load(Resolver.class, loader);
             }
         });
-        final Class<T> clazz = this.clazz.resolve(context, loader);
+        final Class<T> clazz = this.clazz.resolve(loader);
         for (final Resolver resolver : resolvers) {
-            final T that = resolver.resolve(this.ref, clazz, context);
+            final T that = resolver.resolve(this.ref, clazz);
             if (that != null) {
                 return that;
             }

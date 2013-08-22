@@ -1,38 +1,51 @@
 package io.machinecode.nock.spi;
 
 import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.spi.element.execution.Step;
 
+import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.operations.NoSuchJobInstanceException;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.StepExecution;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public interface Repository {
 
-    JobDescriptor add(final Job job, final String id);
-
     // Create
 
-    JobInstance createJobInstance(final JobDescriptor job);
+    JobInstance createJobInstance(final Job job);
 
     JobExecution createJobExecution(final JobInstance jobInstance);
 
-    StepExecution createStepExecution(final StepDescriptor step);
+    StepExecution createStepExecution(final JobExecution jobExecution, final Step<?,?> step);
 
-    // Find
+    // JobOperator
 
-    JobDescriptor findJob(final long id) throws NoSuchJobException;
+    Job getJob(final String name) throws NoSuchJobException, JobSecurityException;
 
-    JobInstance findJobInstance(final long id) throws NoSuchJobInstanceException;
+    Set<String> getJobNames() throws JobSecurityException;
 
-    JobExecution findJobExecution(final long id) throws NoSuchJobExecutionException;
+    int getJobInstanceCount(final String jobName) throws NoSuchJobException, JobSecurityException;
 
-    StepDescriptor findStep(final long id);
+    List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws NoSuchJobException, JobSecurityException;
 
-    StepExecution findStepExecution(final long id);
+    List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException;
+
+    Properties getParameters(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
+
+    JobInstance getJobInstance(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
+
+    List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException;
+
+    JobExecution getJobExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
+
+    List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 }
