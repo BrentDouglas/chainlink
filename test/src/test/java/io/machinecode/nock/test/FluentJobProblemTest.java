@@ -1,6 +1,7 @@
 package io.machinecode.nock.test;
 
 import io.machinecode.nock.core.factory.JobFactory;
+import io.machinecode.nock.core.model.JobImpl;
 import io.machinecode.nock.jsl.fluent.Jsl;
 import io.machinecode.nock.jsl.validation.InvalidJobException;
 import io.machinecode.nock.jsl.validation.InvalidTransitionException;
@@ -24,7 +25,8 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.stepWithBatchletAndMapper()
                         .setId("step1")
                 );
-        JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
+        final JobImpl impl = JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
+        JobFactory.INSTANCE.validate(impl);
     }
 
     @Test(expected = InvalidTransitionException.class)
@@ -40,7 +42,8 @@ public class FluentJobProblemTest {
                         .setId("step2")
                         .setNext("step1")
                 );
-        JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
+        final JobImpl impl = JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
+        JobFactory.INSTANCE.validate(impl);
     }
 
     @Test(expected = InvalidTransitionException.class)
@@ -63,6 +66,7 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.stepWithBatchletAndMapper()
                         .setId("step2")
                 );
-        JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
+        final JobImpl impl = JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
+        JobFactory.INSTANCE.validate(impl);
     }
 }

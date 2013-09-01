@@ -18,7 +18,7 @@ public interface Job {
 
     String getVersion();
 
-    String isRestartable();
+    String getRestartable();
 
     Properties getProperties();
 

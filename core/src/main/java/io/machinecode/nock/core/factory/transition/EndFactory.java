@@ -2,10 +2,10 @@ package io.machinecode.nock.core.factory.transition;
 
 import io.machinecode.nock.core.model.transition.EndImpl;
 import io.machinecode.nock.core.expression.Expression;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
-import io.machinecode.nock.core.factory.ElementFactory;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.element.transition.End;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -22,7 +22,7 @@ public class EndFactory implements ElementFactory<End, EndImpl> {
     }
 
     @Override
-    public EndImpl producePartitioned(final EndImpl that, final PartitionPropertyContext context) {
+    public EndImpl producePartitioned(final EndImpl that, final PropertyContext context) {
         final String on = Expression.resolvePartitionProperty(that.getOn(), context);
         final String exitStatus = Expression.resolvePartitionProperty(that.getExitStatus(), context);
         return new EndImpl(on, exitStatus);

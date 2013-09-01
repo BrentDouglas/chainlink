@@ -30,6 +30,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step3")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3", step.getNext());
@@ -48,6 +49,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step3")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3", step.getNext());
@@ -66,6 +68,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step3?:step2") //Stop throwing validation exception
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3?:step2", step.getNext());
@@ -84,6 +87,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -102,6 +106,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("?:step2")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("?:step2", step1.getNext());
@@ -122,6 +127,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -141,6 +147,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -160,6 +167,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId(" ")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals(" ", step1.getNext());
@@ -179,6 +187,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("stepblah")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("stepblah", step1.getNext());
@@ -198,6 +207,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -218,5 +228,6 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
     }
 }

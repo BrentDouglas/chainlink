@@ -1,14 +1,14 @@
 package io.machinecode.nock.jsl.validation.transition;
 
+import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.transition.Stop;
-import io.machinecode.nock.jsl.validation.Problem;
-import io.machinecode.nock.jsl.validation.ValidationContext;
-import io.machinecode.nock.jsl.validation.Validator;
+import io.machinecode.nock.spi.util.Message;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class StopValidator extends Validator<Stop> {
+public class StopValidator extends ValidatingVisitor<Stop> {
 
     public static final StopValidator INSTANCE = new StopValidator();
 
@@ -17,9 +17,9 @@ public class StopValidator extends Validator<Stop> {
     }
 
     @Override
-    public void doValidate(final Stop that, final ValidationContext context) {
+    public void doVisit(final Stop that, final VisitorNode context) {
         if (that.getOn() == null) {
-            context.addProblem(Problem.attributeRequired("on"));
+            context.addProblem(Message.attributeRequired("on"));
         }
     }
 }

@@ -1,8 +1,8 @@
 package io.machinecode.nock.core.model.partition;
 
+import io.machinecode.nock.core.loader.TypedArtifactReference;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
-import io.machinecode.nock.core.inject.ResolvableReference;
 import io.machinecode.nock.spi.element.partition.Reducer;
 
 import javax.batch.api.partition.PartitionReducer;
@@ -13,6 +13,6 @@ import javax.batch.api.partition.PartitionReducer;
 public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> implements Reducer {
 
     public ReducerImpl(final String ref, final PropertiesImpl properties) {
-        super(new ResolvableReference<PartitionReducer>(ref, PartitionReducer.class), properties);
+        super(new TypedArtifactReference<PartitionReducer>(ref, PartitionReducer.class), properties);
     }
 }

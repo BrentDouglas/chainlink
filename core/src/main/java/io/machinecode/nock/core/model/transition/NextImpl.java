@@ -18,4 +18,9 @@ public class NextImpl extends TransitionImpl implements Next {
     public String getTo() {
         return this.to;
     }
+
+    @Override
+    public Result runTransition() throws Exception {
+        return Result.next(this.to);
+    }
 }

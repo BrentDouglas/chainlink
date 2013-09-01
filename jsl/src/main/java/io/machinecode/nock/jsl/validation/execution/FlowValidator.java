@@ -1,17 +1,17 @@
 package io.machinecode.nock.jsl.validation.execution;
 
+import io.machinecode.nock.jsl.validation.transition.TransitionValidator;
+import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Flow;
 import io.machinecode.nock.spi.element.transition.Transition;
-import io.machinecode.nock.jsl.validation.Problem;
-import io.machinecode.nock.jsl.validation.ValidationContext;
-import io.machinecode.nock.jsl.validation.Validator;
-import io.machinecode.nock.jsl.validation.transition.TransitionValidator;
+import io.machinecode.nock.spi.util.Message;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FlowValidator extends Validator<Flow> {
+public class FlowValidator extends ValidatingVisitor<Flow> {
 
     public static final FlowValidator INSTANCE = new FlowValidator();
 
@@ -20,28 +20,28 @@ public class FlowValidator extends Validator<Flow> {
     }
 
     @Override
-    public void doValidate(final Flow that, final ValidationContext context) {
+    public void doVisit(final Flow that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Problem.attributeRequired("id"));
+            context.addProblem(Message.attributeRequired("id"));
         } else {
-            context.addId(that.getId());
+            context.setTransition(that.getId(), that.getNext());
         }
 
         if (that.getTransitions() != null) {
             for (final Transition transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Problem.notNullElement("transitions"));
+                    context.addProblem(Message.notNullElement("transitions"));
                 }
-                TransitionValidator.validate(transition, context);
+                TransitionValidator.visit(transition, context);
             }
         }
 
         if (that.getExecutions() != null) {
             for (final Execution execution : that.getExecutions()) {
                 if (execution == null) {
-                    context.addProblem(Problem.notNullElement("executions"));
+                    context.addProblem(Message.notNullElement("executions"));
                 }
-                ExcecutionValidator.validate(execution, context);
+                ExcecutionValidator.visit(execution, context);
             }
         }
     }

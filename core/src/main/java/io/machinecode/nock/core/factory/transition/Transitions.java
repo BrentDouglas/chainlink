@@ -5,8 +5,7 @@ import io.machinecode.nock.core.model.transition.FailImpl;
 import io.machinecode.nock.core.model.transition.NextImpl;
 import io.machinecode.nock.core.model.transition.StopImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
+import io.machinecode.nock.core.expression.PropertyContextImpl;
 import io.machinecode.nock.core.util.Util;
 import io.machinecode.nock.core.util.Util.ExpressionTransformer;
 import io.machinecode.nock.spi.element.transition.End;
@@ -14,6 +13,8 @@ import io.machinecode.nock.spi.element.transition.Fail;
 import io.machinecode.nock.spi.element.transition.Next;
 import io.machinecode.nock.spi.element.transition.Stop;
 import io.machinecode.nock.spi.element.transition.Transition;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 import java.util.List;
 
@@ -38,9 +39,9 @@ public class Transitions {
         }
     };
 
-    private static final ExpressionTransformer<TransitionImpl, TransitionImpl, PartitionPropertyContext> TRANSITION_PARTITION_TRANSFORMER = new ExpressionTransformer<TransitionImpl, TransitionImpl, PartitionPropertyContext>() {
+    private static final ExpressionTransformer<TransitionImpl, TransitionImpl, PropertyContext> TRANSITION_PARTITION_TRANSFORMER = new ExpressionTransformer<TransitionImpl, TransitionImpl, PropertyContext>() {
         @Override
-        public TransitionImpl transform(final TransitionImpl that, final PartitionPropertyContext context) {
+        public TransitionImpl transform(final TransitionImpl that, final PropertyContext context) {
             if (that instanceof EndImpl) {
                 return EndFactory.INSTANCE.producePartitioned((EndImpl) that, context);
             } else if (that instanceof FailImpl) {
@@ -59,7 +60,7 @@ public class Transitions {
         return Util.immutableCopy(that, context, TRANSITION_EXECUTION_TRANSFORMER);
     }
 
-    public static List<TransitionImpl> immutableCopyTransitionsPartition(final List<TransitionImpl> that, final PartitionPropertyContext context) {
+    public static List<TransitionImpl> immutableCopyTransitionsPartition(final List<TransitionImpl> that, final PropertyContext context) {
         return Util.immutableCopy(that, context, TRANSITION_PARTITION_TRANSFORMER);
     }
 }

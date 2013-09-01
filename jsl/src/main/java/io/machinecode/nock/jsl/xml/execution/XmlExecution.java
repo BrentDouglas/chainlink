@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.spi.element.execution.Execution;
-import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.loader.Repository;
 import io.machinecode.nock.jsl.xml.util.Copyable;
 
 /**
@@ -12,5 +12,5 @@ public interface XmlExecution<T extends XmlExecution<T>> extends Copyable<T>, Ex
     @Override
     String getId();
 
-    T inherit(final Repository repository);
+    T inherit(final Repository repository, final String defaultJobXml);
 }

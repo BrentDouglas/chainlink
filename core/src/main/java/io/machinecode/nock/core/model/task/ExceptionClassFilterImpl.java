@@ -27,4 +27,10 @@ public class ExceptionClassFilterImpl implements ExceptionClassFilter {
     public List<ExceptionClassImpl> getExcludes() {
         return this.excludes;
     }
+
+    public boolean matches(final Exception e) {
+        final String fqcn = e.getClass().getCanonicalName();
+        //TODO
+        return false;
+    }
 }

@@ -1,11 +1,14 @@
 package io.machinecode.nock.jsl.validation;
 
+import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.Listener;
+import io.machinecode.nock.spi.util.Message;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ListenerValidator extends Validator<Listener> {
+public class ListenerValidator extends ValidatingVisitor<Listener> {
 
     public static final ListenerValidator INSTANCE = new ListenerValidator();
 
@@ -14,12 +17,12 @@ public class ListenerValidator extends Validator<Listener> {
     }
 
     @Override
-    public void doValidate(final Listener that, final ValidationContext context) {
+    public void doVisit(final Listener that, final VisitorNode context) {
         if (that.getRef() == null) {
-            context.addProblem(Problem.attributeRequired("ref"));
+            context.addProblem(Message.attributeRequired("ref"));
         }
         if (that.getProperties() != null) {
-            PropertiesValidator.INSTANCE.validate(that.getProperties(), context);
+            PropertiesValidator.INSTANCE.visit(that.getProperties(), context);
         }
     }
 }

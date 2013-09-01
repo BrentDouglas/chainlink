@@ -1,18 +1,20 @@
 package io.machinecode.nock.jsl.validation;
 
+import io.machinecode.nock.jsl.visitor.VisitorNode;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class InvalidTransitionException extends RuntimeException {
 
-    private final TransitionContext context;
+    private final VisitorNode node;
 
-    public InvalidTransitionException(final TransitionContext context) {
-        this.context = context;
+    public InvalidTransitionException(final VisitorNode node) {
+        this.node = node;
     }
 
     @Override
     public String getMessage() {
-        return context.toTree(new StringBuilder(System.lineSeparator())).toString();
+        return node.toTree(new StringBuilder(System.lineSeparator())).toString();
     }
 }

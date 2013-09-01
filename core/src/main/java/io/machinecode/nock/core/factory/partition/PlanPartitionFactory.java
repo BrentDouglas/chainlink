@@ -5,11 +5,11 @@ import io.machinecode.nock.core.model.partition.CollectorImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.model.partition.PlanImpl;
 import io.machinecode.nock.core.model.partition.ReducerImpl;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
-import io.machinecode.nock.core.factory.ElementFactory;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.element.partition.Partition;
 import io.machinecode.nock.spi.element.partition.Plan;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -33,7 +33,7 @@ public class PlanPartitionFactory implements ElementFactory<Partition<? extends 
     }
 
     @Override
-    public PartitionImpl<PlanImpl> producePartitioned(final PartitionImpl<PlanImpl> that, final PartitionPropertyContext context) {
+    public PartitionImpl<PlanImpl> producePartitioned(final PartitionImpl<PlanImpl> that, final PropertyContext context) {
         final CollectorImpl collector = that.getCollector() == null ? null : CollectorFactory.INSTANCE.producePartitioned(that.getCollector(), context);
         final AnalyserImpl analyser = that.getAnalyzer() == null ? null : AnalyserFactory.INSTANCE.producePartitioned(that.getAnalyzer(), context);
         final ReducerImpl reducer = that.getReducer() == null ? null : ReducerFactory.INSTANCE.producePartitioned(that.getReducer(), context);

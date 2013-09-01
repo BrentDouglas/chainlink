@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
-     id="job1" version="1.0">
-    <!-- This job runs s1, then s2 -->
-    <step id="s1" parent="step1" jsl-name="Job.parent" next="s2"/>
-    <step id="s2" parent="step2" jsl-name="Job.parent" />
-</job>

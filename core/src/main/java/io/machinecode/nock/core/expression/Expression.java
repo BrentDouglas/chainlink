@@ -1,7 +1,9 @@
 package io.machinecode.nock.core.expression;
 
 import io.machinecode.nock.jsl.util.MutablePair;
-import io.machinecode.nock.jsl.util.Pair;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
+import io.machinecode.nock.spi.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +137,7 @@ public class Expression {
     /**
      * @return The index of the position for the next scanning function to resume from.
      */
-    private static  int valueExpression(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
+    private static int valueExpression(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
                                         final String prefix, final int prefixLength, final int start, final PropertyResolver resolver) {
         final int startProperty = indexOf(unresolved, 0, unresolvedLength, prefix, 0, prefixLength, start);
         if (startProperty == -1) {
@@ -151,7 +153,7 @@ public class Expression {
         final CharSequence property = unresolved.subSequence(startProperty + prefixLength, endProperty);
         final CharSequence resolved = resolver.resolve(property);
 
-        if (!EMPTY.equals(resolved)) {
+        if (resolved.length() > 0) {
             builder.append(resolved);
         }
         return endProperty + AFTER_LENGTH;
@@ -221,20 +223,8 @@ public class Expression {
         return principleValueExpression(then, SYSTEM_PROPERTIES, SYSTEM_PROPERTIES_LENGTH, 0, SYSTEM_PROPERTY_RESOLVER).toString();
     }
 
-    //public static <T extends Pair<String, String>> String resolveExecutionProperty(final String that, final JobParameterContext context) {
-    //    if (that == null) {
-    //        return null;
-    //    }
-    //    return principleValueExpression(that, JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, 0, new PropertyResolver() {
-    //        @Override
-    //        public String resolve(final CharSequence value) {
-    //            return get(value, context.getProperties());
-    //        }
-    //    }).toString();
-    //}
 
-
-    public static <T extends Pair<String, String>> String resolvePartitionProperty(final String that, final PartitionPropertyContext context) {
+    public static <T extends Pair<String, String>> String resolvePartitionProperty(final String that, final PropertyContext context) {
         if (that == null) {
             return null;
         }

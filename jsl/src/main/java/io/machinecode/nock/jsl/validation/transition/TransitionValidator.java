@@ -1,11 +1,11 @@
 package io.machinecode.nock.jsl.validation.transition;
 
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.transition.End;
 import io.machinecode.nock.spi.element.transition.Fail;
 import io.machinecode.nock.spi.element.transition.Next;
 import io.machinecode.nock.spi.element.transition.Stop;
 import io.machinecode.nock.spi.element.transition.Transition;
-import io.machinecode.nock.jsl.validation.ValidationContext;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -14,15 +14,15 @@ public final class TransitionValidator {
 
     private TransitionValidator(){}
 
-    public static void validate(final Transition that, final ValidationContext context) {
+    public static void visit(final Transition that, final VisitorNode context) {
         if (that instanceof Stop) {
-            StopValidator.INSTANCE.validate((Stop) that, context);
+            StopValidator.INSTANCE.visit((Stop) that, context);
         } else if (that instanceof Fail) {
-            FailValidator.INSTANCE.validate((Fail) that, context);
+            FailValidator.INSTANCE.visit((Fail) that, context);
         } else if (that instanceof Next) {
-            NextValidator.INSTANCE.validate((Next) that, context);
+            NextValidator.INSTANCE.visit((Next) that, context);
         } else if (that instanceof End) {
-            EndValidator.INSTANCE.validate((End) that, context);
+            EndValidator.INSTANCE.visit((End) that, context);
         }
     }
 }

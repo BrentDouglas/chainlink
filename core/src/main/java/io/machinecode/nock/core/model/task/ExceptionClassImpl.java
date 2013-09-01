@@ -1,6 +1,6 @@
 package io.machinecode.nock.core.model.task;
 
-import io.machinecode.nock.core.inject.ResolvableClass;
+import io.machinecode.nock.core.util.ResolvableClass;
 import io.machinecode.nock.spi.element.task.ExceptionClass;
 
 /**

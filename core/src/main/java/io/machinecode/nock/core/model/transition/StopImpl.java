@@ -2,6 +2,8 @@ package io.machinecode.nock.core.model.transition;
 
 import io.machinecode.nock.spi.element.transition.Stop;
 
+import javax.batch.runtime.BatchStatus;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
@@ -24,5 +26,10 @@ public class StopImpl extends TransitionImpl implements Stop {
     @Override
     public String getRestart() {
         return this.restart;
+    }
+
+    @Override
+    public Result runTransition() throws Exception {
+        return Result.status(BatchStatus.STOPPED, this.exitStatus);
     }
 }

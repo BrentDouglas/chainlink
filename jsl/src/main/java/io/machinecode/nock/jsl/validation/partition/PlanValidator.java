@@ -1,14 +1,14 @@
 package io.machinecode.nock.jsl.validation.partition;
 
-import io.machinecode.nock.spi.element.partition.Plan;
 import io.machinecode.nock.jsl.validation.PropertiesValidator;
-import io.machinecode.nock.jsl.validation.ValidationContext;
-import io.machinecode.nock.jsl.validation.Validator;
+import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
+import io.machinecode.nock.spi.element.partition.Plan;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class PlanValidator extends Validator<Plan> {
+public class PlanValidator extends ValidatingVisitor<Plan> {
 
     public static final PlanValidator INSTANCE = new PlanValidator();
 
@@ -17,9 +17,9 @@ public class PlanValidator extends Validator<Plan> {
     }
 
     @Override
-    public void doValidate(final Plan that, final ValidationContext context) {
+    public void doVisit(final Plan that, final VisitorNode context) {
         if (that.getProperties() != null) {
-            PropertiesValidator.INSTANCE.validate(that.getProperties(), context);
+            PropertiesValidator.INSTANCE.visit(that.getProperties(), context);
         }
         //if (that.getPartitions() < 0) {
         //    context.addProblem(Problem.attributePositive("partitions", that.getPartitions()));

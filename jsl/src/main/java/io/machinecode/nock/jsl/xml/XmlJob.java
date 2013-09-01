@@ -1,5 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
+import io.machinecode.nock.jsl.xml.loader.Repository;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.jsl.xml.execution.XmlDecision;
 import io.machinecode.nock.jsl.xml.execution.XmlExecution;
@@ -76,7 +77,7 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
     }
 
     @Override
-    public String isRestartable() {
+    public String getRestartable() {
         return restartable;
     }
 
@@ -116,10 +117,10 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
     }
 
     @Override
-    public XmlJob inherit(final Repository repository) {
+    public XmlJob inherit(final Repository repository, final String defaultJobXml) {
         final XmlJob copy = this.copy();
         if (copy.parent != null) {
-            final XmlJob that = repository.findParent(XmlJob.class, copy);
+            final XmlJob that = repository.findParent(XmlJob.class, copy, defaultJobXml);
 
             that.getExecutions().clear(); // 4.6.1.1
 
@@ -131,7 +132,7 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
             // 4.1
             copy.restartable = Util.attributeRule(copy.restartable, that.restartable); // 4.4.1
         }
-        copy.executions = Util.inheritingList(repository, this.executions);
+        copy.executions = Util.inheritingList(repository, defaultJobXml, this.executions);
         return copy;
     }
 

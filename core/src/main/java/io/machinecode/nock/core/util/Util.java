@@ -1,7 +1,7 @@
 package io.machinecode.nock.core.util;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.nock.core.expression.PropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 import java.util.ArrayList;
 import java.util.Collections;

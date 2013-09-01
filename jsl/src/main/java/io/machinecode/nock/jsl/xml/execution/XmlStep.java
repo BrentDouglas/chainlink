@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.spi.element.execution.Step;
-import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.loader.Repository;
 import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlListeners;
 import io.machinecode.nock.jsl.xml.XmlProperties;
@@ -183,10 +183,10 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
     }
 
     @Override
-    public XmlStep inherit(final Repository repository) {
+    public XmlStep inherit(final Repository repository, final String defaultJobXml) {
         final XmlStep copy = this.copy();
         if (copy.parent != null) {
-            final XmlStep that = repository.findParent(XmlStep.class, copy);
+            final XmlStep that = repository.findParent(XmlStep.class, copy, defaultJobXml);
 
             copy.inheritingElementRule(that); // 4.6.2.1
 
@@ -206,7 +206,7 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
                     || copy.task instanceof XmlBatchlet && that.task instanceof XmlChunk) {
                 throw new JobStartException();
             }
-            copy.task = Util.recursiveElementRule(copy.task, that.task, repository); // 4.4.1
+            copy.task = Util.recursiveElementRule(copy.task, that.task, repository, defaultJobXml); // 4.4.1
         }
         return copy;
     }

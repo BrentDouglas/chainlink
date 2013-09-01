@@ -9,8 +9,6 @@ import io.machinecode.nock.core.model.partition.MapperImpl;
 import io.machinecode.nock.core.model.partition.PlanImpl;
 import io.machinecode.nock.core.model.task.BatchletImpl;
 import io.machinecode.nock.core.model.task.ChunkImpl;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
 import io.machinecode.nock.core.util.Util;
 import io.machinecode.nock.core.util.Util.NextExpressionTransformer;
 import io.machinecode.nock.spi.element.execution.Decision;
@@ -25,6 +23,8 @@ import io.machinecode.nock.spi.element.partition.Strategy;
 import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.spi.element.task.Chunk;
 import io.machinecode.nock.spi.element.task.Task;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 import java.util.List;
 
@@ -65,9 +65,9 @@ public class Executions {
         }
     };
 
-    private static final NextExpressionTransformer<ExecutionImpl, ExecutionImpl, PartitionPropertyContext> EXECUTION_PARTITION_TRANSFORMER = new NextExpressionTransformer<ExecutionImpl, ExecutionImpl, PartitionPropertyContext>() {
+    private static final NextExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext> EXECUTION_PARTITION_TRANSFORMER = new NextExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext>() {
         @Override
-        public ExecutionImpl transform(final ExecutionImpl that, final ExecutionImpl next, final PartitionPropertyContext context) {
+        public ExecutionImpl transform(final ExecutionImpl that, final ExecutionImpl next, final PropertyContext context) {
             if (that instanceof FlowImpl) {
                 return FlowFactory.INSTANCE.producePartitioned((FlowImpl) that, next, context);
             } else if (that instanceof SplitImpl) {
@@ -102,7 +102,7 @@ public class Executions {
         return Util.immutableCopy(that, context, EXECUTION_BUILD_TRANSFORMER);
     }
 
-    public static List<ExecutionImpl> immutableCopyExecutionsPartition(final List<ExecutionImpl> that, final PartitionPropertyContext context) {
+    public static List<ExecutionImpl> immutableCopyExecutionsPartition(final List<ExecutionImpl> that, final PropertyContext context) {
         return Util.immutableCopy(that, context, EXECUTION_PARTITION_TRANSFORMER);
     }
 }

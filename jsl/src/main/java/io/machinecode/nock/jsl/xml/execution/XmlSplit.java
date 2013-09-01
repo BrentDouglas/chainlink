@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.spi.element.execution.Split;
-import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.loader.Repository;
 import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -67,11 +67,11 @@ public class XmlSplit implements XmlExecution<XmlSplit>, Split {
     }
 
     @Override
-    public XmlSplit inherit(final Repository repository) {
+    public XmlSplit inherit(final Repository repository, final String defaultJobXml) {
         final XmlSplit copy = new XmlSplit();
         copy.setId(this.id);
         copy.setNext(this.next);
-        copy.setFlows(Util.inheritingList(repository, this.flows));
+        copy.setFlows(Util.inheritingList(repository, defaultJobXml, this.flows));
         return copy;
     }
 

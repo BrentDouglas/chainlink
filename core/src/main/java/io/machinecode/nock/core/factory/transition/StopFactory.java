@@ -2,10 +2,10 @@ package io.machinecode.nock.core.factory.transition;
 
 import io.machinecode.nock.core.model.transition.StopImpl;
 import io.machinecode.nock.core.expression.Expression;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
-import io.machinecode.nock.core.factory.ElementFactory;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.element.transition.Stop;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -23,7 +23,7 @@ public class StopFactory implements ElementFactory<Stop, StopImpl> {
     }
 
     @Override
-    public StopImpl producePartitioned(final StopImpl that, final PartitionPropertyContext context) {
+    public StopImpl producePartitioned(final StopImpl that, final PropertyContext context) {
         final String on = Expression.resolvePartitionProperty(that.getOn(), context);
         final String exitStatus = Expression.resolvePartitionProperty(that.getExitStatus(), context);
         final String restart = Expression.resolvePartitionProperty(that.getRestart(), context);

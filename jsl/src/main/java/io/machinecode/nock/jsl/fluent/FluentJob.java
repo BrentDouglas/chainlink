@@ -42,7 +42,7 @@ public class FluentJob implements Job {
     }
 
     @Override
-    public String isRestartable() {
+    public String getRestartable() {
         return this.restartable;
     }
 

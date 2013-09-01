@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.util;
 
-import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.loader.Repository;
 import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 import io.machinecode.nock.jsl.xml.execution.XmlFlow;
 import io.machinecode.nock.jsl.xml.execution.XmlSplit;
@@ -69,7 +69,7 @@ public abstract class Inheritable<T extends Inheritable<T>> implements Copyable<
      *
      * @param repository
      */
-    public abstract T inherit(final Repository repository);
+    public abstract T inherit(final Repository repository, final String defaultJobXml);
 
     /**
      * Pulls attributes from the parent element.
@@ -82,16 +82,16 @@ public abstract class Inheritable<T extends Inheritable<T>> implements Copyable<
         this.jslName = null;
     }
 
-    public static void inheritType(final XmlExecution that, final Repository repository) {
+    public static void inheritType(final XmlExecution that, final Repository repository, final String defaultJobXml) {
         if (that instanceof XmlFlow) {
-            ((XmlFlow)that).inherit(repository);
+            ((XmlFlow)that).inherit(repository, defaultJobXml);
         }
         if (that instanceof XmlStep) {
-            ((XmlStep)that).inherit(repository);
+            ((XmlStep)that).inherit(repository, defaultJobXml);
         }
         if (that instanceof XmlSplit) {
             for (final XmlExecution type : ((XmlSplit)that).getFlows()) {
-                inheritType(type, repository);
+                inheritType(type, repository, defaultJobXml);
             }
         }
     }

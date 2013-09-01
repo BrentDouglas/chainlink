@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.spi.element.execution.Flow;
-import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.loader.Repository;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
@@ -98,10 +98,10 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlExecution<XmlFlo
     }
 
     @Override
-    public XmlFlow inherit(final Repository repository) {
+    public XmlFlow inherit(final Repository repository, final String defaultJobXml) {
         final XmlFlow copy = this.copy();
         if (this.parent != null) {
-            final XmlFlow that = repository.findParent(XmlFlow.class, copy);
+            final XmlFlow that = repository.findParent(XmlFlow.class, copy, defaultJobXml);
 
             that.transitions.clear(); // 4.6.3.1 Drop parent transitions
 
@@ -113,9 +113,9 @@ public class XmlFlow extends Inheritable<XmlFlow> implements XmlExecution<XmlFlo
             copy.id = Util.attributeRule(copy.id, that.id); // 4.1
             copy.next = Util.attributeRule(copy.next, that.next); // 4.1
 
-            copy.executions = Util.inheritingList(repository, that.executions);
+            copy.executions = Util.inheritingList(repository, defaultJobXml, that.executions);
         } else {
-            copy.executions = Util.inheritingList(repository, this.executions);
+            copy.executions = Util.inheritingList(repository, defaultJobXml, this.executions);
         }
 
         return copy;

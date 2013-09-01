@@ -1,11 +1,22 @@
 package io.machinecode.nock.core;
 
+import gnu.trove.map.TMap;
+import gnu.trove.map.hash.THashMap;
+import io.machinecode.nock.core.configuration.ConfigurationFactoryImpl;
+import io.machinecode.nock.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.nock.core.factory.JobFactory;
-import io.machinecode.nock.core.inject.ResolvableService;
 import io.machinecode.nock.core.model.JobImpl;
-import io.machinecode.nock.spi.configuration.Configuration;
-import io.machinecode.nock.spi.configuration.ConfigurationFactory;
+import io.machinecode.nock.core.work.ContextImpl;
+import io.machinecode.nock.core.work.Status;
+import io.machinecode.nock.core.util.PropertiesConverter;
+import io.machinecode.nock.core.util.ResolvableService;
+import io.machinecode.nock.core.work.WorkerImpl;
+import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.transport.TransportFactory;
+import io.machinecode.nock.spi.util.Message;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
@@ -18,32 +29,61 @@ import javax.batch.operations.JobStartException;
 import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.operations.NoSuchJobInstanceException;
+import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.StepExecution;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class JobOperatorImpl implements JobOperator {
 
-    private final Configuration configuration;
+    private final RuntimeConfigurationImpl configuration;
+    private final TransportFactory transportFactory;
+
+    private final TMap<Long, Future<?>> jobs = new THashMap<Long, Future<?>>();
+    final AtomicBoolean lock = new AtomicBoolean(false);
+
+    private Future<?> get(final long executionId) {
+        while (!lock.compareAndSet(false, true)) {}
+        try {
+            return this.jobs.get(executionId);
+        } finally {
+            lock.set(false);
+        }
+    }
+
+    private void put(final long executionId, final  Future<?> future) {
+        while (!lock.compareAndSet(false, true)) {}
+        try {
+            this.jobs.put(executionId, future);
+        } finally {
+            lock.set(false);
+        }
+    }
+
 
     public JobOperatorImpl() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        final List<ConfigurationFactory> factories;
+        this.configuration = new RuntimeConfigurationImpl(ConfigurationFactoryImpl.INSTANCE.produce());
+
+        final List<TransportFactory> transportFactories;
         try {
-            factories = new ResolvableService<ConfigurationFactory>(ConfigurationFactory.class).resolve(tccl);
+            transportFactories = new ResolvableService<TransportFactory>(TransportFactory.class).resolve(configuration.getClassLoader());
         } catch (final ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        if (factories.isEmpty()) {
+        if (transportFactories.isEmpty()) {
             throw new RuntimeException();
+        } else {
+            this.transportFactory = transportFactories.get(0);
         }
-        this.configuration = factories.get(0).produce();
     }
 
     @Override
@@ -73,24 +113,88 @@ public class JobOperatorImpl implements JobOperator {
 
     @Override
     public long start(final String jobXMLName, final Properties jobParameters) throws JobStartException, JobSecurityException {
-        final Job theirs = configuration.getRepository().getJob(jobXMLName);
-        final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, jobParameters);
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            final Job theirs = configuration.getJobLoader().load(jobXMLName);
+            final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, jobParameters);
+            JobFactory.INSTANCE.validate(job);
+
+            final Repository repository = configuration.getRepository();
+            final Transport transport = transportFactory.produce(repository);
+            final JobInstance instance = repository.createJobInstance(job);
+            final JobExecution execution = repository.createJobExecution(instance);
+            final Context context = new ContextImpl(
+                    job,
+                    instance.getInstanceId(),
+                    execution.getExecutionId(),
+                    new long[0]
+            );
+            Status.started(transport, context);
+            final Future<?> stop = transport.runJob(job, context);
+            put(execution.getExecutionId(), stop);
+            return execution.getExecutionId();
+        } catch (final Exception e) {
+            throw new JobStartException(e);
+        }
     }
 
     @Override
     public long restart(final long executionId, final Properties restartParameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            final Repository repository = configuration.getRepository();
+            final JobExecution execution = repository.getLatestJobExecution(executionId);
+            if (BatchStatus.STOPPED.equals(execution.getBatchStatus())
+                    || BatchStatus.STOPPED.equals(execution.getBatchStatus())) {
+                throw new JobRestartException(Message.cantRestartBatchStatus(execution.getExecutionId(), execution.getBatchStatus()));
+            }
+            final Job theirs = configuration.getJobLoader().load(execution.getJobName());
+            final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, restartParameters);
+            JobFactory.INSTANCE.validate(job);
+            if (!job.isRestartable()) {
+                throw new JobRestartException(Message.cantRestartJob(execution.getExecutionId()));
+            }
+            if (BatchStatus.COMPLETED.equals(execution.getBatchStatus())) {
+                throw new JobExecutionAlreadyCompleteException();
+            }
+            final Transport transport = transportFactory.produce(repository);
+            final JobInstance instance = repository.createJobInstance(job);
+            final Context context = new ContextImpl(
+                    job,
+                    instance.getInstanceId(),
+                    execution.getExecutionId(),
+                    new long[0]
+            );
+            Status.started(transport, context);
+            final Future<?> stop = transport.runJob(job, context);
+            put(execution.getExecutionId(), stop);
+            return execution.getExecutionId();
+        } catch (final JobRestartException e) {
+            throw e;
+        } catch (final JobExecutionAlreadyCompleteException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobRestartException(e);
+        }
     }
 
     @Override
     public void stop(final long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final Repository repository = configuration.getRepository();
+        final Future<?> future = get(executionId);
+        if (future == null) {
+            throw new JobExecutionNotRunningException();
+        }
+        future.cancel(true);
+        repository.updateJobExecution(executionId, BatchStatus.STOPPING, new Date());
     }
 
     @Override
     public void abandon(final long executionId) throws NoSuchJobExecutionException, JobExecutionIsRunningException, JobSecurityException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final Repository repository = configuration.getRepository();
+        final JobExecution execution = repository.getJobExecution(executionId);
+        if (Status.isRunning(execution.getBatchStatus())) {
+            throw new JobExecutionIsRunningException();
+        }
+        repository.updateJobExecution(executionId, BatchStatus.ABANDONED, new Date());
     }
 
     @Override

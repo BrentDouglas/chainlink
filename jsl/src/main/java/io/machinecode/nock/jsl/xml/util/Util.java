@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.util;
 
-import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.loader.Repository;
 import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 
 import java.util.ArrayList;
@@ -20,8 +20,8 @@ public class Util {
     public static <X extends Copyable<X>> CopyList<X> copyList(final List<X>... that) {
         return that == null ? null : new CopyList<X>(that);
     }
-    public static <X extends XmlExecution<X> & Copyable<X>> InheritList<X> inheritingList(final Repository repository, final List<X> that) {
-        return that == null ? null : new InheritList<X>(repository, that);
+    public static <X extends XmlExecution<X> & Copyable<X>> InheritList<X> inheritingList(final Repository repository, final String defaultJobXml, final List<X> that) {
+        return that == null ? null : new InheritList<X>(repository, defaultJobXml, that);
     }
 
     public static <X extends Mergeable<X>> X merge(final X child, final X parent) {
@@ -49,13 +49,13 @@ public class Util {
     }
 
     //TODO This needs to call merge
-    public static <X extends Mergeable<X>> X recursiveElementRule(final X child, final X parent, final Repository repository) {
+    public static <X extends Mergeable<X>> X recursiveElementRule(final X child, final X parent, final Repository repository, final String defaultJobXml) {
         if (child == null) {
             return parent == null ? null : parent.copy();
         }
         final X that = child.copy();
         if (that instanceof Inheritable) {
-            ((Inheritable)that).inherit(repository);
+            ((Inheritable)that).inherit(repository, defaultJobXml);
         }
         return that.merge(parent);
     }

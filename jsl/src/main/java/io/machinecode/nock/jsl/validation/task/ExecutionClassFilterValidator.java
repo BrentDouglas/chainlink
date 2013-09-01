@@ -1,15 +1,15 @@
 package io.machinecode.nock.jsl.validation.task;
 
+import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.task.ExceptionClass;
 import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
-import io.machinecode.nock.jsl.validation.Problem;
-import io.machinecode.nock.jsl.validation.ValidationContext;
-import io.machinecode.nock.jsl.validation.Validator;
+import io.machinecode.nock.spi.util.Message;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ExecutionClassFilterValidator extends Validator<ExceptionClassFilter> {
+public class ExecutionClassFilterValidator extends ValidatingVisitor<ExceptionClassFilter> {
 
     public static final ExecutionClassFilterValidator SKIPPABLE = new ExecutionClassFilterValidator("skippable-exception-classes");
     public static final ExecutionClassFilterValidator RETRYABLE = new ExecutionClassFilterValidator("retryable-exception-classes");
@@ -20,26 +20,26 @@ public class ExecutionClassFilterValidator extends Validator<ExceptionClassFilte
     }
 
     @Override
-    public void doValidate(final ExceptionClassFilter that, final ValidationContext context) {
+    public void doVisit(final ExceptionClassFilter that, final VisitorNode context) {
         if (that.getIncludes() != null) {
             for (final ExceptionClass clazz : that.getIncludes()) {
                 if (clazz == null) {
-                    context.addProblem(Problem.notNullElement("includes"));
+                    context.addProblem(Message.notNullElement("includes"));
                     continue;
                 }
                 if (clazz.getClassName() == null) {
-                    context.addProblem(Problem.attributeRequired("class"));
+                    context.addProblem(Message.attributeRequired("class"));
                 }
             }
         }
         if (that.getExcludes() != null) {
             for (final ExceptionClass clazz : that.getExcludes()) {
                 if (clazz == null) {
-                    context.addProblem(Problem.notNullElement("excludes"));
+                    context.addProblem(Message.notNullElement("excludes"));
                     continue;
                 }
                 if (clazz.getClassName() == null) {
-                    context.addProblem(Problem.attributeRequired("class"));
+                    context.addProblem(Message.attributeRequired("class"));
                 }
             }
         }

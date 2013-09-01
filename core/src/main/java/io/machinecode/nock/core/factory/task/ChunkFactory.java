@@ -1,5 +1,7 @@
 package io.machinecode.nock.core.factory.task;
 
+import io.machinecode.nock.core.model.ListenersImpl;
+import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.model.task.CheckpointAlgorithmImpl;
 import io.machinecode.nock.core.model.task.ChunkImpl;
 import io.machinecode.nock.core.model.task.ExceptionClassFilterImpl;
@@ -7,20 +9,20 @@ import io.machinecode.nock.core.model.task.ItemProcessorImpl;
 import io.machinecode.nock.core.model.task.ItemReaderImpl;
 import io.machinecode.nock.core.model.task.ItemWriterImpl;
 import io.machinecode.nock.core.expression.Expression;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
-import io.machinecode.nock.core.factory.ElementFactory;
 import io.machinecode.nock.spi.element.task.Chunk;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
+import io.machinecode.nock.spi.factory.TaskFactory;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ChunkFactory implements ElementFactory<Chunk, ChunkImpl> {
+public class ChunkFactory implements TaskFactory<Chunk, ChunkImpl, ListenersImpl, PartitionImpl<?>> {
 
     public static final ChunkFactory INSTANCE = new ChunkFactory();
 
     @Override
-    public ChunkImpl produceExecution(final Chunk that, final JobPropertyContext context) {
+    public ChunkImpl produceExecution(final Chunk that, final ListenersImpl listeners, final PartitionImpl<?> partition, final JobPropertyContext context) {
         final String checkpointPolicy = Expression.resolveExecutionProperty(that.getCheckpointPolicy(), context);
         final String itemCount = Expression.resolveExecutionProperty(that.getItemCount(), context);
         final String timeLimit = Expression.resolveExecutionProperty(that.getTimeLimit(), context);
@@ -47,12 +49,14 @@ public class ChunkFactory implements ElementFactory<Chunk, ChunkImpl> {
                 checkpointAlgorithm,
                 skippableExceptionClasses,
                 retryableExceptionClasses,
-                noRollbackExceptionClasses
+                noRollbackExceptionClasses,
+                listeners,
+                partition
         );
     }
 
     @Override
-    public ChunkImpl producePartitioned(final ChunkImpl that, final PartitionPropertyContext context) {
+    public ChunkImpl producePartitioned(final ChunkImpl that, final ListenersImpl listeners, final PartitionImpl<?> partition, final PropertyContext context) {
         final String checkpointPolicy = Expression.resolvePartitionProperty(that.getCheckpointPolicy(), context);
         final String itemCount = Expression.resolvePartitionProperty(that.getItemCount(), context);
         final String timeLimit = Expression.resolvePartitionProperty(that.getTimeLimit(), context);
@@ -79,7 +83,9 @@ public class ChunkFactory implements ElementFactory<Chunk, ChunkImpl> {
                 checkpointAlgorithm,
                 skippableExceptionClasses,
                 retryableExceptionClasses,
-                noRollbackExceptionClasses
+                noRollbackExceptionClasses,
+                listeners,
+                partition
         );
     }
 }

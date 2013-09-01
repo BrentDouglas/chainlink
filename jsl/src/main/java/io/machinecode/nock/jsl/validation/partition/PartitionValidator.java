@@ -1,13 +1,13 @@
 package io.machinecode.nock.jsl.validation.partition;
 
+import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.partition.Partition;
-import io.machinecode.nock.jsl.validation.ValidationContext;
-import io.machinecode.nock.jsl.validation.Validator;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class PartitionValidator extends Validator<Partition> {
+public class PartitionValidator extends ValidatingVisitor<Partition> {
 
     public static final PartitionValidator INSTANCE = new PartitionValidator();
 
@@ -16,18 +16,18 @@ public class PartitionValidator extends Validator<Partition> {
     }
 
     @Override
-    public void doValidate(final Partition that, final ValidationContext context) {
+    public void doVisit(final Partition that, final VisitorNode context) {
         if (that.getReducer() != null) {
-            ReducerValidator.INSTANCE.validate(that.getReducer(), context);
+            ReducerValidator.INSTANCE.visit(that.getReducer(), context);
         }
         if (that.getStrategy() != null) {
             StrategyValidator.validate(that.getStrategy(), context);
         }
         if (that.getAnalyzer() != null) {
-            AnalyserValidator.INSTANCE.validate(that.getAnalyzer(), context);
+            AnalyserValidator.INSTANCE.visit(that.getAnalyzer(), context);
         }
         if (that.getCollector() != null) {
-            CollectorValidator.INSTANCE.validate(that.getCollector(), context);
+            CollectorValidator.INSTANCE.visit(that.getCollector(), context);
         }
     }
 }

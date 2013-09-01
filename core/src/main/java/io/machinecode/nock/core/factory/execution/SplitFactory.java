@@ -3,14 +3,14 @@ package io.machinecode.nock.core.factory.execution;
 import io.machinecode.nock.core.model.execution.FlowImpl;
 import io.machinecode.nock.core.model.execution.SplitImpl;
 import io.machinecode.nock.core.expression.Expression;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
-import io.machinecode.nock.core.factory.ExecutionFactory;
+import io.machinecode.nock.spi.factory.ExecutionFactory;
 import io.machinecode.nock.core.util.Util;
 import io.machinecode.nock.core.util.Util.NextExpressionTransformer;
 import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Flow;
 import io.machinecode.nock.spi.element.execution.Split;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 import java.util.List;
 
@@ -27,9 +27,9 @@ public class SplitFactory implements ExecutionFactory<Split, SplitImpl> {
             return FlowFactory.INSTANCE.produceExecution(that, next, context);
         }
     };
-    private static final NextExpressionTransformer<FlowImpl, FlowImpl, PartitionPropertyContext> FLOW_PARTITION_TRANSFORMER = new NextExpressionTransformer<FlowImpl, FlowImpl, PartitionPropertyContext>() {
+    private static final NextExpressionTransformer<FlowImpl, FlowImpl, PropertyContext> FLOW_PARTITION_TRANSFORMER = new NextExpressionTransformer<FlowImpl, FlowImpl, PropertyContext>() {
         @Override
-        public FlowImpl transform(final FlowImpl that, final FlowImpl next, final PartitionPropertyContext context) {
+        public FlowImpl transform(final FlowImpl that, final FlowImpl next, final PropertyContext context) {
             return FlowFactory.INSTANCE.producePartitioned(that, next, context);
         }
     };
@@ -43,7 +43,7 @@ public class SplitFactory implements ExecutionFactory<Split, SplitImpl> {
     }
 
     @Override
-    public SplitImpl producePartitioned(final SplitImpl that, final Execution execution, final PartitionPropertyContext context) {
+    public SplitImpl producePartitioned(final SplitImpl that, final Execution execution, final PropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String next = Expression.resolvePartitionProperty(that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext(), context);
         final List<FlowImpl> flows = Util.immutableCopy(that.getFlows(), context, FLOW_PARTITION_TRANSFORMER);

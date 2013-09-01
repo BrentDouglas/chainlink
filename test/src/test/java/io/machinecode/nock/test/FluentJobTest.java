@@ -192,6 +192,7 @@ public class FluentJobTest {
                                 )
                         )
                 ), ExpressionTest.PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
 
         Assert.assertEquals("i1", job.getId());
     }

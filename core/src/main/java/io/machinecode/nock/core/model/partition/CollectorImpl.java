@@ -1,8 +1,8 @@
 package io.machinecode.nock.core.model.partition;
 
+import io.machinecode.nock.core.loader.TypedArtifactReference;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
-import io.machinecode.nock.core.inject.ResolvableReference;
 import io.machinecode.nock.spi.element.partition.Collector;
 
 import javax.batch.api.partition.PartitionCollector;
@@ -13,6 +13,6 @@ import javax.batch.api.partition.PartitionCollector;
 public class CollectorImpl extends PropertyReferenceImpl<PartitionCollector> implements Collector {
 
     public CollectorImpl(final String ref, final PropertiesImpl properties) {
-        super(new ResolvableReference<PartitionCollector>(ref, PartitionCollector.class), properties);
+        super(new TypedArtifactReference<PartitionCollector>(ref, PartitionCollector.class), properties);
     }
 }

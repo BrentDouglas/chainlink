@@ -1,11 +1,11 @@
 package io.machinecode.nock.jsl.validation.execution;
 
+import io.machinecode.nock.jsl.validation.PropertyReferenceValidator;
+import io.machinecode.nock.jsl.validation.transition.TransitionValidator;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.execution.Decision;
 import io.machinecode.nock.spi.element.transition.Transition;
-import io.machinecode.nock.jsl.validation.Problem;
-import io.machinecode.nock.jsl.validation.PropertyReferenceValidator;
-import io.machinecode.nock.jsl.validation.ValidationContext;
-import io.machinecode.nock.jsl.validation.transition.TransitionValidator;
+import io.machinecode.nock.spi.util.Message;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -19,20 +19,20 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
     }
 
     @Override
-    public void doValidate(final Decision that, final ValidationContext context) {
-        super.validate(that, context);
+    public void doVisit(final Decision that, final VisitorNode context) {
+        super.visit(that, context);
         if (that.getId() == null) {
-            context.addProblem(Problem.attributeRequired("id"));
+            context.addProblem(Message.attributeRequired("id"));
         } else {
-            context.addId(that.getId());
+            context.setTransition(that.getId(), null);
         }
 
         if (that.getTransitions() != null) {
             for (final Transition transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Problem.notNullElement("transitions"));
+                    context.addProblem(Message.notNullElement("transitions"));
                 }
-                TransitionValidator.validate(transition, context);
+                TransitionValidator.visit(transition, context);
             }
         }
     }

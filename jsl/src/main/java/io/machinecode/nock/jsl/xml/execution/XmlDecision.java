@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.spi.element.execution.Decision;
-import io.machinecode.nock.jsl.xml.Repository;
+import io.machinecode.nock.jsl.xml.loader.Repository;
 import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
@@ -93,7 +93,7 @@ public class XmlDecision implements XmlExecution<XmlDecision>, Decision {
     }
 
     @Override
-    public XmlDecision inherit(final Repository repository) {
+    public XmlDecision inherit(final Repository repository, final String defaultJobXml) {
         return copy();
     }
 

@@ -1,14 +1,14 @@
 package io.machinecode.nock.jsl.validation.transition;
 
+import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.transition.End;
-import io.machinecode.nock.jsl.validation.Problem;
-import io.machinecode.nock.jsl.validation.ValidationContext;
-import io.machinecode.nock.jsl.validation.Validator;
+import io.machinecode.nock.spi.util.Message;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class EndValidator extends Validator<End> {
+public class EndValidator extends ValidatingVisitor<End> {
 
     public static final EndValidator INSTANCE = new EndValidator();
 
@@ -17,9 +17,9 @@ public class EndValidator extends Validator<End> {
     }
 
     @Override
-    public void doValidate(final End that, final ValidationContext context) {
+    public void doVisit(final End that, final VisitorNode context) {
         if (that.getOn() == null) {
-            context.addProblem(Problem.attributeRequired("on"));
+            context.addProblem(Message.attributeRequired("on"));
         }
     }
 }

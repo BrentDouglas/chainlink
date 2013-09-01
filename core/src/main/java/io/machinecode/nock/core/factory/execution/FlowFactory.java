@@ -4,12 +4,12 @@ import io.machinecode.nock.core.model.execution.ExecutionImpl;
 import io.machinecode.nock.core.model.execution.FlowImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
 import io.machinecode.nock.core.expression.Expression;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
-import io.machinecode.nock.core.factory.ExecutionFactory;
+import io.machinecode.nock.spi.factory.ExecutionFactory;
 import io.machinecode.nock.core.factory.transition.Transitions;
 import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Flow;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class FlowFactory implements ExecutionFactory<Flow, FlowImpl> {
     }
 
     @Override
-    public FlowImpl producePartitioned(final FlowImpl that, final Execution execution, final PartitionPropertyContext context) {
+    public FlowImpl producePartitioned(final FlowImpl that, final Execution execution, final PropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String next = Expression.resolvePartitionProperty(that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext(), context);
         final List<ExecutionImpl> executions = Executions.immutableCopyExecutionsPartition(that.getExecutions(), context);

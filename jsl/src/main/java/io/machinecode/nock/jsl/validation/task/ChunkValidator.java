@@ -1,15 +1,15 @@
 package io.machinecode.nock.jsl.validation.task;
 
+import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
+import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.task.Chunk;
 import io.machinecode.nock.spi.element.task.Chunk.CheckpointPolicy;
-import io.machinecode.nock.jsl.validation.Problem;
-import io.machinecode.nock.jsl.validation.ValidationContext;
-import io.machinecode.nock.jsl.validation.Validator;
+import io.machinecode.nock.spi.util.Message;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ChunkValidator extends Validator<Chunk> {
+public class ChunkValidator extends ValidatingVisitor<Chunk> {
 
     public static final ChunkValidator INSTANCE = new ChunkValidator();
 
@@ -18,13 +18,13 @@ public class ChunkValidator extends Validator<Chunk> {
     }
 
     @Override
-    public void doValidate(final Chunk that, final ValidationContext context) {
+    public void doVisit(final Chunk that, final VisitorNode context) {
         if (that.getCheckpointPolicy() == null) {
-            context.addProblem(Problem.attributeRequired("checkpoint-policy"));
+            context.addProblem(Message.attributeRequired("checkpoint-policy"));
         }
         if (!CheckpointPolicy.ITEM.equals(that.getCheckpointPolicy())
                 && !CheckpointPolicy.CUSTOM.equals(that.getCheckpointPolicy())) {
-            context.addProblem(Problem.attributeMatches("checkpoint-policy", that.getCheckpointPolicy(), CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM));
+            context.addProblem(Message.attributeMatches("checkpoint-policy", that.getCheckpointPolicy(), CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM));
         }
 
         //if (that.getItemCount() < 0) {
@@ -41,28 +41,28 @@ public class ChunkValidator extends Validator<Chunk> {
         //}
 
         if (that.getReader() == null) {
-            context.addProblem(Problem.notNullElement("reader"));
+            context.addProblem(Message.notNullElement("reader"));
         }
         if (that.getProcessor() == null) {
-            context.addProblem(Problem.notNullElement("processor"));
+            context.addProblem(Message.notNullElement("processor"));
         }
         if (that.getWriter() == null) {
-            context.addProblem(Problem.notNullElement("writer"));
+            context.addProblem(Message.notNullElement("writer"));
         }
 
         //Nullable
 
         if (that.getCheckpointAlgorithm() != null) {
-            CheckpointAlgorithmValidator.INSTANCE.validate(that.getCheckpointAlgorithm(), context);
+            CheckpointAlgorithmValidator.INSTANCE.visit(that.getCheckpointAlgorithm(), context);
         }
         if (that.getNoRollbackExceptionClasses() != null) {
-            ExecutionClassFilterValidator.NO_ROLLBACK.validate(that.getNoRollbackExceptionClasses(), context);
+            ExecutionClassFilterValidator.NO_ROLLBACK.visit(that.getNoRollbackExceptionClasses(), context);
         }
         if (that.getSkippableExceptionClasses() != null) {
-            ExecutionClassFilterValidator.SKIPPABLE.validate(that.getSkippableExceptionClasses(), context);
+            ExecutionClassFilterValidator.SKIPPABLE.visit(that.getSkippableExceptionClasses(), context);
         }
         if (that.getRetryableExceptionClasses() != null) {
-            ExecutionClassFilterValidator.RETRYABLE.validate(that.getRetryableExceptionClasses(), context);
+            ExecutionClassFilterValidator.RETRYABLE.visit(that.getRetryableExceptionClasses(), context);
         }
     }
 }

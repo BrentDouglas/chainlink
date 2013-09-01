@@ -3,11 +3,11 @@ package io.machinecode.nock.core.factory.partition;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.partition.CollectorImpl;
 import io.machinecode.nock.core.expression.Expression;
-import io.machinecode.nock.core.expression.JobPropertyContext;
-import io.machinecode.nock.core.expression.PartitionPropertyContext;
-import io.machinecode.nock.core.factory.ElementFactory;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.core.factory.PropertiesFactory;
 import io.machinecode.nock.spi.element.partition.Collector;
+import io.machinecode.nock.spi.factory.JobPropertyContext;
+import io.machinecode.nock.spi.factory.PropertyContext;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -24,7 +24,7 @@ public class CollectorFactory implements ElementFactory<Collector, CollectorImpl
     }
 
     @Override
-    public CollectorImpl producePartitioned(final CollectorImpl that, final PartitionPropertyContext context) {
+    public CollectorImpl producePartitioned(final CollectorImpl that, final PropertyContext context) {
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);
         return new CollectorImpl(ref, properties);
