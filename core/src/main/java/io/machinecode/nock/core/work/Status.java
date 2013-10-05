@@ -1,5 +1,6 @@
 package io.machinecode.nock.core.work;
 
+import io.machinecode.nock.core.util.Index;
 import io.machinecode.nock.spi.Repository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.transport.Transport;
@@ -8,18 +9,75 @@ import io.machinecode.nock.spi.work.TransitionWork.Result;
 import javax.batch.operations.BatchRuntimeException;
 import javax.batch.runtime.BatchStatus;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class Status {
 
-    public static boolean matches(final CharSequence reference, final CharSequence target) {
-        final int length = reference.length();
-        for (int i = 0; i < length; ++i) {
-            //TODO
+    /**
+     * @see Pattern#quote(String)
+     *
+     * @param source Sequence to quote
+     * @param start  Start index of the sequence to quote
+     * @param end    End index of the sequence to quote
+     * @param query  builder to accept the quoted pattern
+     */
+    private static void quote(final CharSequence source, final int start, final int end, final StringBuilder query) {
+        int slashEIndex = Index.of(source, 0, end,  "\\E", 0, 2, start);
+        if (slashEIndex == -1) {
+            query.append("\\Q")
+                    .append(source.subSequence(start, end))
+                    .append("\\E");
+            return;
         }
-        return true;
+
+        query.append("\\Q");
+        int current = 0;
+        while ((slashEIndex = Index.of(source, 0, end,  "\\E", 0, 2, current)) != -1) {
+            query.append(source.subSequence(current, slashEIndex));
+            current = slashEIndex + 2;
+            query.append("\\E\\\\E\\Q");
+        }
+        query.append(source.subSequence(current, source.length()));
+        query.append("\\E");
+    }
+
+    private static int find(final CharSequence reference, int start, final int length) {
+        for (int i = start; i < length; ++i) {
+            final char c = reference.charAt(i);
+            switch (c) {
+                case '*':
+                case '?':
+                    return i;
+            }
+        }
+        return length;
+    }
+
+    public static boolean matches(final CharSequence reference, final CharSequence target) {
+        final int rl = reference.length();
+
+        final StringBuilder query = new StringBuilder();
+        for (int ri = 0; ri < rl; ++ri) {
+            final char r = reference.charAt(ri);
+            switch (r) {
+                case '*':
+                    query.append(".*");
+                    break;
+                case '?':
+                    query.append(".{1}");
+                    break;
+                default:
+                    final int end = find(reference, ri + 1, rl);
+                    quote(reference, ri, end, query);
+                    ri = end - 1;
+            }
+        }
+        return Pattern.compile(query.toString())
+                .matcher(target)
+                .matches();
     }
 
     public static boolean matches(final BatchStatus reference, final CharSequence target) {

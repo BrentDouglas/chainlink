@@ -1,5 +1,6 @@
 package io.machinecode.nock.core.expression;
 
+import io.machinecode.nock.core.util.Index;
 import io.machinecode.nock.jsl.util.MutablePair;
 import io.machinecode.nock.spi.factory.JobPropertyContext;
 import io.machinecode.nock.spi.factory.PropertyContext;
@@ -60,52 +61,6 @@ public class Expression {
         }
     };
 
-    /**
-     * Straight out of java.lang.String
-     *
-     * @see java.lang.String#indexOf(char[], int, int, char[], int, int, int)
-     *
-     * @return  the index of the first occurrence of the specified substring,
-     *          starting at the specified index,
-     *          or {@code -1} if there is no such occurrence.
-     */
-    static int indexOf(final CharSequence source, int sourceOffset, int sourceCount,
-                       final CharSequence target, int targetOffset, int targetCount,
-                       int fromIndex) {
-        if (fromIndex >= sourceCount) {
-            return (targetCount == 0 ? sourceCount : -1);
-        }
-        if (fromIndex < 0) {
-            fromIndex = 0;
-        }
-        if (targetCount == 0) {
-            return fromIndex;
-        }
-
-        char first = target.charAt(targetOffset);
-        int max = sourceOffset + (sourceCount - targetCount);
-
-        for (int i = sourceOffset + fromIndex; i <= max; i++) {
-            /* Look for first character. */
-            if (source.charAt(i) != first) {
-                while (++i <= max && source.charAt(i) != first){}
-            }
-
-            /* Found first character, now look at the rest of v2 */
-            if (i <= max) {
-                int j = i + 1;
-                int end = j + targetCount - 1;
-                for (int k = targetOffset + 1; j < end && source.charAt(j) == target.charAt(k); j++, k++){}
-
-                if (j == end) {
-                    /* Found whole string. */
-                    return i - sourceOffset;
-                }
-            }
-        }
-        return -1;
-    }
-
     private static CharSequence principleValueExpression(final CharSequence unresolved, final String prefix, final int prefixLength,
                                                          final int start, final PropertyResolver resolver) {
         final StringBuilder builder = new StringBuilder();
@@ -139,11 +94,11 @@ public class Expression {
      */
     private static int valueExpression(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
                                         final String prefix, final int prefixLength, final int start, final PropertyResolver resolver) {
-        final int startProperty = indexOf(unresolved, 0, unresolvedLength, prefix, 0, prefixLength, start);
+        final int startProperty = Index.of(unresolved, 0, unresolvedLength, prefix, 0, prefixLength, start);
         if (startProperty == -1) {
             return start;
         }
-        final int endProperty = indexOf(unresolved, 0, unresolvedLength, AFTER, 0, AFTER_LENGTH, startProperty);
+        final int endProperty = Index.of(unresolved, 0, unresolvedLength, AFTER, 0, AFTER_LENGTH, startProperty);
         if (endProperty == -1) {
             return start;
         }
@@ -163,11 +118,11 @@ public class Expression {
      * @return The start index of the default value expression or the end of the sequence.
      */
     private static int indexOfDefaultExpression(final CharSequence unresolved, final int unresolvedLength, final int start) {
-        final int startDefault = indexOf(unresolved, 0, unresolvedLength, DEFAULT_START, 0, DEFAULT_START_LENGTH, start);
+        final int startDefault = Index.of(unresolved, 0, unresolvedLength, DEFAULT_START, 0, DEFAULT_START_LENGTH, start);
         if (startDefault == -1) {
             return unresolvedLength;
         }
-        final int endDefault = indexOf(unresolved, 0, unresolvedLength, DEFAULT_END, 0, DEFAULT_END_LENGTH, startDefault);
+        final int endDefault = Index.of(unresolved, 0, unresolvedLength, DEFAULT_END, 0, DEFAULT_END_LENGTH, startDefault);
         if (endDefault == -1) {
             return unresolvedLength;
         }
