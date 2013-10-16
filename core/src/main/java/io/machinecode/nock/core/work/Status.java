@@ -46,8 +46,7 @@ public class Status {
 
     private static int find(final CharSequence reference, int start, final int length) {
         for (int i = start; i < length; ++i) {
-            final char c = reference.charAt(i);
-            switch (c) {
+            switch (reference.charAt(i)) {
                 case '*':
                 case '?':
                     return i;
@@ -80,15 +79,12 @@ public class Status {
                 .matches();
     }
 
-    public static boolean matches(final BatchStatus reference, final CharSequence target) {
-        return matches(reference.name(), target);
+    public static boolean matches(final CharSequence reference, final BatchStatus target) {
+        return matches(reference, target.name());
     }
 
     public static boolean isRunning(final BatchStatus status) {
-        return !(status.equals(BatchStatus.COMPLETED)
-                || status.equals(BatchStatus.FAILED)
-                || status.equals(BatchStatus.STOPPED)
-        );
+        return !isComplete(status);
     }
 
     public static boolean isStopping(final Context context) {
@@ -96,10 +92,14 @@ public class Status {
     }
 
     public static boolean isComplete(final Context context) {
-        final BatchStatus status = context.getJobContext().getBatchStatus();
+        return isComplete(context.getJobContext().getBatchStatus());
+    }
+
+    public static boolean isComplete(final BatchStatus status) {
         return status.equals(BatchStatus.COMPLETED)
                 || status.equals(BatchStatus.FAILED)
-                || status.equals(BatchStatus.STOPPED);
+                || status.equals(BatchStatus.STOPPED)
+                || status.equals(BatchStatus.ABANDONED);
     }
 
     public static void update(final Transport transport, final Context context, final Result result) throws Exception {

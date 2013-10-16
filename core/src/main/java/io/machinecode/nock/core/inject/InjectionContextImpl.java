@@ -1,5 +1,7 @@
 package io.machinecode.nock.core.inject;
 
+import io.machinecode.nock.core.loader.ArtifactLoaderImpl;
+import io.machinecode.nock.spi.configuration.Configuration;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 
@@ -13,9 +15,9 @@ public class InjectionContextImpl implements InjectionContext {
     private final WeakReference<ClassLoader> classLoader;
     private final ArtifactLoader artifactLoader;
 
-    public InjectionContextImpl(final ClassLoader classLoader, final ArtifactLoader artifactLoader) {
-        this.classLoader = new WeakReference<ClassLoader>(classLoader);
-        this.artifactLoader = artifactLoader;
+    public InjectionContextImpl(final Configuration configuration) {
+        this.classLoader = new WeakReference<ClassLoader>(configuration.getClassLoader());
+        this.artifactLoader = new ArtifactLoaderImpl(configuration);
     }
 
     @Override

@@ -3,26 +3,32 @@ package io.machinecode.nock.core.work.task;
 import io.machinecode.nock.core.work.ExecutableImpl;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.transport.Transport;
-import io.machinecode.nock.spi.work.ExecutionWork;
+import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.TaskWork;
-import io.machinecode.nock.spi.work.Worker;
 
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
 public class RunTask extends ExecutableImpl {
-    final Worker worker;
     final TaskWork work;
     final Context context;
+    final int timeout;
 
-    public RunTask(final Worker worker, final TaskWork work, final Context context) {
-        this.worker = worker;
+    public RunTask(final TaskWork work, final Context context, final int timeout) {
         this.work = work;
         this.context = context;
+        this.timeout = timeout;
     }
 
     @Override
-    public void run(final Transport transport) throws Exception {
-        work.run(worker, transport, context);
+    public Deferred run(final Transport transport) throws Exception {
+        work.run(transport, context, timeout);
+        return work;
+    }
+
+    @Override
+    public boolean cancel(final boolean mayInterruptIfRunning) {
+        return work.cancel(mayInterruptIfRunning)
+                && super.cancel(mayInterruptIfRunning);
     }
 }

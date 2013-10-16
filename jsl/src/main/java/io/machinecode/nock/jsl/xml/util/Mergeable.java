@@ -19,5 +19,5 @@ public interface Mergeable<T extends Mergeable<T>> extends Copyable<T> {
      * Merges {@param that}.into this
      * @return this with that mixed in.
      */
-    public abstract T merge(final T that);
+    T merge(final T that);
 }

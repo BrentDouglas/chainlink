@@ -17,14 +17,14 @@ public class Bucket implements Serializable {
         this.data = data;
         this.synchronization = synchronization;
         for (int i = 0; i < data.length; ++i) {
-            synchronization.register();
+            synchronization.take();
         }
     }
 
     public final void give(final Serializable that) {
         synchronized (data) {
             data[count++] = that;
-            synchronization.unRegister();
+            synchronization.release();
         }
     }
 

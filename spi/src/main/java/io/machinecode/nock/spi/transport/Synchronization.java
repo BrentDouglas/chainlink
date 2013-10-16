@@ -5,9 +5,11 @@ package io.machinecode.nock.spi.transport;
  */
 public interface Synchronization {
 
-    void register();
+    void take();
 
-    int registered();
+    boolean available();
 
-    void unRegister();
+    void release();
+
+    void listener(final Object that);
 }

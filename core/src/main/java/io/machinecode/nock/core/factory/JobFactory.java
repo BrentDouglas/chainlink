@@ -3,7 +3,6 @@ package io.machinecode.nock.core.factory;
 import io.machinecode.nock.core.expression.Expression;
 import io.machinecode.nock.core.expression.JobPropertyContextImpl;
 import io.machinecode.nock.core.expression.PropertyContextImpl;
-import io.machinecode.nock.core.expression.PropertyContextImpl;
 import io.machinecode.nock.core.factory.execution.Executions;
 import io.machinecode.nock.core.model.JobImpl;
 import io.machinecode.nock.core.model.ListenersImpl;
@@ -15,7 +14,6 @@ import io.machinecode.nock.jsl.validation.JobValidator;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.Job;
 
-import javax.batch.api.listener.JobListener;
 import java.util.List;
 import java.util.Properties;
 

@@ -9,10 +9,10 @@ import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Executable;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.Bucket;
+import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.PartitionWork;
 import io.machinecode.nock.spi.work.StrategyWork;
 import io.machinecode.nock.spi.work.TaskWork;
-import io.machinecode.nock.spi.work.Worker;
 
 import javax.batch.api.partition.PartitionAnalyzer;
 import javax.batch.api.partition.PartitionCollector;
@@ -114,14 +114,14 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     // Lifecycle
 
     @Override
-    public Executable[] map(final TaskWork task, final Worker worker, final Transport transport, final Context context) throws Exception {
+    public PartitionTarget map(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
         final InjectionContext injectionContext = transport.createInjectionContext(context);
         this.loadPartitionReducer(injectionContext).beginPartitionedStep();
         final PartitionPlan plan = loadPartitionPlan(injectionContext); //TODO Can throw
         final int partitions = plan.getPartitions();
         final Properties[] properties = plan.getPartitionProperties();
         if (partitions != properties.length) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(); //TODO Validation error of pass in empty props
         }
         transport.setBucket(
                 new Bucket(
@@ -133,16 +133,16 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         final Executable[] executables = new Executable[partitions];
         for (int i = 0; i < properties.length; ++i) {
             executables[i] = new RunTask(
-                    worker,
                     task.partition(new PropertyContextImpl(properties[i])),
-                    context
+                    context,
+                    timeout
             );
         }
-        return executables;
+        return new PartitionTarget(executables, plan.getThreads());
     }
 
     @Override
-    public void collect(final TaskWork task, final Worker worker, final Transport transport, final Context context) throws Exception {
+    public void collect(final TaskWork task, final Transport transport, final Context context) throws Exception {
         final InjectionContext injectionContext = transport.createInjectionContext(context);
         final PartitionCollector collector = loadPartitionCollector(injectionContext);
         if (collector != null) {
@@ -151,17 +151,18 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     }
 
     @Override
-    public void analyse(final TaskWork task, final Worker worker, final Transport transport, final Context context) throws Exception {
+    public void analyse(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
         final InjectionContext injectionContext = transport.createInjectionContext(context);
         final PartitionAnalyzer analyzer = loadPartitionAnalyzer(injectionContext);
         final PartitionReducer reducer = loadPartitionReducer(injectionContext);
         final StepContext stepContext = context.getStepContext();
         final TransactionManager transactionManager = transport.getTransactionManager();
         PartitionStatus partitionStatus = PartitionStatus.COMMIT;
+        transactionManager.setTransactionTimeout(timeout);
         transactionManager.begin();
         try {
             if (analyzer != null) {
-                final Bucket bucket = transport.getBucket(task);
+                final Bucket bucket = transport.evictBucket(task);
                 for (final Serializable that : bucket.take()) {
                     analyzer.analyzeCollectorData(that);
                 }

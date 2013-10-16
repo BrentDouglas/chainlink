@@ -5,12 +5,37 @@
     <parent>
         <artifactId>nock-parent</artifactId>
         <groupId>io.machinecode.nock</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nock-test</artifactId>
+    <packaging>pom</packaging>
 
+    <modules>
+        <module>core</module>
+        <module>xml</module>
+        <module>cdi</module>
+    </modules>
+
+    <properties>
+        <version.org.jboss.weld.weld-se>1.0.1-Final</version.org.jboss.weld.weld-se>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-test-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.weld</groupId>
+                <artifactId>weld-se</artifactId>
+                <version>${version.org.jboss.weld.weld-se}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -26,6 +51,7 @@
         <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

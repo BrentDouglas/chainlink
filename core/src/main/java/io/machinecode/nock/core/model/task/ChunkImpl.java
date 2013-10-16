@@ -3,6 +3,7 @@ package io.machinecode.nock.core.model.task;
 import io.machinecode.nock.core.factory.task.ChunkFactory;
 import io.machinecode.nock.core.model.ListenersImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
+import io.machinecode.nock.core.work.DeferredImpl;
 import io.machinecode.nock.spi.Repository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.task.Chunk;
@@ -10,7 +11,6 @@ import io.machinecode.nock.spi.factory.PropertyContext;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.TaskWork;
-import io.machinecode.nock.spi.work.Worker;
 
 import javax.batch.api.chunk.CheckpointAlgorithm;
 import javax.batch.api.chunk.ItemProcessor;
@@ -28,6 +28,7 @@ import javax.batch.api.chunk.listener.SkipReadListener;
 import javax.batch.api.chunk.listener.SkipWriteListener;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.context.StepContext;
+import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ChunkImpl implements Chunk, TaskWork {
+public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
 
     private final String checkpointPolicy;
     private final String itemCount;
@@ -53,8 +54,6 @@ public class ChunkImpl implements Chunk, TaskWork {
     private final ExceptionClassFilterImpl noRollbackExceptionClasses;
     private final ListenersImpl listeners;
     private final PartitionImpl<?> partition;
-
-    private transient volatile boolean stopping = false;
 
     public ChunkImpl(
         final String checkpointPolicy,
@@ -148,6 +147,11 @@ public class ChunkImpl implements Chunk, TaskWork {
         return this.noRollbackExceptionClasses;
     }
 
+    @Override
+    public String element() {
+        return ELEMENT;
+    }
+
     // Lifecycle
 
     private static final int BEGIN = 1;
@@ -187,7 +191,7 @@ public class ChunkImpl implements Chunk, TaskWork {
         final List<RetryWriteListener> retryWriteListeners;
         final List<SkipWriteListener> skipWriteListeners;
 
-        private State(final InjectionContext injectionContext, final TransactionManager transactionManager) {
+        private State(final InjectionContext injectionContext, final TransactionManager transactionManager) throws SystemException {
             this.transactionManager = transactionManager;
 
             this.itemCount = Integer.parseInt(ChunkImpl.this.itemCount);
@@ -229,11 +233,15 @@ public class ChunkImpl implements Chunk, TaskWork {
     }
 
     @Override
-    public void run(final Worker worker, final Transport transport, final Context context) throws Exception {
+    public void run(final Transport transport, final Context context, final int timeout) throws Exception {
         final Repository repository = transport.getRepository();
         final StepContext stepContext = context.getStepContext();
-        final State state = new State(transport.createInjectionContext(context), transport.getTransactionManager());
+        final State state = new State(
+                transport.createInjectionContext(context),
+                transport.getTransactionManager()
+        );
 
+        state.transactionManager.setTransactionTimeout(timeout);
         state.transactionManager.begin();
         try {
             state.reader.open(null); //TODO Read things
@@ -242,13 +250,13 @@ public class ChunkImpl implements Chunk, TaskWork {
         } catch (final Exception e) {
             state.transactionManager.rollback();
             context.getStepContext().setExitStatus(BatchStatus.FAILED.name());
-            return;
+            throw e;
         }
 
         try {
             outer: for (;;) {
                 if (BatchStatus.STOPPING.equals(stepContext.getBatchStatus())) {
-                    stopping = true;
+                    cancel(true);
                 }
                 switch (state.next) {
                     case BEGIN:
@@ -256,7 +264,7 @@ public class ChunkImpl implements Chunk, TaskWork {
                         state.transactionManager.begin();
                         state.transactionManager.setTransactionTimeout(state.checkpointAlgorithm.checkpointTimeout());
                         before(state);
-                        state.next(state.checkpointAlgorithm.isReadyToCheckpoint() || stopping ? WRITE : READ);
+                        state.next(state.checkpointAlgorithm.isReadyToCheckpoint() || isCancelled() ? WRITE : READ);
                         break;
                     case READ:
                         read(state);
@@ -266,7 +274,7 @@ public class ChunkImpl implements Chunk, TaskWork {
                         break;
                     case ADD:
                         state.objects.add(state.value);
-                        state.next(state.checkpointAlgorithm.isReadyToCheckpoint() || stopping ? WRITE : READ);
+                        state.next(state.checkpointAlgorithm.isReadyToCheckpoint() || isCancelled() ? WRITE : READ);
                         break;
                     case WRITE:
                         write(state);
@@ -284,9 +292,9 @@ public class ChunkImpl implements Chunk, TaskWork {
                         );
                         state.transactionManager.commit();
                         if (partition != null) {
-                            partition.collect(this, worker, transport, context);
+                            partition.collect(this, transport, context);
                         }
-                        if (stopping) {
+                        if (isCancelled()) {
                             break outer;
                         }
                         break;
@@ -304,7 +312,7 @@ public class ChunkImpl implements Chunk, TaskWork {
             state.reader.close(); //TODO Read things
             state.writer.close();
             if (partition != null) {
-                partition.collect(this, worker, transport, context);
+                partition.collect(this, transport, context);
             }
             state.transactionManager.commit();
         } catch (final Exception e) {
@@ -486,10 +494,5 @@ public class ChunkImpl implements Chunk, TaskWork {
         }
         state.objects.clear();
         state.next(BEGIN);
-    }
-
-    @Override
-    public void stop() throws Exception {
-        this.stopping = true;
     }
 }

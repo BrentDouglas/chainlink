@@ -33,6 +33,7 @@ import java.util.List;
  */
 public class Executions {
 
+    @SuppressWarnings("unchecked")
     private static final NextExpressionTransformer<Execution, ExecutionImpl, JobPropertyContext> EXECUTION_BUILD_TRANSFORMER = new NextExpressionTransformer<Execution, ExecutionImpl, JobPropertyContext>() {
         @Override
         public ExecutionImpl transform(final Execution that, final Execution next, final JobPropertyContext context) {
@@ -65,6 +66,7 @@ public class Executions {
         }
     };
 
+    @SuppressWarnings("unchecked")
     private static final NextExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext> EXECUTION_PARTITION_TRANSFORMER = new NextExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext>() {
         @Override
         public ExecutionImpl transform(final ExecutionImpl that, final ExecutionImpl next, final PropertyContext context) {

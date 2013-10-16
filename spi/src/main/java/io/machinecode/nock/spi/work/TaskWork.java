@@ -10,11 +10,9 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface TaskWork extends Task, Serializable {
+public interface TaskWork extends Task, Work, Deferred<Void>, Serializable {
 
     TaskWork partition(PropertyContext context);
 
-    void run(final Worker worker, final Transport transport, final Context context) throws Exception;
-
-    void stop() throws Exception;
+    void run(final Transport transport, final Context context, final int timeout) throws Exception;
 }

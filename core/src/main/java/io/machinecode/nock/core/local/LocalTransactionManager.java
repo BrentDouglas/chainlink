@@ -1,5 +1,7 @@
 package io.machinecode.nock.core.local;
 
+import org.jboss.logging.Logger;
+
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
@@ -9,14 +11,22 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
 public class LocalTransactionManager implements TransactionManager {
 
-    private final ThreadLocal<Transaction> transaction = new ThreadLocal<Transaction>();
-    volatile long timeout;
+    private static final Logger log = Logger.getLogger(LocalTransactionManager.class);
+
+    final ThreadLocal<Transaction> transaction = new ThreadLocal<Transaction>();
+    private final ThreadLocal<Long> timeout = new ThreadLocal<Long>();
+    private final long defaultTimeout;
+
+    public LocalTransactionManager(final long timeout) {
+        this.defaultTimeout = timeout;
+    }
 
     @Override
     public void begin() throws NotSupportedException, SystemException {
@@ -71,7 +81,7 @@ public class LocalTransactionManager implements TransactionManager {
 
     @Override
     public void setTransactionTimeout(final int seconds) throws SystemException {
-        this.timeout = seconds * 1000;
+        this.timeout.set(seconds == 0 ? defaultTimeout : TimeUnit.SECONDS.toMillis(seconds));
     }
 
     @Override
@@ -79,6 +89,11 @@ public class LocalTransactionManager implements TransactionManager {
         final Transaction transaction = this.transaction.get();
         this.transaction.set(null);
         return transaction;
+    }
+
+    long timeout() {
+        final Long that = this.timeout.get();
+        return that == null ? defaultTimeout : that;
     }
 
     @Override

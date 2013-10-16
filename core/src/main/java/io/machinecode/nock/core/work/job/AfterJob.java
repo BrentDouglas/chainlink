@@ -1,9 +1,11 @@
 package io.machinecode.nock.core.work.job;
 
+import io.machinecode.nock.core.work.DeferredImpl;
 import io.machinecode.nock.core.work.ExecutableImpl;
 import io.machinecode.nock.core.work.Status;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.JobWork;
 
 /**
@@ -19,8 +21,12 @@ public class AfterJob extends ExecutableImpl {
     }
 
     @Override
-    public void run(final Transport transport) throws Exception {
-        work.after(transport, context);
-        Status.postJob(transport, context);
+    public Deferred run(final Transport transport) throws Exception {
+        try {
+            work.after(transport, context);
+            return new DeferredImpl();
+        } finally {
+            Status.postJob(transport, context);
+        }
     }
 }

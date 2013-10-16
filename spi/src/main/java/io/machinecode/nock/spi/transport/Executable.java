@@ -1,15 +1,15 @@
 package io.machinecode.nock.spi.transport;
 
+import io.machinecode.nock.spi.work.Deferred;
+
 import java.io.Serializable;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Executable extends Future<Void>, Synchronization, Serializable {
+public interface Executable extends Deferred<Void>, Synchronization, Serializable {
 
     Executable register(Synchronization synchronization);
 
-    void execute(Transport transport);
+    Result execute(Transport transport);
 }

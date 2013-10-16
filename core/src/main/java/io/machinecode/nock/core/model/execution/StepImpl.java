@@ -1,25 +1,28 @@
 package io.machinecode.nock.core.model.execution;
 
+import io.machinecode.nock.core.Constants;
 import io.machinecode.nock.core.impl.StepContextImpl;
 import io.machinecode.nock.core.model.ListenersImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
+import io.machinecode.nock.core.model.PropertyImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
 import io.machinecode.nock.core.util.PropertiesConverter;
-import io.machinecode.nock.core.work.CompletedFuture;
-import io.machinecode.nock.core.work.ExecutableImpl;
+import io.machinecode.nock.core.work.DeferredImpl;
+import io.machinecode.nock.core.work.PlanImpl;
 import io.machinecode.nock.core.work.execution.AfterExecution;
 import io.machinecode.nock.core.work.task.RunTask;
 import io.machinecode.nock.spi.Repository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.inject.InjectionContext;
-import io.machinecode.nock.spi.transport.Executable;
+import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.ExecutionWork;
+import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.StrategyWork;
 import io.machinecode.nock.spi.work.TaskWork;
-import io.machinecode.nock.spi.work.Worker;
 
 import javax.batch.api.listener.StepListener;
 import javax.batch.runtime.JobExecution;
@@ -27,7 +30,6 @@ import javax.batch.runtime.StepExecution;
 import javax.batch.runtime.context.StepContext;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -44,6 +46,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     private final PartitionImpl<U> partition;
 
     private transient List<StepListener> _listeners;
+    private transient Integer _timeout;
 
     public StepImpl(
             final String id,
@@ -111,10 +114,33 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         return this.partition;
     }
 
+    @Override
+    public String element() {
+        return ELEMENT;
+    }
+
+    private int _timeout() {
+        if (_timeout != null) {
+            return this._timeout;
+        }
+        this._timeout = 180;
+        try {
+            for (final PropertyImpl property : this.properties.getProperties()) {
+                if (Constants.JAVAX_TRANSACTION_GLOBAL_TIMEOUT.equals(property.getName())) {
+                    this._timeout = Integer.parseInt(property.getValue());
+                    return this._timeout;
+                }
+            }
+        } catch (final NumberFormatException e) {
+            //TODO
+        }
+        return this._timeout;
+    }
+
     // Lifecycle
 
     @Override
-    public Future<Void> before(final Worker worker, final Transport transport, final Context context) throws Exception {
+    public Deferred before(final Transport transport, final Context context) throws Exception {
         final Repository repository = transport.getRepository();
         final JobExecution jobExecution = repository.getJobExecution(context.getJobExecutionId());
         final StepExecution stepExecution = repository.createStepExecution(jobExecution, this);
@@ -137,27 +163,29 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         if (exception != null) {
             throw exception;
         }
-        return CompletedFuture.INSTANCE;
+        return new DeferredImpl();
     }
 
     @Override
-    public Future<Void> run(final Worker worker, final Transport transport, final Context context) throws Exception {
-        final AfterExecution after = new AfterExecution(worker, this, context);
-        if (this.partition != null
-                && this.partition.getStrategy() != null) { //TODO This looks like a bug in the xsl
-            final Executable[] tasks = this.partition.map(this.task, worker, transport, context); //TODO This can throw
-            return transport.executeOnAnyThreadThenOnThisThread(tasks, after);
+    public Deferred run(final Transport transport, final Context context) throws Exception {
+        final AfterExecution after = new AfterExecution(this, context);
+        if (this.partition != null && this.partition.getStrategy() != null) { //TODO This looks like a bug in the xsl
+            final PartitionTarget target = this.partition.map(this.task, transport, context, _timeout()); //TODO This can throw
+            return transport.execute(new PlanImpl(target.threads, target.executables, TargetThread.ANY, this.task.element())
+                    .always(new PlanImpl(after, TargetThread.THIS, this.task.element()))
+            );
         }
-        final ExecutableImpl executable = new RunTask(worker, this.task, context);
-        executable.then(transport, after);
-        return transport.executeOnThisThread(executable);
+        return transport.execute(
+                new PlanImpl(new RunTask(this.task, context, _timeout()), TargetThread.ANY, this.task.element())
+                    .then(new PlanImpl(after, TargetThread.THIS, this.task.element()))
+        );
     }
 
     @Override
-    public Future<Void> after(final Worker worker, final Transport transport, final Context context) throws Exception {
+    public Deferred after(final Transport transport, final Context context) throws Exception {
         try {
             if (this.partition != null) {
-                this.partition.analyse(this.task, worker, transport, context);
+                this.partition.analyse(this.task, transport, context, _timeout());
             }
             Exception exception = null;
             if (this._listeners == null) {
@@ -183,11 +211,11 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         } finally {
             context.setStepContext(null);
         }
-        final ExecutionWork execution = worker.transitionOrSetStatus(transport, context, this.transitions, this.next);
+        final ExecutionWork execution = this.transitionOrSetStatus(transport, context, this.transitions, this.next);
         if (execution != null) {
-            return worker.runExecution(execution, transport, context);
+            return transport.execute(execution.plan(transport, context));
         }
-        return CompletedFuture.INSTANCE;
+        return new DeferredImpl();
     }
 
 

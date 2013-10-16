@@ -3,6 +3,12 @@ package io.machinecode.nock.core.model;
 import io.machinecode.nock.core.impl.JobContextImpl;
 import io.machinecode.nock.core.model.execution.ExecutionImpl;
 import io.machinecode.nock.core.util.PropertiesConverter;
+import io.machinecode.nock.core.work.DeferredImpl;
+import io.machinecode.nock.core.work.PlanImpl;
+import io.machinecode.nock.core.work.Status;
+import io.machinecode.nock.core.work.job.AfterJob;
+import io.machinecode.nock.core.work.job.FailJob;
+import io.machinecode.nock.core.work.job.RunJob;
 import io.machinecode.nock.jsl.validation.InvalidJobException;
 import io.machinecode.nock.jsl.validation.JobValidator;
 import io.machinecode.nock.jsl.visitor.JobTraversal;
@@ -10,14 +16,15 @@ import io.machinecode.nock.spi.Repository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.inject.InjectionContext;
+import io.machinecode.nock.spi.transport.Plan;
+import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.JobWork;
-import io.machinecode.nock.spi.work.Worker;
 
 import javax.batch.api.listener.JobListener;
 import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -110,15 +117,26 @@ public class JobImpl implements Job, JobWork {
     }
 
     @Override
-    public Future<Void> runJob(final Worker worker, final Transport transport, final Context context) throws Exception {
-        return worker.runExecution(this.executions.get(0), transport, context);
+    public String element() {
+        return Job.ELEMENT;
+    }
+
+    @Override
+    public Deferred run(final Transport transport, final Context context) throws Exception {
+        if (Status.isStopping(context) || Status.isComplete(context)) {
+            return new DeferredImpl();
+        }
+        return transport.execute(this.executions.get(0).plan(transport, context));
     }
 
     @Override
     public void after(final Transport transport, final Context context) throws Exception {
-        try{
+        try {
+            if (this._listeners == null) {
+                throw new IllegalStateException();
+            }
             Exception exception = null;
-            for (final JobListener listener : this._listeners) { //TODO Check these aren't null? Should never leave this node though
+            for (final JobListener listener : this._listeners) {
                 try {
                     listener.afterJob();
                 } catch (final Exception e) {
@@ -140,5 +158,22 @@ public class JobImpl implements Job, JobWork {
     @Override
     public ExecutionWork next(final String next) {
         return traversal.next(next);
+    }
+
+    @Override
+    public Plan plan(final Transport transport, final Context context) {
+        final RunJob run = new RunJob(this, context);
+        final AfterJob after = new AfterJob(this, context);
+        final FailJob fail = new FailJob(context);
+
+        final PlanImpl runPlan = new PlanImpl(run, TargetThread.ANY, element());
+        final PlanImpl afterPlan = new PlanImpl(after, TargetThread.that(run), element());
+        final PlanImpl failPlan = new PlanImpl(fail, TargetThread.that(run), element());
+
+        after.register(transport.wrapSynchronization(run));
+        runPlan.fail(failPlan)
+            .always(afterPlan.fail(failPlan));
+
+        return runPlan;
     }
 }

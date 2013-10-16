@@ -23,6 +23,7 @@ public abstract class XmlTerminatingTransition<T extends XmlTerminatingTransitio
         return on;
     }
 
+    @SuppressWarnings("unchecked")
     public T setOn(final String on) {
         this.on = on;
         return (T)this;
@@ -32,6 +33,7 @@ public abstract class XmlTerminatingTransition<T extends XmlTerminatingTransitio
         return exitStatus;
     }
 
+    @SuppressWarnings("unchecked")
     public T setExitStatus(final String exitStatus) {
         this.exitStatus = exitStatus;
         return (T)this;

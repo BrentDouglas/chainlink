@@ -5,18 +5,18 @@ import gnu.trove.map.hash.THashMap;
 import io.machinecode.nock.core.configuration.ConfigurationFactoryImpl;
 import io.machinecode.nock.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.nock.core.factory.JobFactory;
+import io.machinecode.nock.core.local.LocalTransportFactory;
 import io.machinecode.nock.core.model.JobImpl;
+import io.machinecode.nock.core.util.ResolvableService;
 import io.machinecode.nock.core.work.ContextImpl;
 import io.machinecode.nock.core.work.Status;
-import io.machinecode.nock.core.util.PropertiesConverter;
-import io.machinecode.nock.core.util.ResolvableService;
-import io.machinecode.nock.core.work.WorkerImpl;
 import io.machinecode.nock.spi.Repository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.transport.TransportFactory;
 import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.work.Deferred;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
@@ -37,7 +37,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -48,10 +47,10 @@ public class JobOperatorImpl implements JobOperator {
     private final RuntimeConfigurationImpl configuration;
     private final TransportFactory transportFactory;
 
-    private final TMap<Long, Future<?>> jobs = new THashMap<Long, Future<?>>();
+    private final TMap<Long, Deferred> jobs = new THashMap<Long, Deferred>();
     final AtomicBoolean lock = new AtomicBoolean(false);
 
-    private Future<?> get(final long executionId) {
+    private Deferred get(final long executionId) {
         while (!lock.compareAndSet(false, true)) {}
         try {
             return this.jobs.get(executionId);
@@ -60,10 +59,10 @@ public class JobOperatorImpl implements JobOperator {
         }
     }
 
-    private void put(final long executionId, final  Future<?> future) {
+    private void put(final long executionId, final Deferred deferred) {
         while (!lock.compareAndSet(false, true)) {}
         try {
-            this.jobs.put(executionId, future);
+            this.jobs.put(executionId, deferred);
         } finally {
             lock.set(false);
         }
@@ -80,7 +79,7 @@ public class JobOperatorImpl implements JobOperator {
             throw new RuntimeException(e);
         }
         if (transportFactories.isEmpty()) {
-            throw new RuntimeException();
+            this.transportFactory = new LocalTransportFactory();
         } else {
             this.transportFactory = transportFactories.get(0);
         }
@@ -103,7 +102,7 @@ public class JobOperatorImpl implements JobOperator {
 
     @Override
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException {
-        return configuration.getRepository().getRunningExecutions(jobName);
+        return configuration.getRepository().getRunningExecutions(jobName); //TODO This should probably go through Transport
     }
 
     @Override
@@ -119,7 +118,7 @@ public class JobOperatorImpl implements JobOperator {
             JobFactory.INSTANCE.validate(job);
 
             final Repository repository = configuration.getRepository();
-            final Transport transport = transportFactory.produce(repository);
+            final Transport transport = transportFactory.produce(configuration, 1);
             final JobInstance instance = repository.createJobInstance(job);
             final JobExecution execution = repository.createJobExecution(instance);
             final Context context = new ContextImpl(
@@ -129,7 +128,7 @@ public class JobOperatorImpl implements JobOperator {
                     new long[0]
             );
             Status.started(transport, context);
-            final Future<?> stop = transport.runJob(job, context);
+            final Deferred stop = transport.execute(job.plan(transport, context));
             put(execution.getExecutionId(), stop);
             return execution.getExecutionId();
         } catch (final Exception e) {
@@ -155,7 +154,7 @@ public class JobOperatorImpl implements JobOperator {
             if (BatchStatus.COMPLETED.equals(execution.getBatchStatus())) {
                 throw new JobExecutionAlreadyCompleteException();
             }
-            final Transport transport = transportFactory.produce(repository);
+            final Transport transport = transportFactory.produce(configuration, 1);
             final JobInstance instance = repository.createJobInstance(job);
             final Context context = new ContextImpl(
                     job,
@@ -164,7 +163,7 @@ public class JobOperatorImpl implements JobOperator {
                     new long[0]
             );
             Status.started(transport, context);
-            final Future<?> stop = transport.runJob(job, context);
+            final Deferred stop = transport.execute(job.plan(transport, context));
             put(execution.getExecutionId(), stop);
             return execution.getExecutionId();
         } catch (final JobRestartException e) {
@@ -179,11 +178,11 @@ public class JobOperatorImpl implements JobOperator {
     @Override
     public void stop(final long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
         final Repository repository = configuration.getRepository();
-        final Future<?> future = get(executionId);
-        if (future == null) {
+        final Deferred deferred = get(executionId);
+        if (deferred == null) {
             throw new JobExecutionNotRunningException();
         }
-        future.cancel(true);
+        deferred.cancel(true);
         repository.updateJobExecution(executionId, BatchStatus.STOPPING, new Date());
     }
 

@@ -4,21 +4,28 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>io.machinecode</groupId>
+        <artifactId>machinecode-parent-pom</artifactId>
+        <version>1.0.2-SNAPSHOT</version>
+    </parent>
+
     <groupId>io.machinecode.nock</groupId>
     <artifactId>nock-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <modules>
         <module>spi</module>
         <module>jsl</module>
         <module>core</module>
+        <module>cdi</module>
         <module>test</module>
+        <module>tck</module>
     </modules>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <version.java>1.6</version.java>
 
         <version.javax.batch.batch-api.version>1.0</version.javax.batch.batch-api.version>
         <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
@@ -26,7 +33,7 @@
 
         <!-- Test dependencies -->
         <version.junit.junit>4.10</version.junit.junit>
-        <version.com.ibm.batch.com.ibm.batch-tck>1.0-b05</version.com.ibm.batch.com.ibm.batch-tck>
+        <version.com.ibm.batch.com.ibm.batch-tck>1.0</version.com.ibm.batch.com.ibm.batch-tck>
     </properties>
 
     <dependencyManagement>
@@ -78,10 +85,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.ibm.batch</groupId>
-                <artifactId>com.ibm.batch-tck</artifactId>
+                <groupId>com.ibm.jbatch</groupId>
+                <artifactId>com.ibm.jbatch-tck</artifactId>
                 <version>${version.com.ibm.batch.com.ibm.batch-tck}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

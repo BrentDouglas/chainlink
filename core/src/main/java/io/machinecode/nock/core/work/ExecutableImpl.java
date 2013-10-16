@@ -1,106 +1,78 @@
 package io.machinecode.nock.core.work;
 
-import io.machinecode.nock.jsl.util.ImmutablePair;
 import io.machinecode.nock.spi.transport.Executable;
-import io.machinecode.nock.spi.transport.Failure;
+import io.machinecode.nock.spi.transport.Result;
 import io.machinecode.nock.spi.transport.Synchronization;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.work.Deferred;
+import org.jboss.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public abstract class ExecutableImpl implements Executable, Synchronization {
+public abstract class ExecutableImpl extends SynchronisationImpl implements Executable {
 
-    private ImmutablePair<Transport, ExecutableImpl> then = null;
-    private ImmutablePair<Transport, ExecutableImpl> always = null;
-    private ImmutablePair<Transport, ExecutableImpl> cancel = null;
-    private ImmutablePair<Transport, FailureImpl> fail = null;
+    private static final Logger log = Logger.getLogger(ExecutableImpl.class);
+
     private final List<Synchronization> synchronizations = new LinkedList<Synchronization>();
-    private final List<Future<Void>> chain = new LinkedList<Future<Void>>();
 
-    private final AtomicInteger sync = new AtomicInteger(0);
     private volatile boolean running = false;
     private volatile boolean cancelled = false;
     private volatile boolean done = false;
-
-    public synchronized ExecutableImpl then(final Transport transport, final ExecutableImpl executable) {
-        if (running) {
-            throw new IllegalStateException();
-        }
-        then = ImmutablePair.of(transport, executable);
-        return this;
-    }
-
-    public synchronized ExecutableImpl always(final Transport transport, final ExecutableImpl executable) {
-        if (running) {
-            throw new IllegalStateException();
-        }
-        always = ImmutablePair.of(transport, executable);
-        return this;
-    }
-
-    public synchronized ExecutableImpl cancel(final Transport transport, final ExecutableImpl executable) {
-        if (running) {
-            throw new IllegalStateException();
-        }
-        cancel = ImmutablePair.of(transport, executable);
-        return this;
-    }
-
-    public synchronized ExecutableImpl fail(final Transport transport, final FailureImpl executable) {
-        if (running) {
-            throw new IllegalStateException();
-        }
-        fail = ImmutablePair.of(transport, executable);
-        return this;
-    }
+    private volatile Deferred<?> chain;
 
     @Override
     public synchronized ExecutableImpl register(final Synchronization synchronization) {
         if (running) {
             throw new IllegalStateException();
         }
-        synchronization.register();
+        synchronization.take();
         synchronizations.add(synchronization);
         return this;
     }
 
     @Override
-    public void execute(final Transport transport) {
+    public Result execute(final Transport transport) {
         synchronized (this) {
-            if (cancelled || running) {
-                return;
+            if (cancelled) {
+                return ResultImpl.CANCELLED;
+            }
+            if (running) {
+                return ResultImpl.RUNNING;
             }
             running = true;
         }
         try {
-            while (sync.get() != 0) {
+            while (!available()) {
                 synchronized (this) {
                     wait();
                 }
             }
-            run(transport);
-            then();
+            chain = run(transport);
+            chain.resolve(null);
+            return ResultImpl.FINISHED;
         } catch (final Exception e) {
-            fail(e);
+            log.debug("", e); //TODO Message
+            return new ResultImpl(e);
         } finally {
-            synchronized (this) {
-                done = true;
-                notifyAll();
-            }
+            resolve(null);
             for (final Synchronization synchronization : synchronizations) {
-                synchronization.unRegister();
+                synchronization.release();
             }
         }
+    }
+
+    @Override
+    public synchronized void resolve(final Void _) {
+        this.done = true;
+        notifyAll();
     }
 
     @Override
@@ -112,14 +84,14 @@ public abstract class ExecutableImpl implements Executable, Synchronization {
             return true;
         }
         cancelled = true;
-        notifyAll();
-        cancel.getKey().executeOnThisThread(cancel.getValue());
-        synchronized (chain) {
-            for (final Future<Void> future : chain) {
-                future.cancel(mayInterruptIfRunning);
+        try {
+            if (chain != null) {
+                chain.cancel(mayInterruptIfRunning);
             }
+            return true;
+        } finally {
+            notifyAll();
         }
-        return true;
     }
 
     @Override
@@ -173,47 +145,5 @@ public abstract class ExecutableImpl implements Executable, Synchronization {
         return null;
     }
 
-    @Override
-    public void register() {
-        sync.incrementAndGet();
-    }
-
-    @Override
-    public int registered() {
-        return sync.get();
-    }
-
-    @Override
-    public synchronized void unRegister() {
-        sync.decrementAndGet();
-        notifyAll();
-    }
-
-    public abstract void run(Transport transport) throws Exception;
-
-    private void fail(final Exception exception) {
-        if (fail == null) {
-            return;
-        }
-        final FailureImpl executable = fail.getValue();
-        if (always != null) {
-            executable.always(always.getKey(), always.getValue());
-        }
-        synchronized (chain) {
-            chain.add(fail.getKey().fail(executable, exception));
-        }
-    }
-
-    private void then() {
-        if (then == null) {
-            return;
-        }
-        final ExecutableImpl executable = then.getValue();
-        if (always != null) {
-            executable.always(always.getKey(), always.getValue());
-        }
-        synchronized (chain) {
-            chain.add(then.getKey().executeOnAnyThread(executable));
-        }
-    }
+    public abstract Deferred<?> run(Transport transport) throws Exception;
 }
