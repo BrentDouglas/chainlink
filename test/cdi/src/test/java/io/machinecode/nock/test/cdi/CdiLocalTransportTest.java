@@ -1,6 +1,6 @@
 package io.machinecode.nock.test.cdi;
 
-import io.machinecode.nock.cdi.CdiExtension;
+import io.machinecode.nock.cdi.CdiArtifactLoader;
 import io.machinecode.nock.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.test.core.transport.LocalTransportTest;
@@ -22,7 +22,7 @@ public class CdiLocalTransportTest extends LocalTransportTest {
         weld = new Weld();
         container = weld.initialize();
         configuration = new RuntimeConfigurationImpl(configuration()
-                .setArtifactLoaders(new ArtifactLoader[]{ CdiExtension.inject(container.getBeanManager(), CdiExtension.class) })
+                .setArtifactLoaders(new ArtifactLoader[]{ CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class) })
                 .build());
     }
 

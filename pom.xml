@@ -19,7 +19,7 @@
         <module>spi</module>
         <module>jsl</module>
         <module>core</module>
-        <module>cdi</module>
+        <module>inject</module>
         <module>test</module>
         <module>tck</module>
     </modules>

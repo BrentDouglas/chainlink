@@ -17,14 +17,14 @@ import java.util.Set;
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class CdiExtension implements ArtifactLoader, Extension {
+public class CdiArtifactLoader implements ArtifactLoader, Extension {
 
     public static final AnnotationLiteral<Default> DEFAULT_ANNOTATION_LITERAL = new AnnotationLiteral<Default>() {};
 
     private static BeanManager beanManager;
 
     void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery beforeBeanDiscovery, final BeanManager beanManager) {
-        CdiExtension.beanManager = beanManager;
+        CdiArtifactLoader.beanManager = beanManager;
         beforeBeanDiscovery.addAnnotatedType(
                 beanManager.createAnnotatedType(CdiProducer.class)
         );
