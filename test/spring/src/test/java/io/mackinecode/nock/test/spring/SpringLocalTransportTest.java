@@ -2,6 +2,8 @@ package io.mackinecode.nock.test.spring;
 
 import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.nock.inject.spring.SpringArtifactLoader;
+import io.machinecode.nock.inject.spring.SpringInjector;
+import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.test.core.transport.TransportTest;
 import org.junit.BeforeClass;
@@ -18,7 +20,8 @@ public class SpringLocalTransportTest extends TransportTest {
     @Override
     protected Builder _configuration() {
         return super._configuration()
-                .setArtifactLoaders(new ArtifactLoader[]{context.getBean(SpringArtifactLoader.class)});
+                .setArtifactLoaders(new ArtifactLoader[]{ context.getBean(SpringArtifactLoader.class) })
+                .setInjectors(new Injector[]{ context.getBean(SpringInjector.class) });
     }
 
     @BeforeClass

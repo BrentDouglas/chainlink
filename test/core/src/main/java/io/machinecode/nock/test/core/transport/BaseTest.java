@@ -6,8 +6,6 @@ import io.machinecode.nock.core.local.LocalRepository;
 import io.machinecode.nock.core.local.LocalTransactionManager;
 import io.machinecode.nock.core.local.LocalTransport;
 import io.machinecode.nock.spi.Repository;
-import io.machinecode.nock.spi.loader.ArtifactLoader;
-import io.machinecode.nock.spi.loader.JobLoader;
 import io.machinecode.nock.spi.transport.Transport;
 import org.junit.Assert;
 
@@ -50,9 +48,7 @@ public abstract class BaseTest extends Assert {
         return new Builder()
                 .setLoader(Thread.currentThread().getContextClassLoader())
                 .setTransactionManager(new LocalTransactionManager(180))
-                .setRepository(repository())
-                .setJobLoaders(new JobLoader[0])
-                .setArtifactLoaders(new ArtifactLoader[0]);
+                .setRepository(repository());
     }
 
     protected final Repository _repository() {

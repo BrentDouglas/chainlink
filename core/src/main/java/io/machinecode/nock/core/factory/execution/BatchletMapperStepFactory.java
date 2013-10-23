@@ -13,11 +13,10 @@ import io.machinecode.nock.core.model.partition.MapperImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.model.task.BatchletImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
-import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.element.partition.Mapper;
 import io.machinecode.nock.spi.element.task.Batchlet;
-import io.machinecode.nock.spi.factory.ExecutionFactory;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.factory.JobPropertyContext;
 import io.machinecode.nock.spi.factory.PropertyContext;
 
@@ -26,14 +25,14 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class BatchletMapperStepFactory implements ExecutionFactory<Step<? extends Batchlet, ? extends Mapper>, StepImpl<BatchletImpl, MapperImpl>> {
+public class BatchletMapperStepFactory implements ElementFactory<Step<? extends Batchlet, ? extends Mapper>, StepImpl<BatchletImpl, MapperImpl>> {
 
     public static final BatchletMapperStepFactory INSTANCE = new BatchletMapperStepFactory();
 
     @Override
-    public StepImpl<BatchletImpl, MapperImpl> produceExecution(final Step<? extends Batchlet, ? extends Mapper> that, final Execution execution, final JobPropertyContext context) {
+    public StepImpl<BatchletImpl, MapperImpl> produceExecution(final Step<? extends Batchlet, ? extends Mapper> that, final JobPropertyContext context) {
         final String id = Expression.resolveExecutionProperty(that.getId(), context);
-        final String next = Expression.resolveExecutionProperty(that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext(), context);
+        final String next = Expression.resolveExecutionProperty(that.getNext(), context);
         final String startLimit = Expression.resolveExecutionProperty(that.getStartLimit(), context);
         final String allowStartIfComplete = Expression.resolveExecutionProperty(that.getAllowStartIfComplete(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
@@ -55,9 +54,9 @@ public class BatchletMapperStepFactory implements ExecutionFactory<Step<? extend
     }
 
     @Override
-    public StepImpl<BatchletImpl, MapperImpl> producePartitioned(final StepImpl<BatchletImpl, MapperImpl> that, final Execution execution, final PropertyContext context) {
+    public StepImpl<BatchletImpl, MapperImpl> producePartitioned(final StepImpl<BatchletImpl, MapperImpl> that, final PropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
-        final String next = Expression.resolvePartitionProperty(that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext(), context);
+        final String next = Expression.resolvePartitionProperty(that.getNext(), context);
         final String startLimit = Expression.resolvePartitionProperty(that.getStartLimit(), context);
         final String allowStartIfComplete = Expression.resolvePartitionProperty(that.getAllowStartIfComplete(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);

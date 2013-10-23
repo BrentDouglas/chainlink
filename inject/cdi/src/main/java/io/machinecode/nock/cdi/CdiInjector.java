@@ -1,6 +1,7 @@
 package io.machinecode.nock.cdi;
 
 import io.machinecode.nock.spi.extension.ContextProvider;
+import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.util.Pair;
 
 import javax.batch.api.BatchProperty;
@@ -19,11 +20,11 @@ import java.util.ServiceLoader;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class CdiProducer {
+public class CdiInjector implements Injector {
 
     private ContextProvider provider;
 
-    public CdiProducer() {
+    public CdiInjector() {
         final ServiceLoader<ContextProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<ContextProvider>>() {
             public ServiceLoader<ContextProvider> run() {
                 return ServiceLoader.load(ContextProvider.class);
@@ -35,6 +36,13 @@ public class CdiProducer {
         } else {
             throw new IllegalStateException(); //TODO Message
         }
+    }
+
+    // TODO Returning false makes the default injector override any previously injected values
+    // Need to return (bean instanceof CDI Proxy)
+    @Override
+    public <T> boolean inject(final T bean) throws Exception {
+        return false;
     }
 
     @Produces

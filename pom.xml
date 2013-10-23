@@ -28,6 +28,7 @@
         <version.java>1.6</version.java>
 
         <version.javax.batch.batch-api.version>1.0</version.javax.batch.batch-api.version>
+        <version.javax.inject>1</version.javax.inject>
         <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
 
@@ -60,6 +61,11 @@
                 <groupId>javax.batch</groupId>
                 <artifactId>javax.batch-api</artifactId>
                 <version>${version.javax.batch.batch-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${version.javax.inject}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>

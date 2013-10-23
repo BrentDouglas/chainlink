@@ -20,6 +20,9 @@ public class JobPropertyContextImpl implements JobPropertyContext {
     public JobPropertyContextImpl(final java.util.Properties parameters) {
         this.properties = new ArrayList<MutablePair<String, String>>();
         this.parameters = new ArrayList<MutablePair<String, String>>();
+        if (parameters == null) {
+            return;
+        }
         for (final Entry<Object, Object> entry : parameters.entrySet()) {
             final Object key = entry.getKey();
             final Object value = entry.getValue();

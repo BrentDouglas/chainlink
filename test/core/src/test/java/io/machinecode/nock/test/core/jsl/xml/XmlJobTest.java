@@ -431,7 +431,7 @@ public class XmlJobTest {
         Assert.assertEquals("true", job.getRestartable());
 
         final Step step = (Step)job.getExecutions().get(0);
-        Assert.assertEquals("step2", step.getNext());
+        Assert.assertNull(step.getNext());
         Assert.assertEquals("false", step.getAllowStartIfComplete());
         Assert.assertEquals(Step.ZERO, step.getStartLimit());
 

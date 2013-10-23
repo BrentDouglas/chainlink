@@ -20,7 +20,6 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
 
     @Override
     public void doVisit(final Decision that, final VisitorNode context) {
-        super.visit(that, context);
         if (that.getId() == null) {
             context.addProblem(Message.attributeRequired("id"));
         } else {

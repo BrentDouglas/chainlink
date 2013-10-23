@@ -1,6 +1,7 @@
 package io.machinecode.nock.spi.configuration;
 
 import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.spi.loader.JobLoader;
 
@@ -20,4 +21,6 @@ public interface Configuration {
     JobLoader[] getJobLoaders();
 
     ArtifactLoader[] getArtifactLoaders();
+
+    Injector[] getInjectors();
 }

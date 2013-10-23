@@ -16,7 +16,7 @@ public class ContextImpl implements Context {
     private final ThreadLocal<long[]> stepExecutionIds = new ThreadLocal<long[]>(); //TODO Probably can't be a threadlocal. Think about this
     private MutableJobContext jobContext;
     private final ThreadLocal<MutableStepContext> stepContext = new ThreadLocal<MutableStepContext>();
-    private Exception exception;
+    private Throwable throwable;
 
     public ContextImpl(final JobWork job, final long jobInstanceId, final long jobExecutionId) {
         this.job = job;
@@ -70,12 +70,12 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public Exception getException() {
-        return exception;
+    public Throwable getThrowable() {
+        return throwable;
     }
 
     @Override
-    public void setException(final Exception exception) {
-        this.exception = exception;
+    public void setThrowable(final Throwable throwable) {
+        this.throwable = throwable;
     }
 }

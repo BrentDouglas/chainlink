@@ -43,9 +43,6 @@ public class ChunkValidator extends ValidatingVisitor<Chunk> {
         if (that.getReader() == null) {
             context.addProblem(Message.notNullElement("reader"));
         }
-        if (that.getProcessor() == null) {
-            context.addProblem(Message.notNullElement("processor"));
-        }
         if (that.getWriter() == null) {
             context.addProblem(Message.notNullElement("writer"));
         }

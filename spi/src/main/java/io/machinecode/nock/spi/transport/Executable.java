@@ -12,5 +12,7 @@ public interface Executable<T extends Work> extends Deferred<Void>, Serializable
 
     T getWork();
 
+    long getJobExecutionId();
+
     Result execute(Transport transport);
 }

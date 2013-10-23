@@ -29,6 +29,7 @@
         <dependency>
             <groupId>io.machinecode.nock</groupId>
             <artifactId>nock-spi</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.enterprise</groupId>

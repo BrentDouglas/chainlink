@@ -12,7 +12,6 @@
     <artifactId>nock-spring</artifactId>
 
     <properties>
-        <version.javax.inject>1</version.javax.inject>
         <version.org.springframework>3.1.1.RELEASE</version.org.springframework>
         <version.org.springframework.spring-beans>${version.org.springframework}</version.org.springframework.spring-beans>
         <version.org.springframework.spring-context>${version.org.springframework}</version.org.springframework.spring-context>
@@ -21,11 +20,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>${version.javax.inject}</version>
-            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
@@ -48,6 +42,7 @@
         <dependency>
             <groupId>io.machinecode.nock</groupId>
             <artifactId>nock-spi</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>

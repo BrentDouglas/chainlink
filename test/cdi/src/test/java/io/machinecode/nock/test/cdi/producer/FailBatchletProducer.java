@@ -2,6 +2,7 @@ package io.machinecode.nock.test.cdi.producer;
 
 import io.machinecode.nock.test.core.transport.artifact.batchlet.FailBatchlet;
 
+import javax.enterprise.inject.New;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
@@ -11,7 +12,7 @@ import javax.inject.Named;
 public class FailBatchletProducer {
     @Produces
     @Named("fail-batchlet")
-    public javax.batch.api.Batchlet batchlet() {
-        return new FailBatchlet();
+    public javax.batch.api.Batchlet batchlet(@New FailBatchlet batchlet) {
+        return batchlet;
     }
 }

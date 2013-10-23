@@ -10,4 +10,6 @@ public interface InjectionContext {
     ClassLoader getClassLoader();
 
     ArtifactLoader getArtifactLoader();
+
+    Injector getInjector();
 }

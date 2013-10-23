@@ -3,6 +3,7 @@ package io.machinecode.nock.core.model.execution;
 import io.machinecode.nock.core.work.PlanImpl;
 import io.machinecode.nock.core.work.Status;
 import io.machinecode.nock.core.work.execution.AfterExecution;
+import io.machinecode.nock.core.work.execution.FailExecution;
 import io.machinecode.nock.core.work.execution.RunExecution;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.execution.Execution;
@@ -50,15 +51,15 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
         }
         final RunExecution run = new RunExecution(this, context);
         final AfterExecution after = new AfterExecution(this, context);
-        //final FailJob fail = new FailJob(this, context); //TODO
+        final FailExecution fail = new FailExecution(this, context); //TODO
 
         final PlanImpl runPlan = new PlanImpl(run, TargetThread.ANY, element());
         final PlanImpl afterPlan = new PlanImpl(after, TargetThread.THIS, element());
-        //final PlanImpl failPlan = new PlanImpl(fail, TargetThread.THIS, element());
+        final PlanImpl failPlan = new PlanImpl(fail, TargetThread.THIS, element());
 
-        runPlan//.fail(failPlan)
+        runPlan.fail(failPlan)
                 .always(afterPlan
-                        //.fail(failPlan)
+                        .fail(failPlan)
                 );
 
         return runPlan;

@@ -72,11 +72,11 @@ public class Util {
             return Collections.emptyList();
         }
         final List<U> list = new ArrayList<U>(that.size());
-        for (int i = 0, j = 1; i < that.size(); ++i, ++j) {
+        final int j = that.size() - 1;
+        final T next = j < 0 ? null : that.get(j);
+        for (int i = 0; i < that.size(); ++i) {
             final T value = that.get(i);
-            final T next = j < that.size() ? that.get(j) : null;
-
-            final U replaced = transformer.transform(value, next, context);
+            final U replaced = transformer.transform(value, next, i == j, context);
             if (replaced != null) {
                 list.add(replaced);
             }
@@ -128,7 +128,7 @@ public class Util {
     }
 
     public interface NextExpressionTransformer<T, U, V extends PropertyContext> {
-        U transform(final T that, final T next, final V context);
+        U transform(final T that, final T next, final boolean last, final V context);
     }
 
     public interface ParametersTransformer<T, U> {

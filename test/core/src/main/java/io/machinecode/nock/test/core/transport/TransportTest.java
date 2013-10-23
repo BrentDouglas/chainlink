@@ -6,6 +6,7 @@ import io.machinecode.nock.core.factory.JobFactory;
 import io.machinecode.nock.core.model.JobImpl;
 import io.machinecode.nock.jsl.fluent.Jsl;
 import io.machinecode.nock.test.core.transport.artifact.batchlet.FailBatchlet;
+import io.machinecode.nock.test.core.transport.artifact.batchlet.InjectedBatchlet;
 import io.machinecode.nock.test.core.transport.artifact.batchlet.RunBatchlet;
 import io.machinecode.nock.test.core.transport.artifact.batchlet.StopBatchlet;
 import org.junit.Assert;
@@ -64,7 +65,6 @@ public abstract class TransportTest extends BaseTest {
         Assert.assertTrue(StopBatchlet.hasRun.get());
         operator.stop(start.id);
         Assert.assertTrue(start.deferred.isCancelled());
-        //Assert.assertTrue(start.deferred.cancel(true));
         try {
             start.deferred.get();
         } catch (final CancellationException e) {
@@ -96,5 +96,29 @@ public abstract class TransportTest extends BaseTest {
         Assert.assertTrue(FailBatchlet.hasRun.get());
         Assert.assertEquals("Batch Status", BatchStatus.FAILED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());
         Assert.assertEquals("Exit  Status", BatchStatus.FAILED.name(), repository().getJobExecution(execution.getExecutionId()).getExitStatus());
+    }
+
+    @Test
+    public void injectBatchletTest() throws Exception {
+        final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+                .setId("job")
+                .addExecution(
+                        Jsl.stepWithBatchletAndPlan()
+                                .setId("step")
+                                .setTask(
+                                        Jsl.batchlet()
+                                                .setRef("injected-batchlet")
+                                                .addProperty("property", "value")
+                                )
+                ), PARAMETERS);
+        final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
+        final Start start = operator.start(job);
+        final JobExecution execution = repository().getJobExecution(start.id);
+        Assert.assertEquals("Batch Status", BatchStatus.STARTED, execution.getBatchStatus()); //TODO Race
+        Assert.assertEquals("Exit  Status", BatchStatus.STARTED.name(), execution.getExitStatus());
+        start.deferred.get();
+        Assert.assertTrue(InjectedBatchlet.hasRun.get());
+        Assert.assertEquals("Batch Status", BatchStatus.COMPLETED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());
+        Assert.assertEquals("Exit  Status", BatchStatus.COMPLETED.name(), repository().getJobExecution(execution.getExecutionId()).getExitStatus());
     }
 }

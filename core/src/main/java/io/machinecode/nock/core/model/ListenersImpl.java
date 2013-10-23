@@ -28,7 +28,7 @@ public class ListenersImpl implements Listeners {
         return this.listeners;
     }
 
-    public <X> List<X> getListenersImplementing(final InjectionContext context, final Class<X> clazz) {
+    public <X> List<X> getListenersImplementing(final InjectionContext context, final Class<X> clazz) throws Exception {
         final List<X> ret = new ArrayList<X>(this.listeners.size());
         for (final ListenerImpl listener : this.listeners) {
             final X that = listener.load(clazz, context);

@@ -29,7 +29,6 @@ import javax.batch.api.chunk.listener.SkipReadListener;
 import javax.batch.api.chunk.listener.SkipWriteListener;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.context.StepContext;
-import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -194,7 +193,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
         final List<RetryWriteListener> retryWriteListeners;
         final List<SkipWriteListener> skipWriteListeners;
 
-        private State(final InjectionContext injectionContext, final TransactionManager transactionManager) throws SystemException {
+        private State(final InjectionContext injectionContext, final TransactionManager transactionManager) throws Exception {
             this.transactionManager = transactionManager;
 
             this.itemCount = Integer.parseInt(ChunkImpl.this.itemCount);
@@ -205,9 +204,9 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             this.objects = new ArrayList<Object>(this.itemCount);
 
             this.reader = ChunkImpl.this.reader.load(injectionContext);
-            this.processor = ChunkImpl.this.processor.load(injectionContext);
+            this.processor = ChunkImpl.this.processor == null ? null : ChunkImpl.this.processor.load(injectionContext);
             this.writer = ChunkImpl.this.writer.load(injectionContext);
-            this.checkpointAlgorithm = ChunkImpl.this.checkpointAlgorithm.load(injectionContext);
+            this.checkpointAlgorithm = ChunkImpl.this.checkpointAlgorithm == null ? null : ChunkImpl.this.checkpointAlgorithm.load(injectionContext);
             this.chunkListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, ChunkListener.class);
             this.itemReadListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, ItemReadListener.class);
             this.retryReadListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, RetryReadListener.class);
@@ -419,7 +418,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             for (final ItemProcessListener listener : state.itemProcessListeners) {
                 listener.beforeProcess(read);
             }
-            final Object processed = state.processor.processItem(read);
+            final Object processed = state.processor == null ? read : state.processor.processItem(read);
             for (final ItemProcessListener listener : state.itemProcessListeners) {
                 listener.afterProcess(read, processed);
             }

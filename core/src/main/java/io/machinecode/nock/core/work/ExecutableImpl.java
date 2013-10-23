@@ -30,9 +30,16 @@ public abstract class ExecutableImpl<T extends Work> implements Executable<T> {
     private final Set<Listener> listeners = new THashSet<Listener>(0);
 
     protected final T work;
+    protected final long jobExecutionId;
 
-    protected ExecutableImpl(final T work) {
+    protected ExecutableImpl(final long jobExecutionId, final T work) {
+        this.jobExecutionId = jobExecutionId;
         this.work = work;
+    }
+
+    @Override
+    public long getJobExecutionId() {
+        return jobExecutionId;
     }
 
     @Override
@@ -55,7 +62,7 @@ public abstract class ExecutableImpl<T extends Work> implements Executable<T> {
             chain = run(transport);
             chain.resolve(null);
             return ResultImpl.FINISHED;
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             log.debug("", e); //TODO Message
             return new ResultImpl(e);
         } finally {

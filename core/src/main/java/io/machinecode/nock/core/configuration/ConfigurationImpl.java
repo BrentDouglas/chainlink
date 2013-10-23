@@ -4,6 +4,7 @@ import io.machinecode.nock.core.local.LocalRepository;
 import io.machinecode.nock.core.local.LocalTransactionManager;
 import io.machinecode.nock.spi.Repository;
 import io.machinecode.nock.spi.configuration.Configuration;
+import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.spi.loader.JobLoader;
 
@@ -16,12 +17,14 @@ public class ConfigurationImpl implements Configuration {
 
     private static final JobLoader[] JOB_LOADERS = new JobLoader[0];
     private static final ArtifactLoader[] ARTIFACT_LOADERS = new ArtifactLoader[0];
+    private static final Injector[] INJECTORS = new Injector[0];
 
     private final ClassLoader loader;
     private final Repository repository;
     private final TransactionManager transactionManager;
     private final JobLoader[] jobLoaders;
     private final ArtifactLoader[] artifactLoaders;
+    private final Injector[] injectors;
 
     public ConfigurationImpl(final ClassLoader loader) {
         this.loader = loader;
@@ -29,6 +32,7 @@ public class ConfigurationImpl implements Configuration {
         this.transactionManager = new LocalTransactionManager(180); //TODO Should not be here
         this.jobLoaders = JOB_LOADERS;
         this.artifactLoaders = ARTIFACT_LOADERS;
+        this.injectors = INJECTORS;
     }
 
     public ConfigurationImpl(final Configuration configuration) {
@@ -37,6 +41,7 @@ public class ConfigurationImpl implements Configuration {
         this.transactionManager = configuration.getTransactionManager();
         this.jobLoaders = configuration.getJobLoaders();
         this.artifactLoaders = configuration.getArtifactLoaders();
+        this.injectors = configuration.getInjectors();
     }
 
     public ConfigurationImpl(final Builder builder) {
@@ -45,6 +50,7 @@ public class ConfigurationImpl implements Configuration {
         this.transactionManager = builder.transactionManager;
         this.jobLoaders = builder.jobLoaders;
         this.artifactLoaders = builder.artifactLoaders;
+        this.injectors = builder.injectors;
     }
 
     @Override
@@ -72,13 +78,18 @@ public class ConfigurationImpl implements Configuration {
         return this.artifactLoaders;
     }
 
+    @Override
+    public Injector[] getInjectors() {
+        return this.injectors;
+    }
 
     public static class Builder {
         private ClassLoader loader;
         private Repository repository;
         private TransactionManager transactionManager;
-        private JobLoader[] jobLoaders;
-        private ArtifactLoader[] artifactLoaders;
+        private JobLoader[] jobLoaders = JOB_LOADERS;
+        private ArtifactLoader[] artifactLoaders = ARTIFACT_LOADERS;
+        private Injector[] injectors = INJECTORS;
 
         public Builder setLoader(final ClassLoader loader) {
             this.loader = loader;
@@ -102,6 +113,11 @@ public class ConfigurationImpl implements Configuration {
 
         public Builder setArtifactLoaders(final ArtifactLoader[] artifactLoaders) {
             this.artifactLoaders = artifactLoaders;
+            return this;
+        }
+
+        public Builder setInjectors(final Injector[] injectors) {
+            this.injectors = injectors;
             return this;
         }
 

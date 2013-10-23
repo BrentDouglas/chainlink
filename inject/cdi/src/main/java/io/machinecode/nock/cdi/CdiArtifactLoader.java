@@ -21,12 +21,12 @@ public class CdiArtifactLoader implements ArtifactLoader, Extension {
 
     public static final AnnotationLiteral<Default> DEFAULT_ANNOTATION_LITERAL = new AnnotationLiteral<Default>() {};
 
-    private static BeanManager beanManager;
+    static BeanManager beanManager;
 
     void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery beforeBeanDiscovery, final BeanManager beanManager) {
         CdiArtifactLoader.beanManager = beanManager;
         beforeBeanDiscovery.addAnnotatedType(
-                beanManager.createAnnotatedType(CdiProducer.class)
+                beanManager.createAnnotatedType(CdiInjector.class)
         );
     }
 

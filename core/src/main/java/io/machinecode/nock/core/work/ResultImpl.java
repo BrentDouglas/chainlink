@@ -21,7 +21,7 @@ public class ResultImpl implements Result {
         this.value = null;
     }
 
-    public ResultImpl(final Exception e) {
+    public ResultImpl(final Throwable e) {
         this.status = Status.ERROR;
         this.value = e;
     }

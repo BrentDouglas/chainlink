@@ -2,15 +2,15 @@ package io.machinecode.nock.core.factory.task;
 
 import io.machinecode.nock.core.model.task.ExceptionClassFilterImpl;
 import io.machinecode.nock.core.model.task.ExceptionClassImpl;
-import io.machinecode.nock.core.expression.PropertyContextImpl;
-import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.core.util.Util;
 import io.machinecode.nock.core.util.Util.ExpressionTransformer;
 import io.machinecode.nock.spi.element.task.ExceptionClass;
 import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.factory.JobPropertyContext;
 import io.machinecode.nock.spi.factory.PropertyContext;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,8 +36,8 @@ public class ExceptionClassFilterFactory implements ElementFactory<ExceptionClas
 
     @Override
     public ExceptionClassFilterImpl produceExecution(final ExceptionClassFilter that, final JobPropertyContext context) {
-        final List<ExceptionClassImpl> includes = Util.immutableCopy(that.getIncludes(), context, EXCEPTION_CLASS_EXECUTION_TRANSFORMER);
-        final List<ExceptionClassImpl> excludes = Util.immutableCopy(that.getExcludes(), context, EXCEPTION_CLASS_EXECUTION_TRANSFORMER);
+        final List<ExceptionClassImpl> includes = that == null ? Collections.<ExceptionClassImpl>emptyList() : Util.immutableCopy(that.getIncludes(), context, EXCEPTION_CLASS_EXECUTION_TRANSFORMER);
+        final List<ExceptionClassImpl> excludes = that == null ? Collections.<ExceptionClassImpl>emptyList() : Util.immutableCopy(that.getExcludes(), context, EXCEPTION_CLASS_EXECUTION_TRANSFORMER);
         return new ExceptionClassFilterImpl(includes, excludes);
     }
 

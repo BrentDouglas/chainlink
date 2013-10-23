@@ -27,7 +27,7 @@ public interface Context extends Serializable {
 
     void setStepContext(final MutableStepContext stepContext);
 
-    Exception getException();
+    Throwable getThrowable();
 
-    void setException(Exception exception);
+    void setThrowable(Throwable thrown);
 }

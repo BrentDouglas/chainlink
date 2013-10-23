@@ -29,7 +29,9 @@ public class ChunkFactory implements TaskFactory<Chunk, ChunkImpl, ListenersImpl
         final String skipLimit = Expression.resolveExecutionProperty(that.getSkipLimit(), context);
         final String retryLimit = Expression.resolveExecutionProperty(that.getRetryLimit(), context);
         final ItemReaderImpl reader = ItemReaderFactory.INSTANCE.produceExecution(that.getReader(), context); //TODO Should not be null but needs validation
-        final ItemProcessorImpl processor = ItemProcessorFactory.INSTANCE.produceExecution(that.getProcessor(), context);
+        final ItemProcessorImpl processor = that.getProcessor() == null
+                ? null
+                : ItemProcessorFactory.INSTANCE.produceExecution(that.getProcessor(), context);
         final ItemWriterImpl writer = ItemWriterFactory.INSTANCE.produceExecution(that.getWriter(), context);
         final CheckpointAlgorithmImpl checkpointAlgorithm = that.getCheckpointAlgorithm() == null
                 ? null
@@ -63,7 +65,9 @@ public class ChunkFactory implements TaskFactory<Chunk, ChunkImpl, ListenersImpl
         final String skipLimit = Expression.resolvePartitionProperty(that.getSkipLimit(), context);
         final String retryLimit = Expression.resolvePartitionProperty(that.getRetryLimit(), context);
         final ItemReaderImpl reader = ItemReaderFactory.INSTANCE.producePartitioned(that.getReader(), context); //TODO Should not be null but needs validation
-        final ItemProcessorImpl processor = ItemProcessorFactory.INSTANCE.producePartitioned(that.getProcessor(), context);
+        final ItemProcessorImpl processor = that.getProcessor() == null
+                ? null
+                : ItemProcessorFactory.INSTANCE.producePartitioned(that.getProcessor(), context);
         final ItemWriterImpl writer = ItemWriterFactory.INSTANCE.producePartitioned(that.getWriter(), context);
         final CheckpointAlgorithmImpl checkpointAlgorithm = that.getCheckpointAlgorithm() == null
                 ? null

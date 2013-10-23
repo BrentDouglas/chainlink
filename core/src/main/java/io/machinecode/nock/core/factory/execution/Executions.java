@@ -10,7 +10,7 @@ import io.machinecode.nock.core.model.partition.PlanImpl;
 import io.machinecode.nock.core.model.task.BatchletImpl;
 import io.machinecode.nock.core.model.task.ChunkImpl;
 import io.machinecode.nock.core.util.Util;
-import io.machinecode.nock.core.util.Util.NextExpressionTransformer;
+import io.machinecode.nock.core.util.Util.ExpressionTransformer;
 import io.machinecode.nock.spi.element.execution.Decision;
 import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Flow;
@@ -34,13 +34,13 @@ import java.util.List;
 public class Executions {
 
     @SuppressWarnings("unchecked")
-    private static final NextExpressionTransformer<Execution, ExecutionImpl, JobPropertyContext> EXECUTION_BUILD_TRANSFORMER = new NextExpressionTransformer<Execution, ExecutionImpl, JobPropertyContext>() {
+    private static final ExpressionTransformer<Execution, ExecutionImpl, JobPropertyContext> EXECUTION_BUILD_TRANSFORMER = new ExpressionTransformer<Execution, ExecutionImpl, JobPropertyContext>() {
         @Override
-        public ExecutionImpl transform(final Execution that, final Execution next, final JobPropertyContext context) {
+        public ExecutionImpl transform(final Execution that, final JobPropertyContext context) {
             if (that instanceof Flow) {
-                return FlowFactory.INSTANCE.produceExecution((Flow) that, next, context);
+                return FlowFactory.INSTANCE.produceExecution((Flow) that,  context);
             } else if (that instanceof Split) {
-                return SplitFactory.INSTANCE.produceExecution((Split) that, next, context);
+                return SplitFactory.INSTANCE.produceExecution((Split) that, context);
             } else if (that instanceof Step) {
                 final Task task = ((Step) that).getTask();
                 final Partition partition = ((Step) that).getPartition();
@@ -48,15 +48,15 @@ public class Executions {
                 //There is no real reason for these selections on null values
                 if (task == null || task instanceof Batchlet) {
                     if (strategy == null || strategy instanceof Mapper) {
-                        return BatchletMapperStepFactory.INSTANCE.produceExecution((Step<Batchlet, Mapper>) that, next, context);
+                        return BatchletMapperStepFactory.INSTANCE.produceExecution((Step<Batchlet, Mapper>) that,  context);
                     } else if (strategy instanceof Plan) {
-                        return BatchletPlanStepFactory.INSTANCE.produceExecution((Step<Batchlet, Plan>) that, next, context);
+                        return BatchletPlanStepFactory.INSTANCE.produceExecution((Step<Batchlet, Plan>) that, context);
                     }
                 } else if (task instanceof Chunk) {
                     if (strategy == null || strategy instanceof Mapper) {
-                        return ChunkMapperStepFactory.INSTANCE.produceExecution((Step<Chunk, Mapper>) that, next, context);
+                        return ChunkMapperStepFactory.INSTANCE.produceExecution((Step<Chunk, Mapper>) that,  context);
                     } else if (strategy instanceof Plan) {
-                        return ChunkPlanStepFactory.INSTANCE.produceExecution((Step<Chunk, Plan>) that, next, context);
+                        return ChunkPlanStepFactory.INSTANCE.produceExecution((Step<Chunk, Plan>) that, context);
                     }
                 }
             } else if (that instanceof Decision) {
@@ -67,13 +67,13 @@ public class Executions {
     };
 
     @SuppressWarnings("unchecked")
-    private static final NextExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext> EXECUTION_PARTITION_TRANSFORMER = new NextExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext>() {
+    private static final ExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext> EXECUTION_PARTITION_TRANSFORMER = new ExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext>() {
         @Override
-        public ExecutionImpl transform(final ExecutionImpl that, final ExecutionImpl next, final PropertyContext context) {
+        public ExecutionImpl transform(final ExecutionImpl that, final PropertyContext context) {
             if (that instanceof FlowImpl) {
-                return FlowFactory.INSTANCE.producePartitioned((FlowImpl) that, next, context);
+                return FlowFactory.INSTANCE.producePartitioned((FlowImpl) that, context);
             } else if (that instanceof SplitImpl) {
-                return SplitFactory.INSTANCE.producePartitioned((SplitImpl) that, next, context);
+                return SplitFactory.INSTANCE.producePartitioned((SplitImpl) that, context);
             } else if (that instanceof StepImpl) {
                 final Task task = ((StepImpl) that).getTask();
                 final Partition partition = ((StepImpl) that).getPartition();
@@ -81,15 +81,15 @@ public class Executions {
                 //There is no real reason for these selections on null values
                 if (task == null || task instanceof Batchlet) {
                     if (strategy == null || strategy instanceof Mapper) {
-                        return BatchletMapperStepFactory.INSTANCE.producePartitioned((StepImpl<BatchletImpl, MapperImpl>) that, next, context);
+                        return BatchletMapperStepFactory.INSTANCE.producePartitioned((StepImpl<BatchletImpl, MapperImpl>) that, context);
                     } else if (strategy instanceof Plan) {
-                        return BatchletPlanStepFactory.INSTANCE.producePartitioned((StepImpl<BatchletImpl, PlanImpl>) that, next, context);
+                        return BatchletPlanStepFactory.INSTANCE.producePartitioned((StepImpl<BatchletImpl, PlanImpl>) that, context);
                     }
                 } else if (task instanceof Chunk) {
                     if (strategy == null || strategy instanceof Mapper) {
-                        return ChunkMapperStepFactory.INSTANCE.producePartitioned((StepImpl<ChunkImpl, MapperImpl>) that, next, context);
+                        return ChunkMapperStepFactory.INSTANCE.producePartitioned((StepImpl<ChunkImpl, MapperImpl>) that, context);
                     } else if (strategy instanceof Plan) {
-                        return ChunkPlanStepFactory.INSTANCE.producePartitioned((StepImpl<ChunkImpl, PlanImpl>) that, next, context);
+                        return ChunkPlanStepFactory.INSTANCE.producePartitioned((StepImpl<ChunkImpl, PlanImpl>) that, context);
                     }
                 }
             } else if (that instanceof DecisionImpl) {

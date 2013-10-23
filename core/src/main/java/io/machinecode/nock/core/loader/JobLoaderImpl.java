@@ -1,7 +1,6 @@
 package io.machinecode.nock.core.loader;
 
 import gnu.trove.set.hash.TLinkedHashSet;
-import io.machinecode.nock.core.util.ResolvableService;
 import io.machinecode.nock.jsl.xml.loader.JarXmlJobLoader;
 import io.machinecode.nock.spi.configuration.Configuration;
 import io.machinecode.nock.spi.element.Job;
@@ -9,7 +8,6 @@ import io.machinecode.nock.spi.loader.JobLoader;
 
 import javax.batch.operations.NoSuchJobException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,13 +22,13 @@ public class JobLoaderImpl implements JobLoader {
         this.loader = new JarXmlJobLoader(configuration.getClassLoader());
         this.loaders = new TLinkedHashSet<JobLoader>();
         Collections.addAll(this.loaders, configuration.getJobLoaders());
-        final List<JobLoader> loaders;
-        try {
-            loaders = new ResolvableService<JobLoader>(JobLoader.class).resolve(configuration.getClassLoader());
-        } catch (final ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        this.loaders.addAll(loaders);
+        //final List<JobLoader> loaders;
+        //try {
+        //    loaders = new ResolvableService<JobLoader>(JobLoader.class).resolve(configuration.getClassLoader());
+        //} catch (final ClassNotFoundException e) {
+        //    throw new RuntimeException(e);
+        //}
+        //this.loaders.addAll(loaders);
     }
 
     @Override

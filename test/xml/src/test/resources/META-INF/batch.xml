@@ -5,4 +5,5 @@
     <ref id="run-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.RunBatchlet" />
     <ref id="stop-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.StopBatchlet" />
     <ref id="fail-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.FailBatchlet" />
+    <ref id="injected-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.InjectedBatchlet" />
 </batch-artifacts>

@@ -7,6 +7,7 @@ import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.JobWork;
+import org.jboss.logging.Logger;
 
 import javax.batch.runtime.context.JobContext;
 
@@ -14,11 +15,11 @@ import javax.batch.runtime.context.JobContext;
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
 public class AfterJob extends ExecutableImpl<JobWork> {
-    final long jobExecutionId;
+
+    private static final Logger log = Logger.getLogger(AfterJob.class);
 
     public AfterJob(final JobWork work, final Context context) {
-        super(work);
-        this.jobExecutionId = context.getJobExecutionId();
+        super(context.getJobExecutionId(), work);
     }
 
     @Override
@@ -27,14 +28,17 @@ public class AfterJob extends ExecutableImpl<JobWork> {
         final JobContext jobContext = context.getJobContext();
         try {
             work.after(transport, context);
-            return new DeferredImpl<Void>();
+        } catch (final Throwable e) {
+            log.error("", e); //TODO Message
+            context.setThrowable(e);
         } finally {
-            if (context.getException() == null) {
-                Status.completedJob(transport.getRepository(), jobExecutionId, jobContext.getExitStatus());
+            if (context.getThrowable() == null) {
+                Status.completedJob(transport.getRepository(), jobExecutionId, jobContext == null ? null : jobContext.getExitStatus());
             } else {
-                Status.failedJob(transport.getRepository(), jobExecutionId, jobContext.getExitStatus());
+                Status.failedJob(transport.getRepository(), jobExecutionId, jobContext == null ? null : jobContext.getExitStatus());
             }
             transport.finalizeJob(jobExecutionId);
         }
+        return new DeferredImpl<Void>();
     }
 }

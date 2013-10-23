@@ -13,11 +13,10 @@ import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.model.partition.PlanImpl;
 import io.machinecode.nock.core.model.task.ChunkImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
-import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.element.partition.Plan;
 import io.machinecode.nock.spi.element.task.Chunk;
-import io.machinecode.nock.spi.factory.ExecutionFactory;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.factory.JobPropertyContext;
 import io.machinecode.nock.spi.factory.PropertyContext;
 
@@ -26,14 +25,14 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ChunkPlanStepFactory implements ExecutionFactory<Step<? extends Chunk, ? extends Plan>, StepImpl<ChunkImpl, PlanImpl>> {
+public class ChunkPlanStepFactory implements ElementFactory<Step<? extends Chunk, ? extends Plan>, StepImpl<ChunkImpl, PlanImpl>> {
 
     public static final ChunkPlanStepFactory INSTANCE = new ChunkPlanStepFactory();
 
     @Override
-    public StepImpl<ChunkImpl, PlanImpl> produceExecution(final Step<? extends Chunk, ? extends Plan> that, final Execution execution, final JobPropertyContext context) {
+    public StepImpl<ChunkImpl, PlanImpl> produceExecution(final Step<? extends Chunk, ? extends Plan> that, final JobPropertyContext context) {
         final String id = Expression.resolveExecutionProperty(that.getId(), context);
-        final String next = Expression.resolveExecutionProperty(that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext(), context);
+        final String next = Expression.resolveExecutionProperty(that.getNext(), context);
         final String startLimit = Expression.resolveExecutionProperty(that.getStartLimit(), context);
         final String allowStartIfComplete = Expression.resolveExecutionProperty(that.getAllowStartIfComplete(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
@@ -55,9 +54,9 @@ public class ChunkPlanStepFactory implements ExecutionFactory<Step<? extends Chu
     }
 
     @Override
-    public StepImpl<ChunkImpl, PlanImpl> producePartitioned(final StepImpl<ChunkImpl, PlanImpl> that, final Execution execution, final PropertyContext context) {
+    public StepImpl<ChunkImpl, PlanImpl> producePartitioned(final StepImpl<ChunkImpl, PlanImpl> that, final PropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
-        final String next = Expression.resolvePartitionProperty(that.getNext() == null ? execution == null ? null : execution.getId() : that.getNext(), context);
+        final String next = Expression.resolvePartitionProperty(that.getNext(), context);
         final String startLimit = Expression.resolvePartitionProperty(that.getStartLimit(), context);
         final String allowStartIfComplete = Expression.resolvePartitionProperty(that.getAllowStartIfComplete(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);

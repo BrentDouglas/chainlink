@@ -68,7 +68,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return this.strategy;
     }
 
-    public PartitionCollector loadPartitionCollector(final InjectionContext injectionContext) {
+    public PartitionCollector loadPartitionCollector(final InjectionContext injectionContext) throws Exception {
         if (collector == null) {
             return null;
         }
@@ -83,7 +83,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return _collector.get();
     }
 
-    public PartitionReducer loadPartitionReducer(final InjectionContext injectionContext) {
+    public PartitionReducer loadPartitionReducer(final InjectionContext injectionContext) throws Exception {
         if (reducer == null) {
             return null;
         }
@@ -103,7 +103,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return _plan;
     }
 
-    public PartitionAnalyzer loadPartitionAnalyzer(final InjectionContext injectionContext) {
+    public PartitionAnalyzer loadPartitionAnalyzer(final InjectionContext injectionContext) throws Exception {
         if (analyser == null) {
             return null;
         }

@@ -1,7 +1,9 @@
 package io.machinecode.nock.test.cdi;
 
 import io.machinecode.nock.cdi.CdiArtifactLoader;
+import io.machinecode.nock.cdi.CdiInjector;
 import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.test.core.transport.TransportTest;
 import org.jboss.weld.environment.se.Weld;
@@ -20,7 +22,8 @@ public class CdiLocalTransportTest extends TransportTest {
     @Override
     protected Builder _configuration() {
         return super._configuration()
-                .setArtifactLoaders(new ArtifactLoader[]{ CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class) });
+                .setArtifactLoaders(new ArtifactLoader[]{ CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class) })
+                .setInjectors(new Injector[]{ CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class) });
     }
 
     @BeforeClass

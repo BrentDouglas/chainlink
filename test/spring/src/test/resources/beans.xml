@@ -8,4 +8,5 @@
     <bean id="run-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.RunBatchlet" />
     <bean id="stop-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.StopBatchlet" />
     <bean id="fail-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.FailBatchlet" />
+    <bean id="injected-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.InjectedBatchlet" />
 </beans>

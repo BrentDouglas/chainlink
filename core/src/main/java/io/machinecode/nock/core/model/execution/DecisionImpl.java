@@ -54,6 +54,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
         final InjectionContext ic = transport.createInjectionContext(context);
         final ClassLoader classLoader = ic.getClassLoader();
         final Decider decider = this.ref.load(classLoader, ic.getArtifactLoader());
+        ic.getInjector().inject(decider);
 
         final String exitStatus = decider.decide(transport.getRepository().getStepExecutions(context.getStepExecutionIds()));
         context.getJobContext().setExitStatus(exitStatus);
