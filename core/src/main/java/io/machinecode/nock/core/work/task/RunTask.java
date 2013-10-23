@@ -9,19 +9,19 @@ import io.machinecode.nock.spi.work.TaskWork;
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class RunTask extends ExecutableImpl {
-    final TaskWork work;
-    final Context context;
+public class RunTask extends ExecutableImpl<TaskWork> {
+    final long jobExecutionId;
     final int timeout;
 
     public RunTask(final TaskWork work, final Context context, final int timeout) {
-        this.work = work;
-        this.context = context;
+        super(work);
+        this.jobExecutionId = context.getJobExecutionId();
         this.timeout = timeout;
     }
 
     @Override
-    public Deferred run(final Transport transport) throws Exception {
+    public Deferred<?> run(final Transport transport) throws Exception {
+        final Context context = transport.getContext(jobExecutionId);
         work.run(transport, context, timeout);
         return work;
     }

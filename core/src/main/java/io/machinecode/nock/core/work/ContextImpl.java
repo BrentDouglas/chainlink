@@ -1,10 +1,9 @@
 package io.machinecode.nock.core.work;
 
 import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.MutableJobContext;
+import io.machinecode.nock.spi.context.MutableStepContext;
 import io.machinecode.nock.spi.work.JobWork;
-
-import javax.batch.runtime.context.JobContext;
-import javax.batch.runtime.context.StepContext;
 
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
@@ -15,10 +14,10 @@ public class ContextImpl implements Context {
     private final long jobInstanceId;
     private final long jobExecutionId;
     private final long[] stepExecutionIds;
-    private JobContext jobContext;
-    private StepContext stepContext;
+    private MutableJobContext jobContext;
+    private final ThreadLocal<MutableStepContext> stepContext = new ThreadLocal<MutableStepContext>();
 
-    public ContextImpl(final JobWork job, final long jobInstanceId, final long jobExecutionId, final long[] stepExecutionIds) {
+    public ContextImpl(final JobWork job, final long jobInstanceId, final long jobExecutionId, final long... stepExecutionIds) {
         this.job = job;
         this.jobInstanceId = jobInstanceId;
         this.jobExecutionId = jobExecutionId;
@@ -42,26 +41,26 @@ public class ContextImpl implements Context {
 
     @Override
     public long[] getStepExecutionIds() {
-        return stepExecutionIds;
+        return stepExecutionIds; //TODO This is wrong
     }
 
     @Override
-    public JobContext getJobContext() {
+    public MutableJobContext getJobContext() {
         return jobContext;
     }
 
     @Override
-    public void setJobContext(final JobContext jobContext) {
+    public void setJobContext(final MutableJobContext jobContext) {
         this.jobContext = jobContext;
     }
 
     @Override
-    public StepContext getStepContext() {
-        return stepContext;
+    public MutableStepContext getStepContext() {
+        return stepContext.get();
     }
 
     @Override
-    public void setStepContext(final StepContext stepContext) {
-        this.stepContext = stepContext;
+    public void setStepContext(final MutableStepContext stepContext) {
+        this.stepContext.set(stepContext);
     }
 }

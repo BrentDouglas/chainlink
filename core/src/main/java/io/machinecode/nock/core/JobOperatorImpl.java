@@ -1,7 +1,5 @@
 package io.machinecode.nock.core;
 
-import gnu.trove.map.TMap;
-import gnu.trove.map.hash.THashMap;
 import io.machinecode.nock.core.configuration.ConfigurationFactoryImpl;
 import io.machinecode.nock.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.nock.core.factory.JobFactory;
@@ -33,11 +31,9 @@ import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.StepExecution;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -45,29 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class JobOperatorImpl implements JobOperator {
 
     private final RuntimeConfigurationImpl configuration;
-    private final TransportFactory transportFactory;
-
-    private final TMap<Long, Deferred> jobs = new THashMap<Long, Deferred>();
-    final AtomicBoolean lock = new AtomicBoolean(false);
-
-    private Deferred get(final long executionId) {
-        while (!lock.compareAndSet(false, true)) {}
-        try {
-            return this.jobs.get(executionId);
-        } finally {
-            lock.set(false);
-        }
-    }
-
-    private void put(final long executionId, final Deferred deferred) {
-        while (!lock.compareAndSet(false, true)) {}
-        try {
-            this.jobs.put(executionId, deferred);
-        } finally {
-            lock.set(false);
-        }
-    }
-
+    private final Transport transport;
 
     public JobOperatorImpl() {
         this.configuration = new RuntimeConfigurationImpl(ConfigurationFactoryImpl.INSTANCE.produce());
@@ -78,36 +52,43 @@ public class JobOperatorImpl implements JobOperator {
         } catch (final ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+        final TransportFactory transportFactory;
         if (transportFactories.isEmpty()) {
-            this.transportFactory = new LocalTransportFactory();
+            transportFactory = new LocalTransportFactory();
         } else {
-            this.transportFactory = transportFactories.get(0);
+            transportFactory = transportFactories.get(0);
         }
+        transport = transportFactory.produce(configuration, 1); //TODO
+    }
+
+    public JobOperatorImpl(final RuntimeConfigurationImpl configuration, final Transport transport) {
+        this.configuration = configuration;
+        this.transport = transport;
     }
 
     @Override
     public Set<String> getJobNames() throws JobSecurityException {
-        return configuration.getRepository().getJobNames();
+        return transport.getRepository().getJobNames();
     }
 
     @Override
     public int getJobInstanceCount(final String jobName) throws NoSuchJobException, JobSecurityException {
-        return configuration.getRepository().getJobInstanceCount(jobName);
+        return transport.getRepository().getJobInstanceCount(jobName);
     }
 
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws NoSuchJobException, JobSecurityException {
-        return configuration.getRepository().getJobInstances(jobName, start, count);
+        return transport.getRepository().getJobInstances(jobName, start, count);
     }
 
     @Override
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException {
-        return configuration.getRepository().getRunningExecutions(jobName); //TODO This should probably go through Transport
+        return transport.getRepository().getRunningExecutions(jobName); //TODO This should probably go through Transport
     }
 
     @Override
     public Properties getParameters(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
-        return configuration.getRepository().getParameters(executionId);
+        return transport.getRepository().getParameters(executionId);
     }
 
     @Override
@@ -117,20 +98,18 @@ public class JobOperatorImpl implements JobOperator {
             final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, jobParameters);
             JobFactory.INSTANCE.validate(job);
 
-            final Repository repository = configuration.getRepository();
-            final Transport transport = transportFactory.produce(configuration, 1);
+            final Repository repository = transport.getRepository();
             final JobInstance instance = repository.createJobInstance(job);
             final JobExecution execution = repository.createJobExecution(instance);
+            final long jobExecutionId = execution.getExecutionId();
             final Context context = new ContextImpl(
                     job,
                     instance.getInstanceId(),
-                    execution.getExecutionId(),
-                    new long[0]
+                    jobExecutionId
             );
-            Status.started(transport, context);
-            final Deferred stop = transport.execute(job.plan(transport, context));
-            put(execution.getExecutionId(), stop);
-            return execution.getExecutionId();
+            Status.startedJob(repository, jobExecutionId);
+            transport.executeJob(jobExecutionId, job, context);
+            return jobExecutionId;
         } catch (final Exception e) {
             throw new JobStartException(e);
         }
@@ -139,7 +118,7 @@ public class JobOperatorImpl implements JobOperator {
     @Override
     public long restart(final long executionId, final Properties restartParameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
         try {
-            final Repository repository = configuration.getRepository();
+            final Repository repository = transport.getRepository();
             final JobExecution execution = repository.getLatestJobExecution(executionId);
             if (BatchStatus.STOPPED.equals(execution.getBatchStatus())
                     || BatchStatus.STOPPED.equals(execution.getBatchStatus())) {
@@ -154,18 +133,15 @@ public class JobOperatorImpl implements JobOperator {
             if (BatchStatus.COMPLETED.equals(execution.getBatchStatus())) {
                 throw new JobExecutionAlreadyCompleteException();
             }
-            final Transport transport = transportFactory.produce(configuration, 1);
             final JobInstance instance = repository.createJobInstance(job);
             final Context context = new ContextImpl(
                     job,
                     instance.getInstanceId(),
-                    execution.getExecutionId(),
-                    new long[0]
+                    executionId
             );
-            Status.started(transport, context);
-            final Deferred stop = transport.execute(job.plan(transport, context));
-            put(execution.getExecutionId(), stop);
-            return execution.getExecutionId();
+            Status.startedJob(repository, executionId);
+            transport.executeJob(executionId, job, context);
+            return executionId;
         } catch (final JobRestartException e) {
             throw e;
         } catch (final JobExecutionAlreadyCompleteException e) {
@@ -177,42 +153,43 @@ public class JobOperatorImpl implements JobOperator {
 
     @Override
     public void stop(final long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
-        final Repository repository = configuration.getRepository();
-        final Deferred deferred = get(executionId);
+        final Repository repository = transport.getRepository();
+        final Deferred<?> deferred = transport.getJob(executionId);
         if (deferred == null) {
             throw new JobExecutionNotRunningException();
         }
+        Status.stoppingJob(repository, executionId);
         deferred.cancel(true);
-        repository.updateJobExecution(executionId, BatchStatus.STOPPING, new Date());
+        //Status.stoppedJob(repository, executionId);
     }
 
     @Override
     public void abandon(final long executionId) throws NoSuchJobExecutionException, JobExecutionIsRunningException, JobSecurityException {
-        final Repository repository = configuration.getRepository();
-        final JobExecution execution = repository.getJobExecution(executionId);
+        final Repository repository = transport.getRepository();
+        final JobExecution execution = repository.getJobExecution(executionId); // TODO Should we be getting this from the repo or transport
         if (Status.isRunning(execution.getBatchStatus())) {
             throw new JobExecutionIsRunningException();
         }
-        repository.updateJobExecution(executionId, BatchStatus.ABANDONED, new Date());
+        Status.abandonedJob(repository, executionId);
     }
 
     @Override
     public JobInstance getJobInstance(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
-        return configuration.getRepository().getJobInstance(executionId);
+        return transport.getRepository().getJobInstance(executionId);
     }
 
     @Override
     public List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException {
-        return configuration.getRepository().getJobExecutions(instance);
+        return transport.getRepository().getJobExecutions(instance);
     }
 
     @Override
     public JobExecution getJobExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
-        return configuration.getRepository().getJobExecution(executionId);
+        return transport.getRepository().getJobExecution(executionId);
     }
 
     @Override
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        return configuration.getRepository().getStepExecutions(jobExecutionId);
+        return transport.getRepository().getStepExecutions(jobExecutionId);
     }
 }

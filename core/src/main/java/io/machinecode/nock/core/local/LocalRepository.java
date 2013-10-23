@@ -33,25 +33,25 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class LocalRepository implements Repository {
-    final AtomicLong jobInstanceIndex = new AtomicLong();
-    final AtomicLong jobExecutionIndex = new AtomicLong();
-    final AtomicLong stepExecutionIndex = new AtomicLong();
+    protected final AtomicLong jobInstanceIndex = new AtomicLong();
+    protected final AtomicLong jobExecutionIndex = new AtomicLong();
+    protected final AtomicLong stepExecutionIndex = new AtomicLong();
 
-    final TMap<Long, JobInstance> jobInstances = new THashMap<Long, JobInstance>();
-    final TMap<Long, JobExecution> jobExecutions = new THashMap<Long, JobExecution>();
-    final TMap<Long, List<JobExecution>> jobInstanceExecutions = new THashMap<Long, List<JobExecution>>();
-    final TMap<Long, JobInstance> jobExecutionInstances = new THashMap<Long, JobInstance>();
-    final TMap<Long, StepExecution> stepExecutions = new THashMap<Long, StepExecution>();
-    final TMap<Long, Set<Long>> jobExecutionStepExecutions = new THashMap<Long, Set<Long>>();
-    final TMap<Long, JobExecution> latestJobExecutionForInstance = new THashMap<Long, JobExecution>();
+    protected final TMap<Long, JobInstance> jobInstances = new THashMap<Long, JobInstance>();
+    protected final TMap<Long, JobExecution> jobExecutions = new THashMap<Long, JobExecution>();
+    protected final TMap<Long, List<JobExecution>> jobInstanceExecutions = new THashMap<Long, List<JobExecution>>();
+    protected final TMap<Long, JobInstance> jobExecutionInstances = new THashMap<Long, JobInstance>();
+    protected final TMap<Long, StepExecution> stepExecutions = new THashMap<Long, StepExecution>();
+    protected final TMap<Long, Set<Long>> jobExecutionStepExecutions = new THashMap<Long, Set<Long>>();
+    protected final TMap<Long, JobExecution> latestJobExecutionForInstance = new THashMap<Long, JobExecution>();
 
-    final AtomicBoolean jobInstanceLock = new AtomicBoolean(false);
-    final AtomicBoolean jobExecutionLock = new AtomicBoolean(false);
-    final AtomicBoolean jobInstanceExecutionLock = new AtomicBoolean(false);
-    final AtomicBoolean jobExecutionInstanceLock = new AtomicBoolean(false);
-    final AtomicBoolean stepExecutionLock = new AtomicBoolean(false);
-    final AtomicBoolean jobExecutionStepExecutionLock = new AtomicBoolean(false);
-    final AtomicBoolean latestJobExecutionForInstanceLock = new AtomicBoolean(false);
+    protected final AtomicBoolean jobInstanceLock = new AtomicBoolean(false);
+    protected final AtomicBoolean jobExecutionLock = new AtomicBoolean(false);
+    protected final AtomicBoolean jobInstanceExecutionLock = new AtomicBoolean(false);
+    protected final AtomicBoolean jobExecutionInstanceLock = new AtomicBoolean(false);
+    protected final AtomicBoolean stepExecutionLock = new AtomicBoolean(false);
+    protected final AtomicBoolean jobExecutionStepExecutionLock = new AtomicBoolean(false);
+    protected final AtomicBoolean latestJobExecutionForInstanceLock = new AtomicBoolean(false);
 
     @Override
     public JobInstance createJobInstance(final Job job) {
@@ -81,7 +81,8 @@ public class LocalRepository implements Repository {
         final JobExecutionImpl execution = new JobExecutionImpl.Builder()
                 .setExecutionId(id)
                 .setJobName(instance.getJobName())
-                .setBatchStatus(BatchStatus.STOPPED)
+                .setBatchStatus(BatchStatus.STARTING)
+                .setExitStatus(BatchStatus.STARTING.name())
                 .setCreated(new Date())
                 .setUpdated(new Date())
                 .build();
@@ -101,7 +102,7 @@ public class LocalRepository implements Repository {
         try {
             latestJobExecutionForInstance.put(instance.getInstanceId(), execution);
         } finally {
-            jobInstanceExecutionLock.set(false);
+            latestJobExecutionForInstanceLock.set(false);
         }
         while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -128,11 +129,16 @@ public class LocalRepository implements Repository {
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
                 .setExecutionId(id)
                 .setStepName(step.getId())
-                .setBatchStatus(BatchStatus.STOPPED)
+                .setBatchStatus(BatchStatus.STARTING)
+                .setExitStatus(BatchStatus.STARTING.name())
                 .build();
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             stepExecutions.putIfAbsent(id, execution);
+            //final StepExecution old = stepExecutions.putIfAbsent(id, execution);
+            //if (old != null) {
+            //    throw new StepAlreadyExistsException();
+            //}
         } finally {
             stepExecutionLock.set(false);
         }
@@ -150,7 +156,7 @@ public class LocalRepository implements Repository {
     }
 
     @Override
-    public void startJobExecution(final long executionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void startJobExecution(final long executionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
             final JobExecution execution = jobExecutions.get(executionId);
@@ -160,7 +166,7 @@ public class LocalRepository implements Repository {
             jobExecutions.put(executionId, JobExecutionImpl.from(execution)
                     .setUpdated(timestamp)
                     .setStart(timestamp)
-                    .setBatchStatus(batchStatus)
+                    .setBatchStatus(BatchStatus.STARTED)
                     .build()
             );
         } finally {
@@ -207,25 +213,6 @@ public class LocalRepository implements Repository {
     }
 
     @Override
-    public void finishJobExecution(final long executionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
-        try {
-            final JobExecution execution = jobExecutions.get(executionId);
-            if (execution == null) {
-                throw new NoSuchJobExecutionException();
-            }
-            jobExecutions.put(executionId, JobExecutionImpl.from(execution)
-                    .setBatchStatus(batchStatus)
-                    .setUpdated(timestamp)
-                    .setEnd(timestamp)
-                    .build()
-            );
-        } finally {
-            jobExecutionLock.set(false);
-        }
-    }
-
-    @Override
     public void updateStepExecution(final long executionId, final Serializable serializable, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -233,7 +220,46 @@ public class LocalRepository implements Repository {
              if (execution == null) {
                  throw new NoSuchJobExecutionException();
              }
-            stepExecutions.put(executionId, StepExecutionImpl.from(execution).setPersistentUserData(serializable).build());
+            stepExecutions.put(executionId, StepExecutionImpl.from(execution)
+                    .setPersistentUserData(serializable)
+                    .build()
+            );
+        } finally {
+            stepExecutionLock.set(false);
+        }
+    }
+
+    @Override
+    public void updateStepExecution(final long executionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final StepExecution execution = stepExecutions.get(executionId);
+             if (execution == null) {
+                 throw new NoSuchJobExecutionException();
+             }
+            stepExecutions.put(executionId, StepExecutionImpl.from(execution)
+                    .setBatchStatus(batchStatus)
+                    .build()
+            );
+        } finally {
+            stepExecutionLock.set(false);
+        }
+    }
+
+    @Override
+    public void finishStepExecution(final long executionId, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final StepExecution execution = stepExecutions.get(executionId);
+             if (execution == null) {
+                 throw new NoSuchJobExecutionException();
+             }
+            stepExecutions.put(executionId, StepExecutionImpl.from(execution)
+                    .setBatchStatus(batchStatus)
+                    .setExitStatus(exitStatus)
+                    .setEnd(timestamp)
+                    .build()
+            );
         } finally {
             stepExecutionLock.set(false);
         }
@@ -385,7 +411,7 @@ public class LocalRepository implements Repository {
             }
             return execution;
         } finally {
-            jobInstanceExecutionLock.set(false);
+            latestJobExecutionForInstanceLock.set(false);
         }
     }
 

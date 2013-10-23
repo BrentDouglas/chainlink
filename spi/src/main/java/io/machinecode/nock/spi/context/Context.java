@@ -2,8 +2,6 @@ package io.machinecode.nock.spi.context;
 
 import io.machinecode.nock.spi.work.JobWork;
 
-import javax.batch.runtime.context.JobContext;
-import javax.batch.runtime.context.StepContext;
 import java.io.Serializable;
 
 /**
@@ -19,11 +17,11 @@ public interface Context extends Serializable {
 
     long[] getStepExecutionIds();
 
-    JobContext getJobContext();
+    MutableJobContext getJobContext();
 
-    void setJobContext(final JobContext jobContext);
+    void setJobContext(final MutableJobContext jobContext);
 
-    StepContext getStepContext();
+    MutableStepContext getStepContext();
 
-    void setStepContext(final StepContext stepContext);
+    void setStepContext(final MutableStepContext stepContext);
 }

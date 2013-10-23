@@ -1,7 +1,7 @@
 package io.machinecode.nock.test.cdi;
 
 import io.machinecode.nock.cdi.CdiArtifactLoader;
-import io.machinecode.nock.core.configuration.RuntimeConfigurationImpl;
+import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.test.core.transport.LocalTransportTest;
 import org.jboss.weld.environment.se.Weld;
@@ -17,13 +17,16 @@ public class CdiLocalTransportTest extends LocalTransportTest {
     private static Weld weld;
     private static WeldContainer container;
 
+    @Override
+    protected Builder _configuration() {
+        return super._configuration()
+                .setArtifactLoaders(new ArtifactLoader[]{ CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class) });
+    }
+
     @BeforeClass
     public static void beforeClass() {
         weld = new Weld();
         container = weld.initialize();
-        configuration = new RuntimeConfigurationImpl(configuration()
-                .setArtifactLoaders(new ArtifactLoader[]{ CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class) })
-                .build());
     }
 
     @AfterClass

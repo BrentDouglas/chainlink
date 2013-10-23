@@ -1,15 +1,13 @@
 package io.machinecode.nock.core.model.execution;
 
-import io.machinecode.nock.core.work.DeferredImpl;
 import io.machinecode.nock.core.work.PlanImpl;
-import io.machinecode.nock.core.work.execution.AfterExecution;
 import io.machinecode.nock.core.work.execution.RunExecution;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.execution.Flow;
 import io.machinecode.nock.spi.element.execution.Split;
+import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
-import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.TransitionWork;
 
@@ -46,22 +44,21 @@ public class SplitImpl extends ExecutionImpl implements Split {
     }
 
     @Override
-    public Deferred run(final Transport transport, final Context context) throws Exception {
+    public Plan run(final Transport transport, final Context context) throws Exception {
         final RunExecution[] flows = new RunExecution[this.flows.size()];
         for (int i = 0; i < flows.length; ++i) {
             flows[i] = new RunExecution(this.flows.get(i), context);
         }
-        return transport.execute(new PlanImpl(flows, TargetThread.ANY, Flow.ELEMENT)
-                .always(new PlanImpl(new AfterExecution(this, context), TargetThread.THIS, Flow.ELEMENT))
-        );
+        return new PlanImpl(flows, TargetThread.ANY, Flow.ELEMENT);
+                //.always(new PlanImpl(new AfterExecution(this, context), TargetThread.THIS, Flow.ELEMENT));
     }
 
     @Override
-    public Deferred after(final Transport transport, final Context context) throws Exception {
+    public Plan after(final Transport transport, final Context context) throws Exception {
         final ExecutionWork next = this.transitionOrSetStatus(transport, context, Collections.<TransitionWork>emptyList(), this.next);
         if (next != null) {
-            return transport.execute(next.plan(transport, context));
+            return next.plan(transport, context);
         }
-        return new DeferredImpl();
+        return null;//new DeferredImpl<Void>();
     }
 }

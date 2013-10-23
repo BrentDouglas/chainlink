@@ -29,19 +29,38 @@ public interface Repository {
 
     JobExecution createJobExecution(final JobInstance jobInstance) throws Exception;
 
+    /**
+     * Must have batch status set to {@link BatchStatus#STARTING} and exit status set to {@code STARTING}
+     *
+     * @param jobExecution
+     * @param step
+     * @return
+     * @throws Exception
+     */
     StepExecution createStepExecution(final JobExecution jobExecution, final Step<?,?> step) throws Exception;
 
     // Update
 
-    void startJobExecution(final long executionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    /**
+     * The {@link JobExecution} with {@param executionId} MUST have its batch status set to {@link BatchStatus#STARTED}
+     * after this method finishes.
+     *
+     * @param executionId
+     * @param timestamp
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException
+     */
+    void startJobExecution(final long executionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
     void updateJobExecution(final long executionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
     void finishJobExecution(final long executionId, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void finishJobExecution(final long executionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void updateStepExecution(final long stepExecutionId, final Serializable serializable, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void updateStepExecution(final long stepExecutionId, Serializable serializable, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void updateStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+
+    void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
     // JobOperator
 

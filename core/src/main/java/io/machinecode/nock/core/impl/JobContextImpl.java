@@ -1,15 +1,16 @@
 package io.machinecode.nock.core.impl;
 
+import io.machinecode.nock.spi.context.MutableJobContext;
+
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
-import javax.batch.runtime.context.JobContext;
 import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobContextImpl implements JobContext {
+public class JobContextImpl implements MutableJobContext {
     private final JobInstance instance;
     private final JobExecution execution;
     private final Properties properties;

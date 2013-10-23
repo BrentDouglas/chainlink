@@ -7,12 +7,15 @@ import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.work.DeferredImpl;
+import io.machinecode.nock.core.work.Status;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.spi.factory.PropertyContext;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.work.Listener;
 import io.machinecode.nock.spi.work.TaskWork;
+import org.jboss.logging.Logger;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -23,10 +26,10 @@ import java.util.concurrent.TimeoutException;
  */
 public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet> implements Batchlet, TaskWork {
 
+    private static final Logger log = Logger.getLogger(BatchletImpl.class);
+
     private final PartitionImpl<?> partition;
     private transient javax.batch.api.Batchlet batchlet;
-
-    private transient volatile boolean stopping = false;
 
     private final DeferredImpl<Void> delegate = new DeferredImpl<Void>(); //TODO transience?
 
@@ -49,7 +52,11 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             }
             batchlet = load(injectionContext);
         }
-        batchlet.process();
+        try {
+            batchlet.process();
+        } catch (final Exception e) {
+            Status.failedJob(transport.getRepository(), context.getJobExecutionId(), context.getStepContext().getExitStatus());
+        }
         if (partition != null) {
             partition.collect(this, transport, context);
         }
@@ -66,16 +73,21 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
+    public void addListener(final Listener listener) {
+        delegate.addListener(listener);
+    }
+
+    @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
         final boolean ret = delegate.cancel(mayInterruptIfRunning);
         if (batchlet != null) {
             try {
                 batchlet.stop();
             } catch (final Exception e) {
+                log.debugf(e, "Batchlet %s threw when calling stop", getRef()); //TODO Message
                 throw new TodoException(e);
             }
         }
-        //TODO Mark job and step batch status STOPPED
         return ret;
     }
 

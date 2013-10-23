@@ -1,7 +1,10 @@
 package io.machinecode.nock.core.work;
 
+import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.spi.work.Deferred;
+import io.machinecode.nock.spi.work.Listener;
 
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -12,13 +15,15 @@ import java.util.concurrent.TimeoutException;
  */
 public class DeferredImpl<T> implements Deferred<T> {
 
-    private final Deferred[] chain;
+    protected final Deferred<?>[] chain;
 
-    private volatile boolean cancelled = false;
-    private volatile boolean done = false;
-    private volatile T value;
+    protected volatile boolean cancelled = false;
+    protected volatile boolean done = false;
+    protected volatile T value;
 
-    public DeferredImpl(final Deferred... chain) {
+    protected final Set<Runnable> listeners = new THashSet<Runnable>();
+
+    public DeferredImpl(final Deferred<?>... chain) {
         this.chain = chain;
     }
 
@@ -26,7 +31,15 @@ public class DeferredImpl<T> implements Deferred<T> {
     public synchronized void resolve(final T that) {
         this.done = true;
         this.value = that;
+        for (final Runnable listener : listeners) {
+            listener.run();
+        }
         notifyAll();
+    }
+
+    @Override
+    public synchronized void addListener(final Listener listener) {
+        listeners.add(listener);
     }
 
     @Override
@@ -39,7 +52,7 @@ public class DeferredImpl<T> implements Deferred<T> {
             boolean cancelled = true;
             RuntimeException exception = null;
             if (chain != null) {
-                for (final Deferred that : chain) {
+                for (final Deferred<?> that : chain) {
                     try {
                         cancelled = that.cancel(mayInterruptIfRunning) && cancelled;
                     } catch (final RuntimeException e) {
@@ -79,9 +92,7 @@ public class DeferredImpl<T> implements Deferred<T> {
             if (cancelled) {
                 throw new CancellationException();
             }
-            if (!done) {
-                wait();
-            }
+            await();
         }
         if (cancelled) {
             throw new CancellationException();
@@ -98,9 +109,7 @@ public class DeferredImpl<T> implements Deferred<T> {
             if (cancelled) {
                 throw new CancellationException();
             }
-            if (!done) {
-                wait(unit.toMillis(timeout));
-            }
+            await(timeout, unit);
         }
         if (cancelled) {
             throw new CancellationException();
@@ -109,5 +118,17 @@ public class DeferredImpl<T> implements Deferred<T> {
             throw new TimeoutException();
         }
         return value;
+    }
+
+    protected void await() throws InterruptedException {
+        if (!done) {
+            wait();
+        }
+    }
+
+    protected void await(final long timeout, final TimeUnit unit) throws InterruptedException {
+        if (!done) {
+            wait(unit.toMillis(timeout));
+        }
     }
 }

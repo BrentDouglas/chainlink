@@ -3,7 +3,6 @@ package io.machinecode.nock.core.model;
 import io.machinecode.nock.core.impl.JobContextImpl;
 import io.machinecode.nock.core.model.execution.ExecutionImpl;
 import io.machinecode.nock.core.util.PropertiesConverter;
-import io.machinecode.nock.core.work.DeferredImpl;
 import io.machinecode.nock.core.work.PlanImpl;
 import io.machinecode.nock.core.work.Status;
 import io.machinecode.nock.core.work.job.AfterJob;
@@ -19,9 +18,9 @@ import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
-import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.JobWork;
+import org.jboss.logging.Logger;
 
 import javax.batch.api.listener.JobListener;
 import java.util.List;
@@ -30,6 +29,8 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class JobImpl implements Job, JobWork {
+
+    private static final Logger log = Logger.getLogger(JobImpl.class);
 
     private final String id;
     private final String version;
@@ -122,11 +123,11 @@ public class JobImpl implements Job, JobWork {
     }
 
     @Override
-    public Deferred run(final Transport transport, final Context context) throws Exception {
+    public Plan run(final Transport transport, final Context context) throws Exception {
         if (Status.isStopping(context) || Status.isComplete(context)) {
-            return new DeferredImpl();
+            return null;
         }
-        return transport.execute(this.executions.get(0).plan(transport, context));
+        return this.executions.get(0).plan(transport, context);
     }
 
     @Override
@@ -164,13 +165,12 @@ public class JobImpl implements Job, JobWork {
     public Plan plan(final Transport transport, final Context context) {
         final RunJob run = new RunJob(this, context);
         final AfterJob after = new AfterJob(this, context);
-        final FailJob fail = new FailJob(context);
+        final FailJob fail = new FailJob(this, context);
 
         final PlanImpl runPlan = new PlanImpl(run, TargetThread.ANY, element());
         final PlanImpl afterPlan = new PlanImpl(after, TargetThread.that(run), element());
         final PlanImpl failPlan = new PlanImpl(fail, TargetThread.that(run), element());
 
-        after.register(transport.wrapSynchronization(run));
         runPlan.fail(failPlan)
             .always(afterPlan.fail(failPlan));
 

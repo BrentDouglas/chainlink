@@ -11,6 +11,7 @@ import io.machinecode.nock.spi.factory.PropertyContext;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.TaskWork;
+import org.jboss.logging.Logger;
 
 import javax.batch.api.chunk.CheckpointAlgorithm;
 import javax.batch.api.chunk.ItemProcessor;
@@ -39,6 +40,8 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
+
+    private static final Logger log = Logger.getLogger(ChunkImpl.class);
 
     private final String checkpointPolicy;
     private final String itemCount;
@@ -303,6 +306,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
                 }
             }
         } catch (final Exception e) {
+            log.debugf(e, "Chunk threw "); //TODO Message
             state.transactionManager.setRollbackOnly();
             error(state, e);
             state.transactionManager.rollback();

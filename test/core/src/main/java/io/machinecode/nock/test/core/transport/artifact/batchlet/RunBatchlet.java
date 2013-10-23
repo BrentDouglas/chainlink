@@ -1,4 +1,4 @@
-package io.machinecode.nock.test.core.transport.artifact;
+package io.machinecode.nock.test.core.transport.artifact.batchlet;
 
 import io.machinecode.nock.jsl.util.Reference;
 

@@ -1,14 +1,15 @@
 package io.machinecode.nock.core.work;
 
+import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.spi.transport.Executable;
 import io.machinecode.nock.spi.transport.Result;
-import io.machinecode.nock.spi.transport.Synchronization;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.Deferred;
+import io.machinecode.nock.spi.work.Listener;
+import io.machinecode.nock.spi.work.Work;
 import org.jboss.logging.Logger;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -17,25 +18,26 @@ import java.util.concurrent.TimeoutException;
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public abstract class ExecutableImpl extends SynchronisationImpl implements Executable {
+public abstract class ExecutableImpl<T extends Work> implements Executable<T> {
 
     private static final Logger log = Logger.getLogger(ExecutableImpl.class);
-
-    private final List<Synchronization> synchronizations = new LinkedList<Synchronization>();
 
     private volatile boolean running = false;
     private volatile boolean cancelled = false;
     private volatile boolean done = false;
     private volatile Deferred<?> chain;
 
+    private final Set<Listener> listeners = new THashSet<Listener>(0);
+
+    protected final T work;
+
+    protected ExecutableImpl(final T work) {
+        this.work = work;
+    }
+
     @Override
-    public synchronized ExecutableImpl register(final Synchronization synchronization) {
-        if (running) {
-            throw new IllegalStateException();
-        }
-        synchronization.take();
-        synchronizations.add(synchronization);
-        return this;
+    public T getWork() {
+        return work;
     }
 
     @Override
@@ -50,11 +52,6 @@ public abstract class ExecutableImpl extends SynchronisationImpl implements Exec
             running = true;
         }
         try {
-            while (!available()) {
-                synchronized (this) {
-                    wait();
-                }
-            }
             chain = run(transport);
             chain.resolve(null);
             return ResultImpl.FINISHED;
@@ -63,16 +60,25 @@ public abstract class ExecutableImpl extends SynchronisationImpl implements Exec
             return new ResultImpl(e);
         } finally {
             resolve(null);
-            for (final Synchronization synchronization : synchronizations) {
-                synchronization.release();
-            }
         }
     }
 
     @Override
     public synchronized void resolve(final Void _) {
         this.done = true;
+        synchronized (listeners) {
+            for (final Runnable listener : listeners) {
+                listener.run();
+            }
+        }
         notifyAll();
+    }
+
+    @Override
+    public void addListener(final Listener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
     }
 
     @Override

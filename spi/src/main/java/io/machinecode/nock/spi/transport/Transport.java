@@ -5,6 +5,7 @@ import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.work.Bucket;
 import io.machinecode.nock.spi.work.Deferred;
+import io.machinecode.nock.spi.work.JobWork;
 import io.machinecode.nock.spi.work.TaskWork;
 
 import javax.transaction.TransactionManager;
@@ -16,11 +17,17 @@ public interface Transport {
 
     TransactionManager getTransactionManager();
 
-    Repository getRepository() throws Exception;
+    Repository getRepository();
 
-    Deferred execute(Plan plan);
+    Context getContext(long jobExecutionId);
 
-    Synchronization wrapSynchronization(Synchronization synchronization);
+    Deferred<?> getJob(long jobExecutionId);
+
+    Deferred<?> execute(long jobExecutionId, Executable executable, Plan plan);
+
+    Deferred<?> executeJob(long jobExecutionId, JobWork job, Context context);
+
+    void finishJob(long jobExecutionId);
 
     InjectionContext createInjectionContext(Context context);
 

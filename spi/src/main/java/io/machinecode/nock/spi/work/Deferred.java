@@ -8,4 +8,6 @@ import java.util.concurrent.Future;
 public interface Deferred<T> extends Future<T> {
 
     void resolve(final T that);
+
+    void addListener(final Listener listener);
 }

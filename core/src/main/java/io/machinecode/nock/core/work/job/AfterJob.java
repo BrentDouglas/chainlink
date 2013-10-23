@@ -8,25 +8,29 @@ import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.JobWork;
 
+import javax.batch.runtime.context.JobContext;
+
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class AfterJob extends ExecutableImpl {
-    final JobWork work;
-    final Context context;
+public class AfterJob extends ExecutableImpl<JobWork> {
+    final long jobExecutionId;
 
     public AfterJob(final JobWork work, final Context context) {
-        this.work = work;
-        this.context = context;
+        super(work);
+        this.jobExecutionId = context.getJobExecutionId();
     }
 
     @Override
-    public Deferred run(final Transport transport) throws Exception {
+    public Deferred<?> run(final Transport transport) throws Exception {
+        final Context context = transport.getContext(jobExecutionId);
+        final JobContext jobContext = context.getJobContext();
         try {
             work.after(transport, context);
-            return new DeferredImpl();
+            return new DeferredImpl<Void>();
         } finally {
-            Status.postJob(transport, context);
+            Status.postJob(transport.getRepository(), jobExecutionId, jobContext.getBatchStatus(), jobContext.getExitStatus());
+            transport.finishJob(jobExecutionId);
         }
     }
 }

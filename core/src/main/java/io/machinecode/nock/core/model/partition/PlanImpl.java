@@ -49,7 +49,7 @@ public class PlanImpl implements Plan, StrategyWork {
 
     private static class PartitionPlanImpl implements PartitionPlan {
         private int partitions;
-        private boolean override; //Where does this come from
+        private boolean override; //TODO Where does this come from
         private int threads;
         private Properties[] properties;
 

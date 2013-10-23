@@ -1,16 +1,17 @@
 package io.machinecode.nock.core.impl;
 
+import io.machinecode.nock.spi.context.MutableStepContext;
+
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
-import javax.batch.runtime.context.StepContext;
 import java.io.Serializable;
 import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class StepContextImpl implements StepContext {
+public class StepContextImpl implements MutableStepContext {
     private final StepExecution execution;
     private final Properties properties;
     private String exitStatus;
@@ -82,5 +83,10 @@ public class StepContextImpl implements StepContext {
     @Override
     public Metric[] getMetrics() {
         return metrics;
+    }
+
+    @Override
+    public void setException(final Exception exception) {
+        this.exception = exception;
     }
 }

@@ -2,6 +2,7 @@
 <batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/batchXML_1_0.xsd">
-    <ref id="run-batchlet" class="io.machinecode.nock.test.core.transport.artifact.RunBatchlet" />
-    <ref id="stop-batchlet" class="io.machinecode.nock.test.core.transport.artifact.StopBatchlet" />
+    <ref id="run-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.RunBatchlet" />
+    <ref id="stop-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.StopBatchlet" />
+    <ref id="fail-batchlet" class="io.machinecode.nock.test.core.transport.artifact.batchlet.FailBatchlet" />
 </batch-artifacts>

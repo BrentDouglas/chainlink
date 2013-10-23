@@ -1,7 +1,6 @@
 package io.machinecode.nock.core.model.partition;
 
 import io.machinecode.nock.core.expression.PropertyContextImpl;
-import io.machinecode.nock.core.work.SynchronisationImpl;
 import io.machinecode.nock.core.work.task.RunTask;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.partition.Partition;
@@ -13,6 +12,7 @@ import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.PartitionWork;
 import io.machinecode.nock.spi.work.StrategyWork;
 import io.machinecode.nock.spi.work.TaskWork;
+import org.jboss.logging.Logger;
 
 import javax.batch.api.partition.PartitionAnalyzer;
 import javax.batch.api.partition.PartitionCollector;
@@ -28,6 +28,8 @@ import java.util.Properties;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class PartitionImpl<T extends StrategyWork> implements Partition<T>, PartitionWork<T> {
+
+    private static final Logger log = Logger.getLogger(PartitionImpl.class);
 
     private final CollectorImpl collector;
     private final AnalyserImpl analyser;
@@ -125,8 +127,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         }
         transport.setBucket(
                 new Bucket(
-                        new Serializable[partitions],
-                        transport.wrapSynchronization(new SynchronisationImpl())
+                        new Serializable[partitions]
                 ),
                 task
         );
@@ -173,7 +174,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
             }
             transactionManager.commit();
         } catch (final Exception e) {
-            //log.error("", e); //TODO Log this?
+            log.debugf(e, "");
             partitionStatus = PartitionStatus.ROLLBACK;
             transactionManager.setRollbackOnly();
             if (reducer != null) {
