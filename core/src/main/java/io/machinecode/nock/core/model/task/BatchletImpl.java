@@ -7,7 +7,6 @@ import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.work.DeferredImpl;
-import io.machinecode.nock.core.work.Status;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.spi.factory.PropertyContext;
@@ -54,11 +53,10 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         }
         try {
             batchlet.process();
-        } catch (final Exception e) {
-            Status.failedJob(transport.getRepository(), context.getJobExecutionId(), context.getStepContext().getExitStatus());
-        }
-        if (partition != null) {
-            partition.collect(this, transport, context);
+        } finally {
+            if (partition != null) {
+                partition.collect(this, transport, context);
+            }
         }
     }
 

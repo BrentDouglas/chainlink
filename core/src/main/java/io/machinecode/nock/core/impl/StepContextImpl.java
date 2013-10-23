@@ -6,6 +6,7 @@ import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -14,6 +15,7 @@ import java.util.Properties;
 public class StepContextImpl implements MutableStepContext {
     private final StepExecution execution;
     private final Properties properties;
+    private BatchStatus batchStatus;
     private String exitStatus;
     private Object transientUserData;
     private Serializable persistentUserData;
@@ -23,6 +25,8 @@ public class StepContextImpl implements MutableStepContext {
     public StepContextImpl(final StepExecution execution, final Properties properties) {
         this.execution = execution;
         this.properties = properties;
+        this.batchStatus = execution.getBatchStatus();
+        this.exitStatus = null;
     }
 
     @Override
@@ -62,7 +66,12 @@ public class StepContextImpl implements MutableStepContext {
 
     @Override
     public BatchStatus getBatchStatus() {
-        return execution.getBatchStatus();
+        return batchStatus;
+    }
+
+    @Override
+    public void setBatchStatus(final BatchStatus batchStatus) {
+        this.batchStatus = batchStatus;
     }
 
     @Override
@@ -81,12 +90,17 @@ public class StepContextImpl implements MutableStepContext {
     }
 
     @Override
-    public Metric[] getMetrics() {
-        return metrics;
+    public void setException(final Exception exception) {
+        this.exception = exception;
     }
 
     @Override
-    public void setException(final Exception exception) {
-        this.exception = exception;
+    public Metric[] getMetrics() {
+        return Arrays.copyOf(metrics, metrics.length);
+    }
+
+    @Override
+    public void setMetrics(final Metric[] metrics) {
+        this.metrics = metrics;
     }
 }

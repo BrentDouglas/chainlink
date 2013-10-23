@@ -6,7 +6,7 @@ import io.machinecode.nock.core.factory.JobFactory;
 import io.machinecode.nock.core.local.LocalTransportFactory;
 import io.machinecode.nock.core.model.JobImpl;
 import io.machinecode.nock.core.util.ResolvableService;
-import io.machinecode.nock.core.work.ContextImpl;
+import io.machinecode.nock.core.impl.ContextImpl;
 import io.machinecode.nock.core.work.Status;
 import io.machinecode.nock.spi.Repository;
 import io.machinecode.nock.spi.context.Context;
@@ -15,6 +15,7 @@ import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.transport.TransportFactory;
 import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Deferred;
+import io.machinecode.nock.spi.work.JobWork;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
@@ -98,21 +99,39 @@ public class JobOperatorImpl implements JobOperator {
             final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, jobParameters);
             JobFactory.INSTANCE.validate(job);
 
-            final Repository repository = transport.getRepository();
-            final JobInstance instance = repository.createJobInstance(job);
-            final JobExecution execution = repository.createJobExecution(instance);
-            final long jobExecutionId = execution.getExecutionId();
-            final Context context = new ContextImpl(
-                    job,
-                    instance.getInstanceId(),
-                    jobExecutionId
-            );
-            Status.startedJob(repository, jobExecutionId);
-            transport.executeJob(jobExecutionId, job, context);
-            return jobExecutionId;
+            return start(job).id;
         } catch (final Exception e) {
             throw new JobStartException(e);
         }
+    }
+
+    public static class Start {
+        public final long id;
+        public final Deferred<?> deferred;
+
+        public Start(final long id, final Deferred<?> deferred) {
+            this.id = id;
+            this.deferred = deferred;
+        }
+    }
+
+    public Start start(final JobWork job) throws Exception {
+        JobFactory.INSTANCE.validate(job);
+
+        final Repository repository = transport.getRepository();
+        final JobInstance instance = repository.createJobInstance(job);
+        final JobExecution execution = repository.createJobExecution(instance);
+        final long jobExecutionId = execution.getExecutionId();
+        final Context context = new ContextImpl(
+                job,
+                instance.getInstanceId(),
+                jobExecutionId
+        );
+        Status.startedJob(repository, jobExecutionId);
+        return new Start(
+                jobExecutionId,
+                transport.executeJob(jobExecutionId, job, context)
+        );
     }
 
     @Override
@@ -160,7 +179,8 @@ public class JobOperatorImpl implements JobOperator {
         }
         Status.stoppingJob(repository, executionId);
         deferred.cancel(true);
-        //Status.stoppedJob(repository, executionId);
+        final Context context = transport.getContext(executionId);
+        Status.stoppedJob(repository, executionId, context.getJobContext().getExitStatus());
     }
 
     @Override

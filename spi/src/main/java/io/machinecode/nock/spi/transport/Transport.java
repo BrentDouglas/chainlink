@@ -27,7 +27,7 @@ public interface Transport {
 
     Deferred<?> executeJob(long jobExecutionId, JobWork job, Context context);
 
-    void finishJob(long jobExecutionId);
+    void finalizeJob(long jobExecutionId);
 
     InjectionContext createInjectionContext(Context context);
 

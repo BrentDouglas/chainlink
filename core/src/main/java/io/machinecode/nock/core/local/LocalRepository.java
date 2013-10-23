@@ -167,6 +167,7 @@ public class LocalRepository implements Repository {
                     .setUpdated(timestamp)
                     .setStart(timestamp)
                     .setBatchStatus(BatchStatus.STARTED)
+                    .setExitStatus(BatchStatus.STARTED.name())
                     .build()
             );
         } finally {
@@ -185,6 +186,7 @@ public class LocalRepository implements Repository {
             jobExecutions.put(executionId, JobExecutionImpl.from(execution)
                     .setUpdated(timestamp)
                     .setBatchStatus(batchStatus)
+                    .setExitStatus(batchStatus.name())
                     .build()
             );
         } finally {
@@ -239,6 +241,7 @@ public class LocalRepository implements Repository {
              }
             stepExecutions.put(executionId, StepExecutionImpl.from(execution)
                     .setBatchStatus(batchStatus)
+                    .setExitStatus(batchStatus.name())
                     .build()
             );
         } finally {

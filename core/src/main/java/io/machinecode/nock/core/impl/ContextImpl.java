@@ -1,4 +1,4 @@
-package io.machinecode.nock.core.work;
+package io.machinecode.nock.core.impl;
 
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.context.MutableJobContext;
@@ -13,15 +13,15 @@ public class ContextImpl implements Context {
     private final JobWork job;
     private final long jobInstanceId;
     private final long jobExecutionId;
-    private final long[] stepExecutionIds;
+    private final ThreadLocal<long[]> stepExecutionIds = new ThreadLocal<long[]>(); //TODO Probably can't be a threadlocal. Think about this
     private MutableJobContext jobContext;
     private final ThreadLocal<MutableStepContext> stepContext = new ThreadLocal<MutableStepContext>();
+    private Exception exception;
 
-    public ContextImpl(final JobWork job, final long jobInstanceId, final long jobExecutionId, final long... stepExecutionIds) {
+    public ContextImpl(final JobWork job, final long jobInstanceId, final long jobExecutionId) {
         this.job = job;
         this.jobInstanceId = jobInstanceId;
         this.jobExecutionId = jobExecutionId;
-        this.stepExecutionIds = stepExecutionIds;
     }
 
     @Override
@@ -41,7 +41,12 @@ public class ContextImpl implements Context {
 
     @Override
     public long[] getStepExecutionIds() {
-        return stepExecutionIds; //TODO This is wrong
+        return stepExecutionIds.get();
+    }
+
+    @Override
+    public void setStepExecutionIds(final long[] stepExecutionIds) {
+        this.stepExecutionIds.set(stepExecutionIds);
     }
 
     @Override
@@ -62,5 +67,15 @@ public class ContextImpl implements Context {
     @Override
     public void setStepContext(final MutableStepContext stepContext) {
         this.stepContext.set(stepContext);
+    }
+
+    @Override
+    public Exception getException() {
+        return exception;
+    }
+
+    @Override
+    public void setException(final Exception exception) {
+        this.exception = exception;
     }
 }

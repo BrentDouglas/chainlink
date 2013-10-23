@@ -3,7 +3,7 @@ package io.mackinecode.nock.test.spring;
 import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.nock.inject.spring.SpringArtifactLoader;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
-import io.machinecode.nock.test.core.transport.LocalTransportTest;
+import io.machinecode.nock.test.core.transport.TransportTest;
 import org.junit.BeforeClass;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -11,7 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class SpringLocalTransportTest extends LocalTransportTest {
+public class SpringLocalTransportTest extends TransportTest {
 
     private static AbstractApplicationContext context;
 

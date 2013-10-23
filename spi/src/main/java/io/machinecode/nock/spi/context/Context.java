@@ -17,6 +17,8 @@ public interface Context extends Serializable {
 
     long[] getStepExecutionIds();
 
+    void setStepExecutionIds(final long[] stepExecutionIds);
+
     MutableJobContext getJobContext();
 
     void setJobContext(final MutableJobContext jobContext);
@@ -24,4 +26,8 @@ public interface Context extends Serializable {
     MutableStepContext getStepContext();
 
     void setStepContext(final MutableStepContext stepContext);
+
+    Exception getException();
+
+    void setException(Exception exception);
 }

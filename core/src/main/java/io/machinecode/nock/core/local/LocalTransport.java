@@ -225,7 +225,7 @@ public class LocalTransport implements Transport {
     }
 
     @Override
-    public void finishJob(final long jobExecutionId) {
+    public void finalizeJob(final long jobExecutionId) {
         _evictChildren(jobExecutionId);
         _evictContext(jobExecutionId);
         final Deferred<?> job = _evictJob(jobExecutionId);

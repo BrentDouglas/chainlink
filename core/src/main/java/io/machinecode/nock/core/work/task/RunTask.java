@@ -22,7 +22,11 @@ public class RunTask extends ExecutableImpl<TaskWork> {
     @Override
     public Deferred<?> run(final Transport transport) throws Exception {
         final Context context = transport.getContext(jobExecutionId);
-        work.run(transport, context, timeout);
+        try {
+            work.run(transport, context, timeout);
+        } catch (final Exception e) {
+            context.setException(e);
+        }
         return work;
     }
 

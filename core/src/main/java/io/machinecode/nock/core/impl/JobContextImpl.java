@@ -15,12 +15,15 @@ public class JobContextImpl implements MutableJobContext {
     private final JobExecution execution;
     private final Properties properties;
     private Object transientUserData;
+    private BatchStatus batchStatus;
     private String exitStatus;
 
     public JobContextImpl(final JobInstance instance, final JobExecution execution, final Properties properties) {
         this.instance = instance;
         this.execution = execution;
         this.properties = properties;
+        this.batchStatus = execution.getBatchStatus();
+        this.exitStatus = null;
     }
 
     @Override
@@ -55,7 +58,12 @@ public class JobContextImpl implements MutableJobContext {
 
     @Override
     public BatchStatus getBatchStatus() {
-        return execution.getBatchStatus();
+        return batchStatus;
+    }
+
+    @Override
+    public void setBatchStatus(final BatchStatus batchStatus) {
+        this.batchStatus = batchStatus;
     }
 
     @Override

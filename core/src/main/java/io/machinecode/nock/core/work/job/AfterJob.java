@@ -29,8 +29,12 @@ public class AfterJob extends ExecutableImpl<JobWork> {
             work.after(transport, context);
             return new DeferredImpl<Void>();
         } finally {
-            Status.postJob(transport.getRepository(), jobExecutionId, jobContext.getBatchStatus(), jobContext.getExitStatus());
-            transport.finishJob(jobExecutionId);
+            if (context.getException() == null) {
+                Status.completedJob(transport.getRepository(), jobExecutionId, jobContext.getExitStatus());
+            } else {
+                Status.failedJob(transport.getRepository(), jobExecutionId, jobContext.getExitStatus());
+            }
+            transport.finalizeJob(jobExecutionId);
         }
     }
 }
