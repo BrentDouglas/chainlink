@@ -1,7 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.spi.element.Property;
-import io.machinecode.nock.jsl.xml.util.Copyable;
+import io.machinecode.nock.jsl.inherit.InheritableProperty;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -13,7 +12,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlAccessorType(NONE)
 //@XmlType(name = "Property")
-public class XmlProperty implements Copyable<XmlProperty>, Property {
+public class XmlProperty implements InheritableProperty<XmlProperty> {
 
     @XmlAttribute(name = "name", required = true)
     private String name;
@@ -49,8 +48,9 @@ public class XmlProperty implements Copyable<XmlProperty>, Property {
 
     @Override
     public XmlProperty copy(final XmlProperty that) {
-        that.setName(this.name);
-        that.setValue(this.value);
-        return that;
+        return PropertyTool.copy(this, that);
+        //that.setName(this.name);
+        //that.setValue(this.value);
+        //return that;
     }
 }

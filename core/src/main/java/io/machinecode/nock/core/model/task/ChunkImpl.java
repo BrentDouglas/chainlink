@@ -4,7 +4,7 @@ import io.machinecode.nock.core.factory.task.ChunkFactory;
 import io.machinecode.nock.core.model.ListenersImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.work.DeferredImpl;
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.task.Chunk;
 import io.machinecode.nock.spi.factory.PropertyContext;
@@ -236,7 +236,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
 
     @Override
     public void run(final Transport transport, final Context context, final int timeout) throws Exception {
-        final Repository repository = transport.getRepository();
+        final ExecutionRepository repository = transport.getRepository();
         final StepContext stepContext = context.getStepContext();
         final State state = new State(
                 transport.createInjectionContext(context),

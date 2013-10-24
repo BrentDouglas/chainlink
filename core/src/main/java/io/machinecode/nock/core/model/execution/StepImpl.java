@@ -10,7 +10,7 @@ import io.machinecode.nock.core.model.transition.TransitionImpl;
 import io.machinecode.nock.core.util.PropertiesConverter;
 import io.machinecode.nock.core.work.PlanImpl;
 import io.machinecode.nock.core.work.task.RunTask;
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.inject.InjectionContext;
@@ -143,7 +143,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
 
     @Override
     public Plan before(final Transport transport, final Context context) throws Exception {
-        final Repository repository = transport.getRepository();
+        final ExecutionRepository repository = transport.getRepository();
         final JobExecution jobExecution = repository.getJobExecution(context.getJobExecutionId());
         final StepExecution stepExecution = repository.createStepExecution(jobExecution, this);
         if (stepExecution.getBatchStatus() != BatchStatus.STARTING
@@ -207,7 +207,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                 }
             }
             final StepContext stepContext = context.getStepContext();
-            final Repository repository = transport.getRepository();
+            final ExecutionRepository repository = transport.getRepository();
             repository.updateStepExecution(stepContext.getStepExecutionId(), stepContext.getPersistentUserData(), new Date());
             if (exception != null) {
                 throw exception;

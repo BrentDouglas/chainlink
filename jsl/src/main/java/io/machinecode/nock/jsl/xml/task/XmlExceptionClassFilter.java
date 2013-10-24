@@ -1,8 +1,7 @@
 package io.machinecode.nock.jsl.xml.task;
 
-import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
-import io.machinecode.nock.jsl.xml.util.MergeableList;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.jsl.inherit.task.InheritableExceptionClassFilter;
+import io.machinecode.nock.jsl.xml.XmlMergeableList;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -19,7 +18,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "includes",
 //        "excludes"
 //})
-public class XmlExceptionClassFilter extends MergeableList<XmlExceptionClassFilter> implements ExceptionClassFilter {
+public class XmlExceptionClassFilter extends XmlMergeableList<XmlExceptionClassFilter> implements InheritableExceptionClassFilter<XmlExceptionClassFilter, XmlExceptionClass> {
 
     @XmlElement(name = "include", namespace = NAMESPACE, required = false)
     private List<XmlExceptionClass> includes;
@@ -53,17 +52,19 @@ public class XmlExceptionClassFilter extends MergeableList<XmlExceptionClassFilt
 
     @Override
     public XmlExceptionClassFilter copy(final XmlExceptionClassFilter that) {
-        that.setIncludes(Util.copyList(this.includes));
-        that.setExcludes(Util.copyList(this.excludes));
-        return that;
+        return ExceptionClassFilterTool.copy(this, that);
+        //that.setIncludes(Util.copyList(this.includes));
+        //that.setExcludes(Util.copyList(this.excludes));
+        //return that;
     }
 
     @Override
     public XmlExceptionClassFilter merge(final XmlExceptionClassFilter that) {
-        if (this.merge) {
-            this.includes = Util.listRule(this.includes, that.includes);
-            this.excludes = Util.listRule(this.excludes, that.includes);
-        }
-        return this;
+        return ExceptionClassFilterTool.merge(this, that);
+        //if (this.merge) {
+        //    this.includes = Util.listRule(this.includes, that.includes);
+        //    this.excludes = Util.listRule(this.excludes, that.excludes);
+        //}
+        //return this;
     }
 }

@@ -1,11 +1,9 @@
-package io.machinecode.nock.jsl.xml.loader;
-
-import io.machinecode.nock.jsl.xml.util.Inheritable;
+package io.machinecode.nock.spi;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Repository {
+public interface JobRepository {
 
     /**
      *
@@ -16,7 +14,7 @@ public interface Repository {
      * @return The parent element.
      * @throws ParentNotFoundException If the parent element is not in this repository.
      */
-    <T extends Inheritable<T>> T findParent(final Class<T> clazz, final T that, final String defaultJobXml) throws ParentNotFoundException;
+    <T extends InheritableElement<T>> T findParent(final Class<T> clazz, final T that, final String defaultJobXml) throws ParentNotFoundException;
 
     /**
      *
@@ -27,5 +25,5 @@ public interface Repository {
      * @return The parent element.
      * @throws ParentNotFoundException If the parent element is not in this repository.
      */
-    <T extends Inheritable<T>> T findParent(final Class<T> clazz, final String id, String jslName) throws ParentNotFoundException;
+    <T extends InheritableElement<T>> T findParent(final Class<T> clazz, final String id, String jslName) throws ParentNotFoundException;
 }

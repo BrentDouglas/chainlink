@@ -1,8 +1,6 @@
 package io.machinecode.nock.jsl.xml.partition;
 
-import io.machinecode.nock.spi.element.partition.Partition;
-import io.machinecode.nock.jsl.xml.util.Copyable;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.jsl.inherit.InheritablePartition;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -21,7 +19,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "analyzer",
 //        "reducer"
 //})
-public class XmlPartition implements Copyable<XmlPartition>, Partition {
+public class XmlPartition implements InheritablePartition<XmlPartition, XmlStrategy, XmlCollector, XmlAnalyser, XmlReducer> {
 
     @XmlElements({
             @XmlElement(name = "plan", namespace = NAMESPACE, required = false, type = XmlPlan.class),
@@ -85,10 +83,11 @@ public class XmlPartition implements Copyable<XmlPartition>, Partition {
 
     @Override
     public XmlPartition copy(final XmlPartition that) {
-        that.setStrategy(Util.copy(this.strategy));
-        that.setCollector(Util.copy(this.collector));
-        that.setAnalyzer(Util.copy(this.analyzer));
-        that.setReducer(Util.copy(this.reducer));
-        return that;
+        return PartitionTool.copy(this, that);
+        //that.setStrategy(Util.copy(this.strategy));
+        //that.setCollector(Util.copy(this.collector));
+        //that.setAnalyzer(Util.copy(this.analyzer));
+        //that.setReducer(Util.copy(this.reducer));
+        //return that;
     }
 }

@@ -1,8 +1,6 @@
 package io.machinecode.nock.jsl.xml.task;
 
-import io.machinecode.nock.spi.element.task.ExceptionClass;
-import io.machinecode.nock.jsl.xml.util.Mergeable;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.jsl.inherit.task.InheritableExceptionClass;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -13,7 +11,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlExceptionClass implements Mergeable<XmlExceptionClass>, ExceptionClass {
+public class XmlExceptionClass implements InheritableExceptionClass<XmlExceptionClass> {
 
     @XmlAttribute(name = "class", required = true)
     private String className;
@@ -35,13 +33,15 @@ public class XmlExceptionClass implements Mergeable<XmlExceptionClass>, Exceptio
 
     @Override
     public XmlExceptionClass copy(final XmlExceptionClass that) {
-        that.setClassName(this.className);
-        return that;
+        return ExceptionClassTool.copy(this, that);
+        //that.setClassName(this.className);
+        //return that;
     }
 
     @Override
     public XmlExceptionClass merge(final XmlExceptionClass that) {
-        this.setClassName(Util.attributeRule(this.className, that.className));
-        return this;
+        return ExceptionClassTool.merge(this, that);
+        //this.setClassName(Util.attributeRule(this.className, that.className));
+        //return this;
     }
 }

@@ -1,14 +1,12 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.jsl.xml.loader.Repository;
-import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.jsl.inherit.InheritableJob;
 import io.machinecode.nock.jsl.xml.execution.XmlDecision;
 import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 import io.machinecode.nock.jsl.xml.execution.XmlFlow;
 import io.machinecode.nock.jsl.xml.execution.XmlSplit;
 import io.machinecode.nock.jsl.xml.execution.XmlStep;
-import io.machinecode.nock.jsl.xml.util.Inheritable;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.spi.JobRepository;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -33,7 +31,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "listeners",
 //        "executions"
 //})
-public class XmlJob extends Inheritable<XmlJob> implements Job {
+public class XmlJob extends XmlInheritableBase<XmlJob> implements InheritableJob<XmlJob, XmlProperties, XmlListeners, XmlExecution> {
 
     @XmlID
     @XmlSchemaType(name = "ID")
@@ -117,23 +115,24 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
     }
 
     @Override
-    public XmlJob inherit(final Repository repository, final String defaultJobXml) {
-        final XmlJob copy = this.copy();
-        if (copy.parent != null) {
-            final XmlJob that = repository.findParent(XmlJob.class, copy, defaultJobXml);
-
-            that.getExecutions().clear(); // 4.6.1.1
-
-            copy.inheritingElementRule(that); // 4.6.1.2
-
-            // 4.4
-            copy.properties = Util.merge(copy.properties, that.properties);
-            copy.listeners = Util.merge(copy.listeners, that.listeners);
-            // 4.1
-            copy.restartable = Util.attributeRule(copy.restartable, that.restartable); // 4.4.1
-        }
-        copy.executions = Util.inheritingList(repository, defaultJobXml, this.executions);
-        return copy;
+    public XmlJob inherit(final JobRepository repository, final String defaultJobXml) {
+        return JobTool.inherit(XmlJob.class, this, repository, defaultJobXml);
+        //final XmlJob copy = this.copy();
+        //if (copy.parent != null) {
+        //    final XmlJob that = repository.findParent(XmlJob.class, copy, defaultJobXml);
+//
+        //    that.getExecutions().clear(); // 4.6.1.1
+//
+        //    copy.inheritingElementRule(that); // 4.6.1.2
+//
+        //    // 4.4
+        //    copy.properties = Util.merge(copy.properties, that.properties);
+        //    copy.listeners = Util.merge(copy.listeners, that.listeners);
+        //    // 4.1
+        //    copy.restartable = Util.attributeRule(copy.restartable, that.restartable); // 4.4.1
+        //}
+        //copy.executions = Util.inheritingList(repository, defaultJobXml, this.executions);
+        //return copy;
     }
 
     @Override
@@ -143,12 +142,13 @@ public class XmlJob extends Inheritable<XmlJob> implements Job {
 
     @Override
     public XmlJob copy(final XmlJob that) {
-        super.copy(that);
-        that.setId(this.id);
-        that.setRestartable(this.restartable);
-        that.setProperties(Util.copy(this.properties));
-        that.setListeners(Util.copy(this.listeners));
-        that.setExecutions(Util.copyList(this.executions));
-        return that;
+        return JobTool.copy(this, that);
+        //super.copy(that);
+        //that.setId(this.id);
+        //that.setRestartable(this.restartable);
+        //that.setProperties(Util.copy(this.properties));
+        //that.setListeners(Util.copy(this.listeners));
+        //that.setExecutions(Util.copyList(this.executions));
+        //return that;
     }
 }

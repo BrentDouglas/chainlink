@@ -1,8 +1,7 @@
 package io.machinecode.nock.jsl.xml.execution;
 
-import io.machinecode.nock.spi.element.execution.Split;
-import io.machinecode.nock.jsl.xml.loader.Repository;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.jsl.inherit.execution.InheritableSplit;
+import io.machinecode.nock.spi.JobRepository;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -22,7 +21,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //@XmlType(name = "Split", propOrder = {
 //        "flows"
 //})
-public class XmlSplit implements XmlExecution<XmlSplit>, Split {
+public class XmlSplit implements XmlExecution<XmlSplit>, InheritableSplit<XmlSplit, XmlFlow> {
 
     @XmlID
     @XmlSchemaType(name = "ID")
@@ -67,12 +66,13 @@ public class XmlSplit implements XmlExecution<XmlSplit>, Split {
     }
 
     @Override
-    public XmlSplit inherit(final Repository repository, final String defaultJobXml) {
-        final XmlSplit copy = new XmlSplit();
-        copy.setId(this.id);
-        copy.setNext(this.next);
-        copy.setFlows(Util.inheritingList(repository, defaultJobXml, this.flows));
-        return copy;
+    public XmlSplit inherit(final JobRepository repository, final String defaultJobXml) {
+        return SplitTool.inherit(this, repository, defaultJobXml);
+        //final XmlSplit copy = new XmlSplit();
+        //copy.setId(this.id);
+        //copy.setNext(this.next);
+        //copy.setFlows(Util.inheritingList(repository, defaultJobXml, this.flows));
+        //return copy;
     }
 
     @Override
@@ -82,9 +82,10 @@ public class XmlSplit implements XmlExecution<XmlSplit>, Split {
 
     @Override
     public XmlSplit copy(final XmlSplit that) {
-        that.setId(this.id);
-        that.setNext(this.next);
-        that.setFlows(Util.copyList(this.flows));
-        return that;
+        return SplitTool.copy(this, that);
+        //that.setId(this.id);
+        //that.setNext(this.next);
+        //that.setFlows(Util.copyList(this.flows));
+        //return that;
     }
 }

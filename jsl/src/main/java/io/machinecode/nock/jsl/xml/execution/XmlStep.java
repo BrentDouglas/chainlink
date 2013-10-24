@@ -1,11 +1,11 @@
 package io.machinecode.nock.jsl.xml.execution;
 
-import io.machinecode.nock.spi.element.execution.Step;
-import io.machinecode.nock.jsl.xml.loader.Repository;
-import io.machinecode.nock.jsl.xml.XmlBatchlet;
+import io.machinecode.nock.jsl.inherit.execution.InheritableStep;
+import io.machinecode.nock.jsl.xml.XmlInheritableBase;
 import io.machinecode.nock.jsl.xml.XmlListeners;
 import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.partition.XmlPartition;
+import io.machinecode.nock.jsl.xml.task.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.task.XmlChunk;
 import io.machinecode.nock.jsl.xml.task.XmlTask;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
@@ -13,10 +13,8 @@ import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
 import io.machinecode.nock.jsl.xml.transition.XmlStop;
 import io.machinecode.nock.jsl.xml.transition.XmlTransition;
-import io.machinecode.nock.jsl.xml.util.Inheritable;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.spi.JobRepository;
 
-import javax.batch.operations.JobStartException;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -40,7 +38,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "partition",
 //        "transitions"
 //})
-public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlStep>, Step {
+public class XmlStep extends XmlInheritableBase<XmlStep> implements XmlExecution<XmlStep>, InheritableStep<XmlStep, XmlProperties, XmlListeners, XmlTask, XmlTransition, XmlPartition> {
 
     @XmlID
     @XmlSchemaType(name = "ID")
@@ -183,32 +181,33 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
     }
 
     @Override
-    public XmlStep inherit(final Repository repository, final String defaultJobXml) {
-        final XmlStep copy = this.copy();
-        if (copy.parent != null) {
-            final XmlStep that = repository.findParent(XmlStep.class, copy, defaultJobXml);
-
-            copy.inheritingElementRule(that); // 4.6.2.1
-
-            copy.partition = Util.attributeRule(copy.partition, that.partition); // 4.6.2.2
-
-            copy.next = Util.attributeRule(copy.next, that.next); // 4.1
-            copy.startLimit = Util.attributeRule(copy.startLimit, that.startLimit); // 4.1
-            copy.allowStartIfComplete = Util.attributeRule(copy.allowStartIfComplete, that.allowStartIfComplete); // 4.1
-
-            // Skip types
-            // 4.3
-            copy.properties = Util.merge(copy.properties, that.properties);
-            copy.listeners = Util.merge(copy.listeners, that.listeners);
-            copy.transitions = Util.listRule(copy.transitions, that.transitions);
-            // 4.1
-            if (copy.task instanceof XmlChunk && that.task instanceof XmlBatchlet
-                    || copy.task instanceof XmlBatchlet && that.task instanceof XmlChunk) {
-                throw new JobStartException();
-            }
-            copy.task = Util.recursiveElementRule(copy.task, that.task, repository, defaultJobXml); // 4.4.1
-        }
-        return copy;
+    public XmlStep inherit(final JobRepository repository, final String defaultJobXml) {
+        return StepTool.inherit(XmlStep.class, this, repository, defaultJobXml);
+        //final XmlStep copy = this.copy();
+        //if (copy.parent != null) {
+        //    final XmlStep that = repository.findParent(XmlStep.class, copy, defaultJobXml);
+//
+        //    copy.inheritingElementRule(that); // 4.6.2.1
+//
+        //    copy.partition = Util.attributeRule(copy.partition, that.partition); // 4.6.2.2
+//
+        //    copy.next = Util.attributeRule(copy.next, that.next); // 4.1
+        //    copy.startLimit = Util.attributeRule(copy.startLimit, that.startLimit); // 4.1
+        //    copy.allowStartIfComplete = Util.attributeRule(copy.allowStartIfComplete, that.allowStartIfComplete); // 4.1
+//
+        //    // Skip types
+        //    // 4.3
+        //    copy.properties = Util.merge(copy.properties, that.properties);
+        //    copy.listeners = Util.merge(copy.listeners, that.listeners);
+        //    copy.transitions = Util.listRule(copy.transitions, that.transitions);
+        //    // 4.1
+        //    if (copy.task instanceof XmlChunk && that.task instanceof XmlBatchlet
+        //            || copy.task instanceof XmlBatchlet && that.task instanceof XmlChunk) {
+        //        throw new JobStartException();
+        //    }
+        //    copy.task = Util.recursiveElementRule(copy.task, that.task, repository, defaultJobXml); // 4.4.1
+        //}
+        //return copy;
     }
 
     @Override
@@ -218,16 +217,17 @@ public class XmlStep extends Inheritable<XmlStep> implements XmlExecution<XmlSte
 
     @Override
     public XmlStep copy(final XmlStep that) {
-        super.copy(that);
-        that.setId(this.id);
-        that.setNext(this.next);
-        that.setStartLimit(this.startLimit);
-        that.setAllowStartIfComplete(this.allowStartIfComplete);
-        that.setProperties(Util.copy(this.properties));
-        that.setListeners(Util.copy(this.listeners));
-        that.setTask(Util.copy(this.task));
-        that.setPartition(Util.copy(this.partition));
-        that.setTransitions(Util.copyList(this.transitions));
-        return that;
+        return StepTool.copy(this, that);
+        //super.copy(that);
+        //that.setId(this.id);
+        //that.setNext(this.next);
+        //that.setStartLimit(this.startLimit);
+        //that.setAllowStartIfComplete(this.allowStartIfComplete);
+        //that.setProperties(Util.copy(this.properties));
+        //that.setListeners(Util.copy(this.listeners));
+        //that.setTask(Util.copy(this.task));
+        //that.setPartition(Util.copy(this.partition));
+        //that.setTransitions(Util.copyList(this.transitions));
+        //return that;
     }
 }

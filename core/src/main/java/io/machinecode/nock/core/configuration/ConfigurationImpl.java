@@ -2,7 +2,7 @@ package io.machinecode.nock.core.configuration;
 
 import io.machinecode.nock.core.local.LocalRepository;
 import io.machinecode.nock.core.local.LocalTransactionManager;
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.configuration.Configuration;
 import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
@@ -20,7 +20,7 @@ public class ConfigurationImpl implements Configuration {
     private static final Injector[] INJECTORS = new Injector[0];
 
     private final ClassLoader loader;
-    private final Repository repository;
+    private final ExecutionRepository repository;
     private final TransactionManager transactionManager;
     private final JobLoader[] jobLoaders;
     private final ArtifactLoader[] artifactLoaders;
@@ -59,7 +59,7 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public Repository getRepository() {
+    public ExecutionRepository getRepository() {
         return this.repository;
     }
 
@@ -85,7 +85,7 @@ public class ConfigurationImpl implements Configuration {
 
     public static class Builder {
         private ClassLoader loader;
-        private Repository repository;
+        private ExecutionRepository repository;
         private TransactionManager transactionManager;
         private JobLoader[] jobLoaders = JOB_LOADERS;
         private ArtifactLoader[] artifactLoaders = ARTIFACT_LOADERS;
@@ -96,7 +96,7 @@ public class ConfigurationImpl implements Configuration {
             return this;
         }
 
-        public Builder setRepository(final Repository repository) {
+        public Builder setRepository(final ExecutionRepository repository) {
             this.repository = repository;
             return this;
         }

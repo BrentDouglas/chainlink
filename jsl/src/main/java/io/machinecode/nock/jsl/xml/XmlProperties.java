@@ -1,8 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.spi.element.Properties;
-import io.machinecode.nock.jsl.xml.util.MergeableList;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.jsl.inherit.InheritableProperties;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -20,7 +18,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //@XmlType(name = "Properties", propOrder = {
 //        "properties"
 //})
-public class XmlProperties extends MergeableList<XmlProperties> implements Properties {
+public class XmlProperties extends XmlMergeableList<XmlProperties> implements InheritableProperties<XmlProperties, XmlProperty> {
 
     @XmlAttribute(name = "partition", required = false)
     private String partition;
@@ -55,15 +53,17 @@ public class XmlProperties extends MergeableList<XmlProperties> implements Prope
 
     @Override
     public XmlProperties copy(final XmlProperties that) {
-        that.setProperties(Util.copyList(this.properties));
-        return that;
+        return PropertiesTool.copy(this, that);
+        //that.setProperties(Util.copyList(this.properties));
+        //return that;
     }
 
     @Override
     public XmlProperties merge(final XmlProperties that) {
-        if (this.merge) {
-            this.properties = Util.listRule(this.properties, that.properties);
-        }
-        return this;
+        return PropertiesTool.merge(this, that);
+        //if (this.merge) {
+        //    this.properties = Util.listRule(this.properties, that.properties);
+        //}
+        //return this;
     }
 }

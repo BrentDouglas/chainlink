@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.xml.transition;
 
-import io.machinecode.nock.jsl.xml.util.Copyable;
+import io.machinecode.nock.jsl.inherit.transition.InheritableTerminatingTransition;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -11,7 +11,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public abstract class XmlTerminatingTransition<T extends XmlTerminatingTransition<T>> implements Copyable<T> {
+public abstract class XmlTerminatingTransition<T extends XmlTerminatingTransition<T>> implements InheritableTerminatingTransition<T> {
 
     @XmlAttribute(name = "on", required = true)
     private String on;
@@ -41,8 +41,9 @@ public abstract class XmlTerminatingTransition<T extends XmlTerminatingTransitio
 
     @Override
     public T copy(final T that) {
-        that.setOn(this.on);
-        that.setExitStatus(this.exitStatus);
-        return that;
+        return TerminatingTransitionTool.copy((T)this, that);
+        //that.setOn(this.on);
+        //that.setExitStatus(this.exitStatus);
+        //return that;
     }
 }

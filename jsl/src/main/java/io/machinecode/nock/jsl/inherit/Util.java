@@ -1,7 +1,10 @@
-package io.machinecode.nock.jsl.xml.util;
+package io.machinecode.nock.jsl.inherit;
 
-import io.machinecode.nock.jsl.xml.loader.Repository;
-import io.machinecode.nock.jsl.xml.execution.XmlExecution;
+import io.machinecode.nock.jsl.xml.XmlInheritableBase;
+import io.machinecode.nock.spi.Copyable;
+import io.machinecode.nock.spi.Inheritable;
+import io.machinecode.nock.spi.JobRepository;
+import io.machinecode.nock.spi.Mergeable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +17,13 @@ public class Util {
     public static <X extends Copyable<X>> X copy(final X that) {
         return that == null ? null : that.copy();
     }
-    public static <X extends Copyable<X>> CopyList<X> copyList(final List<X> that) {
+    public static <X extends Copyable<X>> CopyList<X> copyList(final List<? extends X> that) {
         return that == null ? null : new CopyList<X>(that);
     }
-    public static <X extends Copyable<X>> CopyList<X> copyList(final List<X>... that) {
+    public static <X extends Copyable<X>> CopyList<X> copyList(final List<? extends X>... that) {
         return that == null ? null : new CopyList<X>(that);
     }
-    public static <X extends XmlExecution<X> & Copyable<X>> InheritList<X> inheritingList(final Repository repository, final String defaultJobXml, final List<X> that) {
+    public static <X extends Inheritable<X>> InheritList<X> inheritingList(final JobRepository repository, final String defaultJobXml, final List<? extends X> that) {
         return that == null ? null : new InheritList<X>(repository, defaultJobXml, that);
     }
 
@@ -49,12 +52,12 @@ public class Util {
     }
 
     //TODO This needs to call merge
-    public static <X extends Mergeable<X>> X recursiveElementRule(final X child, final X parent, final Repository repository, final String defaultJobXml) {
+    public static <X extends Mergeable<X>> X recursiveElementRule(final X child, final X parent, final JobRepository repository, final String defaultJobXml) {
         if (child == null) {
             return parent == null ? null : parent.copy();
         }
         final X that = child.copy();
-        if (that instanceof Inheritable) {
+        if (that instanceof XmlInheritableBase) {
             ((Inheritable)that).inherit(repository, defaultJobXml);
         }
         return that.merge(parent);

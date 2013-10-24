@@ -6,7 +6,7 @@ import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.core.impl.JobExecutionImpl;
 import io.machinecode.nock.core.impl.JobInstanceImpl;
 import io.machinecode.nock.core.impl.StepExecutionImpl;
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Step;
 
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class LocalRepository implements Repository {
+public class LocalRepository implements ExecutionRepository {
     protected final AtomicLong jobInstanceIndex = new AtomicLong();
     protected final AtomicLong jobExecutionIndex = new AtomicLong();
     protected final AtomicLong stepExecutionIndex = new AtomicLong();

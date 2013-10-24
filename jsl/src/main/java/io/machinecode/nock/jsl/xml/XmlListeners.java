@@ -1,8 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.spi.element.Listeners;
-import io.machinecode.nock.jsl.xml.util.MergeableList;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.jsl.inherit.InheritableListeners;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -19,7 +17,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //@XmlType(name = "Listeners", propOrder = {
 //        "listeners"
 //})
-public class XmlListeners extends MergeableList<XmlListeners> implements Listeners {
+public class XmlListeners extends XmlMergeableList<XmlListeners> implements InheritableListeners<XmlListeners, XmlListener> {
 
     @XmlElement(name = "listener", namespace = NAMESPACE, required = false)
     private List<XmlListener> listeners = new ArrayList<XmlListener>(0);
@@ -29,8 +27,8 @@ public class XmlListeners extends MergeableList<XmlListeners> implements Listene
         return listeners;
     }
 
-    public XmlListeners setProperties(final List<XmlListener> properties) {
-        this.listeners = properties;
+    public XmlListeners setListeners(final List<XmlListener> listeners) {
+        this.listeners = listeners;
         return this;
     }
 
@@ -41,15 +39,17 @@ public class XmlListeners extends MergeableList<XmlListeners> implements Listene
 
     @Override
     public XmlListeners copy(final XmlListeners that) {
-        that.setProperties(Util.copyList(this.listeners));
-        return that;
+        return ListenersTool.copy(this, that);
+        //that.setListeners(Util.copyList(this.listeners));
+        //return that;
     }
 
     @Override
     public XmlListeners merge(final XmlListeners that) {
-        if (this.merge) {
-            this.listeners = Util.listRule(this.listeners, that.listeners);
-        }
-        return this;
+        return ListenersTool.merge(this, that);
+        //if (this.merge) {
+        //    this.listeners = Util.listRule(this.listeners, that.listeners);
+        //}
+        //return this;
     }
 }

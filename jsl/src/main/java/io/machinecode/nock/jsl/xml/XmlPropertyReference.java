@@ -1,8 +1,6 @@
 package io.machinecode.nock.jsl.xml;
 
-import io.machinecode.nock.spi.element.PropertyReference;
-import io.machinecode.nock.jsl.xml.util.Mergeable;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.jsl.inherit.InheritablePropertyReference;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -15,7 +13,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public abstract class XmlPropertyReference<T extends XmlPropertyReference<T>> implements Mergeable<T>, PropertyReference {
+public abstract class XmlPropertyReference<T extends XmlPropertyReference<T>> implements InheritablePropertyReference<T, XmlProperties> {
 
     @XmlAttribute(name = "ref", required = true)
     private String ref;
@@ -46,15 +44,17 @@ public abstract class XmlPropertyReference<T extends XmlPropertyReference<T>> im
 
     @Override
     public T copy(final T that) {
-        that.setRef(this.ref);
-        that.setProperties(Util.copy(this.properties));
-        return that;
+        return PropertyReferenceTool.copy((T)this, that);
+        //that.setRef(this.ref);
+        //that.setProperties(Util.copy(this.properties));
+        //return that;
     }
 
     @Override
     public T merge(final T that) {
-        this.setRef(Util.attributeRule(this.ref, that.getRef()));
-        this.setProperties(Util.merge(this.properties, that.getProperties()));
-        return (T)this;
+        return PropertyReferenceTool.merge((T)this, that);
+        //this.setRef(Util.attributeRule(this.ref, that.getRef()));
+        //this.setProperties(Util.merge(this.properties, that.getProperties()));
+        //return (T)this;
     }
 }

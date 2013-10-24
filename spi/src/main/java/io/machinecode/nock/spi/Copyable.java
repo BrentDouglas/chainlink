@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.xml.util;
+package io.machinecode.nock.spi;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

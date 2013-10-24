@@ -7,7 +7,7 @@ import io.machinecode.nock.core.work.AllDeferredImpl;
 import io.machinecode.nock.core.work.AnyDeferredImpl;
 import io.machinecode.nock.core.work.DeferredImpl;
 import io.machinecode.nock.core.work.Notify;
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.configuration.RuntimeConfiguration;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.inject.InjectionContext;
@@ -43,7 +43,7 @@ public class LocalTransport implements Transport {
 
     protected static final LocalWork[] NO_WORK = new LocalWork[0];
 
-    protected final Repository repository;
+    protected final ExecutionRepository repository;
     protected final InjectionContext injectionContext;
     protected final IdentityHashMap<TaskWork, Bucket> buckets = new IdentityHashMap<TaskWork, Bucket>();
 
@@ -186,7 +186,7 @@ public class LocalTransport implements Transport {
     }
 
     @Override
-    public Repository getRepository() {
+    public ExecutionRepository getRepository() {
         return repository;
     }
 

@@ -1,14 +1,13 @@
 package io.machinecode.nock.jsl.xml.execution;
 
-import io.machinecode.nock.spi.element.execution.Decision;
-import io.machinecode.nock.jsl.xml.loader.Repository;
+import io.machinecode.nock.jsl.inherit.execution.InheritableDecision;
 import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
 import io.machinecode.nock.jsl.xml.transition.XmlStop;
 import io.machinecode.nock.jsl.xml.transition.XmlTransition;
-import io.machinecode.nock.jsl.xml.util.Util;
+import io.machinecode.nock.spi.JobRepository;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -30,7 +29,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "properties",
 //        "transitions"
 //})
-public class XmlDecision implements XmlExecution<XmlDecision>, Decision {
+public class XmlDecision implements XmlExecution<XmlDecision>, InheritableDecision<XmlDecision, XmlProperties, XmlTransition> {
 
     @XmlID
     @XmlSchemaType(name = "ID")
@@ -93,21 +92,23 @@ public class XmlDecision implements XmlExecution<XmlDecision>, Decision {
     }
 
     @Override
-    public XmlDecision inherit(final Repository repository, final String defaultJobXml) {
-        return copy();
-    }
-
-    @Override
     public XmlDecision copy() {
         return copy(new XmlDecision());
     }
 
     @Override
     public XmlDecision copy(final XmlDecision that) {
-        that.setId(this.id);
-        that.setRef(this.ref);
-        that.setProperties(Util.copy(this.properties));
-        that.setTransitions(Util.copyList(this.transitions));
-        return that;
+        return DecisionTool.copy(this, that);
+        //that.setId(this.id);
+        //that.setRef(this.ref);
+        //that.setProperties(Util.copy(this.properties));
+        //that.setTransitions(Util.copyList(this.transitions));
+        //return that;
+    }
+
+    @Override
+    public XmlDecision inherit(final JobRepository repository, final String defaultJobXml) {
+        return DecisionTool.inherit(this, repository, defaultJobXml);
+        //return copy();
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class FluentStep<T extends Task, U extends Strategy> extends FluentExecution<FluentStep<T, U>> implements Step <T, U> {
+public class FluentStep<T extends Task, U extends Strategy> extends FluentExecution<FluentStep<T, U>> implements Step <T, U> {
 
     private String next;
     private String startLimit = ZERO;

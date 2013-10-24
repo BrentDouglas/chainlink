@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.task;
 
+import io.machinecode.nock.jsl.inherit.task.InheritableChunk;
 import io.machinecode.nock.spi.element.task.Chunk;
-import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -23,7 +23,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "retryableExceptionClasses",
 //        "noRollbackExceptionClasses"
 //})
-public class XmlChunk implements XmlTask<XmlChunk>, Chunk {
+public class XmlChunk implements XmlTask<XmlChunk>, InheritableChunk<XmlChunk, XmlItemReader, XmlItemProcessor, XmlItemWriter, XmlCheckpointAlgorithm, XmlExceptionClassFilter>, Chunk {
 
     @XmlAttribute(name = "checkpoint-policy", required = false)
     private String checkpointPolicy = CheckpointPolicy.ITEM;
@@ -177,35 +177,37 @@ public class XmlChunk implements XmlTask<XmlChunk>, Chunk {
 
     @Override
     public XmlChunk copy(final XmlChunk that) {
-        that.setCheckpointPolicy(this.checkpointPolicy);
-        that.setItemCount(this.itemCount);
-        that.setTimeLimit(this.timeLimit);
-        that.setSkipLimit(this.skipLimit);
-        that.setRetryLimit(this.retryLimit);
-        that.setReader(Util.copy(this.reader));
-        that.setProcessor(Util.copy(this.processor));
-        that.setWriter(Util.copy(this.writer));
-        that.setCheckpointAlgorithm(Util.copy(this.checkpointAlgorithm));
-        that.setSkippableExceptionClasses(Util.copy(this.skippableExceptionClasses));
-        that.setRetryableExceptionClasses(Util.copy(this.retryableExceptionClasses));
-        that.setNoRollbackExceptionClasses(Util.copy(this.noRollbackExceptionClasses));
-        return that;
+        return ChunkTool.copy(this, that);
+        //that.setCheckpointPolicy(this.checkpointPolicy);
+        //that.setItemCount(this.itemCount);
+        //that.setTimeLimit(this.timeLimit);
+        //that.setSkipLimit(this.skipLimit);
+        //that.setRetryLimit(this.retryLimit);
+        //that.setReader(Util.copy(this.reader));
+        //that.setProcessor(Util.copy(this.processor));
+        //that.setWriter(Util.copy(this.writer));
+        //that.setCheckpointAlgorithm(Util.copy(this.checkpointAlgorithm));
+        //that.setSkippableExceptionClasses(Util.copy(this.skippableExceptionClasses));
+        //that.setRetryableExceptionClasses(Util.copy(this.retryableExceptionClasses));
+        //that.setNoRollbackExceptionClasses(Util.copy(this.noRollbackExceptionClasses));
+        //return that;
     }
 
     @Override
     public XmlChunk merge(final XmlChunk that) {
-        this.setCheckpointPolicy(Util.attributeRule(this.checkpointPolicy, that.checkpointPolicy));
-        this.setItemCount(Util.attributeRule(this.itemCount, that.itemCount));
-        this.setTimeLimit(Util.attributeRule(this.timeLimit, that.timeLimit));
-        this.setSkipLimit(Util.attributeRule(this.skipLimit, that.skipLimit));
-        this.setRetryLimit(Util.attributeRule(this.retryLimit, that.retryLimit));
-        this.setReader(Util.merge(this.reader, that.reader));
-        this.setProcessor(Util.merge(this.processor, that.processor));
-        this.setWriter(Util.merge(this.writer, that.writer));
-        this.setCheckpointAlgorithm(Util.merge(this.checkpointAlgorithm, that.checkpointAlgorithm));
-        this.setSkippableExceptionClasses(Util.merge(this.skippableExceptionClasses, that.skippableExceptionClasses));
-        this.setRetryableExceptionClasses(Util.merge(this.retryableExceptionClasses, that.retryableExceptionClasses));
-        this.setNoRollbackExceptionClasses(Util.merge(this.noRollbackExceptionClasses, that.noRollbackExceptionClasses));
-        return this;
+        return ChunkTool.merge(this, that);
+        //this.setCheckpointPolicy(Util.attributeRule(this.checkpointPolicy, that.checkpointPolicy));
+        //this.setItemCount(Util.attributeRule(this.itemCount, that.itemCount));
+        //this.setTimeLimit(Util.attributeRule(this.timeLimit, that.timeLimit));
+        //this.setSkipLimit(Util.attributeRule(this.skipLimit, that.skipLimit));
+        //this.setRetryLimit(Util.attributeRule(this.retryLimit, that.retryLimit));
+        //this.setReader(Util.merge(this.reader, that.reader));
+        //this.setProcessor(Util.merge(this.processor, that.processor));
+        //this.setWriter(Util.merge(this.writer, that.writer));
+        //this.setCheckpointAlgorithm(Util.merge(this.checkpointAlgorithm, that.checkpointAlgorithm));
+        //this.setSkippableExceptionClasses(Util.merge(this.skippableExceptionClasses, that.skippableExceptionClasses));
+        //this.setRetryableExceptionClasses(Util.merge(this.retryableExceptionClasses, that.retryableExceptionClasses));
+        //this.setNoRollbackExceptionClasses(Util.merge(this.noRollbackExceptionClasses, that.noRollbackExceptionClasses));
+        //return this;
     }
 }

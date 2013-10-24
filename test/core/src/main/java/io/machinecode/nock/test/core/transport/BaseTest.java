@@ -5,7 +5,7 @@ import io.machinecode.nock.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.nock.core.local.LocalRepository;
 import io.machinecode.nock.core.local.LocalTransactionManager;
 import io.machinecode.nock.core.local.LocalTransport;
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.transport.Transport;
 import org.junit.Assert;
 
@@ -18,7 +18,7 @@ public abstract class BaseTest extends Assert {
 
     public static final Properties PARAMETERS = new Properties();
     private Transport _transport;
-    private Repository _repository;
+    private ExecutionRepository _repository;
     private RuntimeConfigurationImpl _configuration;
 
     protected final RuntimeConfigurationImpl configuration() {
@@ -28,7 +28,7 @@ public abstract class BaseTest extends Assert {
         return this._configuration;
     }
 
-    protected final Repository repository() {
+    protected final ExecutionRepository repository() {
         if (this._repository == null) {
             this._repository = _repository();
         }
@@ -51,7 +51,7 @@ public abstract class BaseTest extends Assert {
                 .setRepository(repository());
     }
 
-    protected final Repository _repository() {
+    protected final ExecutionRepository _repository() {
         return new LocalRepository();
     }
 

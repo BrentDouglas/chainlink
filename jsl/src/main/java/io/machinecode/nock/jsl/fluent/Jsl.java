@@ -1,6 +1,16 @@
 package io.machinecode.nock.jsl.fluent;
 
+import io.machinecode.nock.jsl.fluent.execution.FluentDecision;
+import io.machinecode.nock.jsl.fluent.execution.FluentFlow;
+import io.machinecode.nock.jsl.fluent.execution.FluentSplit;
+import io.machinecode.nock.jsl.fluent.execution.FluentStep;
+import io.machinecode.nock.jsl.fluent.partition.FluentAnalyser;
+import io.machinecode.nock.jsl.fluent.partition.FluentCollector;
 import io.machinecode.nock.jsl.fluent.partition.FluentMapper;
+import io.machinecode.nock.jsl.fluent.partition.FluentMapperPartition;
+import io.machinecode.nock.jsl.fluent.partition.FluentPlan;
+import io.machinecode.nock.jsl.fluent.partition.FluentPlanPartition;
+import io.machinecode.nock.jsl.fluent.partition.FluentReducer;
 import io.machinecode.nock.jsl.fluent.task.FluentBatchlet;
 import io.machinecode.nock.jsl.fluent.task.FluentCheckpointAlgorithm;
 import io.machinecode.nock.jsl.fluent.task.FluentChunk;
@@ -9,23 +19,14 @@ import io.machinecode.nock.jsl.fluent.task.FluentExceptionClassFilter;
 import io.machinecode.nock.jsl.fluent.task.FluentItemProcessor;
 import io.machinecode.nock.jsl.fluent.task.FluentItemReader;
 import io.machinecode.nock.jsl.fluent.task.FluentItemWriter;
-import io.machinecode.nock.jsl.fluent.partition.FluentAnalyser;
-import io.machinecode.nock.jsl.fluent.partition.FluentCollector;
-import io.machinecode.nock.jsl.fluent.partition.FluentMapperPartition;
-import io.machinecode.nock.jsl.fluent.partition.FluentPlan;
-import io.machinecode.nock.jsl.fluent.partition.FluentReducer;
-import io.machinecode.nock.jsl.fluent.partition.FluentPlanPartition;
 import io.machinecode.nock.jsl.fluent.transition.FluentEnd;
 import io.machinecode.nock.jsl.fluent.transition.FluentFail;
 import io.machinecode.nock.jsl.fluent.transition.FluentNext;
 import io.machinecode.nock.jsl.fluent.transition.FluentStop;
-import io.machinecode.nock.jsl.fluent.execution.FluentBatchletMapperStep;
-import io.machinecode.nock.jsl.fluent.execution.FluentBatchletPlanStep;
-import io.machinecode.nock.jsl.fluent.execution.FluentChunkMapperStep;
-import io.machinecode.nock.jsl.fluent.execution.FluentChunkPlanStep;
-import io.machinecode.nock.jsl.fluent.execution.FluentDecision;
-import io.machinecode.nock.jsl.fluent.execution.FluentFlow;
-import io.machinecode.nock.jsl.fluent.execution.FluentSplit;
+import io.machinecode.nock.spi.element.partition.Mapper;
+import io.machinecode.nock.spi.element.partition.Plan;
+import io.machinecode.nock.spi.element.task.Batchlet;
+import io.machinecode.nock.spi.element.task.Chunk;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -66,19 +67,19 @@ public class Jsl {
         return split();
     }
 
-    public static FluentBatchletMapperStep executionAsStepWithBatchletAndMapper() {
+    public static FluentStep<Batchlet,Mapper> executionAsStepWithBatchletAndMapper() {
         return stepWithBatchletAndMapper();
     }
 
-    public static FluentBatchletPlanStep executionAsStepWithBatchletAndPlan() {
+    public static FluentStep<Batchlet,Plan> executionAsStepWithBatchletAndPlan() {
         return stepWithBatchletAndPlan();
     }
 
-    public static FluentChunkMapperStep executionAsStepWithChunkAndMapper() {
+    public static FluentStep<Chunk,Mapper> executionAsStepWithChunkAndMapper() {
         return stepWithChunkAndMapper();
     }
 
-    public static FluentChunkPlanStep executionAsStepWithChunkAndPlan() {
+    public static FluentStep<Chunk,Plan> executionAsStepWithChunkAndPlan() {
         return stepWithChunkAndPlan();
     }
 
@@ -94,20 +95,20 @@ public class Jsl {
         return new FluentSplit();
     }
 
-    public static FluentBatchletMapperStep stepWithBatchletAndMapper() {
-        return new FluentBatchletMapperStep();
+    public static FluentStep<Batchlet,Mapper> stepWithBatchletAndMapper() {
+        return new FluentStep<Batchlet,Mapper>();
     }
 
-    public static FluentBatchletPlanStep stepWithBatchletAndPlan() {
-        return new FluentBatchletPlanStep();
+    public static FluentStep<Batchlet,Plan> stepWithBatchletAndPlan() {
+        return new FluentStep<Batchlet,Plan>();
     }
 
-    public static FluentChunkMapperStep stepWithChunkAndMapper() {
-        return new FluentChunkMapperStep();
+    public static FluentStep<Chunk,Mapper> stepWithChunkAndMapper() {
+        return new FluentStep<Chunk,Mapper>();
     }
 
-    public static FluentChunkPlanStep stepWithChunkAndPlan() {
-        return new FluentChunkPlanStep();
+    public static FluentStep<Chunk,Plan> stepWithChunkAndPlan() {
+        return new FluentStep<Chunk,Plan>();
     }
 
     // Transition

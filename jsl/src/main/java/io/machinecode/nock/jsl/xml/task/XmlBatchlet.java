@@ -1,7 +1,8 @@
-package io.machinecode.nock.jsl.xml;
+package io.machinecode.nock.jsl.xml.task;
 
+import io.machinecode.nock.jsl.inherit.task.InheritableTask;
+import io.machinecode.nock.jsl.xml.XmlPropertyReference;
 import io.machinecode.nock.spi.element.task.Batchlet;
-import io.machinecode.nock.jsl.xml.task.XmlTask;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -14,7 +15,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //@XmlType(name = "Batchlet", propOrder = {
 //        "properties"
 //})
-public class XmlBatchlet extends XmlPropertyReference<XmlBatchlet> implements XmlTask<XmlBatchlet>, Batchlet {
+public class XmlBatchlet extends XmlPropertyReference<XmlBatchlet> implements InheritableTask<XmlBatchlet>, XmlTask<XmlBatchlet>, Batchlet {
 
     @Override
     public XmlBatchlet copy() {

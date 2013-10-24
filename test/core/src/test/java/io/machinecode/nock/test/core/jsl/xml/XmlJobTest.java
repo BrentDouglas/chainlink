@@ -1,20 +1,20 @@
 package io.machinecode.nock.test.core.jsl.xml;
 
 import io.machinecode.nock.core.factory.JobFactory;
-import io.machinecode.nock.jsl.xml.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.XmlJob;
 import io.machinecode.nock.jsl.xml.XmlListener;
 import io.machinecode.nock.jsl.xml.XmlProperty;
 import io.machinecode.nock.jsl.xml.execution.XmlFlow;
 import io.machinecode.nock.jsl.xml.execution.XmlStep;
 import io.machinecode.nock.jsl.xml.loader.JarXmlJobLoader;
+import io.machinecode.nock.jsl.xml.task.XmlBatchlet;
 import io.machinecode.nock.jsl.xml.task.XmlChunk;
 import io.machinecode.nock.jsl.xml.task.XmlItemProcessor;
 import io.machinecode.nock.jsl.xml.task.XmlItemReader;
 import io.machinecode.nock.jsl.xml.task.XmlItemWriter;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlStop;
-import io.machinecode.nock.jsl.xml.util.Inheritable;
+import io.machinecode.nock.spi.InheritableElement;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.element.partition.Plan;
@@ -36,7 +36,7 @@ public class XmlJobTest {
     private static ClassLoader classLoader = XmlJobTest.class.getClassLoader();
     private static JarXmlJobLoader repo;
 
-    private static void testInheritance(final Inheritable inheritable) {
+    private static void testInheritance(final InheritableElement<?> inheritable) {
         Assert.assertNull(inheritable.isAbstract());
         Assert.assertNull(inheritable.getParent());
         Assert.assertNull(inheritable.getJslName());

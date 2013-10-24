@@ -11,7 +11,7 @@ import io.machinecode.nock.core.work.job.RunJob;
 import io.machinecode.nock.jsl.validation.InvalidJobException;
 import io.machinecode.nock.jsl.validation.JobValidator;
 import io.machinecode.nock.jsl.visitor.JobTraversal;
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.inject.InjectionContext;
@@ -91,7 +91,7 @@ public class JobImpl implements Job, JobWork {
 
     @Override
     public void before(final Transport transport, final Context context) throws Exception {
-        final Repository repository = transport.getRepository();
+        final ExecutionRepository repository = transport.getRepository();
         final JobContextImpl jobContext = new JobContextImpl(
                 repository.getJobInstance(context.getJobInstanceId()),
                 repository.getJobExecution(context.getJobExecutionId()),

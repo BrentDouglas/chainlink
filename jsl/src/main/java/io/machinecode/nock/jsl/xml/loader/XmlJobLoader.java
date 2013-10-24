@@ -7,7 +7,10 @@ import io.machinecode.nock.jsl.xml.execution.XmlExecution;
 import io.machinecode.nock.jsl.xml.execution.XmlFlow;
 import io.machinecode.nock.jsl.xml.execution.XmlSplit;
 import io.machinecode.nock.jsl.xml.execution.XmlStep;
-import io.machinecode.nock.jsl.xml.util.Inheritable;
+import io.machinecode.nock.spi.Inheritable;
+import io.machinecode.nock.spi.InheritableElement;
+import io.machinecode.nock.spi.JobRepository;
+import io.machinecode.nock.spi.ParentNotFoundException;
 import io.machinecode.nock.spi.loader.JobLoader;
 
 import javax.batch.operations.NoSuchJobException;
@@ -20,7 +23,7 @@ import java.io.InputStream;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class XmlJobLoader implements JobLoader, Repository {
+public abstract class XmlJobLoader implements JobLoader, JobRepository {
 
     private static final Unmarshaller unmarshaller;
 
@@ -67,13 +70,13 @@ public abstract class XmlJobLoader implements JobLoader, Repository {
     }
 
     @Override
-    public <T extends Inheritable<T>> T findParent(final Class<T> clazz, final T that, final String defaultJobXml) throws ParentNotFoundException {
+    public <T extends InheritableElement<T>> T findParent(final Class<T> clazz, final T that, final String defaultJobXml) throws ParentNotFoundException {
         final String jslName = that.getJslName() == null ? defaultJobXml : that .getJslName();
         return findParent(clazz, that.getParent(), jslName);
     }
 
     @Override
-    public <T extends Inheritable<T>> T findParent(final Class<T> clazz, final String id, final String jslName) throws ParentNotFoundException {
+    public <T extends InheritableElement<T>> T findParent(final Class<T> clazz, final String id, final String jslName) throws ParentNotFoundException {
         final XmlNode node = doLoad(jslName);
         if (node == null) {
             throw new NoSuchJobException();
@@ -93,7 +96,7 @@ public abstract class XmlJobLoader implements JobLoader, Repository {
 
         final TMap<String, Inheritable> values = new THashMap<String, Inheritable>();
 
-        public <T extends Inheritable<T>> T findParent(final Class<T> clazz, final String id, final String jslName) throws ParentNotFoundException {
+        public <T extends InheritableElement<T>> T findParent(final Class<T> clazz, final String id, final String jslName) throws ParentNotFoundException {
             if (this.name.equals(jslName)) {
                 final Inheritable target = values.get(id);
                 if (target == null) {

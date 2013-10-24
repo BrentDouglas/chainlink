@@ -1,6 +1,6 @@
 package io.machinecode.nock.spi.transport;
 
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.work.Bucket;
@@ -17,7 +17,7 @@ public interface Transport {
 
     TransactionManager getTransactionManager();
 
-    Repository getRepository();
+    ExecutionRepository getRepository();
 
     Context getContext(long jobExecutionId);
 

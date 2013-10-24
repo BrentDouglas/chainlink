@@ -8,7 +8,7 @@ import io.machinecode.nock.core.model.JobImpl;
 import io.machinecode.nock.core.util.ResolvableService;
 import io.machinecode.nock.core.impl.ContextImpl;
 import io.machinecode.nock.core.work.Status;
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.transport.Transport;
@@ -118,7 +118,7 @@ public class JobOperatorImpl implements JobOperator {
     public Start start(final JobWork job) throws Exception {
         JobFactory.INSTANCE.validate(job);
 
-        final Repository repository = transport.getRepository();
+        final ExecutionRepository repository = transport.getRepository();
         final JobInstance instance = repository.createJobInstance(job);
         final JobExecution execution = repository.createJobExecution(instance);
         final long jobExecutionId = execution.getExecutionId();
@@ -137,7 +137,7 @@ public class JobOperatorImpl implements JobOperator {
     @Override
     public long restart(final long executionId, final Properties restartParameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
         try {
-            final Repository repository = transport.getRepository();
+            final ExecutionRepository repository = transport.getRepository();
             final JobExecution execution = repository.getLatestJobExecution(executionId);
             if (BatchStatus.STOPPED.equals(execution.getBatchStatus())
                     || BatchStatus.STOPPED.equals(execution.getBatchStatus())) {
@@ -172,7 +172,7 @@ public class JobOperatorImpl implements JobOperator {
 
     @Override
     public void stop(final long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
-        final Repository repository = transport.getRepository();
+        final ExecutionRepository repository = transport.getRepository();
         final Deferred<?> deferred = transport.getJob(executionId);
         if (deferred == null) {
             throw new JobExecutionNotRunningException();
@@ -185,7 +185,7 @@ public class JobOperatorImpl implements JobOperator {
 
     @Override
     public void abandon(final long executionId) throws NoSuchJobExecutionException, JobExecutionIsRunningException, JobSecurityException {
-        final Repository repository = transport.getRepository();
+        final ExecutionRepository repository = transport.getRepository();
         final JobExecution execution = repository.getJobExecution(executionId); // TODO Should we be getting this from the repo or transport
         if (Status.isRunning(execution.getBatchStatus())) {
             throw new JobExecutionIsRunningException();

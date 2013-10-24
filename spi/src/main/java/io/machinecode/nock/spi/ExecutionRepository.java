@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Repository {
+public interface ExecutionRepository {
 
     // Create
 

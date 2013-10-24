@@ -1,6 +1,6 @@
 package io.machinecode.nock.spi.configuration;
 
-import io.machinecode.nock.spi.Repository;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.spi.loader.JobLoader;
@@ -14,7 +14,7 @@ public interface RuntimeConfiguration extends Configuration {
 
     ClassLoader getClassLoader();
 
-    Repository getRepository();
+    ExecutionRepository getRepository();
 
     TransactionManager getTransactionManager();
 

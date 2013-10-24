@@ -1,8 +1,7 @@
 package io.machinecode.nock.jsl.xml.partition;
 
-import io.machinecode.nock.spi.element.partition.Plan;
+import io.machinecode.nock.jsl.inherit.InheritablePlan;
 import io.machinecode.nock.jsl.xml.XmlProperties;
-import io.machinecode.nock.jsl.xml.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -18,7 +17,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //@XmlType(name = "PartitionPlan", propOrder = {
 //        "properties"
 //})
-public class XmlPlan implements XmlStrategy<XmlPlan>, Plan {
+public class XmlPlan implements XmlStrategy<XmlPlan>, InheritablePlan<XmlPlan, XmlProperties> {
 
     @XmlAttribute(name = "partitions", required = false)
     private String partitions = ONE;
@@ -66,9 +65,10 @@ public class XmlPlan implements XmlStrategy<XmlPlan>, Plan {
 
     @Override
     public XmlPlan copy(final XmlPlan that) {
-        that.setPartitions(this.partitions);
-        that.setThreads(this.threads);
-        that.setProperties(Util.copy(this.properties));
-        return that;
+        return PlanTool.copy(this, that);
+        //that.setPartitions(this.partitions);
+        //that.setThreads(this.threads);
+        //that.setProperties(Util.copy(this.properties));
+        //return that;
     }
 }
