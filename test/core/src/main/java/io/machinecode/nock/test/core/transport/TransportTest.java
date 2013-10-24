@@ -99,7 +99,7 @@ public abstract class TransportTest extends BaseTest {
     }
 
     @Test
-    public void injectBatchletTest() throws Exception {
+    public void injectedBatchletTest() throws Exception {
         final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("job")
                 .addExecution(

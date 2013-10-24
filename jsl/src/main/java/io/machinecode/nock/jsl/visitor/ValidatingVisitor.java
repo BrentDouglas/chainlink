@@ -58,10 +58,14 @@ public abstract class ValidatingVisitor<T> extends Visitor<T> {
 
     public static boolean hasInvalidTransfer(final VisitorNode node) {
         boolean ret = false;
-        for (final Transition entry : node.transitions) {
-            if (!node.localScope.containsKey(entry.next)) {
-                node.addProblem(Message.invalidTransition(VisitorNode.element(entry.element, entry.id, entry.next, new StringBuilder()).toString()));
-                ret = true;
+
+        //Only report this for the parent context
+        if (node.parent == null || node.localScope != node.parent.localScope) {
+            for (final Transition entry : node.transitions) {
+                if (!node.localScope.containsKey(entry.next)) {
+                    node.addProblem(Message.invalidTransition(VisitorNode.element(entry.element, entry.id, entry.next, new StringBuilder()).toString()));
+                    ret = true;
+                }
             }
         }
 

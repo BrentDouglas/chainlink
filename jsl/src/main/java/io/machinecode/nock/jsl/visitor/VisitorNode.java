@@ -56,7 +56,7 @@ public class VisitorNode {
         } else if (value instanceof Execution) {
             this.transitions = new ArrayList<Transition>(0);
             this.localScope = parent.localScope;
-        } else  {
+        } else {
             this.transitions = parent.transitions;
             this.localScope = parent.localScope;
         }

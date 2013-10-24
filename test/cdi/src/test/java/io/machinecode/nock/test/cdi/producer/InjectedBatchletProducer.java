@@ -15,4 +15,10 @@ public class InjectedBatchletProducer {
     public javax.batch.api.Batchlet batchlet(@New InjectedBatchlet batchlet) {
         return batchlet;
     }
+
+    @Produces
+    @Named("unmanaged-injected-batchlet")
+    public javax.batch.api.Batchlet unmanaged() {
+        return new InjectedBatchlet();
+    }
 }

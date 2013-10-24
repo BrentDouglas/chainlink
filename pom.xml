@@ -21,7 +21,6 @@
         <module>core</module>
         <module>inject</module>
         <module>test</module>
-        <module>tck</module>
     </modules>
 
     <properties>
@@ -33,8 +32,13 @@
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
 
         <!-- Test dependencies -->
-        <version.junit.junit>4.10</version.junit.junit>
         <version.com.ibm.batch.com.ibm.batch-tck>1.0</version.com.ibm.batch.com.ibm.batch-tck>
+        <version.junit.junit>4.10</version.junit.junit>
+        <version.org.testng.testng>6.8</version.org.testng.testng>
+
+        <!-- Plugin dependencies -->
+        <version.org.codehaus.mojo.build-helper-maven-plugin>1.8</version.org.codehaus.mojo.build-helper-maven-plugin>
+        <version.org.codehaus.mojo.properties-maven-plugin>1.0-alpha-2</version.org.codehaus.mojo.properties-maven-plugin>
     </properties>
 
     <dependencyManagement>
@@ -85,16 +89,51 @@
 
             <!-- Test dependencies -->
             <dependency>
+                <groupId>com.ibm.jbatch</groupId>
+                <artifactId>com.ibm.jbatch-tck</artifactId>
+                <version>${version.com.ibm.batch.com.ibm.batch-tck}</version>
+            </dependency>
+            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${version.junit.junit}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.ibm.jbatch</groupId>
-                <artifactId>com.ibm.jbatch-tck</artifactId>
-                <version>${version.com.ibm.batch.com.ibm.batch-tck}</version>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${version.org.testng.testng}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${version.org.codehaus.mojo.build-helper-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>${version.org.codehaus.mojo.properties-maven-plugin}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>tck</id>
+            <activation>
+                <property><name>tck</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>tck</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

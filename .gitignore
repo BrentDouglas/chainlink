@@ -18,3 +18,7 @@ idea
 .metadata
 .project
 .settings
+
+# Build
+build.properties
+tck.properties

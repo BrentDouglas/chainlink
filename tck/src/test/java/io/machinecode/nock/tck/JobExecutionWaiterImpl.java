@@ -23,8 +23,8 @@ public class JobExecutionWaiterImpl implements JobExecutionWaiter {
 
     @Override
     public JobExecution awaitTermination() throws JobExecutionTimeoutException {
-        final long start = System.currentTimeMillis();
-        while (start + timeout < System.currentTimeMillis()) {
+        final long end = System.currentTimeMillis() + timeout;
+        do {
             final JobExecution execution = operator.getJobExecution(executionId);
             if (Status.isComplete(execution.getBatchStatus())) {
                 return execution;
@@ -34,7 +34,7 @@ public class JobExecutionWaiterImpl implements JobExecutionWaiter {
             } catch (InterruptedException e) {
                 throw new JobExecutionTimeoutException();
             }
-        }
+        } while (System.currentTimeMillis() < end);
         throw new JobExecutionTimeoutException();
     }
 }

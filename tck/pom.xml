@@ -15,10 +15,126 @@
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
             <artifactId>com.ibm.jbatch-tck</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch-model</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch-ri-spi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch-runtime</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.machinecode.nock</groupId>
             <artifactId>nock-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>../build.properties</file>
+                                <file>tck.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals><goal>add-test-source</goal></goals>
+                        <configuration>
+                            <sources>
+                                <source>${tck.source}/src</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-resources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals><goal>add-test-resource</goal></goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${tck.source}/testJobXml/META-INF/batch-jobs</directory>
+                                    <targetPath>META-INF/batch-jobs</targetPath>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/src/test/resources</directory>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/../spi/src/main/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/**Test*.java</include>
+                        <include>**/**TestCase*.java</include>
+                    </includes>
+                    <systemPropertyVariables>
+                        <ExecutionTests.testInvokeJobWithUserStop.sleep>${ExecutionTests.testInvokeJobWithUserStop.sleep}</ExecutionTests.testInvokeJobWithUserStop.sleep>
+                        <JobOperatorTests.testInvokeJobWithUserStop.sleep>${JobOperatorTests.testInvokeJobWithUserStop.sleep}</JobOperatorTests.testInvokeJobWithUserStop.sleep>
+                        <JobOperatorTests.testJobOperatorGetRunningJobExecutions.sleep>${JobOperatorTests.testJobOperatorGetRunningJobExecutions.sleep}</JobOperatorTests.testJobOperatorGetRunningJobExecutions.sleep>
+                        <JobOperatorTests.testJobOperatorGetRunningJobExecutions.app.timeinterval>${JobOperatorTests.testJobOperatorGetRunningJobExecutions.app.timeinterval}</JobOperatorTests.testJobOperatorGetRunningJobExecutions.app.timeinterval>
+                        <JobOperatorTests.testJobOperatorGetRunningJobInstancesException.app.timeinterval>${JobOperatorTests.testJobOperatorGetRunningJobInstancesException.app.timeinterval}</JobOperatorTests.testJobOperatorGetRunningJobInstancesException.app.timeinterval>
+                        <JobOperatorTests.testJobOperatorTestAbandonActiveRestart.sleep>${JobOperatorTests.testJobOperatorTestAbandonActiveRestart.sleep}</JobOperatorTests.testJobOperatorTestAbandonActiveRestart.sleep>
+                        <JobOperatorTests.testJobOperatorTestRestartAlreadAbandonedJob.sleep>${JobOperatorTests.testJobOperatorTestRestartAlreadAbandonedJob.sleep}</JobOperatorTests.testJobOperatorTestRestartAlreadAbandonedJob.sleep>
+                        <ParallelExecutionTests.testStopRunningPartitionedStep.sleep>${ParallelExecutionTests.testStopRunningPartitionedStep.sleep}</ParallelExecutionTests.testStopRunningPartitionedStep.sleep>
+                        <ParallelExecutionTests.testStopRestartRunningPartitionedStep.sleep>${ParallelExecutionTests.testStopRestartRunningPartitionedStep.sleep}</ParallelExecutionTests.testStopRestartRunningPartitionedStep.sleep>
+                        <ParallelExecutionTests.testInvokeJobWithOnePartitionedStepExitStatus.sleep>${ParallelExecutionTests.testInvokeJobWithOnePartitionedStepExitStatus.sleep}</ParallelExecutionTests.testInvokeJobWithOnePartitionedStepExitStatus.sleep>
+                        <StopOrFailOnExitStatusWithRestartTests.testInvokeJobWithUserStop.sleep>${StopOrFailOnExitStatusWithRestartTests.testInvokeJobWithUserStop.sleep}</StopOrFailOnExitStatusWithRestartTests.testInvokeJobWithUserStop.sleep>
+                        <TransactionTests.testGlobalTranNoExceptions.sleep>${TransactionTests.testGlobalTranNoExceptions.sleep}</TransactionTests.testGlobalTranNoExceptions.sleep>
+                        <TransactionTests.testGlobalTranForcedExceptionWithRollback.sleep>${TransactionTests.testGlobalTranForcedExceptionWithRollback.sleep}</TransactionTests.testGlobalTranForcedExceptionWithRollback.sleep>
+                        <TransactionTests.testGlobalTranForcedExceptionCheckpointRestart.sleep>${TransactionTests.testGlobalTranForcedExceptionCheckpointRestart.sleep}</TransactionTests.testGlobalTranForcedExceptionCheckpointRestart.sleep>
+                        <TransactionTests.testGlobalTranNoDelayLongTimeout.sleep>${TransactionTests.testGlobalTranNoDelayLongTimeout.sleep}</TransactionTests.testGlobalTranNoDelayLongTimeout.sleep>
+                        <TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.1>${TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.1}</TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.1>
+                        <TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.2>${TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.2}</TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.2>
+                        <TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutSteps.sleep>${TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutSteps.sleep}</TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutSteps.sleep>
+                        <TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutStepsCustomCheckpointAlgorithm.sleep>${TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutStepsCustomCheckpointAlgorithm.sleep}</TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutStepsCustomCheckpointAlgorithm.sleep>
+                        <TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.1>${TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.1}</TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.1>
+                        <TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.2>${TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.2}</TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.2>
+                        <ChunkTests.testChunkTimeBased10Seconds.sleep>${ChunkTests.testChunkTimeBased10Seconds.sleep}</ChunkTests.testChunkTimeBased10Seconds.sleep>
+                        <ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep>${ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep}</ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep>
+                        <ChunkTests.testChunkTimeBasedTimeLimit0.sleep>${ChunkTests.testChunkTimeBasedTimeLimit0.sleep}</ChunkTests.testChunkTimeBasedTimeLimit0.sleep>
+                        <ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep>${ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep}</ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
