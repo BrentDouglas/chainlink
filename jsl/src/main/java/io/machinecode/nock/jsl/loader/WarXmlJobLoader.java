@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.xml.loader;
+package io.machinecode.nock.jsl.loader;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

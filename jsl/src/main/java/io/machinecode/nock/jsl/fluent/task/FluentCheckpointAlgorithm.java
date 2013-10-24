@@ -7,4 +7,8 @@ import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class FluentCheckpointAlgorithm extends FluentPropertyReference<FluentCheckpointAlgorithm> implements CheckpointAlgorithm {
+    @Override
+    public FluentCheckpointAlgorithm copy() {
+        return copy(new FluentCheckpointAlgorithm());
+    }
 }

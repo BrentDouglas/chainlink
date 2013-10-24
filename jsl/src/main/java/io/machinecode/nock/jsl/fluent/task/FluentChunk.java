@@ -1,29 +1,24 @@
 package io.machinecode.nock.jsl.fluent.task;
 
-import io.machinecode.nock.spi.element.task.CheckpointAlgorithm;
-import io.machinecode.nock.spi.element.task.Chunk;
-import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
-import io.machinecode.nock.spi.element.task.ItemProcessor;
-import io.machinecode.nock.spi.element.task.ItemReader;
-import io.machinecode.nock.spi.element.task.ItemWriter;
+import io.machinecode.nock.jsl.inherit.task.InheritableChunk;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentChunk implements Chunk {
+public class FluentChunk implements FluentTask<FluentChunk>, InheritableChunk<FluentChunk, FluentItemReader, FluentItemProcessor, FluentItemWriter, FluentCheckpointAlgorithm, FluentExceptionClassFilter> {
 
     private String checkpointPolicy = CheckpointPolicy.ITEM;
     private String itemCount = TEN;
     private String timeLimit = ZERO;
     private String skipLimit = ZERO;
     private String retryLimit = ZERO;
-    private ItemReader reader;
-    private ItemProcessor processor;
-    private ItemWriter writer;
-    private CheckpointAlgorithm checkpointAlgorithm;
-    private ExceptionClassFilter skippableExceptionClasses;
-    private ExceptionClassFilter retryableExceptionClasses;
-    private ExceptionClassFilter noRollbackExceptionClasses;
+    private FluentItemReader reader;
+    private FluentItemProcessor processor;
+    private FluentItemWriter writer;
+    private FluentCheckpointAlgorithm checkpointAlgorithm;
+    private FluentExceptionClassFilter skippableExceptionClasses;
+    private FluentExceptionClassFilter retryableExceptionClasses;
+    private FluentExceptionClassFilter noRollbackExceptionClasses;
 
 
     @Override
@@ -77,72 +72,87 @@ public class FluentChunk implements Chunk {
     }
 
     @Override
-    public ItemReader getReader() {
+    public FluentItemReader getReader() {
         return this.reader;
     }
 
-    public FluentChunk setReader(final ItemReader reader) {
+    public FluentChunk setReader(final FluentItemReader reader) {
         this.reader = reader;
         return this;
     }
 
     @Override
-    public ItemProcessor getProcessor() {
+    public FluentItemProcessor getProcessor() {
         return this.processor;
     }
 
-    public FluentChunk setProcessor(final ItemProcessor processor) {
+    public FluentChunk setProcessor(final FluentItemProcessor processor) {
         this.processor = processor;
         return this;
     }
 
     @Override
-    public ItemWriter getWriter() {
+    public FluentItemWriter getWriter() {
         return this.writer;
     }
 
-    public FluentChunk setWriter(final ItemWriter writer) {
+    public FluentChunk setWriter(final FluentItemWriter writer) {
         this.writer = writer;
         return this;
     }
 
     @Override
-    public CheckpointAlgorithm getCheckpointAlgorithm() {
+    public FluentCheckpointAlgorithm getCheckpointAlgorithm() {
         return this.checkpointAlgorithm;
     }
 
-    public FluentChunk setCheckpointAlgorithm(final CheckpointAlgorithm checkpointAlgorithm) {
+    public FluentChunk setCheckpointAlgorithm(final FluentCheckpointAlgorithm checkpointAlgorithm) {
         this.checkpointAlgorithm = checkpointAlgorithm;
         return this;
     }
 
     @Override
-    public ExceptionClassFilter getSkippableExceptionClasses() {
+    public FluentExceptionClassFilter getSkippableExceptionClasses() {
         return this.skippableExceptionClasses;
     }
 
-    public FluentChunk setSkippableExceptionClasses(final ExceptionClassFilter skippableExceptionClasses) {
+    public FluentChunk setSkippableExceptionClasses(final FluentExceptionClassFilter skippableExceptionClasses) {
         this.skippableExceptionClasses = skippableExceptionClasses;
         return this;
     }
 
     @Override
-    public ExceptionClassFilter getRetryableExceptionClasses() {
+    public FluentExceptionClassFilter getRetryableExceptionClasses() {
         return this.retryableExceptionClasses;
     }
 
-    public FluentChunk setRetryableExceptionClasses(final ExceptionClassFilter retryableExceptionClasses) {
+    public FluentChunk setRetryableExceptionClasses(final FluentExceptionClassFilter retryableExceptionClasses) {
         this.retryableExceptionClasses = retryableExceptionClasses;
         return this;
     }
 
     @Override
-    public ExceptionClassFilter getNoRollbackExceptionClasses() {
+    public FluentExceptionClassFilter getNoRollbackExceptionClasses() {
         return this.noRollbackExceptionClasses;
     }
 
-    public FluentChunk setNoRollbackExceptionClasses(final ExceptionClassFilter noRollbackExceptionClasses) {
+    public FluentChunk setNoRollbackExceptionClasses(final FluentExceptionClassFilter noRollbackExceptionClasses) {
         this.noRollbackExceptionClasses = noRollbackExceptionClasses;
         return this;
+    }
+
+    @Override
+    public FluentChunk copy() {
+        return copy(new FluentChunk());
+    }
+
+    @Override
+    public FluentChunk copy(final FluentChunk that) {
+        return ChunkTool.copy(this, that);
+    }
+
+    @Override
+    public FluentChunk merge(final FluentChunk that) {
+        return ChunkTool.merge(this, that);
     }
 }

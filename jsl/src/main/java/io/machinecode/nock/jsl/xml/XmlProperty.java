@@ -49,8 +49,5 @@ public class XmlProperty implements InheritableProperty<XmlProperty> {
     @Override
     public XmlProperty copy(final XmlProperty that) {
         return PropertyTool.copy(this, that);
-        //that.setName(this.name);
-        //that.setValue(this.value);
-        //return that;
     }
 }

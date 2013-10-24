@@ -1,7 +1,7 @@
 package io.machinecode.nock.core.loader;
 
 import gnu.trove.set.hash.TLinkedHashSet;
-import io.machinecode.nock.jsl.xml.loader.JarXmlJobLoader;
+import io.machinecode.nock.jsl.loader.JarXmlJobLoader;
 import io.machinecode.nock.spi.configuration.Configuration;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.loader.JobLoader;

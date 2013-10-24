@@ -1,16 +1,17 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.spi.element.Listener;
-import io.machinecode.nock.spi.element.Listeners;
-import io.machinecode.nock.spi.element.task.Task;
-import io.machinecode.nock.spi.element.Properties;
-import io.machinecode.nock.spi.element.partition.Strategy;
-import io.machinecode.nock.spi.element.partition.Partition;
-import io.machinecode.nock.spi.element.transition.Transition;
-import io.machinecode.nock.spi.element.execution.Step;
+import io.machinecode.nock.jsl.fluent.FluentInheritableBase;
+import io.machinecode.nock.jsl.fluent.FluentListener;
 import io.machinecode.nock.jsl.fluent.FluentListeners;
 import io.machinecode.nock.jsl.fluent.FluentProperties;
 import io.machinecode.nock.jsl.fluent.FluentProperty;
+import io.machinecode.nock.jsl.fluent.partition.FluentPartition;
+import io.machinecode.nock.jsl.fluent.partition.FluentStrategy;
+import io.machinecode.nock.jsl.fluent.task.FluentTask;
+import io.machinecode.nock.jsl.fluent.transition.FluentTransition;
+import io.machinecode.nock.jsl.inherit.execution.InheritableStep;
+import io.machinecode.nock.spi.Copyable;
+import io.machinecode.nock.spi.JobRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,22 +19,37 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentStep<T extends Task, U extends Strategy> extends FluentExecution<FluentStep<T, U>> implements Step <T, U> {
+public class FluentStep<T extends FluentTask, U extends Copyable<U> & FluentStrategy<U>>
+        extends FluentInheritableBase<FluentStep<T, U>>
+        implements FluentExecution<FluentStep<T, U>>, InheritableStep<FluentStep<T, U>, FluentProperties, FluentListeners, T, FluentTransition, FluentPartition<U>> {
 
+    private String id;
     private String next;
     private String startLimit = ZERO;
     private String allowStartIfComplete = "false";
-    private final FluentProperties properties = new FluentProperties();
-    private final FluentListeners listeners = new FluentListeners();
-    private final List<Transition> transitions = new ArrayList<Transition>(0);
+    private FluentProperties properties;
+    private FluentListeners listeners;
+    private List<FluentTransition> transitions = new ArrayList<FluentTransition>(0);
     private T task;
-    private Partition<U> partition;
+    private FluentPartition<U> partition;
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public FluentStep<T, U> setId(final String id) {
+        this.id = id;
+        return this;
+    }
 
     @Override
     public String getNext() {
         return this.next;
     }
 
+    @Override
     public FluentStep<T, U> setNext(final String next) {
         this.next = next;
         return this;
@@ -60,21 +76,39 @@ public class FluentStep<T extends Task, U extends Strategy> extends FluentExecut
     }
 
     @Override
-    public Properties getProperties() {
+    public FluentProperties getProperties() {
         return this.properties;
     }
 
+    @Override
+    public FluentStep<T, U> setProperties(final FluentProperties properties) {
+        this.properties = properties;
+        return this;
+    }
+
     public FluentStep<T, U> addProperty(final String name, final String value) {
+        if (this.properties == null) {
+            this.properties = new FluentProperties();
+        }
         this.properties.getProperties().add(new FluentProperty().setName(name).setValue(value));
         return this;
     }
 
     @Override
-    public Listeners getListeners() {
+    public FluentListeners getListeners() {
         return this.listeners;
     }
 
-    public FluentStep<T, U> addListener(final Listener listener) {
+    @Override
+    public FluentStep<T, U> setListeners(final FluentListeners listeners) {
+        this.listeners = listeners;
+        return this;
+    }
+
+    public FluentStep<T, U> addListener(final FluentListener listener) {
+        if (this.listeners == null) {
+            this.listeners = new FluentListeners();
+        }
         this.listeners.addListener(listener);
         return this;
     }
@@ -90,22 +124,44 @@ public class FluentStep<T extends Task, U extends Strategy> extends FluentExecut
     }
 
     @Override
-    public List<Transition> getTransitions() {
+    public List<FluentTransition> getTransitions() {
         return this.transitions;
     }
 
-    public FluentStep<T, U> addTransition(final Transition transition) {
+    @Override
+    public FluentStep<T, U> setTransitions(final List<FluentTransition> transitions) {
+        this.transitions = transitions;
+        return this;
+    }
+
+    public FluentStep<T, U> addTransition(final FluentTransition transition) {
         this.transitions.add(transition);
         return this;
     }
 
     @Override
-    public Partition<U> getPartition() {
+    public FluentPartition<U> getPartition() {
         return this.partition;
     }
 
-    public FluentStep<T, U> setPartition(final Partition<U> partition) {
+    @Override
+    public FluentStep<T, U> setPartition(final FluentPartition<U> partition) {
         this.partition = partition;
         return this;
+    }
+
+    @Override
+    public FluentStep<T, U> inherit(final JobRepository repository, final String defaultJobXml) {
+        return StepTool.inherit(FluentStep.class, this, repository, defaultJobXml);
+    }
+
+    @Override
+    public FluentStep<T, U> copy() {
+        return copy(new FluentStep<T, U>());
+    }
+
+    @Override
+    public FluentStep<T, U> copy(final FluentStep<T, U> that) {
+        return StepTool.copy(this, that);
     }
 }

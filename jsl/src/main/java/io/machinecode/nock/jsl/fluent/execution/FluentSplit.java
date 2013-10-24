@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.spi.element.execution.Flow;
-import io.machinecode.nock.spi.element.execution.Split;
+import io.machinecode.nock.jsl.inherit.execution.InheritableSplit;
+import io.machinecode.nock.spi.JobRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +9,22 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentSplit extends FluentExecution<FluentSplit> implements Split {
+public class FluentSplit implements FluentExecution<FluentSplit>, InheritableSplit<FluentSplit, FluentFlow> {
 
+    private String id;
     private String next;
-    private List<Flow> flows = new ArrayList<Flow>(0);
+    private List<FluentFlow> flows = new ArrayList<FluentFlow>(0);
+
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    public FluentSplit setId(final String id) {
+        this.id = id;
+        return this;
+    }
 
     @Override
     public String getNext() {
@@ -25,12 +37,33 @@ public class FluentSplit extends FluentExecution<FluentSplit> implements Split {
     }
 
     @Override
-    public List<Flow> getFlows() {
+    public List<FluentFlow> getFlows() {
         return this.flows;
     }
 
-    public FluentSplit addFlow(final Flow flow) {
+    @Override
+    public FluentSplit setFlows(final List<FluentFlow> flows) {
+        this.flows = flows;
+        return this;
+    }
+
+    public FluentSplit addFlow(final FluentFlow flow) {
         this.flows.add(flow);
         return this;
+    }
+
+    @Override
+    public FluentSplit inherit(final JobRepository repository, final String defaultJobXml) {
+        return SplitTool.inherit(this, repository, defaultJobXml);
+    }
+
+    @Override
+    public FluentSplit copy() {
+        return copy(new FluentSplit());
+    }
+
+    @Override
+    public FluentSplit copy(final FluentSplit that) {
+        return SplitTool.copy(this, that);
     }
 }

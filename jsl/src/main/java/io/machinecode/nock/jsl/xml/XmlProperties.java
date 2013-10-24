@@ -54,16 +54,10 @@ public class XmlProperties extends XmlMergeableList<XmlProperties> implements In
     @Override
     public XmlProperties copy(final XmlProperties that) {
         return PropertiesTool.copy(this, that);
-        //that.setProperties(Util.copyList(this.properties));
-        //return that;
     }
 
     @Override
     public XmlProperties merge(final XmlProperties that) {
         return PropertiesTool.merge(this, that);
-        //if (this.merge) {
-        //    this.properties = Util.listRule(this.properties, that.properties);
-        //}
-        //return this;
     }
 }

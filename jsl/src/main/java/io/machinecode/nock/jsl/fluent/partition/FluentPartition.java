@@ -1,58 +1,67 @@
 package io.machinecode.nock.jsl.fluent.partition;
 
-import io.machinecode.nock.spi.element.partition.Analyser;
-import io.machinecode.nock.spi.element.partition.Collector;
-import io.machinecode.nock.spi.element.partition.Strategy;
-import io.machinecode.nock.spi.element.partition.Partition;
-import io.machinecode.nock.spi.element.partition.Reducer;
+import io.machinecode.nock.jsl.inherit.InheritablePartition;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class FluentPartition<T extends Strategy> implements Partition<T> {
+public class FluentPartition<T extends FluentStrategy<T>>
+        implements InheritablePartition<FluentPartition<T>, FluentStrategy<T>, FluentCollector, FluentAnalyser, FluentReducer> {
 
-    private T strategy;
-    private Collector collector;
-    private Analyser analyser;
-    private Reducer reducer;
+    private FluentStrategy<T> strategy;
+    private FluentCollector collector;
+    private FluentAnalyser analyser;
+    private FluentReducer reducer;
 
     @Override
-    public T getStrategy() {
+    public FluentStrategy<T> getStrategy() {
         return this.strategy;
     }
 
-    public FluentPartition<T> setStrategy(final T strategy) {
+    public FluentPartition<T> setStrategy(final FluentStrategy<T> strategy) {
         this.strategy = strategy;
         return this;
     }
 
     @Override
-    public Collector getCollector() {
+    public FluentCollector getCollector() {
         return this.collector;
     }
 
-    public FluentPartition<T> setAnalyser(final Analyser analyser) {
-        this.analyser = analyser;
-        return this;
-    }
-
     @Override
-    public Analyser getAnalyzer() {
-        return this.analyser;
-    }
-
-    public FluentPartition<T> setCollector(final Collector collector) {
+    public FluentPartition<T> setCollector(final FluentCollector collector) {
         this.collector = collector;
         return this;
     }
 
     @Override
-    public Reducer getReducer() {
+    public FluentAnalyser getAnalyzer() {
+        return this.analyser;
+    }
+
+    @Override
+    public FluentPartition<T> setAnalyzer(final FluentAnalyser analyser) {
+        this.analyser = analyser;
+        return this;
+    }
+
+    @Override
+    public FluentReducer getReducer() {
         return this.reducer;
     }
 
-    public FluentPartition<T> setReducer(final Reducer reducer) {
+    public FluentPartition<T> setReducer(final FluentReducer reducer) {
         this.reducer = reducer;
         return this;
+    }
+
+    @Override
+    public FluentPartition<T> copy() {
+        return copy(new FluentPartition<T>());
+    }
+
+    @Override
+    public FluentPartition<T> copy(final FluentPartition<T> that) {
+        return PartitionTool.copy(this, that);
     }
 }

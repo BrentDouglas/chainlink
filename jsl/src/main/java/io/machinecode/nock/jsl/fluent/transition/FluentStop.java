@@ -1,24 +1,13 @@
 package io.machinecode.nock.jsl.fluent.transition;
 
-import io.machinecode.nock.spi.element.transition.Stop;
+import io.machinecode.nock.jsl.inherit.transition.InheritableStop;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentStop extends FluentTransition<FluentStop> implements Stop {
+public class FluentStop extends FluentTerminatingTransition<FluentStop> implements InheritableStop<FluentStop> {
 
-    private String exitStatus;
     private String restart;
-
-    @Override
-    public String getExitStatus() {
-        return this.exitStatus;
-    }
-
-    public FluentStop setExitStatus(final String exitStatus) {
-        this.exitStatus = exitStatus;
-        return this;
-    }
 
     @Override
     public String getRestart() {
@@ -28,5 +17,15 @@ public class FluentStop extends FluentTransition<FluentStop> implements Stop {
     public FluentStop setRestart(final String restart) {
         this.restart = restart;
         return this;
+    }
+
+    @Override
+    public FluentStop copy() {
+        return copy(new FluentStop());
+    }
+
+    @Override
+    public FluentStop copy(final FluentStop that) {
+        return StopTool.copy(this, that);
     }
 }

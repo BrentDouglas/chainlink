@@ -1,8 +1,9 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.spi.element.execution.Execution;
-import io.machinecode.nock.spi.element.transition.Transition;
-import io.machinecode.nock.spi.element.execution.Flow;
+import io.machinecode.nock.jsl.fluent.FluentInheritableBase;
+import io.machinecode.nock.jsl.fluent.transition.FluentTransition;
+import io.machinecode.nock.jsl.inherit.execution.InheritableFlow;
+import io.machinecode.nock.spi.JobRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +11,23 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentFlow extends FluentExecution<FluentFlow> implements Flow {
+public class FluentFlow extends FluentInheritableBase<FluentFlow> implements FluentExecution<FluentFlow>, InheritableFlow<FluentFlow, FluentExecution, FluentTransition> {
 
+    private String id;
     private String next;
-    private final List<Execution> executions = new ArrayList<Execution>(0);
-    private final List<Transition> transitions = new ArrayList<Transition>(0);
+    private List<FluentExecution> executions = new ArrayList<FluentExecution>(0);
+    private List<FluentTransition> transitions = new ArrayList<FluentTransition>(0);
+
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    public FluentFlow setId(final String id) {
+        this.id = id;
+        return this;
+    }
 
     @Override
     public String getNext() {
@@ -27,22 +40,49 @@ public class FluentFlow extends FluentExecution<FluentFlow> implements Flow {
     }
 
     @Override
-    public List<Execution> getExecutions() {
+    public List<FluentExecution> getExecutions() {
         return this.executions;
     }
 
-    public FluentFlow addExecution(final Execution execution) {
+    @Override
+    public FluentFlow setExecutions(final List<FluentExecution> executions) {
+        this.executions = executions;
+        return this;
+    }
+
+    public FluentFlow addExecution(final FluentExecution execution) {
         this.executions.add(execution);
         return this;
     }
 
     @Override
-    public List<Transition> getTransitions() {
+    public List<FluentTransition> getTransitions() {
         return this.transitions;
     }
 
-    public FluentFlow addTransition(final Transition transition) {
+    @Override
+    public FluentFlow setTransitions(final List<FluentTransition> transitions) {
+        this.transitions = transitions;
+        return this;
+    }
+
+    public FluentFlow addTransition(final FluentTransition transition) {
         this.transitions.add(transition);
         return this;
+    }
+
+    @Override
+    public FluentFlow inherit(final JobRepository repository, final String defaultJobXml) {
+        return FlowTool.inherit(FluentFlow.class, this, repository, defaultJobXml);
+    }
+
+    @Override
+    public FluentFlow copy() {
+        return copy(new FluentFlow());
+    }
+
+    @Override
+    public FluentFlow copy(final FluentFlow that) {
+        return FlowTool.copy(this, that);
     }
 }

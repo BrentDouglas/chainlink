@@ -68,11 +68,6 @@ public class XmlSplit implements XmlExecution<XmlSplit>, InheritableSplit<XmlSpl
     @Override
     public XmlSplit inherit(final JobRepository repository, final String defaultJobXml) {
         return SplitTool.inherit(this, repository, defaultJobXml);
-        //final XmlSplit copy = new XmlSplit();
-        //copy.setId(this.id);
-        //copy.setNext(this.next);
-        //copy.setFlows(Util.inheritingList(repository, defaultJobXml, this.flows));
-        //return copy;
     }
 
     @Override
@@ -83,9 +78,5 @@ public class XmlSplit implements XmlExecution<XmlSplit>, InheritableSplit<XmlSpl
     @Override
     public XmlSplit copy(final XmlSplit that) {
         return SplitTool.copy(this, that);
-        //that.setId(this.id);
-        //that.setNext(this.next);
-        //that.setFlows(Util.copyList(this.flows));
-        //return that;
     }
 }

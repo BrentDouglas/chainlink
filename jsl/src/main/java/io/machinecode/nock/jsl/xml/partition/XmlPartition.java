@@ -84,10 +84,5 @@ public class XmlPartition implements InheritablePartition<XmlPartition, XmlStrat
     @Override
     public XmlPartition copy(final XmlPartition that) {
         return PartitionTool.copy(this, that);
-        //that.setStrategy(Util.copy(this.strategy));
-        //that.setCollector(Util.copy(this.collector));
-        //that.setAnalyzer(Util.copy(this.analyzer));
-        //that.setReducer(Util.copy(this.reducer));
-        //return that;
     }
 }

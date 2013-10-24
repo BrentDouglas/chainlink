@@ -7,4 +7,8 @@ import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class FluentCollector extends FluentPropertyReference<FluentCollector> implements Collector {
+    @Override
+    public FluentCollector copy() {
+        return copy(new FluentCollector());
+    }
 }

@@ -99,26 +99,6 @@ public class XmlFlow extends XmlInheritableBase<XmlFlow> implements XmlExecution
     @Override
     public XmlFlow inherit(final JobRepository repository, final String defaultJobXml) {
         return FlowTool.inherit(XmlFlow.class, this, repository, defaultJobXml);
-        //final XmlFlow copy = this.copy();
-        //if (this.parent != null) {
-        //    final XmlFlow that = repository.findParent(XmlFlow.class, copy, defaultJobXml);
-//
-        //    that.transitions.clear(); // 4.6.3.1 Drop parent transitions
-//
-        //    copy.executions.clear(); // 4.6.3.2
-//
-        //    copy.inheritingElementRule(that); // 4.6.3.3
-//
-        //    // 4.6.3.4
-        //    copy.id = Util.attributeRule(copy.id, that.id); // 4.1
-        //    copy.next = Util.attributeRule(copy.next, that.next); // 4.1
-//
-        //    copy.executions = Util.inheritingList(repository, defaultJobXml, that.executions);
-        //} else {
-        //    copy.executions = Util.inheritingList(repository, defaultJobXml, this.executions);
-        //}
-//
-        //return copy;
     }
 
     @Override
@@ -129,11 +109,5 @@ public class XmlFlow extends XmlInheritableBase<XmlFlow> implements XmlExecution
     @Override
     public XmlFlow copy(final XmlFlow that) {
         return FlowTool.copy(this, that);
-        //super.copy(that);
-        //that.setId(this.id);
-        //that.setNext(this.next);
-        //that.setExecutions(Util.copyList(this.executions)); //TODO Skip these on inherit call
-        //that.setTransitions(Util.copyList(this.transitions));
-        //return that;
     }
 }

@@ -1,6 +1,7 @@
 package io.machinecode.nock.jsl.fluent.task;
 
-import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
+import io.machinecode.nock.jsl.fluent.FluentMergeableList;
+import io.machinecode.nock.jsl.inherit.task.InheritableExceptionClassFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,36 +9,44 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentExceptionClassFilter implements ExceptionClassFilter {
+public class FluentExceptionClassFilter
+        extends FluentMergeableList<FluentExceptionClassFilter>
+        implements InheritableExceptionClassFilter<FluentExceptionClassFilter, FluentExceptionClass> {
 
-    private final List<FluentExceptionClass> includes = new ArrayList<FluentExceptionClass>(0);
-    private final List<FluentExceptionClass> excludes = new ArrayList<FluentExceptionClass>(0);
+    private List<FluentExceptionClass> includes = new ArrayList<FluentExceptionClass>(0);
+    private List<FluentExceptionClass> excludes = new ArrayList<FluentExceptionClass>(0);
 
     @Override
     public List<FluentExceptionClass> getIncludes() {
         return this.includes;
     }
 
-    public FluentExceptionClassFilter setIncludes(final String... includes) {
+    @Override
+    public FluentExceptionClassFilter setIncludes(final List<FluentExceptionClass> includes) {
+        this.includes = includes;
+        return this;
+    }
+
+    public FluentExceptionClassFilter addIncludes(final String... includes) {
         for (final String include : includes) {
             this.includes.add(new FluentExceptionClass().setClassName(include));
         }
         return this;
     }
 
-    public FluentExceptionClassFilter setIncludes(final Class<? extends Throwable>... includes) {
+    public FluentExceptionClassFilter addIncludes(final Class<? extends Throwable>... includes) {
         for (final Class<? extends Throwable> include : includes) {
             this.includes.add(new FluentExceptionClass().setClassName(include.getCanonicalName()));
         }
         return this;
     }
 
-    public FluentExceptionClassFilter setInclude(final String include) {
+    public FluentExceptionClassFilter addInclude(final String include) {
         this.includes.add(new FluentExceptionClass().setClassName(include));
         return this;
     }
 
-    public FluentExceptionClassFilter setInclude(final Class<? extends Throwable> include) {
+    public FluentExceptionClassFilter addInclude(final Class<? extends Throwable> include) {
         this.includes.add(new FluentExceptionClass().setClassName(include.getCanonicalName()));
         return this;
     }
@@ -47,27 +56,48 @@ public class FluentExceptionClassFilter implements ExceptionClassFilter {
         return this.excludes;
     }
 
-    public FluentExceptionClassFilter setExcludes(final String... excludes) {
+    @Override
+    public FluentExceptionClassFilter setExcludes(final List<FluentExceptionClass> excludes) {
+        this.excludes = excludes;
+        return this;
+    }
+
+    public FluentExceptionClassFilter addExcludes(final String... excludes) {
         for (final String exclude : excludes) {
             this.excludes.add(new FluentExceptionClass().setClassName(exclude));
         }
         return this;
     }
 
-    public FluentExceptionClassFilter setExcludes(final Class<? extends Throwable>... excludes) {
+    public FluentExceptionClassFilter addExcludes(final Class<? extends Throwable>... excludes) {
         for (final Class<? extends Throwable> exclude : excludes) {
             this.excludes.add(new FluentExceptionClass().setClassName(exclude.getCanonicalName()));
         }
         return this;
     }
 
-    public FluentExceptionClassFilter setExclude(final String exclude) {
+    public FluentExceptionClassFilter addExclude(final String exclude) {
         this.excludes.add(new FluentExceptionClass().setClassName(exclude));
         return this;
     }
 
-    public FluentExceptionClassFilter setExclude(final Class<? extends Throwable> exclude) {
+    public FluentExceptionClassFilter addExclude(final Class<? extends Throwable> exclude) {
         this.excludes.add(new FluentExceptionClass().setClassName(exclude.getCanonicalName()));
         return this;
+    }
+
+    @Override
+    public FluentExceptionClassFilter copy() {
+        return copy(new FluentExceptionClassFilter());
+    }
+
+    @Override
+    public FluentExceptionClassFilter copy(final FluentExceptionClassFilter that) {
+        return ExceptionClassFilterTool.copy(this, that);
+    }
+
+    @Override
+    public FluentExceptionClassFilter merge(final FluentExceptionClassFilter that) {
+        return ExceptionClassFilterTool.merge(this, that);
     }
 }

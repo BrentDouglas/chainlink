@@ -4,6 +4,7 @@ import io.machinecode.nock.jsl.util.ForwardingList;
 import io.machinecode.nock.spi.Copyable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,7 +13,10 @@ import java.util.List;
 public class CopyList<T extends Copyable<T>> extends ForwardingList<T> implements List<T> {
 
     public CopyList(final List<? extends T> delegate) {
-        super(new ArrayList<T>(delegate.size()));
+        super(delegate == null ? Collections.<T>emptyList() : new ArrayList<T>(delegate.size()));
+        if (delegate == null) {
+            return;
+        }
         for (final T that : delegate) {
             this.delegate.add(that == null ? null : that.copy());
         }

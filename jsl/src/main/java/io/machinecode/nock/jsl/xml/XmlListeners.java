@@ -40,16 +40,10 @@ public class XmlListeners extends XmlMergeableList<XmlListeners> implements Inhe
     @Override
     public XmlListeners copy(final XmlListeners that) {
         return ListenersTool.copy(this, that);
-        //that.setListeners(Util.copyList(this.listeners));
-        //return that;
     }
 
     @Override
     public XmlListeners merge(final XmlListeners that) {
         return ListenersTool.merge(this, that);
-        //if (this.merge) {
-        //    this.listeners = Util.listRule(this.listeners, that.listeners);
-        //}
-        //return this;
     }
 }

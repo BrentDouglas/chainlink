@@ -7,4 +7,8 @@ import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class FluentItemWriter extends FluentPropertyReference<FluentItemWriter> implements ItemWriter {
+    @Override
+    public FluentItemWriter copy() {
+        return copy(new FluentItemWriter());
+    }
 }

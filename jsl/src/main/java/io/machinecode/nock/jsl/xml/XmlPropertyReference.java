@@ -27,6 +27,7 @@ public abstract class XmlPropertyReference<T extends XmlPropertyReference<T>> im
         return ref;
     }
 
+    @Override
     public T setRef(final String ref) {
         this.ref = ref;
         return (T)this;
@@ -37,6 +38,7 @@ public abstract class XmlPropertyReference<T extends XmlPropertyReference<T>> im
         return properties;
     }
 
+    @Override
     public T setProperties(final XmlProperties properties) {
         this.properties = properties;
         return (T)this;
@@ -45,16 +47,10 @@ public abstract class XmlPropertyReference<T extends XmlPropertyReference<T>> im
     @Override
     public T copy(final T that) {
         return PropertyReferenceTool.copy((T)this, that);
-        //that.setRef(this.ref);
-        //that.setProperties(Util.copy(this.properties));
-        //return that;
     }
 
     @Override
     public T merge(final T that) {
         return PropertyReferenceTool.merge((T)this, that);
-        //this.setRef(Util.attributeRule(this.ref, that.getRef()));
-        //this.setProperties(Util.merge(this.properties, that.getProperties()));
-        //return (T)this;
     }
 }

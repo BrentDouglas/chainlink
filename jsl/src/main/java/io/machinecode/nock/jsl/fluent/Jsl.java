@@ -7,9 +7,8 @@ import io.machinecode.nock.jsl.fluent.execution.FluentStep;
 import io.machinecode.nock.jsl.fluent.partition.FluentAnalyser;
 import io.machinecode.nock.jsl.fluent.partition.FluentCollector;
 import io.machinecode.nock.jsl.fluent.partition.FluentMapper;
-import io.machinecode.nock.jsl.fluent.partition.FluentMapperPartition;
+import io.machinecode.nock.jsl.fluent.partition.FluentPartition;
 import io.machinecode.nock.jsl.fluent.partition.FluentPlan;
-import io.machinecode.nock.jsl.fluent.partition.FluentPlanPartition;
 import io.machinecode.nock.jsl.fluent.partition.FluentReducer;
 import io.machinecode.nock.jsl.fluent.task.FluentBatchlet;
 import io.machinecode.nock.jsl.fluent.task.FluentCheckpointAlgorithm;
@@ -23,10 +22,6 @@ import io.machinecode.nock.jsl.fluent.transition.FluentEnd;
 import io.machinecode.nock.jsl.fluent.transition.FluentFail;
 import io.machinecode.nock.jsl.fluent.transition.FluentNext;
 import io.machinecode.nock.jsl.fluent.transition.FluentStop;
-import io.machinecode.nock.spi.element.partition.Mapper;
-import io.machinecode.nock.spi.element.partition.Plan;
-import io.machinecode.nock.spi.element.task.Batchlet;
-import io.machinecode.nock.spi.element.task.Chunk;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -35,6 +30,10 @@ public class Jsl {
 
     public static FluentJob job() {
         return new FluentJob();
+    }
+
+    public static FluentJob job(final String name) {
+        return new FluentJob().setJslName(name);
     }
 
     public static FluentListener listener() {
@@ -67,19 +66,19 @@ public class Jsl {
         return split();
     }
 
-    public static FluentStep<Batchlet,Mapper> executionAsStepWithBatchletAndMapper() {
+    public static FluentStep<FluentBatchlet,FluentMapper> executionAsStepWithBatchletAndMapper() {
         return stepWithBatchletAndMapper();
     }
 
-    public static FluentStep<Batchlet,Plan> executionAsStepWithBatchletAndPlan() {
+    public static FluentStep<FluentBatchlet,FluentPlan> executionAsStepWithBatchletAndPlan() {
         return stepWithBatchletAndPlan();
     }
 
-    public static FluentStep<Chunk,Mapper> executionAsStepWithChunkAndMapper() {
+    public static FluentStep<FluentChunk,FluentMapper> executionAsStepWithChunkAndMapper() {
         return stepWithChunkAndMapper();
     }
 
-    public static FluentStep<Chunk,Plan> executionAsStepWithChunkAndPlan() {
+    public static FluentStep<FluentChunk,FluentPlan> executionAsStepWithChunkAndPlan() {
         return stepWithChunkAndPlan();
     }
 
@@ -95,20 +94,20 @@ public class Jsl {
         return new FluentSplit();
     }
 
-    public static FluentStep<Batchlet,Mapper> stepWithBatchletAndMapper() {
-        return new FluentStep<Batchlet,Mapper>();
+    public static FluentStep<FluentBatchlet,FluentMapper> stepWithBatchletAndMapper() {
+        return new FluentStep<FluentBatchlet,FluentMapper>();
     }
 
-    public static FluentStep<Batchlet,Plan> stepWithBatchletAndPlan() {
-        return new FluentStep<Batchlet,Plan>();
+    public static FluentStep<FluentBatchlet,FluentPlan> stepWithBatchletAndPlan() {
+        return new FluentStep<FluentBatchlet,FluentPlan>();
     }
 
-    public static FluentStep<Chunk,Mapper> stepWithChunkAndMapper() {
-        return new FluentStep<Chunk,Mapper>();
+    public static FluentStep<FluentChunk,FluentMapper> stepWithChunkAndMapper() {
+        return new FluentStep<FluentChunk,FluentMapper>();
     }
 
-    public static FluentStep<Chunk,Plan> stepWithChunkAndPlan() {
-        return new FluentStep<Chunk,Plan>();
+    public static FluentStep<FluentChunk,FluentPlan> stepWithChunkAndPlan() {
+        return new FluentStep<FluentChunk,FluentPlan>();
     }
 
     // Transition
@@ -155,12 +154,12 @@ public class Jsl {
         return new FluentCollector();
     }
 
-    public static FluentPlanPartition partitionWithPlan() {
-        return new FluentPlanPartition();
+    public static FluentPartition<FluentPlan> partitionWithPlan() {
+        return new FluentPartition<FluentPlan>();
     }
 
-    public static FluentMapperPartition partitionWithMapper() {
-        return new FluentMapperPartition();
+    public static FluentPartition<FluentMapper> partitionWithMapper() {
+        return new FluentPartition<FluentMapper>();
     }
 
     public static FluentMapper strategyAsMapper() {
@@ -211,6 +210,18 @@ public class Jsl {
 
     public static FluentExceptionClassFilter filter() {
         return new FluentExceptionClassFilter();
+    }
+
+    public static FluentExceptionClassFilter skippableExceptionClasses() {
+        return filter();
+    }
+
+    public static FluentExceptionClassFilter retryableExceptionClasses() {
+        return filter();
+    }
+
+    public static FluentExceptionClassFilter noRollbackExceptionClasses() {
+        return filter();
     }
 
     public static FluentItemProcessor processor() {

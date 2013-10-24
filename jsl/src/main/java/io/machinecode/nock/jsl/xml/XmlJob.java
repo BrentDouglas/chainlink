@@ -143,12 +143,5 @@ public class XmlJob extends XmlInheritableBase<XmlJob> implements InheritableJob
     @Override
     public XmlJob copy(final XmlJob that) {
         return JobTool.copy(this, that);
-        //super.copy(that);
-        //that.setId(this.id);
-        //that.setRestartable(this.restartable);
-        //that.setProperties(Util.copy(this.properties));
-        //that.setListeners(Util.copy(this.listeners));
-        //that.setExecutions(Util.copyList(this.executions));
-        //return that;
     }
 }

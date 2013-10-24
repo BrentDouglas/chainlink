@@ -7,4 +7,8 @@ import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class FluentItemReader extends FluentPropertyReference<FluentItemReader> implements ItemReader {
+    @Override
+    public FluentItemReader copy() {
+        return copy(new FluentItemReader());
+    }
 }

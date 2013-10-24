@@ -5,17 +5,10 @@ import io.machinecode.nock.spi.element.transition.Fail;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentFail extends FluentTransition<FluentFail> implements Fail {
-
-    private String exitStatus;
+public class FluentFail extends FluentTerminatingTransition<FluentFail> implements Fail {
 
     @Override
-    public String getExitStatus() {
-        return this.exitStatus;
-    }
-
-    public FluentFail setExitStatus(final String exitStatus) {
-        this.exitStatus = exitStatus;
-        return this;
+    public FluentFail copy() {
+        return copy(new FluentFail());
     }
 }

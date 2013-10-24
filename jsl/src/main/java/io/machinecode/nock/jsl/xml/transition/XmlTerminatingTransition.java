@@ -42,8 +42,5 @@ public abstract class XmlTerminatingTransition<T extends XmlTerminatingTransitio
     @Override
     public T copy(final T that) {
         return TerminatingTransitionTool.copy((T)this, that);
-        //that.setOn(this.on);
-        //that.setExitStatus(this.exitStatus);
-        //return that;
     }
 }

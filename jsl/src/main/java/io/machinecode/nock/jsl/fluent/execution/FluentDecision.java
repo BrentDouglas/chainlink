@@ -1,8 +1,10 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.spi.element.transition.Transition;
-import io.machinecode.nock.spi.element.execution.Decision;
+import io.machinecode.nock.jsl.fluent.FluentProperties;
 import io.machinecode.nock.jsl.fluent.FluentPropertyReference;
+import io.machinecode.nock.jsl.fluent.transition.FluentTransition;
+import io.machinecode.nock.jsl.inherit.execution.InheritableDecision;
+import io.machinecode.nock.spi.JobRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +12,10 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentDecision extends FluentPropertyReference<FluentDecision> implements Decision {
+public class FluentDecision extends FluentPropertyReference<FluentDecision> implements FluentExecution<FluentDecision>, InheritableDecision<FluentDecision, FluentProperties, FluentTransition> {
 
     private String id;
-    private final List<Transition> transitions = new ArrayList<Transition>(0);
+    private List<FluentTransition> transitions = new ArrayList<FluentTransition>(0);
 
     @Override
     public String getId() {
@@ -26,12 +28,28 @@ public class FluentDecision extends FluentPropertyReference<FluentDecision> impl
     }
 
     @Override
-    public List<Transition> getTransitions() {
+    public List<FluentTransition> getTransitions() {
         return this.transitions;
     }
 
-    public FluentDecision addTransition(final Transition transition) {
+    @Override
+    public FluentDecision setTransitions(final List<FluentTransition> transitions) {
+        this.transitions = transitions;
+        return this;
+    }
+
+    public FluentDecision addTransition(final FluentTransition transition) {
         this.transitions.add(transition);
         return this;
+    }
+
+    @Override
+    public FluentDecision inherit(final JobRepository repository, final String defaultJobXml) {
+        return DecisionTool.inherit(this, repository, defaultJobXml);
+    }
+
+    @Override
+    public FluentDecision copy() {
+        return copy(new FluentDecision());
     }
 }

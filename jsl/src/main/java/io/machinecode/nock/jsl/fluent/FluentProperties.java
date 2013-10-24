@@ -1,8 +1,6 @@
 package io.machinecode.nock.jsl.fluent;
 
-import io.machinecode.nock.spi.element.Properties;
-import io.machinecode.nock.spi.element.Property;
-import io.machinecode.nock.jsl.util.ForwardingList;
+import io.machinecode.nock.jsl.inherit.InheritableProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,37 +8,55 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentProperties<T extends FluentProperties<T>> extends ForwardingList<Property> implements Properties {
+public class FluentProperties extends FluentMergeableList<FluentProperties> implements InheritableProperties<FluentProperties, FluentProperty> {
 
     private String partition;
-    //private final List<Property> properties = new ArrayList<Property>(0);
+    private List<FluentProperty> properties = new ArrayList<FluentProperty>(0);
 
-    public FluentProperties() {
-        super(new ArrayList<Property>());
-    }
 
     @Override
     public String getPartition() {
         return partition;
     }
 
-    public T setPartition(final String partition) {
+    public FluentProperties setPartition(final String partition) {
         this.partition = partition;
-        return (T)this;
+        return this;
     }
 
     @Override
-    public List<Property> getProperties() {
-        return this.delegate;
+    public List<FluentProperty> getProperties() {
+        return this.properties;
     }
 
-    public T addProperty(final Property property) {
-        this.delegate.add(property);
-        return (T) this;
+    public FluentProperties addProperty(final FluentProperty property) {
+        this.properties.add(property);
+        return this;
     }
 
-    public T addProperty(final String name, final String value) {
-        this.delegate.add(new FluentProperty().setName(name).setValue(value));
-        return (T) this;
+    public FluentProperties addProperty(final String name, final String value) {
+        this.properties.add(new FluentProperty().setName(name).setValue(value));
+        return this;
+    }
+
+    @Override
+    public FluentProperties setProperties(final List<FluentProperty> properties) {
+        this.properties = properties;
+        return this;
+    }
+
+    @Override
+    public FluentProperties copy() {
+        return copy(new FluentProperties());
+    }
+
+    @Override
+    public FluentProperties copy(final FluentProperties that) {
+        return PropertiesTool.copy(this, that);
+    }
+
+    @Override
+    public FluentProperties merge(final FluentProperties that) {
+        return PropertiesTool.merge(this, that);
     }
 }

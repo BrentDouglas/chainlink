@@ -54,7 +54,7 @@ public class XmlExceptionClassFilter extends XmlMergeableList<XmlExceptionClassF
     public XmlExceptionClassFilter copy(final XmlExceptionClassFilter that) {
         return ExceptionClassFilterTool.copy(this, that);
         //that.setIncludes(Util.copyList(this.includes));
-        //that.setExcludes(Util.copyList(this.excludes));
+        //that.addExcludes(Util.copyList(this.excludes));
         //return that;
     }
 

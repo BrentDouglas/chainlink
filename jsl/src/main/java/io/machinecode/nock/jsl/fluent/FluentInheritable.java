@@ -1,4 +1,4 @@
-package io.machinecode.nock.jsl.fluent.inherit;
+package io.machinecode.nock.jsl.fluent;
 
 import io.machinecode.nock.jsl.inherit.InheritableBase;
 
