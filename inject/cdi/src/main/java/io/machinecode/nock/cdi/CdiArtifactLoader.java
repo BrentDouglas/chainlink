@@ -25,9 +25,6 @@ public class CdiArtifactLoader implements ArtifactLoader, Extension {
 
     void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery beforeBeanDiscovery, final BeanManager beanManager) {
         CdiArtifactLoader.beanManager = beanManager;
-        beforeBeanDiscovery.addAnnotatedType(
-                beanManager.createAnnotatedType(CdiInjector.class)
-        );
     }
 
     public void shutdown(@Observes BeforeShutdown beforeShutdown) {

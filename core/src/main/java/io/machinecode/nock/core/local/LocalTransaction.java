@@ -5,41 +5,31 @@ import org.jboss.logging.Logger;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
-import javax.transaction.UserTransaction;
 import javax.transaction.xa.XAResource;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class LocalTransaction implements UserTransaction, Transaction {
+public class LocalTransaction implements Transaction {
 
     private static final Logger log = Logger.getLogger(LocalTransaction.class);
 
     private final LocalTransactionManager manager;
 
-    private long timeout;
-    private long start;
+    private final long timeout;
     private int status = Status.STATUS_ACTIVE;
 
     private Set<Synchronization> syncs;
 
     public LocalTransaction(final LocalTransactionManager manager) {
         this.manager = manager;
-    }
-
-    @Override
-    public void begin() throws NotSupportedException, SystemException {
-        this.start = System.currentTimeMillis();
-        this.timeout = this.manager.timeout();
+        this.timeout = System.currentTimeMillis() + this.manager.timeout();
     }
 
     @Override
@@ -54,7 +44,7 @@ public class LocalTransaction implements UserTransaction, Transaction {
                     //Rollback
                     throw new RollbackException();
             }
-            if (end - this.start > this.timeout) {
+            if (this.timeout < end) {
                 //Rollback
                 throw new RollbackException();
             }
@@ -95,11 +85,6 @@ public class LocalTransaction implements UserTransaction, Transaction {
         return this.status;
     }
 
-    @Override
-    public void setTransactionTimeout(final int seconds) throws SystemException {
-        this.manager.setTransactionTimeout(seconds);
-    }
-
     // XA
 
     @Override
@@ -132,6 +117,9 @@ public class LocalTransaction implements UserTransaction, Transaction {
     }
 
     private void _before() {
+        if (this.syncs == null) {
+            return;
+        }
         for (final Synchronization sync : this.syncs) {
             try {
                 sync.beforeCompletion();
@@ -142,6 +130,9 @@ public class LocalTransaction implements UserTransaction, Transaction {
     }
 
     private void _after(final int status) {
+        if (this.syncs == null) {
+            return;
+        }
         for (final Synchronization sync : this.syncs) {
             try {
                 sync.afterCompletion(status);

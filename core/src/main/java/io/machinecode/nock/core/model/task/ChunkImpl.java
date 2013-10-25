@@ -217,6 +217,13 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             this.itemWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, ItemWriteListener.class);
             this.retryWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, RetryWriteListener.class);
             this.skipWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, SkipWriteListener.class);
+
+            if (this.reader == null) {
+                throw new IllegalStateException(ChunkImpl.this.reader.getRef());
+            }
+            if (this.writer == null) {
+                throw new IllegalStateException(ChunkImpl.this.writer.getRef());
+            }
         }
 
         public void next(final int status) {

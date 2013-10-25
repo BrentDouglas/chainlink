@@ -22,13 +22,6 @@ public class JobLoaderImpl implements JobLoader {
         this.loader = new JarXmlJobLoader(configuration.getClassLoader());
         this.loaders = new TLinkedHashSet<JobLoader>();
         Collections.addAll(this.loaders, configuration.getJobLoaders());
-        //final List<JobLoader> loaders;
-        //try {
-        //    loaders = new ResolvableService<JobLoader>(JobLoader.class).resolve(configuration.getClassLoader());
-        //} catch (final ClassNotFoundException e) {
-        //    throw new RuntimeException(e);
-        //}
-        //this.loaders.addAll(loaders);
     }
 
     @Override

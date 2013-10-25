@@ -52,6 +52,9 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             batchlet = load(injectionContext);
         }
         try {
+            if (batchlet == null) {
+                throw new IllegalStateException(getRef()); //TODO
+            }
             batchlet.process();
         } finally {
             if (partition != null) {

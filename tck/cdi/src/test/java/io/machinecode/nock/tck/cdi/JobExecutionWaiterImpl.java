@@ -1,4 +1,4 @@
-package io.machinecode.nock.tck;
+package io.machinecode.nock.tck.cdi;
 
 import com.ibm.jbatch.tck.spi.JobExecutionTimeoutException;
 import com.ibm.jbatch.tck.spi.JobExecutionWaiter;
@@ -15,7 +15,7 @@ public class JobExecutionWaiterImpl implements JobExecutionWaiter {
     private final JobOperator operator;
     private final long timeout;
 
-    JobExecutionWaiterImpl(final long executionId, final JobOperator operator, final long timeout) {
+    public JobExecutionWaiterImpl(final long executionId, final JobOperator operator, final long timeout) {
         this.executionId = executionId;
         this.operator = operator;
         this.timeout = timeout;

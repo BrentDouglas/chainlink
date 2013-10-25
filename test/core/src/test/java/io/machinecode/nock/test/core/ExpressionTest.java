@@ -1,10 +1,9 @@
 package io.machinecode.nock.test.core;
 
-import io.machinecode.nock.core.expression.IllegalExpressionException;
 import io.machinecode.nock.core.factory.JobFactory;
+import io.machinecode.nock.jsl.fluent.Jsl;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Step;
-import io.machinecode.nock.jsl.fluent.Jsl;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -55,7 +54,7 @@ public class ExpressionTest {
         Assert.assertEquals("step3", step.getNext());
     }
 
-    @Test
+    @Test//(expected = IllegalExpressionException.class)
     public void validJobPropertyWithInvalidDefaultTest() {
         final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
@@ -93,7 +92,7 @@ public class ExpressionTest {
         Assert.assertEquals("step2", step1.getNext());
     }
 
-    @Test
+    @Test//(expected = IllegalExpressionException.class)
     public void invalidDefaultJobPropertyTest() {
         final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
@@ -213,7 +212,7 @@ public class ExpressionTest {
         Assert.assertEquals("step2", step1.getNext());
     }
 
-    @Test(expected = IllegalExpressionException.class)
+    @Test
     public void valueAfterDefaultTest() {
         final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
@@ -224,10 +223,32 @@ public class ExpressionTest {
                 .addProperty("prop3", "2")
                 .addExecution(Jsl.stepWithBatchletAndPlan()
                         .setId("step1")
-                        .setNext("blah?:default;INVALID PART")
+                        .setNext("blah?:default;not invalid apparently")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                 ), PARAMETERS);
+        JobFactory.INSTANCE.validate(job);
+    }
+
+    @Test
+    public void somethingOutOfTckTest() {
+        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+                .setId("i1")
+                .setRestartable("false")
+                .setVersion("1.0")
+                .addProperty("prop1", "st")
+                .addProperty("prop2", "ep")
+                .addProperty("prop3", "2")
+                .addExecution(Jsl.stepWithBatchletAndPlan()
+                        .setId("step1")
+                        .setNext("#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']};#{jobParameters['infile.name']}?:#{systemProperties['file.name.junit']};.txt")
+                ).addExecution(Jsl.stepWithChunkAndPlan()
+                        .setId("step2")
+                        .setNext("#{systemProperties['file.separator']}test#{systemProperties['file.separator']}#{jobParameters['myFilename']}.txt")
+                ).addExecution(Jsl.stepWithBatchletAndPlan()
+                        .setId("step3")
+                        .setNext("#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']};#{jobParameters['infile.name']}?:#{systemProperties['file.name.junit']};.txt")
+                ) , PARAMETERS);
         JobFactory.INSTANCE.validate(job);
     }
 }

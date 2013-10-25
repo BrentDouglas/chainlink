@@ -1,5 +1,6 @@
 package io.machinecode.nock.spi.element;
 
+import io.machinecode.nock.spi.PropertiesElement;
 import io.machinecode.nock.spi.element.execution.Execution;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Job {
+public interface Job extends PropertiesElement {
 
     String ELEMENT = "job";
 
@@ -19,8 +20,6 @@ public interface Job {
     String getVersion();
 
     String getRestartable();
-
-    Properties getProperties();
 
     Listeners getListeners();
 

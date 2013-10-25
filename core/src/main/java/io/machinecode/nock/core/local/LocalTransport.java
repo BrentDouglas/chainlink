@@ -440,8 +440,8 @@ public class LocalTransport implements Transport {
 
         @Override
         public void run() {
-            super.run();
             work.enqueue();
+            super.run();
         }
     }
 
@@ -449,14 +449,11 @@ public class LocalTransport implements Transport {
         private volatile boolean running = true;
         final Stack<LocalWork> stack = new Stack<LocalWork>();
 
-        //public final Notify notifyQueue = new Notify(stack);
-
         public Worker() {
             threads.put(this, this);
         }
 
         public Deferred add(final LocalWork work) {
-            //work.executable.addListener(notifyQueue);
             try {
                 final Deferred<?>[] any = new Deferred[work.then.length + work.fail.length];
                 int i = 0;
@@ -475,8 +472,8 @@ public class LocalTransport implements Transport {
                 }
                 return new AllDeferredImpl<Void>(all);
             } finally {
-                stack.push(work);
                 synchronized (stack) {
+                    stack.push(work);
                     stack.notifyAll();
                 }
             }
@@ -511,7 +508,7 @@ public class LocalTransport implements Transport {
                             break;
                         case RUNNING:
                         default:
-                            throw new IllegalStateException(); //TODO Message
+                            throw new IllegalStateException("was " + result.status()); //TODO Message
                     }
                 } catch (final Throwable e) {
                     log.error("", e); //TODO Message
@@ -543,11 +540,6 @@ public class LocalTransport implements Transport {
         }
 
         private void _queueChildren(final LocalWork that) {
-            //final List<LocalWork> locals = _popChildren(that.executable);
-            //final ListIterator<LocalWork> it = locals.listIterator(locals.size());
-            //while (it.hasPrevious()) {
-            //    it.previous().enqueue();
-            //}
             for (final LocalWork local : _popChildren(that.executable)) {
                 local.enqueue();
             }

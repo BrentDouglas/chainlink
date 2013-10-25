@@ -23,6 +23,6 @@ public final class JobTraversal {
 
     public ExecutionWork next(final String next) {
         final Pair<ExecutionWork, String> pair =  this.transitions.get(next);
-        return pair == null ? null : pair.getKey();
+        return pair == null ? null : pair.getName();
     }
 }

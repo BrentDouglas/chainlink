@@ -87,7 +87,7 @@ public abstract class XmlArtifactLoader implements ArtifactLoader {
                 continue;
             }
             if (!as.isAssignableFrom(that.getClass())) {
-                log.debug(Message.artifactWithWrongClass(id, fqcn, as.getCanonicalName()));
+                log.warn(Message.artifactWithWrongClass(id, fqcn, as.getCanonicalName()));
                 continue;
             }
             return as.cast(that);

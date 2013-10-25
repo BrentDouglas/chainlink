@@ -350,7 +350,21 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public JobInstance getJobInstance(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public JobInstance getJobInstance(final long instanceId) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!jobInstanceLock.compareAndSet(false, true)) {}
+        try {
+            final JobInstance instance = jobInstances.get(instanceId);
+            if (instance == null) {
+                throw new NoSuchJobInstanceException();
+            }
+            return instance;
+        } finally {
+            jobInstanceLock.set(false);
+        }
+    }
+
+    @Override
+    public JobInstance getJobInstanceForExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
         while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
         try {
             final JobInstance instance = jobExecutionInstances.get(executionId);

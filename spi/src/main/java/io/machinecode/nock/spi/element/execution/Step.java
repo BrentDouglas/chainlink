@@ -1,7 +1,7 @@
 package io.machinecode.nock.spi.element.execution;
 
+import io.machinecode.nock.spi.PropertiesElement;
 import io.machinecode.nock.spi.element.Listeners;
-import io.machinecode.nock.spi.element.Properties;
 import io.machinecode.nock.spi.element.partition.Partition;
 import io.machinecode.nock.spi.element.partition.Strategy;
 import io.machinecode.nock.spi.element.task.Task;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Step<T extends Task, U extends Strategy> extends TransitionExecution {
+public interface Step<T extends Task, U extends Strategy> extends TransitionExecution, PropertiesElement {
 
     String ELEMENT = "step";
 
@@ -21,8 +21,6 @@ public interface Step<T extends Task, U extends Strategy> extends TransitionExec
     String getStartLimit();
 
     String getAllowStartIfComplete();
-
-    Properties getProperties();
 
     Listeners getListeners();
 

@@ -65,7 +65,6 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
         return runPlan;
     }
 
-
     public ExecutionWork transitionOrSetStatus(final Transport transport, final Context context, final List<? extends TransitionWork> transitions, final String next) throws Exception {
         if (next != null) {
             return context.getJob().next(next);

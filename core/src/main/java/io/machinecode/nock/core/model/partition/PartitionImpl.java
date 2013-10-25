@@ -118,7 +118,10 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     @Override
     public PartitionTarget map(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
         final InjectionContext injectionContext = transport.createInjectionContext(context);
-        this.loadPartitionReducer(injectionContext).beginPartitionedStep();
+        final PartitionReducer reducer =this.loadPartitionReducer(injectionContext);
+        if (reducer != null) {
+            reducer.beginPartitionedStep();
+        }
         final PartitionPlan plan = loadPartitionPlan(injectionContext); //TODO Can throw
         final int partitions = plan.getPartitions();
         final Properties[] properties = plan.getPartitionProperties();

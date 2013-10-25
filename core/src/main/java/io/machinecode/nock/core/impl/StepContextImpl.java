@@ -27,6 +27,7 @@ public class StepContextImpl implements MutableStepContext {
         this.properties = properties;
         this.batchStatus = execution.getBatchStatus();
         this.exitStatus = null;
+        this.metrics = new Metric[0];
     }
 
     @Override

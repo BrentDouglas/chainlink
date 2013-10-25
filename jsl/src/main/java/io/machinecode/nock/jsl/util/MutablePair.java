@@ -16,7 +16,7 @@ public class MutablePair<K,V>  implements Pair<K,V> {
     }
 
     @Override
-    public K getKey() {
+    public K getName() {
         return key;
     }
 

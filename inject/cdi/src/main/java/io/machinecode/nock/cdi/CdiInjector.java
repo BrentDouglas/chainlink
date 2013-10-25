@@ -8,6 +8,7 @@ import javax.batch.api.BatchProperty;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import java.security.AccessController;
@@ -60,7 +61,7 @@ public class CdiInjector implements Injector {
         final ListIterator<? extends Pair<String, String>> iterator = properties.listIterator(properties.size());
         while (iterator.hasPrevious()) {
             final Pair<String, String> pair = iterator.previous();
-            if (name.equals(pair.getKey())) {
+            if (name.equals(pair.getName())) {
                 return pair.getValue();
             }
         }
@@ -69,12 +70,14 @@ public class CdiInjector implements Injector {
 
     @Produces
     @Dependent
+    @Default
     public JobContext getJobContext() {
         return provider.getJobContext();
     }
 
     @Produces
     @Dependent
+    @Default
     public StepContext getStepContext() {
         return provider.getStepContext();
     }

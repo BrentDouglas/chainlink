@@ -5,7 +5,7 @@ package io.machinecode.nock.spi.util;
  */
 public interface Pair<K,V> {
 
-    K getKey();
+    K getName();
 
     V getValue();
 }

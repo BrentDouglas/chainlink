@@ -44,6 +44,7 @@ public class JobOperatorImpl implements JobOperator {
     private final RuntimeConfigurationImpl configuration;
     private final Transport transport;
 
+    //TODO This whole business needs sorting out
     public JobOperatorImpl() {
         this.configuration = new RuntimeConfigurationImpl(ConfigurationFactoryImpl.INSTANCE.produce());
 

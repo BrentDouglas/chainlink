@@ -13,20 +13,16 @@ import java.util.Set;
  */
 public class ArtifactLoaderImpl implements ArtifactLoader {
 
-    private final JarXmlArtifactLoader loader;
+    private final JarXmlArtifactLoader batchLoader;
+    private final TcclArtifactLoader tcclLoader;
     private final Set<ArtifactLoader> loaders;
 
     public ArtifactLoaderImpl(final Configuration configuration) {
-        this.loader = new JarXmlArtifactLoader(configuration.getClassLoader());
+        this.batchLoader = new JarXmlArtifactLoader(configuration.getClassLoader());
+        this.tcclLoader = new TcclArtifactLoader();
         this.loaders = new TLinkedHashSet<ArtifactLoader>();
         Collections.addAll(this.loaders, configuration.getArtifactLoaders());
-        //final List<ArtifactLoader> loaders;
-        //try {
-        //    loaders = new ResolvableService<ArtifactLoader>(ArtifactLoader.class).resolve(configuration.getClassLoader());
-        //} catch (final ClassNotFoundException e) {
-        //    throw new RuntimeException(e);
-        //}
-        //this.loaders.addAll(loaders);
+        this.loaders.add(new ClassLoaderArtifactLoader());
     }
 
 
@@ -41,6 +37,11 @@ public class ArtifactLoaderImpl implements ArtifactLoader {
             return that;
         }
         // 2. Archive Loader
-        return this.loader.load(id, as, loader);
+        final T batch = this.batchLoader.load(id, as, loader);
+        if (batch != null) {
+            return batch;
+        }
+        // 3. Tccl Loader
+        return this.tcclLoader.load(id, as, loader);
     }
 }

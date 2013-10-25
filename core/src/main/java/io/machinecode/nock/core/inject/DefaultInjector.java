@@ -88,7 +88,7 @@ public class DefaultInjector implements Injector {
         final ListIterator<? extends Pair<String, String>> iterator = properties.listIterator(properties.size());
         while (iterator.hasPrevious()) {
             final Pair<String, String> pair = iterator.previous();
-            if (name.equals(pair.getKey())) {
+            if (name.equals(pair.getName())) {
                 return pair.getValue();
             }
         }

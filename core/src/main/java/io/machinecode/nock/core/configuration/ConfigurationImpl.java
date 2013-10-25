@@ -84,7 +84,7 @@ public class ConfigurationImpl implements Configuration {
     }
 
     public static class Builder {
-        private ClassLoader loader;
+        private ClassLoader loader = Thread.currentThread().getContextClassLoader();
         private ExecutionRepository repository;
         private TransactionManager transactionManager;
         private JobLoader[] jobLoaders = JOB_LOADERS;

@@ -10,11 +10,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nock-tck</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <build.properties>../build.properties</build.properties>
+        <tck.properties>tck.properties</tck.properties>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
-            <artifactId>com.ibm.jbatch-tck</artifactId>
+            <artifactId>com.ibm.jbatch-tck-spi</artifactId>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -43,6 +49,39 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>tck-core</id>
+            <activation>
+                <property><name>tck-core</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>core</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tck-cdi</id>
+            <activation>
+                <property><name>tck-cdi</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>cdi</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tck-spring</id>
+            <activation>
+                <property><name>tck-spring</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>spring</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
@@ -50,14 +89,14 @@
                 <artifactId>properties-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>initialize</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
                         <configuration>
                             <files>
-                                <file>../build.properties</file>
-                                <file>tck.properties</file>
+                                <file>${build.properties}</file>
+                                <file>${tck.properties}</file>
                             </files>
                         </configuration>
                     </execution>
@@ -74,6 +113,7 @@
                         <configuration>
                             <sources>
                                 <source>${tck.source}/src</source>
+                                <source>${tck.source}/testArtifacts</source>
                             </sources>
                         </configuration>
                     </execution>

@@ -11,20 +11,6 @@
 
     <artifactId>nock-cdi</artifactId>
 
-    <properties>
-        <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
-                <version>${version.javax.enterprise.cdi-api}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>io.machinecode.nock</groupId>

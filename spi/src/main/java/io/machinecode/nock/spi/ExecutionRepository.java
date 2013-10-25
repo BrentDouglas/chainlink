@@ -74,7 +74,9 @@ public interface ExecutionRepository {
 
     Properties getParameters(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
 
-    JobInstance getJobInstance(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
+    JobInstance getJobInstance(final long instanceId) throws NoSuchJobExecutionException, JobSecurityException;
+
+    JobInstance getJobInstanceForExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
 
     List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException;
 

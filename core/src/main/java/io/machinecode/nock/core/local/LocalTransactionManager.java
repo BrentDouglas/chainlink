@@ -11,12 +11,13 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 import java.util.concurrent.TimeUnit;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class LocalTransactionManager implements TransactionManager {
+public class LocalTransactionManager implements TransactionManager, UserTransaction {
 
     private static final Logger log = Logger.getLogger(LocalTransactionManager.class);
 

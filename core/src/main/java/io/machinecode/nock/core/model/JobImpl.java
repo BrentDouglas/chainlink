@@ -13,11 +13,13 @@ import io.machinecode.nock.jsl.validation.JobValidator;
 import io.machinecode.nock.jsl.visitor.JobTraversal;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Pair;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.JobWork;
 import org.jboss.logging.Logger;
@@ -159,6 +161,11 @@ public class JobImpl implements Job, JobWork {
     @Override
     public ExecutionWork next(final String next) {
         return traversal.next(next);
+    }
+
+    @Override
+    public List<? extends Pair<String, String>> properties(final Element element) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

@@ -32,6 +32,6 @@ public class ContextProviderImpl implements ContextProvider {
 
     @Override
     public List<? extends Pair<String, String>> getProperties() {
-        return Collections.emptyList(); //TODO
+        return context.getProperties(); //TODO
     }
 }

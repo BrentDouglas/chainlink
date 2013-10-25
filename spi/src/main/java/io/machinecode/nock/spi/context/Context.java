@@ -1,8 +1,10 @@
 package io.machinecode.nock.spi.context;
 
+import io.machinecode.nock.spi.util.Pair;
 import io.machinecode.nock.spi.work.JobWork;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -30,4 +32,6 @@ public interface Context extends Serializable {
     Throwable getThrowable();
 
     void setThrowable(Throwable thrown);
+
+    List<? extends Pair<String, String>> getProperties();
 }

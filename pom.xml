@@ -21,6 +21,7 @@
         <module>core</module>
         <module>inject</module>
         <module>test</module>
+        <module>tck</module>
     </modules>
 
     <properties>
@@ -31,8 +32,19 @@
         <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
 
+        <!-- CDI -->
+        <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
+        <version.org.jboss.weld.weld-se>1.0.1-Final</version.org.jboss.weld.weld-se>
+
+        <!-- Spring -->
+        <version.javax.inject>1</version.javax.inject>
+        <version.org.springframework>3.1.1.RELEASE</version.org.springframework>
+        <version.org.springframework.spring-beans>${version.org.springframework}</version.org.springframework.spring-beans>
+        <version.org.springframework.spring-context>${version.org.springframework}</version.org.springframework.spring-context>
+        <version.org.springframework.spring-core>${version.org.springframework}</version.org.springframework.spring-core>
+
         <!-- Test dependencies -->
-        <version.com.ibm.batch.com.ibm.batch-tck>1.0</version.com.ibm.batch.com.ibm.batch-tck>
+        <version.com.ibm.batch.com.ibm.batch-tck-spi>1.0</version.com.ibm.batch.com.ibm.batch-tck-spi>
         <version.junit.junit>4.10</version.junit.junit>
         <version.org.testng.testng>6.8</version.org.testng.testng>
 
@@ -62,6 +74,16 @@
                 <type>jar</type>
             </dependency>
             <dependency>
+                <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-cdi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.batch</groupId>
                 <artifactId>javax.batch-api</artifactId>
                 <version>${version.javax.batch.batch-api.version}</version>
@@ -87,11 +109,45 @@
                 <version>${version.net.sf.trove4j.trove4j}</version>
             </dependency>
 
+            <!-- CDI -->
+            <dependency>
+                <groupId>javax.enterprise</groupId>
+                <artifactId>cdi-api</artifactId>
+                <version>${version.javax.enterprise.cdi-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.weld</groupId>
+                <artifactId>weld-se</artifactId>
+                <version>${version.org.jboss.weld.weld-se}</version>
+            </dependency>
+
+            <!-- Spring -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${version.org.springframework.spring-beans}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${version.org.springframework.spring-context}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${version.org.springframework.spring-core}</version>
+            </dependency>
+
             <!-- Test dependencies -->
             <dependency>
                 <groupId>com.ibm.jbatch</groupId>
-                <artifactId>com.ibm.jbatch-tck</artifactId>
-                <version>${version.com.ibm.batch.com.ibm.batch-tck}</version>
+                <artifactId>com.ibm.jbatch-tck-spi</artifactId>
+                <version>${version.com.ibm.batch.com.ibm.batch-tck-spi}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-test-core</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -123,17 +179,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <profiles>
-        <profile>
-            <id>tck</id>
-            <activation>
-                <property><name>tck</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>tck</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

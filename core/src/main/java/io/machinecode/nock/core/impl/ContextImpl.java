@@ -3,7 +3,10 @@ package io.machinecode.nock.core.impl;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.context.MutableJobContext;
 import io.machinecode.nock.spi.context.MutableStepContext;
+import io.machinecode.nock.spi.util.Pair;
 import io.machinecode.nock.spi.work.JobWork;
+
+import java.util.List;
 
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
@@ -77,5 +80,10 @@ public class ContextImpl implements Context {
     @Override
     public void setThrowable(final Throwable throwable) {
         this.throwable = throwable;
+    }
+
+    @Override
+    public List<? extends Pair<String, String>> getProperties() {
+        return null;//properties;
     }
 }

@@ -74,7 +74,7 @@ public abstract class ExecutableImpl<T extends Work> implements Executable<T> {
     public synchronized void resolve(final Void _) {
         this.done = true;
         synchronized (listeners) {
-            for (final Runnable listener : listeners) {
+            for (final Listener listener : listeners) {
                 listener.run();
             }
         }
