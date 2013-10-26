@@ -1,6 +1,6 @@
 package io.machinecode.nock.spi.element.execution;
 
-import io.machinecode.nock.spi.PropertiesElement;
+import io.machinecode.nock.spi.element.PropertiesElement;
 import io.machinecode.nock.spi.element.Listeners;
 import io.machinecode.nock.spi.element.partition.Partition;
 import io.machinecode.nock.spi.element.partition.Strategy;

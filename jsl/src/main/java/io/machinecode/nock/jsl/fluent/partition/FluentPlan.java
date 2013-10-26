@@ -3,6 +3,9 @@ package io.machinecode.nock.jsl.fluent.partition;
 import io.machinecode.nock.jsl.fluent.FluentProperties;
 import io.machinecode.nock.jsl.inherit.InheritablePlan;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
@@ -10,7 +13,7 @@ public class FluentPlan implements FluentStrategy<FluentPlan>, InheritablePlan<F
 
     private String partitions = ONE;
     private String threads;
-    private FluentProperties properties;
+    private List<FluentProperties> properties = new ArrayList<FluentProperties>(0);
 
 
     @Override
@@ -34,21 +37,24 @@ public class FluentPlan implements FluentStrategy<FluentPlan>, InheritablePlan<F
     }
 
     @Override
-    public FluentProperties getProperties() {
+    public List<FluentProperties> getProperties() {
         return this.properties;
     }
 
     @Override
-    public FluentPlan setProperties(final FluentProperties properties) {
+    public FluentPlan setProperties(final List<FluentProperties> properties) {
         this.properties = properties;
         return this;
     }
 
-    public FluentPlan addProperty(final String name, final String value) {
-        if (this.properties == null) {
-            this.properties = new FluentProperties();
+    public FluentPlan addProperty(final String partition, final String name, final String value) {
+        for (final FluentProperties that : this.properties) {
+            if (partition.equals(that.getPartition())) {
+                that.addProperty(name, value);
+                return this;
+            }
         }
-        this.properties.addProperty(name, value);
+        this.properties.add(new FluentProperties().setPartition(partition).addProperty(name, value));
         return this;
     }
 

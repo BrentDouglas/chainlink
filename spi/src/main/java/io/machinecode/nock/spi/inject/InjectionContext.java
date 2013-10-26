@@ -12,4 +12,6 @@ public interface InjectionContext {
     ArtifactLoader getArtifactLoader();
 
     Injector getInjector();
+
+    InjectablesProvider getProvider();
 }

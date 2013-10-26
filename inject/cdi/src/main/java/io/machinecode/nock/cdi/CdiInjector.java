@@ -1,6 +1,6 @@
 package io.machinecode.nock.cdi;
 
-import io.machinecode.nock.spi.extension.ContextProvider;
+import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.util.Pair;
 
@@ -23,15 +23,15 @@ import java.util.ServiceLoader;
  */
 public class CdiInjector implements Injector {
 
-    private ContextProvider provider;
+    private InjectablesProvider provider;
 
     public CdiInjector() {
-        final ServiceLoader<ContextProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<ContextProvider>>() {
-            public ServiceLoader<ContextProvider> run() {
-                return ServiceLoader.load(ContextProvider.class);
+        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<InjectablesProvider>>() {
+            public ServiceLoader<InjectablesProvider> run() {
+                return ServiceLoader.load(InjectablesProvider.class);
             }
         });
-        final Iterator<ContextProvider> iterator = providers.iterator();
+        final Iterator<InjectablesProvider> iterator = providers.iterator();
         if (iterator.hasNext()) {
             provider = iterator.next();
         } else {
@@ -57,7 +57,7 @@ public class CdiInjector implements Injector {
         } else {
             name = batchProperty;
         }
-        final List<? extends Pair<String, String>> properties = provider.getProperties();
+        final List<? extends Pair<String, String>> properties = provider.getInjectables().getProperties();
         final ListIterator<? extends Pair<String, String>> iterator = properties.listIterator(properties.size());
         while (iterator.hasPrevious()) {
             final Pair<String, String> pair = iterator.previous();
@@ -72,13 +72,13 @@ public class CdiInjector implements Injector {
     @Dependent
     @Default
     public JobContext getJobContext() {
-        return provider.getJobContext();
+        return provider.getInjectables().getJobContext();
     }
 
     @Produces
     @Dependent
     @Default
     public StepContext getStepContext() {
-        return provider.getStepContext();
+        return provider.getInjectables().getStepContext();
     }
 }

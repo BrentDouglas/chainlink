@@ -487,7 +487,6 @@ public class LocalTransport implements Transport {
                     continue;
                 }
                 try {
-                    LocalContextProvider.set(_getContext(that.executable.getJobExecutionId()));
                     final Result result = that.executable.execute(LocalTransport.this);
                     switch (result.status()) {
                         case FINISHED:
@@ -513,7 +512,6 @@ public class LocalTransport implements Transport {
                 } catch (final Throwable e) {
                     log.error("", e); //TODO Message
                 } finally {
-                    LocalContextProvider.unset();
                     LocalTransport.this.executables.remove(that.executable);
                     synchronized (stack) {
                         stack.remove(that);

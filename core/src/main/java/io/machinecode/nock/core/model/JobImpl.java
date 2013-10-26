@@ -15,7 +15,6 @@ import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.element.Job;
-import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
@@ -100,8 +99,7 @@ public class JobImpl implements Job, JobWork {
                 PropertiesConverter.convert(this.properties)
         );
         context.setJobContext(jobContext);
-        final InjectionContext injectionContext = transport.createInjectionContext(context);
-        this._listeners = this.listeners.getListenersImplementing(injectionContext, JobListener.class);
+        this._listeners = this.listeners.getListenersImplementing(transport, context, JobListener.class);
         Exception exception = null;
         for (final JobListener listener : this._listeners) {
             try {
@@ -165,7 +163,7 @@ public class JobImpl implements Job, JobWork {
 
     @Override
     public List<? extends Pair<String, String>> properties(final Element element) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return traversal.properties(element);
     }
 
     @Override
@@ -177,9 +175,10 @@ public class JobImpl implements Job, JobWork {
         final PlanImpl runPlan = new PlanImpl(run, TargetThread.ANY, element());
         final PlanImpl afterPlan = new PlanImpl(after, TargetThread.that(run), element());
         final PlanImpl failPlan = new PlanImpl(fail, TargetThread.that(run), element());
+        final PlanImpl afterFailPlan = new PlanImpl(fail, TargetThread.that(run), element());
 
         runPlan.fail(failPlan)
-            .always(afterPlan.fail(failPlan));
+            .always(afterPlan.fail(afterFailPlan));
 
         return runPlan;
     }

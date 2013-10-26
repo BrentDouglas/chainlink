@@ -1,9 +1,10 @@
 package io.machinecode.nock.core.model;
 
 import io.machinecode.nock.core.loader.ArtifactReference;
+import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Listener;
 import io.machinecode.nock.spi.element.PropertyReference;
-import io.machinecode.nock.spi.inject.InjectionContext;
+import io.machinecode.nock.spi.transport.Transport;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -28,9 +29,7 @@ public class ListenerImpl implements Listener, PropertyReference {
         return this.properties;
     }
 
-    public <T> T load(final Class<T> clazz, final InjectionContext context) throws Exception {
-        final T that = this.ref.load(context.getClassLoader(), clazz, context.getArtifactLoader());
-        context.getInjector().inject(that);
-        return that;
+    public <T> T load(final Class<T> clazz, final Transport transport, final Context context) throws Exception {
+        return this.ref.load(clazz, transport, context, this);
     }
 }

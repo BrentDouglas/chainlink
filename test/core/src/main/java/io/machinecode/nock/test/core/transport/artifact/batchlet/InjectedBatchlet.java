@@ -30,7 +30,7 @@ public class InjectedBatchlet extends javax.batch.api.AbstractBatchlet {
         hasRun.set(true);
         Assert.assertNotNull(jobContext);
         Assert.assertNotNull(stepContext);
-        //Assert.assertNotNull(property); //TODO ContextProvider needs to provide properties
+        //Assert.assertNotNull(property); //TODO InjectablesProvider needs to provide properties
         return BatchStatus.COMPLETED.toString();
     }
 }

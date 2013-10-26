@@ -106,17 +106,17 @@ public class ConfigurationImpl implements Configuration {
             return this;
         }
 
-        public Builder setJobLoaders(final JobLoader[] jobLoaders) {
+        public Builder setJobLoaders(final JobLoader... jobLoaders) {
             this.jobLoaders = jobLoaders;
             return this;
         }
 
-        public Builder setArtifactLoaders(final ArtifactLoader[] artifactLoaders) {
+        public Builder setArtifactLoaders(final ArtifactLoader... artifactLoaders) {
             this.artifactLoaders = artifactLoaders;
             return this;
         }
 
-        public Builder setInjectors(final Injector[] injectors) {
+        public Builder setInjectors(final Injector... injectors) {
             this.injectors = injectors;
             return this;
         }

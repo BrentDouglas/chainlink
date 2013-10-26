@@ -6,6 +6,8 @@ import io.machinecode.nock.jsl.xml.XmlProperties;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.machinecode.nock.spi.element.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
@@ -26,7 +28,7 @@ public class XmlPlan implements XmlStrategy<XmlPlan>, InheritablePlan<XmlPlan, X
     private String threads;
 
     @XmlElement(name = "properties", namespace = NAMESPACE, required = false)
-    private XmlProperties properties;
+    private List<XmlProperties> properties = new ArrayList<XmlProperties>(0);
 
     @Override
     public String getPartitions() {
@@ -49,11 +51,11 @@ public class XmlPlan implements XmlStrategy<XmlPlan>, InheritablePlan<XmlPlan, X
     }
 
     @Override
-    public XmlProperties getProperties() {
+    public List<XmlProperties> getProperties() {
         return properties;
     }
 
-    public XmlPlan setProperties(final XmlProperties properties) {
+    public XmlPlan setProperties(final List<XmlProperties> properties) {
         this.properties = properties;
         return this;
     }

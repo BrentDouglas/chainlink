@@ -10,7 +10,6 @@ import io.machinecode.nock.core.work.DeferredImpl;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.spi.factory.PropertyContext;
-import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.Listener;
 import io.machinecode.nock.spi.work.TaskWork;
@@ -44,12 +43,11 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
 
     @Override
     public void run(final Transport transport, final Context context, final int timeout) throws Exception {
-        final InjectionContext injectionContext = transport.createInjectionContext(context);
         synchronized (this) {
             if (delegate.isCancelled()) {
                 return;
             }
-            batchlet = load(injectionContext);
+            batchlet = load(transport, context);
         }
         try {
             if (batchlet == null) {

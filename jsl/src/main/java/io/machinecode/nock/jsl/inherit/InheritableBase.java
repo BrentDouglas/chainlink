@@ -28,7 +28,7 @@ public interface InheritableBase<T extends InheritableBase<T>>
         }
 
         /**
-         * Pulls attributes from the parent element.
+         * Pulls attributes from the parent elementName.
          *
          * @param parent
          */

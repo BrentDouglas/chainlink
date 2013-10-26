@@ -1,9 +1,9 @@
 package io.machinecode.nock.jsl.visitor;
 
 import gnu.trove.map.hash.THashMap;
+import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Flow;
-import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.util.Message;
 
 import java.util.ArrayList;
@@ -21,8 +21,9 @@ public class VisitorNode {
     protected final List<String> problems = new ArrayList<String>(0);
     protected final VisitorNode parent;
     protected final List<VisitorNode> children = new ArrayList<VisitorNode>(0);
-    protected final String element;
-    protected final ExecutionWork value;
+    protected final String elementName;
+    protected final Element element;
+    protected final Execution value;
     protected boolean failed = false;
 
     protected String id;
@@ -31,8 +32,9 @@ public class VisitorNode {
     protected final Map<String, VisitorNode> localScope;
     final List<Transition> transitions;
 
-    public VisitorNode(final String element) {
-        this.element = element;
+    public VisitorNode(final String elementName, final Element value) {
+        this.elementName = elementName;
+        this.element = value;
         this.value = null;
         this.parent = null;
         this.ids = new THashMap<String, VisitorNode>(0);
@@ -41,19 +43,17 @@ public class VisitorNode {
         this.transitions = new ArrayList<Transition>(0);
     }
 
-    public VisitorNode(final String element, final VisitorNode parent) {
-        this(element, null, parent);
-    }
-
-    public VisitorNode(final String element, final ExecutionWork value, final VisitorNode parent) {
-        this.element = element;
-        this.value = value;
+    public VisitorNode(final String elementName, final Element value, final VisitorNode parent) {
+        boolean ex = value instanceof Execution;
+        this.elementName = elementName;
+        this.element = value;
+        this.value = ex ? (Execution)value : null;
         this.parent = parent;
         this.ids = parent.ids;
         if (value instanceof Flow) {
             this.transitions = new ArrayList<Transition>(0);
             this.localScope = new THashMap<String, VisitorNode>(0);
-        } else if (value instanceof Execution) {
+        } else if (ex) {
             this.transitions = new ArrayList<Transition>(0);
             this.localScope = parent.localScope;
         } else {
@@ -67,10 +67,10 @@ public class VisitorNode {
         this.id = id;
         this.next = next;
         if (next != null) {
-            this.transitions.add(new Transition(this.element, id, next));
+            this.transitions.add(new Transition(this.elementName, id, next));
         }
         if (id != null) {
-            if (this.parent != null && this.parent.localScope != this.localScope) {
+            if (this.parent != null) {
                 this.parent.localScope.put(id, this);
             }
             this.jobScope.put(id, this);
@@ -125,7 +125,7 @@ public class VisitorNode {
     }
 
     protected StringBuilder element(final StringBuilder builder) {
-        return element(this.element, this.id, this.next, builder);
+        return element(this.elementName, this.id, this.next, builder);
     }
 
     public static StringBuilder element(final String element, final String id, final String next, final StringBuilder builder) {

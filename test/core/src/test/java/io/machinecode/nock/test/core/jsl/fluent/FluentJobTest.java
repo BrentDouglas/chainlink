@@ -1,6 +1,7 @@
 package io.machinecode.nock.test.core.jsl.fluent;
 
 import io.machinecode.nock.core.factory.JobFactory;
+import io.machinecode.nock.core.model.JobImpl;
 import io.machinecode.nock.jsl.fluent.Jsl;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.task.Chunk.CheckpointPolicy;
@@ -47,7 +48,7 @@ public class FluentJobTest {
                                 .setStrategy(Jsl.plan()
                                         .setThreads("4")
                                         .setPartitions("7")
-                                        .addProperty("something", "else")
+                                        .addProperty("1", "something", "else")
                                 )
                         ).setTask(Jsl.batchlet()
                                 .setRef("batch1")
@@ -102,7 +103,7 @@ public class FluentJobTest {
                                 .setStrategy(Jsl.plan()
                                         .setThreads("4")
                                         .setPartitions("7")
-                                        .addProperty("something", "else")
+                                        .addProperty("2", "something", "else")
                                 )
                         ).setTask(Jsl.chunk()
                                 .setItemCount("4")
@@ -260,5 +261,28 @@ public class FluentJobTest {
                 ), ExpressionTest.PARAMETERS);
 
         XmlJobTest.testDefaults(job);
+    }
+
+    @Test//(expected = InvalidTransitionException.class)
+    public void transitionScopeTest() {
+        final Job job = Jsl.job()
+                .setId("job1")
+                .setRestartable("false")
+                .setVersion("1.0")
+                .addExecution(Jsl.flow()
+                        .setId("flow1")
+                        .setNext("step2")
+                        .addExecution(Jsl.stepWithChunkAndPlan()
+                                .setId("step3")
+                                .setNext("step4")
+                        )
+                        .addExecution(Jsl.stepWithChunkAndPlan()
+                                .setId("step4")
+                        )
+                ).addExecution(Jsl.stepWithBatchletAndMapper()
+                        .setId("step2")
+                );
+        final JobImpl impl = JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
+        JobFactory.INSTANCE.validate(impl);
     }
 }

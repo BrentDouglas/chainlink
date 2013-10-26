@@ -1,4 +1,4 @@
-package io.machinecode.nock.spi.extension;
+package io.machinecode.nock.spi.inject;
 
 import io.machinecode.nock.spi.util.Pair;
 
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface ContextProvider {
+public interface Injectables {
 
     JobContext getJobContext();
 

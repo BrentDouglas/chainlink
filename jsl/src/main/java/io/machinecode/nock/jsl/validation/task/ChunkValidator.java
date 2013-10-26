@@ -42,9 +42,16 @@ public class ChunkValidator extends ValidatingVisitor<Chunk> {
 
         if (that.getReader() == null) {
             context.addProblem(Message.notNullElement("reader"));
+        } else {
+            ItemReaderValidator.INSTANCE.visit(that.getReader(), context);
         }
         if (that.getWriter() == null) {
             context.addProblem(Message.notNullElement("writer"));
+        } else {
+            ItemWriterValidator.INSTANCE.visit(that.getWriter(), context);
+        }
+        if (that.getProcessor() != null) {
+            ItemProcessorValidator.INSTANCE.visit(that.getProcessor(), context);
         }
 
         //Nullable

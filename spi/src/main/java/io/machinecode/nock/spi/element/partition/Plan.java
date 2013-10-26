@@ -1,11 +1,13 @@
 package io.machinecode.nock.spi.element.partition;
 
-import io.machinecode.nock.spi.PropertiesElement;
+import io.machinecode.nock.spi.element.Properties;
+
+import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Plan extends Strategy, PropertiesElement {
+public interface Plan extends Strategy {
 
     String ELEMENT = "plan";
 
@@ -14,4 +16,6 @@ public interface Plan extends Strategy, PropertiesElement {
     String getPartitions();
 
     String getThreads();
+
+    List<? extends Properties> getProperties();
 }

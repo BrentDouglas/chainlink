@@ -43,6 +43,9 @@ public class CdiArtifactLoader implements ArtifactLoader, Extension {
     private static <T> T _inject(final BeanManager beanManager, final Class<T> as, final Annotation... annotation) {
         final Set<Bean<?>> beans = beanManager.getBeans(as, annotation);
         final Bean<?> bean = beanManager.resolve(beans);
+        if (bean == null) {
+            return null;
+        }
         final CreationalContext<?> ctx = beanManager.createCreationalContext(bean);
         return as.cast(beanManager.getReference(bean, as, ctx));
     }

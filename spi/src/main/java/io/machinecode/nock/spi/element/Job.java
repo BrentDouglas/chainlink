@@ -1,6 +1,5 @@
 package io.machinecode.nock.spi.element;
 
-import io.machinecode.nock.spi.PropertiesElement;
 import io.machinecode.nock.spi.element.execution.Execution;
 
 import java.util.List;

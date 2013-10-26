@@ -1,11 +1,14 @@
 package io.machinecode.nock.core.model.partition;
 
 import io.machinecode.nock.core.model.PropertiesImpl;
+import io.machinecode.nock.core.util.PropertiesConverter;
+import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.partition.Plan;
-import io.machinecode.nock.spi.inject.InjectionContext;
+import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.StrategyWork;
 
 import javax.batch.api.partition.PartitionPlan;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -15,9 +18,9 @@ public class PlanImpl implements Plan, StrategyWork {
 
     private final String partitions;
     private final String threads;
-    private final PropertiesImpl properties;
+    private final List<PropertiesImpl> properties;
 
-    public PlanImpl(final String partitions, final String threads, final PropertiesImpl properties) {
+    public PlanImpl(final String partitions, final String threads, final List<PropertiesImpl> properties) {
         this.partitions = partitions;
         this.threads = threads;
         this.properties = properties;
@@ -34,16 +37,21 @@ public class PlanImpl implements Plan, StrategyWork {
     }
 
     @Override
-    public PropertiesImpl getProperties() {
+    public List<PropertiesImpl> getProperties() {
         return this.properties;
     }
 
     @Override
-    public PartitionPlan getPartitionPlan(final InjectionContext context) {
+    public PartitionPlan getPartitionPlan(final Transport transport, final Context context) {
+        final Properties[] properties = new Properties[this.properties.size()];
+        for (int i = 0; i < properties.length; ++i) {
+            final PropertiesImpl property = this.properties.get(i);
+            properties[i] = PropertiesConverter.convert(property);
+        }
         return new PartitionPlanImpl(
                 Integer.parseInt(this.partitions),
                 Integer.parseInt(this.threads),
-                this.properties.toArray(new Properties[this.properties.size()])
+                properties
         );
     }
 

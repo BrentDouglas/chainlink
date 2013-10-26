@@ -3,8 +3,9 @@ package io.machinecode.nock.core.model.partition;
 import io.machinecode.nock.core.loader.TypedArtifactReference;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
+import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.partition.Mapper;
-import io.machinecode.nock.spi.inject.InjectionContext;
+import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.StrategyWork;
 
 import javax.batch.api.partition.PartitionMapper;
@@ -20,7 +21,7 @@ public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implement
     }
 
     @Override
-    public PartitionPlan getPartitionPlan(final InjectionContext context) throws Exception {
-        return this.load(context).mapPartitions();
+    public PartitionPlan getPartitionPlan(final Transport transport, final Context context) throws Exception {
+        return this.load(transport, context).mapPartitions();
     }
 }

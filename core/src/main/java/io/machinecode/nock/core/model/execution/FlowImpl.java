@@ -51,8 +51,8 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     public Plan run(final Transport transport, final Context context) throws Exception {
         //final ExecutionImpl first = this.executions.get(0); //There will have been a validation error raised if this is empty
         //return transport.execute(context.getJobExecutionId(), this,
-        //        new PlanImpl(new RunExecution(first, context), TargetThread.ANY, first.element())
-        //                .then(new PlanImpl(new AfterExecution(this, context), TargetThread.THIS, first.element()))
+        //        new PlanImpl(new RunExecution(first, context), TargetThread.ANY, first.elementName())
+        //                .then(new PlanImpl(new AfterExecution(this, context), TargetThread.THIS, first.elementName()))
         //);
         return this.executions.get(0).plan(transport, context);
     }

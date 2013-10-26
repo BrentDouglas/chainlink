@@ -1,8 +1,9 @@
 package io.machinecode.nock.core.model;
 
 
+import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Listeners;
-import io.machinecode.nock.spi.inject.InjectionContext;
+import io.machinecode.nock.spi.transport.Transport;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,10 +29,10 @@ public class ListenersImpl implements Listeners {
         return this.listeners;
     }
 
-    public <X> List<X> getListenersImplementing(final InjectionContext context, final Class<X> clazz) throws Exception {
+    public <X> List<X> getListenersImplementing(final Transport transport, final Context context, final Class<X> clazz) throws Exception {
         final List<X> ret = new ArrayList<X>(this.listeners.size());
         for (final ListenerImpl listener : this.listeners) {
-            final X that = listener.load(clazz, context);
+            final X that = listener.load(clazz, transport, context);
             if (that == null) {
                 continue;
             }

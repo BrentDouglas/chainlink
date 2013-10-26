@@ -81,9 +81,4 @@ public class ContextImpl implements Context {
     public void setThrowable(final Throwable throwable) {
         this.throwable = throwable;
     }
-
-    @Override
-    public List<? extends Pair<String, String>> getProperties() {
-        return null;//properties;
-    }
 }

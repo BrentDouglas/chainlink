@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
- * An element that can inherit from other elements from
+ * An elementName that can inherit from other elements from
  * the JSL Inheritance v1 spec.
  *
  * @author Brent Douglas <brent.n.douglas@gmail.com>

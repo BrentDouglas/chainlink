@@ -1,7 +1,4 @@
-package io.machinecode.nock.spi;
-
-import io.machinecode.nock.spi.element.Element;
-import io.machinecode.nock.spi.element.Properties;
+package io.machinecode.nock.spi.element;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

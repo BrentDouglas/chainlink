@@ -1,6 +1,7 @@
 package io.machinecode.nock.jsl.visitor;
 
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.util.Message;
 
 import java.util.LinkedList;
@@ -10,7 +11,7 @@ import java.util.Set;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class ValidatingVisitor<T> extends Visitor<T> {
+public abstract class ValidatingVisitor<T extends Element> extends Visitor<T> {
 
     protected ValidatingVisitor(final String element) {
         super(element);
@@ -60,9 +61,9 @@ public abstract class ValidatingVisitor<T> extends Visitor<T> {
         boolean ret = false;
 
         //Only report this for the parent context
-        if (node.parent == null || node.localScope != node.parent.localScope) {
+        if (node.parent != null && node.localScope != node.parent.localScope) {
             for (final Transition entry : node.transitions) {
-                if (!node.localScope.containsKey(entry.next)) {
+                if (!node.parent.localScope.containsKey(entry.next)) {
                     node.addProblem(Message.invalidTransition(VisitorNode.element(entry.element, entry.id, entry.next, new StringBuilder()).toString()));
                     ret = true;
                 }

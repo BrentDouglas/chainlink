@@ -1,6 +1,7 @@
 package io.machinecode.nock.core.inject;
 
-import io.machinecode.nock.spi.extension.ContextProvider;
+import io.machinecode.nock.spi.inject.Injectables;
+import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.util.Pair;
 
@@ -22,15 +23,15 @@ import java.util.ServiceLoader;
  */
 public class DefaultInjector implements Injector {
 
-    private ContextProvider provider;
+    private InjectablesProvider provider;
 
     public DefaultInjector() {
-        final ServiceLoader<ContextProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<ContextProvider>>() {
-            public ServiceLoader<ContextProvider> run() {
-                return ServiceLoader.load(ContextProvider.class);
+        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<InjectablesProvider>>() {
+            public ServiceLoader<InjectablesProvider> run() {
+                return ServiceLoader.load(InjectablesProvider.class);
             }
         });
-        final Iterator<ContextProvider> iterator = providers.iterator();
+        final Iterator<InjectablesProvider> iterator = providers.iterator();
         if (iterator.hasNext()) {
             provider = iterator.next();
         } else {
@@ -42,13 +43,14 @@ public class DefaultInjector implements Injector {
     @Override
     public <T> boolean inject(final T bean) throws Exception {
         Class<?> clazz = bean.getClass();
+        final Injectables injectables = provider.getInjectables();
         do {
             for (final Field field : clazz.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Inject.class)) {
                     final int modifiers = field.getModifiers();
                     final BatchProperty batchProperty = field.getAnnotation(BatchProperty.class);
                     if (String.class.equals(field.getType())) {
-                        final String property = _property(batchProperty.name(), field.getName(), provider.getProperties());
+                        final String property = _property(batchProperty.name(), field.getName(), injectables.getProperties());
                         if (property == null || "".equals(property)) {
                             continue;
                         }
@@ -57,7 +59,7 @@ public class DefaultInjector implements Injector {
                         if (Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers)) {
                             continue;
                         }
-                        final JobContext jobContext = provider.getJobContext();
+                        final JobContext jobContext = injectables.getJobContext();
                         if (jobContext == null) {
                             continue;
                         }
@@ -66,7 +68,7 @@ public class DefaultInjector implements Injector {
                         if (Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers)) {
                             continue;
                         }
-                        final StepContext stepContext = provider.getStepContext();
+                        final StepContext stepContext = injectables.getStepContext();
                         if (stepContext == null) {
                             continue;
                         }

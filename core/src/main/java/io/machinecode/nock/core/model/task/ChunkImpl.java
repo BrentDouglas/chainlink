@@ -8,7 +8,6 @@ import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.task.Chunk;
 import io.machinecode.nock.spi.factory.PropertyContext;
-import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.TaskWork;
 import org.jboss.logging.Logger;
@@ -193,7 +192,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
         final List<RetryWriteListener> retryWriteListeners;
         final List<SkipWriteListener> skipWriteListeners;
 
-        private State(final InjectionContext injectionContext, final TransactionManager transactionManager) throws Exception {
+        private State(final Transport transport, final Context context, final TransactionManager transactionManager) throws Exception {
             this.transactionManager = transactionManager;
 
             this.itemCount = Integer.parseInt(ChunkImpl.this.itemCount);
@@ -203,20 +202,20 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
 
             this.objects = new ArrayList<Object>(this.itemCount);
 
-            this.reader = ChunkImpl.this.reader.load(injectionContext);
-            this.processor = ChunkImpl.this.processor == null ? null : ChunkImpl.this.processor.load(injectionContext);
-            this.writer = ChunkImpl.this.writer.load(injectionContext);
-            this.checkpointAlgorithm = ChunkImpl.this.checkpointAlgorithm == null ? null : ChunkImpl.this.checkpointAlgorithm.load(injectionContext);
-            this.chunkListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, ChunkListener.class);
-            this.itemReadListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, ItemReadListener.class);
-            this.retryReadListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, RetryReadListener.class);
-            this.skipReadListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, SkipReadListener.class);
-            this.itemProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, ItemProcessListener.class);
-            this.retryProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, RetryProcessListener.class);
-            this.skipProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, SkipProcessListener.class);
-            this.itemWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, ItemWriteListener.class);
-            this.retryWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, RetryWriteListener.class);
-            this.skipWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(injectionContext, SkipWriteListener.class);
+            this.reader = ChunkImpl.this.reader.load(transport, context);
+            this.processor = ChunkImpl.this.processor == null ? null : ChunkImpl.this.processor.load(transport, context);
+            this.writer = ChunkImpl.this.writer.load(transport, context);
+            this.checkpointAlgorithm = ChunkImpl.this.checkpointAlgorithm == null ? null : ChunkImpl.this.checkpointAlgorithm.load(transport, context);
+            this.chunkListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, ChunkListener.class);
+            this.itemReadListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, ItemReadListener.class);
+            this.retryReadListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, RetryReadListener.class);
+            this.skipReadListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, SkipReadListener.class);
+            this.itemProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, ItemProcessListener.class);
+            this.retryProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, RetryProcessListener.class);
+            this.skipProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, SkipProcessListener.class);
+            this.itemWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, ItemWriteListener.class);
+            this.retryWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, RetryWriteListener.class);
+            this.skipWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, SkipWriteListener.class);
 
             if (this.reader == null) {
                 throw new IllegalStateException(ChunkImpl.this.reader.getRef());
@@ -246,7 +245,8 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
         final ExecutionRepository repository = transport.getRepository();
         final StepContext stepContext = context.getStepContext();
         final State state = new State(
-                transport.createInjectionContext(context),
+                transport,
+                context,
                 transport.getTransactionManager()
         );
 
@@ -313,7 +313,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             }
         } catch (final Exception e) {
             log.debugf(e, "Chunk threw "); //TODO Message
-            state.transactionManager.setRollbackOnly();
+            state.transactionManager.setRollbackOnly(); //TODO Tighten this up.
             error(state, e);
             state.transactionManager.rollback();
         }

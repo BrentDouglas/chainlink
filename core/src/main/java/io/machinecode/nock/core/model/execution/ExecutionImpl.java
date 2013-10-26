@@ -56,10 +56,11 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
         final PlanImpl runPlan = new PlanImpl(run, TargetThread.ANY, element());
         final PlanImpl afterPlan = new PlanImpl(after, TargetThread.THIS, element());
         final PlanImpl failPlan = new PlanImpl(fail, TargetThread.THIS, element());
+        final PlanImpl afterFailPlan = new PlanImpl(fail, TargetThread.THIS, element());
 
         runPlan.fail(failPlan)
                 .always(afterPlan
-                        .fail(failPlan)
+                        .fail(afterFailPlan)
                 );
 
         return runPlan;

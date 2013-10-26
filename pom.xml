@@ -34,7 +34,7 @@
 
         <!-- CDI -->
         <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
-        <version.org.jboss.weld.weld-se>1.0.1-Final</version.org.jboss.weld.weld-se>
+        <version.org.jboss.weld.se.weld-se>2.1.0.Final</version.org.jboss.weld.se.weld-se>
 
         <!-- Spring -->
         <version.javax.inject>1</version.javax.inject>
@@ -116,9 +116,9 @@
                 <version>${version.javax.enterprise.cdi-api}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.weld</groupId>
+                <groupId>org.jboss.weld.se</groupId>
                 <artifactId>weld-se</artifactId>
-                <version>${version.org.jboss.weld.weld-se}</version>
+                <version>${version.org.jboss.weld.se.weld-se}</version>
             </dependency>
 
             <!-- Spring -->

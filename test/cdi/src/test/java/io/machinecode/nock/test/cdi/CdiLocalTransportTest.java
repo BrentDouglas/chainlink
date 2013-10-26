@@ -8,8 +8,6 @@ import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.nock.core.factory.JobFactory;
 import io.machinecode.nock.core.model.JobImpl;
 import io.machinecode.nock.jsl.fluent.Jsl;
-import io.machinecode.nock.spi.inject.Injector;
-import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.test.core.transport.TransportTest;
 import io.machinecode.nock.test.core.transport.artifact.batchlet.InjectedBatchlet;
 import org.jboss.weld.environment.se.Weld;
@@ -33,8 +31,8 @@ public class CdiLocalTransportTest extends TransportTest {
     @Override
     protected Builder _configuration() {
         return super._configuration()
-                .setArtifactLoaders(new ArtifactLoader[]{ CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class) })
-                .setInjectors(new Injector[]{ CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class) });
+                .setArtifactLoaders(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class))
+                .setInjectors(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class));
     }
 
     @BeforeClass

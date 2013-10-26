@@ -3,6 +3,7 @@ package io.machinecode.nock.jsl.validation.partition;
 import io.machinecode.nock.jsl.validation.PropertiesValidator;
 import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
+import io.machinecode.nock.spi.element.Properties;
 import io.machinecode.nock.spi.element.partition.Plan;
 
 /**
@@ -19,7 +20,9 @@ public class PlanValidator extends ValidatingVisitor<Plan> {
     @Override
     public void doVisit(final Plan that, final VisitorNode context) {
         if (that.getProperties() != null) {
-            PropertiesValidator.INSTANCE.visit(that.getProperties(), context);
+            for (final Properties properties : that.getProperties()) {
+                PropertiesValidator.INSTANCE.visit(properties, context);
+            }
         }
         //if (that.getPartitions() < 0) {
         //    context.addProblem(Problem.attributePositive("partitions", that.getPartitions()));

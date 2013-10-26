@@ -1,6 +1,7 @@
 package io.machinecode.nock.inject.spring;
 
-import io.machinecode.nock.spi.extension.ContextProvider;
+import io.machinecode.nock.spi.inject.Injectables;
+import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.Injector;
 import io.machinecode.nock.spi.util.Pair;
 import org.springframework.util.ReflectionUtils;
@@ -24,15 +25,15 @@ import java.util.ServiceLoader;
  */
 public class SpringInjector implements Injector {
 
-    private ContextProvider provider;
+    private InjectablesProvider provider;
 
     public SpringInjector() {
-        final ServiceLoader<ContextProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<ContextProvider>>() {
-            public ServiceLoader<ContextProvider> run() {
-                return ServiceLoader.load(ContextProvider.class);
+        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<InjectablesProvider>>() {
+            public ServiceLoader<InjectablesProvider> run() {
+                return ServiceLoader.load(InjectablesProvider.class);
             }
         });
-        final Iterator<ContextProvider> iterator = providers.iterator();
+        final Iterator<InjectablesProvider> iterator = providers.iterator();
         if (iterator.hasNext()) {
             provider = iterator.next();
         } else {
@@ -43,22 +44,23 @@ public class SpringInjector implements Injector {
     @Override
     public <T> boolean inject(final T bean) throws Exception {
         final Class<?> clazz = bean.getClass();
+        final Injectables injectables = provider.getInjectables();
         _context(clazz, JobContext.class, bean, new LazyGet<JobContext>() {
             @Override
             public JobContext get() {
-                return provider.getJobContext();
+                return injectables.getJobContext();
             }
         });
         _context(clazz, StepContext.class, bean, new LazyGet<StepContext>() {
             @Override
             public StepContext get() {
-                return provider.getStepContext();
+                return injectables.getStepContext();
             }
         });
         _batchProperty(clazz, String.class, bean, new LazyGet<List<? extends Pair<String, String>>>() {
             @Override
             public List<? extends Pair<String, String>> get() {
-                return provider.getProperties();
+                return injectables.getProperties();
             }
         });
         return true;

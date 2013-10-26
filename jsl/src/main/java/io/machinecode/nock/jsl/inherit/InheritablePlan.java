@@ -4,6 +4,8 @@ import io.machinecode.nock.spi.Copyable;
 import io.machinecode.nock.spi.element.Properties;
 import io.machinecode.nock.spi.element.partition.Plan;
 
+import java.util.List;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
@@ -16,9 +18,9 @@ public interface InheritablePlan<T extends InheritablePlan<T, P>,
     T setThreads(final String threads);
 
     @Override
-    P getProperties() ;
+    List<P> getProperties() ;
 
-    T setProperties(final P properties);
+    T setProperties(final List<P> properties);
 
     class PlanTool {
 
@@ -27,7 +29,7 @@ public interface InheritablePlan<T extends InheritablePlan<T, P>,
         T copy(final T _this, final T that) {
             that.setPartitions(_this.getPartitions());
             that.setThreads(_this.getThreads());
-            that.setProperties(Util.copy(_this.getProperties()));
+            that.setProperties(Util.copyList(_this.getProperties()));
             return that;
         }
     }

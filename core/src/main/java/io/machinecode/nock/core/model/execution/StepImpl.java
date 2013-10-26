@@ -13,7 +13,6 @@ import io.machinecode.nock.core.work.task.RunTask;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.execution.Step;
-import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
@@ -153,8 +152,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         final StepContextImpl stepContext = new StepContextImpl(stepExecution, PropertiesConverter.convert(this.properties));
         context.setStepContext(stepContext);
         Exception exception = null;
-        final InjectionContext injectionContext = transport.createInjectionContext(context);
-        this._listeners = this.listeners.getListenersImplementing(injectionContext, StepListener.class);
+        this._listeners = this.listeners.getListenersImplementing(transport, context, StepListener.class);
         for (final StepListener listener : this._listeners) {
             try {
                 listener.beforeStep();
@@ -178,10 +176,10 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         if (this.partition != null && this.partition.getStrategy() != null) { //TODO This looks like a bug in the xsl
             final PartitionTarget target = this.partition.map(this.task, transport, context, _timeout()); //TODO This can throw
             return new PlanImpl(target.threads, target.executables, TargetThread.ANY, this.task.element());
-                    //.always(new PlanImpl(after, TargetThread.THIS, this.task.element()));
+                    //.always(new PlanImpl(after, TargetThread.THIS, this.task.elementName()));
         }
         return new PlanImpl(new RunTask(this.task, context, _timeout()), TargetThread.ANY, this.task.element());
-                    //.then(new PlanImpl(after, TargetThread.THIS, this.task.element()));
+                    //.then(new PlanImpl(after, TargetThread.THIS, this.task.elementName()));
     }
 
     @Override

@@ -22,13 +22,6 @@ public class InjectorImpl implements Injector {
         this.injector = new DefaultInjector();
         this.injectors = new TLinkedHashSet<Injector>();
         Collections.addAll(this.injectors, configuration.getInjectors());
-        //final List<Injector> loaders;
-        //try {
-        //    loaders = new ResolvableService<Injector>(Injector.class).resolve(configuration.getClassLoader());
-        //} catch (final ClassNotFoundException e) {
-        //    throw new RuntimeException(e);
-        //}
-        //this.injectors.addAll(loaders);
     }
 
     @Override

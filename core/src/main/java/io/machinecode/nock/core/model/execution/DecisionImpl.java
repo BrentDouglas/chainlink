@@ -5,7 +5,6 @@ import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.execution.Decision;
-import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.ExecutionWork;
@@ -51,10 +50,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
 
     @Override
     public Plan run(final Transport transport, final Context context) throws Exception {
-        final InjectionContext ic = transport.createInjectionContext(context);
-        final ClassLoader classLoader = ic.getClassLoader();
-        final Decider decider = this.ref.load(classLoader, ic.getArtifactLoader());
-        ic.getInjector().inject(decider);
+        final Decider decider = this.ref.load(transport, context, this);
 
         final String exitStatus = decider.decide(transport.getRepository().getStepExecutions(context.getStepExecutionIds()));
         context.getJobContext().setExitStatus(exitStatus);

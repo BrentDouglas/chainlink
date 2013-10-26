@@ -3,7 +3,7 @@ package io.machinecode.nock.jsl.fluent;
 import io.machinecode.nock.jsl.inherit.InheritableBase;
 
 /**
- * An element that can inherit from other elements from
+ * An elementName that can inherit from other elements from
  * the JSL Inheritance v1 spec.
  *
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -57,7 +57,7 @@ public abstract class FluentInheritable<T extends FluentInheritable<T>> implemen
     }
 
     /**
-     * Pulls attributes from the parent element.
+     * Pulls attributes from the parent elementName.
      *
      * @param parent
      */

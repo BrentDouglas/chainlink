@@ -4,7 +4,6 @@ import io.machinecode.nock.core.expression.PropertyContextImpl;
 import io.machinecode.nock.core.work.task.RunTask;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.partition.Partition;
-import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Executable;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.Bucket;
@@ -68,7 +67,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return this.strategy;
     }
 
-    public PartitionCollector loadPartitionCollector(final InjectionContext injectionContext) throws Exception {
+    public PartitionCollector loadPartitionCollector(final Transport transport, final Context context) throws Exception {
         if (collector == null) {
             return null;
         }
@@ -77,38 +76,38 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                 _collector = new ThreadLocal<PartitionCollector>();
             }
             if (_collector.get() == null) {
-                _collector.set(collector.load(injectionContext));
+                _collector.set(collector.load(transport, context));
             }
         }
         return _collector.get();
     }
 
-    public PartitionReducer loadPartitionReducer(final InjectionContext injectionContext) throws Exception {
+    public PartitionReducer loadPartitionReducer(final Transport transport, final Context context) throws Exception {
         if (reducer == null) {
             return null;
         }
         if (_reducer == null) {
-            _reducer = reducer.load(injectionContext);
+            _reducer = reducer.load(transport, context);
         }
         return _reducer;
     }
 
-    public PartitionPlan loadPartitionPlan(final InjectionContext injectionContext) throws Exception {
+    public PartitionPlan loadPartitionPlan(final Transport transport, final Context context) throws Exception {
         if (strategy == null) {
             return null;
         }
         if (_plan == null) {
-            _plan = strategy.getPartitionPlan(injectionContext);
+            _plan = strategy.getPartitionPlan(transport, context);
         }
         return _plan;
     }
 
-    public PartitionAnalyzer loadPartitionAnalyzer(final InjectionContext injectionContext) throws Exception {
+    public PartitionAnalyzer loadPartitionAnalyzer(final Transport transport, final Context context) throws Exception {
         if (analyser == null) {
             return null;
         }
         if (_analyser == null) {
-            _analyser = analyser.load(injectionContext);
+            _analyser = analyser.load(transport, context);
         }
         return _analyser;
     }
@@ -117,12 +116,11 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
 
     @Override
     public PartitionTarget map(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
-        final InjectionContext injectionContext = transport.createInjectionContext(context);
-        final PartitionReducer reducer =this.loadPartitionReducer(injectionContext);
+        final PartitionReducer reducer =this.loadPartitionReducer(transport, context);
         if (reducer != null) {
             reducer.beginPartitionedStep();
         }
-        final PartitionPlan plan = loadPartitionPlan(injectionContext); //TODO Can throw
+        final PartitionPlan plan = loadPartitionPlan(transport, context); //TODO Can throw
         final int partitions = plan.getPartitions();
         final Properties[] properties = plan.getPartitionProperties();
         if (partitions != properties.length) {
@@ -147,8 +145,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
 
     @Override
     public void collect(final TaskWork task, final Transport transport, final Context context) throws Exception {
-        final InjectionContext injectionContext = transport.createInjectionContext(context);
-        final PartitionCollector collector = loadPartitionCollector(injectionContext);
+        final PartitionCollector collector = loadPartitionCollector(transport, context);
         if (collector != null) {
             transport.getBucket(task).give(collector.collectPartitionData());
         }
@@ -156,9 +153,8 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
 
     @Override
     public void analyse(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
-        final InjectionContext injectionContext = transport.createInjectionContext(context);
-        final PartitionAnalyzer analyzer = loadPartitionAnalyzer(injectionContext);
-        final PartitionReducer reducer = loadPartitionReducer(injectionContext);
+        final PartitionAnalyzer analyzer = loadPartitionAnalyzer(transport, context);
+        final PartitionReducer reducer = loadPartitionReducer(transport, context);
         final StepContext stepContext = context.getStepContext();
         final TransactionManager transactionManager = transport.getTransactionManager();
         PartitionStatus partitionStatus = PartitionStatus.COMMIT;
