@@ -22,3 +22,6 @@ idea
 # Build
 build.properties
 tck.properties
+
+# Logging
+log4j.properties

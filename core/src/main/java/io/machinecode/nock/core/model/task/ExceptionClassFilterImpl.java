@@ -1,6 +1,7 @@
 package io.machinecode.nock.core.model.task;
 
 import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
+import org.jboss.logging.Logger;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class ExceptionClassFilterImpl implements ExceptionClassFilter {
+
+    private static final Logger log = Logger.getLogger(ExceptionClassFilterImpl.class);
 
     private final List<ExceptionClassImpl> includes;
     private final List<ExceptionClassImpl> excludes;

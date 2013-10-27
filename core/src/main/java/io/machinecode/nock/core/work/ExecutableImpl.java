@@ -4,6 +4,7 @@ import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.spi.transport.Executable;
 import io.machinecode.nock.spi.transport.Result;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.Listener;
 import io.machinecode.nock.spi.work.Work;
@@ -63,7 +64,7 @@ public abstract class ExecutableImpl<T extends Work> implements Executable<T> {
             chain.resolve(null);
             return ResultImpl.FINISHED;
         } catch (final Throwable e) {
-            log.debug("", e); //TODO Message
+            log.infof(e, Message.format("executable.execute.exception", jobExecutionId));
             return new ResultImpl(e);
         } finally {
             resolve(null);
@@ -75,6 +76,7 @@ public abstract class ExecutableImpl<T extends Work> implements Executable<T> {
         this.done = true;
         synchronized (listeners) {
             for (final Listener listener : listeners) {
+            log.debugf(Message.format("executable.listener.run", jobExecutionId));
                 listener.run();
             }
         }
@@ -84,6 +86,7 @@ public abstract class ExecutableImpl<T extends Work> implements Executable<T> {
     @Override
     public void addListener(final Listener listener) {
         synchronized (listeners) {
+            log.debugf(Message.format("executable.listener.add", jobExecutionId));
             listeners.add(listener);
         }
     }

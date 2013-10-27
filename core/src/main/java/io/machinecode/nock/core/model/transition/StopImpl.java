@@ -1,6 +1,7 @@
 package io.machinecode.nock.core.model.transition;
 
 import io.machinecode.nock.spi.element.transition.Stop;
+import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
 
@@ -8,6 +9,8 @@ import javax.batch.runtime.BatchStatus;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class StopImpl extends TransitionImpl implements Stop {
+
+    private static final Logger log = Logger.getLogger(StopImpl.class);
 
     private final String exitStatus;
     private final String restart;

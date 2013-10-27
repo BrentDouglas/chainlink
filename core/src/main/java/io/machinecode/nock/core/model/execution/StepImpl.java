@@ -16,6 +16,7 @@ import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.StrategyWork;
@@ -120,21 +121,22 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         return ELEMENT;
     }
 
-    private int _timeout() {
+    private int _timeout(final long jobExecutionId) {
         if (_timeout != null) {
             return this._timeout;
         }
         this._timeout = 180;
-        try {
             for (final PropertyImpl property : this.properties.getProperties()) {
-                if (Constants.JAVAX_TRANSACTION_GLOBAL_TIMEOUT.equals(property.getName())) {
-                    this._timeout = Integer.parseInt(property.getValue());
-                    return this._timeout;
+                try {
+                    if (Constants.JAVAX_TRANSACTION_GLOBAL_TIMEOUT.equals(property.getName())) {
+                        this._timeout = Integer.parseInt(property.getValue());
+                        return this._timeout;
+                    }
+                } catch (final NumberFormatException e) {
+                    log.debugf(Message.get("step.transaction.timeout.not.integer"), jobExecutionId, id, property.getValue());
+                    break;
                 }
             }
-        } catch (final NumberFormatException e) {
-            //TODO
-        }
         return this._timeout;
     }
 
@@ -145,16 +147,18 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         final ExecutionRepository repository = transport.getRepository();
         final JobExecution jobExecution = repository.getJobExecution(context.getJobExecutionId());
         final StepExecution stepExecution = repository.createStepExecution(jobExecution, this);
-        if (stepExecution.getBatchStatus() != BatchStatus.STARTING
-                || !stepExecution.getExitStatus().equals(BatchStatus.STARTING.name())) {
-            throw new IllegalStateException(); //TODO Message
+        final long jobExecutionId = context.getJobExecutionId();
+        if (stepExecution.getBatchStatus() != BatchStatus.STARTING) {
+            throw new IllegalStateException(Message.format("step.not.starting", jobExecutionId, id, stepExecution.getBatchStatus()));
         }
         final StepContextImpl stepContext = new StepContextImpl(stepExecution, PropertiesConverter.convert(this.properties));
+        log.debugf(Message.get("step.create.step.context"), jobExecutionId, id);
         context.setStepContext(stepContext);
         Exception exception = null;
         this._listeners = this.listeners.getListenersImplementing(transport, context, StepListener.class);
         for (final StepListener listener : this._listeners) {
             try {
+                log.debugf(Message.get("step.listener.before.step"), jobExecutionId, id);
                 listener.beforeStep();
             } catch (final Exception e) {
                 if (exception == null) {
@@ -172,22 +176,23 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
 
     @Override
     public Plan run(final Transport transport, final Context context) throws Exception {
-        //final AfterExecution after = new AfterExecution(this, context);
+        final long jobExecutionId = context.getJobExecutionId();
+        int timeout = _timeout(jobExecutionId);
         if (this.partition != null && this.partition.getStrategy() != null) { //TODO This looks like a bug in the xsl
-            final PartitionTarget target = this.partition.map(this.task, transport, context, _timeout()); //TODO This can throw
+            final PartitionTarget target = this.partition.map(this.task, transport, context, timeout);
             return new PlanImpl(target.threads, target.executables, TargetThread.ANY, this.task.element());
-                    //.always(new PlanImpl(after, TargetThread.THIS, this.task.elementName()));
         }
-        return new PlanImpl(new RunTask(this.task, context, _timeout()), TargetThread.ANY, this.task.element());
-                    //.then(new PlanImpl(after, TargetThread.THIS, this.task.elementName()));
+        return new PlanImpl(new RunTask(this.task, context, timeout), TargetThread.ANY, this.task.element());
     }
 
     @Override
     public Plan after(final Transport transport, final Context context) throws Exception {
+        final long jobExecutionId = context.getJobExecutionId();
+        int timeout = _timeout(jobExecutionId);
         final ExecutionWork execution;
         try {
             if (this.partition != null) {
-                this.partition.analyse(this.task, transport, context, _timeout());
+                this.partition.analyse(this.task, transport, context, timeout);
             }
             Exception exception = null;
             if (this._listeners == null) {
@@ -195,6 +200,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             }
             for (final StepListener listener : this._listeners) {
                 try {
+                    log.debugf(Message.get("step.listener.after.step"), jobExecutionId, id);
                     listener.afterStep();
                 } catch (final Exception e) {
                     if (exception == null) {
@@ -206,12 +212,14 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             }
             final StepContext stepContext = context.getStepContext();
             final ExecutionRepository repository = transport.getRepository();
+            log.debugf(Message.get("step.update.persistent.data"), jobExecutionId, id);
             repository.updateStepExecution(stepContext.getStepExecutionId(), stepContext.getPersistentUserData(), new Date());
             if (exception != null) {
                 throw exception;
             }
             execution = this.transitionOrSetStatus(transport, context, this.transitions, this.next);
         } finally {
+            log.debugf(Message.get("step.destroy.step.context"), jobExecutionId, id);
             context.setStepContext(null);
         }
         if (execution != null) {

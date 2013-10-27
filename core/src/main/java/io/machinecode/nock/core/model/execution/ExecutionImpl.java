@@ -10,11 +10,14 @@ import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.TransitionWork;
 import io.machinecode.nock.spi.work.TransitionWork.Result;
+import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import java.util.List;
 
@@ -22,6 +25,8 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public abstract class ExecutionImpl implements Execution, ExecutionWork {
+
+    private static final Logger log = Logger.getLogger(ExecutionImpl.class);
 
     protected final String id;
 
@@ -71,8 +76,9 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
             return context.getJob().next(next);
         }
         final StepContext stepContext = context.getStepContext();
-        final String exitStatus = stepContext.getExitStatus();
-        final BatchStatus batchStatus = stepContext.getBatchStatus();
+        final JobContext jobContext = context.getJobContext();
+        final String exitStatus = stepContext == null ? jobContext.getExitStatus() : stepContext.getExitStatus();
+        final BatchStatus batchStatus = stepContext == null ? jobContext.getBatchStatus() : stepContext.getBatchStatus();
         final String status = exitStatus == null
                 ? batchStatus.name()
                 : exitStatus;
@@ -80,14 +86,23 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
             if (Status.matches(transition.getOn(), status)) {
                 final Result result = transition.runTransition();
                 if (result.next != null) {
+                    log.debugf(Message.get("execution.transition"), context.getJobExecutionId(), id, result.next);
                     return context.getJob().next(result.next);
                 } else {
-                    Status.finishStep(transport.getRepository(), stepContext.getStepExecutionId(), result.batchStatus, result.exitStatus);
+                    if (stepContext == null) {
+                        Status.finishJob(transport.getRepository(), jobContext.getExecutionId(), result.batchStatus, result.exitStatus);
+                    } else {
+                        Status.finishStep(transport.getRepository(), stepContext.getStepExecutionId(), result.batchStatus, result.exitStatus);
+                    }
                     return null;
                 }
             }
         }
-        Status.finishStep(transport.getRepository(), stepContext.getStepExecutionId(), BatchStatus.COMPLETED, exitStatus);
+        if (stepContext == null) {
+            Status.finishJob(transport.getRepository(), jobContext.getExecutionId(), BatchStatus.COMPLETED, exitStatus);
+        } else {
+            Status.finishStep(transport.getRepository(), stepContext.getStepExecutionId(), BatchStatus.COMPLETED, exitStatus);
+        }
         return null;
     }
 }

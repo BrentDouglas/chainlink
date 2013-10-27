@@ -7,6 +7,7 @@ import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Transport;
+import org.jboss.logging.Logger;
 
 import javax.batch.operations.BatchRuntimeException;
 
@@ -14,6 +15,8 @@ import javax.batch.operations.BatchRuntimeException;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class TypedArtifactReference<T> {
+
+    private static final Logger log = Logger.getLogger(TypedArtifactReference.class);
 
     private final String ref;
     private final ResolvableClass<T> clazz;

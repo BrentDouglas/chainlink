@@ -18,12 +18,14 @@ import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.util.Pair;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.JobWork;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.listener.JobListener;
+import javax.batch.runtime.BatchStatus;
 import java.util.List;
 
 /**
@@ -98,11 +100,15 @@ public class JobImpl implements Job, JobWork {
                 repository.getJobExecution(context.getJobExecutionId()),
                 PropertiesConverter.convert(this.properties)
         );
+        long jobExecutionId = jobContext.getExecutionId();
+
+        log.debugf(Message.get("job.create.job.context"), jobExecutionId, id);
         context.setJobContext(jobContext);
         this._listeners = this.listeners.getListenersImplementing(transport, context, JobListener.class);
         Exception exception = null;
         for (final JobListener listener : this._listeners) {
             try {
+                log.debugf(Message.get("job.listener.before.job"), jobExecutionId, id);
                 listener.beforeJob();
             } catch (final Exception e) {
                 if (exception == null) {
@@ -124,7 +130,9 @@ public class JobImpl implements Job, JobWork {
 
     @Override
     public Plan run(final Transport transport, final Context context) throws Exception {
-        if (Status.isStopping(context) || Status.isComplete(context)) {
+        final BatchStatus batchStatus = context.getJobContext().getBatchStatus();
+        if (Status.isStopping(batchStatus) || Status.isComplete(batchStatus)) {
+            log.debugf(Message.get("job.status.early.termination"), context.getJobExecutionId(), id, batchStatus);
             return null;
         }
         return this.executions.get(0).plan(transport, context);
@@ -132,6 +140,7 @@ public class JobImpl implements Job, JobWork {
 
     @Override
     public void after(final Transport transport, final Context context) throws Exception {
+        final long jobExecutionId = context.getJobExecutionId();
         try {
             if (this._listeners == null) {
                 throw new IllegalStateException();
@@ -139,6 +148,7 @@ public class JobImpl implements Job, JobWork {
             Exception exception = null;
             for (final JobListener listener : this._listeners) {
                 try {
+                    log.debugf(Message.get("job.listener.after.job"), jobExecutionId, id);
                     listener.afterJob();
                 } catch (final Exception e) {
                     if (exception == null) {
@@ -152,6 +162,7 @@ public class JobImpl implements Job, JobWork {
                 throw exception;
             }
         } finally {
+            log.debugf(Message.get("job.destroy.job.context"), jobExecutionId, id);
             context.setJobContext(null);
         }
     }

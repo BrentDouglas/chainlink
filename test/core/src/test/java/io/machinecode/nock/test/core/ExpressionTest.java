@@ -232,6 +232,8 @@ public class ExpressionTest {
 
     @Test
     public void somethingOutOfTckTest() {
+        System.setProperty("file.name.junit", "myfile2");
+
         final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
@@ -245,10 +247,14 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                         .setNext("#{systemProperties['file.separator']}test#{systemProperties['file.separator']}#{jobParameters['myFilename']}.txt")
-                ).addExecution(Jsl.stepWithBatchletAndPlan()
-                        .setId("step3")
-                        .setNext("#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']};#{jobParameters['infile.name']}?:#{systemProperties['file.name.junit']};.txt")
                 ) , PARAMETERS);
         JobFactory.INSTANCE.validate(job);
+
+        System.clearProperty("file.name.junit");
+
+        final Step step1 = (Step)job.getExecutions().get(0);
+        final Step step2 = (Step)job.getExecutions().get(1);
+        Assert.assertEquals("/myfile2.txt", step1.getNext());
+        Assert.assertEquals("/test/.txt", step2.getNext());
     }
 }

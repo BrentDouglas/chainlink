@@ -5,11 +5,14 @@ import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Listener;
 import io.machinecode.nock.spi.element.PropertyReference;
 import io.machinecode.nock.spi.transport.Transport;
+import org.jboss.logging.Logger;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class ListenerImpl implements Listener, PropertyReference {
+
+    private static final Logger log = Logger.getLogger(ListenerImpl.class);
 
     protected final PropertiesImpl properties;
     protected final ArtifactReference ref;

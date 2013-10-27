@@ -4,7 +4,9 @@ import io.machinecode.nock.core.util.Index;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.TransitionWork.Result;
+import org.jboss.logging.Logger;
 
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -16,6 +18,8 @@ import java.util.regex.Pattern;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class Status {
+
+    private static final Logger log = Logger.getLogger(Status.class);
 
     /**
      * @see Pattern#quote(String)
@@ -88,8 +92,12 @@ public class Status {
         return !isComplete(status);
     }
 
+    public static boolean isStopping(final BatchStatus status) {
+        return BatchStatus.STOPPING.equals(status);
+    }
+
     public static boolean isStopping(final Context context) {
-        return context.getJobContext().getBatchStatus().equals(BatchStatus.STOPPING);
+        return BatchStatus.STOPPING.equals(context.getJobContext().getBatchStatus());
     }
 
     public static boolean isComplete(final Context context) {
@@ -110,6 +118,18 @@ public class Status {
                 || matches(exitStatus, BatchStatus.ABANDONED);
     }
 
+    public static void stoppedJob(final ExecutionRepository repository, final long jobExecutionId, final String exitStatus) throws NoSuchJobExecutionException, JobSecurityException {
+        finishJob(repository, jobExecutionId, BatchStatus.STOPPED, exitStatus);
+    }
+
+    public static void failedJob(final ExecutionRepository repository, final long jobExecutionId, final String exitStatus) {
+        finishJob(repository, jobExecutionId, BatchStatus.FAILED, exitStatus);
+    }
+
+    public static void completedJob(final ExecutionRepository repository, final long jobExecutionId, final String exitStatus) throws Exception {
+        finishJob(repository, jobExecutionId, BatchStatus.COMPLETED, exitStatus);
+    }
+
     public static void finishJob(final Transport transport, final Context context, final Result result) throws Exception {
         finishJob(transport.getRepository(), context.getJobExecutionId(), result.batchStatus, result.exitStatus);
     }
@@ -119,43 +139,42 @@ public class Status {
     }
 
     public static void finishJob(final ExecutionRepository repository, final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus) throws NoSuchJobExecutionException, JobSecurityException {
-        repository.finishJobExecution(jobExecutionId, batchStatus, exitStatus == null ? batchStatus.name() : exitStatus, new Date());
+        final String es = exitStatus == null ? batchStatus.name() : exitStatus;
+        log.debugf(Message.get("status.finish.job.with"), jobExecutionId, batchStatus, es);
+        repository.finishJobExecution(jobExecutionId, batchStatus, es, new Date());
     }
 
     public static void finishStep(final ExecutionRepository repository, final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus) throws NoSuchJobExecutionException, JobSecurityException {
-        repository.finishStepExecution(stepExecutionId, batchStatus, exitStatus == null ? batchStatus.name() : exitStatus, new Date());
+        final String es = exitStatus == null ? batchStatus.name() : exitStatus;
+        log.debugf(Message.get("status.finish.step.with"), stepExecutionId, batchStatus, es);
+        repository.finishStepExecution(stepExecutionId, batchStatus, es, new Date());
     }
 
     public static void startingJob(final ExecutionRepository repository, final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        repository.updateJobExecution(jobExecutionId, BatchStatus.STARTING, new Date());
+        _updateJob(repository, jobExecutionId, BatchStatus.STARTING);
     }
 
     public static void startedJob(final ExecutionRepository repository, final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        log.debugf(Message.get("status.start.job"), jobExecutionId);
         repository.startJobExecution(jobExecutionId, new Date());
     }
 
     public static void stoppingJob(final ExecutionRepository repository, final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        repository.updateJobExecution(jobExecutionId, BatchStatus.STOPPING, new Date());
+        _updateJob(repository, jobExecutionId, BatchStatus.STOPPING);
     }
 
-    public static void stoppedJob(final ExecutionRepository repository, final long jobExecutionId, final String exitStatus) throws NoSuchJobExecutionException, JobSecurityException {
-        repository.finishJobExecution(jobExecutionId, BatchStatus.STOPPED, exitStatus == null ? BatchStatus.STOPPED.name() : exitStatus, new Date());
+    private static void _updateJob(final ExecutionRepository repository, final long jobExecutionId, final BatchStatus batchStatus) throws NoSuchJobExecutionException, JobSecurityException {
+        log.debugf(Message.get("status.update.job.with"), jobExecutionId, batchStatus);
+        repository.updateJobExecution(jobExecutionId, batchStatus, new Date());
     }
 
     public static void stoppedStep(final ExecutionRepository repository, final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        log.debugf(Message.get("status.update.step.with"), stepExecutionId, BatchStatus.STOPPED);
         repository.updateStepExecution(stepExecutionId, BatchStatus.STOPPED, new Date());
-    }
-
-    public static void failedJob(final ExecutionRepository repository, final long jobExecutionId, final String exitStatus) {
-        repository.finishJobExecution(jobExecutionId, BatchStatus.FAILED, exitStatus == null ? BatchStatus.FAILED.name() : exitStatus, new Date());
-    }
-
-    public static void completedJob(final ExecutionRepository repository, final long jobExecutionId, final String exitStatus) throws Exception {
-        repository.finishJobExecution(jobExecutionId, BatchStatus.COMPLETED, exitStatus == null ? BatchStatus.COMPLETED.name() : exitStatus, new Date());
     }
 
     public static void abandonedJob(final ExecutionRepository repository, final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         //Uses update as the job cannot be running when this is called, therefore the exit status will already have been set
-        repository.updateJobExecution(jobExecutionId, BatchStatus.ABANDONED, new Date());
+        _updateJob(repository, jobExecutionId, BatchStatus.ABANDONED);
     }
 }

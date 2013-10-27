@@ -4,6 +4,7 @@ package io.machinecode.nock.core.model;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Listeners;
 import io.machinecode.nock.spi.transport.Transport;
+import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +14,8 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class ListenersImpl implements Listeners {
+
+    private static final Logger log = Logger.getLogger(ListenersImpl.class);
 
     private final List<ListenerImpl> listeners;
 

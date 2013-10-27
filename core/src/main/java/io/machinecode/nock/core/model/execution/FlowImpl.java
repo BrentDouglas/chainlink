@@ -5,8 +5,10 @@ import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.execution.Flow;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.TransitionWork;
+import org.jboss.logging.Logger;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class FlowImpl extends ExecutionImpl implements Flow {
+
+    private static final Logger log = Logger.getLogger(FlowImpl.class);
 
     private final String next;
     private final List<ExecutionImpl> executions;
@@ -49,22 +53,17 @@ public class FlowImpl extends ExecutionImpl implements Flow {
 
     @Override
     public Plan run(final Transport transport, final Context context) throws Exception {
-        //final ExecutionImpl first = this.executions.get(0); //There will have been a validation error raised if this is empty
-        //return transport.execute(context.getJobExecutionId(), this,
-        //        new PlanImpl(new RunExecution(first, context), TargetThread.ANY, first.elementName())
-        //                .then(new PlanImpl(new AfterExecution(this, context), TargetThread.THIS, first.elementName()))
-        //);
+        log.debugf(Message.get("flow.run"), context.getJobExecutionId(), id);
         return this.executions.get(0).plan(transport, context);
     }
 
     @Override
     public Plan after(final Transport transport, final Context context) throws Exception {
+        log.debugf(Message.get("flow.after"), context.getJobExecutionId(), id);
         final ExecutionWork next = this.transitionOrSetStatus(transport, context, Collections.<TransitionWork>emptyList(), this.next);
         if (next != null) {
-            //return transport.execute(context.getJobExecutionId(), this, next.plan(transport, context));
             return next.plan(transport, context);
         }
-        //return new DeferredImpl<Void>();
         return null;
     }
 }

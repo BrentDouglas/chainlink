@@ -6,7 +6,9 @@ import io.machinecode.nock.core.model.PropertyReferenceImpl;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.partition.Mapper;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.StrategyWork;
+import org.jboss.logging.Logger;
 
 import javax.batch.api.partition.PartitionMapper;
 import javax.batch.api.partition.PartitionPlan;
@@ -16,12 +18,16 @@ import javax.batch.api.partition.PartitionPlan;
  */
 public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implements Mapper, StrategyWork {
 
+    private static final Logger log = Logger.getLogger(MapperImpl.class);
+
     public MapperImpl(final String ref, final PropertiesImpl properties) {
         super(new TypedArtifactReference<PartitionMapper>(ref, PartitionMapper.class), properties);
     }
 
     @Override
     public PartitionPlan getPartitionPlan(final Transport transport, final Context context) throws Exception {
-        return this.load(transport, context).mapPartitions();
+        final PartitionMapper mapper = this.load(transport, context);
+        log.debugf(Message.get("mapper.map.partitions"), context.getJobExecutionId(), ref.ref());
+        return mapper.mapPartitions();
     }
 }

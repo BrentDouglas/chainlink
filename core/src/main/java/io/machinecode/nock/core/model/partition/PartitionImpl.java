@@ -6,6 +6,7 @@ import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.partition.Partition;
 import io.machinecode.nock.spi.transport.Executable;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Bucket;
 import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.PartitionWork;
@@ -116,15 +117,17 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
 
     @Override
     public PartitionTarget map(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
-        final PartitionReducer reducer =this.loadPartitionReducer(transport, context);
+        final long jobExecutionId = context.getJobExecutionId();
+        final PartitionReducer reducer = this.loadPartitionReducer(transport, context);
         if (reducer != null) {
+            log.debugf(Message.get("partition.before.partitioned.step"), jobExecutionId);
             reducer.beginPartitionedStep();
         }
-        final PartitionPlan plan = loadPartitionPlan(transport, context); //TODO Can throw
+        final PartitionPlan plan = loadPartitionPlan(transport, context);
         final int partitions = plan.getPartitions();
         final Properties[] properties = plan.getPartitionProperties();
         if (partitions != properties.length) {
-            throw new IllegalStateException(); //TODO Validation error of pass in empty props
+            throw new IllegalStateException(Message.format("partition.properties.length", jobExecutionId, partitions, properties.length));
         }
         transport.setBucket(
                 new Bucket(
@@ -147,41 +150,48 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     public void collect(final TaskWork task, final Transport transport, final Context context) throws Exception {
         final PartitionCollector collector = loadPartitionCollector(transport, context);
         if (collector != null) {
+            log.debugf(Message.get("partition.collect.partitioned.data"), context.getJobExecutionId(), this.collector.getRef());
             transport.getBucket(task).give(collector.collectPartitionData());
         }
     }
 
     @Override
     public void analyse(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
+        final long jobExecutionId = context.getJobExecutionId();
         final PartitionAnalyzer analyzer = loadPartitionAnalyzer(transport, context);
         final PartitionReducer reducer = loadPartitionReducer(transport, context);
         final StepContext stepContext = context.getStepContext();
         final TransactionManager transactionManager = transport.getTransactionManager();
         PartitionStatus partitionStatus = PartitionStatus.COMMIT;
+        log.debugf(Message.get("partition.set.transaction.timeout"), jobExecutionId, timeout);
         transactionManager.setTransactionTimeout(timeout);
         transactionManager.begin();
         try {
             if (analyzer != null) {
                 final Bucket bucket = transport.evictBucket(task);
                 for (final Serializable that : bucket.take()) {
+                    log.debugf(Message.get("partition.analyse.collector.data"), jobExecutionId, this.analyser.getRef());
                     analyzer.analyzeCollectorData(that);
                 }
                 analyzer.analyzeStatus(stepContext.getBatchStatus(), stepContext.getExitStatus());
             }
             if (reducer != null) {
+                log.debugf(Message.get("partition.before.partitioned.step.complete"), jobExecutionId, this.reducer.getRef());
                 reducer.beforePartitionedStepCompletion();
             }
             transactionManager.commit();
         } catch (final Exception e) {
-            log.debugf(e, "");
+            log.infof(e, Message.get("partition.caught.while.analysing"), jobExecutionId);
             partitionStatus = PartitionStatus.ROLLBACK;
             transactionManager.setRollbackOnly();
             if (reducer != null) {
+                log.debugf(Message.get("partition.rollback.partitioned.step"), jobExecutionId, this.reducer.getRef());
                 reducer.rollbackPartitionedStep();
             }
             transactionManager.rollback();
         } finally {
             if (reducer != null) {
+                log.debugf(Message.get("partition.after.partitioned.step"), jobExecutionId, this.reducer.getRef(), partitionStatus);
                 reducer.afterPartitionedStepCompletion(partitionStatus);
             }
         }

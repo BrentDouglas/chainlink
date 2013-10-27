@@ -5,6 +5,7 @@ import io.machinecode.nock.core.work.ExecutableImpl;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.JobWork;
 import org.jboss.logging.Logger;
@@ -31,7 +32,7 @@ public class RunJob extends ExecutableImpl<JobWork> {
             }
             return transport.execute(jobExecutionId, this, plan);
         } catch (final Throwable e) {
-            log.error("", e); //TODO Message
+            log.errorf(e, Message.format("work.job.run.exception", jobExecutionId));
             context.setThrowable(e);
             return new DeferredImpl<Void>();
         }

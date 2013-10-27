@@ -3,6 +3,7 @@ package io.machinecode.nock.core.work.task;
 import io.machinecode.nock.core.work.ExecutableImpl;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.TaskWork;
 import org.jboss.logging.Logger;
@@ -27,7 +28,7 @@ public class RunTask extends ExecutableImpl<TaskWork> {
         try {
             work.run(transport, context, timeout);
         } catch (final Throwable e) {
-            log.error("", e); //TODO Message
+            log.errorf(e, Message.format("work.task.run.exception", jobExecutionId));
             context.setThrowable(e);
         }
         return work;

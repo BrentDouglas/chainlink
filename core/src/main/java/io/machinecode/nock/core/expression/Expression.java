@@ -1,15 +1,12 @@
 package io.machinecode.nock.core.expression;
 
 import io.machinecode.nock.core.util.Index;
-import io.machinecode.nock.jsl.util.MutablePair;
 import io.machinecode.nock.spi.factory.JobPropertyContext;
 import io.machinecode.nock.spi.factory.PropertyContext;
 import io.machinecode.nock.spi.util.Pair;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map.Entry;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -38,46 +35,22 @@ public class Expression {
 
     private static final int AFTER_LENGTH = AFTER.length();
 
-
-    private static final PropertyResolver SYSTEM_PROPERTY_RESOLVER = new PropertyResolver() {
-
-        private final List<MutablePair<String,String>> properties;
-
-        {
-            this.properties = new ArrayList<MutablePair<String, String>>();
-            for (final Entry<Object, Object> entry : System.getProperties().entrySet()) {
-                final Object key = entry.getKey();
-                final Object value = entry.getValue();
-                this.properties.add(MutablePair.of(
-                        key instanceof String ? (String)key : key.toString(),
-                        value instanceof String ? (String)value : value.toString()
-                ));
-            }
-        }
-
-        @Override
-        public CharSequence resolve(final CharSequence value) {
-            return get(value, properties);
-        }
-    };
-
-    private static CharSequence attributeValue(final CharSequence unresolved, final String prefix, final int prefixLength,
-                                               final int start, final PropertyResolver resolver) {
+    private static CharSequence attributeValue(final CharSequence unresolved, final int start, final PropertyResolver... resolvers) {
         final StringBuilder builder = new StringBuilder();
         final int unresolvedLength = unresolved.length();
         int before = start;
         int after;
-        while ((after = principleValueExpression(builder, unresolved, unresolvedLength, prefix, prefixLength, before, resolver)) != before) {
+        while ((after = principleValueExpression(builder, unresolved, unresolvedLength, before, resolvers)) != before) {
             before = after;
         }
         return builder;
     }
 
     private static int principleValueExpression(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
-                                                final String prefix, final int prefixLength, final int start, final PropertyResolver resolver) {
+                                                final int start, final PropertyResolver[] resolvers) {
         final int len = builder.length();
         final int startDefault = _indexOfDefaultExpressionStart(unresolved, unresolvedLength, start);
-        final int value = _valueExpressions(builder, unresolved, startDefault, prefix, prefixLength, start, resolver);
+        final int value = _valueExpressions(builder, unresolved, startDefault,  start, resolvers);
         if (value < startDefault) {
             builder.append(unresolved.subSequence(value, startDefault));
         }
@@ -90,7 +63,7 @@ public class Expression {
             return end;
         }
         if (expectsDefault && builder.length() == len) {
-            return _defaultExpression(builder, unresolved, endDefault, prefix, prefixLength, startDefault, resolver);
+            return _defaultExpression(builder, unresolved, endDefault, startDefault, resolvers);
         }
         return endDefault == -1 ? unresolvedLength : endDefault;
     }
@@ -99,10 +72,10 @@ public class Expression {
      * @return The index of the position for the next scanning function to resume from.
      */
     private static int _valueExpressions(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
-                                         final String prefix, final int prefixLength, final int start, final PropertyResolver resolver) {
+                                         final int start, final PropertyResolver[] resolvers) {
         int before = start;
         int after;
-        while ((after = valueExpression(builder, unresolved, unresolvedLength, prefix, prefixLength, before, resolver)) != before) {
+        while ((after = valueExpression(builder, unresolved, unresolvedLength, before, resolvers)) != before) {
             before = after;
         }
         return after;
@@ -112,20 +85,33 @@ public class Expression {
      * @return The index of the position for the next scanning function to resume from.
      */
     private static int valueExpression(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
-                                        final String prefix, final int prefixLength, final int start, final PropertyResolver resolver) {
-        final int startProperty = Index.of(unresolved, 0, unresolvedLength, prefix, 0, prefixLength, start);
-        if (startProperty == -1) {
-            return start;
+                                       final int start, final PropertyResolver[] resolvers) {
+        int selectedStartProperty = Integer.MAX_VALUE;
+        int endProperty = -1;
+        PropertyResolver selectedResolver = null;
+        for (final PropertyResolver resolver : resolvers) {
+            final int startProperty = Index.of(unresolved, 0, unresolvedLength, resolver.prefix(), 0, resolver.length(), start);
+            if (startProperty == -1) {
+                continue;
+            }
+            endProperty = Index.of(unresolved, 0, unresolvedLength, AFTER, 0, AFTER_LENGTH, startProperty);
+            if (endProperty == -1) {
+                continue;
+            }
+            if (startProperty < selectedStartProperty) {
+                selectedResolver = resolver;
+                selectedStartProperty = startProperty;
+            }
         }
-        final int endProperty = Index.of(unresolved, 0, unresolvedLength, AFTER, 0, AFTER_LENGTH, startProperty);
-        if (endProperty == -1) {
+
+        if (selectedResolver == null) {
             return start;
         }
 
-        builder.append(unresolved.subSequence(start, startProperty));
+        builder.append(unresolved.subSequence(start, selectedStartProperty));
 
-        final CharSequence property = unresolved.subSequence(startProperty + prefixLength, endProperty);
-        final CharSequence resolved = resolver.resolve(property);
+        final CharSequence property = unresolved.subSequence(selectedStartProperty + selectedResolver.length(), endProperty);
+        final CharSequence resolved = selectedResolver.resolve(property);
 
         if (resolved.length() > 0) {
             builder.append(resolved);
@@ -163,10 +149,10 @@ public class Expression {
      * @return The index of the position for the next scanning function to resume from.
      */
     private static int _defaultExpression(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
-                                          final String prefix, final int prefixLength, final int start, final PropertyResolver resolver) {
+                                          final int start, final PropertyResolver[] resolvers) {
         final CharSequence defaultValue = unresolved.subSequence(start + DEFAULT_START_LENGTH, unresolvedLength - DEFAULT_END_LENGTH);
         final int defaultValueLength = defaultValue.length();
-        int value = _valueExpressions(builder, defaultValue, defaultValueLength, prefix, prefixLength, 0, resolver);
+        int value = _valueExpressions(builder, defaultValue, defaultValueLength, 0, resolvers);
         if (value < defaultValueLength) {
             builder.append(defaultValue.subSequence(value, defaultValueLength));
         }
@@ -188,19 +174,11 @@ public class Expression {
         if (that == null) {
             return null;
         }
-        CharSequence then = attributeValue(that, JOB_PROPERTIES, JOB_PROPERTIES_LENGTH, 0, new PropertyResolver() {
-            @Override
-            public String resolve(final CharSequence value) {
-                return get(value, context.getProperties());
-            }
-        });
-        then = attributeValue(then, JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, 0, new PropertyResolver() {
-            @Override
-            public String resolve(final CharSequence value) {
-                return get(value, context.getParameters());
-            }
-        });
-        return attributeValue(then, SYSTEM_PROPERTIES, SYSTEM_PROPERTIES_LENGTH, 0, SYSTEM_PROPERTY_RESOLVER).toString();
+        return attributeValue(that, 0,
+                new ContextPropertyResolver(JOB_PROPERTIES, JOB_PROPERTIES_LENGTH, context),
+                new ContextPropertyResolver(JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, context),
+                SYSTEM_PROPERTY_RESOLVER
+        ).toString();
     }
 
 
@@ -208,11 +186,51 @@ public class Expression {
         if (that == null) {
             return null;
         }
-        return attributeValue(that, PARTITION_PLAN, PARTITION_PLAN_LENGTH, 0, new PropertyResolver() {
-            @Override
-            public String resolve(final CharSequence value) {
-                return get(value, context.getProperties());
-            }
-        }).toString();
+        return attributeValue(that, 0, new ContextPropertyResolver(PARTITION_PLAN, PARTITION_PLAN_LENGTH, context)).toString();
     }
+
+    private static final class ContextPropertyResolver implements PropertyResolver {
+
+        private final String prefix;
+        private final int length;
+        private final PropertyContext context;
+
+        private ContextPropertyResolver(final String prefix, final int length, final PropertyContext context) {
+            this.prefix = prefix;
+            this.length = length;
+            this.context = context;
+        }
+
+        @Override
+        public String prefix() {
+            return prefix;
+        }
+
+        @Override
+        public int length() {
+            return length;
+        }
+
+        @Override
+        public CharSequence resolve(final CharSequence value) {
+            return get(value, context.getProperties());
+        }
+    }
+
+    private static final PropertyResolver SYSTEM_PROPERTY_RESOLVER = new PropertyResolver() {
+        @Override
+        public String prefix() {
+            return SYSTEM_PROPERTIES;
+        }
+
+        @Override
+        public int length() {
+            return SYSTEM_PROPERTIES_LENGTH;
+        }
+
+        @Override
+        public CharSequence resolve(final CharSequence value) {
+            return System.getProperty(value.toString());
+        }
+    };
 }

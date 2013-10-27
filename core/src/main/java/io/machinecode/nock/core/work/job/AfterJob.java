@@ -5,6 +5,7 @@ import io.machinecode.nock.core.work.ExecutableImpl;
 import io.machinecode.nock.core.work.Status;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.JobWork;
 import org.jboss.logging.Logger;
@@ -29,7 +30,7 @@ public class AfterJob extends ExecutableImpl<JobWork> {
         try {
             work.after(transport, context);
         } catch (final Throwable e) {
-            log.error("", e); //TODO Message
+            log.errorf(e, Message.format("work.job.after.exception", jobExecutionId));
             context.setThrowable(e);
         } finally {
             if (context.getThrowable() == null) {

@@ -5,9 +5,12 @@ import io.machinecode.nock.core.util.PropertiesConverter;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.partition.Plan;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.StrategyWork;
+import org.jboss.logging.Logger;
 
 import javax.batch.api.partition.PartitionPlan;
+import javax.batch.operations.BatchRuntimeException;
 import java.util.List;
 import java.util.Properties;
 
@@ -15,6 +18,8 @@ import java.util.Properties;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class PlanImpl implements Plan, StrategyWork {
+
+    private static final Logger log = Logger.getLogger(PlanImpl.class);
 
     private final String partitions;
     private final String threads;
@@ -43,14 +48,27 @@ public class PlanImpl implements Plan, StrategyWork {
 
     @Override
     public PartitionPlan getPartitionPlan(final Transport transport, final Context context) {
+        final long jobExecutionId = context.getJobExecutionId();
         final Properties[] properties = new Properties[this.properties.size()];
         for (int i = 0; i < properties.length; ++i) {
             final PropertiesImpl property = this.properties.get(i);
             properties[i] = PropertiesConverter.convert(property);
         }
+        int threads;
+        int partitions;
+        try {
+            threads = Integer.parseInt(this.threads);
+        } catch (final NumberFormatException e) {
+            throw new BatchRuntimeException(Message.format("plan.threads.not.integer", jobExecutionId, this.threads), e);
+        }
+        try {
+            partitions = Integer.parseInt(this.partitions);
+        } catch (final NumberFormatException e) {
+            throw new BatchRuntimeException(Message.format("plan.partitions.not.integer", jobExecutionId, this.partitions), e);
+        }
         return new PartitionPlanImpl(
-                Integer.parseInt(this.partitions),
-                Integer.parseInt(this.threads),
+                partitions,
+                threads,
                 properties
         );
     }

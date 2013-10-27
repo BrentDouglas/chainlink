@@ -1,6 +1,5 @@
 package io.machinecode.nock.core.model.task;
 
-import io.machinecode.nock.core.TodoException;
 import io.machinecode.nock.core.factory.task.BatchletFactory;
 import io.machinecode.nock.core.loader.TypedArtifactReference;
 import io.machinecode.nock.core.model.PropertiesImpl;
@@ -11,10 +10,12 @@ import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.spi.factory.PropertyContext;
 import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Listener;
 import io.machinecode.nock.spi.work.TaskWork;
 import org.jboss.logging.Logger;
 
+import javax.batch.operations.BatchRuntimeException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -43,8 +44,10 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
 
     @Override
     public void run(final Transport transport, final Context context, final int timeout) throws Exception {
+        final long jobExecutionId = context.getJobExecutionId();
         synchronized (this) {
             if (delegate.isCancelled()) {
+                log.debugf(Message.get("batchlet.cancelled"), jobExecutionId, getRef());
                 return;
             }
             batchlet = load(transport, context);
@@ -53,6 +56,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             if (batchlet == null) {
                 throw new IllegalStateException(getRef()); //TODO
             }
+            log.debugf(Message.get("batchlet.process"), jobExecutionId, getRef());
             batchlet.process();
         } finally {
             if (partition != null) {
@@ -81,10 +85,10 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         final boolean ret = delegate.cancel(mayInterruptIfRunning);
         if (batchlet != null) {
             try {
+                log.debugf(Message.get("batchlet.stop"), getRef());
                 batchlet.stop();
             } catch (final Exception e) {
-                log.debugf(e, "Batchlet %s threw when calling stop", getRef()); //TODO Message
-                throw new TodoException(e);
+                throw new BatchRuntimeException(Message.format("batchlet.stop.exception", getRef()), e);
             }
         }
         return ret;
