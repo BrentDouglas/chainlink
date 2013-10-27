@@ -28,8 +28,10 @@ public class ArtifactReference {
                     context.getJob().properties(element))
             );
             final ClassLoader classLoader = injectionContext.getClassLoader();
-            final T that =  injectionContext.getArtifactLoader().load(this.ref, clazz, classLoader);
-            injectionContext.getInjector().inject(that);
+            final T that = injectionContext.getArtifactLoader().load(this.ref, clazz, classLoader);
+            if (that != null) {
+                injectionContext.getInjector().inject(that);
+            }
             return that;
         } finally {
             provider.setInjectables(null);

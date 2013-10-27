@@ -27,7 +27,7 @@ public class InjectorImpl implements Injector {
     @Override
     public <T> boolean inject(final T bean) throws Exception {
         if (bean == null) {
-            log.debug("Trying to inject null bean", new Exception()); //TODO Message
+            log.debugf("injector.bean.null"); //TODO Message
             return false;
         }
         for (final Injector injector : injectors) {

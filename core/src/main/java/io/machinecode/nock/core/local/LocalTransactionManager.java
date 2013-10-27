@@ -40,22 +40,28 @@ public class LocalTransactionManager implements TransactionManager, UserTransact
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-        final Transaction transaction = this.transaction.get();
-        if (transaction == null) {
-            throw new IllegalStateException();
+        try {
+            final Transaction transaction = this.transaction.get();
+            if (transaction == null) {
+                throw new IllegalStateException();
+            }
+            transaction.commit();
+        } finally {
+            this.transaction.set(null);
         }
-        transaction.commit();
-        this.transaction.set(null);
     }
 
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
-        final Transaction transaction = this.transaction.get();
-        if (transaction == null) {
-            throw new IllegalStateException();
+        try {
+            final Transaction transaction = this.transaction.get();
+            if (transaction == null) {
+                throw new IllegalStateException();
+            }
+            transaction.rollback();
+        } finally {
+            this.transaction.set(null);
         }
-        transaction.rollback();
-        this.transaction.set(null);
     }
 
     @Override

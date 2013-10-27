@@ -6,6 +6,7 @@ import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.core.impl.JobExecutionImpl;
 import io.machinecode.nock.core.impl.JobInstanceImpl;
 import io.machinecode.nock.core.impl.StepExecutionImpl;
+import io.machinecode.nock.spi.Checkpoint;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Step;
@@ -42,6 +43,7 @@ public class LocalRepository implements ExecutionRepository {
     protected final TMap<Long, List<JobExecution>> jobInstanceExecutions = new THashMap<Long, List<JobExecution>>();
     protected final TMap<Long, JobInstance> jobExecutionInstances = new THashMap<Long, JobInstance>();
     protected final TMap<Long, StepExecution> stepExecutions = new THashMap<Long, StepExecution>();
+    protected final TMap<Long, Checkpoint> checkpoints = new THashMap<Long, Checkpoint>();
     protected final TMap<Long, Set<Long>> jobExecutionStepExecutions = new THashMap<Long, Set<Long>>();
     protected final TMap<Long, JobExecution> latestJobExecutionForInstance = new THashMap<Long, JobExecution>();
 
@@ -50,6 +52,7 @@ public class LocalRepository implements ExecutionRepository {
     protected final AtomicBoolean jobInstanceExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionInstanceLock = new AtomicBoolean(false);
     protected final AtomicBoolean stepExecutionLock = new AtomicBoolean(false);
+    protected final AtomicBoolean checkpointLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionStepExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean latestJobExecutionForInstanceLock = new AtomicBoolean(false);
 
@@ -215,31 +218,14 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateStepExecution(final long executionId, final Serializable serializable, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void updateStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final StepExecution execution = stepExecutions.get(executionId);
-             if (execution == null) {
-                 throw new NoSuchJobExecutionException();
-             }
-            stepExecutions.put(executionId, StepExecutionImpl.from(execution)
-                    .setPersistentUserData(serializable)
-                    .build()
-            );
-        } finally {
-            stepExecutionLock.set(false);
-        }
-    }
-
-    @Override
-    public void updateStepExecution(final long executionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
-        try {
-            final StepExecution execution = stepExecutions.get(executionId);
-             if (execution == null) {
-                 throw new NoSuchJobExecutionException();
-             }
-            stepExecutions.put(executionId, StepExecutionImpl.from(execution)
+            final StepExecution execution = stepExecutions.get(stepExecutionId);
+            if (execution == null) {
+                throw new NoSuchJobExecutionException();
+            }
+            stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setBatchStatus(batchStatus)
                     .setExitStatus(batchStatus.name())
                     .build()
@@ -250,14 +236,54 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void finishStepExecution(final long executionId, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void updateStepExecution(final long stepExecutionId, final Serializable serializable, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final StepExecution execution = stepExecutions.get(executionId);
+            final StepExecution execution = stepExecutions.get(stepExecutionId);
+            if (execution == null) {
+                throw new NoSuchJobExecutionException();
+            }
+            stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
+                    .setPersistentUserData(serializable)
+                    .build()
+            );
+        } finally {
+            stepExecutionLock.set(false);
+        }
+    }
+
+    @Override
+    public void updateStepExecution(final long stepExecutionId, final Serializable serializable, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final StepExecution execution = stepExecutions.get(stepExecutionId);
              if (execution == null) {
                  throw new NoSuchJobExecutionException();
              }
-            stepExecutions.put(executionId, StepExecutionImpl.from(execution)
+            stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
+                    .setPersistentUserData(serializable)
+                    .build()
+            );
+        } finally {
+            stepExecutionLock.set(false);
+        }
+        while (!checkpointLock.compareAndSet(false, true)) {}
+        try {
+            checkpoints.put(stepExecutionId, checkpoint);
+        } finally {
+            checkpointLock.set(false);
+        }
+    }
+
+    @Override
+    public void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final StepExecution execution = stepExecutions.get(stepExecutionId);
+             if (execution == null) {
+                 throw new NoSuchJobExecutionException();
+             }
+            stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setBatchStatus(batchStatus)
                     .setExitStatus(exitStatus)
                     .setEnd(timestamp)
@@ -265,6 +291,16 @@ public class LocalRepository implements ExecutionRepository {
             );
         } finally {
             stepExecutionLock.set(false);
+        }
+    }
+
+    @Override
+    public Checkpoint getStepExecutionCheckpoint(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!checkpointLock.compareAndSet(false, true)) {}
+        try {
+            return checkpoints.get(stepExecutionId);
+        } finally {
+            checkpointLock.set(false);
         }
     }
 

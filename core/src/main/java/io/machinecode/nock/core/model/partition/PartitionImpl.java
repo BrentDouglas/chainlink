@@ -126,9 +126,9 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         final PartitionPlan plan = loadPartitionPlan(transport, context);
         final int partitions = plan.getPartitions();
         final Properties[] properties = plan.getPartitionProperties();
-        if (partitions != properties.length) {
-            throw new IllegalStateException(Message.format("partition.properties.length", jobExecutionId, partitions, properties.length));
-        }
+        //if (partitions != properties.length) {
+        //    throw new IllegalStateException(Message.format("partition.properties.length", jobExecutionId, partitions, properties.length));
+        //}
         transport.setBucket(
                 new Bucket(
                         new Serializable[partitions]
@@ -136,9 +136,10 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                 task
         );
         final Executable[] executables = new Executable[partitions];
-        for (int i = 0; i < properties.length; ++i) {
+        for (int i = 0; i < partitions; ++i) {
+            //TODO Not really sure if this is how properties are meant to be distributed
             executables[i] = new RunTask(
-                    task.partition(new PropertyContextImpl(properties[i])),
+                    task.partition(new PropertyContextImpl(i < properties.length ? properties[i] : null)),
                     context,
                     timeout
             );

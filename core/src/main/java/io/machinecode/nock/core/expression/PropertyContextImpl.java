@@ -31,6 +31,9 @@ public class PropertyContextImpl implements PropertyContext {
     }
 
     public void addProperties(final Properties properties) {
+        if (properties == null) {
+            return;
+        }
         for (final Entry<Object, Object> entry : properties.entrySet()) {
             final Object key = entry.getKey();
             final Object value = entry.getValue();

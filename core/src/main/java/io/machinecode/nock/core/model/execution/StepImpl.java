@@ -213,7 +213,11 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             final StepContext stepContext = context.getStepContext();
             final ExecutionRepository repository = transport.getRepository();
             log.debugf(Message.get("step.update.persistent.data"), jobExecutionId, id);
-            repository.updateStepExecution(stepContext.getStepExecutionId(), stepContext.getPersistentUserData(), new Date());
+            repository.updateStepExecution(
+                    stepContext.getStepExecutionId(),
+                    stepContext.getPersistentUserData(),
+                    new Date()
+            );
             if (exception != null) {
                 throw exception;
             }

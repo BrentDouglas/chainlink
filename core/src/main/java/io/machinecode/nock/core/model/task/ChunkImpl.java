@@ -4,6 +4,7 @@ import io.machinecode.nock.core.factory.task.ChunkFactory;
 import io.machinecode.nock.core.model.ListenersImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.work.DeferredImpl;
+import io.machinecode.nock.spi.Checkpoint;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.task.Chunk;
@@ -30,6 +31,7 @@ import javax.batch.api.chunk.listener.SkipWriteListener;
 import javax.batch.operations.BatchRuntimeException;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.context.StepContext;
+import javax.transaction.Status;
 import javax.transaction.TransactionManager;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -167,9 +169,12 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
 
     private class State {
         int next = BEGIN;
+        boolean finished = false;
         Object value;
         Serializable readInfo = null;
         Serializable writeInfo = null;
+        Exception exception = null;
+        Throwable failure = null;
 
         final List<Object> objects;
 
@@ -197,7 +202,8 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
         final List<RetryWriteListener> retryWriteListeners;
         final List<SkipWriteListener> skipWriteListeners;
 
-        private State(final Transport transport, final Context context, final int timeout, final TransactionManager transactionManager) throws Exception {
+        private State(final Transport transport, final Context context, final int timeout,
+                      final TransactionManager transactionManager, final Checkpoint checkpoint) throws Exception {
             this.jobExecutionId = context.getJobExecutionId();
             this.transactionManager = transactionManager;
 
@@ -205,6 +211,11 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             this.timeLimit = Integer.parseInt(ChunkImpl.this.timeLimit);
             this.skipLimit = Integer.parseInt(ChunkImpl.this.skipLimit);
             this.retryLimit = Integer.parseInt(ChunkImpl.this.retryLimit);
+
+            if (checkpoint != null) {
+                this.readInfo = checkpoint.getReaderCheckpoint();
+                this.writeInfo = checkpoint.getWriterCheckpoint();
+            }
 
             this.objects = ChunkImpl.this.checkpointAlgorithm == null
                     ? new LinkedList<Object>()
@@ -221,7 +232,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             if (this.writer == null) {
                 throw new IllegalStateException(Message.format("chunk.writer.null", jobExecutionId, ChunkImpl.this.writer.getRef()));
             }
-            this.checkpointAlgorithm = ChunkImpl.this.checkpointAlgorithm == null
+            this.checkpointAlgorithm = CheckpointPolicy.ITEM.equalsIgnoreCase(ChunkImpl.this.checkpointPolicy) || ChunkImpl.this.checkpointAlgorithm == null //TODO Check this is caught in the job validator and remove this
                     ? new ItemCheckpointAlgorithm(timeout, this.itemCount)
                     : ChunkImpl.this.checkpointAlgorithm.load(transport, context);
             this.chunkListeners = ChunkImpl.this.listeners.getListenersImplementing(transport, context, ChunkListener.class);
@@ -244,6 +255,38 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             this.next = status;
             this.value = value;
         }
+
+        public void throwable(final Throwable e) {
+            if (this.failure == null) {
+                this.failure = e;
+            } else {
+                this.failure.addSuppressed(e);
+            }
+        }
+
+        public void exception(final Exception e) {
+            if (this.exception == null) {
+                this.exception = e;
+            } else {
+                this.exception.addSuppressed(e);
+            }
+        }
+
+        public boolean failed() {
+            return this.exception != null || this.failure != null;
+        }
+
+        public void tryThrow(final String message) throws Exception {
+            if (this.exception != null) {
+                if (this.failure != null) {
+                    this.exception.addSuppressed(failure);
+                }
+                throw this.exception;
+            }
+            if (this.failure != null) {
+                throw new BatchRuntimeException(Message.format(message, this.jobExecutionId), this.failure);
+            }
+        }
     }
 
     @Override
@@ -259,139 +302,202 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
                 transport,
                 context,
                 timeout,
-                transport.getTransactionManager()
+                transport.getTransactionManager(),
+                repository.getStepExecutionCheckpoint(stepContext.getStepExecutionId())
         );
 
-        log.debugf(Message.get("chunk.transaction.timeout"), state.jobExecutionId);
+        log.debugf(Message.get("chunk.transaction.timeout"), state.jobExecutionId, timeout);
         state.transactionManager.setTransactionTimeout(timeout);
         state.transactionManager.begin();
+        openReader(state);
+        openWriter(state);
         try {
-            //TODO Read things
-            log.debugf(Message.get("chunk.reader.open"), state.jobExecutionId, reader.getRef());
-            state.reader.open(null);
-            log.debugf(Message.get("chunk.writer.open"), state.jobExecutionId, writer.getRef());
-            state.writer.open(null);
-            state.transactionManager.commit();
-        } catch (final Exception e) {
-            try {
-                log.infof(e, Message.format("chunk.exception.opening", state.jobExecutionId));
-                //context.getStepContext().setExitStatus(BatchStatus.FAILED.name()); //TODO Is this a thing?
-            } finally {
+            if (!state.failed()) {
+                state.transactionManager.commit();
+            } else {
+                state.transactionManager.setRollbackOnly();
+                closeReader(state);
+                closeWriter(state);
                 state.transactionManager.rollback();
             }
-            throw e;
         } catch (final Throwable e) {
-            state.transactionManager.rollback();
-            throw new BatchRuntimeException(Message.format("chunk.throwable.opening", state.jobExecutionId), e);
+            state.throwable(e);
         }
+        state.tryThrow("chunk.failed.opening");
 
-        Throwable failure = null;
         try {
-            outer: for (;;) {
-                if (BatchStatus.STOPPING.equals(stepContext.getBatchStatus())) {
-                    cancel(true);
-                }
-                switch (state.next) {
-                    case BEGIN:
-                        log.debugf(Message.get("chunk.state.begin"), state.jobExecutionId);
-                        state.checkpointAlgorithm.beginCheckpoint();
-                        state.transactionManager.begin();
-                        state.transactionManager.setTransactionTimeout(state.checkpointAlgorithm.checkpointTimeout());
-                        before(state);
-                        state.next(state.checkpointAlgorithm.isReadyToCheckpoint() || isCancelled() ? WRITE : READ);
-                        break;
-                    case READ:
-                        log.debugf(Message.get("chunk.state.read"), state.jobExecutionId);
-                        read(state);
-                        break;
-                    case PROCESS:
-                        log.debugf(Message.get("chunk.state.process"), state.jobExecutionId);
-                        process(state.value, state);
-                        break;
-                    case ADD:
-                        log.debugf(Message.get("chunk.state.add"), state.jobExecutionId);
-                        state.objects.add(state.value);
-                        state.next(readyToCheckpoint(state) ? WRITE : READ);
-                        break;
-                    case WRITE:
-                        log.debugf(Message.get("chunk.state.write"), state.jobExecutionId);
-                        write(state);
-                        // 11.8 9 m has this outside the write catch block
-                        after(state);
-                        break;
-                    case COMMIT:
-                        log.debugf(Message.get("chunk.state.commit"), state.jobExecutionId);
-                        log.debugf(Message.get("chunk.reader.checkpoint"), state.jobExecutionId, reader.getRef());
-                        state.readInfo = state.reader.checkpointInfo();
-                        log.debugf(Message.get("chunk.writer.checkpoint"), state.jobExecutionId, writer.getRef());
-                        state.writeInfo = state.writer.checkpointInfo();
-
-                        repository.updateStepExecution(
-                                stepContext.getStepExecutionId(),
-                                stepContext.getPersistentUserData(),
-                                new Date()
-                        );
-                        state.transactionManager.commit();
-                        if (partition != null) {
-                            partition.collect(this, transport, context);
-                        }
-                        if (isCancelled()) {
-                            break outer;
-                        }
-                        break;
-                    default:
-                        throw new IllegalStateException();
-                }
-            }
-        } catch (final Exception e) {
             try {
-            log.infof(e, Message.format("chunk.exception", state.jobExecutionId));
-            state.transactionManager.setRollbackOnly(); //TODO Tighten this up.
-            error(state, e);
-            } finally {
-                state.transactionManager.rollback();
-            }
-        } catch (final Throwable e) {
-            try {
-                failure = e;
+                while (!state.failed() && loop(state, transport, context, repository, stepContext)) {
+                    //
+                }
+            } catch (final Exception e) {
+                state.exception(e);
+                state.transactionManager.setRollbackOnly();
+                error(state, e);
+                log.infof(e, Message.format("chunk.exception", state.jobExecutionId));
+            } catch (final Throwable e) {
+                state.throwable(e);
+                state.transactionManager.setRollbackOnly();
                 log.infof(e, Message.format("chunk.throwable", state.jobExecutionId));
-            } finally {
-                state.transactionManager.rollback();
-            }
-        }
-        state.transactionManager.begin();
-        try {
-            //TODO Read things
-            log.debugf(Message.get("chunk.reader.close"), state.jobExecutionId, reader.getRef());
-            state.reader.close();
-            log.debugf(Message.get("chunk.writer.close"), state.jobExecutionId, writer.getRef());
-            state.writer.close();
-            if (partition != null) {
-                partition.collect(this, transport, context);
-            }
-            state.transactionManager.commit();
-        } catch (final Exception e) {
-            try {
-                log.infof(e, Message.format("chunk.exception.closing", state.jobExecutionId));
-            } finally {
-                state.transactionManager.rollback();
             }
         } catch (final Throwable e) {
+            state.throwable(e);
+        } finally {
             try {
-                if (failure == null) {
-                    failure = e;
-                } else {
-                    failure.addSuppressed(e);
+                if (state.failed() && state.transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION) {
+                    state.transactionManager.rollback();
                 }
-                throw new BatchRuntimeException(Message.format("chunk.throwable.closing", state.jobExecutionId), failure);
-            } finally {
-                state.transactionManager.rollback();
+            } catch (final Throwable e) {
+                state.throwable(e);
             }
         }
+
+        state.transactionManager.begin();
+        closeReader(state);
+        closeWriter(state);
+        if (!state.failed()) {
+            collect(state, transport, context);
+            state.transactionManager.commit();
+        } else {
+            state.transactionManager.rollback();
+        }
+        state.tryThrow("chunk.failed");
+    }
+
+    private boolean loop(final State state, final Transport transport, final Context context, final ExecutionRepository repository, final StepContext stepContext) throws Exception {
+        if (BatchStatus.STOPPING.equals(stepContext.getBatchStatus())) {
+            cancel(true);
+        }
+        switch (state.next) {
+            case BEGIN:
+                final int checkpointTimeout = state.checkpointAlgorithm.checkpointTimeout();
+                log.debugf(Message.get("chunk.transaction.timeout"), state.jobExecutionId, checkpointTimeout);
+                state.transactionManager.setTransactionTimeout(checkpointTimeout);
+                log.debugf(Message.get("chunk.state.begin"), state.jobExecutionId);
+                state.checkpointAlgorithm.beginCheckpoint();
+                state.transactionManager.begin();
+                before(state);
+                state.next(readyToCheckpoint(state) ? WRITE : READ);
+                break;
+            case READ:
+                log.debugf(Message.get("chunk.state.read"), state.jobExecutionId);
+                read(state);
+                break;
+            case PROCESS:
+                log.debugf(Message.get("chunk.state.process"), state.jobExecutionId);
+                process(state.value, state);
+                break;
+            case ADD:
+                log.debugf(Message.get("chunk.state.add"), state.jobExecutionId);
+                state.objects.add(state.value);
+                state.next(readyToCheckpoint(state) ? WRITE : READ);
+                break;
+            case WRITE:
+                log.debugf(Message.get("chunk.state.write"), state.jobExecutionId);
+                write(state);
+                // 11.8 9 m has this outside the write catch block
+                after(state);
+                break;
+            case COMMIT:
+                log.debugf(Message.get("chunk.state.commit"), state.jobExecutionId);
+                log.debugf(Message.get("chunk.reader.checkpoint"), state.jobExecutionId, reader.getRef());
+                state.readInfo = state.reader.checkpointInfo();
+                log.debugf(Message.get("chunk.writer.checkpoint"), state.jobExecutionId, writer.getRef());
+                state.writeInfo = state.writer.checkpointInfo();
+
+                repository.updateStepExecution(
+                        stepContext.getStepExecutionId(),
+                        stepContext.getPersistentUserData(),
+                        new CheckpointImpl(state.readInfo, state.writeInfo),
+                        new Date()
+                );
+                state.transactionManager.commit();
+                state.checkpointAlgorithm.endCheckpoint();
+                collect(state, transport, context);
+                if (isCancelled()) {
+                    return false;
+                }
+                if (state.finished) {
+                    return false;
+                }
+                state.next(BEGIN);
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+        return true;
     }
 
     private boolean readyToCheckpoint(final State state) throws Exception {
         return state.checkpointAlgorithm.isReadyToCheckpoint() || isCancelled();
+    }
+
+    private void collect(final State state, final Transport transport, final Context context) {
+        try {
+            if (partition != null) {
+                partition.collect(this, transport, context);
+            }
+        } catch (final Exception e) {
+            state.exception(e);
+            log.infof(e, Message.format("chunk.partition.exception.collect", state.jobExecutionId));
+        } catch (final Throwable e) {
+            state.throwable(e);
+            log.infof(e, Message.format("chunk.partition.throwable.collect", state.jobExecutionId));
+        }
+    }
+
+    private void openReader(final State state) {
+        try {
+            //TODO Read things
+            log.debugf(Message.get("chunk.reader.open"), state.jobExecutionId, reader.getRef());
+            state.reader.open(state.readInfo);
+        } catch (final Exception e) {
+            state.exception(e);
+            log.infof(e, Message.format("chunk.reader.exception.opening", state.jobExecutionId));
+        } catch (final Throwable e) {
+            state.throwable(e);
+            log.infof(e, Message.format("chunk.reader.throwable.opening", state.jobExecutionId));
+        }
+    }
+
+    private void closeReader(final State state) {
+        try {
+            log.debugf(Message.get("chunk.reader.close"), state.jobExecutionId, reader.getRef());
+            state.reader.close();
+        } catch (final Exception e) {
+            state.exception(e);
+            log.infof(e, Message.format("chunk.reader.exception.closing", state.jobExecutionId));
+        } catch (final Throwable e) {
+            state.throwable(e);
+            log.infof(e, Message.format("chunk.reader.throwable.closing", state.jobExecutionId));
+        }
+    }
+
+    private void openWriter(final State state) {
+        try {
+            //TODO Read things
+            log.debugf(Message.get("chunk.writer.open"), state.jobExecutionId, reader.getRef());
+            state.writer.open(state.writeInfo);
+        } catch (final Exception e) {
+            state.exception(e);
+            log.infof(e, Message.format("chunk.writer.exception.opening", state.jobExecutionId));
+        } catch (final Throwable e) {
+            state.throwable(e);
+            log.infof(e, Message.format("chunk.writer.throwable.opening", state.jobExecutionId));
+        }
+    }
+
+    private void closeWriter(final State state) {
+        try {
+            log.debugf(Message.get("chunk.writer.close"), state.jobExecutionId, writer.getRef());
+            state.writer.close();
+        } catch (final Exception e) {
+            state.exception(e);
+            log.infof(e, Message.format("chunk.writer.exception.closing", state.jobExecutionId));
+        } catch (final Throwable e) {
+            state.throwable(e);
+            log.infof(e, Message.format("chunk.writer.throwable.closing", state.jobExecutionId));
+        }
     }
 
     private void before(final State state) throws Exception {
@@ -433,21 +539,13 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
     }
 
     private void error(final State state, final Exception that) throws Exception {
-        Exception exception = null;
         for (final ChunkListener listener : state.chunkListeners) {
             try {
                 log.debugf(Message.get("chunk.listener.error"), state.jobExecutionId);
                 listener.onError(that);
             } catch (final Exception e) {
-                if (exception == null) {
-                    exception = e;
-                } else {
-                    exception.addSuppressed(e);
-                }
+                state.exception(e);
             }
-        }
-        if (exception != null) {
-            throw exception;
         }
     }
 
@@ -460,6 +558,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             log.debugf(Message.get("chunk.reader.read"), state.jobExecutionId, reader.getRef());
             final Object read = state.reader.readItem();
             if (read == null) {
+                state.finished = true;
                 state.next(WRITE);
                 return;
             }
@@ -581,26 +680,43 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
 
     private void rollback(final State state) throws Exception {
         try {
-            log.debugf(Message.get("chunk.writer.close"), state.jobExecutionId, writer.getRef());
-            state.writer.close();
-            log.debugf(Message.get("chunk.reader.close"), state.jobExecutionId, reader.getRef());
-            state.reader.close();
+            closeReader(state);
+            closeWriter(state);
         } finally {
             state.transactionManager.rollback();
         }
 
         state.transactionManager.begin();
-        try {
-            log.debugf(Message.get("chunk.writer.open"), state.jobExecutionId, writer.getRef());
-            state.writer.open(state.writeInfo);
-            log.debugf(Message.get("chunk.reader.open"), state.jobExecutionId, reader.getRef());
-            state.reader.open(state.readInfo);
+            openReader(state);
+            openWriter(state);
+        if (!state.failed()) {
             state.transactionManager.commit();
-        } catch (final Exception e) {
+        } else {
             state.transactionManager.rollback();
         }
         state.objects.clear();
         state.next(BEGIN);
+    }
+
+    public static final class CheckpointImpl implements Checkpoint {
+
+        private final Serializable reader;
+        private final Serializable writer;
+
+        public CheckpointImpl(final Serializable reader, final Serializable writer) {
+            this.reader = reader;
+            this.writer = writer;
+        }
+
+        @Override
+        public Serializable getReaderCheckpoint() {
+            return reader;
+        }
+
+        @Override
+        public Serializable getWriterCheckpoint() {
+            return writer;
+        }
     }
 
     private static final class ItemCheckpointAlgorithm implements CheckpointAlgorithm {

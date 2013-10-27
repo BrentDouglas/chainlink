@@ -38,7 +38,9 @@ public class TypedArtifactReference<T> {
             );
             final ClassLoader classLoader = injectionContext.getClassLoader();
             final T that =  injectionContext.getArtifactLoader().load(this.ref, this.type(classLoader), classLoader);
-            injectionContext.getInjector().inject(that);
+            if (that != null) {
+                injectionContext.getInjector().inject(that);
+            }
             return that;
         } finally {
             provider.setInjectables(null);
