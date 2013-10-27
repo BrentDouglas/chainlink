@@ -234,6 +234,9 @@ public class ExpressionTest {
     public void somethingOutOfTckTest() {
         System.setProperty("file.name.junit", "myfile2");
 
+        final Properties parameters = new Properties();
+        parameters.setProperty("myFilename", "testfile1");
+
         final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
@@ -247,7 +250,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                         .setNext("#{systemProperties['file.separator']}test#{systemProperties['file.separator']}#{jobParameters['myFilename']}.txt")
-                ) , PARAMETERS);
+                ) , parameters);
         JobFactory.INSTANCE.validate(job);
 
         System.clearProperty("file.name.junit");
@@ -255,6 +258,6 @@ public class ExpressionTest {
         final Step step1 = (Step)job.getExecutions().get(0);
         final Step step2 = (Step)job.getExecutions().get(1);
         Assert.assertEquals("/myfile2.txt", step1.getNext());
-        Assert.assertEquals("/test/.txt", step2.getNext());
+        Assert.assertEquals("/test/testfile1.txt", step2.getNext());
     }
 }

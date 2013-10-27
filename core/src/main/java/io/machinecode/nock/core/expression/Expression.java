@@ -127,10 +127,6 @@ public class Expression {
         if (startDefault == -1) {
             return unresolvedLength;
         }
-        //final int endDefault = Index.of(unresolved, 0, unresolvedLength, DEFAULT_END, 0, DEFAULT_END_LENGTH, startDefault);
-        //if (endDefault == -1) {
-        //    return unresolvedLength;
-        //}
         return startDefault;
     }
 
@@ -159,7 +155,7 @@ public class Expression {
         return unresolvedLength;
     }
 
-    private static <T extends Pair<String, String>> String get(final CharSequence value, final List<T> properties) {
+    private static <T extends Pair<String, String>> String _get(final CharSequence value, final List<T> properties) {
         final ListIterator<T> it = properties.listIterator(properties.size());
         while (it.hasPrevious()) {
             final T property = it.previous();
@@ -175,8 +171,8 @@ public class Expression {
             return null;
         }
         return attributeValue(that, 0,
-                new ContextPropertyResolver(JOB_PROPERTIES, JOB_PROPERTIES_LENGTH, context),
-                new ContextPropertyResolver(JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, context),
+                new ContextPropertyResolver(JOB_PROPERTIES, JOB_PROPERTIES_LENGTH, context.getProperties()),
+                new ContextPropertyResolver(JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, context.getParameters()),
                 SYSTEM_PROPERTY_RESOLVER
         ).toString();
     }
@@ -186,19 +182,19 @@ public class Expression {
         if (that == null) {
             return null;
         }
-        return attributeValue(that, 0, new ContextPropertyResolver(PARTITION_PLAN, PARTITION_PLAN_LENGTH, context)).toString();
+        return attributeValue(that, 0, new ContextPropertyResolver(PARTITION_PLAN, PARTITION_PLAN_LENGTH, context.getProperties())).toString();
     }
 
     private static final class ContextPropertyResolver implements PropertyResolver {
 
         private final String prefix;
         private final int length;
-        private final PropertyContext context;
+        private final List<? extends Pair<String, String>> properties;
 
-        private ContextPropertyResolver(final String prefix, final int length, final PropertyContext context) {
+        private ContextPropertyResolver(final String prefix, final int length, final List<? extends Pair<String, String>> properties) {
             this.prefix = prefix;
             this.length = length;
-            this.context = context;
+            this.properties = properties;
         }
 
         @Override
@@ -213,7 +209,7 @@ public class Expression {
 
         @Override
         public CharSequence resolve(final CharSequence value) {
-            return get(value, context.getProperties());
+            return _get(value, properties);
         }
     }
 
@@ -230,7 +226,8 @@ public class Expression {
 
         @Override
         public CharSequence resolve(final CharSequence value) {
-            return System.getProperty(value.toString());
+            final String that = System.getProperty(value.toString());
+            return that == null ? "" : that;
         }
     };
 }
