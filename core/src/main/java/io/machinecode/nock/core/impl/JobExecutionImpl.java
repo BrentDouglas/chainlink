@@ -1,14 +1,15 @@
 package io.machinecode.nock.core.impl;
 
+import io.machinecode.nock.spi.RestartableJobExecution;
+
 import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
 import java.util.Date;
 import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobExecutionImpl implements JobExecution {
+public class JobExecutionImpl implements RestartableJobExecution {
     private final long executionId;
     private final String jobName;
     private final BatchStatus batchStatus;
@@ -18,6 +19,7 @@ public class JobExecutionImpl implements JobExecution {
     private final Date created;
     private final Date updated;
     private final Properties parameters;
+    private final String restartId;
 
     public JobExecutionImpl(final Builder builder) {
         this.executionId = builder.executionId;
@@ -29,6 +31,7 @@ public class JobExecutionImpl implements JobExecution {
         this.created = builder.created;
         this.updated = builder.updated;
         this.parameters = builder.parameters;
+        this.restartId = builder.restartId;
     }
 
     public JobExecutionImpl(final JobExecutionImpl builder) {
@@ -41,6 +44,7 @@ public class JobExecutionImpl implements JobExecution {
         this.created = builder.created;
         this.updated = builder.updated;
         this.parameters = builder.parameters;
+        this.restartId = builder.restartId;
     }
 
     @Override
@@ -88,7 +92,12 @@ public class JobExecutionImpl implements JobExecution {
         return parameters;
     }
 
-    public static Builder from(final JobExecution builder) {
+    @Override
+    public String getRestartId() {
+        return restartId;
+    }
+
+    public static Builder from(final RestartableJobExecution builder) {
         final Builder that = new Builder();
         that.executionId = builder.getExecutionId();
         that.jobName = builder.getJobName();
@@ -99,6 +108,7 @@ public class JobExecutionImpl implements JobExecution {
         that.created = builder.getCreateTime();
         that.updated = builder.getLastUpdatedTime();
         that.parameters = builder.getJobParameters();
+        that.restartId = builder.getRestartId();
         return that;
     }
 
@@ -112,6 +122,7 @@ public class JobExecutionImpl implements JobExecution {
         private Date created;
         private Date updated;
         private Properties parameters;
+        private String restartId;
 
         public Builder setExecutionId(final long executionId) {
             this.executionId = executionId;
@@ -155,6 +166,11 @@ public class JobExecutionImpl implements JobExecution {
 
         public Builder setParameters(final Properties parameters) {
             this.parameters = parameters;
+            return this;
+        }
+
+        public Builder setRestartId(final String restartId) {
+            this.restartId = restartId;
             return this;
         }
 

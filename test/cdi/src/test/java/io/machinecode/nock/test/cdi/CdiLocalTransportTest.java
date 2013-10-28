@@ -63,8 +63,6 @@ public class CdiLocalTransportTest extends TransportTest {
         final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
         final Start start = operator.start(job);
         final JobExecution execution = repository().getJobExecution(start.id);
-        Assert.assertEquals("Batch Status", BatchStatus.STARTED, execution.getBatchStatus()); //TODO Race
-        Assert.assertEquals("Exit  Status", BatchStatus.STARTED.name(), execution.getExitStatus());
         start.deferred.get();
         Assert.assertTrue(InjectedBatchlet.hasRun.get());
         Assert.assertEquals("Batch Status", BatchStatus.COMPLETED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());

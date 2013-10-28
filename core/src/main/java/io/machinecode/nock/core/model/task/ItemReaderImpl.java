@@ -10,7 +10,7 @@ import io.machinecode.nock.spi.element.task.ItemReader;
  */
 public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.ItemReader> implements ItemReader {
 
-    public ItemReaderImpl(final String ref, final PropertiesImpl properties) {
-        super(new TypedArtifactReference<javax.batch.api.chunk.ItemReader>(ref, javax.batch.api.chunk.ItemReader.class), properties);
+    public ItemReaderImpl(final TypedArtifactReference<javax.batch.api.chunk.ItemReader> ref, final PropertiesImpl properties) {
+        super(ref, properties);
     }
 }

@@ -31,9 +31,27 @@ public class ExceptionClassFilterImpl implements ExceptionClassFilter {
         return this.excludes;
     }
 
-    public boolean matches(final Exception e) {
-        final String fqcn = e.getClass().getCanonicalName();
-        //TODO
+    public boolean matches(final Exception exception) throws ClassNotFoundException {
+        final Class<?> clazz = exception.getClass();
+        final ClassLoader loader = clazz.getClassLoader();
+        for (final ExceptionClassImpl that : excludes) {
+            try {
+                if (that.matches(clazz, loader)) {
+                    return false;
+                }
+            } catch (final ClassNotFoundException e) {
+                // If it's not available in the exception's classloader, clearly it is not a match
+            }
+        }
+        for (final ExceptionClassImpl that : includes) {
+            try {
+                if (that.matches(clazz, loader)) {
+                    return true;
+                }
+            } catch (final ClassNotFoundException e) {
+                //
+            }
+        }
         return false;
     }
 }

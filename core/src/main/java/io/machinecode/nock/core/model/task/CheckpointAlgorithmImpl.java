@@ -10,7 +10,7 @@ import io.machinecode.nock.spi.element.task.CheckpointAlgorithm;
  */
 public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.api.chunk.CheckpointAlgorithm> implements CheckpointAlgorithm {
 
-    public CheckpointAlgorithmImpl(final String ref, final PropertiesImpl properties) {
-        super(new TypedArtifactReference<javax.batch.api.chunk.CheckpointAlgorithm>(ref, javax.batch.api.chunk.CheckpointAlgorithm.class), properties);
+    public CheckpointAlgorithmImpl(final TypedArtifactReference<javax.batch.api.chunk.CheckpointAlgorithm> ref, final PropertiesImpl properties) {
+        super(ref, properties);
     }
 }

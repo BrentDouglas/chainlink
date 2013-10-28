@@ -7,6 +7,7 @@ import io.machinecode.nock.core.work.DeferredImpl;
 import io.machinecode.nock.spi.Checkpoint;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.MutableStepContext;
 import io.machinecode.nock.spi.element.task.Chunk;
 import io.machinecode.nock.spi.factory.PropertyContext;
 import io.machinecode.nock.spi.transport.Transport;
@@ -30,7 +31,6 @@ import javax.batch.api.chunk.listener.SkipReadListener;
 import javax.batch.api.chunk.listener.SkipWriteListener;
 import javax.batch.operations.BatchRuntimeException;
 import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.context.StepContext;
 import javax.transaction.Status;
 import javax.transaction.TransactionManager;
 import java.io.Serializable;
@@ -38,6 +38,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import static javax.batch.runtime.Metric.MetricType.COMMIT_COUNT;
+import static javax.batch.runtime.Metric.MetricType.FILTER_COUNT;
+import static javax.batch.runtime.Metric.MetricType.PROCESS_SKIP_COUNT;
+import static javax.batch.runtime.Metric.MetricType.READ_COUNT;
+import static javax.batch.runtime.Metric.MetricType.READ_SKIP_COUNT;
+import static javax.batch.runtime.Metric.MetricType.ROLLBACK_COUNT;
+import static javax.batch.runtime.Metric.MetricType.WRITE_COUNT;
+import static javax.batch.runtime.Metric.MetricType.WRITE_SKIP_COUNT;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -179,13 +188,14 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
         final List<Object> objects;
 
         final long jobExecutionId;
+        final TransactionManager transactionManager;
+        final ExecutionRepository repository;
+        final MutableStepContext stepContext;
 
         final int itemCount;
         final int timeLimit;
         final int skipLimit;
         final int retryLimit;
-
-        final TransactionManager transactionManager;
 
         final ItemReader reader;
         final ItemProcessor processor;
@@ -202,16 +212,18 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
         final List<RetryWriteListener> retryWriteListeners;
         final List<SkipWriteListener> skipWriteListeners;
 
-        private State(final Transport transport, final Context context, final int timeout,
-                      final TransactionManager transactionManager, final Checkpoint checkpoint) throws Exception {
+        private State(final Transport transport, final Context context, final int timeout) throws Exception {
             this.jobExecutionId = context.getJobExecutionId();
-            this.transactionManager = transactionManager;
+            this.transactionManager = transport.getTransactionManager();
+            this.repository = transport.getRepository();
+            this.stepContext = context.getStepContext();
 
             this.itemCount = Integer.parseInt(ChunkImpl.this.itemCount);
             this.timeLimit = Integer.parseInt(ChunkImpl.this.timeLimit);
             this.skipLimit = Integer.parseInt(ChunkImpl.this.skipLimit);
             this.retryLimit = Integer.parseInt(ChunkImpl.this.retryLimit);
 
+            final Checkpoint checkpoint = repository.getStepExecutionCheckpoint(stepContext.getStepExecutionId());
             if (checkpoint != null) {
                 this.readInfo = checkpoint.getReaderCheckpoint();
                 this.writeInfo = checkpoint.getWriterCheckpoint();
@@ -295,15 +307,16 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
     }
 
     @Override
+    public boolean isPartitioned() {
+        return partition != null;
+    }
+
+    @Override
     public void run(final Transport transport, final Context context, final int timeout) throws Exception {
-        final ExecutionRepository repository = transport.getRepository();
-        final StepContext stepContext = context.getStepContext();
         final State state = new State(
                 transport,
                 context,
-                timeout,
-                transport.getTransactionManager(),
-                repository.getStepExecutionCheckpoint(stepContext.getStepExecutionId())
+                timeout
         );
 
         log.debugf(Message.get("chunk.transaction.timeout"), state.jobExecutionId, timeout);
@@ -327,7 +340,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
 
         try {
             try {
-                while (!state.failed() && loop(state, transport, context, repository, stepContext)) {
+                while (!state.failed() && loop(state, transport, context)) {
                     //
                 }
             } catch (final Exception e) {
@@ -362,10 +375,13 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             state.transactionManager.rollback();
         }
         state.tryThrow("chunk.failed");
+        if (isCancelled()) {
+            io.machinecode.nock.core.work.Status.stoppedJob(state.repository, state.jobExecutionId, state.stepContext.getExitStatus());
+        }
     }
 
-    private boolean loop(final State state, final Transport transport, final Context context, final ExecutionRepository repository, final StepContext stepContext) throws Exception {
-        if (BatchStatus.STOPPING.equals(stepContext.getBatchStatus())) {
+    private boolean loop(final State state, final Transport transport, final Context context) throws Exception {
+        if (BatchStatus.STOPPING.equals(state.stepContext.getBatchStatus())) {
             cancel(true);
         }
         switch (state.next) {
@@ -405,13 +421,15 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
                 log.debugf(Message.get("chunk.writer.checkpoint"), state.jobExecutionId, writer.getRef());
                 state.writeInfo = state.writer.checkpointInfo();
 
-                repository.updateStepExecution(
-                        stepContext.getStepExecutionId(),
-                        stepContext.getPersistentUserData(),
+                state.repository.updateStepExecution(
+                        state.stepContext.getStepExecutionId(),
+                        state.stepContext.getPersistentUserData(),
+                        state.stepContext.getMetrics(),
                         new CheckpointImpl(state.readInfo, state.writeInfo),
                         new Date()
                 );
                 state.transactionManager.commit();
+                state.stepContext.getMetric(COMMIT_COUNT).increment();
                 state.checkpointAlgorithm.endCheckpoint();
                 collect(state, transport, context);
                 if (isCancelled()) {
@@ -562,6 +580,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
                 state.next(WRITE);
                 return;
             }
+            state.stepContext.getMetric(READ_COUNT).increment();
             for (final ItemReadListener listener : state.itemReadListeners) {
                 log.debugf(Message.get("chunk.reader.after"), state.jobExecutionId);
                 listener.afterRead(read);
@@ -573,6 +592,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
                 listener.onReadError(e);
             }
             if (getSkippableExceptionClasses().matches(e)) {
+                state.stepContext.getMetric(READ_SKIP_COUNT).increment();
                 for (final SkipReadListener listener : state.skipReadListeners) {
                     log.debugf(Message.get("chunk.reader.skip"), state.jobExecutionId);
                     listener.onSkipReadItem(e);
@@ -605,6 +625,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             log.debugf(Message.get("chunk.processor.process"), state.jobExecutionId, processor.getRef());
             final Object processed = state.processor == null ? read : state.processor.processItem(read);
             if (processed == null) {
+                state.stepContext.getMetric(FILTER_COUNT).increment();
                 state.next(readyToCheckpoint(state) ? WRITE : READ);
                 return;
             }
@@ -619,6 +640,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
                 listener.onProcessError(read, e);
             }
             if (getSkippableExceptionClasses().matches(e)) {
+                state.stepContext.getMetric(PROCESS_SKIP_COUNT).increment();
                 for (final SkipProcessListener listener : state.skipProcessListeners) {
                     log.debugf(Message.get("chunk.processor.skip"), state.jobExecutionId);
                     listener.onSkipProcessItem(read, e);
@@ -646,6 +668,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
             }
             log.debugf(Message.get("chunk.writer.write"), state.jobExecutionId, writer.getRef());
             state.writer.writeItems(state.objects);
+            state.stepContext.getMetric(WRITE_COUNT).increment();
             for (final ItemWriteListener listener : state.itemWriteListeners) {
                 log.debugf(Message.get("chunk.writer.after"), state.jobExecutionId);
                 listener.afterWrite(state.objects);
@@ -657,6 +680,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
                 listener.onWriteError(state.objects, e);
             }
             if (getSkippableExceptionClasses().matches(e)) {
+                state.stepContext.getMetric(WRITE_SKIP_COUNT).increment();
                 for (final SkipWriteListener listener : state.skipWriteListeners) {
                     log.debugf(Message.get("chunk.writer.skip"), state.jobExecutionId);
                     listener.onSkipWriteItem(state.objects, e);
@@ -679,6 +703,7 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
     }
 
     private void rollback(final State state) throws Exception {
+        state.stepContext.getMetric(ROLLBACK_COUNT).increment();
         try {
             closeReader(state);
             closeWriter(state);
@@ -698,56 +723,4 @@ public class ChunkImpl extends DeferredImpl<Void> implements Chunk, TaskWork {
         state.next(BEGIN);
     }
 
-    public static final class CheckpointImpl implements Checkpoint {
-
-        private final Serializable reader;
-        private final Serializable writer;
-
-        public CheckpointImpl(final Serializable reader, final Serializable writer) {
-            this.reader = reader;
-            this.writer = writer;
-        }
-
-        @Override
-        public Serializable getReaderCheckpoint() {
-            return reader;
-        }
-
-        @Override
-        public Serializable getWriterCheckpoint() {
-            return writer;
-        }
-    }
-
-    private static final class ItemCheckpointAlgorithm implements CheckpointAlgorithm {
-
-        final int timeout;
-        final int target;
-        int current;
-
-        public ItemCheckpointAlgorithm(final int timeout, final int target) {
-            this.timeout = timeout;
-            this.target = target;
-        }
-
-        @Override
-        public int checkpointTimeout() throws Exception {
-            return timeout;
-        }
-
-        @Override
-        public void beginCheckpoint() throws Exception {
-            current = 0;
-        }
-
-        @Override
-        public boolean isReadyToCheckpoint() throws Exception {
-            return target == current++;
-        }
-
-        @Override
-        public void endCheckpoint() throws Exception {
-            //
-        }
-    }
 }

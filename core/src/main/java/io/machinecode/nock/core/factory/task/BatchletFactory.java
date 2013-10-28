@@ -2,6 +2,7 @@ package io.machinecode.nock.core.factory.task;
 
 import io.machinecode.nock.core.expression.Expression;
 import io.machinecode.nock.core.factory.PropertiesFactory;
+import io.machinecode.nock.core.loader.TypedArtifactReference;
 import io.machinecode.nock.core.model.ListenersImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
@@ -22,13 +23,21 @@ public class BatchletFactory implements TaskFactory<Batchlet, BatchletImpl, List
     public BatchletImpl produceExecution(final Batchlet that, final ListenersImpl _, PartitionImpl<?> partition, final JobPropertyContext context) {
         final String ref = Expression.resolveExecutionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
-        return new BatchletImpl(ref, properties, partition);
+        return new BatchletImpl(
+                context.getReference(new TypedArtifactReference<javax.batch.api.Batchlet>(ref, javax.batch.api.Batchlet.class)),
+                properties,
+                partition
+        );
     }
 
     @Override
     public BatchletImpl producePartitioned(final BatchletImpl that, final ListenersImpl _, PartitionImpl<?> partition, final PropertyContext context) {
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);
-        return new BatchletImpl(ref, properties, partition);
+        return new BatchletImpl(
+                context.getReference(new TypedArtifactReference<javax.batch.api.Batchlet>(ref, javax.batch.api.Batchlet.class)),
+                properties,
+                partition
+        );
     }
 }

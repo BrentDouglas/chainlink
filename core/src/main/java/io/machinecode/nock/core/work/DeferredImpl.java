@@ -1,8 +1,10 @@
 package io.machinecode.nock.core.work;
 
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.Listener;
+import org.jboss.logging.Logger;
 
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -15,13 +17,20 @@ import java.util.concurrent.TimeoutException;
  */
 public class DeferredImpl<T> implements Deferred<T> {
 
+    private static final Logger log = Logger.getLogger(DeferredImpl.class);
+
     protected final Deferred<?>[] chain;
 
     protected volatile boolean cancelled = false;
     protected volatile boolean done = false;
-    protected volatile T value;
 
-    protected final Set<Runnable> listeners = new THashSet<Runnable>();
+    private volatile int sync = 0;
+
+    private final Set<Listener> then = new THashSet<Listener>(0);
+    private final Set<Listener> cancel = new THashSet<Listener>(0);
+    private final Set<Listener> always = new THashSet<Listener>(0);
+
+    protected volatile T value;
 
     public DeferredImpl(final Deferred<?>... chain) {
         this.chain = chain;
@@ -29,17 +38,54 @@ public class DeferredImpl<T> implements Deferred<T> {
 
     @Override
     public synchronized void resolve(final T that) {
+        log.tracef(Message.format("deferred.resolve"));
         this.done = true;
         this.value = that;
-        for (final Runnable listener : listeners) {
-            listener.run();
+        try {
+            RuntimeException exception = null;
+            for (final Listener listener : then) {
+                try {
+                    listener.run(this);
+                } catch (final RuntimeException e) {
+                    if (exception == null) {
+                        exception = e;
+                    } else {
+                        exception.addSuppressed(e);
+                    }
+                }
+            }
+            for (final Listener listener : always) {
+                try {
+                    listener.run(this);
+                } catch (final RuntimeException e) {
+                    if (exception == null) {
+                        exception = e;
+                    } else {
+                        exception.addSuppressed(e);
+                    }
+                }
+            }
+            if (exception != null) {
+                throw exception;
+            }
+        } finally {
+            notifyAll();
         }
-        notifyAll();
     }
 
     @Override
-    public synchronized void addListener(final Listener listener) {
-        listeners.add(listener);
+    public synchronized void onResolve(final Listener listener) {
+        then.add(listener);
+    }
+
+    @Override
+    public synchronized void onCancel(final Listener listener) {
+        cancel.add(listener);
+    }
+
+    @Override
+    public synchronized void always(final Listener listener) {
+        always.add(listener);
     }
 
     @Override
@@ -48,9 +94,32 @@ public class DeferredImpl<T> implements Deferred<T> {
             return true;
         }
         this.cancelled = true;
+        log.tracef(Message.format("deferred.cancel"));
         try {
             boolean cancelled = true;
             RuntimeException exception = null;
+            for (final Listener listener : cancel) {
+                try {
+                    listener.run(this);
+                } catch (final RuntimeException e) {
+                    if (exception == null) {
+                        exception = e;
+                    } else {
+                        exception.addSuppressed(e);
+                    }
+                }
+            }
+            for (final Listener listener : always) {
+                try {
+                    listener.run(this);
+                } catch (final RuntimeException e) {
+                    if (exception == null) {
+                        exception = e;
+                    } else {
+                        exception.addSuppressed(e);
+                    }
+                }
+            }
             if (chain != null) {
                 for (final Deferred<?> that : chain) {
                     try {
@@ -118,6 +187,21 @@ public class DeferredImpl<T> implements Deferred<T> {
             throw new TimeoutException();
         }
         return value;
+    }
+
+    @Override
+    public void enlist() {
+        ++sync;
+    }
+
+    @Override
+    public void delist() {
+        --sync;
+    }
+
+    @Override
+    public boolean available() {
+        return sync == 0;
     }
 
     protected void await() throws InterruptedException {

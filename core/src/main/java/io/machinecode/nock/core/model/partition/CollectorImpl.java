@@ -12,7 +12,7 @@ import javax.batch.api.partition.PartitionCollector;
  */
 public class CollectorImpl extends PropertyReferenceImpl<PartitionCollector> implements Collector {
 
-    public CollectorImpl(final String ref, final PropertiesImpl properties) {
-        super(new TypedArtifactReference<PartitionCollector>(ref, PartitionCollector.class), properties);
+    public CollectorImpl(final TypedArtifactReference<PartitionCollector> ref, final PropertiesImpl properties) {
+        super(ref, properties);
     }
 }

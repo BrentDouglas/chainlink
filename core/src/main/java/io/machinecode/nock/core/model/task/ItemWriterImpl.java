@@ -10,7 +10,7 @@ import io.machinecode.nock.spi.element.task.ItemWriter;
  */
 public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.ItemWriter> implements ItemWriter {
 
-    public ItemWriterImpl(final String ref, final PropertiesImpl properties) {
-        super(new TypedArtifactReference<javax.batch.api.chunk.ItemWriter>(ref, javax.batch.api.chunk.ItemWriter.class), properties);
+    public ItemWriterImpl(final TypedArtifactReference<javax.batch.api.chunk.ItemWriter> ref, final PropertiesImpl properties) {
+        super(ref, properties);
     }
 }

@@ -2,7 +2,6 @@ package io.machinecode.nock.jsl.visitor;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
-import io.machinecode.nock.jsl.util.ImmutablePair;
 import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.element.Properties;
 import io.machinecode.nock.spi.element.PropertiesElement;
@@ -15,6 +14,7 @@ import org.jboss.logging.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -23,17 +23,21 @@ public final class JobTraversal {
 
     private static final Logger log = Logger.getLogger(JobTraversal.class);
 
-    private final TMap<String, Pair<ExecutionWork, String>> transitions;
+    private final TMap<String, ExecutionWork> transitions;
     private final TMap<Element, List<Pair<String, String>>> properties;
 
     public JobTraversal(final VisitorNode root) {
-        this.transitions = new THashMap<String, Pair<ExecutionWork, String>>(root.transitions.size());
-        for (final Transition that : root.transitions) {
-            final VisitorNode next = root.ids.get(that.id);
-            this.transitions.put(that.id, ImmutablePair.of((ExecutionWork)next.value, that.next));
-        }
+        this.transitions = new THashMap<String, ExecutionWork>(root.ids.size());
         this.properties = new THashMap<Element, List<Pair<String, String>>>();
+        _addTransitions(root);
         _addProperties(root, null); //Root should always be a JobImpl which is a PropertiesElement
+    }
+
+    private void _addTransitions(final VisitorNode node) {
+        for (final Entry<String, VisitorNode> entry : node.ids.entrySet()) {
+            final VisitorNode that = entry.getValue();
+            this.transitions.put(entry.getKey(), (ExecutionWork)that.value);
+        }
     }
 
     private void _addProperties(final VisitorNode node, final List<Pair<String, String>> parent) {
@@ -60,8 +64,8 @@ public final class JobTraversal {
     }
 
     public ExecutionWork next(final String next) {
-        final Pair<ExecutionWork, String> pair =  this.transitions.get(next);
-        return pair == null ? null : pair.getName();
+        final ExecutionWork work = this.transitions.get(next);
+        return work == null ? null : work;
     }
 
     public List<? extends Pair<String, String>> properties(final Element element) {

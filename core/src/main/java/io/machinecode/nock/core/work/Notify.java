@@ -1,5 +1,6 @@
 package io.machinecode.nock.core.work;
 
+import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.Listener;
 
 /**
@@ -13,7 +14,7 @@ public class Notify implements Listener {
     }
 
     @Override
-    public void run() {
+    public void run(final Deferred<?> deferred) {
         synchronized (that) {
             that.notifyAll();
         }

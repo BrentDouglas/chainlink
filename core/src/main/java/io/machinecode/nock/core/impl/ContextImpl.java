@@ -1,12 +1,10 @@
 package io.machinecode.nock.core.impl;
 
+import io.machinecode.nock.spi.RestartableJobExecution;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.context.MutableJobContext;
 import io.machinecode.nock.spi.context.MutableStepContext;
-import io.machinecode.nock.spi.util.Pair;
 import io.machinecode.nock.spi.work.JobWork;
-
-import java.util.List;
 
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
@@ -14,22 +12,30 @@ import java.util.List;
 public class ContextImpl implements Context {
 
     private final JobWork job;
+    private final RestartableJobExecution jobExecution;
     private final long jobInstanceId;
     private final long jobExecutionId;
+    private MutableJobContext parentJobContext;
+    private final ThreadLocal<MutableJobContext> jobContexts = new ThreadLocal<MutableJobContext>();
     private final ThreadLocal<long[]> stepExecutionIds = new ThreadLocal<long[]>(); //TODO Probably can't be a threadlocal. Think about this
-    private MutableJobContext jobContext;
     private final ThreadLocal<MutableStepContext> stepContext = new ThreadLocal<MutableStepContext>();
     private Throwable throwable;
 
-    public ContextImpl(final JobWork job, final long jobInstanceId, final long jobExecutionId) {
+    public ContextImpl(final JobWork job, final long jobInstanceId, final RestartableJobExecution jobExecution) {
         this.job = job;
         this.jobInstanceId = jobInstanceId;
-        this.jobExecutionId = jobExecutionId;
+        this.jobExecution = jobExecution;
+        this.jobExecutionId = jobExecution.getExecutionId();
     }
 
     @Override
     public JobWork getJob() {
         return job;
+    }
+
+    @Override
+    public RestartableJobExecution getJobExecution() {
+        return jobExecution;
     }
 
     @Override
@@ -54,12 +60,21 @@ public class ContextImpl implements Context {
 
     @Override
     public MutableJobContext getJobContext() {
-        return jobContext;
+        if (jobContexts.get() == null && parentJobContext != null) {
+            jobContexts.set(parentJobContext.copy());
+        }
+        return jobContexts.get();
     }
 
     @Override
     public void setJobContext(final MutableJobContext jobContext) {
-        this.jobContext = jobContext;
+        this.jobContexts.set(jobContext);
+    }
+
+    @Override
+    public void setParentJobContext(final MutableJobContext jobContext) {
+        this.parentJobContext = jobContext;
+        this.jobContexts.set(jobContext);
     }
 
     @Override

@@ -101,6 +101,7 @@ public class JobImpl implements Job, JobWork {
                 PropertiesConverter.convert(this.properties)
         );
         long jobExecutionId = jobContext.getExecutionId();
+        Status.startedJob(repository, jobExecutionId);
 
         log.debugf(Message.get("job.create.job.context"), jobExecutionId, id);
         context.setJobContext(jobContext);
@@ -134,6 +135,11 @@ public class JobImpl implements Job, JobWork {
         if (Status.isStopping(batchStatus) || Status.isComplete(batchStatus)) {
             log.debugf(Message.get("job.status.early.termination"), context.getJobExecutionId(), id, batchStatus);
             return null;
+        }
+        final String restartId = context.getJobExecution().getRestartId();
+        if (restartId != null) {
+            log.debugf(Message.get("job.restart.transition"), context.getJobExecutionId(), id, restartId);
+            return context.getJob().next(restartId).plan(transport, context);
         }
         return this.executions.get(0).plan(transport, context);
     }

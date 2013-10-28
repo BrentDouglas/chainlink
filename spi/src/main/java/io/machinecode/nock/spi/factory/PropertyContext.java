@@ -1,5 +1,6 @@
 package io.machinecode.nock.spi.factory;
 
+import io.machinecode.nock.spi.inject.ArtifactReference;
 import io.machinecode.nock.spi.util.Pair;
 
 import java.util.List;
@@ -10,4 +11,6 @@ import java.util.List;
 public interface PropertyContext {
 
     List<? extends Pair<String, String>> getProperties();
+
+    <T extends ArtifactReference> T getReference(T ref);
 }

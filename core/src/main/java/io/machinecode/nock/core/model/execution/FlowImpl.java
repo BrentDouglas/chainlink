@@ -60,7 +60,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     @Override
     public Plan after(final Transport transport, final Context context) throws Exception {
         log.debugf(Message.get("flow.after"), context.getJobExecutionId(), id);
-        final ExecutionWork next = this.transitionOrSetStatus(transport, context, Collections.<TransitionWork>emptyList(), this.next);
+        final ExecutionWork next = this.transition(transport, context, Collections.<TransitionWork>emptyList(), this.next);
         if (next != null) {
             return next.plan(transport, context);
         }

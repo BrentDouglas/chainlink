@@ -1,6 +1,6 @@
 package io.machinecode.nock.core.model;
 
-import io.machinecode.nock.core.loader.ArtifactReference;
+import io.machinecode.nock.core.loader.UntypedArtifactReference;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Listener;
 import io.machinecode.nock.spi.element.PropertyReference;
@@ -15,9 +15,9 @@ public class ListenerImpl implements Listener, PropertyReference {
     private static final Logger log = Logger.getLogger(ListenerImpl.class);
 
     protected final PropertiesImpl properties;
-    protected final ArtifactReference ref;
+    protected final UntypedArtifactReference ref;
 
-    public ListenerImpl(final ArtifactReference ref, final PropertiesImpl properties) {
+    public ListenerImpl(final UntypedArtifactReference ref, final PropertiesImpl properties) {
         this.ref = ref;
         this.properties = properties;
     }

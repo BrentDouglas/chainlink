@@ -12,7 +12,7 @@ import javax.batch.api.partition.PartitionAnalyzer;
  */
 public class AnalyserImpl extends PropertyReferenceImpl<PartitionAnalyzer> implements Analyser {
 
-    public AnalyserImpl(final String ref, final PropertiesImpl properties) {
-        super(new TypedArtifactReference<PartitionAnalyzer>(ref, PartitionAnalyzer.class), properties);
+    public AnalyserImpl(final TypedArtifactReference<PartitionAnalyzer> ref, final PropertiesImpl properties) {
+        super(ref, properties);
     }
 }

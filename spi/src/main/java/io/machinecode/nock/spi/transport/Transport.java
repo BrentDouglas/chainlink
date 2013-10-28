@@ -33,7 +33,7 @@ public interface Transport {
 
     Bucket getBucket(TaskWork work);
 
-    void setBucket(Bucket bucket, TaskWork work);
+    void setBucket(TaskWork work, Bucket bucket);
 
     Bucket evictBucket(TaskWork work);
 }

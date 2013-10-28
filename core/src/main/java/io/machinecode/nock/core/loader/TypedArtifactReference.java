@@ -4,6 +4,7 @@ import io.machinecode.nock.core.local.InjectablesImpl;
 import io.machinecode.nock.core.util.ResolvableClass;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Element;
+import io.machinecode.nock.spi.inject.ArtifactReference;
 import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Transport;
@@ -14,7 +15,7 @@ import javax.batch.operations.BatchRuntimeException;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class TypedArtifactReference<T> {
+public class TypedArtifactReference<T> implements ArtifactReference {
 
     private static final Logger log = Logger.getLogger(TypedArtifactReference.class);
 
@@ -47,6 +48,7 @@ public class TypedArtifactReference<T> {
         }
     }
 
+    @Override
     public String ref() {
         return this.ref;
     }

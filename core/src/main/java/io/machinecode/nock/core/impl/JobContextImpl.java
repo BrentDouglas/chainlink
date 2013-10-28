@@ -23,7 +23,7 @@ public class JobContextImpl implements MutableJobContext {
         this.execution = execution;
         this.properties = properties;
         this.batchStatus = execution.getBatchStatus();
-        this.exitStatus = null;
+        this.exitStatus = execution.getExitStatus();
     }
 
     @Override
@@ -74,5 +74,10 @@ public class JobContextImpl implements MutableJobContext {
     @Override
     public void setExitStatus(final String status) {
         this.exitStatus = status;
+    }
+
+    @Override
+    public JobContextImpl copy() {
+        return new JobContextImpl(this.instance, this.execution, this.properties);
     }
 }

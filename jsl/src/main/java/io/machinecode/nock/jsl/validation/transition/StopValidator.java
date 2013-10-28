@@ -21,5 +21,6 @@ public class StopValidator extends ValidatingVisitor<Stop> {
         if (that.getOn() == null) {
             context.addProblem(Message.attributeRequired("on"));
         }
+        //TODO Validate restart is a valid execution id if it exists
     }
 }

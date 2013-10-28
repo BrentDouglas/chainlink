@@ -25,11 +25,11 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     private final PropertiesImpl properties;
     private final TypedArtifactReference<Decider> ref;
 
-    public DecisionImpl(final String id, final String ref, final PropertiesImpl properties, final List<TransitionImpl> transitions) {
+    public DecisionImpl(final String id, final TypedArtifactReference<Decider> ref, final PropertiesImpl properties, final List<TransitionImpl> transitions) {
         super(id);
         this.transitions = transitions;
         this.properties = properties;
-        this.ref = new TypedArtifactReference<Decider>(ref, Decider.class);
+        this.ref = ref;
     }
 
     @Override
@@ -58,8 +58,8 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
 
         log.debugf(Message.get("decision.decide"), context.getJobExecutionId(), this.id, this.ref.ref());
         final String exitStatus = decider.decide(transport.getRepository().getStepExecutions(context.getStepExecutionIds()));
-        context.getJobContext().setExitStatus(exitStatus);
-        final ExecutionWork execution = this.transitionOrSetStatus(transport, context, this.transitions, null);
+        context.getJobContext().setExitStatus(exitStatus); //TODO Really?
+        final ExecutionWork execution = this.transition(transport, context, this.transitions, null);
         if (execution != null) {
             return execution.plan(transport, context);
         }

@@ -1,16 +1,13 @@
 package io.machinecode.nock.core.factory;
 
-import io.machinecode.nock.core.loader.ArtifactReference;
-import io.machinecode.nock.core.loader.TypedArtifactReference;
+import io.machinecode.nock.core.expression.Expression;
+import io.machinecode.nock.core.loader.UntypedArtifactReference;
 import io.machinecode.nock.core.model.ListenerImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
-import io.machinecode.nock.core.expression.Expression;
-import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.element.Listener;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.factory.JobPropertyContext;
 import io.machinecode.nock.spi.factory.PropertyContext;
-
-import javax.batch.api.listener.StepListener;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -24,7 +21,7 @@ public class StepListenerFactory implements ElementFactory<Listener, ListenerImp
         final String ref = Expression.resolveExecutionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
         return new ListenerImpl(
-                new ArtifactReference(ref),
+                context.getReference(new UntypedArtifactReference(ref)),
                 properties
         );
     }
@@ -34,7 +31,7 @@ public class StepListenerFactory implements ElementFactory<Listener, ListenerImp
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);
         return new ListenerImpl(
-                new ArtifactReference(ref),
+                context.getReference(new UntypedArtifactReference(ref)),
                 properties
         );
     }

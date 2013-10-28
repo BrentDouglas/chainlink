@@ -3,6 +3,7 @@ package io.machinecode.nock.core.loader;
 import io.machinecode.nock.core.local.InjectablesImpl;
 import io.machinecode.nock.spi.context.Context;
 import io.machinecode.nock.spi.element.Element;
+import io.machinecode.nock.spi.inject.ArtifactReference;
 import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.transport.Transport;
@@ -10,11 +11,11 @@ import io.machinecode.nock.spi.transport.Transport;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ArtifactReference {
+public class UntypedArtifactReference implements ArtifactReference {
 
     private final String ref;
 
-    public ArtifactReference(final String ref) {
+    public UntypedArtifactReference(final String ref) {
         this.ref = ref;
     }
 
@@ -38,6 +39,7 @@ public class ArtifactReference {
         }
     }
 
+    @Override
     public String ref() {
         return this.ref;
     }

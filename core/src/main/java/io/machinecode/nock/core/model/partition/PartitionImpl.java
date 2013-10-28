@@ -8,6 +8,7 @@ import io.machinecode.nock.spi.transport.Executable;
 import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.util.Message;
 import io.machinecode.nock.spi.work.Bucket;
+import io.machinecode.nock.spi.work.Bucket.Item;
 import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.PartitionWork;
 import io.machinecode.nock.spi.work.StrategyWork;
@@ -130,10 +131,8 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         //    throw new IllegalStateException(Message.format("partition.properties.length", jobExecutionId, partitions, properties.length));
         //}
         transport.setBucket(
-                new Bucket(
-                        new Serializable[partitions]
-                ),
-                task
+                task,
+                new Bucket(partitions)
         );
         final Executable[] executables = new Executable[partitions];
         for (int i = 0; i < partitions; ++i) {
@@ -150,6 +149,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     @Override
     public void collect(final TaskWork task, final Transport transport, final Context context) throws Exception {
         final PartitionCollector collector = loadPartitionCollector(transport, context);
+        final StepContext stepContext = context.getStepContext();
         if (collector != null) {
             log.debugf(Message.get("partition.collect.partitioned.data"), context.getJobExecutionId(), this.collector.getRef());
             transport.getBucket(task).give(collector.collectPartitionData());
@@ -161,20 +161,23 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         final long jobExecutionId = context.getJobExecutionId();
         final PartitionAnalyzer analyzer = loadPartitionAnalyzer(transport, context);
         final PartitionReducer reducer = loadPartitionReducer(transport, context);
-        final StepContext stepContext = context.getStepContext();
         final TransactionManager transactionManager = transport.getTransactionManager();
         PartitionStatus partitionStatus = PartitionStatus.COMMIT;
         log.debugf(Message.get("partition.set.transaction.timeout"), jobExecutionId, timeout);
         transactionManager.setTransactionTimeout(timeout);
         transactionManager.begin();
         try {
+            final Bucket bucket = transport.evictBucket(task);
             if (analyzer != null) {
-                final Bucket bucket = transport.evictBucket(task);
-                for (final Serializable that : bucket.take()) {
-                    log.debugf(Message.get("partition.analyse.collector.data"), jobExecutionId, this.analyser.getRef());
-                    analyzer.analyzeCollectorData(that);
+                if (this.collector != null) {
+                    for (final Serializable that : bucket.data()) {
+                        log.debugf(Message.get("partition.analyse.collector.data"), jobExecutionId, this.analyser.getRef());
+                        analyzer.analyzeCollectorData(that);
+                    }
                 }
-                analyzer.analyzeStatus(stepContext.getBatchStatus(), stepContext.getExitStatus());
+                for (final Item item : bucket.items()) {
+                    analyzer.analyzeStatus(item.batchStatus, item.exitStatus);
+                }
             }
             if (reducer != null) {
                 log.debugf(Message.get("partition.before.partitioned.step.complete"), jobExecutionId, this.reducer.getRef());

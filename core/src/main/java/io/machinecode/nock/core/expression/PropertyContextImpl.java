@@ -1,8 +1,11 @@
 package io.machinecode.nock.core.expression;
 
+import gnu.trove.map.TMap;
+import gnu.trove.map.hash.THashMap;
 import io.machinecode.nock.spi.factory.PropertyContext;
 import io.machinecode.nock.spi.element.Property;
 import io.machinecode.nock.jsl.util.MutablePair;
+import io.machinecode.nock.spi.inject.ArtifactReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,18 +19,16 @@ import java.util.Properties;
 public class PropertyContextImpl implements PropertyContext {
 
     private final List<MutablePair<String,String>> properties;
+    private final TMap<String,ArtifactReference> references;
 
     public PropertyContextImpl() {
         this.properties = new ArrayList<MutablePair<String, String>>();
+        this.references = new THashMap<String, ArtifactReference>();
     }
 
     public PropertyContextImpl(final Properties properties) {
         this();
         addProperties(properties);
-    }
-
-    public PropertyContextImpl(final PropertyContextImpl parent) {
-        this.properties = parent == null ? new ArrayList<MutablePair<String, String>>() : parent.properties;
     }
 
     public void addProperties(final Properties properties) {
@@ -51,5 +52,11 @@ public class PropertyContextImpl implements PropertyContext {
     @Override
     public List<MutablePair<String, String>> getProperties() {
         return Collections.unmodifiableList(properties);
+    }
+
+    @Override
+    public <T extends ArtifactReference> T getReference(final T that) {
+        final T old = (T) references.putIfAbsent(that.ref(), that);
+        return old == null ? that : old;
     }
 }

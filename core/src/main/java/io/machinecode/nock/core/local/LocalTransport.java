@@ -19,6 +19,7 @@ import io.machinecode.nock.spi.transport.Transport;
 import io.machinecode.nock.spi.work.Bucket;
 import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.JobWork;
+import io.machinecode.nock.spi.work.Listener;
 import io.machinecode.nock.spi.work.TaskWork;
 import org.jboss.logging.Logger;
 
@@ -28,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -217,18 +219,16 @@ public class LocalTransport implements Transport {
 
     @Override
     public Deferred<?> executeJob(final long jobExecutionId, final JobWork job, final Context context) {
-        final Plan plan = job.plan(this, context);
-        final Deferred<?> that = _work(jobExecutionId, null, plan).enqueue();
-        _putJob(jobExecutionId, that);
         _putContext(jobExecutionId, context);
-        return that;
+        final Plan plan = job.plan(this, context);
+        return _work(jobExecutionId, null, plan).enqueueJob(jobExecutionId);
     }
 
     @Override
     public void finalizeJob(final long jobExecutionId) {
+        final Deferred<?> job = _evictJob(jobExecutionId);
         _evictChildren(jobExecutionId);
         _evictContext(jobExecutionId);
-        final Deferred<?> job = _evictJob(jobExecutionId);
         synchronized (job) {
             job.notifyAll();
         }
@@ -245,7 +245,7 @@ public class LocalTransport implements Transport {
     }
 
     @Override
-    public void setBucket(final Bucket bucket, final TaskWork work) {
+    public void setBucket(final TaskWork work, final Bucket bucket) {
        this.buckets.put(work, bucket);
     }
 
@@ -428,6 +428,14 @@ public class LocalTransport implements Transport {
             queued = true;
             return this.worker.add(this);
         }
+
+        public synchronized Deferred enqueueJob(final long jobExecutionId) {
+            if (queued) {
+                throw new IllegalStateException();
+            }
+            queued = true;
+            return this.worker.addJob(jobExecutionId, this);
+        }
     }
 
     public static class Enqueue extends Notify {
@@ -439,9 +447,19 @@ public class LocalTransport implements Transport {
         }
 
         @Override
-        public void run() {
+        public void run(final Deferred<?> deferred) {
             work.enqueue();
-            super.run();
+            super.run(deferred);
+        }
+    }
+
+    public static class Cancel implements Listener {
+
+        public static Cancel INSTANCE = new Cancel();
+
+        @Override
+        public void run(final Deferred<?> that) {
+            that.cancel(true);
         }
     }
 
@@ -453,24 +471,43 @@ public class LocalTransport implements Transport {
             threads.put(this, this);
         }
 
+        private Deferred _build(final LocalWork work) {
+            final Deferred<?>[] any = new Deferred[work.then.length + work.fail.length];
+            int i = 0;
+            for (final LocalWork that : work.then) {
+                any[i] = that.executable;
+            }
+            for (final LocalWork that : work.fail) {
+                any[i] = that.executable;
+            }
+            final Deferred<?>[] all = new Deferred[2 + work.always.length];
+            all[0] = work.executable;
+            all[1] = new AnyDeferredImpl<Void>(any);
+            int j = 2;
+            for (final LocalWork that : work.always) {
+                all[j++] = that.executable;
+            }
+            return new AllDeferredImpl<Void>(all);
+        }
+
+        //These are in finally blocks as the jobs will never get cleared otherwise
+        //TODO If build throws should not continue execution
+        public Deferred addJob(final long jobExecutionId, final LocalWork work) {
+            try {
+                final Deferred that = _build(work);
+                _putJob(jobExecutionId, that);
+                return that;
+            } finally {
+                synchronized (stack) {
+                    stack.push(work);
+                    stack.notifyAll();
+                }
+            }
+        }
+
         public Deferred add(final LocalWork work) {
             try {
-                final Deferred<?>[] any = new Deferred[work.then.length + work.fail.length];
-                int i = 0;
-                for (final LocalWork that : work.then) {
-                    any[i] = that.executable;
-                }
-                for (final LocalWork that : work.fail) {
-                    any[i] = that.executable;
-                }
-                final Deferred<?>[] all = new Deferred[2 + work.always.length];
-                all[0] = work.executable;
-                all[1] = new AnyDeferredImpl<Void>(any);
-                int j = 2;
-                for (final LocalWork that : work.always) {
-                    all[j++] = that.executable;
-                }
-                return new AllDeferredImpl<Void>(all);
+                return _build(work);
             } finally {
                 synchronized (stack) {
                     stack.push(work);
@@ -491,7 +528,7 @@ public class LocalTransport implements Transport {
                     switch (result.status()) {
                         case FINISHED:
                             _queue(that.then, that.always);
-                            for (final LocalWork fail : that.fail) { //TODO This is to ensure that one of the Deferred's in the AnyDeferred is marked as done
+                            for (final LocalWork fail : that.fail) { //This is to ensure that one of the Deferred's in the AnyDeferred is marked as done
                                 fail.executable.cancel(true);
                             }
                             _queueChildren(that);
@@ -499,7 +536,7 @@ public class LocalTransport implements Transport {
                         case ERROR:
                             _queue(that.fail, that.always);
                             log.error("", (Throwable) result.value()); //TODO Message
-                            for (final LocalWork then : that.then) { //TODO Resolving deferreds
+                            for (final LocalWork then : that.then) { //Resolving deferreds
                                 then.executable.cancel(true);
                             }
                             break;
@@ -523,30 +560,38 @@ public class LocalTransport implements Transport {
         private void _queue(final LocalWork[] nows, final LocalWork[] thens) {
             if (nows.length == 0) {
                 for (final LocalWork then : thens) {
+                    //then.executable.onCancel(Cancel.INSTANCE);
                     then.enqueue();
                 }
                 return;
             }
             for (final LocalWork then : thens) {
                 for (final LocalWork now : nows) {
-                    now.executable.addListener(new Enqueue(then));
+                    now.executable.onResolve(new Enqueue(then));
                 }
             }
             for (final LocalWork now : nows) {
+                //now.executable.onCancel(Cancel.INSTANCE);
                 now.enqueue();
             }
         }
 
         private void _queueChildren(final LocalWork that) {
             for (final LocalWork local : _popChildren(that.executable)) {
+                //local.executable.onCancel(Cancel.INSTANCE);
                 local.enqueue();
             }
         }
 
         private LocalWork _next() {
             synchronized (stack) {
-                if (!stack.empty()) {
-                    return stack.pop();
+                final ListIterator<LocalWork> it = stack.listIterator(stack.size());
+                while (it.hasPrevious()) {
+                    final LocalWork that = it.previous();
+                    if (that.executable.available()) {
+                        it.remove();
+                        return that;
+                    }
                 }
                 try {
                     stack.wait();

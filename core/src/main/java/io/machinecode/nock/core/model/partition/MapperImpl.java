@@ -20,8 +20,8 @@ public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implement
 
     private static final Logger log = Logger.getLogger(MapperImpl.class);
 
-    public MapperImpl(final String ref, final PropertiesImpl properties) {
-        super(new TypedArtifactReference<PartitionMapper>(ref, PartitionMapper.class), properties);
+    public MapperImpl(final TypedArtifactReference<PartitionMapper> ref, final PropertiesImpl properties) {
+        super(ref, properties);
     }
 
     @Override

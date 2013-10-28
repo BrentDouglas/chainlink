@@ -1,16 +1,18 @@
 package io.machinecode.nock.core.factory.execution;
 
+import io.machinecode.nock.core.expression.Expression;
+import io.machinecode.nock.core.factory.PropertiesFactory;
+import io.machinecode.nock.core.factory.transition.Transitions;
+import io.machinecode.nock.core.loader.TypedArtifactReference;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.execution.DecisionImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
-import io.machinecode.nock.core.expression.Expression;
-import io.machinecode.nock.spi.factory.ElementFactory;
-import io.machinecode.nock.core.factory.PropertiesFactory;
-import io.machinecode.nock.core.factory.transition.Transitions;
 import io.machinecode.nock.spi.element.execution.Decision;
+import io.machinecode.nock.spi.factory.ElementFactory;
 import io.machinecode.nock.spi.factory.JobPropertyContext;
 import io.machinecode.nock.spi.factory.PropertyContext;
 
+import javax.batch.api.Decider;
 import java.util.List;
 
 /**
@@ -28,7 +30,7 @@ public class DecisionFactory implements ElementFactory<Decision, DecisionImpl> {
         final List<TransitionImpl> transitions = Transitions.immutableCopyTransitionsDescriptor(that.getTransitions(), context);
         return new DecisionImpl(
                 id,
-                ref,
+                context.getReference(new TypedArtifactReference<Decider>(ref, Decider.class)),
                 properties,
                 transitions
         );
@@ -42,7 +44,7 @@ public class DecisionFactory implements ElementFactory<Decision, DecisionImpl> {
         final List<TransitionImpl> transitions = Transitions.immutableCopyTransitionsPartition(that.getTransitions(), context);
         return new DecisionImpl(
                 id,
-                ref,
+                context.getReference(new TypedArtifactReference<Decider>(ref, Decider.class)),
                 properties,
                 transitions
         );

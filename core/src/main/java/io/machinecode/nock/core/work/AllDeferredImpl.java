@@ -12,7 +12,7 @@ public class AllDeferredImpl<T> extends DeferredImpl<T> {
     public AllDeferredImpl(final Deferred<?>... chain) {
         super(chain);
         for (final Deferred<?> that : chain) {
-            that.addListener(new Notify(this));
+            that.onResolve(new Notify(this));
         }
         this.done = true;
     }

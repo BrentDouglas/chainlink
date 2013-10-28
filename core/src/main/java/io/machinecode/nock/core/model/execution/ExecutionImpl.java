@@ -6,6 +6,8 @@ import io.machinecode.nock.core.work.execution.AfterExecution;
 import io.machinecode.nock.core.work.execution.FailExecution;
 import io.machinecode.nock.core.work.execution.RunExecution;
 import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.MutableJobContext;
+import io.machinecode.nock.spi.context.MutableStepContext;
 import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.transport.Plan;
 import io.machinecode.nock.spi.transport.TargetThread;
@@ -17,8 +19,6 @@ import io.machinecode.nock.spi.work.TransitionWork.Result;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.context.JobContext;
-import javax.batch.runtime.context.StepContext;
 import java.util.List;
 
 /**
@@ -71,37 +71,53 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
         return runPlan;
     }
 
-    public ExecutionWork transitionOrSetStatus(final Transport transport, final Context context, final List<? extends TransitionWork> transitions, final String next) throws Exception {
-        if (next != null) {
-            return context.getJob().next(next);
+    public String getExitStatus(final Context context) {
+        final MutableStepContext stepContext = context.getStepContext();
+        final MutableJobContext jobContext = context.getJobContext();
+        final String exitStatus;
+        final String batchletStatus;
+        final BatchStatus batchStatus;
+        if (stepContext != null) {
+            batchStatus = stepContext.getBatchStatus();
+            exitStatus = stepContext.getExitStatus();
+            batchletStatus = stepContext.getBatchletStatus();
+        } else if (jobContext != null) {
+            batchStatus = jobContext.getBatchStatus();
+            exitStatus = jobContext.getExitStatus();
+            batchletStatus = null;
+        } else {
+            throw new IllegalStateException(); //TODO Message
         }
-        final StepContext stepContext = context.getStepContext();
-        final JobContext jobContext = context.getJobContext();
-        final String exitStatus = stepContext == null ? jobContext.getExitStatus() : stepContext.getExitStatus();
-        final BatchStatus batchStatus = stepContext == null ? jobContext.getBatchStatus() : stepContext.getBatchStatus();
-        final String status = exitStatus == null
-                ? batchStatus.name()
-                : exitStatus;
+        return exitStatus != null
+                ? exitStatus
+                : batchletStatus != null
+                    ? batchletStatus
+                    : batchStatus.name();
+    }
+
+    public ExecutionWork transition(final Transport transport, final Context context, final List<? extends TransitionWork> transitions, final String next) throws Exception {
+        final String status = getExitStatus(context);
+        log.tracef(Message.get("execution.transition.statuses"), context.getJobExecutionId(), id, status);
         for (final TransitionWork transition : transitions) {
             if (Status.matches(transition.getOn(), status)) {
+                log.tracef(Message.get("execution.transition.matched"), context.getJobExecutionId(), id, transition.element(), status, transition.getOn());
                 final Result result = transition.runTransition();
                 if (result.next != null) {
                     log.debugf(Message.get("execution.transition"), context.getJobExecutionId(), id, result.next);
+                    Status.finishStep(transport.getRepository(), context.getJobExecutionId(), BatchStatus.COMPLETED, status);
                     return context.getJob().next(result.next);
                 } else {
-                    if (stepContext == null) {
-                        Status.finishJob(transport.getRepository(), jobContext.getExecutionId(), result.batchStatus, result.exitStatus);
-                    } else {
-                        Status.finishStep(transport.getRepository(), stepContext.getStepExecutionId(), result.batchStatus, result.exitStatus);
-                    }
+                    final String finalStatus = result.exitStatus == null ? status : result.exitStatus;
+                    Status.finishStep(transport.getRepository(), context.getJobExecutionId(), result.batchStatus, finalStatus);
+                    Status.finishJob(transport.getRepository(), context.getJobExecutionId(), result.batchStatus, finalStatus, result.restartId);
                     return null;
                 }
+            } else {
+                log.tracef(Message.get("execution.transition.skipped"), context.getJobExecutionId(), id, transition.element(), status, transition.getOn());
             }
         }
-        if (stepContext == null) {
-            Status.finishJob(transport.getRepository(), jobContext.getExecutionId(), BatchStatus.COMPLETED, exitStatus);
-        } else {
-            Status.finishStep(transport.getRepository(), stepContext.getStepExecutionId(), BatchStatus.COMPLETED, exitStatus);
+        if (next != null) {
+            return context.getJob().next(next);
         }
         return null;
     }

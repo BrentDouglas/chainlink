@@ -12,23 +12,31 @@ public interface TransitionWork extends Transition, Serializable {
 
     Result runTransition() throws Exception;
 
+    String element();
+
     class Result {
         public final BatchStatus batchStatus;
         public final String exitStatus;
         public final String next;
+        public final String restartId;
 
-        public Result(final BatchStatus batchStatus, final String exitStatus, final String next) {
+        public Result(final BatchStatus batchStatus, final String exitStatus, final String next, final String restartId) {
             this.batchStatus = batchStatus;
             this.exitStatus = exitStatus;
             this.next = next;
+            this.restartId = restartId;
         }
 
         public static Result next(final String next) {
-            return new Result(null, null, next);
+            return new Result(null, null, next, null);
         }
 
         public static Result status(final BatchStatus batchStatus, final String exitStatus) {
-            return new Result(batchStatus, exitStatus, null);
+            return new Result(batchStatus, exitStatus, null, null);
+        }
+
+        public static Result status(final BatchStatus batchStatus, final String exitStatus, final String restartId) {
+            return new Result(batchStatus, exitStatus, null, restartId);
         }
     }
 }

@@ -28,4 +28,9 @@ public class EndImpl extends TransitionImpl implements End {
     public Result runTransition() throws Exception {
         return Result.status(BatchStatus.COMPLETED, this.exitStatus);
     }
+
+    @Override
+    public String element() {
+        return End.ELEMENT;
+    }
 }

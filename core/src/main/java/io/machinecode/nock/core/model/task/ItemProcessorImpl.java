@@ -10,7 +10,7 @@ import io.machinecode.nock.spi.element.task.ItemProcessor;
  */
 public class ItemProcessorImpl extends PropertyReferenceImpl<javax.batch.api.chunk.ItemProcessor> implements ItemProcessor {
 
-    public ItemProcessorImpl(final String ref, final PropertiesImpl properties) {
-        super(new TypedArtifactReference<javax.batch.api.chunk.ItemProcessor>(ref, javax.batch.api.chunk.ItemProcessor.class), properties);
+    public ItemProcessorImpl(final TypedArtifactReference<javax.batch.api.chunk.ItemProcessor> ref, final PropertiesImpl properties) {
+        super(ref, properties);
     }
 }

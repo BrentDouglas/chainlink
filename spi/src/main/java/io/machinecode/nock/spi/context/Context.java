@@ -1,5 +1,6 @@
 package io.machinecode.nock.spi.context;
 
+import io.machinecode.nock.spi.RestartableJobExecution;
 import io.machinecode.nock.spi.work.JobWork;
 
 import java.io.Serializable;
@@ -11,6 +12,8 @@ public interface Context extends Serializable {
 
     JobWork getJob();
 
+    RestartableJobExecution getJobExecution();
+
     long getJobInstanceId();
 
     long getJobExecutionId();
@@ -21,7 +24,9 @@ public interface Context extends Serializable {
 
     MutableJobContext getJobContext();
 
-    void setJobContext(final MutableJobContext jobContext);
+    void setJobContext(MutableJobContext jobContext);
+
+    void setParentJobContext(MutableJobContext jobContext);
 
     MutableStepContext getStepContext();
 

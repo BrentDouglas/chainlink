@@ -12,7 +12,7 @@ import javax.batch.api.partition.PartitionReducer;
  */
 public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> implements Reducer {
 
-    public ReducerImpl(final String ref, final PropertiesImpl properties) {
-        super(new TypedArtifactReference<PartitionReducer>(ref, PartitionReducer.class), properties);
+    public ReducerImpl(final TypedArtifactReference<PartitionReducer> ref, final PropertiesImpl properties) {
+        super(ref, properties);
     }
 }

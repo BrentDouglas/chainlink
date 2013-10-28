@@ -6,7 +6,9 @@ import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.work.DeferredImpl;
+import io.machinecode.nock.core.work.Status;
 import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.MutableStepContext;
 import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.spi.factory.PropertyContext;
 import io.machinecode.nock.spi.transport.Transport;
@@ -32,8 +34,8 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
 
     private final DeferredImpl<Void> delegate = new DeferredImpl<Void>(); //TODO transience?
 
-    public BatchletImpl(final String ref, final PropertiesImpl properties, final PartitionImpl<?> partition) {
-        super(new TypedArtifactReference<javax.batch.api.Batchlet>(ref, javax.batch.api.Batchlet.class), properties);
+    public BatchletImpl(final TypedArtifactReference<javax.batch.api.Batchlet> ref, final PropertiesImpl properties, final PartitionImpl<?> partition) {
+        super(ref, properties);
         this.partition = partition;
     }
 
@@ -52,16 +54,20 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             }
             batchlet = load(transport, context);
         }
+        final MutableStepContext stepContext = context.getStepContext();
         try {
             if (batchlet == null) {
                 throw new IllegalStateException(getRef()); //TODO
             }
             log.debugf(Message.get("batchlet.process"), jobExecutionId, getRef());
-            batchlet.process();
+            stepContext.setBatchletStatus(batchlet.process());
         } finally {
             if (partition != null) {
                 partition.collect(this, transport, context);
             }
+        }
+        if (delegate.isCancelled()) {
+            Status.stoppedJob(transport.getRepository(), jobExecutionId, context.getStepContext().getExitStatus());
         }
     }
 
@@ -71,13 +77,28 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
+    public boolean isPartitioned() {
+        return partition != null;
+    }
+
+    @Override
     public void resolve(final Void that) {
         delegate.resolve(that);
     }
 
     @Override
-    public void addListener(final Listener listener) {
-        delegate.addListener(listener);
+    public void onResolve(final Listener listener) {
+        delegate.onResolve(listener);
+    }
+
+    @Override
+    public void onCancel(final Listener listener) {
+        delegate.onCancel(listener);
+    }
+
+    @Override
+    public void always(final Listener listener) {
+        delegate.always(listener);
     }
 
     @Override
@@ -112,5 +133,20 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     @Override
     public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         return delegate.get(timeout, unit);
+    }
+
+    @Override
+    public void enlist() {
+        delegate.enlist();
+    }
+
+    @Override
+    public void delist() {
+        delegate.delist();
+    }
+
+    @Override
+    public boolean available() {
+        return delegate.available();
     }
 }

@@ -36,8 +36,6 @@ public abstract class TransportTest extends BaseTest {
         final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
         final Start start = operator.start(job);
         final JobExecution execution = repository().getJobExecution(start.id);
-        Assert.assertEquals("Batch Status", BatchStatus.STARTED, execution.getBatchStatus()); //TODO Race
-        Assert.assertEquals("Exit  Status", BatchStatus.STARTED.name(), execution.getExitStatus());
         start.deferred.get();
         Assert.assertTrue(RunBatchlet.hasRun.get());
         Assert.assertEquals("Batch Status", BatchStatus.COMPLETED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());
@@ -59,8 +57,6 @@ public abstract class TransportTest extends BaseTest {
         final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
         final Start start = operator.start(job);
         final JobExecution execution = repository().getJobExecution(start.id);
-        Assert.assertEquals("Batch Status", BatchStatus.STARTED, execution.getBatchStatus()); //TODO Race
-        Assert.assertEquals("Exit  Status", BatchStatus.STARTED.name(), execution.getExitStatus());
         Thread.sleep(100);
         Assert.assertTrue(StopBatchlet.hasRun.get());
         operator.stop(start.id);
@@ -90,8 +86,6 @@ public abstract class TransportTest extends BaseTest {
         final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
         final Start start = operator.start(job);
         final JobExecution execution = repository().getJobExecution(start.id);
-        Assert.assertEquals("Batch Status", BatchStatus.STARTED, execution.getBatchStatus()); //TODO Race
-        Assert.assertEquals("Exit  Status", BatchStatus.STARTED.name(), execution.getExitStatus());
         start.deferred.get();
         Assert.assertTrue(FailBatchlet.hasRun.get());
         Assert.assertEquals("Batch Status", BatchStatus.FAILED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());
@@ -114,8 +108,6 @@ public abstract class TransportTest extends BaseTest {
         final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
         final Start start = operator.start(job);
         final JobExecution execution = repository().getJobExecution(start.id);
-        Assert.assertEquals("Batch Status", BatchStatus.STARTED, execution.getBatchStatus()); //TODO Race
-        Assert.assertEquals("Exit  Status", BatchStatus.STARTED.name(), execution.getExitStatus());
         start.deferred.get();
         Assert.assertTrue(InjectedBatchlet.hasRun.get());
         Assert.assertEquals("Batch Status", BatchStatus.COMPLETED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());

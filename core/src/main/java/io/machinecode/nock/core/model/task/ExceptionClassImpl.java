@@ -18,4 +18,9 @@ public class ExceptionClassImpl implements ExceptionClass {
     public String getClassName() {
         return this.clazz.fqcn();
     }
+
+    public boolean matches(final Class<?> theirs, final ClassLoader loader) throws ClassNotFoundException {
+        return theirs.getCanonicalName().equals(getClassName())
+                || this.clazz.resolve(loader).isAssignableFrom(theirs);
+    }
 }

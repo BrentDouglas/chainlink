@@ -10,6 +10,7 @@ import io.machinecode.nock.spi.work.Deferred;
 import io.machinecode.nock.spi.work.JobWork;
 import org.jboss.logging.Logger;
 
+import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.context.JobContext;
 
 /**
@@ -33,10 +34,21 @@ public class AfterJob extends ExecutableImpl<JobWork> {
             log.errorf(e, Message.format("work.job.after.exception", jobExecutionId));
             context.setThrowable(e);
         } finally {
-            if (context.getThrowable() == null) {
-                Status.completedJob(transport.getRepository(), jobExecutionId, jobContext == null ? null : jobContext.getExitStatus());
-            } else {
-                Status.failedJob(transport.getRepository(), jobExecutionId, jobContext == null ? null : jobContext.getExitStatus());
+            final BatchStatus batchStatus = transport.getRepository().getJobExecution(jobExecutionId).getBatchStatus();
+            if (!Status.isComplete(batchStatus)) { //TODO Race?
+                if (context.getThrowable() == null) {
+                    Status.completedJob(
+                            transport.getRepository(),
+                            jobExecutionId,
+                            jobContext == null ? BatchStatus.COMPLETED.name() : jobContext.getExitStatus()
+                    );
+                } else {
+                    Status.failedJob(
+                            transport.getRepository(),
+                            jobExecutionId,
+                            jobContext == null ? BatchStatus.FAILED.name() : jobContext.getExitStatus()
+                    );
+                }
             }
             transport.finalizeJob(jobExecutionId);
         }
