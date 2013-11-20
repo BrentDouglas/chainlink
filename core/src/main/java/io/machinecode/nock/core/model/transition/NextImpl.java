@@ -23,7 +23,7 @@ public class NextImpl extends TransitionImpl implements Next {
     }
 
     @Override
-    public Result runTransition() throws Exception {
+    public Result runTransition(final String id) throws Exception {
         return Result.next(this.to);
     }
 

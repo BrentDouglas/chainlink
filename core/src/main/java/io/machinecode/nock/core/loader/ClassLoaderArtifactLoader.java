@@ -17,14 +17,14 @@ public class ClassLoaderArtifactLoader implements ArtifactLoader {
             if (as.isAssignableFrom(that)) {
                 return as.cast(that.newInstance());
             } else {
-                log.warn(""); //TODO Message
+                log.warn(""); //TODO Messages
             }
         } catch (final ClassNotFoundException e) {
             //
         } catch (final InstantiationException e) {
-            log.warn(""); //TODO Message
+            log.warn(""); //TODO Messages
         } catch (final IllegalAccessException e) {
-            log.warn(""); //TODO Message
+            log.warn(""); //TODO Messages
         }
         return null;
     }

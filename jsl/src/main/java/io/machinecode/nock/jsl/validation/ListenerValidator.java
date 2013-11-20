@@ -3,7 +3,7 @@ package io.machinecode.nock.jsl.validation;
 import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.Listener;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -19,7 +19,7 @@ public class ListenerValidator extends ValidatingVisitor<Listener> {
     @Override
     public void doVisit(final Listener that, final VisitorNode context) {
         if (that.getRef() == null) {
-            context.addProblem(Message.attributeRequired("ref"));
+            context.addProblem(Messages.attributeRequired("ref"));
         }
         if (that.getProperties() != null) {
             PropertiesValidator.INSTANCE.visit(that.getProperties(), context);

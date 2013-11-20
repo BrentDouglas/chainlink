@@ -3,7 +3,7 @@ package io.machinecode.nock.jsl.validation.transition;
 import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.transition.Next;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -19,10 +19,10 @@ public class NextValidator extends ValidatingVisitor<Next> {
     @Override
     public void doVisit(final Next that, final VisitorNode context) {
         if (that.getOn() == null) {
-            context.addProblem(Message.attributeRequired("on"));
+            context.addProblem(Messages.attributeRequired("on"));
         }
         if (that.getTo() == null) {
-            context.addProblem(Message.attributeRequired("to"));
+            context.addProblem(Messages.attributeRequired("to"));
         } else {
             context.setTransition(null, that.getTo());
         }

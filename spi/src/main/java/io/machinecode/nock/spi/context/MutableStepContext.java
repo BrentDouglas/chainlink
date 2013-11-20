@@ -18,4 +18,6 @@ public interface MutableStepContext extends StepContext {
     void setBatchletStatus(String batchletStatus);
 
     MutableMetric getMetric(MetricType type);
+
+    MutableStepContext copy();
 }

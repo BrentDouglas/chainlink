@@ -8,6 +8,7 @@ import io.machinecode.nock.spi.util.Resolvable;
 public class ResolvableClass<T> implements Resolvable<Class<T>> {
 
     private final String fqcn;
+    private transient Class<T> clazz;
 
     public ResolvableClass(final String fqcn) {
         this.fqcn = fqcn;
@@ -20,7 +21,10 @@ public class ResolvableClass<T> implements Resolvable<Class<T>> {
     @Override
     @SuppressWarnings("unchecked")
     public Class<T> resolve(final ClassLoader loader) throws ClassNotFoundException {
-        return (Class<T>) loader.loadClass(this.fqcn);
+        if (clazz == null) {
+            clazz = (Class<T>) loader.loadClass(this.fqcn);
+        }
+        return clazz;
     }
 
     public String fqcn() {

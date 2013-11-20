@@ -75,7 +75,7 @@ public class Expression {
                                          final int start, final PropertyResolver[] resolvers) {
         int before = start;
         int after;
-        while ((after = valueExpression(builder, unresolved, unresolvedLength, before, resolvers)) != before) {
+        while ((after = _valueExpression(builder, unresolved, unresolvedLength, before, resolvers)) != before) {
             before = after;
         }
         return after;
@@ -84,8 +84,8 @@ public class Expression {
     /**
      * @return The index of the position for the next scanning function to resume from.
      */
-    private static int valueExpression(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
-                                       final int start, final PropertyResolver[] resolvers) {
+    private static int _valueExpression(final StringBuilder builder, final CharSequence unresolved, final int unresolvedLength,
+                                        final int start, final PropertyResolver[] resolvers) {
         int selectedStartProperty = Integer.MAX_VALUE;
         int endProperty = -1;
         PropertyResolver selectedResolver = null;
@@ -155,7 +155,7 @@ public class Expression {
         return unresolvedLength;
     }
 
-    private static <T extends Pair<String, String>> String _get(final CharSequence value, final List<T> properties) {
+    private static <T extends Pair<String, String>> String _getProperty(final CharSequence value, final List<T> properties) {
         final ListIterator<T> it = properties.listIterator(properties.size());
         while (it.hasPrevious()) {
             final T property = it.previous();
@@ -209,7 +209,7 @@ public class Expression {
 
         @Override
         public CharSequence resolve(final CharSequence value) {
-            return _get(value, properties);
+            return _getProperty(value, properties);
         }
     }
 
@@ -227,7 +227,7 @@ public class Expression {
         @Override
         public CharSequence resolve(final CharSequence value) {
             final String that = System.getProperty(value.toString());
-            return that == null ? "" : that;
+            return that == null ? EMPTY : that;
         }
     };
 }

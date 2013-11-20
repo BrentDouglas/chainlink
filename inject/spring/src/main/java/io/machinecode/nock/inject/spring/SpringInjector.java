@@ -37,7 +37,7 @@ public class SpringInjector implements Injector {
         if (iterator.hasNext()) {
             provider = iterator.next();
         } else {
-            throw new IllegalStateException(); //TODO Message
+            throw new IllegalStateException(); //TODO Messages
         }
     }
 

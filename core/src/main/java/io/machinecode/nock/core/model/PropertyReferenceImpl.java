@@ -1,9 +1,9 @@
 package io.machinecode.nock.core.model;
 
 import io.machinecode.nock.core.loader.TypedArtifactReference;
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.PropertyReference;
-import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.execution.Executor;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -29,11 +29,11 @@ public class PropertyReferenceImpl<T> implements PropertyReference {
         return this.properties;
     }
 
-    public T load(final Transport transport, final Context context) throws Exception {
+    public T load(final Executor executor, final ExecutionContext context) throws Exception {
         if (this._cached != null) {
             return this._cached;
         }
-        final T that = this.ref.load(transport, context, this);
+        final T that = this.ref.load(executor, context, this);
         this._cached = that;
         return that;
     }

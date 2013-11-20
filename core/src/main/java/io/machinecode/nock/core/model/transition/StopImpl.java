@@ -32,8 +32,8 @@ public class StopImpl extends TransitionImpl implements Stop {
     }
 
     @Override
-    public Result runTransition() throws Exception {
-        return Result.status(BatchStatus.STOPPED, this.exitStatus, this.restart);
+    public Result runTransition(final String id) throws Exception {
+        return Result.status(BatchStatus.STOPPED, this.exitStatus, this.restart == null ? id : this.restart);
     }
 
     @Override

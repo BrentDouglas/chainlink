@@ -108,5 +108,7 @@ public interface ExecutionRepository {
 
     StepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException; // ? Should throw someting else ?
 
+    StepExecution getStepExecution(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException; // ? Should throw someting else ?
+
     StepExecution[] getStepExecutions(final long[] stepExecutionIds) throws NoSuchJobExecutionException, JobSecurityException;
 }

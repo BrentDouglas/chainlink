@@ -2,7 +2,7 @@ package io.machinecode.nock.jsl.visitor;
 
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.spi.element.Element;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +29,7 @@ public abstract class ValidatingVisitor<T extends Element> extends Visitor<T> {
             while ((that = node.jobScope.get(that.next)) != null) {
                 cycle.add(that);
                 if (!trail.add(that.id)) {
-                    node.addProblem(Message.cycleDetected());
+                    node.addProblem(Messages.cycleDetected());
                     for (final VisitorNode problem : cycle) {
                         final StringBuilder builder = new StringBuilder()
                                 .append("  ")
@@ -64,7 +64,7 @@ public abstract class ValidatingVisitor<T extends Element> extends Visitor<T> {
         if (node.parent != null && node.localScope != node.parent.localScope) {
             for (final Transition entry : node.transitions) {
                 if (!node.parent.localScope.containsKey(entry.next)) {
-                    node.addProblem(Message.invalidTransition(VisitorNode.element(entry.element, entry.id, entry.next, new StringBuilder()).toString()));
+                    node.addProblem(Messages.invalidTransition(VisitorNode.element(entry.element, entry.id, entry.next, new StringBuilder()).toString()));
                     ret = true;
                 }
             }

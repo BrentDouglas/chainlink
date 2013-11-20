@@ -1,6 +1,6 @@
 package io.machinecode.nock.spi.work;
 
-import io.machinecode.nock.spi.transport.Executable;
+import io.machinecode.nock.spi.execution.Executable;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

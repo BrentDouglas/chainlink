@@ -5,7 +5,7 @@ import io.machinecode.nock.jsl.validation.transition.TransitionValidator;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.execution.Decision;
 import io.machinecode.nock.spi.element.transition.Transition;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -21,7 +21,7 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
     @Override
     public void doVisit(final Decision that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Message.attributeRequired("id"));
+            context.addProblem(Messages.attributeRequired("id"));
         } else {
             context.setTransition(that.getId(), null);
         }
@@ -29,7 +29,7 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
         if (that.getTransitions() != null) {
             for (final Transition transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Message.notNullElement("transitions"));
+                    context.addProblem(Messages.notNullElement("transitions"));
                 }
                 TransitionValidator.visit(transition, context);
             }

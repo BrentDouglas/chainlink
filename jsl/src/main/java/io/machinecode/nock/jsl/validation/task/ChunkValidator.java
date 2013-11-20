@@ -4,7 +4,7 @@ import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.task.Chunk;
 import io.machinecode.nock.spi.element.task.Chunk.CheckpointPolicy;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -20,11 +20,11 @@ public class ChunkValidator extends ValidatingVisitor<Chunk> {
     @Override
     public void doVisit(final Chunk that, final VisitorNode context) {
         if (that.getCheckpointPolicy() == null) {
-            context.addProblem(Message.attributeRequired("checkpoint-policy"));
+            context.addProblem(Messages.attributeRequired("checkpoint-policy"));
         }
         if (!CheckpointPolicy.ITEM.equals(that.getCheckpointPolicy())
                 && !CheckpointPolicy.CUSTOM.equals(that.getCheckpointPolicy())) {
-            context.addProblem(Message.attributeMatches("checkpoint-policy", that.getCheckpointPolicy(), CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM));
+            context.addProblem(Messages.attributeMatches("checkpoint-policy", that.getCheckpointPolicy(), CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM));
         }
 
         //if (that.getItemCount() < 0) {
@@ -41,12 +41,12 @@ public class ChunkValidator extends ValidatingVisitor<Chunk> {
         //}
 
         if (that.getReader() == null) {
-            context.addProblem(Message.notNullElement("reader"));
+            context.addProblem(Messages.notNullElement("reader"));
         } else {
             ItemReaderValidator.INSTANCE.visit(that.getReader(), context);
         }
         if (that.getWriter() == null) {
-            context.addProblem(Message.notNullElement("writer"));
+            context.addProblem(Messages.notNullElement("writer"));
         } else {
             ItemWriterValidator.INSTANCE.visit(that.getWriter(), context);
         }

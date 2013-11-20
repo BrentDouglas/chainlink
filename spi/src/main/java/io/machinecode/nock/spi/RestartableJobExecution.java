@@ -8,7 +8,7 @@ import javax.batch.runtime.JobExecution;
 public interface RestartableJobExecution extends JobExecution {
 
     /**
-     * @return The id of the step to restart on if this job was stoped.
+     * @return The id of the step to restart on if this job was stopped.
      */
     String getRestartId();
 }

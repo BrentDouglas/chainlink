@@ -25,7 +25,7 @@ public class FailImpl extends TransitionImpl implements Fail {
     }
 
     @Override
-    public Result runTransition() throws Exception {
+    public Result runTransition(final String id) throws Exception {
         return Result.status(BatchStatus.FAILED, this.exitStatus);
     }
 

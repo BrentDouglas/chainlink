@@ -1,6 +1,7 @@
 package io.machinecode.nock.core.model.execution;
 
 import io.machinecode.nock.core.Constants;
+import io.machinecode.nock.core.impl.ExecutionContextImpl;
 import io.machinecode.nock.core.impl.StepContextImpl;
 import io.machinecode.nock.core.model.ListenersImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
@@ -8,23 +9,20 @@ import io.machinecode.nock.core.model.PropertyImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
 import io.machinecode.nock.core.util.PropertiesConverter;
-import io.machinecode.nock.core.work.PlanImpl;
-import io.machinecode.nock.core.work.Status;
-import io.machinecode.nock.core.work.execution.AfterExecution;
-import io.machinecode.nock.core.work.execution.FailExecution;
-import io.machinecode.nock.core.work.execution.RunExecution;
-import io.machinecode.nock.core.work.task.RunTask;
+import io.machinecode.nock.core.work.RepositoryStatus;
+import io.machinecode.nock.core.work.ExecutionExecutable;
+import io.machinecode.nock.core.work.TaskExecutable;
 import io.machinecode.nock.spi.ExecutionRepository;
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.ExecutionContext;
+import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.element.execution.Step;
-import io.machinecode.nock.spi.transport.Executable;
-import io.machinecode.nock.spi.transport.Plan;
-import io.machinecode.nock.spi.transport.TargetThread;
-import io.machinecode.nock.spi.transport.Transport;
-import io.machinecode.nock.spi.util.Message;
-import io.machinecode.nock.spi.work.Deferred;
-import io.machinecode.nock.spi.work.ExecutionWork;
-import io.machinecode.nock.spi.work.Listener;
+import io.machinecode.nock.spi.execution.CallbackExecutable;
+import io.machinecode.nock.spi.execution.Executable;
+import io.machinecode.nock.spi.execution.Executor;
+import io.machinecode.nock.spi.execution.Item;
+import io.machinecode.nock.spi.util.Messages;
+import io.machinecode.nock.spi.deferred.Deferred;
+import io.machinecode.nock.spi.deferred.Listener;
 import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.StrategyWork;
 import io.machinecode.nock.spi.work.TaskWork;
@@ -35,7 +33,10 @@ import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
 import javax.batch.runtime.context.StepContext;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -123,11 +124,6 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         return this.partition;
     }
 
-    @Override
-    public String element() {
-        return ELEMENT;
-    }
-
     private int _timeout(final long jobExecutionId) {
         if (_timeout != null) {
             return this._timeout;
@@ -140,7 +136,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                         return this._timeout;
                     }
                 } catch (final NumberFormatException e) {
-                    log.debugf(Message.get("step.transaction.timeout.not.integer"), jobExecutionId, id, property.getValue());
+                    log.debugf(Messages.get("step.transaction.timeout.not.integer"), jobExecutionId, id, property.getValue());
                     break;
                 }
             }
@@ -149,41 +145,43 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
 
     // Lifecycle
 
-    @Override
-    public Plan plan(final Transport transport, final Context context) {
-        if (Status.isStopping(context) || Status.isComplete(context)) {
-            return null; //TODO
-        }
-        final RunExecution run = new RunExecution(this, context);
-        final FailExecution fail = new FailExecution(this, context); //TODO
-
-        final PlanImpl runPlan = new PlanImpl(run, TargetThread.ANY, element());
-        final PlanImpl failPlan = new PlanImpl(fail, TargetThread.THIS, element());
-
-        runPlan.fail(failPlan);
-
-        return runPlan;
+    private boolean isPartitioned() {
+        return this.partition != null && this.partition.getStrategy() != null;
     }
 
+    private transient int partitions;
+    private transient List<ExecutionContext> contexts;
+
     @Override
-    public Plan before(final Transport transport, final Context context) throws Exception {
-        final ExecutionRepository repository = transport.getRepository();
-        final JobExecution jobExecution = repository.getJobExecution(context.getJobExecutionId());
+    public Deferred<?,?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+                                final CallbackExecutable parentExecutable, final ExecutionContext parentContext,
+                                final ExecutionContext... previousContexts) throws Exception {
+        if (RepositoryStatus.isStopping(parentContext) || RepositoryStatus.isComplete(parentContext)) {
+            return null; //TODO
+        }
+        final ExecutionRepository repository = executor.getRepository();
+        final JobExecution jobExecution = repository.getJobExecution(parentContext.getJobExecutionId());
         final StepExecution stepExecution = repository.createStepExecution(jobExecution, this);
+        final long stepExecutionId = stepExecution.getStepExecutionId();
+        final ExecutionContext context = new ExecutionContextImpl(
+                parentContext,
+                this.id,
+                stepExecutionId
+        );
         final long jobExecutionId = context.getJobExecutionId();
         if (stepExecution.getBatchStatus() != BatchStatus.STARTING) {
-            throw new IllegalStateException(Message.format("step.not.starting", jobExecutionId, id, stepExecution.getBatchStatus()));
+            throw new IllegalStateException(Messages.format("step.not.starting", jobExecutionId, id, stepExecution.getBatchStatus()));
         }
         final StepContextImpl stepContext = new StepContextImpl(stepExecution, PropertiesConverter.convert(this.properties));
-        log.debugf(Message.get("step.create.step.context"), jobExecutionId, id);
+        log.debugf(Messages.get("step.create.step.context"), jobExecutionId, id);
         context.setStepContext(stepContext);
         //TODO Find out where this is meant to go
-        repository.startStepExecution(stepExecution.getStepExecutionId(), stepContext.getMetrics(), new Date());
+        repository.startStepExecution(stepExecutionId, stepContext.getMetrics(), new Date());
         Exception exception = null;
-        this._listeners = this.listeners.getListenersImplementing(transport, context, StepListener.class);
+        this._listeners = this.listeners.getListenersImplementing(executor, context, StepListener.class);
         for (final StepListener listener : this._listeners) {
             try {
-                log.debugf(Message.get("step.listener.before.step"), jobExecutionId, id);
+                log.debugf(Messages.get("step.listener.before.step"), jobExecutionId, id);
                 listener.beforeStep();
             } catch (final Exception e) {
                 if (exception == null) {
@@ -196,84 +194,84 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         if (exception != null) {
             throw exception;
         }
-        return null;
-    }
 
-    @Override
-    public Plan run(final Transport transport, final Context context) throws Exception {
-        final long jobExecutionId = context.getJobExecutionId();
         int timeout = _timeout(jobExecutionId);
 
-        final AfterExecution after = new AfterExecution(this, context);
-        final PlanImpl afterPlan = new PlanImpl(after, TargetThread.THIS, element());
-        final FailExecution fail = new FailExecution(this, context);
-        final PlanImpl afterFailPlan = new PlanImpl(fail, TargetThread.THIS, element());
-
-        if (this.partition != null && this.partition.getStrategy() != null) { //TODO This looks like a bug in the xsl
-            final PartitionTarget target = this.partition.map(this.task, transport, context, timeout);
-            for (final Executable executable : target.executables) {
-                after.enlist();
-                executable.always(new Listener() { //TODO Real class
-                    @Override
-                    public void run(final Deferred<?> that) {
-                        that.delist();
-                    }
-                });
-            }
-            return new PlanImpl(target.threads, target.executables, TargetThread.ANY, this.task.element())
-                    .always(afterPlan.fail(afterFailPlan));
+        if (!isPartitioned()) { //TODO This looks like a bug in the xsl
+            this.partitions = 1;
+            this.contexts = new ArrayList<ExecutionContext>(1);
+            return executor.execute(new TaskExecutable(this.task, context, this.id, -1, timeout));
+        } else {
+            final PartitionTarget target = this.partition.map(this.task, executor, context, timeout);
+            this.partitions = target.executables.length;
+            this.contexts = new ArrayList<ExecutionContext>(this.partitions);
+            return executor.execute(
+                    target.threads,
+                    target.executables
+            );
         }
-        return new PlanImpl(new RunTask(this.task, context, timeout), TargetThread.ANY, this.task.element())
-                .always(afterPlan.fail(afterFailPlan));
     }
 
     @Override
-    public Plan after(final Transport transport, final Context context) throws Exception {
+    public Deferred<?,?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+                               final CallbackExecutable parentExecutable, final ExecutionContext context,
+                               final ExecutionContext childContext) throws Exception {
+        Collections.addAll(this.contexts, childContext);
+        if (this.contexts.size() <= this.partitions) {
+            return null; //TODO
+        }
         final long jobExecutionId = context.getJobExecutionId();
         int timeout = _timeout(jobExecutionId);
+        final StepContext stepContext = context.getStepContext();
         try {
-            if (this.partition != null) {
-                this.partition.analyse(this.task, transport, context, timeout);
-            }
-            Exception exception = null;
-            if (this._listeners == null) {
-                throw new IllegalStateException(); //TODO Message
-            }
-            for (final StepListener listener : this._listeners) {
-                try {
-                    log.debugf(Message.get("step.listener.after.step"), jobExecutionId, id);
-                    listener.afterStep();
-                } catch (final Exception e) {
-                    if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
+            try {
+                final LinkedList<Item> items = new LinkedList<Item>();
+                for (final ExecutionContext partitionContext : this.contexts) {
+                    Collections.addAll(items, partitionContext.getItems());
+                }
+                if (this.isPartitioned()) {
+                    this.partition.analyse(this.task, executor, context, timeout, items);
+                }
+                Exception exception = null;
+                if (this._listeners == null) {
+                    throw new IllegalStateException(); //TODO Messages
+                }
+                for (final StepListener listener : this._listeners) {
+                    try {
+                        log.debugf(Messages.get("step.listener.after.step"), jobExecutionId, id);
+                        listener.afterStep();
+                    } catch (final Exception e) {
+                        if (exception == null) {
+                            exception = e;
+                        } else {
+                            exception.addSuppressed(e);
+                        }
                     }
                 }
+                final ExecutionRepository repository = executor.getRepository();
+                log.debugf(Messages.get("step.update.persistent.data"), jobExecutionId, id);
+                repository.updateStepExecution(
+                        stepContext.getStepExecutionId(),
+                        stepContext.getPersistentUserData(),
+                        new Date()
+                );
+                if (exception != null) {
+                    throw exception;
+                }
+            } catch (final Throwable e) {
+                RepositoryStatus.finishStep(
+                        executor.getRepository(),
+                        context.getJobExecutionId(),
+                        BatchStatus.FAILED,
+                        stepContext.getExitStatus()
+                );
+                context.getStepContext().setBatchStatus(BatchStatus.FAILED);
+                context.getJobContext().setBatchStatus(BatchStatus.FAILED);
+                return null;
             }
-            final StepContext stepContext = context.getStepContext();
-            final ExecutionRepository repository = transport.getRepository();
-            log.debugf(Message.get("step.update.persistent.data"), jobExecutionId, id);
-            repository.updateStepExecution(
-                    stepContext.getStepExecutionId(),
-                    stepContext.getPersistentUserData(),
-                    new Date()
-            );
-            if (exception != null) {
-                Status.finishStep(transport.getRepository(), stepContext.getStepExecutionId(), BatchStatus.FAILED, stepContext.getExitStatus());
-                throw exception;
-            }
-            final ExecutionWork execution = this.transition(transport, context, this.transitions, this.next);
-            if (execution != null) {
-                return execution.plan(transport, context);
-            }
-            return null;
-        } catch (final Throwable e) {
-            Status.finishStep(transport.getRepository(), context.getJobExecutionId(), BatchStatus.FAILED, getExitStatus(context));
-            context.setThrowable(e);
-            return null;
+            return this.transition(executor, threadId, context, parentExecutable, this.transitions, this.next, stepContext.getExitStatus());
         } finally {
-            log.debugf(Message.get("step.destroy.step.context"), jobExecutionId, id);
+            log.debugf(Messages.get("step.destroy.step.context"), jobExecutionId, id);
             context.setStepContext(null);
         }
     }

@@ -1,13 +1,13 @@
 package io.machinecode.nock.core.loader;
 
-import io.machinecode.nock.core.local.InjectablesImpl;
+import io.machinecode.nock.core.impl.InjectablesImpl;
 import io.machinecode.nock.core.util.ResolvableClass;
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.inject.ArtifactReference;
 import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.InjectionContext;
-import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.execution.Executor;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.BatchRuntimeException;
@@ -28,14 +28,14 @@ public class TypedArtifactReference<T> implements ArtifactReference {
         this.clazz = new ResolvableClass<T>(clazz);
     }
 
-    public T load(final Transport transport, final Context context, final Element element) throws Exception {
-        final InjectionContext injectionContext = transport.createInjectionContext(context);
+    public T load(final Executor executor, final ExecutionContext context, final Element element) throws Exception {
+        final InjectionContext injectionContext = executor.createInjectionContext(context);
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(new InjectablesImpl(
                     context.getJobContext(),
                     context.getStepContext(),
-                    context.getJob().properties(element))
+                    context.getJob().getProperties(element))
             );
             final ClassLoader classLoader = injectionContext.getClassLoader();
             final T that =  injectionContext.getArtifactLoader().load(this.ref, this.type(classLoader), classLoader);

@@ -1,6 +1,6 @@
 package io.machinecode.nock.test.cdi.producer;
 
-import io.machinecode.nock.test.core.transport.artifact.batchlet.StopBatchlet;
+import io.machinecode.nock.test.core.execution.artifact.batchlet.StopBatchlet;
 
 import javax.enterprise.inject.New;
 import javax.enterprise.inject.Produces;

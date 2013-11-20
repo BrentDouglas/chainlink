@@ -1,8 +1,8 @@
 package io.machinecode.nock.spi.work;
 
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.partition.Strategy;
-import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.execution.Executor;
 
 import javax.batch.api.partition.PartitionPlan;
 import java.io.Serializable;
@@ -12,5 +12,5 @@ import java.io.Serializable;
  */
 public interface StrategyWork extends Strategy, Serializable {
 
-    PartitionPlan getPartitionPlan(final Transport transport, final Context context) throws Exception;
+    PartitionPlan getPartitionPlan(final Executor executor, final ExecutionContext context) throws Exception;
 }

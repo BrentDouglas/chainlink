@@ -4,8 +4,9 @@ import io.machinecode.nock.jsl.validation.execution.ExcecutionValidator;
 import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.Job;
+import io.machinecode.nock.spi.element.execution.Decision;
 import io.machinecode.nock.spi.element.execution.Execution;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -21,12 +22,12 @@ public class JobValidator extends ValidatingVisitor<Job> {
     @Override
     public void doVisit(final Job that, final VisitorNode node) {
         if (that.getId() == null) {
-            node.addProblem(Message.attributeRequired("id"));
+            node.addProblem(Messages.attributeRequired("id"));
         } else {
             node.setTransition(that.getId(), null);
         }
         if (!"1.0".equals(that.getVersion())) {
-            node.addProblem(Message.attributeMatches("version", that.getVersion(), "1.0"));
+            node.addProblem(Messages.attributeMatches("version", that.getVersion(), "1.0"));
         }
 
         if (that.getListeners() != null) {
@@ -37,11 +38,14 @@ public class JobValidator extends ValidatingVisitor<Job> {
         }
 
         if (that.getExecutions() == null || that.getExecutions().isEmpty()) {
-            node.addProblem(Message.executionsRequired());
+            node.addProblem(Messages.executionsRequired());
         } else {
+            if (that.getExecutions().get(0) instanceof Decision) {
+                node.addProblem(Messages.format("validation.decision.first.execution"));
+            }
             for (final Execution execution : that.getExecutions()) {
                 if (execution == null) {
-                    node.addProblem(Message.notNullElement("execution"));
+                    node.addProblem(Messages.notNullElement("execution"));
                     continue;
                 }
                 ExcecutionValidator.visit(execution, node);

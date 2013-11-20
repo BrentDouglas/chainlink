@@ -2,7 +2,7 @@ package io.machinecode.nock.tck.cdi;
 
 import com.ibm.jbatch.tck.spi.JobExecutionTimeoutException;
 import com.ibm.jbatch.tck.spi.JobExecutionWaiter;
-import io.machinecode.nock.core.work.Status;
+import io.machinecode.nock.core.work.RepositoryStatus;
 
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.JobExecution;
@@ -26,7 +26,7 @@ public class JobExecutionWaiterImpl implements JobExecutionWaiter {
         final long end = System.currentTimeMillis() + timeout;
         do {
             final JobExecution execution = operator.getJobExecution(executionId);
-            if (Status.isComplete(execution.getBatchStatus())) {
+            if (RepositoryStatus.isComplete(execution.getBatchStatus())) {
                 return execution;
             }
             try {

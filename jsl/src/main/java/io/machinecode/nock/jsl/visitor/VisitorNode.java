@@ -4,7 +4,7 @@ import gnu.trove.map.hash.THashMap;
 import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Flow;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,8 +76,8 @@ public class VisitorNode {
             this.jobScope.put(id, this);
             final VisitorNode old;
             if ((old = this.ids.put(id, this)) != null) {
-                addProblem(Message.nonUniqueId(id));
-                old.addProblem(Message.nonUniqueId(id));
+                addProblem(Messages.nonUniqueId(id));
+                old.addProblem(Messages.nonUniqueId(id));
             }
         }
     }

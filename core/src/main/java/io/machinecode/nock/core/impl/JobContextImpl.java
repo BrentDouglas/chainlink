@@ -5,22 +5,34 @@ import io.machinecode.nock.spi.context.MutableJobContext;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
+import javax.batch.runtime.context.JobContext;
 import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class JobContextImpl implements MutableJobContext {
-    private final JobInstance instance;
-    private final JobExecution execution;
+    private final long instanceId;
+    private final String jobName;
+    private final long executionId;
     private final Properties properties;
     private Object transientUserData;
     private BatchStatus batchStatus;
     private String exitStatus;
 
+    public JobContextImpl(final JobContext context) {
+        this.instanceId = context.getInstanceId();
+        this.jobName = context.getJobName();
+        this.executionId = context.getExecutionId();
+        this.properties = context.getProperties();
+        this.batchStatus = context.getBatchStatus(); //TODO ?
+        this.exitStatus = context.getExitStatus();
+    }
+
     public JobContextImpl(final JobInstance instance, final JobExecution execution, final Properties properties) {
-        this.instance = instance;
-        this.execution = execution;
+        this.instanceId = instance.getInstanceId();
+        this.jobName = instance.getJobName();
+        this.executionId = execution.getExecutionId();
         this.properties = properties;
         this.batchStatus = execution.getBatchStatus();
         this.exitStatus = execution.getExitStatus();
@@ -28,7 +40,7 @@ public class JobContextImpl implements MutableJobContext {
 
     @Override
     public String getJobName() {
-        return instance.getJobName();
+        return jobName;
     }
 
     @Override
@@ -43,12 +55,12 @@ public class JobContextImpl implements MutableJobContext {
 
     @Override
     public long getInstanceId() {
-        return instance.getInstanceId();
+        return instanceId;
     }
 
     @Override
     public long getExecutionId() {
-        return execution.getExecutionId();
+        return executionId;
     }
 
     @Override
@@ -78,6 +90,6 @@ public class JobContextImpl implements MutableJobContext {
 
     @Override
     public JobContextImpl copy() {
-        return new JobContextImpl(this.instance, this.execution, this.properties);
+        return new JobContextImpl(this);
     }
 }

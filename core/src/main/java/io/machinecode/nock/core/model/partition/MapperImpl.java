@@ -3,10 +3,10 @@ package io.machinecode.nock.core.model.partition;
 import io.machinecode.nock.core.loader.TypedArtifactReference;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.partition.Mapper;
-import io.machinecode.nock.spi.transport.Transport;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.execution.Executor;
+import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.StrategyWork;
 import org.jboss.logging.Logger;
 
@@ -25,9 +25,9 @@ public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implement
     }
 
     @Override
-    public PartitionPlan getPartitionPlan(final Transport transport, final Context context) throws Exception {
-        final PartitionMapper mapper = this.load(transport, context);
-        log.debugf(Message.get("mapper.map.partitions"), context.getJobExecutionId(), ref.ref());
+    public PartitionPlan getPartitionPlan(final Executor executor, final ExecutionContext context) throws Exception {
+        final PartitionMapper mapper = this.load(executor, context);
+        log.debugf(Messages.get("mapper.map.partitions"), context.getJobExecutionId(), ref.ref());
         return mapper.mapPartitions();
     }
 }

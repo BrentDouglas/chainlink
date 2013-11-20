@@ -9,7 +9,7 @@ import io.machinecode.nock.jsl.visitor.ValidatingVisitor;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.element.transition.Transition;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -25,7 +25,7 @@ public class StepValidator extends ValidatingVisitor<Step> {
     @Override
     public void doVisit(final Step that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Message.attributeRequired("id"));
+            context.addProblem(Messages.attributeRequired("id"));
         } else {
             context.setTransition(that.getId(), that.getNext());
         }
@@ -36,7 +36,7 @@ public class StepValidator extends ValidatingVisitor<Step> {
         if (that.getTransitions() != null) {
             for (final Object transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Message.notNullElement("transition"));
+                    context.addProblem(Messages.notNullElement("transition"));
                 }
                 TransitionValidator.visit((Transition) transition, context);
             }

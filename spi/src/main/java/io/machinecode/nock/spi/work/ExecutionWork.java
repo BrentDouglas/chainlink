@@ -1,20 +1,25 @@
 package io.machinecode.nock.spi.work;
 
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.ExecutionContext;
+import io.machinecode.nock.spi.context.ThreadId;
+import io.machinecode.nock.spi.deferred.Deferred;
 import io.machinecode.nock.spi.element.execution.Execution;
-import io.machinecode.nock.spi.transport.Plan;
-import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.execution.CallbackExecutable;
+import io.machinecode.nock.spi.execution.Executable;
+import io.machinecode.nock.spi.execution.Executor;
 
 import java.io.Serializable;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface ExecutionWork extends Execution, Work, Planned, Serializable {
+public interface ExecutionWork extends Execution, Work, Serializable {
 
-    Plan before(final Transport transport, final Context context) throws Exception;
+    Deferred<?,?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+                         final CallbackExecutable parentExecutable, final ExecutionContext context,
+                         final ExecutionContext... contexts) throws Exception;
 
-    Plan run(final Transport transport, final Context context) throws Exception;
-
-    Plan after(final Transport transport, final Context context) throws Exception;
+    Deferred<?,?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+                        final CallbackExecutable parentExecutable, final ExecutionContext context,
+                        final ExecutionContext childContext) throws Exception;
 }

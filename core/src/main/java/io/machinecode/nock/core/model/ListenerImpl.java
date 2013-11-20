@@ -1,10 +1,10 @@
 package io.machinecode.nock.core.model;
 
 import io.machinecode.nock.core.loader.UntypedArtifactReference;
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.Listener;
 import io.machinecode.nock.spi.element.PropertyReference;
-import io.machinecode.nock.spi.transport.Transport;
+import io.machinecode.nock.spi.execution.Executor;
 import org.jboss.logging.Logger;
 
 /**
@@ -32,7 +32,7 @@ public class ListenerImpl implements Listener, PropertyReference {
         return this.properties;
     }
 
-    public <T> T load(final Class<T> clazz, final Transport transport, final Context context) throws Exception {
-        return this.ref.load(clazz, transport, context, this);
+    public <T> T load(final Class<T> clazz, final Executor executor, final ExecutionContext context) throws Exception {
+        return this.ref.load(clazz, executor, context, this);
     }
 }

@@ -4,7 +4,7 @@ import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.core.batch.BatchArtifactRef;
 import io.machinecode.nock.core.batch.BatchArtifacts;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
@@ -75,7 +75,7 @@ public abstract class XmlArtifactLoader implements ArtifactLoader {
             try {
                 clazz = loader.loadClass(fqcn);
             } catch (final ClassNotFoundException e) {
-                log.error(Message.cantLoadMatchingArtifact(id, fqcn), e);
+                log.error(Messages.cantLoadMatchingArtifact(id, fqcn), e);
                 continue;
             }
 
@@ -83,11 +83,11 @@ public abstract class XmlArtifactLoader implements ArtifactLoader {
             try {
                 that = clazz.newInstance();
             } catch (final Exception e) {
-                log.error(Message.cantLoadMatchingArtifact(id, fqcn), e);
+                log.error(Messages.cantLoadMatchingArtifact(id, fqcn), e);
                 continue;
             }
             if (!as.isAssignableFrom(that.getClass())) {
-                log.warn(Message.artifactWithWrongClass(id, fqcn, as.getCanonicalName()));
+                log.warn(Messages.artifactWithWrongClass(id, fqcn, as.getCanonicalName()));
                 continue;
             }
             return as.cast(that);

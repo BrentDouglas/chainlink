@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 public interface TransitionWork extends Transition, Serializable {
 
-    Result runTransition() throws Exception;
+    Result runTransition(String id) throws Exception;
 
     String element();
 

@@ -14,6 +14,7 @@ import java.util.ServiceLoader;
 public class ResolvableService<T> implements Resolvable<List<T>> {
 
     private final ResolvableClass<T> clazz;
+    private transient List<T> services;
 
     public ResolvableService(final Class<T> clazz) {
         this.clazz = new ResolvableClass<T>(clazz);
@@ -21,16 +22,18 @@ public class ResolvableService<T> implements Resolvable<List<T>> {
 
     @Override
     public List<T> resolve(final ClassLoader loader) throws ClassNotFoundException {
-        final Class<T> clazz = this.clazz.resolve(loader);
-        final ServiceLoader<T> resolvers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<T>>() {
-            public ServiceLoader<T> run() {
-                return ServiceLoader.load(clazz, loader);
+        if (services == null) {
+            final Class<T> clazz = this.clazz.resolve(loader);
+            final ServiceLoader<T> resolvers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<T>>() {
+                public ServiceLoader<T> run() {
+                    return ServiceLoader.load(clazz, loader);
+                }
+            });
+            services = new ArrayList<T>();
+            for (final T that : resolvers) {
+                services.add(that);
             }
-        });
-        final ArrayList<T> list = new ArrayList<T>();
-        for (final T that : resolvers) {
-            list.add(that);
         }
-        return list;
+        return services;
     }
 }

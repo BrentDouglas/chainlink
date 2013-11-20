@@ -7,6 +7,7 @@ import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.Metric.MetricType;
 import javax.batch.runtime.StepExecution;
+import javax.batch.runtime.context.StepContext;
 import java.io.Serializable;
 import java.util.Properties;
 
@@ -14,7 +15,8 @@ import java.util.Properties;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class StepContextImpl implements MutableStepContext {
-    private final StepExecution execution;
+    private final String stepName;
+    private final long stepExecutionId;
     private final Properties properties;
     private BatchStatus batchStatus;
     private String exitStatus;
@@ -24,8 +26,23 @@ public class StepContextImpl implements MutableStepContext {
     private Exception exception;
     private MutableMetric[] metrics;
 
+
+    public StepContextImpl(final StepContext context) {
+        this.stepExecutionId = context.getStepExecutionId();
+        this.stepName = context.getStepName();
+        this.properties = context.getProperties();
+        this.batchStatus = context.getBatchStatus(); //TODO ?
+        this.exitStatus = null;
+        final MetricType[] values = MetricType.values();
+        this.metrics = new MutableMetric[values.length];
+        for (int i = 0; i < values.length; ++i) {
+            this.metrics[i] = new MutableMetricImpl(values[i]);
+        }
+    }
+
     public StepContextImpl(final StepExecution execution, final Properties properties) {
-        this.execution = execution;
+        this.stepExecutionId = execution.getStepExecutionId();
+        this.stepName = execution.getStepName();
         this.properties = properties;
         this.batchStatus = execution.getBatchStatus();
         this.exitStatus = null;
@@ -38,7 +55,7 @@ public class StepContextImpl implements MutableStepContext {
 
     @Override
     public String getStepName() {
-        return execution.getStepName();
+        return stepName;
     }
 
     @Override
@@ -53,7 +70,7 @@ public class StepContextImpl implements MutableStepContext {
 
     @Override
     public long getStepExecutionId() {
-        return execution.getStepExecutionId();
+        return stepExecutionId;
     }
 
     @Override
@@ -128,5 +145,10 @@ public class StepContextImpl implements MutableStepContext {
             }
         }
         return null;
+    }
+
+    @Override
+    public MutableStepContext copy() {
+        return new StepContextImpl(this);
     }
 }

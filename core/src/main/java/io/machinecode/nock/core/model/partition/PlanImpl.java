@@ -2,10 +2,10 @@ package io.machinecode.nock.core.model.partition;
 
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.util.PropertiesConverter;
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.partition.Plan;
-import io.machinecode.nock.spi.transport.Transport;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.execution.Executor;
+import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.StrategyWork;
 import org.jboss.logging.Logger;
 
@@ -47,7 +47,7 @@ public class PlanImpl implements Plan, StrategyWork {
     }
 
     @Override
-    public PartitionPlan getPartitionPlan(final Transport transport, final Context context) {
+    public PartitionPlan getPartitionPlan(final Executor executor, final ExecutionContext context) {
         final long jobExecutionId = context.getJobExecutionId();
         final Properties[] properties = new Properties[this.properties.size()];
         for (int i = 0; i < properties.length; ++i) {
@@ -59,12 +59,12 @@ public class PlanImpl implements Plan, StrategyWork {
         try {
             threads = Integer.parseInt(this.threads);
         } catch (final NumberFormatException e) {
-            throw new BatchRuntimeException(Message.format("plan.threads.not.integer", jobExecutionId, this.threads), e);
+            throw new BatchRuntimeException(Messages.format("plan.threads.not.integer", jobExecutionId, this.threads), e);
         }
         try {
             partitions = Integer.parseInt(this.partitions);
         } catch (final NumberFormatException e) {
-            throw new BatchRuntimeException(Message.format("plan.partitions.not.integer", jobExecutionId, this.partitions), e);
+            throw new BatchRuntimeException(Messages.format("plan.partitions.not.integer", jobExecutionId, this.partitions), e);
         }
         return new PartitionPlanImpl(
                 partitions,

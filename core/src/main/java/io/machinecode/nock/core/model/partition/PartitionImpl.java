@@ -1,14 +1,15 @@
 package io.machinecode.nock.core.model.partition;
 
 import io.machinecode.nock.core.expression.PropertyContextImpl;
-import io.machinecode.nock.core.work.task.RunTask;
-import io.machinecode.nock.spi.context.Context;
+import io.machinecode.nock.core.impl.ExecutionContextImpl;
+import io.machinecode.nock.core.work.ItemImpl;
+import io.machinecode.nock.core.work.TaskExecutable;
+import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.partition.Partition;
-import io.machinecode.nock.spi.transport.Executable;
-import io.machinecode.nock.spi.transport.Transport;
-import io.machinecode.nock.spi.util.Message;
-import io.machinecode.nock.spi.work.Bucket;
-import io.machinecode.nock.spi.work.Bucket.Item;
+import io.machinecode.nock.spi.execution.Executable;
+import io.machinecode.nock.spi.execution.Executor;
+import io.machinecode.nock.spi.execution.Item;
+import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.PartitionWork;
 import io.machinecode.nock.spi.work.StrategyWork;
@@ -20,9 +21,9 @@ import javax.batch.api.partition.PartitionCollector;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.api.partition.PartitionReducer;
 import javax.batch.api.partition.PartitionReducer.PartitionStatus;
-import javax.batch.runtime.context.StepContext;
+import javax.batch.runtime.BatchStatus;
 import javax.transaction.TransactionManager;
-import java.io.Serializable;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -69,7 +70,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return this.strategy;
     }
 
-    public PartitionCollector loadPartitionCollector(final Transport transport, final Context context) throws Exception {
+    public PartitionCollector loadPartitionCollector(final Executor executor, final ExecutionContext context) throws Exception {
         if (collector == null) {
             return null;
         }
@@ -78,38 +79,38 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                 _collector = new ThreadLocal<PartitionCollector>();
             }
             if (_collector.get() == null) {
-                _collector.set(collector.load(transport, context));
+                _collector.set(collector.load(executor, context));
             }
         }
         return _collector.get();
     }
 
-    public PartitionReducer loadPartitionReducer(final Transport transport, final Context context) throws Exception {
+    public PartitionReducer loadPartitionReducer(final Executor executor, final ExecutionContext context) throws Exception {
         if (reducer == null) {
             return null;
         }
         if (_reducer == null) {
-            _reducer = reducer.load(transport, context);
+            _reducer = reducer.load(executor, context);
         }
         return _reducer;
     }
 
-    public PartitionPlan loadPartitionPlan(final Transport transport, final Context context) throws Exception {
+    public PartitionPlan loadPartitionPlan(final Executor executor, final ExecutionContext context) throws Exception {
         if (strategy == null) {
             return null;
         }
         if (_plan == null) {
-            _plan = strategy.getPartitionPlan(transport, context);
+            _plan = strategy.getPartitionPlan(executor, context);
         }
         return _plan;
     }
 
-    public PartitionAnalyzer loadPartitionAnalyzer(final Transport transport, final Context context) throws Exception {
+    public PartitionAnalyzer loadPartitionAnalyzer(final Executor executor, final ExecutionContext context) throws Exception {
         if (analyser == null) {
             return null;
         }
         if (_analyser == null) {
-            _analyser = analyser.load(transport, context);
+            _analyser = analyser.load(executor, context);
         }
         return _analyser;
     }
@@ -117,29 +118,34 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     // Lifecycle
 
     @Override
-    public PartitionTarget map(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
+    public PartitionTarget map(final TaskWork task, final Executor executor, final ExecutionContext context, final int timeout) throws Exception {
         final long jobExecutionId = context.getJobExecutionId();
-        final PartitionReducer reducer = this.loadPartitionReducer(transport, context);
+        final PartitionReducer reducer = this.loadPartitionReducer(executor, context);
         if (reducer != null) {
-            log.debugf(Message.get("partition.before.partitioned.step"), jobExecutionId);
+            log.debugf(Messages.get("partition.before.partitioned.step"), jobExecutionId);
             reducer.beginPartitionedStep();
         }
-        final PartitionPlan plan = loadPartitionPlan(transport, context);
+        final PartitionPlan plan = loadPartitionPlan(executor, context);
         final int partitions = plan.getPartitions();
         final Properties[] properties = plan.getPartitionProperties();
         //if (partitions != properties.length) {
-        //    throw new IllegalStateException(Message.format("partition.properties.length", jobExecutionId, partitions, properties.length));
+        //    throw new IllegalStateException(Messages.format("partition.properties.length", jobExecutionId, partitions, properties.length));
         //}
-        transport.setBucket(
-                task,
-                new Bucket(partitions)
-        );
+        final String id = context.getStepContext().getStepName();
         final Executable[] executables = new Executable[partitions];
         for (int i = 0; i < partitions; ++i) {
             //TODO Not really sure if this is how properties are meant to be distributed
-            executables[i] = new RunTask(
-                    task.partition(new PropertyContextImpl(i < properties.length ? properties[i] : null)),
+            final ExecutionContext partitionContext = new ExecutionContextImpl(
                     context,
+                    id,
+                    context.getStepExecutionId(),
+                    i
+            );
+            executables[i] = new TaskExecutable(
+                    task.partition(new PropertyContextImpl(i < properties.length ? properties[i] : null)),
+                    partitionContext,
+                    id,
+                    i,
                     timeout
             );
         }
@@ -147,55 +153,58 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     }
 
     @Override
-    public void collect(final TaskWork task, final Transport transport, final Context context) throws Exception {
-        final PartitionCollector collector = loadPartitionCollector(transport, context);
-        final StepContext stepContext = context.getStepContext();
+    public Item collect(final TaskWork task, final Executor executor, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception {
+        final PartitionCollector collector = loadPartitionCollector(executor, context);
         if (collector != null) {
-            log.debugf(Message.get("partition.collect.partitioned.data"), context.getJobExecutionId(), this.collector.getRef());
-            transport.getBucket(task).give(collector.collectPartitionData());
+            log.debugf(Messages.get("partition.collect.partitioned.data"), context.getJobExecutionId(), this.collector.getRef());
+            return new ItemImpl(
+                    collector.collectPartitionData(),
+                    batchStatus,
+                    exitStatus
+            );
         }
+        return null;
     }
 
     @Override
-    public void analyse(final TaskWork task, final Transport transport, final Context context, final int timeout) throws Exception {
+    public void analyse(final TaskWork task, final Executor executor, final ExecutionContext context, final int timeout, final List<Item> items) throws Exception {
         final long jobExecutionId = context.getJobExecutionId();
-        final PartitionAnalyzer analyzer = loadPartitionAnalyzer(transport, context);
-        final PartitionReducer reducer = loadPartitionReducer(transport, context);
-        final TransactionManager transactionManager = transport.getTransactionManager();
+        final PartitionAnalyzer analyzer = loadPartitionAnalyzer(executor, context);
+        final PartitionReducer reducer = loadPartitionReducer(executor, context);
+        final TransactionManager transactionManager = executor.getTransactionManager();
         PartitionStatus partitionStatus = PartitionStatus.COMMIT;
-        log.debugf(Message.get("partition.set.transaction.timeout"), jobExecutionId, timeout);
+        log.debugf(Messages.get("partition.set.transaction.timeout"), jobExecutionId, timeout);
         transactionManager.setTransactionTimeout(timeout);
         transactionManager.begin();
         try {
-            final Bucket bucket = transport.evictBucket(task);
             if (analyzer != null) {
                 if (this.collector != null) {
-                    for (final Serializable that : bucket.data()) {
-                        log.debugf(Message.get("partition.analyse.collector.data"), jobExecutionId, this.analyser.getRef());
-                        analyzer.analyzeCollectorData(that);
+                    for (final Item that : items) {
+                        log.debugf(Messages.get("partition.analyse.collector.data"), jobExecutionId, this.analyser.getRef());
+                        analyzer.analyzeCollectorData(that.getData());
                     }
                 }
-                for (final Item item : bucket.items()) {
-                    analyzer.analyzeStatus(item.batchStatus, item.exitStatus);
+                for (final Item item : items) {
+                    analyzer.analyzeStatus(item.getBatchStatus(), item.getExitStatus());
                 }
             }
             if (reducer != null) {
-                log.debugf(Message.get("partition.before.partitioned.step.complete"), jobExecutionId, this.reducer.getRef());
+                log.debugf(Messages.get("partition.before.partitioned.step.complete"), jobExecutionId, this.reducer.getRef());
                 reducer.beforePartitionedStepCompletion();
             }
             transactionManager.commit();
         } catch (final Exception e) {
-            log.infof(e, Message.get("partition.caught.while.analysing"), jobExecutionId);
+            log.infof(e, Messages.get("partition.caught.while.analysing"), jobExecutionId);
             partitionStatus = PartitionStatus.ROLLBACK;
             transactionManager.setRollbackOnly();
             if (reducer != null) {
-                log.debugf(Message.get("partition.rollback.partitioned.step"), jobExecutionId, this.reducer.getRef());
+                log.debugf(Messages.get("partition.rollback.partitioned.step"), jobExecutionId, this.reducer.getRef());
                 reducer.rollbackPartitionedStep();
             }
             transactionManager.rollback();
         } finally {
             if (reducer != null) {
-                log.debugf(Message.get("partition.after.partitioned.step"), jobExecutionId, this.reducer.getRef(), partitionStatus);
+                log.debugf(Messages.get("partition.after.partitioned.step"), jobExecutionId, this.reducer.getRef(), partitionStatus);
                 reducer.afterPartitionedStepCompletion(partitionStatus);
             }
         }

@@ -1,18 +1,15 @@
 package io.machinecode.nock.core.model.execution;
 
-import io.machinecode.nock.core.work.PlanImpl;
-import io.machinecode.nock.core.work.Status;
-import io.machinecode.nock.core.work.execution.AfterExecution;
-import io.machinecode.nock.core.work.execution.FailExecution;
-import io.machinecode.nock.core.work.execution.RunExecution;
-import io.machinecode.nock.spi.context.Context;
-import io.machinecode.nock.spi.context.MutableJobContext;
-import io.machinecode.nock.spi.context.MutableStepContext;
+import io.machinecode.nock.core.work.ExecutionExecutable;
+import io.machinecode.nock.core.work.RepositoryStatus;
+import io.machinecode.nock.spi.context.ExecutionContext;
+import io.machinecode.nock.spi.context.ThreadId;
+import io.machinecode.nock.spi.deferred.Deferred;
 import io.machinecode.nock.spi.element.execution.Execution;
-import io.machinecode.nock.spi.transport.Plan;
-import io.machinecode.nock.spi.transport.TargetThread;
-import io.machinecode.nock.spi.transport.Transport;
-import io.machinecode.nock.spi.util.Message;
+import io.machinecode.nock.spi.execution.CallbackExecutable;
+import io.machinecode.nock.spi.execution.Executable;
+import io.machinecode.nock.spi.execution.Executor;
+import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.TransitionWork;
 import io.machinecode.nock.spi.work.TransitionWork.Result;
@@ -39,86 +36,64 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
         return this.id;
     }
 
-    @Override
-    public Plan before(final Transport transport, final Context context) throws Exception {
-        return null;//new DeferredImpl<Void>();
+    public String getExitStatus(final String jobStatus, final String executionStatus) {
+        return executionStatus != null
+                ? executionStatus
+                : jobStatus;
     }
 
-    @Override
-    public Plan after(final Transport transport, final Context context) throws Exception {
-        return null;//new DeferredImpl<Void>();
-    }
-
-    @Override
-    public Plan plan(final Transport transport, final Context context) {
-        if (Status.isStopping(context) || Status.isComplete(context)) {
-            return null; //TODO
-        }
-        final RunExecution run = new RunExecution(this, context);
-        final AfterExecution after = new AfterExecution(this, context);
-        final FailExecution fail = new FailExecution(this, context); //TODO
-
-        final PlanImpl runPlan = new PlanImpl(run, TargetThread.ANY, element());
-        final PlanImpl afterPlan = new PlanImpl(after, TargetThread.THIS, element());
-        final PlanImpl failPlan = new PlanImpl(fail, TargetThread.THIS, element());
-        final PlanImpl afterFailPlan = new PlanImpl(fail, TargetThread.THIS, element());
-
-        runPlan.fail(failPlan)
-                .always(afterPlan
-                        .fail(afterFailPlan)
-                );
-
-        return runPlan;
-    }
-
-    public String getExitStatus(final Context context) {
-        final MutableStepContext stepContext = context.getStepContext();
-        final MutableJobContext jobContext = context.getJobContext();
-        final String exitStatus;
-        final String batchletStatus;
-        final BatchStatus batchStatus;
-        if (stepContext != null) {
-            batchStatus = stepContext.getBatchStatus();
-            exitStatus = stepContext.getExitStatus();
-            batchletStatus = stepContext.getBatchletStatus();
-        } else if (jobContext != null) {
-            batchStatus = jobContext.getBatchStatus();
-            exitStatus = jobContext.getExitStatus();
-            batchletStatus = null;
-        } else {
-            throw new IllegalStateException(); //TODO Message
-        }
-        return exitStatus != null
-                ? exitStatus
-                : batchletStatus != null
-                    ? batchletStatus
-                    : batchStatus.name();
-    }
-
-    public ExecutionWork transition(final Transport transport, final Context context, final List<? extends TransitionWork> transitions, final String next) throws Exception {
-        final String status = getExitStatus(context);
-        log.tracef(Message.get("execution.transition.statuses"), context.getJobExecutionId(), id, status);
+    public Deferred<?,?> transition(final Executor executor, final ThreadId threadId, final ExecutionContext context,
+                                    final CallbackExecutable parentExecutable, final List<? extends TransitionWork> transitions,
+                                    final String next, final String executionStatus) throws Exception {
+        //if (Status.isStopping(context)) {
+        //    return null; //TODO log
+        //}
+        final long jobExecutionId = context.getJobExecutionId();
+        final BatchStatus batchStatus = context.getStepContext().getBatchStatus();
+        final String exitStatus = getExitStatus(context.getJobContext().getExitStatus(), executionStatus);
+        log.tracef(Messages.get("execution.transition.statuses"), jobExecutionId, id, exitStatus);
         for (final TransitionWork transition : transitions) {
-            if (Status.matches(transition.getOn(), status)) {
-                log.tracef(Message.get("execution.transition.matched"), context.getJobExecutionId(), id, transition.element(), status, transition.getOn());
-                final Result result = transition.runTransition();
+            if (RepositoryStatus.matches(transition.getOn(), exitStatus)) { //TODO No idea why see testTransitionElementOnAttrValuesWithRestartJobParamOverrides
+                log.tracef(Messages.get("execution.transition.matched"), jobExecutionId, id, transition.element(), exitStatus, transition.getOn());
+                final Result result = transition.runTransition(id);
                 if (result.next != null) {
-                    log.debugf(Message.get("execution.transition"), context.getJobExecutionId(), id, result.next);
-                    Status.finishStep(transport.getRepository(), context.getJobExecutionId(), BatchStatus.COMPLETED, status);
-                    return context.getJob().next(result.next);
+                    if (RepositoryStatus.isFailed(batchStatus)) {
+                        RepositoryStatus.finishStep(executor.getRepository(), jobExecutionId, batchStatus, exitStatus);
+                        return _runCallback(executor, context, parentExecutable);
+                    }
+                    log.debugf(Messages.get("execution.transition"), jobExecutionId, id, result.next);
+                    RepositoryStatus.finishStep(executor.getRepository(), jobExecutionId, BatchStatus.COMPLETED, exitStatus);
+                    return _runNextExecution(executor, context, threadId, result.next);
                 } else {
-                    final String finalStatus = result.exitStatus == null ? status : result.exitStatus;
-                    Status.finishStep(transport.getRepository(), context.getJobExecutionId(), result.batchStatus, finalStatus);
-                    Status.finishJob(transport.getRepository(), context.getJobExecutionId(), result.batchStatus, finalStatus, result.restartId);
-                    return null;
+                    final String finalStatus = result.exitStatus == null ? exitStatus : result.exitStatus;
+                    RepositoryStatus.finishStep(executor.getRepository(), jobExecutionId, result.batchStatus, finalStatus);
+                    RepositoryStatus.finishJob(executor.getRepository(), jobExecutionId, result.batchStatus, finalStatus, result.restartId);
+                    return _runCallback(executor, context, parentExecutable);
                 }
             } else {
-                log.tracef(Message.get("execution.transition.skipped"), context.getJobExecutionId(), id, transition.element(), status, transition.getOn());
+                log.tracef(Messages.get("execution.transition.skipped"), jobExecutionId, id, transition.element(), exitStatus, transition.getOn());
             }
         }
-        if (next != null) {
-            return context.getJob().next(next);
+        if (RepositoryStatus.isFailed(batchStatus)) {
+            RepositoryStatus.finishStep(executor.getRepository(), jobExecutionId, batchStatus, exitStatus);
+            return _runCallback(executor, context, parentExecutable);
         }
-        return null;
+        if (next != null) {
+            return _runNextExecution(executor, context, threadId, next);
+        }
+        return _runCallback(executor, context, parentExecutable);
+    }
+
+    private static Deferred<?,?> _runCallback(final Executor executor, final ExecutionContext context,
+                                              final CallbackExecutable parentExecutable) {
+        return executor.callback(parentExecutable, context);
+    }
+
+    private static Deferred<?,?> _runNextExecution(final Executor executor, final ExecutionContext context,
+                                                   final ThreadId threadId, final String next) {
+        return executor.execute(
+                threadId,
+                new ExecutionExecutable(context.getJob().getNextExecution(next), context)
+        );
     }
 }
