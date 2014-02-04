@@ -53,7 +53,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     // Lifecycle
 
     @Override
-    public Deferred<?, ?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                  final CallbackExecutable parentExecutable, final ExecutionContext context,
                                  final ExecutionContext... contexts) throws Exception {
         log.debugf(Messages.get("flow.run"), context.getJobExecutionId(), id);
@@ -61,7 +61,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     }
 
     @Override
-    public Deferred<?, ?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                 final CallbackExecutable parentExecutable, final ExecutionContext context,
                                 final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("flow.after"), context.getJobExecutionId(), id);

@@ -14,10 +14,10 @@ import java.util.concurrent.TimeoutException;
 */
 public class JobOperationImpl implements JobOperation {
     private final long id;
-    private final Deferred<?,?> deferred;
+    private final Deferred<?> deferred;
     private final ExecutionRepository repository;
 
-    public JobOperationImpl(final long id, final Deferred<?,?> deferred, final ExecutionRepository repository) {
+    public JobOperationImpl(final long id, final Deferred<?> deferred, final ExecutionRepository repository) {
         this.id = id;
         this.deferred = deferred;
         this.repository = repository;

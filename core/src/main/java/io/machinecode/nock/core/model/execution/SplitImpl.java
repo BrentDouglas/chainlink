@@ -49,7 +49,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
     private transient List<ExecutionContext> contexts;
 
     @Override
-    public Deferred<?, ?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                  final CallbackExecutable parentExecutable, final ExecutionContext context,
                                  final ExecutionContext... previousContexts) throws Exception {
         log.debugf(Messages.get("split.run"), context.getJobExecutionId(), id);
@@ -72,7 +72,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
     }
 
     @Override
-    public Deferred<?, ?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                 final CallbackExecutable parentExecutable, final ExecutionContext context,
                                 final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("split.after"), context.getJobExecutionId(), id);

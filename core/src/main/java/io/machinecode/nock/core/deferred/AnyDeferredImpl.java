@@ -9,9 +9,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class AnyDeferredImpl<T, U extends Throwable> extends DeferredImpl<T, U> {
 
-    public AnyDeferredImpl(final Deferred<?,?>... chain) {
+    public AnyDeferredImpl(final Deferred<?>... chain) {
         super(chain);
-        for (final Deferred<?,?> that : chain) {
+        for (final Deferred<?> that : chain) {
             that.onResolve(new Notify(this));
         }
         this.state = RESOLVED;
@@ -22,7 +22,7 @@ public class AnyDeferredImpl<T, U extends Throwable> extends DeferredImpl<T, U> 
         if (this.isCancelled()) {
             return true;
         }
-        for (final Deferred<?,?> that : chain) {
+        for (final Deferred<?> that : chain) {
             if (that.isDone()) {
                 return true;
             }

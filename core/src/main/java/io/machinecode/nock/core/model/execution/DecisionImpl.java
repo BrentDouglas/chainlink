@@ -59,7 +59,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     private transient String exitStatus;
 
     @Override
-    public Deferred<?, ?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                  final CallbackExecutable parentExecutable, final ExecutionContext context,
                                  final ExecutionContext[] contexts) throws Exception {
         log.debugf(Messages.get("decision.decide"), context.getJobExecutionId(), this.id, this.ref.ref());
@@ -75,7 +75,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     }
 
     @Override
-    public Deferred<?, ?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                 final CallbackExecutable parentExecutable, final ExecutionContext context,
                                 final ExecutionContext childContext) throws Exception {
         return this.transition(executor, threadId, context, parentExecutable, this.transitions, null, exitStatus);

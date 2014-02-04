@@ -28,7 +28,7 @@ public class ExecutionExecutable extends CallbackExecutableImpl<ExecutionWork> {
     }
 
     @Override
-    public Deferred<?,?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
+    public Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                                    final ExecutionContext... contexts) throws Throwable {
         try {
             return work.before(executor, threadId, this, parentExecutable, context, contexts);
@@ -43,7 +43,7 @@ public class ExecutionExecutable extends CallbackExecutableImpl<ExecutionWork> {
     }
 
     @Override
-    public Deferred<?,?> doCallback(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
+    public Deferred<?> doCallback(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                                     final ExecutionContext childContext) throws Throwable {
         try {
             final JobContext jobContext = childContext.getJobContext();

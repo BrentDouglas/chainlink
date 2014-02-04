@@ -18,6 +18,7 @@ import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.execution.Worker;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.deferred.Deferred;
+import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.transaction.TransactionManager;
@@ -47,7 +48,7 @@ public class EventedExecutor implements Executor {
     protected final TMap<ThreadId, Worker> threads = new THashMap<ThreadId, Worker>();
     protected final AtomicBoolean threadsLock = new AtomicBoolean(false);
 
-    protected final TLongObjectMap<Deferred<?,?>> jobs = new TLongObjectHashMap<Deferred<?,?>>();
+    protected final TLongObjectMap<Deferred<?>> jobs = new TLongObjectHashMap<Deferred<?>>();
     protected final AtomicBoolean jobLock = new AtomicBoolean(false);
 
     public EventedExecutor(final RuntimeConfiguration configuration, final int threads) {
@@ -64,7 +65,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Deferred<?,?> getJob(final long executionId) {
+    public Deferred<?> getJob(final long executionId) {
         while (!jobLock.compareAndSet(false, true)) {}
         try {
             return this.jobs.get(executionId);
@@ -74,10 +75,10 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Deferred<?,?> removeJob(final long jobExecutionId) {
+    public Deferred<?> removeJob(final long jobExecutionId) {
         while (!jobLock.compareAndSet(false, true)) {}
         try {
-            final Deferred<?,?> job = this.jobs.remove(jobExecutionId);
+            final Deferred<?> job = this.jobs.remove(jobExecutionId);
             synchronized (job) {
                 job.notifyAll();
             }
@@ -98,35 +99,35 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Deferred<?, ?> execute(final Executable executable) {
+    public Deferred<?> execute(final Executable executable) {
         final Worker worker = _leastBusy(workers, Collections.<Worker>emptySet());
         worker.addExecutable(new ExecutableEventImpl<Executable>(executable, null));
         return executable;
     }
 
     @Override
-    public Deferred<?, ?> callback(final CallbackExecutable executable, final ExecutionContext context) {
+    public Deferred<?> callback(final CallbackExecutable executable, final ExecutionContext context) {
         final Worker worker = _leastBusy(workers, Collections.<Worker>emptySet());
         worker.addCallback(new ExecutableEventImpl<CallbackExecutable>(executable, null, context));
         return executable;
     }
 
     @Override
-    public Deferred<?, ?> execute(final ThreadId threadId, final Executable executable) {
+    public Deferred<?> execute(final ThreadId threadId, final Executable executable) {
         final Worker worker = getWorker(threadId);
         worker.addExecutable(new ExecutableEventImpl<Executable>(executable, null));
         return executable;
     }
 
     @Override
-    public Deferred<?, ?> callback(final ThreadId threadId, final CallbackExecutable executable, final ExecutionContext context) {
+    public Deferred<?> callback(final ThreadId threadId, final CallbackExecutable executable, final ExecutionContext context) {
         final Worker worker = getWorker(threadId);
         worker.addCallback(new ExecutableEventImpl<CallbackExecutable>(executable, null, context));
         return executable;
     }
 
     @Override
-    public Deferred<?, ?> execute(final int maxThreads, final Executable... executables) {
+    public Deferred<?> execute(final int maxThreads, final Executable... executables) {
         final Set<Worker> used = new THashSet<Worker>();
         for (int i = 0; i < maxThreads; ++i) {
             used.add(_leastBusy(workers, used));
@@ -293,7 +294,9 @@ public class EventedExecutor implements Executor {
                 }
             } catch (final InterruptedException ie) {
                 running = false;
-                // TODO log
+                log.infof(Messages.format("worker.interrupted"));
+                removeFromThreadPool();
+                //TODO Log
             }
         }
 

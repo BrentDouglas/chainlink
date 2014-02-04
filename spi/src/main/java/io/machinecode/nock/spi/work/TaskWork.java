@@ -11,7 +11,7 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface TaskWork extends Task, Work, Deferred<ExecutionContext, Throwable>, Serializable {
+public interface TaskWork extends Task, Work, Deferred<ExecutionContext>, Serializable {
 
     TaskWork partition(PropertyContext context);
 

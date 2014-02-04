@@ -34,7 +34,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     private final PartitionImpl<?> partition;
     private transient javax.batch.api.Batchlet batchlet;
 
-    private final DeferredImpl<ExecutionContext, Throwable> delegate = new DeferredImpl<ExecutionContext, Throwable>();
+    private final DeferredImpl<ExecutionContext> delegate = new DeferredImpl<ExecutionContext>();
 
     public BatchletImpl(final TypedArtifactReference<javax.batch.api.Batchlet> ref, final PropertiesImpl properties, final PartitionImpl<?> partition) {
         super(ref, properties);

@@ -153,7 +153,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     private transient List<ExecutionContext> contexts;
 
     @Override
-    public Deferred<?,?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                 final CallbackExecutable parentExecutable, final ExecutionContext parentContext,
                                 final ExecutionContext... previousContexts) throws Exception {
         if (RepositoryStatus.isStopping(parentContext) || RepositoryStatus.isComplete(parentContext)) {
@@ -213,7 +213,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     }
 
     @Override
-    public Deferred<?,?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                final CallbackExecutable parentExecutable, final ExecutionContext context,
                                final ExecutionContext childContext) throws Exception {
         Collections.addAll(this.contexts, childContext);

@@ -25,7 +25,7 @@ public class JobExecutable extends CallbackExecutableImpl<JobWork> {
     }
 
     @Override
-    public Deferred<?,?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
+    public Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                                    final ExecutionContext... _) throws Throwable {
         try {
             return work.before(executor, threadId, this, parentExecutable, context);
@@ -37,12 +37,12 @@ public class JobExecutable extends CallbackExecutableImpl<JobWork> {
     }
 
     @Override
-    protected Deferred<?, ?> doCallback(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
+    protected Deferred<?> doCallback(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                                         final ExecutionContext childContext) throws Throwable {
         final JobContext jobContext = context.getJobContext();
         try {
             work.after(executor, threadId, this, parentExecutable, context, childContext);
-            return new DeferredImpl<Void,Throwable>();
+            return new DeferredImpl<Void>();
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("work.job.after.exception", context.getJobExecutionId()));
             context.getJobContext().setBatchStatus(BatchStatus.FAILED);

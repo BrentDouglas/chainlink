@@ -128,7 +128,7 @@ public class JobOperatorImpl implements JobOperator {
                 execution
         );
         RepositoryStatus.startingJob(repository, jobExecutionId);
-        final Deferred<?,?> deferred = executor.execute(new JobExecutable(job, context));
+        final Deferred<?> deferred = executor.execute(new JobExecutable(job, context));
         //TODO put jobs jobExecutionId, deferred
         return new JobOperationImpl(
                 jobExecutionId,
@@ -164,7 +164,7 @@ public class JobOperatorImpl implements JobOperator {
                     execution
             );
             RepositoryStatus.startingJob(repository, executionId);
-            final Deferred<?,?> deferred = executor.execute(new JobExecutable(job, context));
+            final Deferred<?> deferred = executor.execute(new JobExecutable(job, context));
             //TODO put jobs jobExecutionId, deferred
             return executionId;
         } catch (final JobRestartException e) {
@@ -181,7 +181,7 @@ public class JobOperatorImpl implements JobOperator {
         log.tracef(Messages.get("operator.stop"), executionId);
         final ExecutionRepository repository = executor.getRepository();
         repository.getJobExecution(executionId); //This will throw a NoSuchJobExecutionException if required
-        final Deferred<?,?> deferred = executor.getJob(executionId);
+        final Deferred<?> deferred = executor.getJob(executionId);
         if (deferred == null) {
             throw new JobExecutionNotRunningException();
         }

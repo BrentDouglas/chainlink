@@ -54,7 +54,7 @@ import static javax.batch.runtime.Metric.MetricType.WRITE_SKIP_COUNT;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ChunkImpl extends DeferredImpl<ExecutionContext, Throwable> implements Chunk, TaskWork {
+public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, TaskWork {
 
     private static final Logger log = Logger.getLogger(ChunkImpl.class);
 
@@ -293,7 +293,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext, Throwable> impleme
             return this.exception != null || this.failure != null;
         }
 
-        public void tryThrow(final String message, final DeferredImpl<?,Throwable> deferred) throws Exception {
+        public void tryThrow(final String message, final DeferredImpl<?> deferred) throws Exception {
             if (this.exception != null) {
                 if (this.failure != null) {
                     this.exception.addSuppressed(failure);

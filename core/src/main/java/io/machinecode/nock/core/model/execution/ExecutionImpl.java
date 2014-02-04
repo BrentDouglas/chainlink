@@ -42,7 +42,7 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
                 : jobStatus;
     }
 
-    public Deferred<?,?> transition(final Executor executor, final ThreadId threadId, final ExecutionContext context,
+    public Deferred<?> transition(final Executor executor, final ThreadId threadId, final ExecutionContext context,
                                     final CallbackExecutable parentExecutable, final List<? extends TransitionWork> transitions,
                                     final String next, final String executionStatus) throws Exception {
         //if (Status.isStopping(context)) {
@@ -84,12 +84,12 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
         return _runCallback(executor, context, parentExecutable);
     }
 
-    private static Deferred<?,?> _runCallback(final Executor executor, final ExecutionContext context,
+    private static Deferred<?> _runCallback(final Executor executor, final ExecutionContext context,
                                               final CallbackExecutable parentExecutable) {
         return executor.callback(parentExecutable, context);
     }
 
-    private static Deferred<?,?> _runNextExecution(final Executor executor, final ExecutionContext context,
+    private static Deferred<?> _runNextExecution(final Executor executor, final ExecutionContext context,
                                                    final ThreadId threadId, final String next) {
         return executor.execute(
                 threadId,

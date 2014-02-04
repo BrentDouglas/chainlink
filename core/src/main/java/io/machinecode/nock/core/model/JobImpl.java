@@ -95,7 +95,7 @@ public class JobImpl implements Job, JobWork {
     // Lifecycle
 
     @Override
-    public Deferred<?, ?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                  final CallbackExecutable parentExecutable, final ExecutionContext context) throws Exception {
         final ExecutionRepository repository = executor.getRepository();
         final JobContextImpl jobContext = new JobContextImpl(
@@ -199,7 +199,7 @@ public class JobImpl implements Job, JobWork {
         return traversal.properties(element);
     }
 
-    private static Deferred<?,?> _runNext(final Executor executor, final ExecutionContext context, final ExecutionWork next) {
+    private static Deferred<?> _runNext(final Executor executor, final ExecutionContext context, final ExecutionWork next) {
         return executor.execute(new ExecutionExecutable(next, context));
     }
 }

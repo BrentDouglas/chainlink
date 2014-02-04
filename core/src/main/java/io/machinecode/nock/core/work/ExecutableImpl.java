@@ -14,7 +14,7 @@ import org.jboss.logging.Logger;
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferred<?,?>, Throwable> implements Executable {
+public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferred<?>> implements Executable {
 
     private static final Logger log = Logger.getLogger(ExecutableImpl.class);
 
@@ -45,7 +45,7 @@ public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferr
                 state = RUNNING;
             }
             log.tracef(Messages.format("executable.execute", context.getJobExecutionId(), this.getClass().getSimpleName()));
-            final Deferred<?,?> next = doExecute(executor, threadId, parentExecutable, contexts);
+            final Deferred<?> next = doExecute(executor, threadId, parentExecutable, contexts);
             chain[0] = next;
             resolve(next);
         } catch (final Throwable e) {
@@ -58,6 +58,6 @@ public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferr
         }
     }
 
-    protected abstract Deferred<?,?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
+    protected abstract Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                                                final ExecutionContext... contexts) throws Throwable;
 }

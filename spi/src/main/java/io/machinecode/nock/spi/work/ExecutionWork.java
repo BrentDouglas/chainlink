@@ -15,11 +15,11 @@ import java.io.Serializable;
  */
 public interface ExecutionWork extends Execution, Work, Serializable {
 
-    Deferred<?,?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                          final CallbackExecutable parentExecutable, final ExecutionContext context,
                          final ExecutionContext... contexts) throws Exception;
 
-    Deferred<?,?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                         final CallbackExecutable parentExecutable, final ExecutionContext context,
                         final ExecutionContext childContext) throws Exception;
 }

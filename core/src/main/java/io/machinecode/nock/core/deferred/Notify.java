@@ -14,7 +14,7 @@ public class Notify implements Listener {
     }
 
     @Override
-    public void run(final Deferred<?,?> deferred) {
+    public void run(final Deferred<?> deferred) {
         synchronized (that) {
             that.notifyAll();
         }

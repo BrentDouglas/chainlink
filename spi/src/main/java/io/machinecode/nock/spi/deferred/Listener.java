@@ -5,5 +5,5 @@ package io.machinecode.nock.spi.deferred;
  */
 public interface Listener {
 
-    void run(final Deferred<?,?> that);
+    void run(final Deferred<?> that);
 }

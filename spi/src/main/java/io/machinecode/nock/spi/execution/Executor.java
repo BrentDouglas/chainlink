@@ -20,19 +20,19 @@ public interface Executor {
 
     InjectionContext createInjectionContext(ExecutionContext context);
 
-    Deferred<?,?> getJob(long jobExecutionId);
+    Deferred<?> getJob(long jobExecutionId);
 
-    Deferred<?,?> removeJob(long jobExecutionId);
+    Deferred<?> removeJob(long jobExecutionId);
 
-    Deferred<?,?> execute(final Executable executable);
+    Deferred<?> execute(final Executable executable);
 
-    Deferred<?,?> callback(final CallbackExecutable executable, final ExecutionContext context);
+    Deferred<?> callback(final CallbackExecutable executable, final ExecutionContext context);
 
-    Deferred<?,?> execute(final ThreadId threadId, final Executable executable);
+    Deferred<?> execute(final ThreadId threadId, final Executable executable);
 
-    Deferred<?,?> callback(final ThreadId threadId, final CallbackExecutable executable, final ExecutionContext context);
+    Deferred<?> callback(final ThreadId threadId, final CallbackExecutable executable, final ExecutionContext context);
 
-    Deferred<?,?> execute(final int maxThreads, final Executable... executables);
+    Deferred<?> execute(final int maxThreads, final Executable... executables);
 
     Worker getWorker(final ThreadId threadId);
 }

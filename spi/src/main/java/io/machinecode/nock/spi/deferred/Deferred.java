@@ -8,19 +8,19 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Deferred<T, U extends Throwable> extends Future<T> {
+public interface Deferred<T> extends Future<T> {
 
     void resolve(final T that);
 
-    void reject(final U that);
+    void reject(final Throwable that);
 
     boolean isResolved();
 
     boolean isRejected();
 
-    U getFailure() throws InterruptedException, ExecutionException;
+    Throwable getFailure() throws InterruptedException, ExecutionException;
 
-    U getFailure(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;
+    Throwable getFailure(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;
 
     void onResolve(final Listener listener);
 

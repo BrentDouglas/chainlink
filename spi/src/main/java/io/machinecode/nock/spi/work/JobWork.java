@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface JobWork extends Job, Work, Serializable {
 
-    Deferred<?,?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
+    Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                          final CallbackExecutable parentExecutable, final ExecutionContext context) throws Exception;
 
     void after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,

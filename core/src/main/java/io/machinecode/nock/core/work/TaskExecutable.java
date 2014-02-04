@@ -32,7 +32,7 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
     }
 
     @Override
-    public Deferred<?,?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
+    public Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                                    final ExecutionContext... contexts) throws Throwable {
         final MutableStepContext stepContext = context.getStepContext();
         try {

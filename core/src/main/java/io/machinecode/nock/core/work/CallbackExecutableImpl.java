@@ -14,7 +14,7 @@ import org.jboss.logging.Logger;
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public abstract class CallbackExecutableImpl<T extends Work> extends DeferredImpl<Deferred<?,?>, Throwable> implements CallbackExecutable {
+public abstract class CallbackExecutableImpl<T extends Work> extends DeferredImpl<Deferred<?>> implements CallbackExecutable {
 
     private static final Logger log = Logger.getLogger(CallbackExecutableImpl.class);
 
@@ -85,9 +85,9 @@ public abstract class CallbackExecutableImpl<T extends Work> extends DeferredImp
         }
     }
 
-    protected abstract Deferred<?,?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
+    protected abstract Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                                                final ExecutionContext... contexts) throws Throwable;
 
-    protected abstract Deferred<?,?> doCallback(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
+    protected abstract Deferred<?> doCallback(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                                                 final ExecutionContext childContext) throws Throwable;
 }

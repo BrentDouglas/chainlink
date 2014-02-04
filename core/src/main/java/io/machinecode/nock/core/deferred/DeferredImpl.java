@@ -18,7 +18,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
+public class DeferredImpl<T> implements Deferred<T> {
 
     private static final Logger log = Logger.getLogger(DeferredImpl.class);
 
@@ -27,66 +27,65 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
     protected static final int REJECTED  = 2;
     protected static final int CANCELLED = 3;
 
-    protected final Deferred<?,?>[] chain;
+    protected final Deferred<?>[] chain;
 
     protected volatile int state = PENDING;
 
     protected volatile T value;
-    protected volatile U failure;
+    protected volatile Throwable failure;
 
     private final Set<Listener> resolveListeners = new THashSet<Listener>(0);
     private final Set<Listener> rejectListeners = new THashSet<Listener>(0);
     private final Set<Listener> cancelListeners = new THashSet<Listener>(0);
 
-    public DeferredImpl(final Deferred<?,?>... chain) {
+    public DeferredImpl(final Deferred<?>... chain) {
         this.chain = chain;
     }
 
     @Override
-    public synchronized void resolve(final T that) {
+    public void resolve(final T value) {
         log.tracef(Messages.format("deferred.resolve"));
-        this.state = RESOLVED;
-        this.value = that;
-        try {
-            RuntimeException exception = null;
-            for (final Listener listener : resolveListeners) {
-                try {
-                    listener.run(this);
-                } catch (final RuntimeException e) {
-                    if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
-                    }
+        synchronized (this) {
+            this.value = value;
+            this.state = RESOLVED;
+        }
+        Throwable exception = null;
+        for (final Listener listener : resolveListeners) {
+            try {
+                listener.run(this);
+            } catch (final Throwable e) {
+                if (exception == null) {
+                    exception = e;
+                } else {
+                    exception.addSuppressed(e);
                 }
             }
-            if (exception != null) {
-                throw exception;
-                //TODO Maybe this should call reject instead, requires signature change though
+        }
+        if (exception != null) {
+            reject(exception);
+        } else {
+            synchronized (this) {
+                notifyAll();
             }
-        } finally {
-            notifyAll();
         }
     }
 
     @Override
-    public void reject(final U that) {
+    public void reject(final Throwable failure) {
         log.tracef(Messages.format("deferred.reject"));
-        this.state = REJECTED;
-        this.failure = that;
-        final Throwable throwable = that;
-        try {
-            for (final Listener listener : rejectListeners) {
-                try {
-                    listener.run(this);
-                } catch (final RuntimeException e) {
-                    throwable.addSuppressed(e);
-                }
+        synchronized (this) {
+            this.failure = failure;
+            this.state = REJECTED;
+        }
+        for (final Listener listener : rejectListeners) {
+            try {
+                listener.run(this);
+            } catch (final Throwable e) {
+                failure.addSuppressed(e);
             }
-        } finally {
-            synchronized (this) {
-                notifyAll();
-            }
+        }
+        synchronized (this) {
+            notifyAll();
         }
     }
 
@@ -136,47 +135,49 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
     }
 
     @Override
-    public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
-        if (this.isCancelled()) {
-            return true;
+    public boolean cancel(final boolean mayInterruptIfRunning) {
+        synchronized (this) {
+            if (this.isCancelled()) {
+                return true;
+            }
         }
         log.tracef(Messages.format("deferred.cancel"));
         RuntimeException exception = null;
         boolean cancelled = true;
         if (chain != null) {
-            for (final Deferred<?,?> that : chain) {
+            for (final Deferred<?> that : chain) {
                 if (that == null) {
                     continue;
                 }
                 try {
                     cancelled = that.cancel(mayInterruptIfRunning) && cancelled;
-                } catch (final RuntimeException e) {
+                } catch (final Throwable e) {
                     if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
+                        exception = new RuntimeException(Messages.format("deferred.cancel.exception"));
                     }
+                    exception.addSuppressed(e);
                 }
             }
         }
-        if (exception != null) {
-            notifyAll();
-            throw exception;
+        synchronized (this) {
+            if (exception != null) {
+                notifyAll();
+                throw exception;
+            }
+            if (this.isResolved() || this.isRejected()) {
+                return false;
+            }
+            this.state = CANCELLED;
         }
-        if (this.isResolved() || this.isRejected()) {
-            return false;
-        }
-        this.state = CANCELLED;
         try {
             for (final Listener listener : cancelListeners) {
                 try {
                     listener.run(this);
-                } catch (final RuntimeException e) {
+                } catch (final Throwable e) {
                     if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
+                        exception = new RuntimeException(Messages.format("deferred.cancel.exception"));
                     }
+                    exception.addSuppressed(e);
                 }
             }
             if (exception != null) {
@@ -184,12 +185,14 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
             }
             return cancelled;
         } finally {
-            notifyAll();
+            synchronized (this) {
+                notifyAll();
+            }
         }
     }
 
     @Override
-    public synchronized boolean isDone() {
+    public boolean isDone() {
         return this.isResolved() || this.isRejected() || this.isCancelled();
     }
 
@@ -220,19 +223,17 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
                 case RESOLVED:
                     return value;
             }
-        }
-        for (;;) {
-            synchronized (this) {
+            for (;;) {
                 wait();
-            }
-            switch (this.state) {
-                case CANCELLED:
-                    throw new CancellationException(Messages.format("deferred.cancelled"));
-                case REJECTED:
-                    throw new ExecutionException(Messages.format("deferred.rejected"), failure);
-                case RESOLVED:
-                    return value;
-                //default/PENDING means this thread was notified before the computation actually completed
+                switch (this.state) {
+                    case CANCELLED:
+                        throw new CancellationException(Messages.format("deferred.cancelled"));
+                    case REJECTED:
+                        throw new ExecutionException(Messages.format("deferred.rejected"), failure);
+                    case RESOLVED:
+                        return value;
+                    //default/PENDING means this thread was notified before the computation actually completed
+                }
             }
         }
     }
@@ -250,20 +251,20 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
                     return value;
             }
             wait(unit.toMillis(timeout));
+            switch (this.state) {
+                case CANCELLED:
+                    throw new CancellationException(Messages.format("deferred.cancelled"));
+                case REJECTED:
+                    throw new ExecutionException(Messages.format("deferred.rejected"), failure);
+                case RESOLVED:
+                    return value;
+            }
         }
-        switch (this.state) {
-            case CANCELLED:
-                throw new CancellationException(Messages.format("deferred.cancelled"));
-            case REJECTED:
-                throw new ExecutionException(Messages.format("deferred.rejected"), failure);
-            case RESOLVED:
-                return value;
-        }
-        throw new TimeoutException();
+        throw new TimeoutException(Messages.format("deferred.timeout"));
     }
 
     @Override
-    public U getFailure() throws InterruptedException, ExecutionException {
+    public Throwable getFailure() throws InterruptedException, ExecutionException {
         _checkState();
         synchronized (this) {
             switch (this.state) {
@@ -274,25 +275,23 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
                 case REJECTED:
                     return failure;
             }
-        }
-        for (;;) {
-            synchronized (this) {
+            for (;;) {
                 wait();
-            }
-            switch (this.state) {
-                case CANCELLED:
-                    throw new CancellationException(Messages.format("deferred.cancelled"));
-                case RESOLVED:
-                    throw new ResolvedException(Messages.format("deferred.resolved"));
-                case REJECTED:
-                    return failure;
-                //default/PENDING means this thread was notified before the computation actually completed
+                switch (this.state) {
+                    case CANCELLED:
+                        throw new CancellationException(Messages.format("deferred.cancelled"));
+                    case RESOLVED:
+                        throw new ResolvedException(Messages.format("deferred.resolved"));
+                    case REJECTED:
+                        return failure;
+                    //default/PENDING means this thread was notified before the computation actually completed
+                }
             }
         }
     }
 
     @Override
-    public U getFailure(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public Throwable getFailure(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         _timedCheckState(timeout, unit);
         synchronized (this) {
             switch (this.state) {
@@ -304,14 +303,14 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
                     return failure;
             }
             wait(unit.toMillis(timeout));
-        }
-        switch (this.state) {
-            case CANCELLED:
-                throw new CancellationException(Messages.format("deferred.cancelled"));
-            case RESOLVED:
-                throw new ResolvedException(Messages.format("deferred.resolved"));
-            case REJECTED:
-                return failure;
+            switch (this.state) {
+                case CANCELLED:
+                    throw new CancellationException(Messages.format("deferred.cancelled"));
+                case RESOLVED:
+                    throw new ResolvedException(Messages.format("deferred.resolved"));
+                case REJECTED:
+                    return failure;
+            }
         }
         throw new TimeoutException(Messages.format("deferred.timeout"));
     }
@@ -322,7 +321,7 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
         }
         RuntimeException exception = null;
         if (chain != null) {
-            for (final Deferred<?,?> that : chain) {
+            for (final Deferred<?> that : chain) {
                 if (that == null) {
                     continue;
                 }
@@ -333,12 +332,11 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
                     that.get();
                 } catch (final CancellationException e) {
                     // Ignore these
-                } catch (final RuntimeException e) {
+                } catch (final Throwable e) {
                     if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
+                        exception = new RuntimeException(Messages.format("deferred.get.exception"));
                     }
+                    exception.addSuppressed(e);
                 }
             }
         }
@@ -355,7 +353,7 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
         final long end = System.currentTimeMillis() + timeoutMillis;
         RuntimeException exception = null;
         if (chain != null) {
-            for (final Deferred<?,?> that : chain) {
+            for (final Deferred<?> that : chain) {
                 if (that == null) {
                     continue;
                 }
@@ -370,12 +368,11 @@ public class DeferredImpl<T, U extends Throwable> implements Deferred<T, U> {
                     that.get(nextTimeout, MILLISECONDS);
                 } catch (final CancellationException e) {
                     // Ignore these
-                } catch (final RuntimeException e) {
+                } catch (final Throwable e) {
                     if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
+                        exception = new RuntimeException(Messages.format("deferred.get.exception"));
                     }
+                    exception.addSuppressed(e);
                 }
             }
         }

@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Executable extends Deferred<Deferred<?,?>, Throwable>, Serializable {
+public interface Executable extends Deferred<Deferred<?>>, Serializable {
 
     void execute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                  final ExecutionContext... priorContexts);
