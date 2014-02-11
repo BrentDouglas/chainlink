@@ -25,7 +25,7 @@ public class StepValidator extends ValidatingVisitor<Step> {
     @Override
     public void doVisit(final Step that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Messages.attributeRequired("id"));
+            context.addProblem(Messages.format("validation.required.attribute", "id"));
         } else {
             context.setTransition(that.getId(), that.getNext());
         }
@@ -36,7 +36,7 @@ public class StepValidator extends ValidatingVisitor<Step> {
         if (that.getTransitions() != null) {
             for (final Object transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Messages.notNullElement("transition"));
+                    context.addProblem(Messages.format("validation.not.null.element", "transition"));
                 }
                 TransitionValidator.visit((Transition) transition, context);
             }

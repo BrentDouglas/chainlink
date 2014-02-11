@@ -76,8 +76,8 @@ public class VisitorNode {
             this.jobScope.put(id, this);
             final VisitorNode old;
             if ((old = this.ids.put(id, this)) != null) {
-                addProblem(Messages.nonUniqueId(id));
-                old.addProblem(Messages.nonUniqueId(id));
+                addProblem(Messages.format("validation.non.unique.id", id));
+                old.addProblem(Messages.format("validation.non.unique.id", id));
             }
         }
     }

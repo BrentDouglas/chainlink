@@ -65,10 +65,20 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Deferred<?> getJob(final long executionId) {
+    public void putJob(final long jobExecutionId, final Deferred<?> deferred) {
         while (!jobLock.compareAndSet(false, true)) {}
         try {
-            return this.jobs.get(executionId);
+            this.jobs.put(jobExecutionId, deferred);
+        } finally {
+            jobLock.set(false);
+        }
+    }
+
+    @Override
+    public Deferred<?> getJob(final long jobExecutionId) {
+        while (!jobLock.compareAndSet(false, true)) {}
+        try {
+            return this.jobs.get(jobExecutionId);
         } finally {
             jobLock.set(false);
         }
@@ -101,28 +111,28 @@ public class EventedExecutor implements Executor {
     @Override
     public Deferred<?> execute(final Executable executable) {
         final Worker worker = _leastBusy(workers, Collections.<Worker>emptySet());
-        worker.addExecutable(new ExecutableEventImpl<Executable>(executable, null));
+        worker.addExecutable(new ExecutableEventImpl<Executable>(executable));
         return executable;
     }
 
     @Override
     public Deferred<?> callback(final CallbackExecutable executable, final ExecutionContext context) {
         final Worker worker = _leastBusy(workers, Collections.<Worker>emptySet());
-        worker.addCallback(new ExecutableEventImpl<CallbackExecutable>(executable, null, context));
+        worker.addCallback(new ExecutableEventImpl<CallbackExecutable>(executable, context));
         return executable;
     }
 
     @Override
     public Deferred<?> execute(final ThreadId threadId, final Executable executable) {
         final Worker worker = getWorker(threadId);
-        worker.addExecutable(new ExecutableEventImpl<Executable>(executable, null));
+        worker.addExecutable(new ExecutableEventImpl<Executable>(executable));
         return executable;
     }
 
     @Override
     public Deferred<?> callback(final ThreadId threadId, final CallbackExecutable executable, final ExecutionContext context) {
         final Worker worker = getWorker(threadId);
-        worker.addCallback(new ExecutableEventImpl<CallbackExecutable>(executable, null, context));
+        worker.addCallback(new ExecutableEventImpl<CallbackExecutable>(executable, context));
         return executable;
     }
 
@@ -138,9 +148,9 @@ public class EventedExecutor implements Executor {
                 it = used.iterator();
             }
             final Worker worker = it.next();
-            worker.addExecutable(new ExecutableEventImpl<Executable>(executable, null));
+            worker.addExecutable(new ExecutableEventImpl<Executable>(executable));
         }
-        return new AllDeferredImpl<Executable, Throwable>(executables);
+        return new AllDeferredImpl<Executable>(executables);
     }
 
     @Override
@@ -256,7 +266,7 @@ public class EventedExecutor implements Executor {
                     return false;
                 }
                 final Executable executable = executableEvent.getExecutable();
-                executable.execute(EventedExecutor.this, threadId, executableEvent.getParentExecutable(), executableEvent.getContexts());
+                executable.execute(EventedExecutor.this, threadId, executable.getParent(), executableEvent.getContexts());
                 return true;
             } catch (final Throwable e) {
                 log.error("", e); //TODO Messages
@@ -275,7 +285,7 @@ public class EventedExecutor implements Executor {
                     return false;
                 }
                 final CallbackExecutable callback = callbackEvent.getExecutable();
-                callback.callback(EventedExecutor.this, threadId, callbackEvent.getParentExecutable(), callbackEvent.getContexts()[0]);
+                callback.callback(EventedExecutor.this, threadId, callback.getParent(), callbackEvent.getContexts()[0]);
                 return true;
             } catch (final Throwable e) {
                 log.error("", e); //TODO Messages

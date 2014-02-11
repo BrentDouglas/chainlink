@@ -2,10 +2,13 @@ package io.machinecode.nock.core.model.partition;
 
 import io.machinecode.nock.core.expression.PropertyContextImpl;
 import io.machinecode.nock.core.impl.ExecutionContextImpl;
+import io.machinecode.nock.core.impl.JobContextImpl;
+import io.machinecode.nock.core.impl.StepContextImpl;
 import io.machinecode.nock.core.work.ItemImpl;
 import io.machinecode.nock.core.work.TaskExecutable;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.partition.Partition;
+import io.machinecode.nock.spi.execution.CallbackExecutable;
 import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.execution.Item;
@@ -118,7 +121,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     // Lifecycle
 
     @Override
-    public PartitionTarget map(final TaskWork task, final Executor executor, final ExecutionContext context, final int timeout) throws Exception {
+    public PartitionTarget map(final TaskWork task, final Executor executor, final CallbackExecutable thisExecutable, final ExecutionContext context, final int timeout) throws Exception {
         final long jobExecutionId = context.getJobExecutionId();
         final PartitionReducer reducer = this.loadPartitionReducer(executor, context);
         if (reducer != null) {
@@ -136,12 +139,13 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         for (int i = 0; i < partitions; ++i) {
             //TODO Not really sure if this is how properties are meant to be distributed
             final ExecutionContext partitionContext = new ExecutionContextImpl(
-                    context,
-                    id,
-                    context.getStepExecutionId(),
-                    i
+                    context.getJob(),
+                    new JobContextImpl(context.getJobContext()),
+                    new StepContextImpl(context.getStepContext()),
+                    context.getJobExecution()
             );
             executables[i] = new TaskExecutable(
+                    thisExecutable,
                     task.partition(new PropertyContextImpl(i < properties.length ? properties[i] : null)),
                     partitionContext,
                     id,

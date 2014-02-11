@@ -19,10 +19,10 @@ public class NextValidator extends ValidatingVisitor<Next> {
     @Override
     public void doVisit(final Next that, final VisitorNode context) {
         if (that.getOn() == null) {
-            context.addProblem(Messages.attributeRequired("on"));
+            context.addProblem(Messages.format("validation.required.attribute", "on"));
         }
         if (that.getTo() == null) {
-            context.addProblem(Messages.attributeRequired("to"));
+            context.addProblem(Messages.format("validation.required.attribute", "to"));
         } else {
             context.setTransition(null, that.getTo());
         }

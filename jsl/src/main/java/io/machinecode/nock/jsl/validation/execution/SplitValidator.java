@@ -20,7 +20,7 @@ public class SplitValidator extends ValidatingVisitor<Split> {
     @Override
     public void doVisit(final Split that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Messages.attributeRequired("id"));
+            context.addProblem(Messages.format("validation.required.attribute", "id"));
         } else {
             context.setTransition(that.getId(), that.getNext());
         }
@@ -28,7 +28,7 @@ public class SplitValidator extends ValidatingVisitor<Split> {
         if (that.getFlows() != null) {
             for (final Flow flow : that.getFlows()) {
                 if (flow == null) {
-                    context.addProblem(Messages.notNullElement("flow"));
+                    context.addProblem(Messages.format("validation.not.null.element", "flow"));
                 }
                 FlowValidator.INSTANCE.visit(flow, context);
             }

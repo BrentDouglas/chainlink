@@ -1,5 +1,6 @@
 package io.machinecode.nock.core.model;
 
+import io.machinecode.nock.core.impl.ExecutionContextImpl;
 import io.machinecode.nock.core.impl.JobContextImpl;
 import io.machinecode.nock.core.model.execution.ExecutionImpl;
 import io.machinecode.nock.core.util.PropertiesConverter;
@@ -96,19 +97,12 @@ public class JobImpl implements Job, JobWork {
 
     @Override
     public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
-                                 final CallbackExecutable parentExecutable, final ExecutionContext context) throws Exception {
+                              final CallbackExecutable parentExecutable, final ExecutionContext context) throws Exception {
         final ExecutionRepository repository = executor.getRepository();
-        final JobContextImpl jobContext = new JobContextImpl(
-                repository.getJobInstance(context.getJobInstanceId()),
-                repository.getJobExecution(context.getJobExecutionId()),
-                PropertiesConverter.convert(this.properties)
-        );
-        long jobExecutionId = jobContext.getExecutionId();
-        jobContext.setBatchStatus(BatchStatus.STARTED);
+        long jobExecutionId = context.getJobExecutionId();
         RepositoryStatus.startedJob(repository, jobExecutionId);
 
         log.debugf(Messages.get("job.create.job.context"), jobExecutionId, id);
-        context.setJobContext(jobContext);
         this._listeners = this.listeners.getListenersImplementing(executor, context, JobListener.class);
         Exception exception = null;
         for (final JobListener listener : this._listeners) {
@@ -142,21 +136,21 @@ public class JobImpl implements Job, JobWork {
                 try {
                     stepExecution = repository.getStepExecution(jobExecutionId, id);
                 } catch (final NoSuchJobExecutionException e) {
-                    return _runNext(executor, context, next);
+                    return _runNext(executor, thisExecutable, context, next);
                 }
                 final BatchStatus bs = stepExecution.getBatchStatus();
                 if (BatchStatus.FAILED == bs || BatchStatus.STOPPED == bs) {
-                    return _runNext(executor, context, next);
+                    return _runNext(executor, thisExecutable, context, next);
                 }
                 if (BatchStatus.COMPLETED == bs && next instanceof Step) {
                     if (Boolean.parseBoolean(((Step) next).getAllowStartIfComplete())) {
-                        return _runNext(executor, context, next);
+                        return _runNext(executor, thisExecutable, context, next);
                     }
                 }
             } while ((next = job.getNextExecution(restartId)) != null);
             return null;
         }
-        return _runNext(executor, context, this.executions.get(0));
+        return _runNext(executor, thisExecutable, context, this.executions.get(0));
     }
 
     @Override
@@ -165,7 +159,7 @@ public class JobImpl implements Job, JobWork {
         final long jobExecutionId = context.getJobExecutionId();
         try {
             if (this._listeners == null) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(Messages.format("job.null.listeners", jobExecutionId, id));
             }
             Exception exception = null;
             for (final JobListener listener : this._listeners) {
@@ -185,7 +179,6 @@ public class JobImpl implements Job, JobWork {
             }
         } finally {
             log.debugf(Messages.get("job.destroy.job.context"), jobExecutionId, id);
-            context.setJobContext(null);
         }
     }
 
@@ -199,7 +192,8 @@ public class JobImpl implements Job, JobWork {
         return traversal.properties(element);
     }
 
-    private static Deferred<?> _runNext(final Executor executor, final ExecutionContext context, final ExecutionWork next) {
-        return executor.execute(new ExecutionExecutable(next, context));
+    private static Deferred<?> _runNext(final Executor executor, final CallbackExecutable thisExecutable,
+                                        final ExecutionContext context, final ExecutionWork next) throws Exception {
+        return executor.execute(new ExecutionExecutable(thisExecutable, next, next.createExecutionContext(executor.getRepository(), context)));
     }
 }

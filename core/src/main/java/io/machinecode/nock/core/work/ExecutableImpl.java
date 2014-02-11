@@ -22,12 +22,24 @@ public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferr
 
     protected final T work;
 
+    protected final CallbackExecutable parent;
     protected final ExecutionContext context;
 
-    public ExecutableImpl(final ExecutionContext context, final T work) {
+    public ExecutableImpl(final CallbackExecutable parent, final ExecutionContext context, final T work) {
         super(new Deferred[1]);
+        this.parent = parent;
         this.context = context;
         this.work = work;
+    }
+
+    @Override
+    public CallbackExecutable getParent() {
+        return parent;
+    }
+
+    @Override
+    public ExecutionContext getContext() {
+        return context;
     }
 
     @Override

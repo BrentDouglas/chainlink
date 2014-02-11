@@ -57,7 +57,9 @@ public class FlowImpl extends ExecutionImpl implements Flow {
                                  final CallbackExecutable parentExecutable, final ExecutionContext context,
                                  final ExecutionContext... contexts) throws Exception {
         log.debugf(Messages.get("flow.run"), context.getJobExecutionId(), id);
-        return executor.execute(new ExecutionExecutable(this.executions.get(0), context));
+        return executor.execute(
+                new ExecutionExecutable(thisExecutable, this.executions.get(0), context)
+        );
     }
 
     @Override
@@ -65,6 +67,6 @@ public class FlowImpl extends ExecutionImpl implements Flow {
                                 final CallbackExecutable parentExecutable, final ExecutionContext context,
                                 final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("flow.after"), context.getJobExecutionId(), id);
-        return this.transition(executor, threadId, context, parentExecutable, Collections.<TransitionWork>emptyList(), this.next, null);
+        return this.transition(executor, threadId, context, thisExecutable, parentExecutable, Collections.<TransitionWork>emptyList(), this.next, null);
     }
 }

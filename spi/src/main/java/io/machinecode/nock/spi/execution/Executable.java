@@ -11,6 +11,10 @@ import java.io.Serializable;
  */
 public interface Executable extends Deferred<Deferred<?>>, Serializable {
 
+    CallbackExecutable getParent();
+
+    ExecutionContext getContext();
+
     void execute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
                  final ExecutionContext... priorContexts);
 }

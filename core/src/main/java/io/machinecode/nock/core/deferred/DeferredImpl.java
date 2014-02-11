@@ -44,7 +44,7 @@ public class DeferredImpl<T> implements Deferred<T> {
 
     @Override
     public void resolve(final T value) {
-        log.tracef(Messages.format("deferred.resolve"));
+        log.tracef(Messages.get("deferred.resolve"));
         synchronized (this) {
             this.value = value;
             this.state = RESOLVED;
@@ -72,7 +72,7 @@ public class DeferredImpl<T> implements Deferred<T> {
 
     @Override
     public void reject(final Throwable failure) {
-        log.tracef(Messages.format("deferred.reject"));
+        log.tracef(Messages.get("deferred.reject"));
         synchronized (this) {
             this.failure = failure;
             this.state = REJECTED;
@@ -141,7 +141,7 @@ public class DeferredImpl<T> implements Deferred<T> {
                 return true;
             }
         }
-        log.tracef(Messages.format("deferred.cancel"));
+        log.tracef(Messages.get("deferred.cancel"));
         RuntimeException exception = null;
         boolean cancelled = true;
         if (chain != null) {
@@ -153,7 +153,7 @@ public class DeferredImpl<T> implements Deferred<T> {
                     cancelled = that.cancel(mayInterruptIfRunning) && cancelled;
                 } catch (final Throwable e) {
                     if (exception == null) {
-                        exception = new RuntimeException(Messages.format("deferred.cancel.exception"));
+                        exception = new RuntimeException(Messages.get("deferred.cancel.exception"));
                     }
                     exception.addSuppressed(e);
                 }
@@ -175,7 +175,7 @@ public class DeferredImpl<T> implements Deferred<T> {
                     listener.run(this);
                 } catch (final Throwable e) {
                     if (exception == null) {
-                        exception = new RuntimeException(Messages.format("deferred.cancel.exception"));
+                        exception = new RuntimeException(Messages.get("deferred.cancel.exception"));
                     }
                     exception.addSuppressed(e);
                 }
@@ -217,9 +217,9 @@ public class DeferredImpl<T> implements Deferred<T> {
         synchronized (this) {
             switch (this.state) {
                 case CANCELLED:
-                    throw new CancellationException(Messages.format("deferred.cancelled"));
+                    throw new CancellationException(Messages.get("deferred.cancelled"));
                 case REJECTED:
-                    throw new ExecutionException(Messages.format("deferred.rejected"), failure);
+                    throw new ExecutionException(Messages.get("deferred.rejected"), failure);
                 case RESOLVED:
                     return value;
             }
@@ -227,9 +227,9 @@ public class DeferredImpl<T> implements Deferred<T> {
                 wait();
                 switch (this.state) {
                     case CANCELLED:
-                        throw new CancellationException(Messages.format("deferred.cancelled"));
+                        throw new CancellationException(Messages.get("deferred.cancelled"));
                     case REJECTED:
-                        throw new ExecutionException(Messages.format("deferred.rejected"), failure);
+                        throw new ExecutionException(Messages.get("deferred.rejected"), failure);
                     case RESOLVED:
                         return value;
                     //default/PENDING means this thread was notified before the computation actually completed
@@ -244,23 +244,23 @@ public class DeferredImpl<T> implements Deferred<T> {
         synchronized (this) {
             switch (this.state) {
                 case CANCELLED:
-                    throw new CancellationException(Messages.format("deferred.cancelled"));
+                    throw new CancellationException(Messages.get("deferred.cancelled"));
                 case REJECTED:
-                    throw new ExecutionException(Messages.format("deferred.rejected"), failure);
+                    throw new ExecutionException(Messages.get("deferred.rejected"), failure);
                 case RESOLVED:
                     return value;
             }
             wait(unit.toMillis(timeout));
             switch (this.state) {
                 case CANCELLED:
-                    throw new CancellationException(Messages.format("deferred.cancelled"));
+                    throw new CancellationException(Messages.get("deferred.cancelled"));
                 case REJECTED:
-                    throw new ExecutionException(Messages.format("deferred.rejected"), failure);
+                    throw new ExecutionException(Messages.get("deferred.rejected"), failure);
                 case RESOLVED:
                     return value;
             }
         }
-        throw new TimeoutException(Messages.format("deferred.timeout"));
+        throw new TimeoutException(Messages.get("deferred.timeout"));
     }
 
     @Override
@@ -269,9 +269,9 @@ public class DeferredImpl<T> implements Deferred<T> {
         synchronized (this) {
             switch (this.state) {
                 case CANCELLED:
-                    throw new CancellationException(Messages.format("deferred.cancelled"));
+                    throw new CancellationException(Messages.get("deferred.cancelled"));
                 case RESOLVED:
-                    throw new ResolvedException(Messages.format("deferred.resolved"));
+                    throw new ResolvedException(Messages.get("deferred.resolved"));
                 case REJECTED:
                     return failure;
             }
@@ -279,9 +279,9 @@ public class DeferredImpl<T> implements Deferred<T> {
                 wait();
                 switch (this.state) {
                     case CANCELLED:
-                        throw new CancellationException(Messages.format("deferred.cancelled"));
+                        throw new CancellationException(Messages.get("deferred.cancelled"));
                     case RESOLVED:
-                        throw new ResolvedException(Messages.format("deferred.resolved"));
+                        throw new ResolvedException(Messages.get("deferred.resolved"));
                     case REJECTED:
                         return failure;
                     //default/PENDING means this thread was notified before the computation actually completed
@@ -296,23 +296,23 @@ public class DeferredImpl<T> implements Deferred<T> {
         synchronized (this) {
             switch (this.state) {
                 case CANCELLED:
-                    throw new CancellationException(Messages.format("deferred.cancelled"));
+                    throw new CancellationException(Messages.get("deferred.cancelled"));
                 case RESOLVED:
-                    throw new ResolvedException(Messages.format("deferred.resolved"));
+                    throw new ResolvedException(Messages.get("deferred.resolved"));
                 case REJECTED:
                     return failure;
             }
             wait(unit.toMillis(timeout));
             switch (this.state) {
                 case CANCELLED:
-                    throw new CancellationException(Messages.format("deferred.cancelled"));
+                    throw new CancellationException(Messages.get("deferred.cancelled"));
                 case RESOLVED:
-                    throw new ResolvedException(Messages.format("deferred.resolved"));
+                    throw new ResolvedException(Messages.get("deferred.resolved"));
                 case REJECTED:
                     return failure;
             }
         }
-        throw new TimeoutException(Messages.format("deferred.timeout"));
+        throw new TimeoutException(Messages.get("deferred.timeout"));
     }
 
     private void _checkState() throws InterruptedException, ExecutionException {
@@ -334,7 +334,7 @@ public class DeferredImpl<T> implements Deferred<T> {
                     // Ignore these
                 } catch (final Throwable e) {
                     if (exception == null) {
-                        exception = new RuntimeException(Messages.format("deferred.get.exception"));
+                        exception = new RuntimeException(Messages.get("deferred.get.exception"));
                     }
                     exception.addSuppressed(e);
                 }
@@ -370,7 +370,7 @@ public class DeferredImpl<T> implements Deferred<T> {
                     // Ignore these
                 } catch (final Throwable e) {
                     if (exception == null) {
-                        exception = new RuntimeException(Messages.format("deferred.get.exception"));
+                        exception = new RuntimeException(Messages.get("deferred.get.exception"));
                     }
                     exception.addSuppressed(e);
                 }

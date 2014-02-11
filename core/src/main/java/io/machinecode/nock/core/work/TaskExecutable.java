@@ -24,8 +24,8 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
     final int partition;
     final int timeout;
 
-    public TaskExecutable(final TaskWork work, final ExecutionContext context, final String stepId, final int partition, final int timeout) {
-        super(context, work);
+    public TaskExecutable(final CallbackExecutable parent, final TaskWork work, final ExecutionContext context, final String stepId, final int partition, final int timeout) {
+        super(parent, context, work);
         this.stepId = stepId;
         this.partition = partition;
         this.timeout = timeout;
@@ -37,7 +37,7 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
         final MutableStepContext stepContext = context.getStepContext();
         try {
             work.run(executor, context, timeout); //TODO
-            return work;
+            return executor.callback(parentExecutable, context);
         } catch (final Throwable e) {
             if (e instanceof Exception) {
                 stepContext.setException((Exception) e);

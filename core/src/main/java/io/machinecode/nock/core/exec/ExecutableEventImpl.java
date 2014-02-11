@@ -12,23 +12,16 @@ import io.machinecode.nock.spi.execution.Worker;
 */
 class ExecutableEventImpl<T extends Executable> implements ExecutableEvent<T> {
     final T executable;
-    final CallbackExecutable parentExecutable;
     final ExecutionContext[] contexts;
 
-    ExecutableEventImpl(final T executable, final CallbackExecutable parentExecutable, final ExecutionContext... contexts) {
+    ExecutableEventImpl(final T executable, final ExecutionContext... contexts) {
         this.executable = executable;
-        this.parentExecutable = parentExecutable;
         this.contexts = contexts;
     }
 
     @Override
     public T getExecutable() {
         return executable;
-    }
-
-    @Override
-    public CallbackExecutable getParentExecutable() {
-        return parentExecutable;
     }
 
     @Override

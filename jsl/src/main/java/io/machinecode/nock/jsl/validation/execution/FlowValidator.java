@@ -23,7 +23,7 @@ public class FlowValidator extends ValidatingVisitor<Flow> {
     @Override
     public void doVisit(final Flow that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Messages.attributeRequired("id"));
+            context.addProblem(Messages.format("validation.required.attribute", "id"));
         } else {
             context.setTransition(that.getId(), that.getNext());
         }
@@ -31,7 +31,7 @@ public class FlowValidator extends ValidatingVisitor<Flow> {
         if (that.getTransitions() != null) {
             for (final Transition transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Messages.notNullElement("transitions"));
+                    context.addProblem(Messages.format("validation.not.null.element", "transitions"));
                 }
                 TransitionValidator.visit(transition, context);
             }
@@ -46,7 +46,7 @@ public class FlowValidator extends ValidatingVisitor<Flow> {
             }
             for (final Execution execution : that.getExecutions()) {
                 if (execution == null) {
-                    context.addProblem(Messages.notNullElement("execution"));
+                    context.addProblem(Messages.format("validation.not.null.element", "execution"));
                     continue;
                 }
                 ExcecutionValidator.visit(execution, context);

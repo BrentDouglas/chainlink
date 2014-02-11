@@ -12,7 +12,5 @@ public interface ExecutableEvent<T extends Executable> extends Serializable {
 
     T getExecutable();
 
-    CallbackExecutable getParentExecutable();
-
     ExecutionContext[] getContexts();
 }

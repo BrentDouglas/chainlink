@@ -21,15 +21,9 @@ public interface ExecutionContext extends Serializable {
 
     Long getStepExecutionId();
 
-    String getId();
-
     MutableJobContext getJobContext();
 
-    void setJobContext(MutableJobContext jobContext);
-
     MutableStepContext getStepContext();
-
-    void setStepContext(final MutableStepContext stepContext);
 
     Item[] getItems();
 

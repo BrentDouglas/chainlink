@@ -1,6 +1,7 @@
 package io.machinecode.nock.core.model.execution;
 
 import io.machinecode.nock.core.impl.ExecutionContextImpl;
+import io.machinecode.nock.core.impl.JobContextImpl;
 import io.machinecode.nock.core.work.RepositoryStatus;
 import io.machinecode.nock.core.work.ExecutionExecutable;
 import io.machinecode.nock.spi.context.ExecutionContext;
@@ -60,15 +61,18 @@ public class SplitImpl extends ExecutionImpl implements Split {
         for (int i = 0; i < flows.length; ++i) {
             final FlowImpl flow = this.flows.get(i);
             final ExecutionContext flowContext = new ExecutionContextImpl(
-                    context,
-                    flow.getId(),
+                    context.getJob(),
+                    new JobContextImpl(context.getJobContext()),
                     null,
-                    i
+                    context.getJobExecution()
             );
-            flows[i] = new ExecutionExecutable(flow, flowContext);
+            flows[i] = new ExecutionExecutable(thisExecutable, flow, flowContext);
         }
         this.contexts = new ArrayList<ExecutionContext>(flows.length);
-        return executor.execute(flows.length, flows);
+        return executor.execute(
+                flows.length,
+                flows
+        );
     }
 
     @Override
@@ -77,9 +81,9 @@ public class SplitImpl extends ExecutionImpl implements Split {
                                 final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("split.after"), context.getJobExecutionId(), id);
         this.contexts.add(childContext);
-        if (this.contexts.size() <= this.flows.size()) {
-            return null; //TODO
+        if (this.contexts.size() < this.flows.size()) {
+            return null;
         }
-        return this.transition(executor, threadId, context, parentExecutable, Collections.<TransitionWork>emptyList(), this.next, null);
+        return this.transition(executor, threadId, context, thisExecutable, parentExecutable, Collections.<TransitionWork>emptyList(), this.next, null);
     }
 }

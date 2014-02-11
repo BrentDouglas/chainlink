@@ -75,7 +75,7 @@ public abstract class XmlArtifactLoader implements ArtifactLoader {
             try {
                 clazz = loader.loadClass(fqcn);
             } catch (final ClassNotFoundException e) {
-                log.error(Messages.cantLoadMatchingArtifact(id, fqcn), e);
+                log.error(Messages.format("validation.cant.load.matching.artifact", id, fqcn), e);
                 continue;
             }
 
@@ -83,11 +83,11 @@ public abstract class XmlArtifactLoader implements ArtifactLoader {
             try {
                 that = clazz.newInstance();
             } catch (final Exception e) {
-                log.error(Messages.cantLoadMatchingArtifact(id, fqcn), e);
+                log.error(Messages.format("validation.cant.load.matching.artifact", id, fqcn), e);
                 continue;
             }
             if (!as.isAssignableFrom(that.getClass())) {
-                log.warn(Messages.artifactWithWrongClass(id, fqcn, as.getCanonicalName()));
+                log.warn(Messages.format("validation.artifact.id.wrong.class", id, fqcn, as.getCanonicalName()));
                 continue;
             }
             return as.cast(that);

@@ -13,7 +13,10 @@ import io.machinecode.nock.core.work.RepositoryStatus;
 import io.machinecode.nock.core.work.ExecutionExecutable;
 import io.machinecode.nock.core.work.TaskExecutable;
 import io.machinecode.nock.spi.ExecutionRepository;
+import io.machinecode.nock.spi.RestartableJobExecution;
 import io.machinecode.nock.spi.context.ExecutionContext;
+import io.machinecode.nock.spi.context.MutableJobContext;
+import io.machinecode.nock.spi.context.MutableStepContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.execution.CallbackExecutable;
@@ -23,6 +26,7 @@ import io.machinecode.nock.spi.execution.Item;
 import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.deferred.Deferred;
 import io.machinecode.nock.spi.deferred.Listener;
+import io.machinecode.nock.spi.work.JobWork;
 import io.machinecode.nock.spi.work.PartitionTarget;
 import io.machinecode.nock.spi.work.StrategyWork;
 import io.machinecode.nock.spi.work.TaskWork;
@@ -32,6 +36,7 @@ import javax.batch.api.listener.StepListener;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
+import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,10 +100,6 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         return this.allowStartIfComplete;
     }
 
-    public boolean isAllowStartIfComplete() {
-        return Boolean.parseBoolean(this.allowStartIfComplete);
-    }
-
     @Override
     public PropertiesImpl getProperties() {
         return this.properties;
@@ -154,29 +155,20 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
 
     @Override
     public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
-                                final CallbackExecutable parentExecutable, final ExecutionContext parentContext,
-                                final ExecutionContext... previousContexts) throws Exception {
-        if (RepositoryStatus.isStopping(parentContext) || RepositoryStatus.isComplete(parentContext)) {
+                              final CallbackExecutable parentExecutable, final ExecutionContext context,
+                              final ExecutionContext... previousContexts) throws Exception {
+        if (RepositoryStatus.isStopping(context) || RepositoryStatus.isComplete(context)) {
             return null; //TODO
         }
         final ExecutionRepository repository = executor.getRepository();
-        final JobExecution jobExecution = repository.getJobExecution(parentContext.getJobExecutionId());
-        final StepExecution stepExecution = repository.createStepExecution(jobExecution, this);
-        final long stepExecutionId = stepExecution.getStepExecutionId();
-        final ExecutionContext context = new ExecutionContextImpl(
-                parentContext,
-                this.id,
-                stepExecutionId
-        );
+        final long stepExecutionId = context.getStepExecutionId();
         final long jobExecutionId = context.getJobExecutionId();
+        final StepExecution stepExecution = repository.getStepExecution(stepExecutionId);
         if (stepExecution.getBatchStatus() != BatchStatus.STARTING) {
             throw new IllegalStateException(Messages.format("step.not.starting", jobExecutionId, id, stepExecution.getBatchStatus()));
         }
-        final StepContextImpl stepContext = new StepContextImpl(stepExecution, PropertiesConverter.convert(this.properties));
-        log.debugf(Messages.get("step.create.step.context"), jobExecutionId, id);
-        context.setStepContext(stepContext);
         //TODO Find out where this is meant to go
-        repository.startStepExecution(stepExecutionId, stepContext.getMetrics(), new Date());
+        repository.startStepExecution(stepExecutionId, context.getStepContext().getMetrics(), new Date());
         Exception exception = null;
         this._listeners = this.listeners.getListenersImplementing(executor, context, StepListener.class);
         for (final StepListener listener : this._listeners) {
@@ -194,15 +186,16 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         if (exception != null) {
             throw exception;
         }
-
         int timeout = _timeout(jobExecutionId);
-
-        if (!isPartitioned()) { //TODO This looks like a bug in the xsl
+        //TODO This looks like a bug in the xsl
+        if (!isPartitioned()) {
             this.partitions = 1;
             this.contexts = new ArrayList<ExecutionContext>(1);
-            return executor.execute(new TaskExecutable(this.task, context, this.id, -1, timeout));
+            return executor.execute(
+                    new TaskExecutable(thisExecutable, this.task, context, this.id, -1, timeout)
+            );
         } else {
-            final PartitionTarget target = this.partition.map(this.task, executor, context, timeout);
+            final PartitionTarget target = this.partition.map(this.task, executor, thisExecutable, context, timeout);
             this.partitions = target.executables.length;
             this.contexts = new ArrayList<ExecutionContext>(this.partitions);
             return executor.execute(
@@ -216,9 +209,9 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                final CallbackExecutable parentExecutable, final ExecutionContext context,
                                final ExecutionContext childContext) throws Exception {
-        Collections.addAll(this.contexts, childContext);
-        if (this.contexts.size() <= this.partitions) {
-            return null; //TODO
+        this.contexts.add(childContext);
+        if (this.contexts.size() < this.partitions) {
+            return null;
         }
         final long jobExecutionId = context.getJobExecutionId();
         int timeout = _timeout(jobExecutionId);
@@ -227,6 +220,9 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             try {
                 final LinkedList<Item> items = new LinkedList<Item>();
                 for (final ExecutionContext partitionContext : this.contexts) {
+                    if (partitionContext.getItems() == null) {
+                        continue;
+                    }
                     Collections.addAll(items, partitionContext.getItems());
                 }
                 if (this.isPartitioned()) {
@@ -234,7 +230,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                 }
                 Exception exception = null;
                 if (this._listeners == null) {
-                    throw new IllegalStateException(); //TODO Messages
+                    throw new IllegalStateException(Messages.format("step.null.listeners", jobExecutionId, id));
                 }
                 for (final StepListener listener : this._listeners) {
                     try {
@@ -269,10 +265,23 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                 context.getJobContext().setBatchStatus(BatchStatus.FAILED);
                 return null;
             }
-            return this.transition(executor, threadId, context, parentExecutable, this.transitions, this.next, stepContext.getExitStatus());
+            return this.transition(executor, threadId, context, thisExecutable, parentExecutable, this.transitions, this.next, stepContext.getExitStatus());
         } finally {
             log.debugf(Messages.get("step.destroy.step.context"), jobExecutionId, id);
-            context.setStepContext(null);
         }
+    }
+
+    @Override
+    public ExecutionContext createExecutionContext(final ExecutionRepository repository, final ExecutionContext context) throws Exception {
+        log.debugf(Messages.get("step.create.step.context"), context.getJobExecutionId(), id);
+        final MutableJobContext jobContext = context.getJobContext();
+        final RestartableJobExecution jobExecution = repository.getJobExecution(jobContext.getExecutionId());
+        final StepExecution stepExecution = repository.createStepExecution(jobExecution, this);
+        return new ExecutionContextImpl(
+                context.getJob(),
+                jobContext,
+                new StepContextImpl(stepExecution.getStepExecutionId(), this, PropertiesConverter.convert(this.properties)),
+                jobExecution
+        );
     }
 }

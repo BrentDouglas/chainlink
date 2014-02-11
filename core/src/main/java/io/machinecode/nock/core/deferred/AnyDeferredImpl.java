@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class AnyDeferredImpl<T, U extends Throwable> extends DeferredImpl<T, U> {
+public class AnyDeferredImpl<T> extends DeferredImpl<T> {
 
     public AnyDeferredImpl(final Deferred<?>... chain) {
         super(chain);

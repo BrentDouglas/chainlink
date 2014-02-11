@@ -78,6 +78,6 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                                 final CallbackExecutable parentExecutable, final ExecutionContext context,
                                 final ExecutionContext childContext) throws Exception {
-        return this.transition(executor, threadId, context, parentExecutable, this.transitions, null, exitStatus);
+        return this.transition(executor, threadId, context, thisExecutable, parentExecutable, this.transitions, null, exitStatus);
     }
 }

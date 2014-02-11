@@ -87,9 +87,4 @@ public class JobContextImpl implements MutableJobContext {
     public void setExitStatus(final String status) {
         this.exitStatus = status;
     }
-
-    @Override
-    public JobContextImpl copy() {
-        return new JobContextImpl(this);
-    }
 }

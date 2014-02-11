@@ -4,17 +4,13 @@ import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
 import io.machinecode.nock.spi.execution.CallbackExecutable;
-import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.Executor;
-import io.machinecode.nock.spi.execution.Item;
 import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.ExecutionWork;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.context.JobContext;
-import java.util.ArrayList;
-import java.util.Collections;
 
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
@@ -23,8 +19,8 @@ public class ExecutionExecutable extends CallbackExecutableImpl<ExecutionWork> {
 
     private static final Logger log = Logger.getLogger(ExecutionExecutable.class);
 
-    public ExecutionExecutable(final ExecutionWork work, final ExecutionContext context) {
-        super(context, work);
+    public ExecutionExecutable(final CallbackExecutable parent, final ExecutionWork work, final ExecutionContext context) {
+        super(parent, context, work);
     }
 
     @Override

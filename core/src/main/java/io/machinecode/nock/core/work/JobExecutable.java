@@ -20,8 +20,8 @@ public class JobExecutable extends CallbackExecutableImpl<JobWork> {
 
     private static final Logger log = Logger.getLogger(JobExecutable.class);
 
-    public JobExecutable(final JobWork work, final ExecutionContext context) {
-        super(context, work);
+    public JobExecutable(final CallbackExecutable parent, final JobWork work, final ExecutionContext context) {
+        super(parent, context, work);
     }
 
     @Override

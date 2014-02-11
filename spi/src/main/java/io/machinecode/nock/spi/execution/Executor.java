@@ -20,6 +20,8 @@ public interface Executor {
 
     InjectionContext createInjectionContext(ExecutionContext context);
 
+    void putJob(long jobExecutionId, final Deferred<?> deferred);
+
     Deferred<?> getJob(long jobExecutionId);
 
     Deferred<?> removeJob(long jobExecutionId);

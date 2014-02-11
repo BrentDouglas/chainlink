@@ -1,5 +1,6 @@
 package io.machinecode.nock.spi.work;
 
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
@@ -14,6 +15,8 @@ import java.io.Serializable;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public interface ExecutionWork extends Execution, Work, Serializable {
+
+    ExecutionContext createExecutionContext(final ExecutionRepository repository, final ExecutionContext parentContext) throws Exception;
 
     Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
                          final CallbackExecutable parentExecutable, final ExecutionContext context,

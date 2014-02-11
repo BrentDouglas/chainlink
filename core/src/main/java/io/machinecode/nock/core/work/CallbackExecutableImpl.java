@@ -24,12 +24,24 @@ public abstract class CallbackExecutableImpl<T extends Work> extends DeferredImp
 
     protected final T work;
 
+    protected final CallbackExecutable parent;
     protected final ExecutionContext context;
 
-    public CallbackExecutableImpl(final ExecutionContext context, final T work) {
+    public CallbackExecutableImpl(final CallbackExecutable parent, final ExecutionContext context, final T work) {
         super(new Deferred[2]);
+        this.parent = parent;
         this.context = context;
         this.work = work;
+    }
+
+    @Override
+    public CallbackExecutable getParent() {
+        return parent;
+    }
+
+    @Override
+    public ExecutionContext getContext() {
+        return context;
     }
 
     @Override
@@ -86,8 +98,8 @@ public abstract class CallbackExecutableImpl<T extends Work> extends DeferredImp
     }
 
     protected abstract Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
-                                               final ExecutionContext... contexts) throws Throwable;
+                                             final ExecutionContext... contexts) throws Throwable;
 
     protected abstract Deferred<?> doCallback(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
-                                                final ExecutionContext childContext) throws Throwable;
+                                              final ExecutionContext childContext) throws Throwable;
 }

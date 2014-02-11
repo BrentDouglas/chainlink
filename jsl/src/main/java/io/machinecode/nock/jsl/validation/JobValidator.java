@@ -22,12 +22,12 @@ public class JobValidator extends ValidatingVisitor<Job> {
     @Override
     public void doVisit(final Job that, final VisitorNode node) {
         if (that.getId() == null) {
-            node.addProblem(Messages.attributeRequired("id"));
+            node.addProblem(Messages.format("validation.required.attribute", "id"));
         } else {
             node.setTransition(that.getId(), null);
         }
         if (!"1.0".equals(that.getVersion())) {
-            node.addProblem(Messages.attributeMatches("version", that.getVersion(), "1.0"));
+            node.addProblem(Messages.format("validation.matches.attribute", "version", that.getVersion(), "1.0"));
         }
 
         if (that.getListeners() != null) {
@@ -38,14 +38,14 @@ public class JobValidator extends ValidatingVisitor<Job> {
         }
 
         if (that.getExecutions() == null || that.getExecutions().isEmpty()) {
-            node.addProblem(Messages.executionsRequired());
+            node.addProblem(Messages.get("validation.executions.required"));
         } else {
             if (that.getExecutions().get(0) instanceof Decision) {
                 node.addProblem(Messages.format("validation.decision.first.execution"));
             }
             for (final Execution execution : that.getExecutions()) {
                 if (execution == null) {
-                    node.addProblem(Messages.notNullElement("execution"));
+                    node.addProblem(Messages.format("validation.not.null.element", "execution"));
                     continue;
                 }
                 ExcecutionValidator.visit(execution, node);

@@ -2,6 +2,7 @@ package io.machinecode.nock.core.impl;
 
 import io.machinecode.nock.spi.context.MutableMetric;
 import io.machinecode.nock.spi.context.MutableStepContext;
+import io.machinecode.nock.spi.element.execution.Step;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
@@ -26,6 +27,18 @@ public class StepContextImpl implements MutableStepContext {
     private Exception exception;
     private MutableMetric[] metrics;
 
+    public StepContextImpl(final long stepExecutionId, final Step<?,?> step, final Properties properties) {
+        this.stepExecutionId = stepExecutionId;
+        this.stepName = step.getId();
+        this.properties = properties;
+        this.batchStatus = BatchStatus.STARTING; //TODO ?
+        this.exitStatus = null;
+        final MetricType[] values = MetricType.values();
+        this.metrics = new MutableMetric[values.length];
+        for (int i = 0; i < values.length; ++i) {
+            this.metrics[i] = new MutableMetricImpl(values[i]);
+        }
+    }
 
     public StepContextImpl(final StepContext context) {
         this.stepExecutionId = context.getStepExecutionId();
@@ -145,10 +158,5 @@ public class StepContextImpl implements MutableStepContext {
             }
         }
         return null;
-    }
-
-    @Override
-    public MutableStepContext copy() {
-        return new StepContextImpl(this);
     }
 }

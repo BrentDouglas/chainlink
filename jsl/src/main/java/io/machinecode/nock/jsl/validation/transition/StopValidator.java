@@ -19,7 +19,7 @@ public class StopValidator extends ValidatingVisitor<Stop> {
     @Override
     public void doVisit(final Stop that, final VisitorNode context) {
         if (that.getOn() == null) {
-            context.addProblem(Messages.attributeRequired("on"));
+            context.addProblem(Messages.format("validation.required.attribute", "on"));
         }
         //TODO Validate restart is a valid execution id if it exists
     }

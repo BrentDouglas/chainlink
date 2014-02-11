@@ -21,7 +21,7 @@ public class ListenersValidator extends ValidatingVisitor<Listeners> {
     public void doVisit(final Listeners that, final VisitorNode context) {
         for(final Listener listener : that.getListeners()) {
             if (listener == null) {
-                context.addProblem(Messages.notNullElement("listener"));
+                context.addProblem(Messages.format("validation.not.null.element", "listener"));
                 continue;
             }
             ListenerValidator.INSTANCE.visit(listener, context);

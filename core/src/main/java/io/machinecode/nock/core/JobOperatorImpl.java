@@ -7,7 +7,9 @@ import io.machinecode.nock.core.factory.JobFactory;
 import io.machinecode.nock.core.impl.ExecutionContextImpl;
 import io.machinecode.nock.core.impl.DelegateJobExecutionImpl;
 import io.machinecode.nock.core.impl.DelegateStepExecutionImpl;
+import io.machinecode.nock.core.impl.JobContextImpl;
 import io.machinecode.nock.core.model.JobImpl;
+import io.machinecode.nock.core.util.PropertiesConverter;
 import io.machinecode.nock.core.util.ResolvableService;
 import io.machinecode.nock.core.work.JobExecutable;
 import io.machinecode.nock.core.work.RepositoryStatus;
@@ -123,13 +125,13 @@ public class JobOperatorImpl implements JobOperator {
         final long jobExecutionId = execution.getExecutionId();
         final ExecutionContext context = new ExecutionContextImpl(
                 job,
-                job.getId(),
-                instance.getInstanceId(),
+                new JobContextImpl(instance, execution, PropertiesConverter.convert(job.getProperties())),
+                null,
                 execution
         );
         RepositoryStatus.startingJob(repository, jobExecutionId);
-        final Deferred<?> deferred = executor.execute(new JobExecutable(job, context));
-        //TODO put jobs jobExecutionId, deferred
+        final Deferred<?> deferred = executor.execute(new JobExecutable(null, job, context));
+        executor.putJob(jobExecutionId, deferred);
         return new JobOperationImpl(
                 jobExecutionId,
                 deferred,
@@ -138,20 +140,20 @@ public class JobOperatorImpl implements JobOperator {
     }
 
     @Override
-    public long restart(final long executionId, final Properties restartParameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
-        log.tracef(Messages.get("operator.restart"), executionId);
+    public long restart(final long jobExecutionId, final Properties restartParameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
+        log.tracef(Messages.get("operator.restart"), jobExecutionId);
         try {
             final ExecutionRepository repository = executor.getRepository();
-            final RestartableJobExecution execution = repository.getLatestJobExecution(executionId);
+            final RestartableJobExecution execution = repository.getLatestJobExecution(jobExecutionId);
             if (!(BatchStatus.STOPPED.equals(execution.getBatchStatus())
                     || BatchStatus.FAILED.equals(execution.getBatchStatus()))) {
-                throw new JobRestartException(Messages.cantRestartBatchStatus(execution.getExecutionId(), execution.getBatchStatus()));
+                throw new JobRestartException(Messages.format("validation.cant.restart.batch.status", execution.getExecutionId(), BatchStatus.STOPPED, BatchStatus.FAILED, execution.getBatchStatus()));
             }
             final Job theirs = configuration.getJobLoader().load(execution.getJobName());
             final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, restartParameters);
             JobFactory.INSTANCE.validate(job);
             if (!job.isRestartable()) {
-                throw new JobRestartException(Messages.cantRestartJob(execution.getExecutionId()));
+                throw new JobRestartException(Messages.format("validation.cant.restart.job", execution.getExecutionId()));
             }
             if (BatchStatus.COMPLETED.equals(execution.getBatchStatus())) {
                 throw new JobExecutionAlreadyCompleteException();
@@ -159,14 +161,14 @@ public class JobOperatorImpl implements JobOperator {
             final JobInstance instance = repository.createJobInstance(job);
             final ExecutionContext context = new ExecutionContextImpl(
                     job,
-                    job.getId(),
-                    instance.getInstanceId(),
+                    new JobContextImpl(instance, execution, PropertiesConverter.convert(job.getProperties())),
+                    null,
                     execution
             );
-            RepositoryStatus.startingJob(repository, executionId);
-            final Deferred<?> deferred = executor.execute(new JobExecutable(job, context));
-            //TODO put jobs jobExecutionId, deferred
-            return executionId;
+            RepositoryStatus.startingJob(repository, jobExecutionId);
+            final Deferred<?> deferred = executor.execute(new JobExecutable(null, job, context));
+            executor.putJob(jobExecutionId, deferred);
+            return jobExecutionId;
         } catch (final JobRestartException e) {
             throw e;
         } catch (final JobExecutionAlreadyCompleteException e) {

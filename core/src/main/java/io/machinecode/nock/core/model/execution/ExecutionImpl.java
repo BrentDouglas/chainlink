@@ -2,6 +2,7 @@ package io.machinecode.nock.core.model.execution;
 
 import io.machinecode.nock.core.work.ExecutionExecutable;
 import io.machinecode.nock.core.work.RepositoryStatus;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
@@ -36,6 +37,11 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
         return this.id;
     }
 
+    @Override
+    public ExecutionContext createExecutionContext(final ExecutionRepository repository, final ExecutionContext parentContext) throws Exception {
+        return parentContext;
+    }
+
     public String getExitStatus(final String jobStatus, final String executionStatus) {
         return executionStatus != null
                 ? executionStatus
@@ -43,7 +49,7 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
     }
 
     public Deferred<?> transition(final Executor executor, final ThreadId threadId, final ExecutionContext context,
-                                    final CallbackExecutable parentExecutable, final List<? extends TransitionWork> transitions,
+                                  final CallbackExecutable thisExecutable, final CallbackExecutable parentExecutable, final List<? extends TransitionWork> transitions,
                                     final String next, final String executionStatus) throws Exception {
         //if (Status.isStopping(context)) {
         //    return null; //TODO log
@@ -63,7 +69,7 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
                     }
                     log.debugf(Messages.get("execution.transition"), jobExecutionId, id, result.next);
                     RepositoryStatus.finishStep(executor.getRepository(), jobExecutionId, BatchStatus.COMPLETED, exitStatus);
-                    return _runNextExecution(executor, context, threadId, result.next);
+                    return _runNextExecution(executor, thisExecutable, context, threadId, result.next);
                 } else {
                     final String finalStatus = result.exitStatus == null ? exitStatus : result.exitStatus;
                     RepositoryStatus.finishStep(executor.getRepository(), jobExecutionId, result.batchStatus, finalStatus);
@@ -79,21 +85,22 @@ public abstract class ExecutionImpl implements Execution, ExecutionWork {
             return _runCallback(executor, context, parentExecutable);
         }
         if (next != null) {
-            return _runNextExecution(executor, context, threadId, next);
+            return _runNextExecution(executor, thisExecutable, context, threadId, next);
         }
         return _runCallback(executor, context, parentExecutable);
     }
 
     private static Deferred<?> _runCallback(final Executor executor, final ExecutionContext context,
-                                              final CallbackExecutable parentExecutable) {
+                                            final CallbackExecutable parentExecutable) {
         return executor.callback(parentExecutable, context);
     }
 
-    private static Deferred<?> _runNextExecution(final Executor executor, final ExecutionContext context,
-                                                   final ThreadId threadId, final String next) {
+    private static Deferred<?> _runNextExecution(final Executor executor, final CallbackExecutable thisExecutable,
+                                                 final ExecutionContext context, final ThreadId threadId, final String next) throws Exception {
+        final ExecutionWork execution = context.getJob().getNextExecution(next);
         return executor.execute(
                 threadId,
-                new ExecutionExecutable(context.getJob().getNextExecution(next), context)
+                new ExecutionExecutable(thisExecutable, execution, execution.createExecutionContext(executor.getRepository(), context))
         );
     }
 }
