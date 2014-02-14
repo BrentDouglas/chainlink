@@ -5,9 +5,10 @@ import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.deferred.Deferred;
-import io.machinecode.nock.spi.work.JobWork;
 
+import javax.batch.operations.JobExecutionNotRunningException;
 import javax.transaction.TransactionManager;
+import java.util.concurrent.Future;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -20,21 +21,19 @@ public interface Executor {
 
     InjectionContext createInjectionContext(ExecutionContext context);
 
-    void putJob(long jobExecutionId, final Deferred<?> deferred);
+    Deferred<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
 
-    Deferred<?> getJob(long jobExecutionId);
+    Deferred<?> removeJob(long jobExecutionId) throws JobExecutionNotRunningException;
 
-    Deferred<?> removeJob(long jobExecutionId);
+    Deferred<?> execute(final long jobExecutionId, final Executable executable);
 
     Deferred<?> execute(final Executable executable);
 
-    Deferred<?> callback(final CallbackExecutable executable, final ExecutionContext context);
-
-    Deferred<?> execute(final ThreadId threadId, final Executable executable);
-
-    Deferred<?> callback(final ThreadId threadId, final CallbackExecutable executable, final ExecutionContext context);
-
     Deferred<?> execute(final int maxThreads, final Executable... executables);
 
+    Deferred<?> callback(final Executable executable, final ExecutionContext context);
+
     Worker getWorker(final ThreadId threadId);
+
+    Future<?> cancel(Deferred<?> deferred);
 }

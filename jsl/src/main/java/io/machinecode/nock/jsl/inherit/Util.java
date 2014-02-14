@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.inherit;
 
-import io.machinecode.nock.jsl.xml.XmlInheritableBase;
+import io.machinecode.nock.jsl.xml.XmlInheritable;
 import io.machinecode.nock.spi.Copyable;
 import io.machinecode.nock.spi.Inheritable;
 import io.machinecode.nock.spi.JobRepository;
@@ -57,7 +57,7 @@ public class Util {
             return parent == null ? null : parent.copy();
         }
         final X that = child.copy();
-        if (that instanceof XmlInheritableBase) {
+        if (that instanceof XmlInheritable) {
             ((Inheritable)that).inherit(repository, defaultJobXml);
         }
         return that.merge(parent);

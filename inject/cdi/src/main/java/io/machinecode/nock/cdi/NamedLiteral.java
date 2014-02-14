@@ -8,8 +8,6 @@ import javax.inject.Named;
  */
 public class NamedLiteral extends AnnotationLiteral<Named> implements Named {
 
-    public static final String DEFAULT_VALUE = "";
-
     private final String value;
 
     public NamedLiteral(final String value) {

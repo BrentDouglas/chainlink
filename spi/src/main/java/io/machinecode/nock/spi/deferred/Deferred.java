@@ -27,4 +27,10 @@ public interface Deferred<T> extends Future<T> {
     void onReject(final Listener listener);
 
     void onCancel(final Listener listener);
+
+    void traverse(final Listener listener);
+
+    void await() throws InterruptedException, ExecutionException;
+
+    void await(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;
 }

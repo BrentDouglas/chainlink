@@ -9,7 +9,6 @@ import io.machinecode.nock.core.model.ListenersImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.execution.ExecutionImpl;
 import io.machinecode.nock.jsl.validation.InvalidJobException;
-import io.machinecode.nock.jsl.validation.InvalidTransitionException;
 import io.machinecode.nock.jsl.validation.JobValidator;
 import io.machinecode.nock.jsl.visitor.VisitorNode;
 import io.machinecode.nock.spi.element.Job;
@@ -24,7 +23,7 @@ public class JobFactory {
 
     public static final JobFactory INSTANCE = new JobFactory();
 
-    public JobImpl produceExecution(final Job that, final Properties parameters) {
+    public JobImpl produceExecution(final Job that, final Properties parameters) throws InvalidJobException {
         final VisitorNode before = JobValidator.INSTANCE.visit(that);
         if (JobValidator.hasFailed(before)) {
             throw new InvalidJobException(before);
@@ -49,10 +48,9 @@ public class JobFactory {
 
     public VisitorNode validate(final Job job) {
         final VisitorNode node = JobValidator.INSTANCE.visit(job);
-        boolean failed = JobValidator.hasCycle(node);
-        failed = JobValidator.hasInvalidTransfer(node) || failed;
+        boolean failed = JobValidator.findProblems(node);
         if (failed) {
-            throw new InvalidTransitionException(node);
+            throw new InvalidJobException(node);
         }
         return node;
     }

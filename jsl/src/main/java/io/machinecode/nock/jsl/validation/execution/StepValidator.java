@@ -25,9 +25,9 @@ public class StepValidator extends ValidatingVisitor<Step> {
     @Override
     public void doVisit(final Step that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Messages.format("validation.required.attribute", "id"));
+            context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "id"));
         } else {
-            context.setTransition(that.getId(), that.getNext());
+            context.addTransition(Messages.get("NOCK-002301.validation.next.attribute"), that.getNext());
         }
         //if (that.getStartLimit() < 0) {
         //    context.addProblem(Problem.attributePositive("start-limit", that.getStartLimit()));
@@ -36,7 +36,7 @@ public class StepValidator extends ValidatingVisitor<Step> {
         if (that.getTransitions() != null) {
             for (final Object transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Messages.format("validation.not.null.element", "transition"));
+                    context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "transition"));
                 }
                 TransitionValidator.visit((Transition) transition, context);
             }

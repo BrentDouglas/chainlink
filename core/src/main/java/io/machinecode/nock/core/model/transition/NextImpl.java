@@ -3,6 +3,8 @@ package io.machinecode.nock.core.model.transition;
 import io.machinecode.nock.spi.element.transition.Next;
 import org.jboss.logging.Logger;
 
+import javax.batch.runtime.BatchStatus;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
@@ -23,12 +25,32 @@ public class NextImpl extends TransitionImpl implements Next {
     }
 
     @Override
-    public Result runTransition(final String id) throws Exception {
-        return Result.next(this.to);
+    public String element() {
+        return Next.ELEMENT;
     }
 
     @Override
-    public String element() {
-        return Next.ELEMENT;
+    public String getExitStatus() {
+        return null;
+    }
+
+    @Override
+    public BatchStatus getBatchStatus() {
+        return null;
+    }
+
+    @Override
+    public String getNext() {
+        return this.to;
+    }
+
+    @Override
+    public String getRestartId() {
+        return null;
+    }
+
+    @Override
+    public boolean isTerminating() {
+        return false;
     }
 }

@@ -13,12 +13,8 @@ public class StopBatchlet extends javax.batch.api.AbstractBatchlet {
     @Override
     public String process() throws Exception {
         hasRun.set(true);
-        try {
-            synchronized (this) {
-                wait();
-            }
-        } catch (final InterruptedException e) {
-            //
+        synchronized (this) {
+            wait();
         }
         return BatchStatus.COMPLETED.toString();
     }

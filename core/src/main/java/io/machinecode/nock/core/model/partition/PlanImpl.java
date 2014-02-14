@@ -59,12 +59,12 @@ public class PlanImpl implements Plan, StrategyWork {
         try {
             threads = Integer.parseInt(this.threads);
         } catch (final NumberFormatException e) {
-            throw new BatchRuntimeException(Messages.format("plan.threads.not.integer", jobExecutionId, this.threads), e);
+            throw new BatchRuntimeException(Messages.format("NOCK-012000.plan.threads.not.integer", jobExecutionId, this.threads), e);
         }
         try {
             partitions = Integer.parseInt(this.partitions);
         } catch (final NumberFormatException e) {
-            throw new BatchRuntimeException(Messages.format("plan.partitions.not.integer", jobExecutionId, this.partitions), e);
+            throw new BatchRuntimeException(Messages.format("NOCK-012001.plan.partitions.not.integer", jobExecutionId, this.partitions), e);
         }
         return new PartitionPlanImpl(
                 partitions,

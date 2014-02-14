@@ -1,6 +1,7 @@
 package io.machinecode.nock.core.local;
 
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.transaction.HeuristicMixedException;
@@ -41,12 +42,10 @@ public class LocalTransaction implements Transaction {
                 case Status.STATUS_ACTIVE:
                     break;
                 default:
-                    //Rollback
-                    throw new RollbackException();
+                    throw new RollbackException(Messages.format("NOCK-007000.transaction.cant.commit", status, _status(Status.STATUS_ACTIVE)));
             }
             if (this.timeout < end) {
-                //Rollback
-                throw new RollbackException();
+                throw new RollbackException(Messages.format("NOCK-007003.transaction.timed.out"));
             }
             //this.status = Status.STATUS_COMMITTING;
             //XA
@@ -63,7 +62,7 @@ public class LocalTransaction implements Transaction {
             switch (this.status) {
                 case Status.STATUS_COMMITTED:
                 case Status.STATUS_PREPARED:
-                    throw new IllegalStateException();
+                    throw new IllegalStateException(Messages.format("NOCK-007001.transaction.cant.rollback", _status(status)));
             }
             this.status = Status.STATUS_ROLLEDBACK;
             _after(Status.STATUS_ROLLEDBACK);
@@ -75,7 +74,7 @@ public class LocalTransaction implements Transaction {
     @Override
     public void setRollbackOnly() throws IllegalStateException, SystemException {
         if (this.status != Status.STATUS_ACTIVE) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(Messages.format("NOCK-007002.transaction.cant.set.rollback.only", _status(status), _status(Status.STATUS_MARKED_ROLLBACK), _status(Status.STATUS_ACTIVE)));
         }
         this.status = Status.STATUS_MARKED_ROLLBACK;
     }
@@ -110,9 +109,9 @@ public class LocalTransaction implements Transaction {
             case Status.STATUS_MARKED_ROLLBACK:
             case Status.STATUS_ROLLING_BACK:
             case Status.STATUS_ROLLEDBACK:
-                throw new RollbackException();
+                throw new RollbackException(Messages.format("NOCK-007004.transaction.rolling.back", _status(status)));
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException(Messages.format("NOCK-007005.transaction.illegal.state", _status(status)));
         }
     }
 
@@ -125,6 +124,7 @@ public class LocalTransaction implements Transaction {
                 sync.beforeCompletion();
             } catch (final Exception e) {
                 this.status = Status.STATUS_MARKED_ROLLBACK;
+                log.tracef(e, Messages.get("NOCK-007100.transaction.before.completion.exception"));
             }
         }
     }
@@ -137,9 +137,30 @@ public class LocalTransaction implements Transaction {
             try {
                 sync.afterCompletion(status);
             } catch (final Exception e) {
-                // TODO log.error();
+                log.tracef(e, Messages.get("NOCK-007101.transaction.after.completion.exception"));
             }
         }
         this.syncs.clear();
+    }
+
+    @Override
+    public String toString() {
+        return "LocalTransaction[status=" + _status(status) + ",timeout=" + timeout + ",syncs=" + (syncs == null ? 0 : syncs.size()) + "]";
+    }
+
+    private static String _status(final int status) {
+        switch (status) {
+            case Status.STATUS_ACTIVE: return "STATUS_ACTIVE";
+            case Status.STATUS_MARKED_ROLLBACK: return "STATUS_MARKED_ROLLBACK";
+            case Status.STATUS_PREPARED: return "STATUS_PREPARED";
+            case Status.STATUS_COMMITTED: return "STATUS_COMMITTED";
+            case Status.STATUS_ROLLEDBACK: return "STATUS_ROLLEDBACK";
+            case Status.STATUS_UNKNOWN: return "STATUS_UNKNOWN";
+            case Status.STATUS_NO_TRANSACTION: return "STATUS_NO_TRANSACTION";
+            case Status.STATUS_PREPARING: return "STATUS_PREPARING";
+            case Status.STATUS_COMMITTING: return "STATUS_COMMITTING";
+            case Status.STATUS_ROLLING_BACK: return "STATUS_ROLLING_BACK";
+        }
+        return Integer.toString(status);
     }
 }

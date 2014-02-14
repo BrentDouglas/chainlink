@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentJob extends FluentInheritableBase<FluentJob> implements InheritableJob<FluentJob, FluentProperties, FluentListeners, FluentExecution>, Job {
+public class FluentJob extends FluentInheritable<FluentJob> implements InheritableJob<FluentJob, FluentProperties, FluentListeners, FluentExecution>, Job {
 
     private String id;
     private String version = "1.0";

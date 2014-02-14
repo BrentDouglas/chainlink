@@ -2,18 +2,20 @@ package io.machinecode.nock.core.model.execution;
 
 import io.machinecode.nock.core.model.transition.TransitionImpl;
 import io.machinecode.nock.core.work.ExecutionExecutable;
+import io.machinecode.nock.core.work.Statuses;
 import io.machinecode.nock.spi.context.ExecutionContext;
+import io.machinecode.nock.spi.context.MutableJobContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
 import io.machinecode.nock.spi.element.execution.Flow;
-import io.machinecode.nock.spi.execution.CallbackExecutable;
 import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.util.Messages;
+import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.TransitionWork;
 import org.jboss.logging.Logger;
 
-import java.util.Collections;
+import javax.batch.runtime.BatchStatus;
 import java.util.List;
 
 /**
@@ -53,20 +55,34 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     // Lifecycle
 
     @Override
-    public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
-                                 final CallbackExecutable parentExecutable, final ExecutionContext context,
-                                 final ExecutionContext... contexts) throws Exception {
-        log.debugf(Messages.get("flow.run"), context.getJobExecutionId(), id);
+    public Deferred<?> before(final Executor executor, final ThreadId threadId, final Executable thisCallback,
+                              final Executable parentCallback, final ExecutionContext context) throws Exception {
+        log.debugf(Messages.get("NOCK-020000.flow.before"), context, id);
+        final ExecutionWork execution = this.executions.get(0);
         return executor.execute(
-                new ExecutionExecutable(thisExecutable, this.executions.get(0), context)
+                new ExecutionExecutable(thisCallback, execution, context)
         );
     }
 
     @Override
-    public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
-                                final CallbackExecutable parentExecutable, final ExecutionContext context,
-                                final ExecutionContext childContext) throws Exception {
-        log.debugf(Messages.get("flow.after"), context.getJobExecutionId(), id);
-        return this.transition(executor, threadId, context, thisExecutable, parentExecutable, Collections.<TransitionWork>emptyList(), this.next, null);
+    public Deferred<?> after(final Executor executor, final ThreadId threadId, final Executable callback,
+                             final ExecutionContext context, final ExecutionContext childContext) throws Exception {
+        log.debugf(Messages.get("NOCK-020001.flow.after"), context, id);
+        final MutableJobContext jobContext = context.getJobContext();
+        final BatchStatus batchStatus = jobContext.getBatchStatus();
+        if (Statuses.isStopping(batchStatus) || Statuses.isFailed(batchStatus)) {
+            return runCallback(executor, context, callback);
+        }
+        final TransitionWork transition = this.transition(context, this.transitions, jobContext.getBatchStatus(), jobContext.getExitStatus());
+        if (transition != null && transition.isTerminating()) {
+            return runCallback(executor, context, callback);
+        } else {
+            return this.next(executor, threadId, context, callback, this.next, transition);
+        }
+    }
+
+    @Override
+    protected Logger log() {
+        return log;
     }
 }

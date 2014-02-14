@@ -9,7 +9,6 @@ import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.execution.Executor;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
-import sun.reflect.Reflection;
 
 import java.util.Properties;
 
@@ -39,9 +38,9 @@ public abstract class BaseTest extends Assert {
         return _repository;
     }
 
-    protected final Executor transport() {
+    protected final Executor executor() {
         if (this._executor == null) {
-            this._executor = _transport();
+            this._executor = _executor();
         }
         return _executor;
     }
@@ -59,13 +58,13 @@ public abstract class BaseTest extends Assert {
         return new LocalRepository();
     }
 
-    protected final Executor _transport() {
+    protected final Executor _executor() {
         return new EventedExecutor(configuration(), 1);
     }
 
     protected void printMethodName() {
-        log.info("");
-        log.info("Running test: " + Thread.currentThread().getStackTrace()[2].getMethodName());
-        log.info("");
+        log.infof("");
+        log.infof("Running test: " + Thread.currentThread().getStackTrace()[2].getMethodName());
+        log.infof("");
     }
 }

@@ -23,15 +23,15 @@ public class FlowValidator extends ValidatingVisitor<Flow> {
     @Override
     public void doVisit(final Flow that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Messages.format("validation.required.attribute", "id"));
+            context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "id"));
         } else {
-            context.setTransition(that.getId(), that.getNext());
+            context.addTransition(Messages.get("NOCK-002301.validation.next.attribute"), that.getNext());
         }
 
         if (that.getTransitions() != null) {
             for (final Transition transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Messages.format("validation.not.null.element", "transitions"));
+                    context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "transitions"));
                 }
                 TransitionValidator.visit(transition, context);
             }
@@ -39,14 +39,16 @@ public class FlowValidator extends ValidatingVisitor<Flow> {
 
 
         if (that.getExecutions() == null || that.getExecutions().isEmpty()) {
-            //context.addProblem(Messages.executionsRequired()); //TODO Surely this is a thing
+            //TODO Surely this is a thing
+            //context.addProblem(Messages.get("validation.executions.required"));
         } else {
             if (that.getExecutions().get(0) instanceof Decision) {
-                context.addProblem(Messages.format("validation.decision.first.execution"));
+                context.addProblem(Messages.format("NOCK-002101.validation.decision.first.execution"));
             }
+            context.addChildTransition(Messages.get("NOCK-002302.validation.flow.implicit"), that.getExecutions().get(0).getId());
             for (final Execution execution : that.getExecutions()) {
                 if (execution == null) {
-                    context.addProblem(Messages.format("validation.not.null.element", "execution"));
+                    context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "execution"));
                     continue;
                 }
                 ExcecutionValidator.visit(execution, context);

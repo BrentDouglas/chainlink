@@ -2,6 +2,7 @@ package io.machinecode.nock.cdi;
 
 import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.Injector;
+import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.util.Pair;
 
 import javax.batch.api.BatchProperty;
@@ -11,6 +12,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
+import java.lang.reflect.Member;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Iterator;
@@ -35,7 +37,7 @@ public class CdiInjector implements Injector {
         if (iterator.hasNext()) {
             provider = iterator.next();
         } else {
-            throw new IllegalStateException(); //TODO Messages
+            throw new IllegalStateException(Messages.format("NOCK-000000.injector.provider.unavailable"));
         }
     }
 
@@ -50,22 +52,13 @@ public class CdiInjector implements Injector {
     @Dependent
     @BatchProperty
     public String getBatchProperty(final InjectionPoint injectionPoint) {
-        final String batchProperty = injectionPoint.getAnnotated().getAnnotation(BatchProperty.class).name();
-        final String name;
-        if (BatchPropertyLiteral.DEFAULT_NAME.equals(batchProperty)) {
-            name = injectionPoint.getMember().getName();
-        } else {
-            name = batchProperty;
+        final BatchProperty batchProperty = injectionPoint.getAnnotated().getAnnotation(BatchProperty.class);
+        final Member field = injectionPoint.getMember();
+        final String property = _property(batchProperty.name(), field.getName(), provider.getInjectables().getProperties());
+        if (property == null || "".equals(property)) {
+            return null;
         }
-        final List<? extends Pair<String, String>> properties = provider.getInjectables().getProperties();
-        final ListIterator<? extends Pair<String, String>> iterator = properties.listIterator(properties.size());
-        while (iterator.hasPrevious()) {
-            final Pair<String, String> pair = iterator.previous();
-            if (name.equals(pair.getName())) {
-                return pair.getValue();
-            }
-        }
-        return null;
+        return property;
     }
 
     @Produces
@@ -80,5 +73,22 @@ public class CdiInjector implements Injector {
     @Default
     public StepContext getStepContext() {
         return provider.getInjectables().getStepContext();
+    }
+
+    public static String _property(final String batchProperty, final String defaultName, final List<? extends Pair<String, String>> properties) {
+        final String name;
+        if (BatchPropertyLiteral.DEFAULT_NAME.equals(batchProperty)) {
+            name = defaultName;
+        } else {
+            name = batchProperty;
+        }
+        final ListIterator<? extends Pair<String, String>> iterator = properties.listIterator(properties.size());
+        while (iterator.hasPrevious()) {
+            final Pair<String, String> pair = iterator.previous();
+            if (name.equals(pair.getName())) {
+                return pair.getValue();
+            }
+        }
+        return null;
     }
 }

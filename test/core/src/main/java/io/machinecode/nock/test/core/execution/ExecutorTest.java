@@ -10,6 +10,7 @@ import io.machinecode.nock.test.core.execution.artifact.batchlet.InjectedBatchle
 import io.machinecode.nock.test.core.execution.artifact.batchlet.RunBatchlet;
 import io.machinecode.nock.test.core.execution.artifact.batchlet.StopBatchlet;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.batch.runtime.BatchStatus;
@@ -21,11 +22,20 @@ import java.util.concurrent.CancellationException;
  */
 public abstract class ExecutorTest extends BaseTest {
 
+    protected JobOperatorImpl operator;
+
+    @Before
+    public void before() {
+        if (operator == null) {
+            operator = new JobOperatorImpl(configuration(), executor());
+        }
+    }
+
     @Test
     public void runBatchletTest() throws Exception {
         printMethodName();
         final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
-                .setId("ran-job")
+                .setId("run-job")
                 .addExecution(
                         Jsl.stepWithBatchletAndPlan()
                                 .setId("step")
@@ -34,11 +44,10 @@ public abstract class ExecutorTest extends BaseTest {
                                                 .setRef("run-batchlet")
                                 )
                 ), PARAMETERS);
-        final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
-        final JobOperationImpl operation = operator.start(job);
+        final JobOperationImpl operation = operator.startJob(job, "run-job", PARAMETERS);
         final JobExecution execution = repository().getJobExecution(operation.getJobExecutionId());
         operation.get();
-        Assert.assertTrue(RunBatchlet.hasRun.get());
+        Assert.assertTrue("RunBatchlet hasn't run yet", RunBatchlet.hasRun.get());
         Assert.assertEquals("Batch Status", BatchStatus.COMPLETED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());
         Assert.assertEquals("Exit  Status", BatchStatus.COMPLETED.name(), repository().getJobExecution(execution.getExecutionId()).getExitStatus());
     }
@@ -56,11 +65,10 @@ public abstract class ExecutorTest extends BaseTest {
                                                 .setRef("stop-batchlet")
                                 )
                 ), PARAMETERS);
-        final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
-        final JobOperationImpl operation = operator.start(job);
+        final JobOperationImpl operation = operator.startJob(job, "stop-job", PARAMETERS);
         final JobExecution execution = repository().getJobExecution(operation.getJobExecutionId());
         Thread.sleep(100);
-        Assert.assertTrue("Stop batchlet hasn't run yet", StopBatchlet.hasRun.get());
+        Assert.assertTrue("StopBatchlet hasn't run yet", StopBatchlet.hasRun.get());
         operator.stop(operation.getJobExecutionId());
         //Assert.assertTrue("Operation hasn't been cancelled", operation.isDone()); //Some wierdness in AllDeferred's done/Cancelled
         try {
@@ -68,7 +76,7 @@ public abstract class ExecutorTest extends BaseTest {
         } catch (final CancellationException e) {
             //
         }
-        Assert.assertTrue("Stop batchlet hasn't stopped yet", StopBatchlet.hasStopped.get());
+        Assert.assertTrue("StopBatchlet hasn't stopped yet", StopBatchlet.hasStopped.get());
         Assert.assertEquals("Batch Status", BatchStatus.STOPPED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());
         Assert.assertEquals("Exit  Status", BatchStatus.STOPPED.name(), repository().getJobExecution(execution.getExecutionId()).getExitStatus());
     }
@@ -86,11 +94,10 @@ public abstract class ExecutorTest extends BaseTest {
                                                 .setRef("fail-batchlet")
                                 )
                 ), PARAMETERS);
-        final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
-        final JobOperationImpl operation = operator.start(job);
+        final JobOperationImpl operation = operator.startJob(job, "fail-job", PARAMETERS);
         final JobExecution execution = repository().getJobExecution(operation.getJobExecutionId());
         operation.get();
-        Assert.assertTrue(FailBatchlet.hasRun.get());
+        Assert.assertTrue("FailBatchlet hasn't run yet", FailBatchlet.hasRun.get());
         Assert.assertEquals("Batch Status", BatchStatus.FAILED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());
         Assert.assertEquals("Exit  Status", BatchStatus.FAILED.name(), repository().getJobExecution(execution.getExecutionId()).getExitStatus());
     }
@@ -109,11 +116,10 @@ public abstract class ExecutorTest extends BaseTest {
                                                 .addProperty("property", "value")
                                 )
                 ), PARAMETERS);
-        final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
-        final JobOperationImpl operation = operator.start(job);
+        final JobOperationImpl operation = operator.startJob(job, "injected-job", PARAMETERS);
         final JobExecution execution = repository().getJobExecution(operation.getJobExecutionId());
         operation.get();
-        Assert.assertTrue(InjectedBatchlet.hasRun.get());
+        Assert.assertTrue("InjectedBatchlet hasn't run yet", InjectedBatchlet.hasRun.get());
         Assert.assertEquals("Batch Status", BatchStatus.COMPLETED, repository().getJobExecution(execution.getExecutionId()).getBatchStatus());
         Assert.assertEquals("Exit  Status", BatchStatus.COMPLETED.name(), repository().getJobExecution(execution.getExecutionId()).getExitStatus());
     }

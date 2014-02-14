@@ -6,7 +6,8 @@ import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.deferred.DeferredImpl;
-import io.machinecode.nock.core.work.RepositoryStatus;
+import io.machinecode.nock.core.work.ItemImpl;
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.MutableStepContext;
 import io.machinecode.nock.spi.element.task.Batchlet;
@@ -20,6 +21,7 @@ import org.jboss.logging.Logger;
 
 import javax.batch.operations.BatchRuntimeException;
 import javax.batch.runtime.BatchStatus;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -32,75 +34,127 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     private static final Logger log = Logger.getLogger(BatchletImpl.class);
 
     private final PartitionImpl<?> partition;
-    private transient javax.batch.api.Batchlet batchlet;
 
-    private final DeferredImpl<ExecutionContext> delegate = new DeferredImpl<ExecutionContext>();
+    private final Delegate delegate = new Delegate();
 
     public BatchletImpl(final TypedArtifactReference<javax.batch.api.Batchlet> ref, final PropertiesImpl properties, final PartitionImpl<?> partition) {
         super(ref, properties);
         this.partition = partition;
     }
 
+    // Lifecycle
+
+    private transient volatile javax.batch.api.Batchlet _batchlet;
+    private transient volatile ExecutionContext _context;
+
     @Override
     public void run(final Executor executor, final ExecutionContext context, final int timeout) throws Exception {
-        final long jobExecutionId = context.getJobExecutionId();
+        this._context = context;
         final Long stepExecutionId = context.getStepExecutionId();
+        final Integer partitionId = context.getPartitionId();
         final MutableStepContext stepContext = context.getStepContext();
-        synchronized (this) {
-            if (delegate.isCancelled()) {
-                log.debugf(Messages.get("batchlet.cancelled"), jobExecutionId, stepExecutionId, getRef());
-                return;
-            }
-            batchlet = load(executor, context);
-        }
-        BatchStatus batchStatus = BatchStatus.COMPLETED;
-        String exitStatus = null;
+        final ExecutionRepository repository = executor.getRepository();
+        stepContext.setBatchStatus(BatchStatus.STARTED);
         Throwable throwable = null;
-        Item item = null;
         try {
-            if (batchlet == null) {
-                throw new IllegalStateException(getRef()); //TODO
+            if (partitionId != null) {
+                repository.updatePartitionExecution(
+                        stepExecutionId,
+                        partitionId,
+                        stepContext.getPersistentUserData(),
+                        BatchStatus.STARTED,
+                        new Date()
+                );
             }
-            log.debugf(Messages.get("batchlet.process"), jobExecutionId, stepExecutionId, getRef());
-            exitStatus = batchlet.process();
-            log.debugf(Messages.get("batchlet.status"), jobExecutionId, stepExecutionId, getRef(), exitStatus);
-            resolve(null);
-        } catch (final Throwable e) {
-            stepContext.setBatchStatus(BatchStatus.FAILED);
-            context.getJobContext().setBatchStatus(BatchStatus.FAILED);
-            batchStatus = BatchStatus.FAILED;
-            throwable = e;
-        } finally {
-            if (partition != null) {
-                item = partition.collect(this, executor, context, batchStatus, exitStatus);
+            synchronized (this) {
+                if (isCancelled()) {
+                    log.debugf(Messages.get("NOCK-013100.batchlet.cancelled"), this._context, getRef());
+                    stepContext.setBatchStatus(BatchStatus.STOPPING);
+                    resolve(context);
+                    if (partitionId != null) {
+                        repository.finishPartitionExecution(
+                                stepExecutionId,
+                                partitionId,
+                                stepContext.getPersistentUserData(),
+                                BatchStatus.STOPPED,
+                                stepContext.getExitStatus(),
+                                new Date()
+                        );
+                    }
+                    return;
+                }
+                this._batchlet = load(executor, context);
+            }
+            try {
+                if (this._batchlet == null) {
+                    stepContext.setBatchStatus(BatchStatus.FAILED);
+                    reject(new IllegalStateException(Messages.format("NOCK-013001.batchlet.not.injected", this._context, getRef())));
+                    if (partitionId != null) {
+                        repository.finishPartitionExecution(
+                                stepExecutionId,
+                                partitionId,
+                                stepContext.getPersistentUserData(),
+                                BatchStatus.FAILED,
+                                stepContext.getExitStatus(),
+                                new Date()
+                        );
+                    }
+                    return;
+                }
+                log.debugf(Messages.get("NOCK-013101.batchlet.process"), this._context, getRef());
+                final String exitStatus = this._batchlet.process();
+                log.debugf(Messages.get("NOCK-013102.batchlet.status"), this._context, getRef(), exitStatus);
+                if (stepContext.getExitStatus() == null) {
+                    // TODO Challenge why process even returns anything, should be void
+                    // Also, the RI doesn't set this until after running step listeners
+                    stepContext.setExitStatus(exitStatus);
+                }
+            } catch (final Throwable e) {
+                if (e instanceof Exception) {
+                    stepContext.setException((Exception)e);
+                }
+                stepContext.setBatchStatus(BatchStatus.FAILED);
+                throwable = e;
+            }
+            if (isCancelled()) {
+                if (stepContext.getBatchStatus() != BatchStatus.FAILED) {
+                    stepContext.setBatchStatus(BatchStatus.STOPPING);
+                }
+            }
+            final Item item;
+            if (this.partition != null) {
+                item = this.partition.collect(this, executor, context, stepContext.getBatchStatus(), stepContext.getExitStatus());
             } else {
-                stepContext.setBatchletStatus(exitStatus);
+                item = new ItemImpl(null, stepContext.getBatchStatus(), stepContext.getExitStatus());
             }
-        }
-        if (delegate.isCancelled()) {
-            context.getStepContext().setBatchStatus(BatchStatus.STOPPED);
-            context.getJobContext().setBatchStatus(BatchStatus.STOPPED);
-            RepositoryStatus.stoppedJob(executor.getRepository(), jobExecutionId, context.getStepContext().getExitStatus());
-        }
-        if (item != null) {
-            context.setItems(new Item[]{item});
-        }
-        //TODO These should be in a finally block
-        if (throwable != null) {
-            reject(throwable);
-        } else {
-            resolve(context);
+            context.setItems(item);
+        } finally {
+            final BatchStatus batchStatus;
+            if (isCancelled()) {
+                stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
+            } else if (throwable != null) {
+                batchStatus = BatchStatus.FAILED;
+                reject(throwable);
+            } else {
+                batchStatus = BatchStatus.COMPLETED;
+                resolve(context);
+            }
+            if (partitionId != null) {
+                repository.finishPartitionExecution(
+                        stepExecutionId,
+                        partitionId,
+                        stepContext.getPersistentUserData(),
+                        batchStatus,
+                        stepContext.getExitStatus(),
+                        new Date()
+                );
+            }
         }
     }
 
     @Override
     public TaskWork partition(final PropertyContext context) {
         return BatchletFactory.INSTANCE.producePartitioned(this, null, this.partition, context);
-    }
-
-    @Override
-    public boolean isPartitioned() {
-        return partition != null;
     }
 
     @Override
@@ -149,21 +203,42 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
-    public boolean cancel(final boolean mayInterruptIfRunning) {
-        final boolean ret = delegate.cancel(mayInterruptIfRunning);
-        if (batchlet != null) {
-            try {
-                log.debugf(Messages.get("batchlet.stop"), getRef());
-                batchlet.stop();
-            } catch (final Exception e) {
-                throw new BatchRuntimeException(Messages.format("batchlet.stop.exception", getRef()), e);
-            }
-        }
-        return ret;
+    public void traverse(final Listener listener) {
+        delegate.traverse(listener);
     }
 
     @Override
-    public boolean isCancelled() {
+    public void await() throws InterruptedException, ExecutionException {
+        delegate.await();
+    }
+
+    @Override
+    public void await(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        delegate.await(timeout, unit);
+    }
+
+    @Override
+    public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
+        if (this._batchlet != null) {
+            try {
+                log.debugf(Messages.get("NOCK-013103.batchlet.stop"), this._context, getRef());
+                this._batchlet.stop();
+            } catch (final Exception e) {
+                reject(new BatchRuntimeException(Messages.format("NOCK-013000.batchlet.stop.exception", this._context, getRef()), e));
+            }
+        }
+        if (this._context != null) {
+            final MutableStepContext stepContext = this._context.getStepContext();
+            if (stepContext != null) {
+                stepContext.setBatchStatus(BatchStatus.STOPPING);
+            }
+        }
+        notifyAll();
+        return delegate.cancel(mayInterruptIfRunning);
+    }
+
+    @Override
+    public synchronized boolean isCancelled() {
         return delegate.isCancelled();
     }
 
@@ -180,5 +255,27 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     @Override
     public ExecutionContext get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         return delegate.get(timeout, unit);
+    }
+
+    private class Delegate extends DeferredImpl<ExecutionContext> {
+        @Override
+        protected String getResolveLogMessage() {
+            return Messages.format("NOCK-013200.batchlet.resolve", BatchletImpl.this._context, BatchletImpl.this.getRef());
+        }
+
+        @Override
+        protected String getRejectLogMessage() {
+            return Messages.format("NOCK-013201.batchlet.reject", BatchletImpl.this._context, BatchletImpl.this.getRef());
+        }
+
+        @Override
+        protected String getCancelLogMessage() {
+            return Messages.format("NOCK-013202.batchlet.cancel", BatchletImpl.this._context, BatchletImpl.this.getRef());
+        }
+
+        @Override
+        protected String getTimeoutExceptionMessage() {
+            return Messages.format("NOCK-013002.batchlet.timeout", BatchletImpl.this._context, BatchletImpl.this.getRef());
+        }
     }
 }

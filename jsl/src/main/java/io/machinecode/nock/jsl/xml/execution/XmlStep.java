@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.jsl.inherit.execution.InheritableStep;
-import io.machinecode.nock.jsl.xml.XmlInheritableBase;
+import io.machinecode.nock.jsl.xml.XmlInheritable;
 import io.machinecode.nock.jsl.xml.XmlListeners;
 import io.machinecode.nock.jsl.xml.XmlProperties;
 import io.machinecode.nock.jsl.xml.partition.XmlPartition;
@@ -39,7 +39,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "transitions"
 //})
 public class XmlStep
-        extends XmlInheritableBase<XmlStep>
+        extends XmlInheritable<XmlStep>
         implements XmlExecution<XmlStep>, InheritableStep<XmlStep, XmlProperties, XmlListeners, XmlTask, XmlTransition, XmlPartition> {
 
     @XmlID

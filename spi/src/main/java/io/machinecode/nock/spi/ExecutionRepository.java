@@ -4,6 +4,7 @@ import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Step;
 
 import javax.batch.operations.JobExecutionNotMostRecentException;
+import javax.batch.operations.JobRestartException;
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -26,9 +27,9 @@ public interface ExecutionRepository {
 
     // Create
 
-    JobInstance createJobInstance(final Job job) throws Exception;
+    ExtendedJobInstance createJobInstance(final Job job, final String jslName) throws Exception;
 
-    RestartableJobExecution createJobExecution(final JobInstance jobInstance) throws Exception;
+    ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception;
 
     /**
      * Must have batch status set to {@link BatchStatus#STARTING}.
@@ -38,12 +39,16 @@ public interface ExecutionRepository {
      * @return
      * @throws Exception
      */
-    StepExecution createStepExecution(final JobExecution jobExecution, final Step<?,?> step) throws Exception;
+    ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final Step<?,?> step, final Date timestamp) throws Exception;
+
+    PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Date timestamp) throws Exception;
+
+    PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception;
 
     // Update
 
     /**
-     * The {@link JobExecution} with {@param executionId} MUST have its batch status set to {@link BatchStatus#STARTED}
+     * The {@link JobExecution} with {@param jobExecutionId} MUST have its batch status set to {@link BatchStatus#STARTED}
      * after this method finishes. The start time must also be set.
      *
      * @param jobExecutionId
@@ -55,7 +60,9 @@ public interface ExecutionRepository {
 
     void updateJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+
+    void linkJobExecutions(final long jobExecutionId, final ExtendedJobExecution restartJobExecution) throws NoSuchJobExecutionException, JobSecurityException;
 
     /**
      * The {@link StepExecution} with {@param stepExecutionId} MUST have its batch status set to {@link BatchStatus#STARTED}
@@ -68,17 +75,17 @@ public interface ExecutionRepository {
      */
     void startStepExecution(final long stepExecutionId, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void updateStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void updateStepExecution(final long stepExecutionId, final Serializable serializable, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void updateStepExecution(final long stepExecutionId, final Serializable serializable, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    // Chunk
+    void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    Checkpoint getStepExecutionCheckpoint(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
+    void finishPartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
     // JobOperator
 
@@ -90,25 +97,29 @@ public interface ExecutionRepository {
 
     List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException;
 
-    Properties getParameters(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
+    Properties getParameters(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 
-    JobInstance getJobInstance(final long instanceId) throws NoSuchJobExecutionException, JobSecurityException;
+    ExtendedJobInstance getJobInstance(final long jobInstanceId) throws NoSuchJobExecutionException, JobSecurityException;
 
-    JobInstance getJobInstanceForExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
+    ExtendedJobInstance getJobInstanceForExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 
     List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException;
 
-    RestartableJobExecution getJobExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException;
+    ExtendedJobExecution getJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 
-    RestartableJobExecution getLatestJobExecution(final long executionId) throws NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobSecurityException;
+    ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws JobRestartException, NoSuchJobExecutionException, NoSuchJobInstanceException, JobExecutionNotMostRecentException, JobSecurityException;
 
-    List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
+    List<StepExecution> getStepExecutionsForJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 
-    //
+    ExtendedStepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException; // TODO Should throw something else
 
-    StepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException; // ? Should throw someting else ?
+    ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException; // TODO Should throw something else
 
-    StepExecution getStepExecution(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException; // ? Should throw someting else ?
+    int getStepExecutionCount(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException; // TODO Should throw something else
 
     StepExecution[] getStepExecutions(final long[] stepExecutionIds) throws NoSuchJobExecutionException, JobSecurityException;
+
+    PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
+
+    PartitionExecution getPartitionExecution(final long stepExecutionId, final int partitionId) throws NoSuchJobExecutionException, JobSecurityException;
 }

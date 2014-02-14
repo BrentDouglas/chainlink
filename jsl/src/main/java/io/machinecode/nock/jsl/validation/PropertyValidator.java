@@ -19,10 +19,10 @@ public class PropertyValidator extends ValidatingVisitor<Property> {
     @Override
     public void doVisit(final Property that, final VisitorNode context) {
         if (that.getName() == null) {
-            context.addProblem(Messages.format("validation.required.attribute", "name"));
+            context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "name"));
         }
         if (that.getValue() == null) {
-            context.addProblem(Messages.format("validation.required.attribute", "value"));
+            context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "value"));
         }
     }
 }

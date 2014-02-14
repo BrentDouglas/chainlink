@@ -32,12 +32,27 @@ public class StopImpl extends TransitionImpl implements Stop {
     }
 
     @Override
-    public Result runTransition(final String id) throws Exception {
-        return Result.status(BatchStatus.STOPPED, this.exitStatus, this.restart == null ? id : this.restart);
+    public String element() {
+        return Stop.ELEMENT;
     }
 
     @Override
-    public String element() {
-        return Stop.ELEMENT;
+    public BatchStatus getBatchStatus() {
+        return BatchStatus.STOPPING;
+    }
+
+    @Override
+    public String getNext() {
+        return null;
+    }
+
+    @Override
+    public String getRestartId() {
+        return this.restart;
+    }
+
+    @Override
+    public boolean isTerminating() {
+        return true;
     }
 }

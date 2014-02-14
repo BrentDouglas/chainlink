@@ -21,15 +21,13 @@ public class DecisionValidator extends PropertyReferenceValidator<Decision> {
     @Override
     public void doVisit(final Decision that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Messages.format("validation.required.attribute", "id"));
-        } else {
-            context.setTransition(that.getId(), null);
+            context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "id"));
         }
 
         if (that.getTransitions() != null) {
             for (final Transition transition : that.getTransitions()) {
                 if (transition == null) {
-                    context.addProblem(Messages.format("validation.not.null.element", "transitions"));
+                    context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "transitions"));
                 }
                 TransitionValidator.visit(transition, context);
             }

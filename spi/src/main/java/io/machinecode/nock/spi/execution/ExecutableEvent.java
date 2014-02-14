@@ -8,9 +8,9 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface ExecutableEvent<T extends Executable> extends Serializable {
+public interface ExecutableEvent extends Serializable {
 
-    T getExecutable();
+    Executable getExecutable();
 
-    ExecutionContext[] getContexts();
+    ExecutionContext getContext();
 }

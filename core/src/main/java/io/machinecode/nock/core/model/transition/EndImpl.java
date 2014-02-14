@@ -25,12 +25,27 @@ public class EndImpl extends TransitionImpl implements End {
     }
 
     @Override
-    public Result runTransition(final String id) throws Exception {
-        return Result.status(BatchStatus.COMPLETED, this.exitStatus);
+    public String element() {
+        return End.ELEMENT;
     }
 
     @Override
-    public String element() {
-        return End.ELEMENT;
+    public BatchStatus getBatchStatus() {
+        return BatchStatus.COMPLETED;
+    }
+
+    @Override
+    public String getNext() {
+        return null;
+    }
+
+    @Override
+    public String getRestartId() {
+        return null;
+    }
+
+    @Override
+    public boolean isTerminating() {
+        return true;
     }
 }

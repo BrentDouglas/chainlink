@@ -3,21 +3,21 @@ package io.machinecode.nock.core.model.execution;
 import io.machinecode.nock.core.loader.TypedArtifactReference;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.transition.TransitionImpl;
-import io.machinecode.nock.core.work.ExecutionExecutable;
+import io.machinecode.nock.core.work.Statuses;
 import io.machinecode.nock.spi.context.ExecutionContext;
+import io.machinecode.nock.spi.context.MutableJobContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
 import io.machinecode.nock.spi.element.execution.Decision;
-import io.machinecode.nock.spi.execution.CallbackExecutable;
 import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.util.Messages;
-import io.machinecode.nock.spi.work.ExecutionWork;
 import io.machinecode.nock.spi.work.TransitionWork;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.Decider;
-import java.util.Collections;
+import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.StepExecution;
 import java.util.List;
 
 /**
@@ -26,6 +26,9 @@ import java.util.List;
 public class DecisionImpl extends ExecutionImpl implements Decision {
 
     private static final Logger log = Logger.getLogger(DecisionImpl.class);
+
+    public static final long[] NO_STEPS = new long[0];
+    public static final StepExecution[] NO_STEP_EXECUTIONS = new StepExecution[0];
 
     private final List<TransitionImpl> transitions;
     private final PropertiesImpl properties;
@@ -56,28 +59,41 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
 
     // Lifecycle
 
-    private transient String exitStatus;
-
     @Override
-    public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
-                                 final CallbackExecutable parentExecutable, final ExecutionContext context,
-                                 final ExecutionContext[] contexts) throws Exception {
-        log.debugf(Messages.get("decision.decide"), context.getJobExecutionId(), this.id, this.ref.ref());
-        final Decider decider = this.ref.load(executor, context, this);
-        final long[] ids = new long[contexts.length];
-        for (int i = 0; i < contexts.length; ++i) {
-            ids[i] = contexts[i].getStepExecutionId();
-        }
-        this.exitStatus = decider.decide(
-                executor.getRepository().getStepExecutions(ids)
+    public Deferred<?> before(final Executor executor, final ThreadId threadId, final Executable thisCallback,
+                              final Executable parentCallback, final ExecutionContext context) throws Exception {
+        log.debugf(Messages.get("NOCK-019000.decision.before"), context, this.id);
+        final Decider decider = this.ref.load(executor, context, this.properties);
+        log.debugf(Messages.get("NOCK-019002.decision.decide"), context, this.id, this.ref.ref());
+        final long[] prior = context.getPriorStepExecutionIds();
+        final Long last = context.getLastStepExecutionId();
+        final long[] actual = prior.length != 0 ? prior : last != null ? new long[]{ last } : NO_STEPS;
+        final String exitStatus = decider.decide(
+                actual == NO_STEPS ? NO_STEP_EXECUTIONS : executor.getRepository().getStepExecutions(actual)
         );
-        return executor.callback(thisExecutable, context);
+        context.getJobContext().setExitStatus(exitStatus);
+        return executor.callback(thisCallback, context);
     }
 
     @Override
-    public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
-                                final CallbackExecutable parentExecutable, final ExecutionContext context,
-                                final ExecutionContext childContext) throws Exception {
-        return this.transition(executor, threadId, context, thisExecutable, parentExecutable, this.transitions, null, exitStatus);
+    public Deferred<?> after(final Executor executor, final ThreadId threadId, final Executable callback,
+                             final ExecutionContext context, final ExecutionContext childContext) throws Exception {
+        log.debugf(Messages.get("NOCK-019001.decision.after"), context, this.id);
+        final MutableJobContext jobContext = context.getJobContext();
+        final BatchStatus batchStatus = jobContext.getBatchStatus();
+        if (Statuses.isStopping(batchStatus) || Statuses.isFailed(batchStatus)) {
+            return runCallback(executor, context, callback);
+        }
+        final TransitionWork transition = this.transition(context, this.transitions, jobContext.getBatchStatus(), jobContext.getExitStatus());
+        if (transition != null && transition.isTerminating()) {
+            return runCallback(executor, context, callback);
+        } else {
+            return this.next(executor, threadId, context, callback, null, transition);
+        }
+    }
+
+    @Override
+    protected Logger log() {
+        return log;
     }
 }

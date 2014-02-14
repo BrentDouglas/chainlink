@@ -4,36 +4,43 @@ import io.machinecode.nock.core.deferred.DeferredImpl;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
-import io.machinecode.nock.spi.execution.CallbackExecutable;
 import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.Work;
-import org.jboss.logging.Logger;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
 public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferred<?>> implements Executable {
 
-    private static final Logger log = Logger.getLogger(ExecutableImpl.class);
-
-    protected static final int RUNNING  = 4;
-
     protected final T work;
 
-    protected final CallbackExecutable parent;
+    protected final ThreadId threadId;
+    protected final Executable parent;
     protected final ExecutionContext context;
 
-    public ExecutableImpl(final CallbackExecutable parent, final ExecutionContext context, final T work) {
+    public ExecutableImpl(final Executable parent, final ExecutionContext context, final T work, final ThreadId threadId) {
         super(new Deferred[1]);
         this.parent = parent;
         this.context = context;
         this.work = work;
+        this.threadId = threadId;
+    }
+
+    public ExecutableImpl(final ExecutableImpl<T> executable, final ThreadId threadId) {
+        this(executable.getParent(), executable.getContext(), executable.work, threadId);
     }
 
     @Override
-    public CallbackExecutable getParent() {
+    public boolean isCancelled() {
+        synchronized (lock) {
+            return super.isCancelled() || (this.parent != null && this.parent.isCancelled());
+        }
+    }
+
+    @Override
+    public Executable getParent() {
         return parent;
     }
 
@@ -43,33 +50,48 @@ public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferr
     }
 
     @Override
-    public void execute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
-                        final ExecutionContext... contexts) {
+    public ThreadId getThreadId() {
+        return threadId;
+    }
+
+    @Override
+    public void execute(final Executor executor, final ThreadId threadId, final Executable callback,
+                        final ExecutionContext context) {
         try {
-            synchronized (this) {
-                if (isCancelled()) {
-                    return;
-                }
-                if (state != PENDING) {
-                    reject(new IllegalStateException()); //TODO
-                    return;
-                }
-                state = RUNNING;
+            log().tracef(Messages.get("NOCK-015703.executable.execute"), this.context, this);
+            final Deferred<?> next = doExecute(executor, threadId, callback, context);
+            // null means that it was an incomplete partition
+            if (next == null) {
+                resolve(null); //Need to call notify listener.
+                return;
             }
-            log.tracef(Messages.format("executable.execute", context.getJobExecutionId(), this.getClass().getSimpleName()));
-            final Deferred<?> next = doExecute(executor, threadId, parentExecutable, contexts);
-            chain[0] = next;
-            resolve(next);
+            resolve(setChild(0, next));
         } catch (final Throwable e) {
-            log.infof(e, Messages.format("executable.execute.exception", context.getJobExecutionId(), this.getClass().getSimpleName()));
+            log().errorf(e, Messages.get("NOCK-015704.executable.exception"), this.context, this);
             reject(e);
-        } finally {
-            synchronized (this) {
-                notifyAll();
-            }
         }
     }
 
-    protected abstract Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
-                                               final ExecutionContext... contexts) throws Throwable;
+    @Override
+    protected String getResolveLogMessage() {
+        return Messages.format("NOCK-015100.executable.resolve", this.context, this);
+    }
+
+    @Override
+    protected String getRejectLogMessage() {
+        return Messages.format("NOCK-015101.executable.reject", this.context, this);
+    }
+
+    @Override
+    protected String getCancelLogMessage() {
+        return Messages.format("NOCK-015102.executable.cancel", this.context, this);
+    }
+
+    @Override
+    protected String getTimeoutExceptionMessage() {
+        return Messages.format("NOCK-015000.executable.timeout", this.context, this);
+    }
+
+    protected abstract Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final Executable callback,
+                                             final ExecutionContext context) throws Throwable;
 }

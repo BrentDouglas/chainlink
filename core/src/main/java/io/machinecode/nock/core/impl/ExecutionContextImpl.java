@@ -1,15 +1,15 @@
 package io.machinecode.nock.core.impl;
 
-import io.machinecode.nock.spi.RestartableJobExecution;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
+import io.machinecode.nock.spi.ExtendedJobExecution;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.MutableJobContext;
 import io.machinecode.nock.spi.context.MutableStepContext;
-import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.execution.Item;
+import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.JobWork;
 import org.jboss.logging.Logger;
-
-import java.util.Stack;
 
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
@@ -19,36 +19,64 @@ public class ExecutionContextImpl implements ExecutionContext {
     private static final Logger log = Logger.getLogger(ExecutionContextImpl.class);
 
     private final JobWork job;
-    private final RestartableJobExecution jobExecution;
-    private final long jobInstanceId;
+    private final ExtendedJobExecution jobExecution;
+    private final ExtendedJobExecution restartJobExecution;
     private final long jobExecutionId;
-    private final Long stepExecutionId;
-    private MutableJobContext jobContext;
+    private final Integer partitionId;
+    private final MutableJobContext jobContext;
+    private String restartElementId;
     private MutableStepContext stepContext;
+    private Long stepExecutionId;
     private Item[] items;
+    private Long lastStepExecutionId;
+    private TLongSet priorStepExecutionIds = new TLongHashSet();
 
-    private ExecutionContextImpl(final JobWork job, final long jobInstanceId,
-                                 final Long stepExecutionId, final RestartableJobExecution jobExecution,
-                                 final Item[] items) {
+    private String logString;
+
+    private ExecutionContextImpl(final JobWork job, final MutableJobContext jobContext, final ExtendedJobExecution jobExecution,
+                                 final ExtendedJobExecution restartJobExecution, final Integer partitionId, final Item[] items) {
         this.job = job;
-        this.jobInstanceId = jobInstanceId;
         this.jobExecution = jobExecution;
+        this.restartJobExecution = restartJobExecution;
+        this.partitionId = partitionId;
         this.jobExecutionId = jobExecution.getExecutionId();
-        this.stepExecutionId = stepExecutionId;
+        this.jobContext = jobContext;
         this.items = items;
     }
 
     public ExecutionContextImpl(final JobWork job, final MutableJobContext jobContext, final MutableStepContext stepContext,
-                                final RestartableJobExecution jobExecution) {
+                                final ExtendedJobExecution jobExecution, final ExtendedJobExecution restartJobExecution,
+                                final Integer partitionId) {
         this(
                 job,
-                jobContext.getInstanceId(),
-                stepContext == null ? null : stepContext.getStepExecutionId(),
+                jobContext,
                 jobExecution,
+                restartJobExecution,
+                partitionId,
                 null
         );
-        this.jobContext = jobContext;
         this.stepContext = stepContext;
+        if (stepContext != null) {
+            this.stepExecutionId = stepContext.getStepExecutionId();
+        }
+        _buildLogString();
+    }
+
+    private void _buildLogString() {
+        final StringBuilder builder = new StringBuilder()
+                .append(Messages.raw("prefix.job.execution")).append('=').append(this.jobExecutionId);
+        if (this.stepExecutionId != null) {
+            builder.append(',').append(Messages.raw("prefix.step.execution")).append('=').append(this.stepExecutionId);
+        }
+        if (this.partitionId != null) {
+            builder.append(',').append(Messages.raw("prefix.partition")).append('=').append(this.partitionId);
+        }
+        this.logString = builder.toString();
+    }
+
+    @Override
+    public String toString() {
+        return logString;
     }
 
     @Override
@@ -57,13 +85,18 @@ public class ExecutionContextImpl implements ExecutionContext {
     }
 
     @Override
-    public RestartableJobExecution getJobExecution() {
+    public ExtendedJobExecution getJobExecution() {
         return jobExecution;
     }
 
     @Override
-    public long getJobInstanceId() {
-        return jobInstanceId;
+    public ExtendedJobExecution getRestartJobExecution() {
+        return restartJobExecution;
+    }
+
+    @Override
+    public boolean isRestarting() {
+        return restartJobExecution != null;
     }
 
     @Override
@@ -77,6 +110,11 @@ public class ExecutionContextImpl implements ExecutionContext {
     }
 
     @Override
+    public Integer getPartitionId() {
+        return partitionId;
+    }
+
+    @Override
     public MutableJobContext getJobContext() {
         return jobContext;
     }
@@ -87,6 +125,15 @@ public class ExecutionContextImpl implements ExecutionContext {
     }
 
     @Override
+    public void setStepContext(final MutableStepContext stepContext) {
+        this.stepContext = stepContext;
+        if (stepContext != null) {
+            this.stepExecutionId = stepContext.getStepExecutionId();
+        }
+        _buildLogString();
+    }
+
+    @Override
     public Item[] getItems() {
         return items;
     }
@@ -94,5 +141,35 @@ public class ExecutionContextImpl implements ExecutionContext {
     @Override
     public void setItems(final Item[] items) {
         this.items = items;
+    }
+
+    @Override
+    public String getRestartElementId() {
+        return restartElementId;
+    }
+
+    @Override
+    public void setRestartElementId(final String restartElementId) {
+        this.restartElementId = restartElementId;
+    }
+
+    @Override
+    public Long getLastStepExecutionId() {
+        return this.lastStepExecutionId;
+    }
+
+    @Override
+    public void setLastStepExecutionId(final long lastStepExecutionId) {
+        this.lastStepExecutionId = lastStepExecutionId;
+    }
+
+    @Override
+    public long[] getPriorStepExecutionIds() {
+        return priorStepExecutionIds.toArray();
+    }
+
+    @Override
+    public void addPriorStepExecutionId(final long priorStepExecutionId) {
+        this.priorStepExecutionIds.add(priorStepExecutionId);
     }
 }

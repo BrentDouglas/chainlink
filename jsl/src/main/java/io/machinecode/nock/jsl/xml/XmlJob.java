@@ -31,7 +31,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "listeners",
 //        "executions"
 //})
-public class XmlJob extends XmlInheritableBase<XmlJob> implements InheritableJob<XmlJob, XmlProperties, XmlListeners, XmlExecution> {
+public class XmlJob extends XmlInheritable<XmlJob> implements InheritableJob<XmlJob, XmlProperties, XmlListeners, XmlExecution> {
 
     @XmlID
     @XmlSchemaType(name = "ID")

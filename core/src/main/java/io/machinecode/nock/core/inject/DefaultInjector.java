@@ -3,6 +3,7 @@ package io.machinecode.nock.core.inject;
 import io.machinecode.nock.spi.inject.Injectables;
 import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.Injector;
+import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.util.Pair;
 
 import javax.batch.api.BatchProperty;
@@ -35,7 +36,7 @@ public class DefaultInjector implements Injector {
         if (iterator.hasNext()) {
             provider = iterator.next();
         } else {
-            throw new IllegalStateException(); //TODO Messages
+            throw new IllegalStateException(Messages.format("NOCK-000000.injector.provider.unavailable"));
         }
     }
 

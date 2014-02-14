@@ -11,9 +11,9 @@ public interface JobLoader {
 
     /**
      *
-     * @param id
-     * @return The {@link Job} corresponding with {@param id}.
+     * @param jslName
+     * @return The {@link Job} contained within the reference to {@param jslName}.
      * @throws NoSuchJobException If this loader does not contain the specified job.
      */
-    Job load(final String id) throws NoSuchJobException;
+    Job load(final String jslName) throws NoSuchJobException;
 }

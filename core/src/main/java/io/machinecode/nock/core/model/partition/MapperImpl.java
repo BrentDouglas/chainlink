@@ -27,7 +27,7 @@ public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implement
     @Override
     public PartitionPlan getPartitionPlan(final Executor executor, final ExecutionContext context) throws Exception {
         final PartitionMapper mapper = this.load(executor, context);
-        log.debugf(Messages.get("mapper.map.partitions"), context.getJobExecutionId(), ref.ref());
+        log.debugf(Messages.get("NOCK-022000.mapper.map.partitions"), context.getJobExecutionId(), ref.ref());
         return mapper.mapPartitions();
     }
 }

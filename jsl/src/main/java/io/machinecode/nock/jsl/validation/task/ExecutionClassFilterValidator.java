@@ -24,22 +24,22 @@ public class ExecutionClassFilterValidator extends ValidatingVisitor<ExceptionCl
         if (that.getIncludes() != null) {
             for (final ExceptionClass clazz : that.getIncludes()) {
                 if (clazz == null) {
-                    context.addProblem(Messages.format("validation.not.null.element", "includes"));
+                    context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "includes"));
                     continue;
                 }
                 if (clazz.getClassName() == null) {
-                    context.addProblem(Messages.format("validation.required.attribute", "class"));
+                    context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "class"));
                 }
             }
         }
         if (that.getExcludes() != null) {
             for (final ExceptionClass clazz : that.getExcludes()) {
                 if (clazz == null) {
-                    context.addProblem(Messages.format("validation.not.null.element", "excludes"));
+                    context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "excludes"));
                     continue;
                 }
                 if (clazz.getClassName() == null) {
-                    context.addProblem(Messages.format("validation.required.attribute", "class"));
+                    context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "class"));
                 }
             }
         }

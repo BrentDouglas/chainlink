@@ -1,18 +1,36 @@
 package io.machinecode.nock.core.local;
 
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TLongLongHashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TLongHashSet;
 import io.machinecode.nock.core.impl.JobExecutionImpl;
 import io.machinecode.nock.core.impl.JobInstanceImpl;
+import io.machinecode.nock.core.impl.MetricImpl;
+import io.machinecode.nock.core.impl.PartitionExecutionImpl;
 import io.machinecode.nock.core.impl.StepExecutionImpl;
 import io.machinecode.nock.spi.Checkpoint;
 import io.machinecode.nock.spi.ExecutionRepository;
-import io.machinecode.nock.spi.RestartableJobExecution;
+import io.machinecode.nock.spi.ExtendedJobExecution;
+import io.machinecode.nock.spi.ExtendedJobInstance;
+import io.machinecode.nock.spi.ExtendedStepExecution;
+import io.machinecode.nock.spi.PartitionExecution;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Step;
+import io.machinecode.nock.spi.util.Messages;
 
+import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
+import javax.batch.operations.JobRestartException;
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -22,6 +40,11 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,30 +63,33 @@ public class LocalRepository implements ExecutionRepository {
     protected final AtomicLong jobExecutionIndex = new AtomicLong();
     protected final AtomicLong stepExecutionIndex = new AtomicLong();
 
-    protected final TLongObjectMap<JobInstance> jobInstances = new TLongObjectHashMap<JobInstance>();
-    protected final TLongObjectMap<RestartableJobExecution> jobExecutions = new TLongObjectHashMap<RestartableJobExecution>();
-    protected final TLongObjectMap<List<Long>> jobInstanceExecutions = new TLongObjectHashMap<List<Long>>();
-    protected final TLongObjectMap<JobInstance> jobExecutionInstances = new TLongObjectHashMap<JobInstance>();
-    protected final TLongObjectMap<StepExecution> stepExecutions = new TLongObjectHashMap<StepExecution>();
-    protected final TLongObjectMap<Checkpoint> checkpoints = new TLongObjectHashMap<Checkpoint>();
-    protected final TLongObjectMap<Set<Long>> jobExecutionStepExecutions = new TLongObjectHashMap<Set<Long>>();
-    protected final TLongObjectMap<Long> latestJobExecutionForInstance = new TLongObjectHashMap<Long>();
+    protected final TLongObjectMap<ExtendedJobInstance> jobInstances = new TLongObjectHashMap<ExtendedJobInstance>();
+    protected final TLongObjectMap<ExtendedJobExecution> jobExecutions = new TLongObjectHashMap<ExtendedJobExecution>();
+    protected final TLongObjectMap<TLongList> jobInstanceExecutions = new TLongObjectHashMap<TLongList>();
+    protected final TLongLongMap jobExecutionInstances = new TLongLongHashMap();
+    protected final TLongObjectMap<ExtendedStepExecution> stepExecutions = new TLongObjectHashMap<ExtendedStepExecution>();
+    protected final TLongObjectMap<TLongSet> jobExecutionStepExecutions = new TLongObjectHashMap<TLongSet>();
+    protected final TLongLongMap latestJobExecutionForInstance = new TLongLongHashMap();
+    protected final TLongObjectMap<TIntObjectMap<PartitionExecution>> stepExecutionPartitionExecutions = new TLongObjectHashMap<TIntObjectMap<PartitionExecution>>();
+    protected final TLongObjectMap<TLongSet> jobExecutionHistory = new TLongObjectHashMap<TLongSet>();
 
     protected final AtomicBoolean jobInstanceLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobInstanceExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionInstanceLock = new AtomicBoolean(false);
     protected final AtomicBoolean stepExecutionLock = new AtomicBoolean(false);
-    protected final AtomicBoolean checkpointLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionStepExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean latestJobExecutionForInstanceLock = new AtomicBoolean(false);
+    protected final AtomicBoolean stepExecutionPartitionExecutionLock = new AtomicBoolean(false);
+    protected final AtomicBoolean jobExecutionHistoryLock = new AtomicBoolean(false);
 
     @Override
-    public JobInstance createJobInstance(final Job job) {
+    public ExtendedJobInstance createJobInstance(final Job job, final String jslName) {
         final long id = jobInstanceIndex.incrementAndGet();
         final JobInstanceImpl instance = new JobInstanceImpl.Builder()
                 .setInstanceId(id)
                 .setJobName(job.getId())
+                .setJslName(jslName)
                 .build();
         while (!jobInstanceLock.compareAndSet(false, true)) {}
         try {
@@ -73,7 +99,7 @@ public class LocalRepository implements ExecutionRepository {
         }
         while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
         try {
-            jobInstanceExecutions.put(id, new ArrayList<Long>(0));
+            jobInstanceExecutions.put(id, new TLongArrayList(0));
         } finally {
             jobInstanceExecutionLock.set(false);
         }
@@ -81,63 +107,72 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public RestartableJobExecution createJobExecution(final JobInstance instance) throws NoSuchJobInstanceException {
-        final long id = jobExecutionIndex.incrementAndGet();
+    public ExtendedJobExecution createJobExecution(final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws NoSuchJobInstanceException {
+        final long jobExecutionId;
+        while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final TLongList executions = jobInstanceExecutions.get(instance.getInstanceId());
+            if (executions == null) {
+                throw new NoSuchJobInstanceException(Messages.format("NOCK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
+            }
+            jobExecutionId = jobExecutionIndex.incrementAndGet();
+            executions.add(jobExecutionId);
+        } finally {
+            jobInstanceExecutionLock.set(false);
+        }
         final JobExecutionImpl execution = new JobExecutionImpl.Builder()
-                .setExecutionId(id)
+                .setExecutionId(jobExecutionId)
                 .setJobName(instance.getJobName())
                 .setBatchStatus(BatchStatus.STARTING)
-                .setCreated(new Date())
-                .setUpdated(new Date())
+                .setParameters(parameters)
+                .setCreated(timestamp)
+                .setUpdated(timestamp)
                 .build();
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
-            jobExecutions.put(id, execution);
+            jobExecutions.put(jobExecutionId, execution);
         } finally {
             jobExecutionLock.set(false);
         }
         while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
         try {
-            jobExecutionInstances.put(id, instance);
+            jobExecutionInstances.put(jobExecutionId, instance.getInstanceId());
         } finally {
             jobExecutionInstanceLock.set(false);
         }
         while (!latestJobExecutionForInstanceLock.compareAndSet(false, true)) {}
         try {
-            latestJobExecutionForInstance.put(instance.getInstanceId(), id);
+            latestJobExecutionForInstance.put(instance.getInstanceId(), jobExecutionId);
         } finally {
             latestJobExecutionForInstanceLock.set(false);
         }
-        while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
-        try {
-            final List<Long> executions = jobInstanceExecutions.get(instance.getInstanceId());
-            if (executions == null) {
-                throw new NoSuchJobInstanceException();
-            }
-            executions.add(id);
-        } finally {
-            jobInstanceExecutionLock.set(false);
-        }
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
-            jobExecutionStepExecutions.put(id, new THashSet<Long>(0));
+            jobExecutionStepExecutions.put(jobExecutionId, new TLongHashSet(0));
         } finally {
             jobExecutionStepExecutionLock.set(false);
+        }
+        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        try {
+            jobExecutionHistory.put(jobExecutionId, new TLongHashSet(0));
+        } finally {
+            jobExecutionHistoryLock.set(false);
         }
         return execution;
     }
 
     @Override
-    public StepExecution createStepExecution(final JobExecution jobExecution, final Step<?, ?> step) {
-        final long id = stepExecutionIndex.incrementAndGet();
+    public ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final Step<?, ?> step, final Date timestamp) throws Exception {
+        final long stepExecutionId = stepExecutionIndex.incrementAndGet();
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
-                .setExecutionId(id)
+                .setStepExecutionId(stepExecutionId)
                 .setStepName(step.getId())
+                .setStart(timestamp)
                 .setBatchStatus(BatchStatus.STARTING)
                 .build();
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            stepExecutions.putIfAbsent(id, execution);
+            stepExecutions.putIfAbsent(stepExecutionId, execution);
             //final StepExecution old = stepExecutions.putIfAbsent(id, execution);
             //if (old != null) {
             //    throw new StepAlreadyExistsException();
@@ -147,26 +182,77 @@ public class LocalRepository implements ExecutionRepository {
         }
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final Set<Long> executionIds = jobExecutionStepExecutions.get(jobExecution.getExecutionId());
+            final TLongSet executionIds = jobExecutionStepExecutions.get(jobExecution.getExecutionId());
             if (executionIds == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
             }
-            executionIds.add(id);
+            executionIds.add(stepExecutionId);
         } finally {
             jobExecutionStepExecutionLock.set(false);
+        }
+        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            stepExecutionPartitionExecutions.put(stepExecutionId, new TIntObjectHashMap<PartitionExecution>());
+        } finally {
+            stepExecutionPartitionExecutionLock.set(false);
         }
         return execution;
     }
 
     @Override
-    public void startJobExecution(final long executionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Date timestamp) throws Exception {
+        final PartitionExecutionImpl execution = new PartitionExecutionImpl.Builder()
+                .setStepExecutionId(stepExecutionId)
+                .setPartitionId(partitionId)
+                .setPartitionProperties(properties)
+                .setStart(timestamp)
+                .setBatchStatus(BatchStatus.STARTING)
+                .build();
+        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            if (partitions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
+            partitions.put(partitionId, execution);
+        } finally {
+            stepExecutionPartitionExecutionLock.set(false);
+        }
+        return execution;
+    }
+
+    @Override
+    public PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception {
+        final PartitionExecutionImpl execution = PartitionExecutionImpl.from(partitionExecution)
+                .setStepExecutionId(stepExecutionId)
+                .setStart(timestamp)
+                .setUpdated(null)
+                .setEnd(null)
+                .setBatchStatus(BatchStatus.STARTING)
+                .setExitStatus(null)
+                .build();
+        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            if (partitions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
+            partitions.put(partitionExecution.getPartitionId(), execution);
+        } finally {
+            stepExecutionPartitionExecutionLock.set(false);
+        }
+        return execution;
+    }
+
+    @Override
+    public void startJobExecution(final long jobExecutionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
-            final RestartableJobExecution execution = jobExecutions.get(executionId);
+            final ExtendedJobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            jobExecutions.put(executionId, JobExecutionImpl.from(execution)
+            jobExecutions.put(jobExecutionId, JobExecutionImpl.from(execution)
                     .setUpdated(timestamp)
                     .setStart(timestamp)
                     .setBatchStatus(BatchStatus.STARTED)
@@ -178,14 +264,14 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateJobExecution(final long executionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void updateJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
-            final RestartableJobExecution execution = jobExecutions.get(executionId);
+            final ExtendedJobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            jobExecutions.put(executionId, JobExecutionImpl.from(execution)
+            jobExecutions.put(jobExecutionId, JobExecutionImpl.from(execution)
                     .setUpdated(timestamp)
                     .setBatchStatus(batchStatus)
                     .build()
@@ -196,23 +282,45 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void finishJobExecution(final long executionId, final BatchStatus batchStatus, final String exitStatus, final String restartId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
-            final RestartableJobExecution execution = jobExecutions.get(executionId);
+            final ExtendedJobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            jobExecutions.put(executionId, JobExecutionImpl.from(execution)
+            jobExecutions.put(jobExecutionId, JobExecutionImpl.from(execution)
                     .setBatchStatus(batchStatus)
                     .setExitStatus(exitStatus)
-                    .setRestartId(restartId)
+                    .setRestartElementId(restartElementId)
                     .setUpdated(timestamp)
                     .setEnd(timestamp)
                     .build()
             );
         } finally {
             jobExecutionLock.set(false);
+        }
+    }
+
+    @Override
+    public void linkJobExecutions(final long jobExecutionId, final ExtendedJobExecution restartJobExecution) throws NoSuchJobExecutionException, JobSecurityException {
+        final long restartJobExecutionId = restartJobExecution.getExecutionId();
+        final TLongSet jobExecutionIds;
+        final TLongSet oldJobExecutionIds;
+        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        try {
+            oldJobExecutionIds = jobExecutionHistory.get(restartJobExecutionId);
+            if (oldJobExecutionIds == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", restartJobExecution));
+            }
+            jobExecutionIds = jobExecutionHistory.get(jobExecutionId);
+            if (jobExecutionIds == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            }
+            jobExecutionIds.add(restartJobExecutionId);
+            jobExecutionIds.addAll(oldJobExecutionIds);
+        } finally {
+            jobExecutionHistoryLock.set(false);
         }
     }
 
@@ -220,9 +328,9 @@ public class LocalRepository implements ExecutionRepository {
     public void startStepExecution(final long stepExecutionId, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final StepExecution execution = stepExecutions.get(stepExecutionId);
+            final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
             if (execution == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setStart(timestamp)
@@ -236,16 +344,16 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final StepExecution execution = stepExecutions.get(stepExecutionId);
+            final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
             if (execution == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
-                    .setBatchStatus(batchStatus)
-                    .setExitStatus(batchStatus.name())
+                    .setPersistentUserData(persistentUserData)
+                    .setMetrics(MetricImpl.copy(metrics))
                     .build()
             );
         } finally {
@@ -254,15 +362,25 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Serializable serializable, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        final Checkpoint _checkpoint;
+        try {
+            _checkpoint = _clone(checkpoint);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e); //TODO
+        } catch (IOException e) {
+            throw new RuntimeException(e); //TODO
+        }
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final StepExecution execution = stepExecutions.get(stepExecutionId);
+            final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
             if (execution == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
-                    .setPersistentUserData(serializable)
+                    .setPersistentUserData(persistentUserData)
+                    .setMetrics(MetricImpl.copy(metrics))
+                    .setCheckpoint(_checkpoint)
                     .build()
             );
         } finally {
@@ -271,41 +389,18 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Serializable serializable, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final StepExecution execution = stepExecutions.get(stepExecutionId);
+            final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
              if (execution == null) {
-                 throw new NoSuchJobExecutionException();
-             }
-            stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
-                    .setPersistentUserData(serializable)
-                    .setMetrics(metrics)
-                    .build()
-            );
-        } finally {
-            stepExecutionLock.set(false);
-        }
-        while (!checkpointLock.compareAndSet(false, true)) {}
-        try {
-            checkpoints.put(stepExecutionId, checkpoint);
-        } finally {
-            checkpointLock.set(false);
-        }
-    }
-
-    @Override
-    public void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
-        try {
-            final StepExecution execution = stepExecutions.get(stepExecutionId);
-             if (execution == null) {
-                 throw new NoSuchJobExecutionException();
+                 throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
              }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setBatchStatus(batchStatus)
                     .setExitStatus(exitStatus)
                     .setEnd(timestamp)
+                    .setMetrics(MetricImpl.copy(metrics))
                     .build()
             );
         } finally {
@@ -314,12 +409,79 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public Checkpoint getStepExecutionCheckpoint(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!checkpointLock.compareAndSet(false, true)) {}
+    public void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        final Checkpoint _checkpoint;
         try {
-            return checkpoints.get(stepExecutionId);
+            _checkpoint = _clone(checkpoint);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e); //TODO
+        } catch (IOException e) {
+            throw new RuntimeException(e); //TODO
+        }
+        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            if (partitions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
+            final PartitionExecution partitionExecution = partitions.get(partitionId);
+            if (partitionExecution == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006008.execution.repository.no.such.partition.execution", stepExecutionId, partitionId));
+            }
+            partitions.put(partitionId, PartitionExecutionImpl.from(partitionExecution)
+                    .setUpdated(timestamp)
+                    .setCheckpoint(_checkpoint)
+                    .setPersistentUserData(persistentUserData)
+                    .setMetrics(MetricImpl.copy(metrics))
+                    .build());
         } finally {
-            checkpointLock.set(false);
+            stepExecutionPartitionExecutionLock.set(false);
+        }
+    }
+
+    @Override
+    public void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            if (partitions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
+            final PartitionExecution partitionExecution = partitions.get(partitionId);
+            if (partitionExecution == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006008.execution.repository.no.such.partition.execution", stepExecutionId, partitionId));
+            }
+            partitions.put(partitionId, PartitionExecutionImpl.from(partitionExecution)
+                    .setUpdated(timestamp)
+                    .setBatchStatus(batchStatus)
+                    .setPersistentUserData(persistentUserData)
+                    .build());
+        } finally {
+            stepExecutionPartitionExecutionLock.set(false);
+        }
+    }
+
+    @Override
+    public void finishPartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            if (partitions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
+            final PartitionExecution partitionExecution = partitions.get(partitionId);
+            if (partitionExecution == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006008.execution.repository.no.such.partition.execution", stepExecutionId, partitionId));
+            }
+            partitions.put(partitionId, PartitionExecutionImpl.from(partitionExecution)
+                    .setEnd(timestamp)
+                    .setUpdated(timestamp)
+                    .setBatchStatus(batchStatus)
+                    .setExitStatus(exitStatus)
+                    .setPersistentUserData(persistentUserData)
+                    .build());
+        } finally {
+            stepExecutionPartitionExecutionLock.set(false);
         }
     }
 
@@ -348,7 +510,7 @@ public class LocalRepository implements ExecutionRepository {
                 }
             }
             if (ret == 0) {
-                 throw new NoSuchJobException();
+                 throw new NoSuchJobException(Messages.format("NOCK-006000.execution.repository.no.such.job", jobName));
             }
             return ret;
         } finally {
@@ -356,7 +518,6 @@ public class LocalRepository implements ExecutionRepository {
         }
     }
 
-    //TODO Pretty sure this is wrong also needs to check start & count against list size
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws NoSuchJobException, JobSecurityException {
         final List<JobInstance> ret = new ArrayList<JobInstance>(count);
@@ -370,16 +531,18 @@ public class LocalRepository implements ExecutionRepository {
         } finally {
             jobInstanceLock.set(false);
         }
+        if (ret.isEmpty()) {
+            throw new NoSuchJobException(Messages.format("NOCK-006000.execution.repository.no.such.job", jobName));
+        }
         Collections.reverse(ret);
-        final int all = ret.size();
-        if (start >= all) {
+        final int size = ret.size();
+        if (start >= size) {
             return Collections.emptyList();
         }
-        final int diff = all - start;
-        if (diff < 0) {
+        if (start + count > size) {
             return Collections.emptyList();
         }
-        return ret.subList(start, start + (count > diff ? count : diff));
+        return ret.subList(start, start + count);
     }
 
     @Override
@@ -393,7 +556,7 @@ public class LocalRepository implements ExecutionRepository {
                 }
             }
             if (ids.isEmpty()) {
-                throw new NoSuchJobException();
+                throw new NoSuchJobException(Messages.format("NOCK-006000.execution.repository.no.such.job", jobName));
             }
             return ids;
         } finally {
@@ -402,12 +565,12 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public Properties getParameters(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public Properties getParameters(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
-            final JobExecution execution = jobExecutions.get(executionId);
+            final JobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             return execution.getJobParameters();
         } finally {
@@ -416,12 +579,12 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public JobInstance getJobInstance(final long instanceId) throws NoSuchJobExecutionException, JobSecurityException {
+    public ExtendedJobInstance getJobInstance(final long jobInstanceId) throws NoSuchJobExecutionException, JobSecurityException {
         while (!jobInstanceLock.compareAndSet(false, true)) {}
         try {
-            final JobInstance instance = jobInstances.get(instanceId);
+            final ExtendedJobInstance instance = jobInstances.get(jobInstanceId);
             if (instance == null) {
-                throw new NoSuchJobInstanceException();
+                throw new NoSuchJobInstanceException(Messages.format("NOCK-006001.execution.repository.no.such.job.instance", jobInstanceId));
             }
             return instance;
         } finally {
@@ -430,35 +593,38 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public JobInstance getJobInstanceForExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public ExtendedJobInstance getJobInstanceForExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        final long instanceId;
         while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
         try {
-            final JobInstance instance = jobExecutionInstances.get(executionId);
-            if (instance == null) {
-                throw new NoSuchJobInstanceException();
+            instanceId = jobExecutionInstances.get(jobExecutionId);
+            if (instanceId == jobExecutionInstances.getNoEntryValue()) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            return instance;
         } finally {
             jobExecutionInstanceLock.set(false);
         }
+        return getJobInstance(instanceId);
     }
 
     @Override
     public List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException {
-        final List<Long> executionIds;
+        final TLongList jobExecutionIds = new TLongArrayList();
         while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
         try {
-            executionIds = jobInstanceExecutions.get(instance.getInstanceId());
-            if (executionIds == null) {
-                throw new NoSuchJobInstanceException();
+            final TLongList executions = jobInstanceExecutions.get(instance.getInstanceId());
+            if (executions == null) {
+                throw new NoSuchJobInstanceException(Messages.format("NOCK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
             }
+            jobExecutionIds.addAll(executions);
         } finally {
             jobInstanceExecutionLock.set(false);
         }
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
-            final List<JobExecution> executions = new ArrayList<JobExecution>(executionIds.size());
-            for (final Long executionId : executionIds) {
+            final List<JobExecution> executions = new ArrayList<JobExecution>(jobExecutionIds.size());
+            for (final TLongIterator it = jobExecutionIds.iterator(); it.hasNext();) {
+                final long executionId = it.next();
                 executions.add(jobExecutions.get(executionId));
             }
             return executions;
@@ -468,12 +634,12 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public RestartableJobExecution getJobExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public ExtendedJobExecution getJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
-            final RestartableJobExecution execution = jobExecutions.get(executionId);
+            final ExtendedJobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             return execution;
         } finally {
@@ -482,83 +648,193 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public RestartableJobExecution getLatestJobExecution(final long executionId) throws NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobSecurityException {
-        final JobInstance instance;
+    public ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws JobRestartException, NoSuchJobExecutionException, NoSuchJobInstanceException, JobExecutionNotMostRecentException, JobSecurityException {
+        final long instanceId;
         while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
         try {
-            instance = jobExecutionInstances.get(executionId);
-            if (instance == null) {
-                throw new NoSuchJobExecutionException();
+            instanceId = jobExecutionInstances.get(jobExecutionId);
+            if (instanceId == jobExecutionInstances.getNoEntryValue()) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
         } finally {
             jobExecutionInstanceLock.set(false);
         }
-
-        final Long latest;
+        final long latest;
         while (!latestJobExecutionForInstanceLock.compareAndSet(false, true)) {}
         try {
-            latest = latestJobExecutionForInstance.get(instance.getInstanceId());
-            if (latest == null) {
-                throw new JobExecutionNotMostRecentException();
+            latest = latestJobExecutionForInstance.get(instanceId);
+            if (latest == latestJobExecutionForInstance.getNoEntryValue()) {
+                throw new NoSuchJobInstanceException(Messages.format("NOCK-006001.execution.repository.no.such.job.instance", jobExecutionId));
+            }
+            if (latest != jobExecutionId) {
+                throw new JobExecutionNotMostRecentException(Messages.format("NOCK-006004.repository.not.most.recent.execution", jobExecutionId, instanceId));
             }
         } finally {
             latestJobExecutionForInstanceLock.set(false);
         }
-        return getJobExecution(latest);
+        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final JobExecution execution = jobExecutions.get(latest);
+            if (execution == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            }
+            switch (execution.getBatchStatus()) {
+                case STOPPED:
+                case FAILED:
+                    break;
+                case COMPLETED:
+                    throw new JobExecutionAlreadyCompleteException(Messages.format("NOCK-006006.execution.repository.execution.already.complete", jobExecutionId));
+                default:
+                    throw new JobRestartException(Messages.format("NOCK-006007.execution.repository.execution.not.eligible.for.restart", execution.getExecutionId(), BatchStatus.STOPPED, BatchStatus.FAILED, execution.getBatchStatus()));
+            }
+        } finally {
+            jobExecutionLock.set(false);
+        }
+        return createJobExecution(
+                getJobInstance(instanceId),
+                parameters,
+                new Date()
+        );
     }
 
     @Override
-    public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        final Set<Long> executionIds;
+    public List<StepExecution> getStepExecutionsForJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        final TLongSet stepExecutionIds = new TLongHashSet();
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
-            executionIds = jobExecutionStepExecutions.get(jobExecutionId);
-            if (executionIds == null) {
-                throw new NoSuchJobExecutionException();
+            final TLongSet executions = jobExecutionStepExecutions.get(jobExecutionId);
+            if (executions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
+            stepExecutionIds.addAll(executions);
         } finally {
             jobExecutionStepExecutionLock.set(false);
         }
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final List<StepExecution> executions = new ArrayList<StepExecution>(executionIds.size());
-            for (final Long executionId : executionIds) {
-                executions.add(stepExecutions.get(executionId));
+            final List<StepExecution> stepExecutions = new ArrayList<StepExecution>(stepExecutionIds.size());
+            for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
+                stepExecutions.add(this.stepExecutions.get(it.next()));
             }
-            return executions;
+            return stepExecutions;
         } finally {
             stepExecutionLock.set(false);
         }
     }
 
     @Override
-    public StepExecution getStepExecution(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException {
-        final Set<Long> executionIds;
+    public ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException {
+        final TLongSet historicJobExecutionIds = new TLongHashSet();
+        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        try {
+            final TLongSet executions = jobExecutionHistory.get(jobExecutionId);
+            if (executions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            }
+            historicJobExecutionIds.addAll(executions);
+        } finally {
+            jobExecutionHistoryLock.set(false);
+        }
+        final TLongSet stepExecutionIds = new TLongHashSet();
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
-            executionIds = jobExecutionStepExecutions.get(jobExecutionId);
+            TLongSet executionIds = jobExecutionStepExecutions.get(jobExecutionId);
             if (executionIds == null) {
-                throw new NoSuchJobExecutionException();
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            }
+            stepExecutionIds.addAll(executionIds);
+            for (final TLongIterator it = historicJobExecutionIds.iterator(); it.hasNext();) {
+                final long historicJobExecutionId = it.next();
+                executionIds = jobExecutionStepExecutions.get(historicJobExecutionId);
+                if (executionIds == null) {
+                    throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", historicJobExecutionId));
+                }
+                stepExecutionIds.addAll(executionIds);
             }
         } finally {
             jobExecutionStepExecutionLock.set(false);
         }
+        final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            for (final Long executionId : executionIds) {
-                final StepExecution execution = stepExecutions.get(executionId);
+            for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
+                final ExtendedStepExecution execution = stepExecutions.get(it.next());
                 if (stepName.equals(execution.getStepName())) {
-                    return execution;
+                    candidates.add(execution);
                 }
             }
-            throw new NoSuchJobExecutionException();
         } finally {
             stepExecutionLock.set(false);
         }
+        ExtendedStepExecution latest = null;
+        for (final ExtendedStepExecution candidate : candidates) {
+            if (latest == null) {
+                latest = candidate;
+                continue;
+            }
+            if (candidate.getStartTime().after(latest.getStartTime())) {
+                latest = candidate;
+            }
+        }
+        if (latest == null) {
+            throw new NoSuchJobExecutionException(Messages.format("NOCK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+        }
+        return latest;
     }
 
     @Override
-    public StepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public int getStepExecutionCount(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException {
+        final TLongSet historicJobExecutionIds = new TLongHashSet();
+        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        try {
+            final TLongSet executions = jobExecutionHistory.get(jobExecutionId);
+            if (executions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            }
+            historicJobExecutionIds.addAll(executions);
+        } finally {
+            jobExecutionHistoryLock.set(false);
+        }
+        final TLongSet stepExecutionIds = new TLongHashSet();
+        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            TLongSet executionIds = jobExecutionStepExecutions.get(jobExecutionId);
+            if (executionIds == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            }
+            stepExecutionIds.addAll(executionIds);
+            for (final TLongIterator it = historicJobExecutionIds.iterator(); it.hasNext();) {
+                final long historicJobExecutionId = it.next();
+                executionIds = jobExecutionStepExecutions.get(historicJobExecutionId);
+                if (executionIds == null) {
+                    throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", historicJobExecutionId));
+                }
+                stepExecutionIds.addAll(executionIds);
+            }
+        } finally {
+            jobExecutionStepExecutionLock.set(false);
+        }
+        final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>(stepExecutionIds.size());
+        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
+                final long stepExecutionId = it.next();
+                final ExtendedStepExecution stepExecution = stepExecutions.get(stepExecutionId);
+                if (stepExecution == null) {
+                    throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                }
+                if (stepName.equals(stepExecution.getStepName())) {
+                    candidates.add(stepExecution);
+                }
+            }
+        } finally {
+            stepExecutionLock.set(false);
+        }
+        return candidates.size();
+    }
+
+    @Override
+    public ExtendedStepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             return stepExecutions.get(stepExecutionId);
@@ -573,13 +849,68 @@ public class LocalRepository implements ExecutionRepository {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             for (int i = 0; i < stepExecutionIds.length; ++i) {
-                for (final long executionId : stepExecutionIds) {
-                    executions[i] = stepExecutions.get(executionId);
-                }
+                executions[i] = stepExecutions.get(stepExecutionIds[i]);
             }
             return executions;
         } finally {
             stepExecutionLock.set(false);
         }
+    }
+
+    @Override
+    public PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            if (partitions.isEmpty()) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
+            final List<PartitionExecution> ret = new ArrayList<PartitionExecution>();
+            for (final TIntObjectIterator<PartitionExecution> it = partitions.iterator(); it.hasNext();) {
+                it.advance();
+                final PartitionExecution partitionExecution = it.value();
+                switch (partitionExecution.getBatchStatus()) {
+                    case FAILED:
+                    case STOPPED:
+                    case STOPPING:
+                    case STARTED:
+                    case STARTING:
+                        ret.add(partitionExecution);
+                        continue;
+                    case ABANDONED:
+                        throw new IllegalStateException(); //TODO Message
+                }
+            }
+            return ret.toArray(new PartitionExecution[ret.size()]);
+        } finally {
+            stepExecutionPartitionExecutionLock.set(false);
+        }
+    }
+
+    @Override
+    public PartitionExecution getPartitionExecution(final long stepExecutionId, final int partitionId) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            if (partitions.isEmpty()) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
+            final PartitionExecution partitionExecution = partitions.get(partitionId);
+            if (partitionExecution == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006008.execution.repository.no.such.partition.execution", stepExecutionId, partitionId));
+            }
+            return partitionExecution;
+        } finally {
+            stepExecutionPartitionExecutionLock.set(false);
+        }
+    }
+
+    //TODO Add recycling
+    private <T> T _clone(final T that) throws IOException, ClassNotFoundException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(that);
+        oos.flush();
+        return (T) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
     }
 }

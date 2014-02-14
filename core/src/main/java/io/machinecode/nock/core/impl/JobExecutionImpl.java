@@ -1,6 +1,6 @@
 package io.machinecode.nock.core.impl;
 
-import io.machinecode.nock.spi.RestartableJobExecution;
+import io.machinecode.nock.spi.ExtendedJobExecution;
 
 import javax.batch.runtime.BatchStatus;
 import java.util.Date;
@@ -9,7 +9,7 @@ import java.util.Properties;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobExecutionImpl implements RestartableJobExecution {
+public class JobExecutionImpl implements ExtendedJobExecution {
     private final long executionId;
     private final String jobName;
     private final BatchStatus batchStatus;
@@ -19,7 +19,7 @@ public class JobExecutionImpl implements RestartableJobExecution {
     private final Date created;
     private final Date updated;
     private final Properties parameters;
-    private final String restartId;
+    private final String restartElementId;
 
     public JobExecutionImpl(final Builder builder) {
         this.executionId = builder.executionId;
@@ -31,7 +31,7 @@ public class JobExecutionImpl implements RestartableJobExecution {
         this.created = builder.created;
         this.updated = builder.updated;
         this.parameters = builder.parameters;
-        this.restartId = builder.restartId;
+        this.restartElementId = builder.restartElementId;
     }
 
     public JobExecutionImpl(final JobExecutionImpl builder) {
@@ -44,7 +44,7 @@ public class JobExecutionImpl implements RestartableJobExecution {
         this.created = builder.created;
         this.updated = builder.updated;
         this.parameters = builder.parameters;
-        this.restartId = builder.restartId;
+        this.restartElementId = builder.restartElementId;
     }
 
     @Override
@@ -93,11 +93,11 @@ public class JobExecutionImpl implements RestartableJobExecution {
     }
 
     @Override
-    public String getRestartId() {
-        return restartId;
+    public String getRestartElementId() {
+        return restartElementId;
     }
 
-    public static Builder from(final RestartableJobExecution builder) {
+    public static Builder from(final ExtendedJobExecution builder) {
         final Builder that = new Builder();
         that.executionId = builder.getExecutionId();
         that.jobName = builder.getJobName();
@@ -108,7 +108,7 @@ public class JobExecutionImpl implements RestartableJobExecution {
         that.created = builder.getCreateTime();
         that.updated = builder.getLastUpdatedTime();
         that.parameters = builder.getJobParameters();
-        that.restartId = builder.getRestartId();
+        that.restartElementId = builder.getRestartElementId();
         return that;
     }
 
@@ -122,7 +122,7 @@ public class JobExecutionImpl implements RestartableJobExecution {
         private Date created;
         private Date updated;
         private Properties parameters;
-        private String restartId;
+        private String restartElementId;
 
         public Builder setExecutionId(final long executionId) {
             this.executionId = executionId;
@@ -169,8 +169,8 @@ public class JobExecutionImpl implements RestartableJobExecution {
             return this;
         }
 
-        public Builder setRestartId(final String restartId) {
-            this.restartId = restartId;
+        public Builder setRestartElementId(final String restartElementId) {
+            this.restartElementId = restartElementId;
             return this;
         }
 

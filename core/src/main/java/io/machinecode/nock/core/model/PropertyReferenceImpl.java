@@ -33,7 +33,7 @@ public class PropertyReferenceImpl<T> implements PropertyReference {
         if (this._cached != null) {
             return this._cached;
         }
-        final T that = this.ref.load(executor, context, this);
+        final T that = this.ref.load(executor, context, this.properties);
         this._cached = that;
         return that;
     }

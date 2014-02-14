@@ -35,10 +35,10 @@ public class XmlChunk implements XmlTask<XmlChunk>, InheritableChunk<XmlChunk, X
     private String timeLimit = ZERO;
 
     @XmlAttribute(name = "skip-limit", required = false)
-    private String skipLimit = ZERO;
+    private String skipLimit = MINUS_ONE;
 
     @XmlAttribute(name = "retry-limit", required = false)
-    private String retryLimit = ZERO;
+    private String retryLimit = MINUS_ONE;
 
     @XmlElement(name = "reader", namespace = NAMESPACE, required = true)
     private XmlItemReader reader;

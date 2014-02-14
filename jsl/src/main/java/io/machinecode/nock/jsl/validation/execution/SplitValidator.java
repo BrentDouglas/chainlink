@@ -20,16 +20,18 @@ public class SplitValidator extends ValidatingVisitor<Split> {
     @Override
     public void doVisit(final Split that, final VisitorNode context) {
         if (that.getId() == null) {
-            context.addProblem(Messages.format("validation.required.attribute", "id"));
+            context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "id"));
         } else {
-            context.setTransition(that.getId(), that.getNext());
+            context.addTransition(Messages.get("NOCK-002301.validation.next.attribute"), that.getNext());
         }
 
         if (that.getFlows() != null) {
             for (final Flow flow : that.getFlows()) {
                 if (flow == null) {
-                    context.addProblem(Messages.format("validation.not.null.element", "flow"));
+                    context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "flow"));
+                    continue;
                 }
+                context.addChildTransition(Messages.get("NOCK-002303.validation.split.implicit"), flow.getId());
                 FlowValidator.INSTANCE.visit(flow, context);
             }
         }

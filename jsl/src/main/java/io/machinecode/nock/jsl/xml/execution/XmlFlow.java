@@ -1,7 +1,7 @@
 package io.machinecode.nock.jsl.xml.execution;
 
 import io.machinecode.nock.jsl.inherit.execution.InheritableFlow;
-import io.machinecode.nock.jsl.xml.XmlInheritableBase;
+import io.machinecode.nock.jsl.xml.XmlInheritable;
 import io.machinecode.nock.jsl.xml.transition.XmlEnd;
 import io.machinecode.nock.jsl.xml.transition.XmlFail;
 import io.machinecode.nock.jsl.xml.transition.XmlNext;
@@ -29,7 +29,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 //        "executions",
 //        "transitions"
 //})
-public class XmlFlow extends XmlInheritableBase<XmlFlow> implements XmlExecution<XmlFlow>, InheritableFlow<XmlFlow, XmlExecution, XmlTransition> {
+public class XmlFlow extends XmlInheritable<XmlFlow> implements XmlExecution<XmlFlow>, InheritableFlow<XmlFlow, XmlExecution, XmlTransition> {
 
     @XmlID
     @XmlSchemaType(name = "ID")

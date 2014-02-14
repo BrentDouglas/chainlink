@@ -14,7 +14,7 @@
 
     <modules>
         <module>core</module>
-        <module>xml</module>
+        <module>batch</module>
         <module>cdi</module>
         <module>spring</module>
     </modules>

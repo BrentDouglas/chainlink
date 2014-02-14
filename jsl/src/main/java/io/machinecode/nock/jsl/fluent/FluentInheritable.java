@@ -50,17 +50,9 @@ public abstract class FluentInheritable<T extends FluentInheritable<T>> implemen
 
     @Override
     public T copy(final T that) {
-        that.setAbstract(this._abstract);
-        that.setParent(this.parent);
-        that.setJslName(this.jslName);
-        return that;
+        return BaseTool.copy((T)this, that);
     }
 
-    /**
-     * Pulls attributes from the parent elementName.
-     *
-     * @param parent
-     */
     protected void inheritingElementRule(final T parent) {
         BaseTool.inheritingElementRule(this, parent);
     }

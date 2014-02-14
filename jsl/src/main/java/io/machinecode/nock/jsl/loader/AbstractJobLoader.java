@@ -12,6 +12,7 @@ import io.machinecode.nock.spi.InheritableElement;
 import io.machinecode.nock.spi.JobRepository;
 import io.machinecode.nock.spi.ParentNotFoundException;
 import io.machinecode.nock.spi.loader.JobLoader;
+import io.machinecode.nock.spi.util.Messages;
 
 import javax.batch.operations.NoSuchJobException;
 
@@ -21,12 +22,12 @@ import javax.batch.operations.NoSuchJobException;
 public abstract class AbstractJobLoader implements JobLoader, JobRepository {
 
     @Override
-    public InheritableJob<?,?,?,?> load(final String id) throws NoSuchJobException {
-        final InheritableJob<?,?,?,?> job = doLoad(id).getJob();
-        return job.inherit(this, id);
+    public InheritableJob<?,?,?,?> load(final String jslName) throws NoSuchJobException {
+        final InheritableJob<?,?,?,?> job = doLoad(jslName).getJob();
+        return job.inherit(this, jslName);
     }
 
-    protected abstract Node doLoad(final String id) throws NoSuchJobException;
+    protected abstract Node doLoad(final String jslName) throws NoSuchJobException;
 
     @Override
     public <T extends InheritableElement<T>> T findParent(final Class<T> clazz, final T that, final String defaultJobXml) throws ParentNotFoundException {
@@ -59,14 +60,14 @@ public abstract class AbstractJobLoader implements JobLoader, JobRepository {
             if (this.name.equals(jslName)) {
                 final Inheritable target = values.get(id);
                 if (target == null) {
-                    throw new ParentNotFoundException("Can't find '" + id + "' in '" + jslName + "'.");
+                    throw new ParentNotFoundException(Messages.format("NOCK-003001.job.loader.id.not.in.file", id, jslName));
                 }
                 if (!clazz.isAssignableFrom(target.getClass())) {
                     throw new ClassCastException();
                 }
                 return clazz.cast(target.inherit(AbstractJobLoader.this, jslName));
             }
-            throw new ParentNotFoundException("Can't find file '" + jslName + "'.");
+            throw new ParentNotFoundException(Messages.format("NOCK-003000.job.loader.no.file", jslName));
         }
 
         public InheritableJob getJob() {

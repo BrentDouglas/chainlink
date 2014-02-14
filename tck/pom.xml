@@ -11,6 +11,9 @@
 
     <artifactId>nock-tck</artifactId>
     <packaging>pom</packaging>
+    <modules>
+        <module>core</module>
+    </modules>
 
     <properties>
         <build.properties>../build.properties</build.properties>
@@ -21,7 +24,6 @@
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
             <artifactId>com.ibm.jbatch-tck-spi</artifactId>
-            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.ibm.jbatch</groupId>
@@ -40,7 +42,6 @@
         <dependency>
             <groupId>io.machinecode.nock</groupId>
             <artifactId>nock-core</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -51,13 +52,13 @@
 
     <profiles>
         <profile>
-            <id>tck-core</id>
+            <id>tck-batch</id>
             <activation>
-                <property><name>tck-core</name></property>
+                <property><name>tck-batch</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
-                <module>core</module>
+                <module>batch</module>
             </modules>
         </profile>
         <profile>

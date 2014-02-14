@@ -1,5 +1,6 @@
 package io.machinecode.nock.core.local;
 
+import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.transaction.HeuristicMixedException;
@@ -33,7 +34,7 @@ public class LocalTransactionManager implements TransactionManager, UserTransact
     public void begin() throws NotSupportedException, SystemException {
         final Transaction current = this.transaction.get();
         if (current != null) {
-            throw new NotSupportedException();
+            throw new NotSupportedException(Messages.format("NOCK-008002.transaction.manager.multiple.transactions.not.supported", Thread.currentThread(), current));
         }
         this.transaction.set(new LocalTransaction(this));
     }
@@ -43,7 +44,7 @@ public class LocalTransactionManager implements TransactionManager, UserTransact
         try {
             final Transaction transaction = this.transaction.get();
             if (transaction == null) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(Messages.format("NOCK-008001.transaction.manager.no.transaction", Thread.currentThread()));
             }
             transaction.commit();
         } finally {
@@ -56,7 +57,7 @@ public class LocalTransactionManager implements TransactionManager, UserTransact
         try {
             final Transaction transaction = this.transaction.get();
             if (transaction == null) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(Messages.format("NOCK-008001.transaction.manager.no.transaction", Thread.currentThread()));
             }
             transaction.rollback();
         } finally {
@@ -68,7 +69,7 @@ public class LocalTransactionManager implements TransactionManager, UserTransact
     public void setRollbackOnly() throws IllegalStateException, SystemException {
         final Transaction transaction = this.transaction.get();
         if (transaction == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(Messages.format("NOCK-008001.transaction.manager.no.transaction", Thread.currentThread()));
         }
         transaction.setRollbackOnly();
     }
@@ -107,7 +108,7 @@ public class LocalTransactionManager implements TransactionManager, UserTransact
     public void resume(final Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
         final Transaction current = this.transaction.get();
         if (current != null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(Messages.format("NOCK-008000.transaction.manager.existing.transaction", Thread.currentThread(), current));
         }
         this.transaction.set(transaction);
     }

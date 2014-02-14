@@ -31,8 +31,8 @@ public class CdiConfigurationFactory implements ConfigurationFactory {
                 .setLoader(Thread.currentThread().getContextClassLoader())
                 .setRepository(new LocalRepository())
                 .setTransactionManager(new LocalTransactionManager(180))
-                .setArtifactLoaders(new ArtifactLoader[]{CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class)})
-                .setInjectors(new Injector[]{CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class)})
+                .setArtifactLoaders(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class))
+                .setInjectors(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class))
                 .build();
     }
 }

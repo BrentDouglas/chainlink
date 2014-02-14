@@ -3,6 +3,7 @@ package io.machinecode.nock.jsl.loader;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.nock.jsl.inherit.InheritableJob;
+import io.machinecode.nock.spi.util.Messages;
 
 import javax.batch.operations.NoSuchJobException;
 
@@ -20,11 +21,11 @@ public class FluentJobLoader extends AbstractJobLoader {
     final TMap<String, Node> repos = new THashMap<String, Node>();
 
     @Override
-    protected Node doLoad(final String id) throws NoSuchJobException {
-        final Node cached = repos.get(id);
+    protected Node doLoad(final String jslName) throws NoSuchJobException {
+        final Node cached = repos.get(jslName);
         if (cached != null) {
             return cached;
         }
-        throw new NoSuchJobException();
+        throw new NoSuchJobException(Messages.format("NOCK-003000.job.loader.no.file", jslName));
     }
 }

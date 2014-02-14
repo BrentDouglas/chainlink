@@ -19,7 +19,7 @@ public class EndValidator extends ValidatingVisitor<End> {
     @Override
     public void doVisit(final End that, final VisitorNode context) {
         if (that.getOn() == null) {
-            context.addProblem(Messages.format("validation.required.attribute", "on"));
+            context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "on"));
         }
     }
 }

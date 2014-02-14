@@ -12,7 +12,6 @@ import javax.xml.bind.JAXBException;
  */
 public class FluentJobInheritanceTest extends InheritanceJobTest {
 
-
     @Override
     protected AbstractJobLoader createRepo() {
         return new FluentJobLoader()

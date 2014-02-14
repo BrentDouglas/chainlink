@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Checkpoint {
+public interface Checkpoint extends Serializable {
 
     Serializable getReaderCheckpoint();
 

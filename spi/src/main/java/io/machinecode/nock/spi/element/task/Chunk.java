@@ -9,11 +9,7 @@ public interface Chunk extends Task {
 
     String TEN = "10";
     String ZERO = "0";
-
-    public static final class CheckpointPolicy {
-        public static final String ITEM = "item";
-        public static final String CUSTOM = "custom";
-    }
+    String MINUS_ONE = "-1";
 
     String getCheckpointPolicy();
 
@@ -38,4 +34,9 @@ public interface Chunk extends Task {
     ExceptionClassFilter getRetryableExceptionClasses();
 
     ExceptionClassFilter getNoRollbackExceptionClasses();
+
+    public static final class CheckpointPolicy {
+        public static final String ITEM = "item";
+        public static final String CUSTOM = "custom";
+    }
 }

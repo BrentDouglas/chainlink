@@ -2,11 +2,16 @@ package io.machinecode.nock.jsl.visitor;
 
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.nock.spi.element.Element;
+import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Execution;
 import io.machinecode.nock.spi.element.execution.Flow;
+import io.machinecode.nock.spi.element.execution.TransitionExecution;
 import io.machinecode.nock.spi.util.Messages;
+import io.machinecode.nock.spi.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +24,7 @@ public class VisitorNode {
 
     protected final Map<String, VisitorNode> ids;
     protected final List<String> problems = new ArrayList<String>(0);
+    protected final List<Cycle> cycles = new ArrayList<Cycle>(0);
     protected final VisitorNode parent;
     protected final List<VisitorNode> children = new ArrayList<VisitorNode>(0);
     protected final String elementName;
@@ -28,82 +34,108 @@ public class VisitorNode {
 
     protected String id;
     protected String next;
-    protected final Map<String, VisitorNode> jobScope;
-    protected final Map<String, VisitorNode> localScope;
-    final List<Transition> transitions;
+    protected final Map<String, VisitorNode> _executions;
+    protected final List<Transition> transitions = new ArrayList<Transition>(0);
+
 
     public VisitorNode(final String elementName, final Element value) {
         this.elementName = elementName;
         this.element = value;
+        this.id = ((Job)value).getId();
         this.value = null;
         this.parent = null;
         this.ids = new THashMap<String, VisitorNode>(0);
-        this.jobScope = new THashMap<String, VisitorNode>(0);
-        this.localScope = this.jobScope;
-        this.transitions = new ArrayList<Transition>(0);
+        this._executions = new THashMap<String, VisitorNode>(0);
     }
 
     public VisitorNode(final String elementName, final Element value, final VisitorNode parent) {
         boolean ex = value instanceof Execution;
         this.elementName = elementName;
         this.element = value;
-        this.value = ex ? (Execution)value : null;
         this.parent = parent;
         this.ids = parent.ids;
         if (value instanceof Flow) {
-            this.transitions = new ArrayList<Transition>(0);
-            this.localScope = new THashMap<String, VisitorNode>(0);
+            this.value = (Execution)value;
+            this.id = this.value.getId();
+            this._executions = new THashMap<String, VisitorNode>(0);
         } else if (ex) {
-            this.transitions = new ArrayList<Transition>(0);
-            this.localScope = parent.localScope;
+            this.value = (Execution)value;
+            this.id = this.value.getId();
+            this._executions = parent._executions;
         } else {
-            this.transitions = parent.transitions;
-            this.localScope = parent.localScope;
+            this.value = null;
+            this._executions = parent._executions;
         }
-        this.jobScope = parent.jobScope;
+        if (this.id != null) {
+            final VisitorNode old;
+            if ((old = this.ids.put(this.id, this)) != null) {
+                addProblem(Messages.format("NOCK-002105.validation.non.unique.id", this.id));
+                old.addProblem(Messages.format("NOCK-002105.validation.non.unique.id", this.id));
+            }
+        }
+        if (value instanceof TransitionExecution) {
+            this.next = ((TransitionExecution) value).getNext();
+            if (this.next != null) {
+                this.transitions.add(new Transition(Transition.Type.SIBLING, this.elementName, this.id, Messages.get("NOCK-002301.validation.next.attribute"), this.next));
+            }
+        }
     }
 
-    public void setTransition(final String id, final String next) {
-        this.id = id;
-        this.next = next;
-        if (next != null) {
-            this.transitions.add(new Transition(this.elementName, id, next));
+    public VisitorNode getExecution(final Transition transition) {
+        final Map<String, VisitorNode> executions;
+        switch (transition.type) {
+            case CHILD:
+                executions = _executions;
+                break;
+            case SIBLING:
+            default:
+                if (parent == null) {
+                    throw new IllegalStateException(Messages.format("NOCK-002000.validation.no.parent.node", this.elementName, this.id));
+                }
+                executions = parent._executions;
         }
-        if (id != null) {
-            if (this.parent != null) {
-                this.parent.localScope.put(id, this);
-            }
-            this.jobScope.put(id, this);
-            final VisitorNode old;
-            if ((old = this.ids.put(id, this)) != null) {
-                addProblem(Messages.format("validation.non.unique.id", id));
-                old.addProblem(Messages.format("validation.non.unique.id", id));
-            }
+        return executions.get(transition.to);
+    }
+
+    public void addTransition(final String element, final String to) {
+        if (to == null) {
+            return;
         }
+        this.transitions.add(new Transition(Transition.Type.SIBLING, this.elementName, this.id, element, to));
+    }
+
+    public void addChildTransition(final String element, final String to) {
+        if (to == null) {
+            return;
+        }
+        this.transitions.add(new Transition(Transition.Type.CHILD, this.elementName, this.id, element, to));
+    }
+
+    public void addParentTransition(final String element, final String to) {
+        this.parent.addTransition(element, to);
     }
 
     public void addProblem(final String problem) {
-        this.problems.add(problem);
         this.failed = true;
+        this.problems.add(problem);
+    }
+
+    public void addCycle(final Cycle problem) {
+        this.failed = true;
+        for (final Cycle cycle : cycles) {
+            if (cycle.isSameAs(problem)) {
+                return;
+            }
+        }
+        this.cycles.add(problem);
     }
 
     VisitorNode addChild(final VisitorNode child) {
+        if (child.id != null) {
+            this._executions.put(child.id, child);
+        }
         this.children.add(child);
         return child;
-    }
-
-    // Getters
-
-    public Object getValue() {
-        return value;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getNext() {
-        return next;
     }
 
     // Formatting
@@ -125,20 +157,15 @@ public class VisitorNode {
     }
 
     protected StringBuilder element(final StringBuilder builder) {
-        return element(this.elementName, this.id, this.next, builder);
+        return element(this.elementName, this.id, builder);
     }
 
-    public static StringBuilder element(final String element, final String id, final String next, final StringBuilder builder) {
+    public static StringBuilder element(final String element, final String id, final StringBuilder builder) {
         builder.append('<')
                 .append(element);
         if (id != null) {
             builder.append(" id=\"")
                     .append(id)
-                    .append('"');
-        }
-        if (next != null) {
-            builder.append(" next=\"")
-                    .append(next)
                     .append('"');
         }
         return builder.append('>');
@@ -165,19 +192,32 @@ public class VisitorNode {
         if (this.failed) {
             builder.append(ERROR);
             ws(builder, depth, "---", "---", "-> ", "+- ");
-            element(builder)
-                    .append(System.lineSeparator());
-            for (int i = 0; i < this.problems.size(); ++i) {
-                final String problem = this.problems.get(i);
+            element(builder).append(System.lineSeparator());
+            for (final String problem : this.problems) {
                 builder.append(PLAIN);
-                if (i == 0) {
+                ws(builder, depth, "|  ", "|     {  ");
+                builder.append(problem).append(System.lineSeparator());
+            }
+            for (final Cycle cycle : this.cycles) {
+                builder.append(PLAIN);
+                ws(builder, depth, "|  ", "|     {  ");
+                builder.append(Messages.get("NOCK-002106.validation.cycle.detected")).append(System.lineSeparator());
+                for (final Pair<Transition, VisitorNode> entry : cycle) {
+                    builder.append(PLAIN);
                     ws(builder, depth, "|  ", "|     {  ");
-                } else {
-                    ws(builder, depth, "|  ", "|     {  ");
+                    final Transition transition = entry.getName();
+                    final VisitorNode visitor = entry.getValue();
+                    builder.append("  ")
+                            .append(visitor.id)
+                            .append(" -> ")
+                            .append(transition.to)
+                            .append(" ");
+                    visitor.element(builder)
+                            .append(" (")
+                            .append(transition.toElement)
+                            .append(")  ");
+                    builder.append(System.lineSeparator());
                 }
-                ++i;
-                builder.append(problem)
-                        .append(System.lineSeparator());
             }
         } else {
             builder.append(PLAIN);
@@ -185,5 +225,72 @@ public class VisitorNode {
             element(builder).append(System.lineSeparator());
         }
         return builder;
+    }
+
+    public static class Cycle extends LinkedList<Pair<Transition, VisitorNode>> {
+
+        public Cycle() {
+        }
+
+        public Cycle(final Collection<? extends Pair<Transition, VisitorNode>> c) {
+            super(c);
+        }
+
+        boolean isSameAs(final Cycle cycle) {
+            if (cycle.size() != size()) {
+                return false;
+            }
+            for (final Pair<Transition, VisitorNode> theirs : cycle) {
+                if (!contains(theirs)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public Cycle subList(final int fromIndex, final int toIndex) {
+            return new Cycle(super.subList(fromIndex, toIndex));
+        }
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof VisitorNode)) return false;
+
+        final VisitorNode that = (VisitorNode) o;
+
+        if (failed != that.failed) return false;
+        if (!children.equals(that.children)) return false;
+        if (element != null ? !element.equals(that.element) : that.element != null) return false;
+        if (elementName != null ? !elementName.equals(that.elementName) : that.elementName != null) return false;
+        if (!_executions.equals(that._executions)) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (ids != null ? !ids.equals(that.ids) : that.ids != null) return false;
+        if (next != null ? !next.equals(that.next) : that.next != null) return false;
+        if (parent != null ? !parent.equals(that.parent) : that.parent != null) return false;
+        if (!problems.equals(that.problems)) return false;
+        if (transitions != null ? !transitions.equals(that.transitions) : that.transitions != null) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = ids != null ? ids.hashCode() : 0;
+        result = 31 * result + problems.hashCode();
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
+        result = 31 * result + children.hashCode();
+        result = 31 * result + (elementName != null ? elementName.hashCode() : 0);
+        result = 31 * result + (element != null ? element.hashCode() : 0);
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (failed ? 1 : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (next != null ? next.hashCode() : 0);
+        result = 31 * result + _executions.hashCode();
+        result = 31 * result + (transitions != null ? transitions.hashCode() : 0);
+        return result;
     }
 }

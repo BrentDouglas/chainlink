@@ -21,11 +21,11 @@ public class ChunkValidator extends ValidatingVisitor<Chunk> {
     @Override
     public void doVisit(final Chunk that, final VisitorNode context) {
         if (that.getCheckpointPolicy() == null) {
-            context.addProblem(Messages.format("validation.required.attribute", "checkpoint-policy"));
+            context.addProblem(Messages.format("NOCK-002102.validation.required.attribute", "checkpoint-policy"));
         }
         if (!CheckpointPolicy.ITEM.equals(that.getCheckpointPolicy())
                 && !CheckpointPolicy.CUSTOM.equals(that.getCheckpointPolicy())) {
-            context.addProblem(Messages.format("validation.matches.attribute", "checkpoint-policy", that.getCheckpointPolicy(), Strings.join(CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM)));
+            context.addProblem(Messages.format("NOCK-002104.validation.matches.attribute", "checkpoint-policy", that.getCheckpointPolicy(), Strings.join(CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM)));
         }
 
         //if (that.getItemCount() < 0) {
@@ -42,12 +42,12 @@ public class ChunkValidator extends ValidatingVisitor<Chunk> {
         //}
 
         if (that.getReader() == null) {
-            context.addProblem(Messages.format("validation.not.null.element", "reader"));
+            context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "reader"));
         } else {
             ItemReaderValidator.INSTANCE.visit(that.getReader(), context);
         }
         if (that.getWriter() == null) {
-            context.addProblem(Messages.format("validation.not.null.element", "writer"));
+            context.addProblem(Messages.format("NOCK-002100.validation.not.null.element", "writer"));
         } else {
             ItemWriterValidator.INSTANCE.visit(that.getWriter(), context);
         }

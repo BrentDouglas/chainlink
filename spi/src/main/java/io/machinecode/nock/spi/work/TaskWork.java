@@ -15,7 +15,5 @@ public interface TaskWork extends Task, Work, Deferred<ExecutionContext>, Serial
 
     TaskWork partition(PropertyContext context);
 
-    boolean isPartitioned();
-
     void run(final Executor executor, final ExecutionContext context, final int timeout) throws Exception;
 }

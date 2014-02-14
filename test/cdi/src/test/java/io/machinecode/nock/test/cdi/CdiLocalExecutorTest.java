@@ -2,7 +2,6 @@ package io.machinecode.nock.test.cdi;
 
 import io.machinecode.nock.cdi.CdiArtifactLoader;
 import io.machinecode.nock.cdi.CdiInjector;
-import io.machinecode.nock.core.JobOperatorImpl;
 import io.machinecode.nock.core.JobOperationImpl;
 import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.nock.core.factory.JobFactory;
@@ -61,8 +60,7 @@ public class CdiLocalExecutorTest extends ExecutorTest {
                                                 .addProperty("property", "value")
                                 )
                 ), PARAMETERS);
-        final JobOperatorImpl operator = new JobOperatorImpl(configuration(), transport());
-        final JobOperationImpl operation = operator.start(job);
+        final JobOperationImpl operation = operator.startJob(job, "unmanaged-injected-job", PARAMETERS);
         final JobExecution execution = repository().getJobExecution(operation.getJobExecutionId());
         operation.get();
         Assert.assertTrue(InjectedBatchlet.hasRun.get());

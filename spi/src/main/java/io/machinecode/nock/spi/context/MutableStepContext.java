@@ -2,6 +2,7 @@ package io.machinecode.nock.spi.context;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric.MetricType;
+import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 
 /**
@@ -13,9 +14,9 @@ public interface MutableStepContext extends StepContext {
 
     void setBatchStatus(BatchStatus batchStatus);
 
-    String getBatchletStatus();
-
-    void setBatchletStatus(String batchletStatus);
-
     MutableMetric getMetric(MetricType type);
+
+    MutableMetric[] getMutableMetrics();
+
+    void setFrom(final MutableStepContext stepContext);
 }

@@ -25,12 +25,27 @@ public class FailImpl extends TransitionImpl implements Fail {
     }
 
     @Override
-    public Result runTransition(final String id) throws Exception {
-        return Result.status(BatchStatus.FAILED, this.exitStatus);
+    public String element() {
+        return Fail.ELEMENT;
     }
 
     @Override
-    public String element() {
-        return Fail.ELEMENT;
+    public BatchStatus getBatchStatus() {
+        return BatchStatus.FAILED;
+    }
+
+    @Override
+    public String getNext() {
+        return null;
+    }
+
+    @Override
+    public String getRestartId() {
+        return null;
+    }
+
+    @Override
+    public boolean isTerminating() {
+        return true;
     }
 }

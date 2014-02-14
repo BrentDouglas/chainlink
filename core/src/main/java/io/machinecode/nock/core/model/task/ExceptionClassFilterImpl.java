@@ -1,6 +1,7 @@
 package io.machinecode.nock.core.model.task;
 
 import io.machinecode.nock.spi.element.task.ExceptionClassFilter;
+import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import java.util.Collections;
@@ -46,6 +47,7 @@ public class ExceptionClassFilterImpl implements ExceptionClassFilter {
         for (final ExceptionClassImpl that : includes) {
             try {
                 if (that.matches(clazz, loader)) {
+                    log.tracef(Messages.get("NOCK-026000.exception.filter.matched"), that.getClassName(), clazz);
                     return true;
                 }
             } catch (final ClassNotFoundException e) {

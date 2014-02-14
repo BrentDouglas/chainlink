@@ -7,7 +7,7 @@ import io.machinecode.nock.test.core.jsl.InheritanceJobTest;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class XmlJobTest  extends InheritanceJobTest{
+public class XmlJobTest  extends InheritanceJobTest {
 
     private static ClassLoader classLoader = XmlJobTest.class.getClassLoader();
 

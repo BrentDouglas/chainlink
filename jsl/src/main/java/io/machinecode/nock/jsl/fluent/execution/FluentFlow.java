@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.jsl.fluent.FluentInheritableBase;
+import io.machinecode.nock.jsl.fluent.FluentInheritable;
 import io.machinecode.nock.jsl.fluent.transition.FluentTransition;
 import io.machinecode.nock.jsl.inherit.execution.InheritableFlow;
 import io.machinecode.nock.spi.JobRepository;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentFlow extends FluentInheritableBase<FluentFlow> implements FluentExecution<FluentFlow>, InheritableFlow<FluentFlow, FluentExecution, FluentTransition> {
+public class FluentFlow extends FluentInheritable<FluentFlow> implements FluentExecution<FluentFlow>, InheritableFlow<FluentFlow, FluentExecution, FluentTransition> {
 
     private String id;
     private String next;

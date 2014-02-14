@@ -1,9 +1,10 @@
 package io.machinecode.nock.spi.context;
 
-import io.machinecode.nock.spi.RestartableJobExecution;
+import io.machinecode.nock.spi.ExtendedJobExecution;
 import io.machinecode.nock.spi.execution.Item;
 import io.machinecode.nock.spi.work.JobWork;
 
+import javax.batch.runtime.JobExecution;
 import java.io.Serializable;
 
 /**
@@ -13,19 +14,37 @@ public interface ExecutionContext extends Serializable {
 
     JobWork getJob();
 
-    RestartableJobExecution getJobExecution();
+    ExtendedJobExecution getJobExecution();
 
-    long getJobInstanceId();
+    ExtendedJobExecution getRestartJobExecution();
+
+    boolean isRestarting();
 
     long getJobExecutionId();
 
     Long getStepExecutionId();
 
+    Integer getPartitionId();
+
     MutableJobContext getJobContext();
 
     MutableStepContext getStepContext();
 
+    void setStepContext(final MutableStepContext stepContext);
+
     Item[] getItems();
 
-    void setItems(final Item[] items);
+    void setItems(final Item... items);
+
+    String getRestartElementId();
+
+    void setRestartElementId(final String restartElementId);
+
+    Long getLastStepExecutionId();
+
+    void setLastStepExecutionId(final long lastStepExecutionId);
+
+    long[] getPriorStepExecutionIds();
+
+    void addPriorStepExecutionId(final long priorStepExecutionId);
 }

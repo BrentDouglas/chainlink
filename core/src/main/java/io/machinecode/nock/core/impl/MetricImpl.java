@@ -28,4 +28,15 @@ public class MetricImpl implements Metric {
     public long getValue() {
         return value;
     }
+
+    public static MetricImpl[] copy(final Metric[] metrics) {
+        if (metrics == null) {
+            return null;
+        }
+        final MetricImpl[] mets = new MetricImpl[metrics.length];
+        for (int i = 0; i < metrics.length; ++i) {
+            mets[i] = new MetricImpl(metrics[i]);
+        }
+        return mets;
+    }
 }

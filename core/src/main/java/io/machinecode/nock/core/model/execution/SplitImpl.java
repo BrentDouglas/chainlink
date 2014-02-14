@@ -2,21 +2,17 @@ package io.machinecode.nock.core.model.execution;
 
 import io.machinecode.nock.core.impl.ExecutionContextImpl;
 import io.machinecode.nock.core.impl.JobContextImpl;
-import io.machinecode.nock.core.work.RepositoryStatus;
 import io.machinecode.nock.core.work.ExecutionExecutable;
+import io.machinecode.nock.core.work.Statuses;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
 import io.machinecode.nock.spi.element.execution.Split;
-import io.machinecode.nock.spi.execution.CallbackExecutable;
 import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.util.Messages;
-import io.machinecode.nock.spi.work.TransitionWork;
 import org.jboss.logging.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,15 +43,14 @@ public class SplitImpl extends ExecutionImpl implements Split {
 
     // Lifecycle
 
-    private transient List<ExecutionContext> contexts;
+    private transient int _completed;
 
     @Override
-    public Deferred<?> before(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
-                                 final CallbackExecutable parentExecutable, final ExecutionContext context,
-                                 final ExecutionContext... previousContexts) throws Exception {
-        log.debugf(Messages.get("split.run"), context.getJobExecutionId(), id);
-        if (RepositoryStatus.isStopping(context) || RepositoryStatus.isComplete(context)) {
-            return null; //TODO
+    public Deferred<?> before(final Executor executor, final ThreadId threadId, final Executable thisCallback,
+                              final Executable parentCallback, final ExecutionContext context) throws Exception {
+        log.debugf(Messages.get("NOCK-021000.split.before"), context, this.id);
+        if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
+            return runCallback(executor, context, parentCallback);
         }
         final ExecutionExecutable[] flows = new ExecutionExecutable[this.flows.size()];
         for (int i = 0; i < flows.length; ++i) {
@@ -64,11 +59,13 @@ public class SplitImpl extends ExecutionImpl implements Split {
                     context.getJob(),
                     new JobContextImpl(context.getJobContext()),
                     null,
-                    context.getJobExecution()
+                    context.getJobExecution(),
+                    context.getRestartJobExecution(),
+                    null
             );
-            flows[i] = new ExecutionExecutable(thisExecutable, flow, flowContext);
+            flows[i] = new ExecutionExecutable(thisCallback, flow, flowContext);
         }
-        this.contexts = new ArrayList<ExecutionContext>(flows.length);
+        this._completed = 0;
         return executor.execute(
                 flows.length,
                 flows
@@ -76,14 +73,24 @@ public class SplitImpl extends ExecutionImpl implements Split {
     }
 
     @Override
-    public Deferred<?> after(final Executor executor, final ThreadId threadId, final CallbackExecutable thisExecutable,
-                                final CallbackExecutable parentExecutable, final ExecutionContext context,
-                                final ExecutionContext childContext) throws Exception {
-        log.debugf(Messages.get("split.after"), context.getJobExecutionId(), id);
-        this.contexts.add(childContext);
-        if (this.contexts.size() < this.flows.size()) {
+    public Deferred<?> after(final Executor executor, final ThreadId threadId, final Executable callback,
+                             final ExecutionContext context, final ExecutionContext childContext) throws Exception {
+        log.debugf(Messages.get("NOCK-021001.split.after"), context, this.id);
+        final Long stepExecutionId = childContext.getLastStepExecutionId();
+        if (stepExecutionId != null) {
+            context.addPriorStepExecutionId(stepExecutionId);
+        }
+        if (++this._completed < this.flows.size()) {
             return null;
         }
-        return this.transition(executor, threadId, context, thisExecutable, parentExecutable, Collections.<TransitionWork>emptyList(), this.next, null);
+        if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
+            return runCallback(executor, context, callback);
+        }
+        return this.next(executor, threadId, context, callback, this.next, null);
+    }
+
+    @Override
+    protected Logger log() {
+        return log;
     }
 }

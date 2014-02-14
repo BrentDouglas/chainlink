@@ -7,6 +7,7 @@ import io.machinecode.nock.spi.util.Pair;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -155,43 +156,32 @@ public class Expression {
         return unresolvedLength;
     }
 
-    private static <T extends Pair<String, String>> String _getProperty(final CharSequence value, final List<T> properties) {
-        final ListIterator<T> it = properties.listIterator(properties.size());
-        while (it.hasPrevious()) {
-            final T property = it.previous();
-            if (value.equals(property.getName())) {
-                return property.getValue();
-            }
-        }
-        return EMPTY;
-    }
-
-    public static <T extends Pair<String, String>> String resolveExecutionProperty(final String that, final JobPropertyContext context) {
+    public static String resolveExecutionProperty(final String that, final JobPropertyContext context) {
         if (that == null) {
             return null;
         }
         return attributeValue(that, 0,
-                new ContextPropertyResolver(JOB_PROPERTIES, JOB_PROPERTIES_LENGTH, context.getProperties()),
-                new ContextPropertyResolver(JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, context.getParameters()),
+                new PropertyResolverImpl(JOB_PROPERTIES, JOB_PROPERTIES_LENGTH, context.getProperties()),
+                new PropertyResolverImpl(JOB_PARAMETERS, JOB_PARAMETERS_LENGTH, context.getParameters()),
                 SYSTEM_PROPERTY_RESOLVER
         ).toString();
     }
 
 
-    public static <T extends Pair<String, String>> String resolvePartitionProperty(final String that, final PropertyContext context) {
+    public static String resolvePartitionProperty(final String that, final PropertyContext context) {
         if (that == null) {
             return null;
         }
-        return attributeValue(that, 0, new ContextPropertyResolver(PARTITION_PLAN, PARTITION_PLAN_LENGTH, context.getProperties())).toString();
+        return attributeValue(that, 0, new PropertyResolverImpl(PARTITION_PLAN, PARTITION_PLAN_LENGTH, context.getProperties())).toString();
     }
 
-    private static final class ContextPropertyResolver implements PropertyResolver {
+    private static class PropertyResolverImpl implements PropertyResolver {
 
         private final String prefix;
         private final int length;
-        private final List<? extends Pair<String, String>> properties;
+        private final Properties properties;
 
-        private ContextPropertyResolver(final String prefix, final int length, final List<? extends Pair<String, String>> properties) {
+        private PropertyResolverImpl(final String prefix, final int length, final Properties properties) {
             this.prefix = prefix;
             this.length = length;
             this.properties = properties;
@@ -199,31 +189,25 @@ public class Expression {
 
         @Override
         public String prefix() {
-            return prefix;
+            return this.prefix;
         }
 
         @Override
         public int length() {
-            return length;
+            return this.length;
         }
 
         @Override
         public CharSequence resolve(final CharSequence value) {
-            return _getProperty(value, properties);
+            if (this.properties == null) {
+                return EMPTY;
+            }
+            final String that = this.properties.getProperty(value.toString());
+            return that == null ? EMPTY : that;
         }
     }
 
-    private static final PropertyResolver SYSTEM_PROPERTY_RESOLVER = new PropertyResolver() {
-        @Override
-        public String prefix() {
-            return SYSTEM_PROPERTIES;
-        }
-
-        @Override
-        public int length() {
-            return SYSTEM_PROPERTIES_LENGTH;
-        }
-
+    private static final PropertyResolver SYSTEM_PROPERTY_RESOLVER = new PropertyResolverImpl(SYSTEM_PROPERTIES, SYSTEM_PROPERTIES_LENGTH, null) {
         @Override
         public CharSequence resolve(final CharSequence value) {
             final String that = System.getProperty(value.toString());

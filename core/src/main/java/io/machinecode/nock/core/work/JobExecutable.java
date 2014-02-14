@@ -4,71 +4,44 @@ import io.machinecode.nock.core.deferred.DeferredImpl;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
-import io.machinecode.nock.spi.execution.CallbackExecutable;
+import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.JobWork;
 import org.jboss.logging.Logger;
 
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.context.JobContext;
-
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class JobExecutable extends CallbackExecutableImpl<JobWork> {
+public class JobExecutable extends ExecutableImpl<JobWork> {
 
     private static final Logger log = Logger.getLogger(JobExecutable.class);
 
-    public JobExecutable(final CallbackExecutable parent, final JobWork work, final ExecutionContext context) {
-        super(parent, context, work);
+    public JobExecutable(final Executable parent, final JobWork work, final ExecutionContext context) {
+        super(parent, context, work, null);
     }
 
     @Override
-    public Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
-                                   final ExecutionContext... _) throws Throwable {
+    public Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final Executable callback,
+                                 final ExecutionContext _) throws Throwable {
         try {
-            return work.before(executor, threadId, this, parentExecutable, context);
+            return work.before(executor, threadId, new JobCallback(this, threadId), this.context);
         } catch (final Throwable e) {
-            log.errorf(e, Messages.format("work.job.before.exception", context.getJobExecutionId()));
-            context.getJobContext().setBatchStatus(BatchStatus.FAILED);
-            throw e;
+            log.errorf(e, Messages.format("NOCK-023002.work.job.before.exception", this.context));
+            Repository.failedJob(
+                    executor.getRepository(),
+                    this.context.getJobExecutionId(),
+                    this.context.getJobContext().getExitStatus()
+            );
+            executor.removeJob(this.context.getJobExecutionId());
+            final Deferred<?> deferred = new DeferredImpl<Void>();
+            deferred.reject(e);
+            return deferred;
         }
     }
 
     @Override
-    protected Deferred<?> doCallback(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
-                                        final ExecutionContext childContext) throws Throwable {
-        final JobContext jobContext = context.getJobContext();
-        try {
-            work.after(executor, threadId, this, parentExecutable, context, childContext);
-            return new DeferredImpl<Void>();
-        } catch (final Throwable e) {
-            log.errorf(e, Messages.format("work.job.after.exception", context.getJobExecutionId()));
-            context.getJobContext().setBatchStatus(BatchStatus.FAILED);
-            throw e;
-        } finally {
-            if (BatchStatus.FAILED.equals(childContext.getJobContext().getBatchStatus())) {
-                RepositoryStatus.failedJob(
-                        executor.getRepository(),
-                        context.getJobExecutionId(),
-                        jobContext.getExitStatus()
-                );
-            } else if (BatchStatus.STOPPING.equals(childContext.getJobContext().getBatchStatus())) {
-                RepositoryStatus.finishJob(
-                        executor.getRepository(),
-                        context.getJobExecutionId(),
-                        BatchStatus.STOPPED,
-                        jobContext.getExitStatus()
-                );
-            } else {
-                RepositoryStatus.completedJob(
-                        executor.getRepository(),
-                        context.getJobExecutionId(),
-                        jobContext.getExitStatus()
-                );
-            }
-            executor.removeJob(context.getJobExecutionId());
-        }
+    protected Logger log() {
+        return log;
     }
 }

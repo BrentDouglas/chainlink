@@ -33,6 +33,6 @@ public class ListenerImpl implements Listener, PropertyReference {
     }
 
     public <T> T load(final Class<T> clazz, final Executor executor, final ExecutionContext context) throws Exception {
-        return this.ref.load(clazz, executor, context, this);
+        return this.ref.load(clazz, executor, context, this.properties);
     }
 }

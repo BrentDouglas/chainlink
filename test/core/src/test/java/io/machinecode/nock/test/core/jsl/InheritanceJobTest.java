@@ -344,8 +344,8 @@ public abstract class InheritanceJobTest {
         Assert.assertEquals(CheckpointPolicy.ITEM, chunk1.getCheckpointPolicy());
         Assert.assertEquals("100", chunk1.getItemCount());
         Assert.assertEquals(Chunk.ZERO, chunk1.getTimeLimit());
-        Assert.assertEquals(Chunk.ZERO, chunk1.getSkipLimit());
-        Assert.assertEquals(Chunk.ZERO, chunk1.getRetryLimit());
+        Assert.assertEquals(Chunk.MINUS_ONE, chunk1.getSkipLimit());
+        Assert.assertEquals(Chunk.MINUS_ONE, chunk1.getRetryLimit());
         Assert.assertNotNull(chunk1.getReader());
         Assert.assertNotNull(chunk1.getProcessor());
         Assert.assertNotNull(chunk1.getWriter());
@@ -394,8 +394,8 @@ public abstract class InheritanceJobTest {
         final Chunk chunk = (Chunk) step.getTask();
         Assert.assertEquals(CheckpointPolicy.ITEM, chunk.getCheckpointPolicy());
         Assert.assertEquals(Chunk.TEN, chunk.getItemCount());
-        Assert.assertEquals(Chunk.ZERO, chunk.getSkipLimit());
-        Assert.assertEquals(Chunk.ZERO, chunk.getRetryLimit());
+        Assert.assertEquals(Chunk.MINUS_ONE, chunk.getSkipLimit());
+        Assert.assertEquals(Chunk.MINUS_ONE, chunk.getRetryLimit());
         Assert.assertEquals(Chunk.ZERO, chunk.getTimeLimit());
     }
 }

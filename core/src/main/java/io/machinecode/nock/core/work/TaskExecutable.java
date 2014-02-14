@@ -1,10 +1,10 @@
 package io.machinecode.nock.core.work;
 
 import io.machinecode.nock.spi.context.ExecutionContext;
+import io.machinecode.nock.spi.context.MutableJobContext;
 import io.machinecode.nock.spi.context.MutableStepContext;
 import io.machinecode.nock.spi.context.ThreadId;
 import io.machinecode.nock.spi.deferred.Deferred;
-import io.machinecode.nock.spi.execution.CallbackExecutable;
 import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.util.Messages;
@@ -24,28 +24,29 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
     final int partition;
     final int timeout;
 
-    public TaskExecutable(final CallbackExecutable parent, final TaskWork work, final ExecutionContext context, final String stepId, final int partition, final int timeout) {
-        super(parent, context, work);
+    public TaskExecutable(final Executable parent, final TaskWork work, final ExecutionContext context, final String stepId, final int partition, final int timeout) {
+        super(parent, context, work, null);
         this.stepId = stepId;
         this.partition = partition;
         this.timeout = timeout;
     }
 
     @Override
-    public Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final CallbackExecutable parentExecutable,
-                                   final ExecutionContext... contexts) throws Throwable {
+    public Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final Executable callback,
+                                 final ExecutionContext childContext) throws Throwable {
         final MutableStepContext stepContext = context.getStepContext();
+        final MutableJobContext jobContext = context.getJobContext();
         try {
-            work.run(executor, context, timeout); //TODO
-            return executor.callback(parentExecutable, context);
+            work.run(executor, this.context, timeout);
+            return executor.callback(callback, this.context);
         } catch (final Throwable e) {
+            log.errorf(e, Messages.format("NOCK-023004.work.task.run.exception", this.context));
             if (e instanceof Exception) {
                 stepContext.setException((Exception) e);
             }
-            log.errorf(e, Messages.format("work.task.run.exception", context.getJobExecutionId()));
-            context.getStepContext().setBatchStatus(BatchStatus.FAILED);
-            context.getJobContext().setBatchStatus(BatchStatus.FAILED);
-            throw e;
+            stepContext.setBatchStatus(BatchStatus.FAILED);
+            jobContext.setBatchStatus(BatchStatus.FAILED);
+            return executor.callback(callback, this.context);
         }
     }
 
@@ -53,5 +54,10 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
     public boolean cancel(final boolean mayInterruptIfRunning) {
         return work.cancel(mayInterruptIfRunning)
                 && super.cancel(mayInterruptIfRunning);
+    }
+
+    @Override
+    protected Logger log() {
+        return log;
     }
 }

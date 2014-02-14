@@ -54,7 +54,7 @@ public class ExpressionTest {
         Assert.assertEquals("step3", step.getNext());
     }
 
-    @Test//(expected = IllegalExpressionException.class)
+    @Test
     public void validJobPropertyWithInvalidDefaultTest() {
         final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
@@ -92,7 +92,7 @@ public class ExpressionTest {
         Assert.assertEquals("step2", step1.getNext());
     }
 
-    @Test//(expected = IllegalExpressionException.class)
+    @Test
     public void invalidDefaultJobPropertyTest() {
         final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("i1")
@@ -223,9 +223,9 @@ public class ExpressionTest {
                 .addProperty("prop3", "2")
                 .addExecution(Jsl.stepWithBatchletAndPlan()
                         .setId("step1")
-                        .setNext("blah?:default;not invalid apparently")
+                        .setNext("blah?:default; not invalid apparently")
                 ).addExecution(Jsl.stepWithChunkAndPlan()
-                        .setId("step2")
+                        .setId("blah not invalid apparently")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
     }
@@ -250,6 +250,10 @@ public class ExpressionTest {
                 ).addExecution(Jsl.stepWithChunkAndPlan()
                         .setId("step2")
                         .setNext("#{systemProperties['file.separator']}test#{systemProperties['file.separator']}#{jobParameters['myFilename']}.txt")
+                ).addExecution(Jsl.stepWithChunkAndPlan()
+                        .setId("/myfile2.txt")
+                ).addExecution(Jsl.stepWithChunkAndPlan()
+                        .setId("/test/testfile1.txt")
                 ) , parameters);
         JobFactory.INSTANCE.validate(job);
 

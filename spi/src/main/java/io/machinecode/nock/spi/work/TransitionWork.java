@@ -10,33 +10,15 @@ import java.io.Serializable;
  */
 public interface TransitionWork extends Transition, Serializable {
 
-    Result runTransition(String id) throws Exception;
-
     String element();
 
-    class Result {
-        public final BatchStatus batchStatus;
-        public final String exitStatus;
-        public final String next;
-        public final String restartId;
+    BatchStatus getBatchStatus();
 
-        public Result(final BatchStatus batchStatus, final String exitStatus, final String next, final String restartId) {
-            this.batchStatus = batchStatus;
-            this.exitStatus = exitStatus;
-            this.next = next;
-            this.restartId = restartId;
-        }
+    String getExitStatus();
 
-        public static Result next(final String next) {
-            return new Result(null, null, next, null);
-        }
+    String getNext();
 
-        public static Result status(final BatchStatus batchStatus, final String exitStatus) {
-            return new Result(batchStatus, exitStatus, null, null);
-        }
+    String getRestartId();
 
-        public static Result status(final BatchStatus batchStatus, final String exitStatus, final String restartId) {
-            return new Result(batchStatus, exitStatus, null, restartId);
-        }
-    }
+    boolean isTerminating();
 }

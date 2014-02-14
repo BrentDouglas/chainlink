@@ -3,6 +3,7 @@ package io.machinecode.nock.core.inject;
 import gnu.trove.set.hash.TLinkedHashSet;
 import io.machinecode.nock.spi.configuration.Configuration;
 import io.machinecode.nock.spi.inject.Injector;
+import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import java.util.Collections;
@@ -27,7 +28,7 @@ public class InjectorImpl implements Injector {
     @Override
     public <T> boolean inject(final T bean) throws Exception {
         if (bean == null) {
-            log.debugf("injector.bean.null"); //TODO Messages
+            log.debugf(Messages.get("NOCK-000001.injector.bean.null"));
             return false;
         }
         for (final Injector injector : injectors) {

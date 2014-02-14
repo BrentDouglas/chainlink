@@ -1,6 +1,6 @@
 package io.machinecode.nock.test.core;
 
-import io.machinecode.nock.core.work.RepositoryStatus;
+import io.machinecode.nock.core.work.Statuses;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -13,39 +13,39 @@ public class StatusTest {
 
     @Test
     public void testExitStatus() {
-        Assert.assertTrue(RepositoryStatus.matches("STARTING", "STARTING"));
-        Assert.assertTrue(RepositoryStatus.matches("STARTED", "STARTED"));
-        Assert.assertTrue(RepositoryStatus.matches("COMPLETED", "COMPLETED"));
-        Assert.assertTrue(RepositoryStatus.matches("FAILED", "FAILED"));
-        Assert.assertTrue(RepositoryStatus.matches("ABANDONED", "ABANDONED"));
-        Assert.assertTrue(RepositoryStatus.matches("STOPPED", "STOPPED"));
-        Assert.assertTrue(RepositoryStatus.matches("STOPPING", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STARTING", "STARTING"));
+        Assert.assertTrue(Statuses.matches("STARTED", "STARTED"));
+        Assert.assertTrue(Statuses.matches("COMPLETED", "COMPLETED"));
+        Assert.assertTrue(Statuses.matches("FAILED", "FAILED"));
+        Assert.assertTrue(Statuses.matches("ABANDONED", "ABANDONED"));
+        Assert.assertTrue(Statuses.matches("STOPPED", "STOPPED"));
+        Assert.assertTrue(Statuses.matches("STOPPING", "STOPPING"));
 
-        Assert.assertTrue(RepositoryStatus.matches("?TOPPING", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("STOPPIN?", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("STOP?ING", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("?TOPPING", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STOPPIN?", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STOP?ING", "STOPPING"));
 
-        Assert.assertTrue(RepositoryStatus.matches("STOPPIN*", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("STOP*", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("STOP*ING", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("STOP*PING", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("S*ING", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("*", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("**", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("*?", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("?*", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("ST*?PI*?G", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("STOP*PI*NG", "STOPPING"));
-        Assert.assertTrue(RepositoryStatus.matches("STOP*PI?G", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STOPPIN*", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STOP*", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STOP*ING", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STOP*PING", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("S*ING", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("*", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("**", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("*?", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("?*", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("ST*?PI*?G", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STOP*PI*NG", "STOPPING"));
+        Assert.assertTrue(Statuses.matches("STOP*PI?G", "STOPPING"));
     }
     @Test
     public void testBatchStatus() {
-        Assert.assertTrue(RepositoryStatus.matches("STARTING", BatchStatus.STARTING));
-        Assert.assertTrue(RepositoryStatus.matches("STARTED", BatchStatus.STARTED));
-        Assert.assertTrue(RepositoryStatus.matches("COMPLETED", BatchStatus.COMPLETED));
-        Assert.assertTrue(RepositoryStatus.matches("FAILED", BatchStatus.FAILED));
-        Assert.assertTrue(RepositoryStatus.matches("ABANDONED", BatchStatus.ABANDONED));
-        Assert.assertTrue(RepositoryStatus.matches("STOPPED", BatchStatus.STOPPED));
-        Assert.assertTrue(RepositoryStatus.matches("STOPPING", BatchStatus.STOPPING));
+        Assert.assertTrue(Statuses.matches("STARTING", BatchStatus.STARTING));
+        Assert.assertTrue(Statuses.matches("STARTED", BatchStatus.STARTED));
+        Assert.assertTrue(Statuses.matches("COMPLETED", BatchStatus.COMPLETED));
+        Assert.assertTrue(Statuses.matches("FAILED", BatchStatus.FAILED));
+        Assert.assertTrue(Statuses.matches("ABANDONED", BatchStatus.ABANDONED));
+        Assert.assertTrue(Statuses.matches("STOPPED", BatchStatus.STOPPED));
+        Assert.assertTrue(Statuses.matches("STOPPING", BatchStatus.STOPPING));
     }
 }

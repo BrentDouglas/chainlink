@@ -10,8 +10,8 @@ public class FluentChunk implements FluentTask<FluentChunk>, InheritableChunk<Fl
     private String checkpointPolicy = CheckpointPolicy.ITEM;
     private String itemCount = TEN;
     private String timeLimit = ZERO;
-    private String skipLimit = ZERO;
-    private String retryLimit = ZERO;
+    private String skipLimit = MINUS_ONE;
+    private String retryLimit = MINUS_ONE;
     private FluentItemReader reader;
     private FluentItemProcessor processor;
     private FluentItemWriter writer;

@@ -1,11 +1,10 @@
 package io.machinecode.nock.jsl.visitor;
 
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.nock.jsl.util.ImmutablePair;
 import io.machinecode.nock.spi.element.Element;
 import io.machinecode.nock.spi.util.Messages;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,66 +16,57 @@ public abstract class ValidatingVisitor<T extends Element> extends Visitor<T> {
         super(element);
     }
 
-    public static boolean hasCycle(final VisitorNode node) {
-        final List<VisitorNode> cycle = new LinkedList<VisitorNode>();
-        final Set<String> trail = new THashSet<String>();
+    public static boolean findProblems(final VisitorNode node) {
         boolean ret = false;
-        //Root node
+        //Root node is a job
+        for (final VisitorNode execution : node.children) {
+            final VisitorNode.Cycle cycle = new VisitorNode.Cycle();
+            final Set<String> trail = new THashSet<String>();
+            ret = _findProblems(execution, cycle, trail) || ret;
+        }
+        return ret;
+    }
+
+    private static boolean _findProblems(final VisitorNode node, final VisitorNode.Cycle cycle, final Set<String> trail) {
+        boolean ret = false;
         if (node.id != null) {
-            VisitorNode that = node;
-            cycle.add(that);
-            trail.add(that.id);
-            while ((that = node.jobScope.get(that.next)) != null) {
-                cycle.add(that);
-                if (!trail.add(that.id)) {
-                    node.addProblem(Messages.get("validation.cycle.detected"));
-                    for (final VisitorNode problem : cycle) {
-                        final StringBuilder builder = new StringBuilder()
-                                .append("  ")
-                                .append(problem.id)
-                                .append(" -> ")
-                                .append(problem.next);
-                        node.addProblem(problem.element(builder).toString());
+            if (!trail.add(node.id)) {
+                for (int i = cycle.size() - 1; i >= 0; --i) {
+                    final VisitorNode that = cycle.get(i).getValue();
+                    if (that.equals(node)) {
+                        that.addCycle(cycle.subList(i, cycle.size()));
+                        ret = true;
+                        break;
                     }
-                    final StringBuilder builder = new StringBuilder()
-                            .append("  ")
-                            .append(that.id)
-                            .append(" -> ")
-                            .append(that.next);
-                    node.addProblem(that.element(builder).toString());
+                }
+                if (!ret) {
+                    cycle.get(0).getValue().addCycle(cycle);
                     ret = true;
-                    break;
+                }
+            } else {
+                for (final Transition transition : node.transitions) {
+                    final VisitorNode execution = node.getExecution(transition);
+                    if (execution == null) {
+                        node.addProblem(Messages.format("NOCK-002107.validation.invalid.transition", node.id, transition.to));
+                        ret = true;
+                        continue;
+                    }
+                    final VisitorNode.Cycle subCycle = new VisitorNode.Cycle(cycle);
+                    final THashSet<String> subTrail = new THashSet<String>(trail);
+                    subCycle.add(ImmutablePair.of(transition, node));
+                    ret = _findProblems(
+                            execution,
+                            subCycle,
+                            subTrail
+                    ) || ret;
                 }
             }
         }
-
-        for (final VisitorNode child : node.children) {
-            ret = hasCycle(child) || ret;
+        for (final VisitorNode execution : node.children) {
+            ret = _findProblems(execution, new VisitorNode.Cycle(), new THashSet<String>()) || ret;
         }
-
         return ret;
     }
-
-    public static boolean hasInvalidTransfer(final VisitorNode node) {
-        boolean ret = false;
-
-        //Only report this for the parent context
-        if (node.parent != null && node.localScope != node.parent.localScope) {
-            for (final Transition entry : node.transitions) {
-                if (!node.parent.localScope.containsKey(entry.next)) {
-                    node.addProblem(Messages.format("validation.invalid.transition", VisitorNode.element(entry.element, entry.id, entry.next, new StringBuilder()).toString()));
-                    ret = true;
-                }
-            }
-        }
-
-        for (final VisitorNode child : node.children) {
-            ret = hasInvalidTransfer(child) || ret;
-        }
-
-        return ret;
-    }
-
 
     public static boolean hasFailed(final VisitorNode node) {
         if (node.failed) {

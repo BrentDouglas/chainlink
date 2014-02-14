@@ -30,28 +30,32 @@ public class JobOperationImpl implements JobOperation {
 
     @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
-        return deferred.cancel(mayInterruptIfRunning);
+        return deferred != null && deferred.cancel(mayInterruptIfRunning);
     }
 
     @Override
     public boolean isCancelled() {
-        return deferred.isCancelled();
+        return deferred != null && deferred.isCancelled();
     }
 
     @Override
     public boolean isDone() {
-        return deferred.isDone();
+        return deferred == null || deferred.isDone();
     }
 
     @Override
     public JobExecution get() throws InterruptedException, ExecutionException {
-        deferred.get();
+        if (deferred != null) {
+            deferred.get();
+        }
         return repository.getJobExecution(id);
     }
 
     @Override
     public JobExecution get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        deferred.get(timeout, unit);
+        if (deferred != null) {
+            deferred.get(timeout, unit);
+        }
         return repository.getJobExecution(id);
     }
 }

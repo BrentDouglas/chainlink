@@ -1,6 +1,8 @@
 package io.machinecode.nock.core.impl;
 
 import io.machinecode.nock.spi.context.MutableJobContext;
+import io.machinecode.nock.spi.util.Messages;
+import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
@@ -12,30 +14,33 @@ import java.util.Properties;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class JobContextImpl implements MutableJobContext {
-    private final long instanceId;
+
+    private static final Logger log = Logger.getLogger(JobContextImpl.class);
+
     private final String jobName;
-    private final long executionId;
+    private final long jobInstanceId;
+    private final long jobExecutionId;
     private final Properties properties;
     private Object transientUserData;
     private BatchStatus batchStatus;
     private String exitStatus;
 
     public JobContextImpl(final JobContext context) {
-        this.instanceId = context.getInstanceId();
         this.jobName = context.getJobName();
-        this.executionId = context.getExecutionId();
+        this.jobInstanceId = context.getInstanceId();
+        this.jobExecutionId = context.getExecutionId();
         this.properties = context.getProperties();
-        this.batchStatus = context.getBatchStatus(); //TODO ?
-        this.exitStatus = context.getExitStatus();
+        this.batchStatus = BatchStatus.STARTED;
+        this.exitStatus = null;
     }
 
     public JobContextImpl(final JobInstance instance, final JobExecution execution, final Properties properties) {
-        this.instanceId = instance.getInstanceId();
         this.jobName = instance.getJobName();
-        this.executionId = execution.getExecutionId();
+        this.jobInstanceId = instance.getInstanceId();
+        this.jobExecutionId = execution.getExecutionId();
         this.properties = properties;
-        this.batchStatus = execution.getBatchStatus();
-        this.exitStatus = execution.getExitStatus();
+        this.batchStatus = BatchStatus.STARTING;
+        this.exitStatus = null;
     }
 
     @Override
@@ -55,12 +60,12 @@ public class JobContextImpl implements MutableJobContext {
 
     @Override
     public long getInstanceId() {
-        return instanceId;
+        return jobInstanceId;
     }
 
     @Override
     public long getExecutionId() {
-        return executionId;
+        return jobExecutionId;
     }
 
     @Override
@@ -75,6 +80,7 @@ public class JobContextImpl implements MutableJobContext {
 
     @Override
     public void setBatchStatus(final BatchStatus batchStatus) {
+        log.debugf(Messages.get("NOCK-029000.job.context.batch.status"), jobExecutionId, jobName, batchStatus);
         this.batchStatus = batchStatus;
     }
 
@@ -84,7 +90,15 @@ public class JobContextImpl implements MutableJobContext {
     }
 
     @Override
-    public void setExitStatus(final String status) {
-        this.exitStatus = status;
+    public void setExitStatus(final String exitStatus) {
+        log.debugf(Messages.get("NOCK-029001.job.context.exit.status"), jobExecutionId, jobName, exitStatus);
+        this.exitStatus = exitStatus;
+    }
+
+    @Override
+    public void setFrom(final JobContext jobContext) {
+        this.batchStatus = jobContext.getBatchStatus();
+        this.exitStatus = jobContext.getExitStatus();
+        this.transientUserData = jobContext.getTransientUserData();
     }
 }

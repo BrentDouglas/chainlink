@@ -1,5 +1,7 @@
 package io.machinecode.nock.core.model.task;
 
+import io.machinecode.nock.spi.util.Messages;
+
 import javax.batch.api.chunk.CheckpointAlgorithm;
 
 /**
@@ -28,7 +30,10 @@ final class ItemCheckpointAlgorithm implements CheckpointAlgorithm {
 
     @Override
     public boolean isReadyToCheckpoint() throws Exception {
-        return target == current++;
+        if (current > target) {
+            throw new IllegalStateException(Messages.format("NOCK-030000.item.checkpoint", current, target));
+        }
+        return target == ++current;
     }
 
     @Override

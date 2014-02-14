@@ -1,31 +1,32 @@
 package io.machinecode.nock.core.exec;
 
 import io.machinecode.nock.spi.context.ExecutionContext;
-import io.machinecode.nock.spi.execution.CallbackExecutable;
 import io.machinecode.nock.spi.execution.Executable;
 import io.machinecode.nock.spi.execution.ExecutableEvent;
-import io.machinecode.nock.spi.deferred.Deferred;
-import io.machinecode.nock.spi.execution.Worker;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-class ExecutableEventImpl<T extends Executable> implements ExecutableEvent<T> {
-    final T executable;
-    final ExecutionContext[] contexts;
+class ExecutableEventImpl implements ExecutableEvent {
+    final Executable executable;
+    final ExecutionContext context;
 
-    ExecutableEventImpl(final T executable, final ExecutionContext... contexts) {
+    ExecutableEventImpl(final Executable executable, final ExecutionContext context) {
         this.executable = executable;
-        this.contexts = contexts;
+        this.context = context;
+    }
+
+    ExecutableEventImpl(final Executable executable) {
+        this(executable, null);
     }
 
     @Override
-    public T getExecutable() {
+    public Executable getExecutable() {
         return executable;
     }
 
     @Override
-    public ExecutionContext[] getContexts() {
-        return contexts;
+    public ExecutionContext getContext() {
+        return context;
     }
 }

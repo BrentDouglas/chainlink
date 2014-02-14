@@ -1,6 +1,6 @@
 package io.machinecode.nock.jsl.fluent.execution;
 
-import io.machinecode.nock.jsl.fluent.FluentInheritableBase;
+import io.machinecode.nock.jsl.fluent.FluentInheritable;
 import io.machinecode.nock.jsl.fluent.FluentListener;
 import io.machinecode.nock.jsl.fluent.FluentListeners;
 import io.machinecode.nock.jsl.fluent.FluentProperties;
@@ -20,7 +20,7 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class FluentStep<T extends FluentTask, U extends Copyable<U> & FluentStrategy<U>>
-        extends FluentInheritableBase<FluentStep<T, U>>
+        extends FluentInheritable<FluentStep<T, U>>
         implements FluentExecution<FluentStep<T, U>>, InheritableStep<FluentStep<T, U>, FluentProperties, FluentListeners, T, FluentTransition, FluentPartition<U>> {
 
     private String id;

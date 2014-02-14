@@ -94,7 +94,7 @@ public class FluentJobTest {
                         )
                         .addTransition(Jsl.next()
                                 .setOn("ERROR")
-                                .setTo("step2") //TODO Is this allowed?
+                                .setTo("step4")
                         )
                         .addTransition(Jsl.stop()
                                 .setOn("ERROR")
@@ -263,8 +263,8 @@ public class FluentJobTest {
         XmlJobTest.testDefaults(job);
     }
 
-    @Test//(expected = InvalidTransitionException.class)
-    public void transitionScopeTest() {
+    @Test
+    public void validFlowTransitionScopeTest() {
         final Job job = Jsl.job()
                 .setId("job1")
                 .setRestartable("false")
