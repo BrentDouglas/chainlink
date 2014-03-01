@@ -4,7 +4,6 @@ import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.nock.core.local.LocalRepository;
 import io.machinecode.nock.core.local.LocalTransactionManager;
 import io.machinecode.nock.inject.spring.SpringArtifactLoader;
-import io.machinecode.nock.inject.spring.SpringInjector;
 import io.machinecode.nock.spi.configuration.Configuration;
 import io.machinecode.nock.spi.configuration.ConfigurationFactory;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -28,7 +27,6 @@ public class SpringConfigurationFactory implements ConfigurationFactory {
                 .setRepository(new LocalRepository())
                 .setTransactionManager(new LocalTransactionManager(180))
                 .setArtifactLoaders(context.getBean(SpringArtifactLoader.class))
-                .setInjectors(context.getBean(SpringInjector.class))
                 .build();
     }
 }

@@ -56,7 +56,7 @@ public class CdiLocalExecutorTest extends ExecutorTest {
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
-                                                .setRef("unmanaged-injected-batchlet")
+                                                .setRef("unmanagedInjectedBatchlet")
                                                 .addProperty("property", "value")
                                 )
                 ), PARAMETERS);

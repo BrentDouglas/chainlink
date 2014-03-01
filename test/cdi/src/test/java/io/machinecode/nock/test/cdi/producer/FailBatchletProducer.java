@@ -11,7 +11,7 @@ import javax.inject.Named;
 */
 public class FailBatchletProducer {
     @Produces
-    @Named("fail-batchlet")
+    @Named("failBatchlet")
     public javax.batch.api.Batchlet batchlet(@New FailBatchlet batchlet) {
         return batchlet;
     }

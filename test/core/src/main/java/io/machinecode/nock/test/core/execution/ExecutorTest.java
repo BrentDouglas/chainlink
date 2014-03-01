@@ -41,7 +41,7 @@ public abstract class ExecutorTest extends BaseTest {
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
-                                                .setRef("run-batchlet")
+                                                .setRef("runBatchlet")
                                 )
                 ), PARAMETERS);
         final JobOperationImpl operation = operator.startJob(job, "run-job", PARAMETERS);
@@ -62,7 +62,7 @@ public abstract class ExecutorTest extends BaseTest {
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
-                                                .setRef("stop-batchlet")
+                                                .setRef("stopBatchlet")
                                 )
                 ), PARAMETERS);
         final JobOperationImpl operation = operator.startJob(job, "stop-job", PARAMETERS);
@@ -91,7 +91,7 @@ public abstract class ExecutorTest extends BaseTest {
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
-                                                .setRef("fail-batchlet")
+                                                .setRef("failBatchlet")
                                 )
                 ), PARAMETERS);
         final JobOperationImpl operation = operator.startJob(job, "fail-job", PARAMETERS);
@@ -112,7 +112,7 @@ public abstract class ExecutorTest extends BaseTest {
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
-                                                .setRef("injected-batchlet")
+                                                .setRef("injectedBatchlet")
                                                 .addProperty("property", "value")
                                 )
                 ), PARAMETERS);

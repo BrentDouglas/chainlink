@@ -11,13 +11,13 @@ import javax.inject.Named;
 */
 public class InjectedBatchletProducer {
     @Produces
-    @Named("injected-batchlet")
+    @Named("injectedBatchlet")
     public javax.batch.api.Batchlet batchlet(@New InjectedBatchlet batchlet) {
         return batchlet;
     }
 
     @Produces
-    @Named("unmanaged-injected-batchlet")
+    @Named("unmanagedInjectedBatchlet")
     public javax.batch.api.Batchlet unmanaged() {
         return new InjectedBatchlet();
     }

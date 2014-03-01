@@ -24,7 +24,7 @@ import java.util.ServiceLoader;
  */
 public class DefaultInjector implements Injector {
 
-    private InjectablesProvider provider;
+    private final InjectablesProvider provider;
 
     public DefaultInjector() {
         final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<InjectablesProvider>>() {
@@ -39,7 +39,6 @@ public class DefaultInjector implements Injector {
             throw new IllegalStateException(Messages.format("NOCK-000000.injector.provider.unavailable"));
         }
     }
-
 
     @Override
     public <T> boolean inject(final T bean) throws Exception {

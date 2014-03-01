@@ -11,7 +11,7 @@ import javax.inject.Named;
 */
 public class RunBatchletProducer {
     @Produces
-    @Named("run-batchlet")
+    @Named("runBatchlet")
     public javax.batch.api.Batchlet batchlet(@New RunBatchlet batchlet) {
         return batchlet;
     }

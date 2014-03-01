@@ -2,7 +2,6 @@ package io.mackinecode.nock.test.spring;
 
 import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.nock.inject.spring.SpringArtifactLoader;
-import io.machinecode.nock.inject.spring.SpringInjector;
 import io.machinecode.nock.test.core.execution.ExecutorTest;
 import org.junit.BeforeClass;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -18,8 +17,7 @@ public class SpringLocalExecutorTest extends ExecutorTest {
     @Override
     protected Builder _configuration() {
         return super._configuration()
-                .setArtifactLoaders(context.getBean(SpringArtifactLoader.class))
-                .setInjectors(context.getBean(SpringInjector.class));
+                .setArtifactLoaders(context.getBean(SpringArtifactLoader.class));
     }
 
     @BeforeClass

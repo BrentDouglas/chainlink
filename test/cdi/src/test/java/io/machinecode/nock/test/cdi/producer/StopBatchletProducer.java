@@ -11,7 +11,7 @@ import javax.inject.Named;
 */
 public class StopBatchletProducer {
     @Produces
-    @Named("stop-batchlet")
+    @Named("stopBatchlet")
     public javax.batch.api.Batchlet batchlet(@New StopBatchlet batchlet) {
         return batchlet;
     }

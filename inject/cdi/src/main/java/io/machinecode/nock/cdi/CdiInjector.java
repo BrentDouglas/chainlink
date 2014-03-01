@@ -25,7 +25,7 @@ import java.util.ServiceLoader;
  */
 public class CdiInjector implements Injector {
 
-    private InjectablesProvider provider;
+    private final InjectablesProvider provider;
 
     public CdiInjector() {
         final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<InjectablesProvider>>() {

@@ -5,8 +5,8 @@
 
     <import resource="classpath*:nock-inject-spring.xml"/>
 
-    <bean id="run-batchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.RunBatchlet" />
-    <bean id="stop-batchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.StopBatchlet" />
-    <bean id="fail-batchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.FailBatchlet" />
-    <bean id="injected-batchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.InjectedBatchlet" />
+    <bean id="runBatchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.RunBatchlet" />
+    <bean id="stopBatchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.StopBatchlet" />
+    <bean id="failBatchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.FailBatchlet" />
+    <bean id="injectedBatchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.InjectedBatchlet" />
 </beans>

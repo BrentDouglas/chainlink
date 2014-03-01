@@ -26,7 +26,7 @@ public class RepositoryTest extends BaseTest {
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
-                                                .setRef("run-batchlet")
+                                                .setRef("runBatchlet")
                                 )
                 ), PARAMETERS);
         final ExtendedJobInstance instance = repository().createJobInstance(job, "job");
