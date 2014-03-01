@@ -4,7 +4,6 @@ import io.machinecode.nock.spi.ExtendedJobExecution;
 import io.machinecode.nock.spi.execution.Item;
 import io.machinecode.nock.spi.work.JobWork;
 
-import javax.batch.runtime.JobExecution;
 import java.io.Serializable;
 
 /**

@@ -1056,7 +1056,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
 
             if (context.isRestarting()) {
                 final Checkpoint checkpoint = this.partitionId == null
-                        ? repository.getLatestStepExecution(this.stepExecutionId, this.stepContext.getStepName()).getCheckpoint()
+                        ? repository.getPreviousStepExecution(this.jobExecutionId, this.stepExecutionId, this.stepContext.getStepName()).getCheckpoint()
                         : repository.getPartitionExecution(this.stepExecutionId, this.partitionId).getCheckpoint();
                 this.readInfo = checkpoint == null ? null : checkpoint.getReaderCheckpoint();
                 this.writeInfo = checkpoint == null ? null : checkpoint.getWriterCheckpoint();

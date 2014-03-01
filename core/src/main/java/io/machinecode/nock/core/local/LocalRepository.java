@@ -58,6 +58,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
+@SuppressWarnings("ALL")
 public class LocalRepository implements ExecutionRepository {
     protected final AtomicLong jobInstanceIndex = new AtomicLong();
     protected final AtomicLong jobExecutionIndex = new AtomicLong();
@@ -720,6 +721,70 @@ public class LocalRepository implements ExecutionRepository {
         } finally {
             stepExecutionLock.set(false);
         }
+    }
+
+    @Override
+    public ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException {
+        final TLongSet historicJobExecutionIds = new TLongHashSet();
+        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        try {
+            final TLongSet executions = jobExecutionHistory.get(jobExecutionId);
+            if (executions == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            }
+            historicJobExecutionIds.addAll(executions);
+        } finally {
+            jobExecutionHistoryLock.set(false);
+        }
+        final TLongSet stepExecutionIds = new TLongHashSet();
+        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            TLongSet executionIds = jobExecutionStepExecutions.get(jobExecutionId);
+            if (executionIds == null) {
+                throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            }
+            stepExecutionIds.addAll(executionIds);
+            for (final TLongIterator it = historicJobExecutionIds.iterator(); it.hasNext();) {
+                final long historicJobExecutionId = it.next();
+                executionIds = jobExecutionStepExecutions.get(historicJobExecutionId);
+                if (executionIds == null) {
+                    throw new NoSuchJobExecutionException(Messages.format("NOCK-006002.execution.repository.no.such.job.execution", historicJobExecutionId));
+                }
+                stepExecutionIds.addAll(executionIds);
+            }
+        } finally {
+            jobExecutionStepExecutionLock.set(false);
+        }
+        final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
+        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
+                final long id = it.next();
+                if (stepExecutionId == id) {
+                    continue;
+                }
+                final ExtendedStepExecution execution = stepExecutions.get(id);
+                if (stepName.equals(execution.getStepName())) {
+                    candidates.add(execution);
+                }
+            }
+        } finally {
+            stepExecutionLock.set(false);
+        }
+        ExtendedStepExecution latest = null;
+        for (final ExtendedStepExecution candidate : candidates) {
+            if (latest == null) {
+                latest = candidate;
+                continue;
+            }
+            if (candidate.getStartTime().after(latest.getStartTime())) {
+                latest = candidate;
+            }
+        }
+        if (latest == null) {
+            throw new NoSuchJobExecutionException(Messages.format("NOCK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+        }
+        return latest;
     }
 
     @Override

@@ -113,6 +113,17 @@ public interface ExecutionRepository {
 
     ExtendedStepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException; // TODO Should throw something else
 
+    /**
+     *
+     * @param jobExecutionId
+     * @param stepExecutionId The id of the step execution currently running.
+     * @param stepName
+     * @return The latest step execution before the one currently running.
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException
+     */
+    ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException; // TODO Should throw something else
+
     ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException; // TODO Should throw something else
 
     int getStepExecutionCount(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException; // TODO Should throw something else
