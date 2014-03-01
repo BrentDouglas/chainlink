@@ -173,8 +173,8 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
     private static final int PROCESS = 3;
     private static final int ADD = 4;
     private static final int WRITE = 5;
-    private static final int COMMIT = 6;
-    private static final int AFTER = 7;
+    private static final int CHECKPOINT = 6;
+    private static final int COMMIT = 7;
 
     private transient volatile ExecutionContext _context;
 
@@ -358,13 +358,13 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 log.debugf(Messages.get("NOCK-014204.chunk.state.write"), this._context);
                 _writeItem(state);
                 break;
-            case COMMIT:
-                log.debugf(Messages.get("NOCK-014205.chunk.state.commit"), this._context);
+            case CHECKPOINT:
+                log.debugf(Messages.get("NOCK-014205.chunk.state.checkpoint"), this._context);
                 // 11.8 9 m has this outside the write catch block
                 _runAfterListeners(state);
                 exception = _checkpoint(state, executor, context);
-            case AFTER:
-                log.debugf(Messages.get("NOCK-014206.chunk.state.after"), this._context);
+            case COMMIT:
+                log.debugf(Messages.get("NOCK-014206.chunk.state.commit"), this._context);
                 _commit(state, exception);
                 if (isCancelled()) {
                     return false;
@@ -520,7 +520,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             if (read == null) {
                 log.debugf(Messages.get("NOCK-014412.chunk.reader.finished"), this._context);
                 state.finished = true;
-                state.next(state.objects.isEmpty() ? COMMIT : WRITE);
+                state.next(state.objects.isEmpty() ? CHECKPOINT : WRITE);
                 return;
             }
             state.stepContext.getMetric(READ_COUNT).increment();
@@ -763,7 +763,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 throw exception;
             }
             state.objects.clear();
-            state.next(COMMIT);
+            state.next(CHECKPOINT);
         } catch (final Exception e) {
             log.warnf(Messages.get("NOCK-014605.chunk.writer.error"), this._context, this.writer.getRef(), e.getClass().getCanonicalName());
             for (final ItemWriteListener listener : state.itemWriteListeners) {
@@ -802,7 +802,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 if (exception != null) {
                     throw exception;
                 }
-                state.next(AFTER);
+                state.next(COMMIT);
                 state.objects.clear();
                 return;
             }
@@ -876,7 +876,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 log.debugf(Messages.get("NOCK-014902.chunk.checkpoint.retry"), this._context, exception.getClass().getCanonicalName());
                 if (getNoRollbackExceptionClasses().matches(exception)) {
                     log.debugf(Messages.get("NOCK-014903.chunk.checkpoint.no.rollback"), this._context, exception.getClass().getCanonicalName());
-                    state.next(COMMIT);
+                    state.next(CHECKPOINT);
                     return;
                 }
                 _rollbackTransaction(state);
@@ -895,7 +895,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 log.debugf(Messages.get("NOCK-014902.chunk.checkpoint.retry"), this._context, e.getClass().getCanonicalName());
                 if (getNoRollbackExceptionClasses().matches(e)) {
                     log.debugf(Messages.get("NOCK-014903.chunk.checkpoint.no.rollback"), this._context, e.getClass().getCanonicalName());
-                    state.next(COMMIT);
+                    state.next(CHECKPOINT);
                     return;
                 }
                 _rollbackTransaction(state);
