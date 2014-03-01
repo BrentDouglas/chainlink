@@ -44,10 +44,20 @@
         <version.org.springframework.spring-context>${version.org.springframework}</version.org.springframework.spring-context>
         <version.org.springframework.spring-core>${version.org.springframework}</version.org.springframework.spring-core>
 
+        <!-- Seam -->
+        <version.org.jboss.seam.jboss-seam>2.2.2.Final</version.org.jboss.seam.jboss-seam>
+
         <!-- Test dependencies -->
         <version.com.ibm.batch.com.ibm.batch-tck-spi>1.0</version.com.ibm.batch.com.ibm.batch-tck-spi>
         <version.junit.junit>4.10</version.junit.junit>
         <version.org.testng.testng>6.8</version.org.testng.testng>
+
+        <!-- Seam Test-->
+        <version.dom4j>1.6.1</version.dom4j>
+        <version.org.javassist.javassist>3.13.0-GA</version.org.javassist.javassist>
+        <version.javax.servlet.servlet-api>2.5</version.javax.servlet.servlet-api>
+        <version.javax.faces.jsf-api>2.1.23.Final</version.javax.faces.jsf-api>
+        <version.org.jboss.spec.jboss-javaee-6.0>2.0.0.Final</version.org.jboss.spec.jboss-javaee-6.0>
 
         <!-- Plugin dependencies -->
         <version.org.codehaus.mojo.build-helper-maven-plugin>1.8</version.org.codehaus.mojo.build-helper-maven-plugin>
@@ -82,6 +92,11 @@
             <dependency>
                 <groupId>io.machinecode.nock</groupId>
                 <artifactId>nock-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-seam</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -127,6 +142,14 @@
                 <version>${version.org.jboss.weld.se.weld-se}</version>
             </dependency>
 
+            <!-- Seam -->
+            <dependency>
+                <groupId>org.jboss.seam</groupId>
+                <artifactId>jboss-seam</artifactId>
+                <type>ejb</type>
+                <version>${version.org.jboss.seam.jboss-seam}</version>
+            </dependency>
+
             <!-- Spring -->
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -166,8 +189,84 @@
                 <artifactId>testng</artifactId>
                 <version>${version.org.testng.testng}</version>
             </dependency>
+
+            <!-- Seam Tests-->
+            <dependency>
+                <groupId>dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <scope>provided</scope>
+                <version>${version.dom4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${version.javax.servlet.servlet-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${version.org.javassist.javassist}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.spec.javax.faces</groupId>
+                <artifactId>jboss-jsf-api_2.1_spec</artifactId>
+                <version>${version.javax.faces.jsf-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.spec</groupId>
+                <artifactId>jboss-javaee-6.0</artifactId>
+                <version>${version.org.jboss.spec.jboss-javaee-6.0}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+
+    <profiles>
+        <profile>
+            <id>seam-2.2</id>
+            <activation>
+                <property><name>seam-2.2</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <!-- Seam -->
+                <version.org.jboss.seam.jboss-seam>2.2.2.Final</version.org.jboss.seam.jboss-seam>
+                <version.org.hibernate.hibernate-validator>3.1.0.GA</version.org.hibernate.hibernate-validator>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-validator</artifactId>
+                        <version>${version.org.hibernate.hibernate-validator}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+        <profile>
+            <id>seam-2.3</id>
+            <activation>
+                <property><name>seam-2.3</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <!-- Seam -->
+                <version.org.jboss.seam.jboss-seam>2.3.1.Final</version.org.jboss.seam.jboss-seam>
+                <version.javax.validation.validation-api>1.1.0.Final</version.javax.validation.validation-api>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                        <version>${version.javax.validation.validation-api}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+    </profiles>
 
     <build>
         <pluginManagement>
