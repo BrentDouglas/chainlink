@@ -2,7 +2,7 @@ package io.machinecode.nock.core.factory.partition;
 
 import io.machinecode.nock.core.expression.Expression;
 import io.machinecode.nock.core.factory.PropertiesFactory;
-import io.machinecode.nock.core.loader.TypedArtifactReference;
+import io.machinecode.nock.core.loader.ArtifactReferenceImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.partition.CollectorImpl;
 import io.machinecode.nock.spi.element.partition.Collector;
@@ -24,7 +24,7 @@ public class CollectorFactory implements ElementFactory<Collector, CollectorImpl
         final String ref = Expression.resolveExecutionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
         return new CollectorImpl(
-                context.getReference(new TypedArtifactReference<PartitionCollector>(ref, PartitionCollector.class)),
+                context.getReference(new ArtifactReferenceImpl(ref)),
                 properties
         );
     }
@@ -34,7 +34,7 @@ public class CollectorFactory implements ElementFactory<Collector, CollectorImpl
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);
         return new CollectorImpl(
-                context.getReference(new TypedArtifactReference<PartitionCollector>(ref, PartitionCollector.class)),
+                context.getReference(new ArtifactReferenceImpl(ref)),
                 properties
         );
     }

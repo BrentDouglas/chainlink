@@ -92,7 +92,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public InjectionContext createInjectionContext(final ExecutionContext context) {
+    public InjectionContext getInjectionContext() {
         return injectionContext;
     }
 

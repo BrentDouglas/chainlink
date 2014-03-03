@@ -76,31 +76,6 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return this.strategy;
     }
 
-    public PartitionCollector loadPartitionCollector(final Executor executor, final ExecutionContext context) throws Exception {
-        if (collector == null) {
-            return null;
-        }
-        synchronized (collector) {
-            if (_collector == null) {
-                _collector = new ThreadLocal<PartitionCollector>();
-            }
-            if (_collector.get() == null) {
-                _collector.set(collector.load(executor, context));
-            }
-        }
-        return _collector.get();
-    }
-
-    public PartitionReducer loadPartitionReducer(final Executor executor, final ExecutionContext context) throws Exception {
-        if (reducer == null) {
-            return null;
-        }
-        if (_reducer == null) {
-            _reducer = reducer.load(executor, context);
-        }
-        return _reducer;
-    }
-
     public PartitionPlan loadPartitionPlan(final Executor executor, final ExecutionContext context) throws Exception {
         if (strategy == null) {
             return null;
@@ -111,31 +86,20 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return _plan;
     }
 
-    public PartitionAnalyzer loadPartitionAnalyzer(final Executor executor, final ExecutionContext context) throws Exception {
-        if (analyser == null) {
-            return null;
-        }
-        if (_analyser == null) {
-            _analyser = analyser.load(executor, context);
-        }
-        return _analyser;
-    }
-
     // Lifecycle
 
     @Override
     public PartitionTarget map(final TaskWork task, final Executor executor, final Executable callback, final ExecutionContext context, final int timeout, final Long restartStepExecutionId) throws Exception {
-        final PartitionReducer reducer = this.loadPartitionReducer(executor, context);
         final PartitionPlan plan = loadPartitionPlan(executor, context);
         final boolean restarting = context.isRestarting();
         final boolean override = plan.getPartitionsOverride();
-        if (reducer != null) {
+        if (this.reducer != null) {
             //TODO Find out why not
             //if (restarting && !override) {
             //    reducer.rollbackPartitionedStep();
             //}
             log.debugf(Messages.get("NOCK-011300.partition.reducer.before.partitioned.step"), context);
-            reducer.beginPartitionedStep();
+            this.reducer.beginPartitionedStep(executor, context);
         }
         final MutableStepContext stepContext = context.getStepContext();
         final String stepName = stepContext.getStepName();
@@ -207,11 +171,10 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
 
     @Override
     public Item collect(final TaskWork task, final Executor executor, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception {
-        final PartitionCollector collector = loadPartitionCollector(executor, context);
-        if (collector != null) {
+        if (this.collector != null) {
             log.debugf(Messages.get("NOCK-011100.partition.collect.partitioned.data"), context, this.collector.getRef());
             return new ItemImpl(
-                    collector.collectPartitionData(),
+                    this.collector.collectPartitionData(executor, context),
                     batchStatus,
                     exitStatus
             );
@@ -222,24 +185,23 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     @Override
     public PartitionStatus analyse(final Executor executor, final ExecutionContext context, final TransactionManager transactionManager, final Item... items) throws Exception {
         PartitionStatus partitionStatus = PartitionStatus.COMMIT;
-        try {
-            final PartitionAnalyzer analyzer = loadPartitionAnalyzer(executor, context);
-            if (items != null && analyzer != null) {
-                if (this.collector != null) {
-                    for (final Item that : items) {
-                        log.debugf(Messages.get("NOCK-011200.partition.analyse.collector.data"), context, this.analyser.getRef());
-                        analyzer.analyzeCollectorData(that.getData());
+        if (items != null && this.analyser != null) {
+            try {
+                    if (this.collector != null) {
+                        for (final Item that : items) {
+                            log.debugf(Messages.get("NOCK-011200.partition.analyse.collector.data"), context, this.analyser.getRef());
+                            this.analyser.analyzeCollectorData(executor, context, that.getData());
+                        }
                     }
+                    for (final Item item : items) {
+                        this.analyser.analyzeStatus(executor, context, item.getBatchStatus(), item.getExitStatus());
+                    }
+            } catch (final Exception e) {
+                log.infof(e, Messages.get("NOCK-011201.partition.analyser.caught"), context, this.analyser.getRef());
+                partitionStatus = PartitionStatus.ROLLBACK;
+                if (transactionManager.getStatus() == Status.STATUS_ACTIVE) {
+                    transactionManager.setRollbackOnly();
                 }
-                for (final Item item : items) {
-                    analyzer.analyzeStatus(item.getBatchStatus(), item.getExitStatus());
-                }
-            }
-        } catch (final Exception e) {
-            log.infof(e, Messages.get("NOCK-011201.partition.analyser.caught"), context, this.analyser.getRef());
-            partitionStatus = PartitionStatus.ROLLBACK;
-            if (transactionManager.getStatus() == Status.STATUS_ACTIVE) {
-                transactionManager.setRollbackOnly();
             }
         }
         return partitionStatus;
@@ -247,26 +209,25 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
 
     @Override
     public void reduce(final PartitionStatus partitionStatus, final Executor executor, final ExecutionContext context, final TransactionManager transactionManager) throws Exception {
-        final PartitionReducer reducer = loadPartitionReducer(executor, context);
         try {
             switch (partitionStatus) {
                 case COMMIT:
                     try {
-                        if (reducer != null) {
+                        if (this.reducer != null) {
                             log.debugf(Messages.get("NOCK-011301.partition.reducer.before.partitioned.step.complete"), context, this.reducer.getRef());
-                            reducer.beforePartitionedStepCompletion();
+                            this.reducer.beforePartitionedStepCompletion(executor, context);
                         }
                         transactionManager.commit();
                     } catch (final Exception e) {
-                        log.warnf(e, Messages.get("NOCK-011304.partition.reducer.caught"), context, this.reducer.getRef());
+                        log.warnf(e, Messages.get("NOCK-011304.partition.reducer.caught"), context, this.reducer.getRef()); //TODO NPE logic?
                         transactionManager.rollback();
                     }
                     break;
                 case ROLLBACK:
                     try {
-                        if (reducer != null) {
+                        if (this.reducer != null) {
                             log.debugf(Messages.get("NOCK-011302.partition.reducer.rollback.partitioned.step"), context, this.reducer.getRef());
-                            reducer.rollbackPartitionedStep();
+                            this.reducer.rollbackPartitionedStep(executor, context);
                         }
                     } finally {
                         transactionManager.rollback();
@@ -274,9 +235,9 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                     break;
             }
         } finally {
-            if (reducer != null) {
+            if (this.reducer != null) {
                 log.debugf(Messages.get("NOCK-011303.partition.reducer.after.partitioned.step"), context, this.reducer.getRef(), partitionStatus);
-                reducer.afterPartitionedStepCompletion(partitionStatus);
+                this.reducer.afterPartitionedStepCompletion(executor, context, partitionStatus);
             }
         }
     }

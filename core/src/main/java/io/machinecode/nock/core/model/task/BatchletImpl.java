@@ -1,7 +1,8 @@
 package io.machinecode.nock.core.model.task;
 
 import io.machinecode.nock.core.factory.task.BatchletFactory;
-import io.machinecode.nock.core.loader.TypedArtifactReference;
+import io.machinecode.nock.core.impl.InjectablesImpl;
+import io.machinecode.nock.core.loader.ArtifactReferenceImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyReferenceImpl;
 import io.machinecode.nock.core.model.partition.PartitionImpl;
@@ -14,6 +15,8 @@ import io.machinecode.nock.spi.element.task.Batchlet;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.execution.Item;
 import io.machinecode.nock.spi.factory.PropertyContext;
+import io.machinecode.nock.spi.inject.InjectablesProvider;
+import io.machinecode.nock.spi.inject.InjectionContext;
 import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.deferred.Listener;
 import io.machinecode.nock.spi.work.TaskWork;
@@ -37,19 +40,22 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
 
     private final Delegate delegate = new Delegate();
 
-    public BatchletImpl(final TypedArtifactReference<javax.batch.api.Batchlet> ref, final PropertiesImpl properties, final PartitionImpl<?> partition) {
+    public BatchletImpl(final ArtifactReferenceImpl ref, final PropertiesImpl properties, final PartitionImpl<?> partition) {
         super(ref, properties);
         this.partition = partition;
     }
 
     // Lifecycle
 
-    private transient volatile javax.batch.api.Batchlet _batchlet;
+    private transient volatile Executor _executor;
     private transient volatile ExecutionContext _context;
 
     @Override
     public void run(final Executor executor, final ExecutionContext context, final int timeout) throws Exception {
-        this._context = context;
+        synchronized (this) {
+            this._context = context;
+            this._executor = executor;
+        }
         final Long stepExecutionId = context.getStepExecutionId();
         final Integer partitionId = context.getPartitionId();
         final MutableStepContext stepContext = context.getStepContext();
@@ -83,26 +89,10 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
                     }
                     return;
                 }
-                this._batchlet = load(executor, context);
             }
             try {
-                if (this._batchlet == null) {
-                    stepContext.setBatchStatus(BatchStatus.FAILED);
-                    reject(new IllegalStateException(Messages.format("NOCK-013001.batchlet.not.injected", this._context, getRef())));
-                    if (partitionId != null) {
-                        repository.finishPartitionExecution(
-                                stepExecutionId,
-                                partitionId,
-                                stepContext.getPersistentUserData(),
-                                BatchStatus.FAILED,
-                                stepContext.getExitStatus(),
-                                new Date()
-                        );
-                    }
-                    return;
-                }
                 log.debugf(Messages.get("NOCK-013101.batchlet.process"), this._context, getRef());
-                final String exitStatus = this._batchlet.process();
+                final String exitStatus = this.process(executor, context);
                 log.debugf(Messages.get("NOCK-013102.batchlet.status"), this._context, getRef(), exitStatus);
                 if (stepContext.getExitStatus() == null) {
                     // TODO Challenge why process even returns anything, should be void
@@ -219,21 +209,23 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
 
     @Override
     public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
-        if (this._batchlet != null) {
+        final boolean set;
+        synchronized (this) {
+            set = this._context != null && this._executor != null;
+        }
+        if (set) {
             try {
                 log.debugf(Messages.get("NOCK-013103.batchlet.stop"), this._context, getRef());
-                this._batchlet.stop();
+                this.stop(this._executor, this._context);
             } catch (final Exception e) {
                 reject(new BatchRuntimeException(Messages.format("NOCK-013000.batchlet.stop.exception", this._context, getRef()), e));
             }
-        }
-        if (this._context != null) {
             final MutableStepContext stepContext = this._context.getStepContext();
             if (stepContext != null) {
                 stepContext.setBatchStatus(BatchStatus.STOPPING);
             }
+            notifyAll();
         }
-        notifyAll();
         return delegate.cancel(mayInterruptIfRunning);
     }
 
@@ -257,6 +249,28 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         return delegate.get(timeout, unit);
     }
 
+    public String process(final Executor executor, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = executor.getInjectionContext();
+        final InjectablesProvider provider = injectionContext.getProvider();
+        try {
+            provider.setInjectables(_injectables(context));
+            return load(javax.batch.api.Batchlet.class, injectionContext, context).process();
+        } finally {
+            provider.setInjectables(null);
+        }
+    }
+
+    public void stop(final Executor executor, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = executor.getInjectionContext();
+        final InjectablesProvider provider = injectionContext.getProvider();
+        try {
+            provider.setInjectables(_injectables(context));
+            load(javax.batch.api.Batchlet.class, injectionContext, context).stop();
+        } finally {
+            provider.setInjectables(null);
+        }
+    }
+
     private class Delegate extends DeferredImpl<ExecutionContext> {
         @Override
         protected String getResolveLogMessage() {
@@ -275,7 +289,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
 
         @Override
         protected String getTimeoutExceptionMessage() {
-            return Messages.format("NOCK-013002.batchlet.timeout", BatchletImpl.this._context, BatchletImpl.this.getRef());
+            return Messages.format("NOCK-013001.batchlet.timeout", BatchletImpl.this._context, BatchletImpl.this.getRef());
         }
     }
 }

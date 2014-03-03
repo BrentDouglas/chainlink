@@ -6,4 +6,6 @@ package io.machinecode.nock.spi.inject;
 public interface ArtifactReference {
 
     String ref();
+
+    <T> T load(final Class<T> clazz, final InjectionContext injectionContext) throws Exception;
 }

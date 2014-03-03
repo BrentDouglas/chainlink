@@ -2,7 +2,7 @@ package io.machinecode.nock.core.factory.task;
 
 import io.machinecode.nock.core.expression.Expression;
 import io.machinecode.nock.core.factory.PropertiesFactory;
-import io.machinecode.nock.core.loader.TypedArtifactReference;
+import io.machinecode.nock.core.loader.ArtifactReferenceImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.task.ItemProcessorImpl;
 import io.machinecode.nock.spi.element.task.ItemProcessor;
@@ -22,7 +22,7 @@ public class ItemProcessorFactory implements ElementFactory<ItemProcessor, ItemP
         final String ref = Expression.resolveExecutionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
         return new ItemProcessorImpl(
-                context.getReference(new TypedArtifactReference<javax.batch.api.chunk.ItemProcessor>(ref, javax.batch.api.chunk.ItemProcessor.class)),
+                context.getReference(new ArtifactReferenceImpl(ref)),
                 properties
         );
     }
@@ -32,7 +32,7 @@ public class ItemProcessorFactory implements ElementFactory<ItemProcessor, ItemP
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);
         return new ItemProcessorImpl(
-                context.getReference(new TypedArtifactReference<javax.batch.api.chunk.ItemProcessor>(ref, javax.batch.api.chunk.ItemProcessor.class)),
+                context.getReference(new ArtifactReferenceImpl(ref)),
                 properties
         );
     }

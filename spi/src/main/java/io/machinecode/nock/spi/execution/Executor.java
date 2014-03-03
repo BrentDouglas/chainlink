@@ -19,7 +19,7 @@ public interface Executor {
 
     ExecutionRepository getRepository();
 
-    InjectionContext createInjectionContext(ExecutionContext context);
+    InjectionContext getInjectionContext();
 
     Deferred<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
 

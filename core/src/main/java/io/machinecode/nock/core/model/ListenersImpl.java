@@ -4,6 +4,8 @@ package io.machinecode.nock.core.model;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.element.Listeners;
 import io.machinecode.nock.spi.execution.Executor;
+import io.machinecode.nock.spi.inject.InjectablesProvider;
+import io.machinecode.nock.spi.inject.InjectionContext;
 import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
@@ -32,16 +34,23 @@ public class ListenersImpl implements Listeners {
         return this.listeners;
     }
 
-    public <X> List<X> getListenersImplementing(final Executor executor, final ExecutionContext context, final Class<X> clazz) throws Exception {
-        final List<X> ret = new ArrayList<X>(this.listeners.size());
-        for (final ListenerImpl listener : this.listeners) {
-            final X that = listener.load(clazz, executor, context);
-            if (that == null) {
-                continue;
+    public List<ListenerImpl> getListenersImplementing(final Executor executor, final ExecutionContext context, final Class<?> clazz) throws Exception {
+        final List<ListenerImpl> ret = new ArrayList<ListenerImpl>(this.listeners.size());
+        final InjectionContext injectionContext = executor.getInjectionContext();
+        final InjectablesProvider provider = injectionContext.getProvider();
+        try {
+            for (final ListenerImpl listener : this.listeners) {
+                provider.setInjectables(listener._injectables(context));
+                final Object that = listener.tryLoad(clazz, injectionContext);
+                if (that == null) {
+                    continue;
+                }
+                if (clazz.isAssignableFrom(that.getClass())) {
+                    ret.add(listener);
+                }
             }
-            if (clazz.isAssignableFrom(that.getClass())) {
-                ret.add(that);
-            }
+        } finally {
+            provider.setInjectables(null);
         }
         return ret;
     }

@@ -87,9 +87,9 @@ public class JobImpl implements Job, JobWork {
 
     // Lifecycle
 
-    private transient List<JobListener> _listeners;
+    private transient List<ListenerImpl> _listeners;
 
-    private List<JobListener> _listeners(final Executor executor, final ExecutionContext context) throws Exception {
+    private List<ListenerImpl> _listeners(final Executor executor, final ExecutionContext context) throws Exception {
         if (this._listeners == null) {
             this._listeners = this.listeners.getListenersImplementing(executor, context, JobListener.class);
         }
@@ -104,10 +104,10 @@ public class JobImpl implements Job, JobWork {
         Repository.startedJob(repository, jobExecutionId);
         log.debugf(Messages.get("NOCK-018000.job.create.job.context"), context);
         Exception exception = null;
-        for (final JobListener listener : this._listeners(executor, context)) {
+        for (final ListenerImpl listener : this._listeners(executor, context)) {
             try {
                 log.debugf(Messages.get("NOCK-018001.job.listener.before.job"), context);
-                listener.beforeJob();
+                listener.beforeJob(executor, context);
             } catch (final Exception e) {
                 if (exception == null) {
                     exception = e;
@@ -142,13 +142,11 @@ public class JobImpl implements Job, JobWork {
     @Override
     public void after(final Executor executor, final ThreadId threadId, final Executable callback,
                       final ExecutionContext context) throws Exception {
-        final long jobExecutionId = context.getJobExecutionId();
         Exception exception = null;
-        //TODO These listeners are being invoked with a different injection context
-        for (final JobListener listener : this._listeners(executor, context)) {
+        for (final ListenerImpl listener : this._listeners(executor, context)) {
             try {
                 log.debugf(Messages.get("NOCK-018003.job.listener.after.job"), context);
-                listener.afterJob();
+                listener.afterJob(executor, context);
             } catch (final Exception e) {
                 if (exception == null) {
                     exception = e;

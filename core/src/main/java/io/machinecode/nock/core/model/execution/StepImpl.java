@@ -2,6 +2,7 @@ package io.machinecode.nock.core.model.execution;
 
 import io.machinecode.nock.core.Constants;
 import io.machinecode.nock.core.impl.StepContextImpl;
+import io.machinecode.nock.core.model.ListenerImpl;
 import io.machinecode.nock.core.model.ListenersImpl;
 import io.machinecode.nock.core.model.PropertiesImpl;
 import io.machinecode.nock.core.model.PropertyImpl;
@@ -153,14 +154,14 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         return this.partition != null && this.partition.getStrategy() != null;
     }
 
-    private transient List<StepListener> _listeners;
+    private transient List<ListenerImpl> _listeners;
     private transient int _partitions;
     private transient int _completed;
     private transient PartitionStatus _partitionStatus;
     private transient TransactionManager _transactionManager;
     private transient Transaction _transaction;
 
-    private List<StepListener> _listeners(final Executor executor, final ExecutionContext context) throws Exception {
+    private List<ListenerImpl> _listeners(final Executor executor, final ExecutionContext context) throws Exception {
         if (this._listeners == null) {
             this._listeners = this.listeners.getListenersImplementing(executor, context, StepListener.class);
         }
@@ -247,10 +248,10 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             throw new IllegalStateException(Messages.format("NOCK-010001.step.not.starting", context, stepExecution.getBatchStatus()));
         }
         Exception exception = null;
-        for (final StepListener listener : this._listeners(executor, context)) {
+        for (final ListenerImpl listener : this._listeners(executor, context)) {
             try {
                 log.debugf(Messages.get("NOCK-010200.step.listener.before.step"), context);
-                listener.beforeStep();
+                listener.beforeStep(executor, context);
             } catch (final Exception e) {
                 if (exception == null) {
                     exception = e;
@@ -344,10 +345,10 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         }
         try {
             Exception exception = null;
-            for (final StepListener listener : this._listeners(executor, context)) {
+            for (final ListenerImpl listener : this._listeners(executor, context)) {
                 try {
                     log.debugf(Messages.get("NOCK-010201.step.listener.after.step"), context);
-                    listener.afterStep();
+                    listener.afterStep(executor, context);
                 } catch (final Exception e) {
                     if (exception == null) {
                         exception = e;
