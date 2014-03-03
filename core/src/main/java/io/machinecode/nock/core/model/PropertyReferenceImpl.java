@@ -37,7 +37,7 @@ public class PropertyReferenceImpl<T> implements PropertyReference {
         if (this._cached != null) {
             return this._cached;
         }
-        final T that = this.ref.load(clazz, injectionContext);
+        final T that = this.ref.load(clazz, injectionContext, context);
         if (that == null) {
             throw new IllegalStateException(Messages.format("NOCK-025004.artifact.null", context, this.ref.ref()));
         }
@@ -47,7 +47,7 @@ public class PropertyReferenceImpl<T> implements PropertyReference {
 
     private transient Injectables _injectables;
 
-    protected Injectables _injectables(final ExecutionContext context) {
+    protected synchronized Injectables _injectables(final ExecutionContext context) {
         if (this._injectables == null) {
             this._injectables = new InjectablesImpl(
                     context.getJobContext(),

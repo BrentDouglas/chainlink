@@ -9,7 +9,23 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>nock-test-seam</artifactId>
+    <artifactId>nock-test-seam-2.3</artifactId>
+
+    <properties>
+        <!-- Seam -->
+        <version.org.jboss.seam.jboss-seam>2.3.1.Final</version.org.jboss.seam.jboss-seam>
+        <version.javax.validation.validation-api>1.1.0.Final</version.javax.validation.validation-api>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>${version.javax.validation.validation-api}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -19,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.nock</groupId>
-            <artifactId>nock-seam</artifactId>
+            <artifactId>nock-inject-seam</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -35,6 +51,11 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -70,38 +91,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
-    <profiles>
-        <profile>
-            <id>seam-2.2</id>
-            <activation>
-                <property><name>seam-2.2</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>seam-2.3</id>
-            <activation>
-                <property><name>seam-2.3</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 
     <build>
         <testResources>

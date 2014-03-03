@@ -15,7 +15,6 @@ import io.machinecode.nock.spi.work.Work;
 public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferred<?>> implements Executable {
 
     protected final T work;
-
     protected final ThreadId threadId;
     protected final Executable parent;
     protected final ExecutionContext context;
@@ -90,6 +89,11 @@ public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferr
     @Override
     protected String getTimeoutExceptionMessage() {
         return Messages.format("NOCK-015000.executable.timeout", this.context, this);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[threadId=" + threadId + ",work=" + work + "]";
     }
 
     protected abstract Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final Executable callback,

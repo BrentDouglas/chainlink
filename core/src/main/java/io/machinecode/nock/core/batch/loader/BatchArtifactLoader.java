@@ -4,9 +4,11 @@ import gnu.trove.set.hash.THashSet;
 import io.machinecode.nock.core.batch.BatchArtifactRef;
 import io.machinecode.nock.core.batch.BatchArtifacts;
 import io.machinecode.nock.spi.loader.ArtifactLoader;
+import io.machinecode.nock.spi.loader.ArtifactOfWrongTypeException;
 import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
+import javax.batch.operations.BatchRuntimeException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -57,41 +59,45 @@ public abstract class BatchArtifactLoader implements ArtifactLoader {
             }
         }
         this.artifacts = batchArtifacts.getRefs();
+        for (final BatchArtifactRef ref : artifacts) {
+            if (ref.getId() == null) {
+                throw new IllegalStateException(Messages.format("NOCK-025005.artifact.batch.file.invalid", "id"));
+            }
+            if (ref.getClazz() == null) {
+                throw new IllegalStateException(Messages.format("NOCK-025005.artifact.batch.file.invalid", "class"));
+            }
+        }
     }
 
     @Override
-    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) {
-        final THashSet<String> fqcns = new THashSet<String>();
+    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws BatchRuntimeException {
+        String fqcn = null;
         for (final BatchArtifactRef ref : artifacts) {
             if (ref.getId().equals(id)) {
-                fqcns.add(ref.getClazz());
+                fqcn = ref.getClazz();
             }
         }
-        if (fqcns.isEmpty()) {
+        if (fqcn == null) {
              return null;
         }
-        for (final String fqcn : fqcns) {
-            final Class<?> clazz;
-            try {
-                clazz = loader.loadClass(fqcn);
-            } catch (final ClassNotFoundException e) {
-                log.errorf(e, Messages.get("NOCK-002201.validation.cant.load.matching.artifact"), id, fqcn);
-                continue;
-            }
-
-            final Object that;
-            try {
-                that = clazz.newInstance();
-            } catch (final Exception e) {
-                log.errorf(e, Messages.get("NOCK-002201.validation.cant.load.matching.artifact"), id, fqcn);
-                continue;
-            }
-            if (!as.isAssignableFrom(that.getClass())) {
-                log.warnf(Messages.get("NOCK-002200.validation.artifact.id.wrong.class"), id, fqcn, as.getCanonicalName());
-                continue;
-            }
-            return as.cast(that);
+        final Class<?> clazz;
+        try {
+            clazz = loader.loadClass(fqcn);
+        } catch (final ClassNotFoundException e) {
+            log.errorf(e, Messages.get("NOCK-002200.validation.cant.load.matching.artifact"), id, fqcn);
+            return null;
         }
-        return null;
+
+        final Object that;
+        try {
+            that = clazz.newInstance();
+        } catch (final Exception e) {
+            log.errorf(e, Messages.get("NOCK-002200.validation.cant.load.matching.artifact"), id, fqcn);
+            return null;
+        }
+        if (!as.isAssignableFrom(that.getClass())) {
+            throw new ArtifactOfWrongTypeException(Messages.format("NOCK-025000.artifact.loader.assignability", id, as.getCanonicalName()));
+        }
+        return as.cast(that);
     }
 }

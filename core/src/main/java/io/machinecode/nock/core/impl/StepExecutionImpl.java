@@ -1,13 +1,6 @@
 package io.machinecode.nock.core.impl;
 
-import io.machinecode.nock.spi.Checkpoint;
 import io.machinecode.nock.spi.ExtendedStepExecution;
-
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.Metric;
-import javax.batch.runtime.StepExecution;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

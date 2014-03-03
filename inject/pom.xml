@@ -15,29 +15,7 @@
     <modules>
         <module>cdi</module>
         <module>spring</module>
+        <module>seam</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>seam-2.2</id>
-            <activation>
-                <property><name>seam-2.2</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>seam</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>seam-2.3</id>
-            <activation>
-                <property><name>seam-2.3</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>seam</module>
-            </modules>
-        </profile>
-    </profiles>
 
 </project>

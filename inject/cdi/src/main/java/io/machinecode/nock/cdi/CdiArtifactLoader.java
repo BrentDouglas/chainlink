@@ -1,6 +1,8 @@
 package io.machinecode.nock.cdi;
 
 import io.machinecode.nock.spi.loader.ArtifactLoader;
+import io.machinecode.nock.spi.util.Messages;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
@@ -19,6 +21,8 @@ import java.util.Set;
  */
 public class CdiArtifactLoader implements ArtifactLoader, Extension {
 
+    private static final Logger log = Logger.getLogger(CdiArtifactLoader.class);
+
     public static final AnnotationLiteral<Default> DEFAULT_ANNOTATION_LITERAL = new AnnotationLiteral<Default>() {};
 
     static BeanManager beanManager;
@@ -33,17 +37,18 @@ public class CdiArtifactLoader implements ArtifactLoader, Extension {
 
     @Override
     public <T> T load(final String id, final Class<T> as, final ClassLoader _) {
-        return _inject(beanManager, as, new NamedLiteral(id));
+        return _inject(beanManager, as, id, new NamedLiteral(id));
     }
 
     public static <T> T inject(final BeanManager beanManager, final Class<T> as) {
-        return _inject(beanManager, as, DEFAULT_ANNOTATION_LITERAL);
+        return _inject(beanManager, as, null, DEFAULT_ANNOTATION_LITERAL);
     }
 
-    private static <T> T _inject(final BeanManager beanManager, final Class<T> as, final Annotation... annotation) {
+    private static <T> T _inject(final BeanManager beanManager, final Class<T> as, final String id, final Annotation... annotation) {
         final Set<Bean<?>> beans = beanManager.getBeans(as, annotation);
         final Bean<?> bean = beanManager.resolve(beans);
         if (bean == null) {
+            log.tracef(Messages.get("NOCK-025001.artifact.loader.not.found"), id, as.getSimpleName());
             return null;
         }
         final CreationalContext<?> ctx = beanManager.createCreationalContext(bean);

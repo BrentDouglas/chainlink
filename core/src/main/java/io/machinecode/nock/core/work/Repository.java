@@ -1,6 +1,5 @@
 package io.machinecode.nock.core.work;
 
-import io.machinecode.nock.spi.Checkpoint;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
@@ -45,9 +44,9 @@ public class Repository {
         repository.finishStepExecution(stepExecutionId, batchStatus, es, metrics, new Date());
     }
 
-    public static void updateStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId,  final Serializable serializable, final Metric[] metrics, final Checkpoint checkpoint) throws NoSuchJobExecutionException, JobSecurityException {
+    public static void updateStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId,  final Serializable serializable, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint) throws NoSuchJobExecutionException, JobSecurityException {
         log.debugf(Messages.get("NOCK-017004.repository.update.step.checkpoint"), jobExecutionId, stepExecutionId);
-        repository.updateStepExecution(stepExecutionId, serializable, metrics, checkpoint, new Date());
+        repository.updateStepExecution(stepExecutionId, serializable, metrics, readerCheckpoint, writerCheckpoint, new Date());
     }
 
     public static void updateStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId,  final Serializable serializable, final Metric[] metrics) throws NoSuchJobExecutionException, JobSecurityException {

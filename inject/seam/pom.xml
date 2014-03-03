@@ -9,7 +9,18 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>nock-seam</artifactId>
+    <artifactId>nock-inject-seam</artifactId>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.seam</groupId>
+                <artifactId>jboss-seam</artifactId>
+                <type>ejb</type>
+                <version>${version.org.jboss.seam.jboss-seam}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -26,6 +37,11 @@
             <groupId>org.jboss.seam</groupId>
             <artifactId>jboss-seam</artifactId>
             <type>ejb</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

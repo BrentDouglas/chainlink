@@ -7,7 +7,7 @@ import io.machinecode.nock.core.model.partition.PartitionImpl;
 import io.machinecode.nock.core.deferred.DeferredImpl;
 import io.machinecode.nock.core.work.ItemImpl;
 import io.machinecode.nock.core.work.Repository;
-import io.machinecode.nock.spi.Checkpoint;
+import io.machinecode.nock.spi.BaseExecution;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.ExecutionContext;
 import io.machinecode.nock.spi.context.MutableStepContext;
@@ -19,10 +19,6 @@ import io.machinecode.nock.spi.util.Messages;
 import io.machinecode.nock.spi.work.TaskWork;
 import org.jboss.logging.Logger;
 
-import javax.batch.api.chunk.CheckpointAlgorithm;
-import javax.batch.api.chunk.ItemProcessor;
-import javax.batch.api.chunk.ItemReader;
-import javax.batch.api.chunk.ItemWriter;
 import javax.batch.api.chunk.listener.ChunkListener;
 import javax.batch.api.chunk.listener.ItemProcessListener;
 import javax.batch.api.chunk.listener.ItemReadListener;
@@ -363,7 +359,11 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 log.debugf(Messages.get("NOCK-014205.chunk.state.checkpoint"), this._context);
                 // 11.8 9 m has this outside the write catch block
                 _runAfterListeners(state);
+                if (state.isFailed()) {
+                    return false;
+                }
                 exception = _checkpoint(state);
+                // Fall through
             case COMMIT:
                 log.debugf(Messages.get("NOCK-014206.chunk.state.commit"), this._context);
                 _commit(state, exception);
@@ -464,7 +464,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             }
         }
         if (exception != null) {
-            _handleException(state, exception);
+            _handleExceptionInTransaction(state, exception);
         }
     }
 
@@ -851,7 +851,8 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                         state.stepExecutionId,
                         state.stepContext.getPersistentUserData(),
                         state.stepContext.getMetrics(),
-                        new CheckpointImpl(state.readInfo, state.writeInfo)
+                        state.readInfo,
+                        state.writeInfo
                 );
             } else {
                 state.repository.updatePartitionExecution(
@@ -859,7 +860,8 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                         state.partitionId,
                         state.stepContext.getPersistentUserData(),
                         state.stepContext.getMetrics(),
-                        new CheckpointImpl(state.readInfo, state.writeInfo),
+                        state.readInfo,
+                        state.writeInfo,
                         new Date()
                 );
             }
@@ -1054,11 +1056,11 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             this.retryLimit = ChunkImpl.this.retryLimit == null ? -1 : Integer.parseInt(ChunkImpl.this.retryLimit);
 
             if (context.isRestarting()) {
-                final Checkpoint checkpoint = this.partitionId == null
-                        ? repository.getPreviousStepExecution(this.jobExecutionId, this.stepExecutionId, this.stepContext.getStepName()).getCheckpoint()
-                        : repository.getPartitionExecution(this.stepExecutionId, this.partitionId).getCheckpoint();
-                this.readInfo = checkpoint == null ? null : checkpoint.getReaderCheckpoint();
-                this.writeInfo = checkpoint == null ? null : checkpoint.getWriterCheckpoint();
+                final BaseExecution execution = this.partitionId == null
+                        ? repository.getPreviousStepExecution(this.jobExecutionId, this.stepExecutionId, this.stepContext.getStepName())
+                        : repository.getPartitionExecution(this.stepExecutionId, this.partitionId);
+                this.readInfo = execution == null ? null : execution.getReaderCheckpoint();
+                this.writeInfo = execution == null ? null : execution.getWriterCheckpoint();
             } else {
                 this.readInfo = null;
                 this.writeInfo = null;

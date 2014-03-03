@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -57,6 +58,7 @@ public class EventedExecutor implements Executor {
     protected final TransactionManager transactionManager;
     protected final InjectionContext injectionContext;
 
+    protected final AtomicInteger worker = new AtomicInteger(0);
     protected final List<WorkerImpl> workers;
     protected final TMap<ThreadId, Worker> threads = new THashMap<ThreadId, Worker>();
     protected final AtomicBoolean threadsLock = new AtomicBoolean(false);
@@ -199,24 +201,16 @@ public class EventedExecutor implements Executor {
     }
 
     private List<WorkerImpl> _leastBusy(final List<WorkerImpl> workers, final int required) {
-        final TreeMap<Integer, WorkerImpl> tree = new TreeMap<Integer, WorkerImpl>(INTEGER_COMPARATOR);
+        final ArrayList<WorkerImpl> ret = new ArrayList<WorkerImpl>(required);
         synchronized (workers) {
-            for (final WorkerImpl worker : workers) {
-                synchronized (worker.threadId) {
-                    tree.put(worker.executables.size(), worker);
+            for (int i = 0; i < required; ++i) {
+                if (worker.get() >= workers.size()) {
+                    worker.set(0);
                 }
+                ret.add(workers.get(worker.getAndIncrement()));
             }
         }
-        final Integer first = tree.firstKey();
-        Integer last = first;
-        for (int i = 0; i < required; ++i) {
-            last = tree.higherKey(last);
-            if (last == null) {
-                last = tree.lastKey();
-                break;
-            }
-        }
-        return new ArrayList<WorkerImpl>(tree.subMap(first, true, last, true).values());
+        return ret;
     }
 
     class WorkerImpl extends Thread implements Worker {

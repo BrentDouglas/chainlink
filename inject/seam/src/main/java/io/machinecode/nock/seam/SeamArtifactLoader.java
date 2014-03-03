@@ -2,6 +2,9 @@ package io.machinecode.nock.seam;
 
 import io.machinecode.nock.spi.loader.ArtifactLoader;
 
+import io.machinecode.nock.spi.loader.ArtifactOfWrongTypeException;
+import io.machinecode.nock.spi.util.Messages;
+import org.jboss.logging.Logger;
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.AutoCreate;
@@ -11,6 +14,8 @@ import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.contexts.Lifecycle;
 
+import javax.batch.operations.BatchRuntimeException;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
@@ -19,8 +24,11 @@ import org.jboss.seam.contexts.Lifecycle;
 @Startup
 @AutoCreate
 public class SeamArtifactLoader implements ArtifactLoader {
+
+    private static final Logger log = Logger.getLogger(SeamArtifactLoader.class);
+
     @Override
-    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) {
+    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws BatchRuntimeException {
         return inject(id, as);
     }
 
@@ -28,17 +36,25 @@ public class SeamArtifactLoader implements ArtifactLoader {
         if (Contexts.isApplicationContextActive()) {
             final Object that = Component.getInstance(id);
             if (that == null) {
+                log.tracef(Messages.get("NOCK-025001.artifact.loader.not.found"), id, as.getSimpleName());
                 return null;
             }
-            return as.isAssignableFrom(that.getClass()) ? as.cast(that) : null;
+            if (as.isAssignableFrom(that.getClass())) {
+                return as.cast(that);
+            }
+            throw new ArtifactOfWrongTypeException(Messages.format("NOCK-025000.artifact.loader.assignability", id, as.getCanonicalName()));
         } else {
             try {
                 Lifecycle.beginCall();
                 final Object that = Component.getInstance(id);
                 if (that == null) {
+                    log.tracef(Messages.get("NOCK-025001.artifact.loader.not.found"), id, as.getSimpleName());
                     return null;
                 }
-                return as.isAssignableFrom(that.getClass()) ? as.cast(that) : null;
+                if (as.isAssignableFrom(that.getClass())) {
+                    return as.cast(that);
+                }
+                throw new ArtifactOfWrongTypeException(Messages.format("NOCK-025000.artifact.loader.assignability", id, as.getCanonicalName()));
             } finally {
                 Lifecycle.endCall();
             }

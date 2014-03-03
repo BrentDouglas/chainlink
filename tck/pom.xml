@@ -20,6 +20,17 @@
         <tck.properties>tck.properties</tck.properties>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.machinecode.nock</groupId>
+                <artifactId>nock-tck-core</artifactId>
+                <scope>test</scope>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
@@ -52,6 +63,19 @@
 
     <profiles>
         <profile>
+            <id>tck-all</id>
+            <activation>
+                <property><name>tck-all</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>batch</module>
+                <module>cdi</module>
+                <module>seam</module>
+                <module>spring</module>
+            </modules>
+        </profile>
+        <profile>
             <id>tck-batch</id>
             <activation>
                 <property><name>tck-batch</name></property>
@@ -69,6 +93,16 @@
             </activation>
             <modules>
                 <module>cdi</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tck-seam</id>
+            <activation>
+                <property><name>tck-seam</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>seam</module>
             </modules>
         </profile>
         <profile>

@@ -56,7 +56,6 @@ public class SeamInjectionInterceptor extends AbstractInterceptor {
         return true;
     }
 
-    //TODO Need to work out a better way to do this
     @AroundInvoke
     public Object aroundInvoke(final InvocationContext invocation) throws Exception {
         final Object bean = invocation.getTarget();

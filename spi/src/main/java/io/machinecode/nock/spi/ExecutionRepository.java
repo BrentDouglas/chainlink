@@ -1,5 +1,6 @@
 package io.machinecode.nock.spi;
 
+import io.machinecode.nock.spi.context.MutableMetric;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Step;
 
@@ -45,6 +46,10 @@ public interface ExecutionRepository {
 
     PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception;
 
+    MutableMetric createMetric(final Metric.MetricType type);
+
+    MutableMetric[] copyMetrics(final Metric[] metrics);
+
     // Update
 
     /**
@@ -73,15 +78,15 @@ public interface ExecutionRepository {
      * @throws NoSuchJobExecutionException
      * @throws JobSecurityException
      */
-    void startStepExecution(final long stepExecutionId, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void startStepExecution(final long stepExecutionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
     void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
     void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
-    void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
+    void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
     void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException;
 
@@ -103,13 +108,13 @@ public interface ExecutionRepository {
 
     ExtendedJobInstance getJobInstanceForExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 
-    List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException;
+    List<? extends JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException;
 
     ExtendedJobExecution getJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 
     ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws JobRestartException, NoSuchJobExecutionException, NoSuchJobInstanceException, JobExecutionNotMostRecentException, JobSecurityException;
 
-    List<StepExecution> getStepExecutionsForJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
+    List<? extends StepExecution> getStepExecutionsForJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 
     ExtendedStepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException; // TODO Should throw something else
 

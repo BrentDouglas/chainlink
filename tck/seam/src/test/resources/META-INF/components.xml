@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://jboss.com/products/seam/core       http://jboss.com/products/seam/core-2.2.xsd
+                                http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd">
+
+    <core:init debug="true">
+        <core:interceptors>
+            <value>org.jboss.seam.core.SynchronizationInterceptor</value>
+            <value>org.jboss.seam.async.AsynchronousInterceptor</value>
+            <value>org.jboss.seam.ejb.RemoveInterceptor</value>
+            <value>org.jboss.seam.persistence.HibernateSessionProxyInterceptor</value>
+            <value>org.jboss.seam.persistence.EntityManagerProxyInterceptor</value>
+            <value>org.jboss.seam.core.MethodContextInterceptor</value>
+            <value>org.jboss.seam.core.EventInterceptor</value>
+            <value>org.jboss.seam.core.ConversationalInterceptor</value>
+            <value>org.jboss.seam.bpm.BusinessProcessInterceptor</value>
+            <value>org.jboss.seam.core.ConversationInterceptor</value>
+            <value>org.jboss.seam.core.BijectionInterceptor</value>
+            <value>org.jboss.seam.transaction.RollbackInterceptor</value>
+            <value>org.jboss.seam.transaction.TransactionInterceptor</value>
+            <value>org.jboss.seam.webservice.WSSecurityInterceptor</value>
+            <value>org.jboss.seam.security.SecurityInterceptor</value>
+            <value>io.machinecode.nock.seam.SeamInjectionInterceptor</value>
+        </core:interceptors>
+     </core:init>
+
+    <component name="artifactInstanceTestJobListener" class="com.ibm.jbatch.tck.artifacts.specialized.ArtifactInstanceTestJobListener" />
+    <component name="artifactInstanceTestStepListener" class="com.ibm.jbatch.tck.artifacts.specialized.ArtifactInstanceTestStepListener" />
+    <component name="artifactInstanceTestChunkListener" class="com.ibm.jbatch.tck.artifacts.specialized.ArtifactInstanceTestChunkListener" />
+    <component name="artifactInstanceTestReader" class="com.ibm.jbatch.tck.artifacts.specialized.ArtifactInstanceTestReader" />
+    <component name="artifactInstanceTestWriter" class="com.ibm.jbatch.tck.artifacts.specialized.ArtifactInstanceTestWriter" />
+    <component name="batchletRestartStateMachineImpl" class="com.ibm.jbatch.tck.artifacts.specialized.BatchletRestartStateMachineImpl" />
+    <component name="batchletUsingStepContextImpl" class="com.ibm.jbatch.tck.artifacts.specialized.BatchletUsingStepContextImpl" />
+    <component name="chunkOnErrorCheckpointListener" class="com.ibm.jbatch.tck.artifacts.specialized.ChunkOnErrorCheckpointListener" />
+    <component name="contextsGetIdJobContextTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.ContextsGetIdJobContextTestBatchlet" />
+    <component name="contextsGetIdStepContextTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.ContextsGetIdStepContextTestBatchlet" />
+    <component name="countInvocationsStepListener" class="com.ibm.jbatch.tck.artifacts.reusable.CountInvocationsStepListener" />
+    <component name="countInvocationsObjectParameterizationStepListener" class="com.ibm.jbatch.tck.artifacts.reusable.CountInvocationsObjectParameterizationStepListener" />
+    <component name="deciderTestsJobListener" class="com.ibm.jbatch.tck.artifacts.specialized.DeciderTestsJobListener" />
+    <component name="deciderTestsBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.DeciderTestsBatchlet" />
+    <component name="deciderTestsDecider" class="com.ibm.jbatch.tck.artifacts.specialized.DeciderTestsDecider" />
+    <component name="defaultValueArrayWriter" class="com.ibm.jbatch.tck.artifacts.specialized.DefaultValueArrayWriter" />
+    <component name="doSomethingArrayItemReaderImpl" class="com.ibm.jbatch.tck.artifacts.specialized.DoSomethingArrayItemReaderImpl" />
+    <component name="doSomethingArrayItemProcessorImpl" class="com.ibm.jbatch.tck.artifacts.specialized.DoSomethingArrayItemProcessorImpl" />
+    <component name="doSomethingItemProcessorImpl" class="com.ibm.jbatch.tck.artifacts.specialized.DoSomethingItemProcessorImpl" />
+    <component name="doSomethingItemReaderImpl" class="com.ibm.jbatch.tck.artifacts.specialized.DoSomethingItemReaderImpl" />
+    <component name="doSomethingItemWriterImpl" class="com.ibm.jbatch.tck.artifacts.specialized.DoSomethingItemWriterImpl" />
+    <component name="doSomethingSimpleArrayWriter" class="com.ibm.jbatch.tck.artifacts.specialized.DoSomethingSimpleArrayWriter" />
+    <component name="doSomethingSimpleTimeArrayReader" class="com.ibm.jbatch.tck.artifacts.specialized.DoSomethingSimpleTimeArrayReader" />
+    <component name="doSomethingSimpleTimeArrayWriter" class="com.ibm.jbatch.tck.artifacts.specialized.DoSomethingSimpleTimeArrayWriter" />
+    <component name="failRestartBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.FailRestartBatchlet" />
+    <component name="flowTransitionToDecisionTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.FlowTransitionToDecisionTestBatchlet" />
+    <component name="flowTransitionWithinFlowTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.FlowTransitionWithinFlowTestBatchlet" />
+    <component name="flowTransitionToDecisionTestDecider" class="com.ibm.jbatch.tck.artifacts.specialized.FlowTransitionToDecisionTestDecider" />
+    <component name="inventoryInitReader" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.InventoryInitReader" />
+    <component name="inventoryInitProcessor" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.InventoryInitProcessor" />
+    <component name="inventoryInitWriter" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.InventoryInitWriter" />
+    <component name="inventoryStepListener" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.InventoryStepListener" />
+    <component name="inventoryReader" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.InventoryReader" />
+    <component name="inventoryProcessor" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.InventoryProcessor" />
+    <component name="inventoryWriter" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.InventoryWriter" />
+    <component name="inventoryCheckpointAlgorithmNoOverride" class="com.ibm.jbatch.tck.artifacts.specialized.InventoryCheckpointAlgorithmNoOverride" />
+    <component name="inventoryCheckpointAlgorithmOverride150" class="com.ibm.jbatch.tck.artifacts.specialized.InventoryCheckpointAlgorithmOverride150" />
+    <component name="jobAttributesTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.JobAttributesTestBatchlet" />
+    <component name="jobContextTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.JobContextTestBatchlet" />
+    <component name="jobLevelPropertiesCountBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.JobLevelPropertiesCountBatchlet" />
+    <component name="jobLevelPropertiesShouldNotBeAvailableThroughStepContextBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.JobLevelPropertiesShouldNotBeAvailableThroughStepContextBatchlet" />
+    <component name="jobLevelPropertiesPropertyValueBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.JobLevelPropertiesPropertyValueBatchlet" />
+    <component name="listenerOnErrorReader" class="com.ibm.jbatch.tck.artifacts.specialized.ListenerOnErrorReader" />
+    <component name="listenerOnErrorProcessor" class="com.ibm.jbatch.tck.artifacts.specialized.ListenerOnErrorProcessor" />
+    <component name="listenerOnErrorWriter" class="com.ibm.jbatch.tck.artifacts.specialized.ListenerOnErrorWriter" />
+    <component name="metricsStepListener" class="com.ibm.jbatch.tck.artifacts.specialized.MetricsStepListener" />
+    <component name="multipleExitStatusBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.MultipleExitStatusBatchlet" />
+    <component name="myBatchletImpl" class="com.ibm.jbatch.tck.artifacts.reusable.MyBatchletImpl" />
+    <component name="myBatchletWithPropertiesImpl" class="com.ibm.jbatch.tck.artifacts.specialized.MyBatchletWithPropertiesImpl" />
+    <component name="myChunkListener" class="com.ibm.jbatch.tck.artifacts.specialized.MyChunkListener" />
+    <component name="myCustomCheckpointAlgorithm" class="com.ibm.jbatch.tck.artifacts.specialized.MyCustomCheckpointAlgorithm" />
+    <component name="myCustomCheckpointListener" class="com.ibm.jbatch.tck.artifacts.specialized.MyCustomCheckpointListener" />
+    <component name="myItemReadListenerImpl" class="com.ibm.jbatch.tck.artifacts.specialized.MyItemReadListenerImpl" />
+    <component name="myItemProcessListenerImpl" class="com.ibm.jbatch.tck.artifacts.specialized.MyItemProcessListenerImpl" />
+    <component name="myItemWriteListenerImpl" class="com.ibm.jbatch.tck.artifacts.specialized.MyItemWriteListenerImpl" />
+    <component name="myLongRunningBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.MyLongRunningBatchletImpl" />
+    <component name="myMultipleExceptionsRetryReadListener" class="com.ibm.jbatch.tck.artifacts.specialized.MyMultipleExceptionsRetryReadListener" />
+    <component name="myPartitionAnalyzer" class="com.ibm.jbatch.tck.artifacts.specialized.MyPartitionAnalyzer" />
+    <component name="myPartitionCollector" class="com.ibm.jbatch.tck.artifacts.specialized.MyPartitionCollector" />
+    <component name="myPartitionReducer" class="com.ibm.jbatch.tck.artifacts.specialized.MyPartitionReducer" />
+    <component name="myParallelSubJobsExitStatusBatchlet" class="com.ibm.jbatch.tck.artifacts.reusable.MyParallelSubJobsExitStatusBatchlet" />
+    <component name="myPartitionedBatchletImpl" class="com.ibm.jbatch.tck.artifacts.specialized.MyPartitionedBatchletImpl" />
+    <component name="myPartitionMapper" class="com.ibm.jbatch.tck.artifacts.specialized.MyPartitionMapper" />
+    <component name="myRetryReadListener" class="com.ibm.jbatch.tck.artifacts.specialized.MyRetryReadListener" />
+    <component name="myRetryProcessListener" class="com.ibm.jbatch.tck.artifacts.specialized.MyRetryProcessListener" />
+    <component name="myRetryWriteListener" class="com.ibm.jbatch.tck.artifacts.specialized.MyRetryWriteListener" />
+    <component name="mySimpleCustomCheckpointAlgorithm" class="com.ibm.jbatch.tck.artifacts.specialized.MySimpleCustomCheckpointAlgorithm" />
+    <component name="mySkipProcessListener" class="com.ibm.jbatch.tck.artifacts.specialized.MySkipProcessListener" />
+    <component name="mySkipReaderExceedListener" class="com.ibm.jbatch.tck.artifacts.specialized.MySkipReaderExceedListener" />
+    <component name="mySkipReadListener" class="com.ibm.jbatch.tck.artifacts.specialized.MySkipReadListener" />
+    <component name="mySkipWriteListener" class="com.ibm.jbatch.tck.artifacts.specialized.MySkipWriteListener" />
+    <component name="myTimeCheckpointListener" class="com.ibm.jbatch.tck.artifacts.specialized.MyTimeCheckpointListener" />
+    <component name="myUniversalListener" class="com.ibm.jbatch.tck.artifacts.specialized.MyUniversalListener" />
+    <component name="numbersRetryReadListener" class="com.ibm.jbatch.tck.artifacts.specialized.NumbersRetryReadListener" />
+    <component name="numbersSkipReadListener" class="com.ibm.jbatch.tck.artifacts.specialized.NumbersSkipReadListener" />
+    <component name="numbersRetryProcessListener" class="com.ibm.jbatch.tck.artifacts.specialized.NumbersRetryProcessListener" />
+    <component name="numbersSkipProcessListener" class="com.ibm.jbatch.tck.artifacts.specialized.NumbersSkipProcessListener" />
+    <component name="numbersRetryWriteListener" class="com.ibm.jbatch.tck.artifacts.specialized.NumbersRetryWriteListener" />
+    <component name="numbersSkipWriteListener" class="com.ibm.jbatch.tck.artifacts.specialized.NumbersSkipWriteListener" />
+    <component name="nullChkPtInfoReader" class="com.ibm.jbatch.tck.artifacts.specialized.NullChkPtInfoReader" />
+    <component name="nullChkPtInfoWriter" class="com.ibm.jbatch.tck.artifacts.specialized.NullChkPtInfoWriter" />
+    <component name="overrideOnAttributeValuesUponRestartBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.OverrideOnAttributeValuesUponRestartBatchlet" />
+    <component name="parsingPartitionAnalyzer" class="com.ibm.jbatch.tck.artifacts.specialized.ParsingPartitionAnalyzer" />
+    <component name="retryReader" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.RetryReader" />
+    <component name="retryProcessor" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.RetryProcessor" />
+    <component name="retryWriter" class="com.ibm.jbatch.tck.artifacts.chunkartifacts.RetryWriter" />
+    <component name="simpleJobListener" class="com.ibm.jbatch.tck.artifacts.reusable.SimpleJobListener" />
+    <component name="skipProcessor" class="com.ibm.jbatch.tck.artifacts.specialized.SkipProcessor" />
+    <component name="skipReader" class="com.ibm.jbatch.tck.artifacts.specialized.SkipReader" />
+    <component name="skipReaderMultipleExceptions" class="com.ibm.jbatch.tck.artifacts.specialized.SkipReaderMultipleExceptions" />
+    <component name="skipWriter" class="com.ibm.jbatch.tck.artifacts.specialized.SkipWriter" />
+    <component name="splitFlowTransitionLoopTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.SplitFlowTransitionLoopTestBatchlet" />
+    <component name="splitTransitionToDecisionTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.SplitTransitionToDecisionTestBatchlet" />
+    <component name="splitTransitionToDecisionTestDecider" class="com.ibm.jbatch.tck.artifacts.specialized.SplitTransitionToDecisionTestDecider" />
+    <component name="splitTransitionToStepTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.SplitTransitionToStepTestBatchlet" />
+    <component name="startLimitJobListener" class="com.ibm.jbatch.tck.artifacts.specialized.StartLimitJobListener" />
+    <component name="startLimitStateMachineVariation1Batchlet" class="com.ibm.jbatch.tck.artifacts.specialized.StartLimitStateMachineVariation1Batchlet" />
+    <component name="startLimitStateMachineVariation2Batchlet" class="com.ibm.jbatch.tck.artifacts.specialized.StartLimitStateMachineVariation2Batchlet" />
+    <component name="startLimitStateMachineVariation3Batchlet" class="com.ibm.jbatch.tck.artifacts.specialized.StartLimitStateMachineVariation3Batchlet" />
+    <component name="stepContextTestBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.StepContextTestBatchlet" />
+    <component name="stepLevelPropertiesCountBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.StepLevelPropertiesCountBatchlet" />
+    <component name="stepLevelPropertiesShouldNotBeAvailableThroughJobContextBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.StepLevelPropertiesShouldNotBeAvailableThroughJobContextBatchlet" />
+    <component name="stepLevelPropertiesPropertyValueBatchlet" class="com.ibm.jbatch.tck.artifacts.specialized.StepLevelPropertiesPropertyValueBatchlet" />
+    <component name="threadTrackingJobListener" class="com.ibm.jbatch.tck.artifacts.specialized.ThreadTrackingJobListener" />
+    <component name="threadTrackingStepListener" class="com.ibm.jbatch.tck.artifacts.specialized.ThreadTrackingStepListener" />
+    <component name="transitionDecider" class="com.ibm.jbatch.tck.artifacts.specialized.TransitionDecider" />
+    <component name="transitionTrackerBatchlet" class="com.ibm.jbatch.tck.artifacts.reusable.TransitionTrackerBatchlet" />
+</components>

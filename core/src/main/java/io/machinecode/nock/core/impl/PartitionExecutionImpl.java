@@ -1,6 +1,5 @@
 package io.machinecode.nock.core.impl;
 
-import io.machinecode.nock.spi.ExtendedStepExecution;
 import io.machinecode.nock.spi.PartitionExecution;
 
 import java.util.Properties;
@@ -37,7 +36,7 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
         BaseExecutionImpl._from(builder, that);
         builder.stepExecutionId = that.getStepExecutionId();
         builder.partitionId = that.getPartitionId();
-        builder.partitionProperties = that.getPartitionProperties();
+        builder.partitionProperties = that.getPartitionParameters();
     }
 
     @Override
@@ -51,7 +50,7 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
     }
 
     @Override
-    public Properties getPartitionProperties() {
+    public Properties getPartitionParameters() {
         return partitionProperties;
     }
 

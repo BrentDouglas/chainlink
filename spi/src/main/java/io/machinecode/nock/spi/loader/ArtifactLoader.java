@@ -12,8 +12,8 @@ public interface ArtifactLoader {
      * @param as Interface
      * @param loader
      * @param <T>
-     * @return The first artifact matching {@param id} and implementing {@param as}
-     * @throws BatchRuntimeException
+     * @return An artifact matching {@param id}
+     * @throws BatchRuntimeException If the artifact does not implement {@param as}
      */
-    <T> T load(final String id, final Class<T> as, final ClassLoader loader);
+    <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws ArtifactOfWrongTypeException;
 }

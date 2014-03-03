@@ -22,7 +22,9 @@ public interface BaseExecution {
 
     Serializable getPersistentUserData();
 
-    Checkpoint getCheckpoint();
-
     Metric[] getMetrics();
+
+    Serializable getReaderCheckpoint();
+
+    Serializable getWriterCheckpoint();
 }

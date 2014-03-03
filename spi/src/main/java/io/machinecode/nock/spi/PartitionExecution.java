@@ -11,5 +11,5 @@ public interface PartitionExecution extends BaseExecution {
 
     int getPartitionId();
 
-    Properties getPartitionProperties();
+    Properties getPartitionParameters();
 }

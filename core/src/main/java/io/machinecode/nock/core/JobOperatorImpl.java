@@ -260,7 +260,7 @@ public class JobOperatorImpl implements JobOperator {
     @Override
     public List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException {
         final ExecutionRepository repository = executor.getRepository();
-        final List<JobExecution> executions =  repository.getJobExecutions(instance);
+        final List<? extends JobExecution> executions =  repository.getJobExecutions(instance);
         final List<JobExecution> delegates = new ArrayList<JobExecution>(executions.size());
         for (final JobExecution execution : executions) {
             delegates.add(new DelegateJobExecutionImpl(execution, repository));
@@ -277,7 +277,7 @@ public class JobOperatorImpl implements JobOperator {
     @Override
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         final ExecutionRepository repository = executor.getRepository();
-        final List<StepExecution> executions =  repository.getStepExecutionsForJob(jobExecutionId);
+        final List<? extends StepExecution> executions =  repository.getStepExecutionsForJob(jobExecutionId);
         final List<StepExecution> delegates = new ArrayList<StepExecution>(executions.size());
         for (final StepExecution execution : executions) {
             delegates.add(new DelegateStepExecutionImpl(execution, repository));

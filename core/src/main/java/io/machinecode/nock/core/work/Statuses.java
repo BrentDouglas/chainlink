@@ -1,18 +1,10 @@
 package io.machinecode.nock.core.work;
 
 import io.machinecode.nock.core.util.Index;
-import io.machinecode.nock.spi.Checkpoint;
-import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.ExecutionContext;
-import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
-import javax.batch.operations.JobSecurityException;
-import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.Metric;
-import java.io.Serializable;
-import java.util.Date;
 import java.util.regex.Pattern;
 
 /**

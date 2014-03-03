@@ -1,6 +1,6 @@
 package io.machinecode.nock.core.configuration;
 
-import io.machinecode.nock.core.local.LocalRepository;
+import io.machinecode.nock.core.local.LocalExecutionRepository;
 import io.machinecode.nock.core.local.LocalTransactionManager;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.configuration.Configuration;
@@ -9,6 +9,7 @@ import io.machinecode.nock.spi.loader.ArtifactLoader;
 import io.machinecode.nock.spi.loader.JobLoader;
 
 import javax.transaction.TransactionManager;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -28,8 +29,8 @@ public class ConfigurationImpl implements Configuration {
 
     public ConfigurationImpl(final ClassLoader loader) {
         this.loader = loader;
-        this.repository = new LocalRepository();
-        this.transactionManager = new LocalTransactionManager(180); //TODO Should not be here
+        this.repository = new LocalExecutionRepository();
+        this.transactionManager = new LocalTransactionManager(180, TimeUnit.SECONDS); //TODO Should not be here
         this.jobLoaders = JOB_LOADERS;
         this.artifactLoaders = ARTIFACT_LOADERS;
         this.injectors = INJECTORS;

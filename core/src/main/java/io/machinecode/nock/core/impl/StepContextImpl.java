@@ -1,5 +1,6 @@
 package io.machinecode.nock.core.impl;
 
+import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.context.MutableMetric;
 import io.machinecode.nock.spi.context.MutableStepContext;
 import io.machinecode.nock.spi.element.execution.Step;
@@ -42,7 +43,7 @@ public class StepContextImpl implements MutableStepContext {
         this.persistentUserData = persistentUserData;
     }
 
-    public StepContextImpl(final long stepExecutionId, final Step<?,?> step, final Properties properties) {
+    public StepContextImpl(final long stepExecutionId, final Step<?,?> step, final Properties properties, final ExecutionRepository repository) {
         this.stepExecutionId = stepExecutionId;
         this.stepName = step.getId();
         this.properties = properties;
@@ -51,11 +52,11 @@ public class StepContextImpl implements MutableStepContext {
         final MetricType[] values = MetricType.values();
         this.metrics = new MutableMetric[values.length];
         for (int i = 0; i < values.length; ++i) {
-            this.metrics[i] = new MutableMetricImpl(values[i]);
+            this.metrics[i] = repository.createMetric(values[i]);
         }
     }
 
-    public StepContextImpl(final StepContext context) {
+    public StepContextImpl(final StepContext context, final ExecutionRepository repository) {
         this.stepExecutionId = context.getStepExecutionId();
         this.stepName = context.getStepName();
         this.properties = context.getProperties();
@@ -64,18 +65,18 @@ public class StepContextImpl implements MutableStepContext {
         final MetricType[] values = MetricType.values();
         this.metrics = new MutableMetric[values.length];
         for (int i = 0; i < values.length; ++i) {
-            this.metrics[i] = new MutableMetricImpl(values[i]);
+            this.metrics[i] = repository.createMetric(values[i]);
         }
     }
 
-    public StepContextImpl(final StepContext context, final Metric[] metrics, final Serializable persistentUserData) {
+    public StepContextImpl(final StepContext context, final Metric[] metrics, final Serializable persistentUserData, final ExecutionRepository repository) {
         this.stepExecutionId = context.getStepExecutionId();
         this.stepName = context.getStepName();
         this.properties = context.getProperties();
         this.batchStatus = BatchStatus.STARTING;
         this.exitStatus = null;
         this.persistentUserData = persistentUserData;
-        this.metrics = MutableMetricImpl.copy(metrics);
+        this.metrics = repository.copyMetrics(metrics);
     }
 
     @Override

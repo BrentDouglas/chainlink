@@ -1,6 +1,8 @@
 package io.machinecode.nock.core.model.execution;
 
 import io.machinecode.nock.core.Constants;
+import io.machinecode.nock.core.impl.ExecutionContextImpl;
+import io.machinecode.nock.core.impl.JobContextImpl;
 import io.machinecode.nock.core.impl.StepContextImpl;
 import io.machinecode.nock.core.model.ListenerImpl;
 import io.machinecode.nock.core.model.ListenersImpl;
@@ -240,7 +242,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         stepExecution = repository.createStepExecution(jobExecution, this, new Date());
 
         final long stepExecutionId = stepExecution.getStepExecutionId();
-        final MutableStepContext stepContext = new StepContextImpl(stepExecutionId, this, PropertiesConverter.convert(this.properties));
+        final MutableStepContext stepContext = new StepContextImpl(stepExecutionId, this, PropertiesConverter.convert(this.properties), repository);
         context.setStepContext(stepContext);
         log.debugf(Messages.get("NOCK-010203.step.create.step.context"), context);
         stepContext.setPersistentUserData(persistentData);
@@ -266,14 +268,22 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         context.setLastStepExecutionId(stepExecutionId);
         int timeout = _timeout(context);
 
-        repository.startStepExecution(stepExecutionId, stepContext.getMetrics(), new Date());
+        repository.startStepExecution(stepExecutionId, new Date());
         stepContext.setBatchStatus(STARTED);
 
         if (!isPartitioned()) {
             this._partitions = 1;
             this._completed = 0;
+            final ExecutionContext clonedContext = new ExecutionContextImpl(
+                    context.getJob(),
+                    context.getJobContext(),
+                    context.getStepContext(),
+                    context.getJobExecution(),
+                    context.getRestartJobExecution(),
+                    null
+            );
             return executor.execute(
-                    new TaskExecutable(thisCallback, this.task, context, this.id, -1, timeout)
+                    new TaskExecutable(thisCallback, this.task, clonedContext, this.id, -1, timeout)
             );
         } else {
             final PartitionTarget target = this.partition.map(this.task, executor, thisCallback, context, timeout, restartStepExecutionId);

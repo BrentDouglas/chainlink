@@ -6,6 +6,7 @@ import io.machinecode.nock.spi.element.Listeners;
 import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.InjectionContext;
+import io.machinecode.nock.spi.loader.ArtifactOfWrongTypeException;
 import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
@@ -41,7 +42,13 @@ public class ListenersImpl implements Listeners {
         try {
             for (final ListenerImpl listener : this.listeners) {
                 provider.setInjectables(listener._injectables(context));
-                final Object that = listener.tryLoad(clazz, injectionContext);
+
+                final Object that;
+                try {
+                    that = listener.load(clazz, injectionContext, context);
+                } catch (final ArtifactOfWrongTypeException e) {
+                    continue;
+                }
                 if (that == null) {
                     continue;
                 }

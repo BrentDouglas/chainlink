@@ -1,7 +1,6 @@
 package io.machinecode.nock.core.impl;
 
 import io.machinecode.nock.spi.BaseExecution;
-import io.machinecode.nock.spi.Checkpoint;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
@@ -18,8 +17,9 @@ public abstract class BaseExecutionImpl implements BaseExecution {
     private final Date end;
     private final String exitStatus;
     private final Serializable persistentUserData;
-    private final Checkpoint checkpoint;
     private final Metric[] metrics;
+    private final Serializable readerCheckpoint;
+    private final Serializable writerCheckpoint;
 
     public BaseExecutionImpl(final Builder builder) {
         this.batchStatus = builder.batchStatus;
@@ -28,8 +28,9 @@ public abstract class BaseExecutionImpl implements BaseExecution {
         this.end = builder.end;
         this.exitStatus = builder.exitStatus;
         this.persistentUserData = builder.persistentUserData;
-        this.checkpoint = builder.checkpoint;
         this.metrics = builder.metrics;
+        this.readerCheckpoint = builder.readerCheckpoint;
+        this.writerCheckpoint = builder.writerCheckpoint;
     }
 
     public BaseExecutionImpl(final BaseExecutionImpl builder) {
@@ -39,8 +40,9 @@ public abstract class BaseExecutionImpl implements BaseExecution {
         this.end = builder.end;
         this.exitStatus = builder.exitStatus;
         this.persistentUserData = builder.persistentUserData;
-        this.checkpoint = builder.checkpoint;
         this.metrics = builder.metrics;
+        this.readerCheckpoint = builder.readerCheckpoint;
+        this.writerCheckpoint = builder.writerCheckpoint;
     }
 
     public static Builder from(final BaseExecutionImpl that) {
@@ -55,8 +57,9 @@ public abstract class BaseExecutionImpl implements BaseExecution {
         builder.end = that.getEndTime();
         builder.exitStatus = that.getExitStatus();
         builder.persistentUserData = that.getPersistentUserData();
-        builder.checkpoint = that.getCheckpoint();
         builder.metrics = that.getMetrics();
+        builder.readerCheckpoint = that.getReaderCheckpoint();
+        builder.writerCheckpoint = that.getWriterCheckpoint();
     }
 
     @Override
@@ -90,13 +93,18 @@ public abstract class BaseExecutionImpl implements BaseExecution {
     }
 
     @Override
-    public Checkpoint getCheckpoint() {
-        return checkpoint;
+    public Metric[] getMetrics() {
+        return metrics;
     }
 
     @Override
-    public Metric[] getMetrics() {
-        return metrics;
+    public Serializable getReaderCheckpoint() {
+        return readerCheckpoint;
+    }
+
+    @Override
+    public Serializable getWriterCheckpoint() {
+        return writerCheckpoint;
     }
 
     public static class Builder<T extends Builder<T>> {
@@ -106,8 +114,9 @@ public abstract class BaseExecutionImpl implements BaseExecution {
         private Date end;
         private String exitStatus;
         private Serializable persistentUserData;
-        private Checkpoint checkpoint;
         private Metric[] metrics;
+        private Serializable readerCheckpoint;
+        private Serializable writerCheckpoint;
 
         public T setBatchStatus(final BatchStatus batchStatus) {
             this.batchStatus = batchStatus;
@@ -139,13 +148,18 @@ public abstract class BaseExecutionImpl implements BaseExecution {
             return (T)this;
         }
 
-        public T setCheckpoint(final Checkpoint checkpoint) {
-            this.checkpoint = checkpoint;
+        public T setMetrics(final Metric[] metrics) {
+            this.metrics = metrics;
             return (T)this;
         }
 
-        public T setMetrics(final Metric[] metrics) {
-            this.metrics = metrics;
+        public T setReaderCheckpoint(final Serializable reader) {
+            this.readerCheckpoint = reader;
+            return (T)this;
+        }
+
+        public T setWriterCheckpoint(final Serializable writer) {
+            this.writerCheckpoint = writer;
             return (T)this;
         }
     }

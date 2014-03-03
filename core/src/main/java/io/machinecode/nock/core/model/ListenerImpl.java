@@ -9,6 +9,7 @@ import io.machinecode.nock.spi.execution.Executor;
 import io.machinecode.nock.spi.inject.Injectables;
 import io.machinecode.nock.spi.inject.InjectablesProvider;
 import io.machinecode.nock.spi.inject.InjectionContext;
+import io.machinecode.nock.spi.loader.ArtifactOfWrongTypeException;
 import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
@@ -65,25 +66,14 @@ public class ListenerImpl implements Listener, PropertyReference {
         return this._injectables;
     }
 
-    public <T> T tryLoad(final Class<T> clazz, final InjectionContext injectionContext) throws Exception {
-        if (this._cached != null && clazz.isAssignableFrom(this._cached.getClass())) {
-            return clazz.cast(this._cached);
-        }
-        final T that= this.ref.load(clazz, injectionContext);
-        if (that != null) {
-            this._cached = that;
-        }
-        return that;
-    }
-
     protected <T> T load(final Class<T> clazz, final InjectionContext injectionContext, final ExecutionContext context) throws Exception {
-        if (this._cached != null && clazz.isAssignableFrom(this._cached.getClass())) {
-            return clazz.cast(this._cached);
+        if (this._cached != null) {
+            if (clazz.isAssignableFrom(this._cached.getClass())) {
+                return clazz.cast(this._cached);
+            }
+            throw new ArtifactOfWrongTypeException(Messages.format("NOCK-025000.artifact.loader.assignability", this.ref.ref(), clazz.getCanonicalName()));
         }
-        final T that= this.ref.load(clazz, injectionContext);
-        if (that == null) {
-            throw new IllegalStateException(Messages.format("NOCK-025004.artifact.null", context, this.ref.ref()));
-        }
+        final T that = this.ref.load(clazz, injectionContext, context);
         this._cached = that;
         return that;
     }

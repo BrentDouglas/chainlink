@@ -3,7 +3,7 @@ package io.machinecode.nock.test.core.execution;
 import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.nock.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.nock.core.exec.EventedExecutor;
-import io.machinecode.nock.core.local.LocalRepository;
+import io.machinecode.nock.core.local.LocalExecutionRepository;
 import io.machinecode.nock.core.local.LocalTransactionManager;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.execution.Executor;
@@ -11,6 +11,7 @@ import org.jboss.logging.Logger;
 import org.junit.Assert;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -50,12 +51,12 @@ public abstract class BaseTest extends Assert {
     protected Builder _configuration() {
         return new Builder()
                 .setLoader(Thread.currentThread().getContextClassLoader())
-                .setTransactionManager(new LocalTransactionManager(180))
+                .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setRepository(repository());
     }
 
     protected final ExecutionRepository _repository() {
-        return new LocalRepository();
+        return new LocalExecutionRepository();
     }
 
     protected final Executor _executor() {

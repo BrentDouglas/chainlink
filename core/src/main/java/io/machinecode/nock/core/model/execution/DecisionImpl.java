@@ -101,11 +101,14 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
 
     protected transient Decider _cached;
 
-    public Decider load(final InjectionContext injectionContext) throws Exception {
+    public Decider load(final InjectionContext injectionContext, final ExecutionContext context) throws Exception {
         if (this._cached != null) {
             return this._cached;
         }
-        final Decider that = this.ref.load(Decider.class, injectionContext);
+        final Decider that = this.ref.load(Decider.class, injectionContext, context);
+        if (that == null) {
+            throw new IllegalStateException(Messages.format("NOCK-025004.artifact.null", context, this.ref));
+        }
         this._cached = that;
         return that;
     }
@@ -119,7 +122,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
                     context.getStepContext(),
                     properties.getProperties()
             ));
-            final Decider decider = load(injectionContext);
+            final Decider decider = load(injectionContext, context);
             if (decider == null) {
                 throw new IllegalStateException(Messages.format("NOCK-025004.artifact.null", context, this.ref.ref()));
             }

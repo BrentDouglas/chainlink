@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.nock</groupId>
-            <artifactId>nock-cdi</artifactId>
+            <artifactId>nock-inject-cdi</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

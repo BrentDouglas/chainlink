@@ -1,6 +1,7 @@
 package io.machinecode.nock.core.loader;
 
 import io.machinecode.nock.spi.loader.ArtifactLoader;
+import io.machinecode.nock.spi.loader.ArtifactOfWrongTypeException;
 import io.machinecode.nock.spi.util.Messages;
 import org.jboss.logging.Logger;
 
@@ -18,7 +19,7 @@ public class TcclArtifactLoader implements ArtifactLoader {
             if (as.isAssignableFrom(that)) {
                 return as.cast(that.newInstance());
             } else {
-                log.warnf(Messages.get("NOCK-025000.artifact.loader.assignability"), id, as.getSimpleName());
+                throw new ArtifactOfWrongTypeException(Messages.format("NOCK-025000.artifact.loader.assignability", id, as.getCanonicalName()));
             }
         } catch (final ClassNotFoundException e) {
             log.tracef(Messages.get("NOCK-025001.artifact.loader.not.found"), id, as.getSimpleName());

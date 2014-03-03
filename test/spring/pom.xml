@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.nock</groupId>
-            <artifactId>nock-spring</artifactId>
+            <artifactId>nock-inject-spring</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

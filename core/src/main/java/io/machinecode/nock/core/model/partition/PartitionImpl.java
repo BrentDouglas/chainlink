@@ -112,11 +112,11 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
             executables = new Executable[partitionExecutions.length];
             for (int id = 0; id < partitionExecutions.length; ++id) {
                 final PartitionExecution execution = partitionExecutions[id];
-                //final Properties properties = execution.getPartitionProperties();
+                //final Properties properties = execution.getPartitionParameters();
                 final int partitionId = execution.getPartitionId();
                 repository.createPartitionExecution(stepExecutionId, execution, new Date());
                 //TODO Which step execution should this be linked to?
-                final MutableStepContext partitionStepContext = new StepContextImpl(stepContext, execution.getMetrics(), execution.getPersistentUserData());
+                final MutableStepContext partitionStepContext = new StepContextImpl(stepContext, execution.getMetrics(), execution.getPersistentUserData(), repository);
                 final ExecutionContext partitionContext = new ExecutionContextImpl(
                         context.getJob(),
                         new JobContextImpl(context.getJobContext()),
@@ -142,7 +142,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                 final ExecutionContext partitionContext = new ExecutionContextImpl(
                         context.getJob(),
                         new JobContextImpl(context.getJobContext()),
-                        new StepContextImpl(context.getStepContext()),
+                        new StepContextImpl(context.getStepContext(), repository),
                         context.getJobExecution(),
                         context.getRestartJobExecution(),
                         partitionId

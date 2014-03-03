@@ -16,14 +16,15 @@ import gnu.trove.set.hash.TLongHashSet;
 import io.machinecode.nock.core.impl.JobExecutionImpl;
 import io.machinecode.nock.core.impl.JobInstanceImpl;
 import io.machinecode.nock.core.impl.MetricImpl;
+import io.machinecode.nock.core.impl.MutableMetricImpl;
 import io.machinecode.nock.core.impl.PartitionExecutionImpl;
 import io.machinecode.nock.core.impl.StepExecutionImpl;
-import io.machinecode.nock.spi.Checkpoint;
 import io.machinecode.nock.spi.ExecutionRepository;
 import io.machinecode.nock.spi.ExtendedJobExecution;
 import io.machinecode.nock.spi.ExtendedJobInstance;
 import io.machinecode.nock.spi.ExtendedStepExecution;
 import io.machinecode.nock.spi.PartitionExecution;
+import io.machinecode.nock.spi.context.MutableMetric;
 import io.machinecode.nock.spi.element.Job;
 import io.machinecode.nock.spi.element.execution.Step;
 import io.machinecode.nock.spi.util.Messages;
@@ -59,7 +60,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @SuppressWarnings("ALL")
-public class LocalRepository implements ExecutionRepository {
+public class LocalExecutionRepository implements ExecutionRepository {
     protected final AtomicLong jobInstanceIndex = new AtomicLong();
     protected final AtomicLong jobExecutionIndex = new AtomicLong();
     protected final AtomicLong stepExecutionIndex = new AtomicLong();
@@ -85,7 +86,7 @@ public class LocalRepository implements ExecutionRepository {
     protected final AtomicBoolean jobExecutionHistoryLock = new AtomicBoolean(false);
 
     @Override
-    public ExtendedJobInstance createJobInstance(final Job job, final String jslName) {
+    public JobInstanceImpl createJobInstance(final Job job, final String jslName) {
         final long id = jobInstanceIndex.incrementAndGet();
         final JobInstanceImpl instance = new JobInstanceImpl.Builder()
                 .setInstanceId(id)
@@ -108,7 +109,7 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedJobExecution createJobExecution(final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws NoSuchJobInstanceException {
+    public JobExecutionImpl createJobExecution(final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws NoSuchJobInstanceException {
         final long jobExecutionId;
         while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -163,7 +164,7 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final Step<?, ?> step, final Date timestamp) throws Exception {
+    public StepExecutionImpl createStepExecution(final JobExecution jobExecution, final Step<?, ?> step, final Date timestamp) throws Exception {
         final long stepExecutionId = stepExecutionIndex.incrementAndGet();
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
                 .setStepExecutionId(stepExecutionId)
@@ -243,6 +244,16 @@ public class LocalRepository implements ExecutionRepository {
             stepExecutionPartitionExecutionLock.set(false);
         }
         return execution;
+    }
+
+    @Override
+    public MutableMetric createMetric(final Metric.MetricType type) {
+        return new MutableMetricImpl(type);
+    }
+
+    @Override
+    public MutableMetric[] copyMetrics(final Metric[] metrics) {
+        return MutableMetricImpl.copy(metrics);
     }
 
     @Override
@@ -326,7 +337,7 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void startStepExecution(final long stepExecutionId, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+    public void startStepExecution(final long stepExecutionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
@@ -335,7 +346,6 @@ public class LocalRepository implements ExecutionRepository {
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setStart(timestamp)
-                    .setMetrics(metrics)
                     .setBatchStatus(BatchStatus.STARTED)
                     .build()
             );
@@ -363,10 +373,12 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        final Checkpoint _checkpoint;
+    public void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        final Serializable _reader;
+        final Serializable _writer;
         try {
-            _checkpoint = _clone(checkpoint);
+            _reader = _clone(readerCheckpoint);
+            _writer = _clone(writerCheckpoint);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e); //TODO
         } catch (IOException e) {
@@ -381,7 +393,8 @@ public class LocalRepository implements ExecutionRepository {
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setPersistentUserData(persistentUserData)
                     .setMetrics(MetricImpl.copy(metrics))
-                    .setCheckpoint(_checkpoint)
+                    .setReaderCheckpoint(_reader)
+                    .setWriterCheckpoint(_writer)
                     .build()
             );
         } finally {
@@ -410,10 +423,12 @@ public class LocalRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final Metric[] metrics, final Checkpoint checkpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        final Checkpoint _checkpoint;
+    public void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        final Serializable _reader;
+        final Serializable _writer;
         try {
-            _checkpoint = _clone(checkpoint);
+            _reader = _clone(readerCheckpoint);
+            _writer = _clone(writerCheckpoint);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e); //TODO
         } catch (IOException e) {
@@ -431,7 +446,8 @@ public class LocalRepository implements ExecutionRepository {
             }
             partitions.put(partitionId, PartitionExecutionImpl.from(partitionExecution)
                     .setUpdated(timestamp)
-                    .setCheckpoint(_checkpoint)
+                    .setReaderCheckpoint(_reader)
+                    .setWriterCheckpoint(_writer)
                     .setPersistentUserData(persistentUserData)
                     .setMetrics(MetricImpl.copy(metrics))
                     .build());

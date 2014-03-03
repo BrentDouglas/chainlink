@@ -26,8 +26,8 @@ public class LocalTransactionManager implements TransactionManager, UserTransact
     private final ThreadLocal<Long> timeout = new ThreadLocal<Long>();
     private final long defaultTimeout;
 
-    public LocalTransactionManager(final long timeout) {
-        this.defaultTimeout = timeout;
+    public LocalTransactionManager(final long duration, final TimeUnit unit) {
+        this.defaultTimeout = unit.toMillis(duration);
     }
 
     @Override
