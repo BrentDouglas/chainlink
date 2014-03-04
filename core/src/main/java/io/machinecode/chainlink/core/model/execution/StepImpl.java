@@ -192,13 +192,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                 final String exitStatus = restartStepExecution.getExitStatus();
                 switch (batchStatus) {
                     case COMPLETED:
-                        //TODO Apparently this should default to false if it is empty
                         if (!Boolean.parseBoolean(this.getAllowStartIfComplete())) {
-                            /*
-                             * a. If the execution element is a COMPLETED step that specifies allow-restart-if-
-                             *    complete=false, then follow the transition to the next execution element based on the
-                             *    exit status for this step from the previous execution.
-                             */
                             context.setLastStepExecutionId(restartStepExecutionId);
                             final TransitionWork transition = this.transition(context, this.transitions, batchStatus, exitStatus);
                             if (transition != null && transition.isTerminating()) {
@@ -207,24 +201,12 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                                 return this.next(executor, threadId, context, parentCallback, this.next, transition);
                             }
                         }
-                        /*
-                         * b. If the execution element is a COMPLETED step that specifies allow-restart-if-
-                         *    complete=true, then re-run the step and follow the transition to the next execution
-                         *    element.
-                         */
                         break;
                     case FAILED:
                     case STOPPED:
-                        /*
-                         *c. If the execution element is a STOPPED or FAILED step then restart the step and follow
-                         *   the transition to the next execution element.
-                         *   Note if the step is a partitioned step, only the partitions that did not complete
-                         *   previously are restarted. This behavior may be overridden through the PartitionPlan, as
-                         *   specified in section 10.9.4 PartitionPlan.
-                         */
                         break;
                     default:
-                        throw new IllegalStateException(); //TODO Message
+                        throw new IllegalStateException(Messages.format("CHAINLINK-010215.step.invalid.restart.batch.status", context, batchStatus));
                 }
             } catch (final NoSuchJobExecutionException e) {
                 log.debugf(Messages.get("CHAINLINK-010207.step.no.existing.execution"), context, this.id, restartJobExecutionId);
