@@ -10,8 +10,8 @@
         <version>1.0.2-SNAPSHOT</version>
     </parent>
 
-    <groupId>io.machinecode.nock</groupId>
-    <artifactId>nock-parent</artifactId>
+    <groupId>io.machinecode.chainlink</groupId>
+    <artifactId>chainlink-parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
 
@@ -73,41 +73,41 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.machinecode.nock</groupId>
-                <artifactId>nock-jsl</artifactId>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-jsl</artifactId>
                 <version>${project.version}</version>
                 <type>jar</type>
             </dependency>
             <dependency>
-                <groupId>io.machinecode.nock</groupId>
-                <artifactId>nock-core</artifactId>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-core</artifactId>
                 <version>${project.version}</version>
                 <type>jar</type>
             </dependency>
             <dependency>
-                <groupId>io.machinecode.nock</groupId>
-                <artifactId>nock-spi</artifactId>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-spi</artifactId>
                 <version>${project.version}</version>
                 <type>jar</type>
             </dependency>
             <dependency>
-                <groupId>io.machinecode.nock</groupId>
-                <artifactId>nock-inject-cdi</artifactId>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-inject-cdi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.machinecode.nock</groupId>
-                <artifactId>nock-guice</artifactId>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-guice</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.machinecode.nock</groupId>
-                <artifactId>nock-inject-spring</artifactId>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-inject-spring</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.machinecode.nock</groupId>
-                <artifactId>nock-inject-seam</artifactId>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-inject-seam</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -185,8 +185,8 @@
                 <version>${version.com.ibm.batch.com.ibm.batch-tck-spi}</version>
             </dependency>
             <dependency>
-                <groupId>io.machinecode.nock</groupId>
-                <artifactId>nock-test-core</artifactId>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-test-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

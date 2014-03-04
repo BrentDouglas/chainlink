@@ -3,13 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>nock-tck</artifactId>
-        <groupId>io.machinecode.nock</groupId>
+        <artifactId>chainlink-tck</artifactId>
+        <groupId>io.machinecode.chainlink</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>nock-tck-spring</artifactId>
+    <artifactId>chainlink-tck-spring</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
@@ -19,13 +19,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.machinecode.nock</groupId>
-            <artifactId>nock-tck-core</artifactId>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-tck-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.machinecode.nock</groupId>
-            <artifactId>nock-inject-spring</artifactId>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-inject-spring</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -22,12 +22,12 @@
             <value>org.jboss.seam.transaction.TransactionInterceptor</value>
             <value>org.jboss.seam.webservice.WSSecurityInterceptor</value>
             <value>org.jboss.seam.security.SecurityInterceptor</value>
-            <value>io.machinecode.nock.seam.SeamInjectionInterceptor</value>
+            <value>io.machinecode.chainlink.seam.SeamInjectionInterceptor</value>
         </core:interceptors>
      </core:init>
 
-    <component name="runBatchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.RunBatchlet" />
-    <component name="stopBatchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.StopBatchlet" />
-    <component name="failBatchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.FailBatchlet" />
-    <component name="injectedBatchlet" class="io.machinecode.nock.test.core.execution.artifact.batchlet.InjectedBatchlet" />
+    <component name="runBatchlet" class="io.machinecode.chainlink.test.core.execution.artifact.batchlet.RunBatchlet" />
+    <component name="stopBatchlet" class="io.machinecode.chainlink.test.core.execution.artifact.batchlet.StopBatchlet" />
+    <component name="failBatchlet" class="io.machinecode.chainlink.test.core.execution.artifact.batchlet.FailBatchlet" />
+    <component name="injectedBatchlet" class="io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet" />
 </components>

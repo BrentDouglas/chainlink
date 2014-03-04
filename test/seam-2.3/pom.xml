@@ -3,13 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>nock-test</artifactId>
-        <groupId>io.machinecode.nock</groupId>
+        <artifactId>chainlink-test</artifactId>
+        <groupId>io.machinecode.chainlink</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>nock-test-seam-2.3</artifactId>
+    <artifactId>chainlink-test-seam-2.3</artifactId>
 
     <properties>
         <!-- Seam -->
@@ -34,13 +34,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.machinecode.nock</groupId>
-            <artifactId>nock-inject-seam</artifactId>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-inject-seam</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.machinecode.nock</groupId>
-            <artifactId>nock-test-core</artifactId>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-test-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

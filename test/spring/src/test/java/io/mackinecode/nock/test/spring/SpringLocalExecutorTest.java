@@ -1,8 +1,8 @@
-package io.mackinecode.nock.test.spring;
+package io.mackinecode.chainlink.test.spring;
 
-import io.machinecode.nock.core.configuration.ConfigurationImpl.Builder;
-import io.machinecode.nock.inject.spring.SpringArtifactLoader;
-import io.machinecode.nock.test.core.execution.ExecutorTest;
+import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
+import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 import org.junit.BeforeClass;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
