@@ -1,7 +1,8 @@
 package io.machinecode.chainlink.core.loader;
 
 import gnu.trove.set.hash.TLinkedHashSet;
-import io.machinecode.chainlink.jsl.loader.JarXmlJobLoader;
+import io.machinecode.chainlink.jsl.xml.loader.JarXmlJobLoader;
+import io.machinecode.chainlink.jsl.xml.loader.WarXmlJobLoader;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.loader.JobLoader;
@@ -19,11 +20,13 @@ public class JobLoaderImpl implements JobLoader {
 
     private static final Logger log = Logger.getLogger(JobLoaderImpl.class);
 
-    private final JarXmlJobLoader loader;
+    private final JarXmlJobLoader jarLoader;
+    private final WarXmlJobLoader warLoader;
     private final Set<JobLoader> loaders;
 
     public JobLoaderImpl(final Configuration configuration) {
-        this.loader = new JarXmlJobLoader(configuration.getClassLoader());
+        this.jarLoader = new JarXmlJobLoader(configuration.getClassLoader());
+        this.warLoader = new WarXmlJobLoader(configuration.getClassLoader());
         this.loaders = new TLinkedHashSet<JobLoader>();
         Collections.addAll(this.loaders, configuration.getJobLoaders());
     }
@@ -38,7 +41,12 @@ public class JobLoaderImpl implements JobLoader {
                 log.tracef(Messages.get("CHAINLINK-003100.job.loader.not.found"), jslName, loader.getClass().getSimpleName());
             }
         }
-        // 2. Archive Loader
-        return loader.load(jslName);
+        // 2. Archive Loaders
+        try {
+            return warLoader.load(jslName);
+        } catch (final NoSuchJobException e) {
+            log.tracef(Messages.get("CHAINLINK-003100.job.loader.not.found"), jslName, warLoader.getClass().getSimpleName());
+        }
+        return jarLoader.load(jslName);
     }
 }

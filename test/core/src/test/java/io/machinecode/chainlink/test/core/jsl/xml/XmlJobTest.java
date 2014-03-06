@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.test.core.jsl.xml;
 
-import io.machinecode.chainlink.jsl.loader.AbstractJobLoader;
-import io.machinecode.chainlink.jsl.loader.JarXmlJobLoader;
+import io.machinecode.chainlink.jsl.xml.loader.JarXmlJobLoader;
 import io.machinecode.chainlink.test.core.jsl.InheritanceJobTest;
 
 /**
@@ -12,7 +11,7 @@ public class XmlJobTest  extends InheritanceJobTest {
     private static ClassLoader classLoader = XmlJobTest.class.getClassLoader();
 
     @Override
-    protected AbstractJobLoader createRepo() {
+    protected JarXmlJobLoader createRepo() {
         return new JarXmlJobLoader(classLoader);
     }
 }

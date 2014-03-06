@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.element;
 
-import io.machinecode.chainlink.jsl.util.ForwardingList;
+import io.machinecode.chainlink.jsl.core.util.ForwardingList;
 import io.machinecode.chainlink.spi.element.Properties;
 
 import java.util.Collections;

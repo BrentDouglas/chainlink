@@ -28,7 +28,17 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-jsl</artifactId>
+            <artifactId>chainlink-jsl-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-jsl-fluent</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-jsl-xml</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

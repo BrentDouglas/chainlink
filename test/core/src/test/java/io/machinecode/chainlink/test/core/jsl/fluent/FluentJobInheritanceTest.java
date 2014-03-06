@@ -1,8 +1,7 @@
 package io.machinecode.chainlink.test.core.jsl.fluent;
 
 import io.machinecode.chainlink.jsl.fluent.Jsl;
-import io.machinecode.chainlink.jsl.loader.AbstractJobLoader;
-import io.machinecode.chainlink.jsl.loader.FluentJobLoader;
+import io.machinecode.chainlink.jsl.fluent.loader.FluentJobLoader;
 import io.machinecode.chainlink.test.core.jsl.InheritanceJobTest;
 
 import javax.xml.bind.JAXBException;
@@ -13,7 +12,7 @@ import javax.xml.bind.JAXBException;
 public class FluentJobInheritanceTest extends InheritanceJobTest {
 
     @Override
-    protected AbstractJobLoader createRepo() {
+    protected FluentJobLoader createRepo() {
         return new FluentJobLoader()
                 .add(
                         "job-config-1",

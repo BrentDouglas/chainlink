@@ -10,6 +10,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>chainlink-jsl</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>core</module>
+        <module>fluent</module>
+        <module>xml</module>
+    </modules>
 
     <dependencies>
         <dependency>

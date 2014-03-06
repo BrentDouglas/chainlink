@@ -14,11 +14,15 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-jsl</artifactId>
+            <artifactId>chainlink-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-spi</artifactId>
+            <artifactId>chainlink-jsl-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-jsl-xml</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>

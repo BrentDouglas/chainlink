@@ -8,9 +8,9 @@ import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.core.element.ListenersImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.execution.ExecutionImpl;
-import io.machinecode.chainlink.jsl.validation.InvalidJobException;
-import io.machinecode.chainlink.jsl.validation.JobValidator;
-import io.machinecode.chainlink.jsl.visitor.VisitorNode;
+import io.machinecode.chainlink.core.validation.InvalidJobException;
+import io.machinecode.chainlink.core.validation.JobValidator;
+import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
 import io.machinecode.chainlink.spi.element.Job;
 
 import java.util.List;

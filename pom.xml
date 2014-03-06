@@ -80,21 +80,28 @@
         <dependencies>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-jsl</artifactId>
-                <version>${project.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-core</artifactId>
                 <version>${project.version}</version>
-                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-spi</artifactId>
                 <version>${project.version}</version>
-                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-jsl-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-jsl-xml</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-jsl-fluent</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
