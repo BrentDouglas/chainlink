@@ -23,10 +23,10 @@ public class ExpressionTest {
                 .setRestartable("false")
                 .setVersion("1.0")
                 .addProperty("job-prop", "step3")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['job-prop']}")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("step3")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -42,10 +42,10 @@ public class ExpressionTest {
                 .setRestartable("false")
                 .setVersion("1.0")
                 .addProperty("job-prop", "step3")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['job-prop']}?:step2;")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("step3")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -61,10 +61,10 @@ public class ExpressionTest {
                 .setRestartable("false")
                 .setVersion("1.0")
                 .addProperty("job-prop", "step3")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['job-prop']}?:step2")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("step3?:step2") //Stop throwing validation exception
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -80,10 +80,10 @@ public class ExpressionTest {
                 .setRestartable("false")
                 .setVersion("1.0")
                 .addProperty("job-prop", "step4")
-                .addExecution(Jsl.stepWithChunkAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['not-a-property']}?:step2;")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("step2")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -99,10 +99,10 @@ public class ExpressionTest {
                 .setRestartable("false")
                 .setVersion("1.0")
                 .addProperty("job-prop", "step4")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['not-a-property']}?:step2")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("?:step2")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -120,10 +120,10 @@ public class ExpressionTest {
                 .addProperty("prop1", "step2")
                 .addProperty("prop2", "somewhere")
                 .addProperty("prop3", "else")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['not-a-property']}#{jobProperties['prop1']}?:#{jobProperties['prop2']}#{jobProperties['prop3']};")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("step2")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -140,10 +140,10 @@ public class ExpressionTest {
                 .setVersion("1.0")
                 .addProperty("prop1", "step")
                 .addProperty("prop2", "2")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['not']}#{jobProperties['not']}?:#{jobProperties['prop1']}#{jobProperties['not']}#{jobProperties['prop2']}#{jobProperties['not']};")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("step2")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -160,10 +160,10 @@ public class ExpressionTest {
                 .setVersion("1.0")
                 .addProperty("prop1", "step")
                 .addProperty("prop2", "2")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['not']} #{jobProperties['not']}?:#{jobProperties['prop1']}#{jobProperties['not']}#{jobProperties['prop2']}#{jobProperties['not']};")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId(" ")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -180,10 +180,10 @@ public class ExpressionTest {
                 .setVersion("1.0")
                 .addProperty("prop1", "step")
                 .addProperty("prop2", "2")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobProperties['not']}#{jobProperties['not']}?:#{jobProperties['prop1']}blah#{jobProperties['not']};")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("stepblah")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -200,10 +200,10 @@ public class ExpressionTest {
                 .setVersion("1.0")
                 .addProperty("prop1", "step")
                 .addProperty("prop2", "2")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("?:step2;")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("step2")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -221,10 +221,10 @@ public class ExpressionTest {
                 .addProperty("prop1", "st")
                 .addProperty("prop2", "ep")
                 .addProperty("prop3", "2")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("blah?:default; not invalid apparently")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("blah not invalid apparently")
                 ), PARAMETERS);
         JobFactory.INSTANCE.validate(job);
@@ -244,15 +244,15 @@ public class ExpressionTest {
                 .addProperty("prop1", "st")
                 .addProperty("prop2", "ep")
                 .addProperty("prop3", "2")
-                .addExecution(Jsl.stepWithBatchletAndPlan()
+                .addExecution(Jsl.step()
                         .setId("step1")
                         .setNext("#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']};#{jobParameters['infile.name']}?:#{systemProperties['file.name.junit']};.txt")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("step2")
                         .setNext("#{systemProperties['file.separator']}test#{systemProperties['file.separator']}#{jobParameters['myFilename']}.txt")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("/myfile2.txt")
-                ).addExecution(Jsl.stepWithChunkAndPlan()
+                ).addExecution(Jsl.step()
                         .setId("/test/testfile1.txt")
                 ) , parameters);
         JobFactory.INSTANCE.validate(job);

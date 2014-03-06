@@ -66,20 +66,8 @@ public class Jsl {
         return split();
     }
 
-    public static FluentStep<FluentBatchlet,FluentMapper> executionAsStepWithBatchletAndMapper() {
-        return stepWithBatchletAndMapper();
-    }
-
-    public static FluentStep<FluentBatchlet,FluentPlan> executionAsStepWithBatchletAndPlan() {
-        return stepWithBatchletAndPlan();
-    }
-
-    public static FluentStep<FluentChunk,FluentMapper> executionAsStepWithChunkAndMapper() {
-        return stepWithChunkAndMapper();
-    }
-
-    public static FluentStep<FluentChunk,FluentPlan> executionAsStepWithChunkAndPlan() {
-        return stepWithChunkAndPlan();
+    public static FluentStep executionAsStep() {
+        return step();
     }
 
     public static FluentDecision decision() {
@@ -94,20 +82,8 @@ public class Jsl {
         return new FluentSplit();
     }
 
-    public static FluentStep<FluentBatchlet,FluentMapper> stepWithBatchletAndMapper() {
-        return new FluentStep<FluentBatchlet,FluentMapper>();
-    }
-
-    public static FluentStep<FluentBatchlet,FluentPlan> stepWithBatchletAndPlan() {
-        return new FluentStep<FluentBatchlet,FluentPlan>();
-    }
-
-    public static FluentStep<FluentChunk,FluentMapper> stepWithChunkAndMapper() {
-        return new FluentStep<FluentChunk,FluentMapper>();
-    }
-
-    public static FluentStep<FluentChunk,FluentPlan> stepWithChunkAndPlan() {
-        return new FluentStep<FluentChunk,FluentPlan>();
+    public static FluentStep step() {
+        return new FluentStep();
     }
 
     // Transition
@@ -154,12 +130,8 @@ public class Jsl {
         return new FluentCollector();
     }
 
-    public static FluentPartition<FluentPlan> partitionWithPlan() {
-        return new FluentPartition<FluentPlan>();
-    }
-
-    public static FluentPartition<FluentMapper> partitionWithMapper() {
-        return new FluentPartition<FluentMapper>();
+    public static FluentPartition partition() {
+        return new FluentPartition();
     }
 
     public static FluentMapper strategyAsMapper() {

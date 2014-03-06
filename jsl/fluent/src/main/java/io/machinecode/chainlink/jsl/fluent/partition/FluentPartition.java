@@ -5,20 +5,30 @@ import io.machinecode.chainlink.jsl.core.inherit.InheritablePartition;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FluentPartition<T extends FluentStrategy<T>>
-        implements InheritablePartition<FluentPartition<T>, FluentStrategy<T>, FluentCollector, FluentAnalyser, FluentReducer> {
+public class FluentPartition
+        implements InheritablePartition<FluentPartition, FluentStrategy, FluentCollector, FluentAnalyser, FluentReducer> {
 
-    private FluentStrategy<T> strategy;
+    private FluentStrategy strategy;
     private FluentCollector collector;
     private FluentAnalyser analyser;
     private FluentReducer reducer;
 
     @Override
-    public FluentStrategy<T> getStrategy() {
+    public FluentStrategy getStrategy() {
         return this.strategy;
     }
 
-    public FluentPartition<T> setStrategy(final FluentStrategy<T> strategy) {
+    public FluentPartition setStrategy(final FluentStrategy strategy) {
+        this.strategy = strategy;
+        return this;
+    }
+
+    public FluentPartition setMapper(final FluentMapper strategy) {
+        this.strategy = strategy;
+        return this;
+    }
+
+    public FluentPartition setPlan(final FluentPlan strategy) {
         this.strategy = strategy;
         return this;
     }
@@ -29,7 +39,7 @@ public class FluentPartition<T extends FluentStrategy<T>>
     }
 
     @Override
-    public FluentPartition<T> setCollector(final FluentCollector collector) {
+    public FluentPartition setCollector(final FluentCollector collector) {
         this.collector = collector;
         return this;
     }
@@ -40,7 +50,7 @@ public class FluentPartition<T extends FluentStrategy<T>>
     }
 
     @Override
-    public FluentPartition<T> setAnalyzer(final FluentAnalyser analyser) {
+    public FluentPartition setAnalyzer(final FluentAnalyser analyser) {
         this.analyser = analyser;
         return this;
     }
@@ -50,18 +60,18 @@ public class FluentPartition<T extends FluentStrategy<T>>
         return this.reducer;
     }
 
-    public FluentPartition<T> setReducer(final FluentReducer reducer) {
+    public FluentPartition setReducer(final FluentReducer reducer) {
         this.reducer = reducer;
         return this;
     }
 
     @Override
-    public FluentPartition<T> copy() {
-        return copy(new FluentPartition<T>());
+    public FluentPartition copy() {
+        return copy(new FluentPartition());
     }
 
     @Override
-    public FluentPartition<T> copy(final FluentPartition<T> that) {
+    public FluentPartition copy(final FluentPartition that) {
         return PartitionTool.copy(this, that);
     }
 }

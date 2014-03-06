@@ -58,7 +58,7 @@ public class CdiLocalExecutorTest extends ExecutorTest {
         final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("unmanaged-injected-job")
                 .addExecution(
-                        Jsl.stepWithBatchletAndPlan()
+                        Jsl.step()
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()

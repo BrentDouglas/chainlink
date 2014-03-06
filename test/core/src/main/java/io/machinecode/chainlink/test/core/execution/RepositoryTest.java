@@ -27,7 +27,7 @@ public abstract class RepositoryTest extends BaseTest {
         return JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("job")
                 .addExecution(
-                        Jsl.stepWithBatchletAndPlan()
+                        Jsl.step()
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()

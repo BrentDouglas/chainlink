@@ -37,7 +37,7 @@ public abstract class ExecutorTest extends BaseTest {
         final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("run-job")
                 .addExecution(
-                        Jsl.stepWithBatchletAndPlan()
+                        Jsl.step()
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
@@ -58,7 +58,7 @@ public abstract class ExecutorTest extends BaseTest {
         final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("stop-job")
                 .addExecution(
-                        Jsl.stepWithBatchletAndPlan()
+                        Jsl.step()
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
@@ -87,7 +87,7 @@ public abstract class ExecutorTest extends BaseTest {
         final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("fail-job")
                 .addExecution(
-                        Jsl.stepWithBatchletAndPlan()
+                        Jsl.step()
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
@@ -108,7 +108,7 @@ public abstract class ExecutorTest extends BaseTest {
         final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
                 .setId("injected-job")
                 .addExecution(
-                        Jsl.stepWithBatchletAndPlan()
+                        Jsl.step()
                                 .setId("step")
                                 .setTask(
                                         Jsl.batchlet()
