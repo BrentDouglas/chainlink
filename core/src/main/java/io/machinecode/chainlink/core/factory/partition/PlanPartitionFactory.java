@@ -1,15 +1,15 @@
 package io.machinecode.chainlink.core.factory.partition;
 
-import io.machinecode.chainlink.core.model.partition.AnalyserImpl;
-import io.machinecode.chainlink.core.model.partition.CollectorImpl;
-import io.machinecode.chainlink.core.model.partition.PartitionImpl;
-import io.machinecode.chainlink.core.model.partition.PlanImpl;
-import io.machinecode.chainlink.core.model.partition.ReducerImpl;
-import io.machinecode.chainlink.spi.factory.ElementFactory;
+import io.machinecode.chainlink.core.element.partition.AnalyserImpl;
+import io.machinecode.chainlink.core.element.partition.CollectorImpl;
+import io.machinecode.chainlink.core.element.partition.PartitionImpl;
+import io.machinecode.chainlink.core.element.partition.PlanImpl;
+import io.machinecode.chainlink.core.element.partition.ReducerImpl;
+import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.spi.element.partition.Partition;
 import io.machinecode.chainlink.spi.element.partition.Plan;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

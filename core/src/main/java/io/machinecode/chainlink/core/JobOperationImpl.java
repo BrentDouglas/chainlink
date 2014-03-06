@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core;
 
-import io.machinecode.chainlink.spi.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.JobOperation;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 

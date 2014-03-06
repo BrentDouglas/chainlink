@@ -5,5 +5,10 @@ package io.machinecode.chainlink.spi.inject;
  */
 public interface Injector {
 
-    <T> boolean inject(final T bean) throws Exception;
+    /**
+     * @param bean The artifact to inject.
+     * @return If the artifact was injected by this injector.
+     * @throws Exception On any error.
+     */
+    boolean inject(final Object bean) throws Exception;
 }

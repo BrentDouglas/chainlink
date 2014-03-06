@@ -2,9 +2,9 @@ package io.machinecode.chainlink.test.core.execution;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.configuration.RuntimeConfigurationImpl;
-import io.machinecode.chainlink.core.exec.EventedExecutor;
-import io.machinecode.chainlink.core.local.LocalTransactionManager;
-import io.machinecode.chainlink.spi.ExecutionRepository;
+import io.machinecode.chainlink.core.execution.EventedExecutor;
+import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.execution.Executor;
 import org.jboss.logging.Logger;
 import org.junit.Assert;

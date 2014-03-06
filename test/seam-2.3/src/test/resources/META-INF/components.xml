@@ -22,7 +22,7 @@
             <value>org.jboss.seam.transaction.TransactionInterceptor</value>
             <value>org.jboss.seam.webservice.WSSecurityInterceptor</value>
             <value>org.jboss.seam.security.SecurityInterceptor</value>
-            <value>io.machinecode.chainlink.seam.SeamInjectionInterceptor</value>
+            <value>io.machinecode.chainlink.inject.seam.SeamInjectionInterceptor</value>
         </core:interceptors>
      </core:init>
 

@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.jsl.fluent.execution;
 
 import io.machinecode.chainlink.jsl.inherit.execution.InheritableSplit;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.inherit;
 import io.machinecode.chainlink.jsl.xml.XmlInheritable;
 import io.machinecode.chainlink.spi.Copyable;
 import io.machinecode.chainlink.spi.Inheritable;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 import io.machinecode.chainlink.spi.Mergeable;
 
 import java.util.ArrayList;

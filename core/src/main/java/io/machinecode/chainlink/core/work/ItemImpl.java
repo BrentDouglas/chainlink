@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.work;
 
-import io.machinecode.chainlink.spi.execution.Item;
+import io.machinecode.chainlink.spi.context.Item;
 
 import javax.batch.runtime.BatchStatus;
 import java.io.Serializable;

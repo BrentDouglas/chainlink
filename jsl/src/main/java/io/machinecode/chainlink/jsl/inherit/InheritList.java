@@ -4,7 +4,7 @@ import io.machinecode.chainlink.jsl.util.ForwardingList;
 import io.machinecode.chainlink.spi.Copyable;
 import io.machinecode.chainlink.spi.Inheritable;
 import io.machinecode.chainlink.spi.InheritableElement;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.ArrayList;
 import java.util.List;

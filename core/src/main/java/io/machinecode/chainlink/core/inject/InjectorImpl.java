@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.inject;
 
 import gnu.trove.set.hash.TLinkedHashSet;
+import io.machinecode.chainlink.inject.core.DefaultInjector;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.util.Messages;
@@ -26,7 +27,7 @@ public class InjectorImpl implements Injector {
     }
 
     @Override
-    public <T> boolean inject(final T bean) throws Exception {
+    public boolean inject(final Object bean) throws Exception {
         if (bean == null) {
             log.debugf(Messages.get("CHAINLINK-000001.injector.bean.null"));
             return false;

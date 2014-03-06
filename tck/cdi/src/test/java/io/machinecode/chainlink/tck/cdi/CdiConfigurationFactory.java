@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.tck.cdi;
 
-import io.machinecode.chainlink.cdi.CdiArtifactLoader;
-import io.machinecode.chainlink.cdi.CdiInjector;
+import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
+import io.machinecode.chainlink.inject.cdi.CdiInjector;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
-import io.machinecode.chainlink.core.local.LocalTransactionManager;
+import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
 import org.jboss.weld.environment.se.Weld;

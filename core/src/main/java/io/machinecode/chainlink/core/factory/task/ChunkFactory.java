@@ -1,18 +1,18 @@
 package io.machinecode.chainlink.core.factory.task;
 
-import io.machinecode.chainlink.core.model.ListenersImpl;
-import io.machinecode.chainlink.core.model.partition.PartitionImpl;
-import io.machinecode.chainlink.core.model.task.CheckpointAlgorithmImpl;
-import io.machinecode.chainlink.core.model.task.ChunkImpl;
-import io.machinecode.chainlink.core.model.task.ExceptionClassFilterImpl;
-import io.machinecode.chainlink.core.model.task.ItemProcessorImpl;
-import io.machinecode.chainlink.core.model.task.ItemReaderImpl;
-import io.machinecode.chainlink.core.model.task.ItemWriterImpl;
+import io.machinecode.chainlink.core.element.ListenersImpl;
+import io.machinecode.chainlink.core.element.partition.PartitionImpl;
+import io.machinecode.chainlink.core.element.task.CheckpointAlgorithmImpl;
+import io.machinecode.chainlink.core.element.task.ChunkImpl;
+import io.machinecode.chainlink.core.element.task.ExceptionClassFilterImpl;
+import io.machinecode.chainlink.core.element.task.ItemProcessorImpl;
+import io.machinecode.chainlink.core.element.task.ItemReaderImpl;
+import io.machinecode.chainlink.core.element.task.ItemWriterImpl;
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.spi.element.task.Chunk;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
-import io.machinecode.chainlink.spi.factory.TaskFactory;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.factory.TaskFactory;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

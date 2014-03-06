@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>core</module>
         <module>cdi</module>
         <module>spring</module>
         <module>seam</module>

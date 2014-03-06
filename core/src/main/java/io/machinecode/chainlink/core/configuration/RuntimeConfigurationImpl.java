@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.core.configuration;
 
 import io.machinecode.chainlink.core.inject.InjectorImpl;
-import io.machinecode.chainlink.core.loader.ArtifactLoaderImpl;
+import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.inject.Injector;
-import io.machinecode.chainlink.spi.loader.ArtifactLoader;
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 
 /**

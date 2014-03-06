@@ -3,7 +3,7 @@ package io.machinecode.chainlink.test;
 import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
-import io.machinecode.chainlink.spi.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.junit.After;
 import org.junit.AfterClass;

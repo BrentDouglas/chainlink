@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.test.core.execution;
 
-import io.machinecode.chainlink.spi.loader.ArtifactLoader;
-import io.machinecode.chainlink.spi.loader.ArtifactOfWrongTypeException;
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.RunBatchlet;
 import org.junit.Assert;
 import org.junit.Test;

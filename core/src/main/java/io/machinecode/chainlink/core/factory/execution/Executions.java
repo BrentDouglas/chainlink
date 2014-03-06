@@ -1,14 +1,14 @@
 package io.machinecode.chainlink.core.factory.execution;
 
-import io.machinecode.chainlink.core.model.execution.DecisionImpl;
-import io.machinecode.chainlink.core.model.execution.ExecutionImpl;
-import io.machinecode.chainlink.core.model.execution.FlowImpl;
-import io.machinecode.chainlink.core.model.execution.SplitImpl;
-import io.machinecode.chainlink.core.model.execution.StepImpl;
-import io.machinecode.chainlink.core.model.partition.MapperImpl;
-import io.machinecode.chainlink.core.model.partition.PlanImpl;
-import io.machinecode.chainlink.core.model.task.BatchletImpl;
-import io.machinecode.chainlink.core.model.task.ChunkImpl;
+import io.machinecode.chainlink.core.element.execution.DecisionImpl;
+import io.machinecode.chainlink.core.element.execution.ExecutionImpl;
+import io.machinecode.chainlink.core.element.execution.FlowImpl;
+import io.machinecode.chainlink.core.element.execution.SplitImpl;
+import io.machinecode.chainlink.core.element.execution.StepImpl;
+import io.machinecode.chainlink.core.element.partition.MapperImpl;
+import io.machinecode.chainlink.core.element.partition.PlanImpl;
+import io.machinecode.chainlink.core.element.task.BatchletImpl;
+import io.machinecode.chainlink.core.element.task.ChunkImpl;
 import io.machinecode.chainlink.core.util.Util;
 import io.machinecode.chainlink.core.util.Util.ExpressionTransformer;
 import io.machinecode.chainlink.spi.element.execution.Decision;
@@ -23,8 +23,8 @@ import io.machinecode.chainlink.spi.element.partition.Strategy;
 import io.machinecode.chainlink.spi.element.task.Batchlet;
 import io.machinecode.chainlink.spi.element.task.Chunk;
 import io.machinecode.chainlink.spi.element.task.Task;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 import java.util.List;
 

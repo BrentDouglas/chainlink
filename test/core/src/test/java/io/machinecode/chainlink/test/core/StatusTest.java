@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.test.core;
 
-import io.machinecode.chainlink.core.work.Statuses;
+import io.machinecode.chainlink.core.util.Statuses;
 import junit.framework.Assert;
 import org.junit.Test;
 

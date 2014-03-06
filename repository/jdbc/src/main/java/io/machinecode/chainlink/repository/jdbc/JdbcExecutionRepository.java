@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.repository.jdbc;
 
-import io.machinecode.chainlink.spi.ExecutionRepository;
-import io.machinecode.chainlink.spi.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.ExtendedJobInstance;
-import io.machinecode.chainlink.spi.ExtendedStepExecution;
-import io.machinecode.chainlink.spi.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.execution.Step;
@@ -57,16 +57,6 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public MutableMetric createMetric(final Metric.MetricType type) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public MutableMetric[] copyMetrics(final Metric[] metrics) {
-        return new MutableMetric[0];  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

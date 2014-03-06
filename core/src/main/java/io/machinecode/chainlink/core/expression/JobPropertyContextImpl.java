@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.expression;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.spi.element.Property;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.inject.ArtifactReference;
 
 import java.util.Properties;

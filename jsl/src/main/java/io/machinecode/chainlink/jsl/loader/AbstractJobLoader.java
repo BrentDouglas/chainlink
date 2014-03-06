@@ -9,7 +9,7 @@ import io.machinecode.chainlink.jsl.inherit.execution.InheritableSplit;
 import io.machinecode.chainlink.jsl.inherit.execution.InheritableStep;
 import io.machinecode.chainlink.spi.Inheritable;
 import io.machinecode.chainlink.spi.InheritableElement;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 import io.machinecode.chainlink.spi.ParentNotFoundException;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.util.Messages;

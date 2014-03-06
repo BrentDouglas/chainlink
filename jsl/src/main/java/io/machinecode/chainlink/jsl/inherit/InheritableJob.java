@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.jsl.inherit;
 
 import io.machinecode.chainlink.spi.Inheritable;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 import io.machinecode.chainlink.spi.Mergeable;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.Listeners;

@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.core.factory.transition;
 
-import io.machinecode.chainlink.core.model.transition.FailImpl;
+import io.machinecode.chainlink.core.element.transition.FailImpl;
 import io.machinecode.chainlink.core.expression.Expression;
-import io.machinecode.chainlink.spi.factory.ElementFactory;
+import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.spi.element.transition.Fail;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

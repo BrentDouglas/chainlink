@@ -4,7 +4,7 @@ import io.machinecode.chainlink.jsl.inherit.InheritableBase;
 import io.machinecode.chainlink.jsl.inherit.Util;
 import io.machinecode.chainlink.spi.Copyable;
 import io.machinecode.chainlink.spi.Inheritable;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 import io.machinecode.chainlink.spi.element.execution.Execution;
 import io.machinecode.chainlink.spi.element.execution.Flow;
 import io.machinecode.chainlink.spi.element.transition.Transition;

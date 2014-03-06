@@ -4,7 +4,7 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.element.task.Task;
 import io.machinecode.chainlink.spi.execution.Executor;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 import java.io.Serializable;
 

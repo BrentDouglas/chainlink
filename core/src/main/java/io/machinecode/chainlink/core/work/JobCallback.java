@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.work;
 
 import io.machinecode.chainlink.core.deferred.DeferredImpl;
+import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.ThreadId;

@@ -2,7 +2,7 @@ package io.machinecode.chainlink.jsl.fluent;
 
 import io.machinecode.chainlink.jsl.fluent.execution.FluentExecution;
 import io.machinecode.chainlink.jsl.inherit.InheritableJob;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 import io.machinecode.chainlink.spi.element.Job;
 
 import java.util.ArrayList;

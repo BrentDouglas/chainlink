@@ -1,14 +1,14 @@
 package io.machinecode.chainlink.core.factory.task;
 
-import io.machinecode.chainlink.core.model.task.ExceptionClassFilterImpl;
-import io.machinecode.chainlink.core.model.task.ExceptionClassImpl;
+import io.machinecode.chainlink.core.element.task.ExceptionClassFilterImpl;
+import io.machinecode.chainlink.core.element.task.ExceptionClassImpl;
 import io.machinecode.chainlink.core.util.Util;
 import io.machinecode.chainlink.core.util.Util.ExpressionTransformer;
 import io.machinecode.chainlink.spi.element.task.ExceptionClass;
 import io.machinecode.chainlink.spi.element.task.ExceptionClassFilter;
-import io.machinecode.chainlink.spi.factory.ElementFactory;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
+import io.machinecode.chainlink.core.factory.ElementFactory;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 import java.util.Collections;
 import java.util.List;

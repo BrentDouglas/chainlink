@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.jpa;
 
-import io.machinecode.chainlink.spi.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;

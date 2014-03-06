@@ -1,15 +1,14 @@
 package io.machinecode.chainlink.core.factory;
 
-import io.machinecode.chainlink.core.model.PropertiesImpl;
-import io.machinecode.chainlink.core.model.PropertyImpl;
+import io.machinecode.chainlink.core.element.PropertiesImpl;
+import io.machinecode.chainlink.core.element.PropertyImpl;
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.util.Util;
 import io.machinecode.chainlink.core.util.Util.ExpressionTransformer;
-import io.machinecode.chainlink.spi.factory.ElementFactory;
 import io.machinecode.chainlink.spi.element.Properties;
 import io.machinecode.chainlink.spi.element.Property;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 import java.util.Collections;
 import java.util.List;

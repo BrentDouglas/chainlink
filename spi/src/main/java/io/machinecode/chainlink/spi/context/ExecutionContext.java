@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.spi.context;
 
-import io.machinecode.chainlink.spi.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.execution.Item;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.work.JobWork;
 
 import java.io.Serializable;

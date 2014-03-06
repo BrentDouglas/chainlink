@@ -1,13 +1,13 @@
 package io.machinecode.chainlink.test.core.execution;
 
 import io.machinecode.chainlink.core.factory.JobFactory;
-import io.machinecode.chainlink.core.impl.MetricImpl;
-import io.machinecode.chainlink.core.model.JobImpl;
+import io.machinecode.chainlink.repository.core.MetricImpl;
+import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
-import io.machinecode.chainlink.spi.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.ExtendedJobInstance;
-import io.machinecode.chainlink.spi.ExtendedStepExecution;
-import io.machinecode.chainlink.spi.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.element.execution.Step;
 import org.junit.Assert;
 import org.junit.Test;
@@ -239,17 +239,6 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(1, params.stringPropertyNames().size());
     }
 
-    @Test
-    public void createMetricTest() {
-        printMethodName();
-
-        for (final Metric.MetricType type : Metric.MetricType.values()) {
-            final Metric metric = repository().createMetric(type);
-            Assert.assertEquals(type, metric.getType());
-            Assert.assertEquals(0, metric.getValue());
-        }
-    }
-
     void _testEmptyMetrics(final Metric[] metrics) {
         Assert.assertNotNull(metrics);
         Assert.assertEquals(8, metrics.length);
@@ -296,8 +285,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(98, seen);
     }
 
-    @Test
-    public void copyMetricsTest() {
+    public void _testCopyMetrics(final Metric[] copy) {
         printMethodName();
         final Metric[] metrics = new Metric[] {
                 new MetricImpl(Metric.MetricType.READ_COUNT, 1),
@@ -310,7 +298,6 @@ public abstract class RepositoryTest extends BaseTest {
                 new MetricImpl(Metric.MetricType.WRITE_SKIP_COUNT, 8)
         };
 
-        final Metric[] copy = repository().copyMetrics(metrics);
         Assert.assertNotNull(copy);
         Assert.assertEquals(8, copy.length);
 

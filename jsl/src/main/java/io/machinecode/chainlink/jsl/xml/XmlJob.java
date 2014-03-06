@@ -6,7 +6,7 @@ import io.machinecode.chainlink.jsl.xml.execution.XmlExecution;
 import io.machinecode.chainlink.jsl.xml.execution.XmlFlow;
 import io.machinecode.chainlink.jsl.xml.execution.XmlSplit;
 import io.machinecode.chainlink.jsl.xml.execution.XmlStep;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

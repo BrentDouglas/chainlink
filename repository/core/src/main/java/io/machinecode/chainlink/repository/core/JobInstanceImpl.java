@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.core;
 
-import io.machinecode.chainlink.spi.ExtendedJobInstance;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 
 import java.util.ArrayList;
 import java.util.List;

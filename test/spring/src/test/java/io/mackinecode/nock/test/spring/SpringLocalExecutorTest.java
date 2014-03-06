@@ -3,7 +3,7 @@ package io.mackinecode.chainlink.test.spring;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
-import io.machinecode.chainlink.spi.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 import org.junit.BeforeClass;
 import org.springframework.context.support.AbstractApplicationContext;

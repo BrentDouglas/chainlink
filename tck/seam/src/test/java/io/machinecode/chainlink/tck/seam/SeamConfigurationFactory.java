@@ -2,8 +2,9 @@ package io.machinecode.chainlink.tck.seam;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
-import io.machinecode.chainlink.core.local.LocalTransactionManager;
-import io.machinecode.chainlink.seam.SeamArtifactLoader;
+import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
+import io.machinecode.chainlink.inject.seam.SeamInjector;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
 import org.jboss.seam.contexts.ServletLifecycle;
@@ -31,6 +32,7 @@ public class SeamConfigurationFactory implements ConfigurationFactory {
                 .setRepository(new MemoryExecutionRepository())
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class))
+                .setInjectors(new SeamInjector())
                 .build();
     }
 }

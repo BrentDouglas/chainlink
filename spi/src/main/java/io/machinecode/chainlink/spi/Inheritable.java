@@ -1,5 +1,7 @@
 package io.machinecode.chainlink.spi;
 
+import io.machinecode.chainlink.spi.loader.JobRepository;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */

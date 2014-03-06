@@ -1,24 +1,21 @@
 package io.machinecode.chainlink.repository.memory;
 
 import gnu.trove.impl.Constants;
-import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TLongLongHashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TLongHashSet;
-import io.machinecode.chainlink.spi.ExecutionRepository;
-import io.machinecode.chainlink.spi.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.ExtendedJobInstance;
-import io.machinecode.chainlink.spi.ExtendedStepExecution;
-import io.machinecode.chainlink.spi.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.execution.Step;
@@ -275,16 +272,6 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             partitionExecutionLock.set(false);
         }
         return execution;
-    }
-
-    @Override
-    public MutableMetric createMetric(final Metric.MetricType type) {
-        return new MutableMetricImpl(type);
-    }
-
-    @Override
-    public MutableMetric[] copyMetrics(final Metric[] metrics) {
-        return MutableMetricImpl.copy(metrics);
     }
 
     @Override

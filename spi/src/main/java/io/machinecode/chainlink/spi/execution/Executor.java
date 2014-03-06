@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.execution;
 
-import io.machinecode.chainlink.spi.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.inject.InjectionContext;

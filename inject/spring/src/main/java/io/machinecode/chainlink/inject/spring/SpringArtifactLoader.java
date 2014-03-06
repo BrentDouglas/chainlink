@@ -1,11 +1,10 @@
 package io.machinecode.chainlink.inject.spring;
 
-import io.machinecode.chainlink.spi.loader.ArtifactLoader;
-import io.machinecode.chainlink.spi.loader.ArtifactOfWrongTypeException;
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 

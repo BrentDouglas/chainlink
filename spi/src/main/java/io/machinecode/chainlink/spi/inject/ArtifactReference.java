@@ -7,7 +7,19 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
  */
 public interface ArtifactReference {
 
+    /**
+     * @return The identifier of this artifact.
+     */
     String ref();
 
-    <T> T load(final Class<T> clazz, final InjectionContext injectionContext, final ExecutionContext context) throws Exception;
+    /**
+     * @param as The interface to load the artifact as.
+     * @param injectionContext
+     * @param context
+     * @param <T> The type of the loaded artifact.
+     * @return The artifact identified by {@link #ref()} or null if none can be found.
+     * @throws ArtifactOfWrongTypeException If the artifact loaded does not implement {@param as}.
+     * @throws Exception If an error occurs.
+     */
+    <T> T load(final Class<T> as, final InjectionContext injectionContext, final ExecutionContext context) throws Exception;
 }

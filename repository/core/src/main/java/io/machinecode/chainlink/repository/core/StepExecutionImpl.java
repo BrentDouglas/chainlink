@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.core;
 
-import io.machinecode.chainlink.spi.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 
 import java.util.ArrayList;
 import java.util.List;

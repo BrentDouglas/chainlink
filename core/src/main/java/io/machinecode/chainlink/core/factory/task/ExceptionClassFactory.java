@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.core.factory.task;
 
-import io.machinecode.chainlink.core.model.task.ExceptionClassImpl;
+import io.machinecode.chainlink.core.element.task.ExceptionClassImpl;
 import io.machinecode.chainlink.core.expression.Expression;
-import io.machinecode.chainlink.spi.factory.ElementFactory;
+import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.spi.element.task.ExceptionClass;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

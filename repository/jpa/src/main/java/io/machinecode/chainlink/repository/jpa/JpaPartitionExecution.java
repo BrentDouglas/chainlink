@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.jpa;
 
-import io.machinecode.chainlink.spi.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.PartitionExecution;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
@@ -20,7 +20,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyEnumerated;
-import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;

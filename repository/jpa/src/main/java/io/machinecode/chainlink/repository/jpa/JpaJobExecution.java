@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.jpa;
 
-import io.machinecode.chainlink.spi.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 
 import javax.batch.runtime.BatchStatus;
 import javax.persistence.CascadeType;

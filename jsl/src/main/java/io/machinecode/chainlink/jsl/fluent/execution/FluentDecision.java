@@ -4,7 +4,7 @@ import io.machinecode.chainlink.jsl.fluent.FluentProperties;
 import io.machinecode.chainlink.jsl.fluent.FluentPropertyReference;
 import io.machinecode.chainlink.jsl.fluent.transition.FluentTransition;
 import io.machinecode.chainlink.jsl.inherit.execution.InheritableDecision;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.ArrayList;
 import java.util.List;

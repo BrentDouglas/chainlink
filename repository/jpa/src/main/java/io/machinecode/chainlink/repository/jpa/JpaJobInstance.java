@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.jpa;
 
-import io.machinecode.chainlink.spi.ExtendedJobInstance;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

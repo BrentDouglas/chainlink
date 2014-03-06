@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.test.core.batch;
 
-import io.machinecode.chainlink.core.batch.BatchArtifacts;
+import io.machinecode.chainlink.inject.core.batch.BatchArtifacts;
 import org.junit.Assert;
 import org.junit.Test;
 

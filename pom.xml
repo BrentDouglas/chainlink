@@ -18,9 +18,9 @@
     <modules>
         <module>spi</module>
         <module>jsl</module>
-        <module>core</module>
         <module>inject</module>
         <module>repository</module>
+        <module>core</module>
         <module>test</module>
         <module>tck</module>
     </modules>
@@ -103,7 +103,7 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-guice</artifactId>
+                <artifactId>chainlink-inject-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

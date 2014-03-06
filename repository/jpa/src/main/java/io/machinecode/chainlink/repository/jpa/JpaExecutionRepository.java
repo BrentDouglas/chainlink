@@ -4,11 +4,11 @@ import io.machinecode.chainlink.repository.core.JobExecutionImpl;
 import io.machinecode.chainlink.repository.core.JobInstanceImpl;
 import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
 import io.machinecode.chainlink.repository.core.StepExecutionImpl;
-import io.machinecode.chainlink.spi.ExecutionRepository;
-import io.machinecode.chainlink.spi.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.ExtendedJobInstance;
-import io.machinecode.chainlink.spi.ExtendedStepExecution;
-import io.machinecode.chainlink.spi.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.execution.Step;
@@ -228,16 +228,6 @@ public class JpaExecutionRepository implements ExecutionRepository {
                 em.close();
             }
         }
-    }
-
-    @Override
-    public MutableMetric createMetric(final Metric.MetricType type) {
-        return new JpaMetric(type);
-    }
-
-    @Override
-    public MutableMetric[] copyMetrics(final Metric[] metrics) {
-        return JpaMetric.copy(metrics);
     }
 
     @Override

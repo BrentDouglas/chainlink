@@ -2,7 +2,7 @@ package io.machinecode.chainlink.jsl.inherit.execution;
 
 import io.machinecode.chainlink.jsl.inherit.Util;
 import io.machinecode.chainlink.spi.Copyable;
-import io.machinecode.chainlink.spi.JobRepository;
+import io.machinecode.chainlink.spi.loader.JobRepository;
 import io.machinecode.chainlink.spi.Mergeable;
 import io.machinecode.chainlink.spi.element.Properties;
 import io.machinecode.chainlink.spi.element.execution.Decision;

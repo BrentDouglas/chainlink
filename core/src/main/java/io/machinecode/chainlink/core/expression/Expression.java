@@ -1,12 +1,9 @@
 package io.machinecode.chainlink.core.expression;
 
 import io.machinecode.chainlink.core.util.Index;
-import io.machinecode.chainlink.spi.factory.JobPropertyContext;
-import io.machinecode.chainlink.spi.factory.PropertyContext;
-import io.machinecode.chainlink.spi.util.Pair;
+import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.spi.expression.PropertyContext;
 
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Properties;
 
 /**
