@@ -4,6 +4,8 @@ import io.machinecode.chainlink.spi.ExecutionRepository;
 import io.machinecode.chainlink.spi.JobOperation;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 
+import javax.batch.operations.JobSecurityException;
+import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.runtime.JobExecution;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +50,15 @@ public class JobOperationImpl implements JobOperation {
         if (deferred != null) {
             deferred.get();
         }
-        return repository.getJobExecution(id);
+        try {
+            return repository.getJobExecution(id);
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ExecutionException(e);
+        }
     }
 
     @Override
@@ -56,6 +66,14 @@ public class JobOperationImpl implements JobOperation {
         if (deferred != null) {
             deferred.get(timeout, unit);
         }
-        return repository.getJobExecution(id);
+        try {
+            return repository.getJobExecution(id);
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ExecutionException(e);
+        }
     }
 }

@@ -5,5 +5,5 @@ package io.machinecode.chainlink.spi.configuration;
  */
 public interface ConfigurationFactory {
 
-    Configuration produce();
+    Configuration produce() throws Exception;
 }

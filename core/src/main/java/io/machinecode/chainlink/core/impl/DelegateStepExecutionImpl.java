@@ -2,6 +2,8 @@ package io.machinecode.chainlink.core.impl;
 
 import io.machinecode.chainlink.spi.ExecutionRepository;
 
+import javax.batch.operations.JobSecurityException;
+import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
@@ -9,9 +11,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @see https://java.net/bugzilla/show_bug.cgi?id=4834
- *
  * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @see https://java.net/bugzilla/show_bug.cgi?id=4834
  */
 public class DelegateStepExecutionImpl implements StepExecution {
     private final long executionId;
@@ -36,31 +37,79 @@ public class DelegateStepExecutionImpl implements StepExecution {
 
     @Override
     public BatchStatus getBatchStatus() {
-        return repository.getStepExecution(executionId).getBatchStatus();
+        try {
+            return repository.getStepExecution(executionId).getBatchStatus();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Date getStartTime() {
-        return repository.getStepExecution(executionId).getStartTime();
+        try {
+            return repository.getStepExecution(executionId).getStartTime();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Date getEndTime() {
-        return repository.getStepExecution(executionId).getEndTime();
+        try {
+            return repository.getStepExecution(executionId).getEndTime();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public String getExitStatus() {
-        return repository.getStepExecution(executionId).getExitStatus();
+        try {
+            return repository.getStepExecution(executionId).getExitStatus();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Serializable getPersistentUserData() {
-        return repository.getStepExecution(executionId).getPersistentUserData();
+        try {
+            return repository.getStepExecution(executionId).getPersistentUserData();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Metric[] getMetrics() {
-        return repository.getStepExecution(executionId).getMetrics();
+        try {
+            return repository.getStepExecution(executionId).getMetrics();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

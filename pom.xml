@@ -20,6 +20,7 @@
         <module>jsl</module>
         <module>core</module>
         <module>inject</module>
+        <module>repository</module>
         <module>test</module>
         <module>tck</module>
     </modules>
@@ -48,19 +49,24 @@
         <version.org.springframework.spring-context>${version.org.springframework}</version.org.springframework.spring-context>
         <version.org.springframework.spring-core>${version.org.springframework}</version.org.springframework.spring-core>
 
-        <!-- Test dependencies -->
+        <!-- Tests -->
         <version.com.ibm.batch.com.ibm.batch-tck-spi>1.0</version.com.ibm.batch.com.ibm.batch-tck-spi>
         <version.junit.junit>4.10</version.junit.junit>
         <version.org.testng.testng>6.8</version.org.testng.testng>
 
-        <!-- Seam Test-->
+        <!-- Seam Tests -->
         <version.dom4j>1.6.1</version.dom4j>
         <version.org.javassist.javassist>3.13.0-GA</version.org.javassist.javassist>
         <version.javax.servlet.servlet-api>2.5</version.javax.servlet.servlet-api>
         <version.javax.faces.jsf-api>2.1.23.Final</version.javax.faces.jsf-api>
         <version.org.jboss.spec.jboss-javaee-6.0>2.0.0.Final</version.org.jboss.spec.jboss-javaee-6.0>
 
-        <!-- Plugin dependencies -->
+        <!-- Jpa Tests -->
+        <database.driver>org.postgresql.Driver</database.driver>
+        <version.org.hibernate>4.2.5.Final</version.org.hibernate>
+        <version.postgresql.postgresql>9.2-1002.jdbc4</version.postgresql.postgresql>
+
+        <!-- Plugins -->
         <version.org.codehaus.mojo.build-helper-maven-plugin>1.8</version.org.codehaus.mojo.build-helper-maven-plugin>
         <version.org.codehaus.mojo.properties-maven-plugin>1.0-alpha-2</version.org.codehaus.mojo.properties-maven-plugin>
 
@@ -108,6 +114,26 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-inject-seam</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-memory</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-jdbc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-jpa</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -178,7 +204,7 @@
                 <version>${version.org.springframework.spring-core}</version>
             </dependency>
 
-            <!-- Test dependencies -->
+            <!-- Tests -->
             <dependency>
                 <groupId>com.ibm.jbatch</groupId>
                 <artifactId>com.ibm.jbatch-tck-spi</artifactId>
@@ -229,6 +255,23 @@
                 <version>${version.org.jboss.spec.jboss-javaee-6.0}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- Jpa Tests-->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${version.postgresql.postgresql}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

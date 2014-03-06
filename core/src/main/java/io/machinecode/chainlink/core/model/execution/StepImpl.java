@@ -265,7 +265,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     null
             );
             return executor.execute(
-                    new TaskExecutable(thisCallback, this.task, clonedContext, this.id, -1, timeout)
+                    new TaskExecutable(thisCallback, this.task, clonedContext, timeout)
             );
         } else {
             final PartitionTarget target = this.partition.map(this.task, executor, thisCallback, context, timeout, restartStepExecutionId);
@@ -281,9 +281,9 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     @Override
     public Deferred<?> after(final Executor executor, final ThreadId threadId, final Executable callback,
                              final ExecutionContext context, final ExecutionContext childContext) throws Exception {
+        log.debugf(Messages.get("CHAINLINK-010101.step.after"), context, childContext);
         final long jobExecutionId = context.getJobExecutionId();
         final long stepExecutionId = context.getStepExecutionId();
-        log.debugf(Messages.get("CHAINLINK-010101.step.after"), childContext);
         final ExecutionRepository repository = executor.getRepository();
         final MutableStepContext stepContext = context.getStepContext();
         ++this._completed;
@@ -395,6 +395,8 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     exitStatus,
                     stepContext.getMetrics()
             );
+            log.debugf(Messages.get("CHAINLINK-010204.step.destroy.step.context"), context);
+            context.setStepContext(null);
             if (transition != null && transition.isTerminating()) {
                 return runCallback(executor, context, callback);
             } else {
@@ -411,10 +413,9 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     stepContext.getExitStatus(),
                     stepContext.getMetrics()
             );
-            return runCallback(executor, context, callback);
-        } finally {
             log.debugf(Messages.get("CHAINLINK-010204.step.destroy.step.context"), context);
             context.setStepContext(null);
+            return runCallback(executor, context, callback);
         }
     }
 

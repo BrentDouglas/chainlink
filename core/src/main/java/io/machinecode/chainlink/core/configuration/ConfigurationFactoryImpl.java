@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.configuration;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import io.machinecode.chainlink.spi.util.Messages;
 
 import java.util.List;
 
@@ -28,9 +29,13 @@ public class ConfigurationFactoryImpl implements ConfigurationFactory {
             throw new RuntimeException(e);
         }
         if (factories.isEmpty()) {
-            this.configuration = new ConfigurationImpl(tccl);
+            throw new IllegalStateException(Messages.get("CHAINLINK-031000.configuration.not.provided"));
         } else {
-            this.configuration = factories.get(0).produce();
+            try {
+                this.configuration = factories.get(0).produce();
+            } catch (final Exception e) {
+                throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
+            }
         }
         return this.configuration;
     }

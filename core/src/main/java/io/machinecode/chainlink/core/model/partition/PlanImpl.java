@@ -48,23 +48,33 @@ public class PlanImpl implements Plan, StrategyWork {
 
     @Override
     public PartitionPlan getPartitionPlan(final Executor executor, final ExecutionContext context) {
-        final long jobExecutionId = context.getJobExecutionId();
-        final Properties[] properties = new Properties[this.properties.size()];
-        for (int i = 0; i < properties.length; ++i) {
-            final PropertiesImpl property = this.properties.get(i);
-            properties[i] = PropertiesConverter.convert(property);
-        }
         int threads;
-        int partitions;
         try {
             threads = Integer.parseInt(this.threads);
         } catch (final NumberFormatException e) {
-            throw new BatchRuntimeException(Messages.format("CHAINLINK-012000.plan.threads.not.integer", jobExecutionId, this.threads), e);
+            throw new BatchRuntimeException(Messages.format("CHAINLINK-012000.plan.threads.not.integer", context, this.threads), e);
         }
+        int partitions;
         try {
             partitions = Integer.parseInt(this.partitions);
         } catch (final NumberFormatException e) {
-            throw new BatchRuntimeException(Messages.format("CHAINLINK-012001.plan.partitions.not.integer", jobExecutionId, this.partitions), e);
+            throw new BatchRuntimeException(Messages.format("CHAINLINK-012001.plan.partitions.not.integer", context, this.partitions), e);
+        }
+        final Properties[] properties = new Properties[partitions];
+        for (final PropertiesImpl property : this.properties) {
+            if (property.getPartition() == null) {
+                throw new BatchRuntimeException(Messages.format("CHAINLINK-012002.plan.property.partition.null", context));
+            }
+            final int partition;
+            try {
+                partition = Integer.parseInt(property.getPartition());
+            } catch (final NumberFormatException e) {
+                throw new BatchRuntimeException(Messages.format("CHAINLINK-012003.plan.property.partition.not.integer", context, property.getPartition()), e);
+            }
+            if (partition >= partitions) {
+                throw new BatchRuntimeException(Messages.format("CHAINLINK-012004.plan.property.partition.too.large", context, partition, partitions));
+            }
+            properties[partition] = PropertiesConverter.convert(property);
         }
         return new PartitionPlanImpl(
                 partitions,
@@ -74,12 +84,9 @@ public class PlanImpl implements Plan, StrategyWork {
     }
 
     private static class PartitionPlanImpl implements PartitionPlan {
-        private int partitions;
-        private boolean override; //TODO Where does this come from
-        private int threads;
-        private Properties[] properties;
-
-        public PartitionPlanImpl() { }
+        private final int partitions;
+        private final int threads;
+        private final Properties[] properties;
 
         public PartitionPlanImpl(final int partitions, final int threads, final Properties[] properties) {
             this.partitions = partitions;
@@ -89,12 +96,12 @@ public class PlanImpl implements Plan, StrategyWork {
 
         @Override
         public boolean getPartitionsOverride() {
-            return this.override;
+            return false;
         }
 
         @Override
         public void setPartitionsOverride(final boolean override) {
-            this.override = override;
+            //
         }
 
         @Override
@@ -104,7 +111,7 @@ public class PlanImpl implements Plan, StrategyWork {
 
         @Override
         public void setPartitions(final int partitions) {
-            this.partitions = partitions;
+            //
         }
 
         @Override
@@ -114,7 +121,7 @@ public class PlanImpl implements Plan, StrategyWork {
 
         @Override
         public void setThreads(final int threads) {
-            this.threads = threads;
+            //
         }
 
         @Override
@@ -124,7 +131,7 @@ public class PlanImpl implements Plan, StrategyWork {
 
         @Override
         public void setPartitionProperties(final Properties[] properties) {
-            this.properties = properties;
+            //
         }
     }
 }

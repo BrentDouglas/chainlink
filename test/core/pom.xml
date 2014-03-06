@@ -11,6 +11,10 @@
 
     <artifactId>chainlink-test-core</artifactId>
 
+    <properties>
+        <build.properties>../../build.properties</build.properties>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -20,6 +24,11 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-core</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>

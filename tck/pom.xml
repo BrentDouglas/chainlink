@@ -18,6 +18,8 @@
     <properties>
         <build.properties>../build.properties</build.properties>
         <tck.properties>tck.properties</tck.properties>
+
+        <configuration.factory.type>Memory</configuration.factory.type>
     </properties>
 
     <dependencyManagement>
@@ -55,13 +57,62 @@
             <artifactId>chainlink-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Memory -->
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-memory</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Jpa -->
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-jpa</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>jpa</id>
+            <activation>
+                <property><name>jpa</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <configuration.factory.type>Jpa</configuration.factory.type>
+            </properties>
+        </profile>
         <profile>
             <id>tck-all</id>
             <activation>
@@ -207,6 +258,10 @@
                         <ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep>${ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep}</ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep>
                         <ChunkTests.testChunkTimeBasedTimeLimit0.sleep>${ChunkTests.testChunkTimeBasedTimeLimit0.sleep}</ChunkTests.testChunkTimeBasedTimeLimit0.sleep>
                         <ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep>${ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep}</ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep>
+
+                        <database.url>${database.url}</database.url>
+                        <database.user>${database.user}</database.user>
+                        <database.password>${database.password}</database.password>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

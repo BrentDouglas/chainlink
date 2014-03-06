@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.core.impl;
+package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.BaseExecution;
 
@@ -12,6 +12,7 @@ import java.util.Date;
  */
 public abstract class BaseExecutionImpl implements BaseExecution {
     private final BatchStatus batchStatus;
+    private final Date create;
     private final Date start;
     private final Date updated;
     private final Date end;
@@ -23,6 +24,7 @@ public abstract class BaseExecutionImpl implements BaseExecution {
 
     public BaseExecutionImpl(final Builder builder) {
         this.batchStatus = builder.batchStatus;
+        this.create = builder.create;
         this.start = builder.start;
         this.updated = builder.updated;
         this.end = builder.end;
@@ -33,16 +35,17 @@ public abstract class BaseExecutionImpl implements BaseExecution {
         this.writerCheckpoint = builder.writerCheckpoint;
     }
 
-    public BaseExecutionImpl(final BaseExecutionImpl builder) {
-        this.batchStatus = builder.batchStatus;
-        this.start = builder.start;
-        this.updated = builder.updated;
-        this.end = builder.end;
-        this.exitStatus = builder.exitStatus;
-        this.persistentUserData = builder.persistentUserData;
-        this.metrics = builder.metrics;
-        this.readerCheckpoint = builder.readerCheckpoint;
-        this.writerCheckpoint = builder.writerCheckpoint;
+    public BaseExecutionImpl(final BaseExecution builder) {
+        this.batchStatus = builder.getBatchStatus();
+        this.create = builder.getCreateTime();
+        this.start = builder.getStartTime();
+        this.updated = builder.getUpdatedTime();
+        this.end = builder.getEndTime();
+        this.exitStatus = builder.getExitStatus();
+        this.persistentUserData = builder.getPersistentUserData();
+        this.metrics = builder.getMetrics();
+        this.readerCheckpoint = builder.getReaderCheckpoint();
+        this.writerCheckpoint = builder.getWriterCheckpoint();
     }
 
     public static Builder from(final BaseExecutionImpl that) {
@@ -53,6 +56,7 @@ public abstract class BaseExecutionImpl implements BaseExecution {
 
     protected static void  _from(final Builder builder, final BaseExecution that) {
         builder.batchStatus = that.getBatchStatus();
+        builder.create = that.getCreateTime();
         builder.start = that.getStartTime();
         builder.end = that.getEndTime();
         builder.exitStatus = that.getExitStatus();
@@ -65,6 +69,11 @@ public abstract class BaseExecutionImpl implements BaseExecution {
     @Override
     public BatchStatus getBatchStatus() {
         return batchStatus;
+    }
+
+    @Override
+    public Date getCreateTime() {
+        return create;
     }
 
     @Override
@@ -109,6 +118,7 @@ public abstract class BaseExecutionImpl implements BaseExecution {
 
     public static class Builder<T extends Builder<T>> {
         private BatchStatus batchStatus;
+        private Date create;
         private Date start;
         private Date updated;
         private Date end;
@@ -120,6 +130,11 @@ public abstract class BaseExecutionImpl implements BaseExecution {
 
         public T setBatchStatus(final BatchStatus batchStatus) {
             this.batchStatus = batchStatus;
+            return (T)this;
+        }
+
+        public T setCreated(final Date create) {
+            this.create = create;
             return (T)this;
         }
 

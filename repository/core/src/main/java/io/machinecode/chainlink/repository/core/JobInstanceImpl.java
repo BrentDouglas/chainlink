@@ -1,6 +1,9 @@
-package io.machinecode.chainlink.core.impl;
+package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.ExtendedJobInstance;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -31,10 +34,18 @@ public class JobInstanceImpl implements ExtendedJobInstance {
         this.jslName = builder.jslName;
     }
 
-    public JobInstanceImpl(final JobInstanceImpl builder) {
-        this.instanceId = builder.instanceId;
-        this.jobName = builder.jobName;
-        this.jslName = builder.jslName;
+    public JobInstanceImpl(final ExtendedJobInstance builder) {
+        this.instanceId = builder.getInstanceId();
+        this.jobName = builder.getJobName();
+        this.jslName = builder.getJslName();
+    }
+
+    public static List<JobInstanceImpl> copy(final List<? extends ExtendedJobInstance> list) {
+        final ArrayList<JobInstanceImpl> copy = new ArrayList<JobInstanceImpl>();
+        for (final ExtendedJobInstance item : list) {
+            copy.add(new JobInstanceImpl(item));
+        }
+        return copy;
     }
 
     public static class Builder {

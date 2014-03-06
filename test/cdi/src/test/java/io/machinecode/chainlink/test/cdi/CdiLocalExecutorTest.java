@@ -7,6 +7,8 @@ import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.model.JobImpl;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
+import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
+import io.machinecode.chainlink.spi.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
 import org.jboss.weld.environment.se.Weld;
@@ -32,6 +34,10 @@ public class CdiLocalExecutorTest extends ExecutorTest {
         return super._configuration()
                 .setArtifactLoaders(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class))
                 .setInjectors(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class));
+    }
+    @Override
+    protected ExecutionRepository _repository() {
+        return new MemoryExecutionRepository();
     }
 
     @BeforeClass

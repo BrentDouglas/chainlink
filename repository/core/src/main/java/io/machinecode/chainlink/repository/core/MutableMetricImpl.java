@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.core.impl;
+package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.context.MutableMetric;
 
@@ -14,6 +14,7 @@ public class MutableMetricImpl implements MutableMetric {
 
     public MutableMetricImpl(final MetricType type) {
         this.type = type;
+        this.value = 0;
     }
 
     public MutableMetricImpl(final Metric metric) {
@@ -39,6 +40,14 @@ public class MutableMetricImpl implements MutableMetric {
     @Override
     public void increment(final long value) {
         this.value += value;
+    }
+
+    public static MutableMetricImpl[] empty() {
+        final MutableMetricImpl[] mets = new MutableMetricImpl[MetricType.values().length];
+        for (int i = 0; i < MetricType.values().length; ++i) {
+            mets[i] = new MutableMetricImpl(MetricType.values()[i]);
+        }
+        return mets;
     }
 
     public static MutableMetricImpl[] copy(final Metric[] metrics) {

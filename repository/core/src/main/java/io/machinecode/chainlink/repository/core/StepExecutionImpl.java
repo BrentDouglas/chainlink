@@ -1,6 +1,9 @@
-package io.machinecode.chainlink.core.impl;
+package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.ExtendedStepExecution;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -15,10 +18,18 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
         this.stepName = builder.stepName;
     }
 
-    public StepExecutionImpl(final StepExecutionImpl builder) {
+    public StepExecutionImpl(final ExtendedStepExecution builder) {
         super(builder);
-        this.executionId = builder.executionId;
-        this.stepName = builder.stepName;
+        this.executionId = builder.getStepExecutionId();
+        this.stepName = builder.getStepName();
+    }
+
+    public static List<StepExecutionImpl> copy(final List<? extends ExtendedStepExecution> list) {
+        final ArrayList<StepExecutionImpl> copy = new ArrayList<StepExecutionImpl>();
+        for (final ExtendedStepExecution item : list) {
+            copy.add(new StepExecutionImpl(item));
+        }
+        return copy;
     }
 
     public static Builder from(final ExtendedStepExecution that) {

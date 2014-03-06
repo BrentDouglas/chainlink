@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.configuration;
 
-import io.machinecode.chainlink.core.local.LocalExecutionRepository;
 import io.machinecode.chainlink.core.local.LocalTransactionManager;
 import io.machinecode.chainlink.spi.ExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
@@ -27,19 +26,12 @@ public class ConfigurationImpl implements Configuration {
     private final ArtifactLoader[] artifactLoaders;
     private final Injector[] injectors;
 
-    public ConfigurationImpl(final ClassLoader loader) {
-        this.loader = loader;
-        this.repository = new LocalExecutionRepository();
-        this.transactionManager = new LocalTransactionManager(180, TimeUnit.SECONDS); //TODO Should not be here
-        this.jobLoaders = JOB_LOADERS;
-        this.artifactLoaders = ARTIFACT_LOADERS;
-        this.injectors = INJECTORS;
-    }
-
     public ConfigurationImpl(final Configuration configuration) {
         this.loader = configuration.getClassLoader();
         this.repository = configuration.getRepository();
-        this.transactionManager = configuration.getTransactionManager();
+        this.transactionManager = configuration.getTransactionManager() == null
+                ? new LocalTransactionManager(180, TimeUnit.SECONDS)
+                : configuration.getTransactionManager();
         this.jobLoaders = configuration.getJobLoaders();
         this.artifactLoaders = configuration.getArtifactLoaders();
         this.injectors = configuration.getInjectors();

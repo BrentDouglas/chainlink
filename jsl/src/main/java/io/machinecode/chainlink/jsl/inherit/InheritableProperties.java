@@ -25,6 +25,7 @@ public interface InheritableProperties<T extends InheritableProperties<T, P>,
         public static <T extends InheritableProperties<T, P>,
                 P extends Copyable<P> & Property>
         T copy(final T _this, final T that) {
+            that.setPartition(_this.getPartition());
             that.setProperties(Util.copyList(_this.getProperties()));
             return that;
         }
@@ -32,6 +33,7 @@ public interface InheritableProperties<T extends InheritableProperties<T, P>,
         public static <T extends InheritableProperties<T, P>,
                 P extends Copyable<P> & Property>
         T merge(final T _this, final T that) {
+            _this.setPartition(Util.attributeRule(_this.getPartition(), that.getPartition()));
             if (_this.getMerge()) {
                 _this.setProperties(Util.listRule(_this.getProperties(), that.getProperties()));
             }

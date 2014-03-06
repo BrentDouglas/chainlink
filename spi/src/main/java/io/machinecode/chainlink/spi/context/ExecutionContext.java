@@ -23,7 +23,7 @@ public interface ExecutionContext extends Serializable {
 
     Long getStepExecutionId();
 
-    Integer getPartitionId();
+    Long getPartitionExecutionId();
 
     MutableJobContext getJobContext();
 

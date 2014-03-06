@@ -102,7 +102,6 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
             this.reducer.beginPartitionedStep(executor, context);
         }
         final MutableStepContext stepContext = context.getStepContext();
-        final String stepName = stepContext.getStepName();
         final ExecutionRepository repository = executor.getRepository();
         final Properties[] properties = plan.getPartitionProperties();
         final Executable[] executables;
@@ -114,7 +113,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                 final PartitionExecution execution = partitionExecutions[id];
                 //final Properties properties = execution.getPartitionParameters();
                 final int partitionId = execution.getPartitionId();
-                repository.createPartitionExecution(stepExecutionId, execution, new Date());
+                final PartitionExecution partitionExecution = repository.createPartitionExecution(stepExecutionId, execution, new Date());
                 //TODO Which step execution should this be linked to?
                 final MutableStepContext partitionStepContext = new StepContextImpl(stepContext, execution.getMetrics(), execution.getPersistentUserData(), repository);
                 final ExecutionContext partitionContext = new ExecutionContextImpl(
@@ -123,15 +122,13 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                         partitionStepContext,
                         context.getJobExecution(),
                         context.getRestartJobExecution(),
-                        partitionId
+                        partitionExecution.getPartitionExecutionId()
                 );
                 final Properties props = partitionId >= properties.length ? null : properties[partitionId];
                 executables[id] = new TaskExecutable(
                         callback,
                         task.partition(new PropertyContextImpl(props)),
                         partitionContext,
-                        stepName,
-                        partitionId,
                         timeout
                 );
             }
@@ -139,26 +136,24 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
             final int partitions = plan.getPartitions();
             executables = new Executable[partitions];
             for (int partitionId = 0; partitionId < partitions; ++partitionId) {
+                final Properties partitionProperties = partitionId < properties.length ? properties[partitionId] : null;
+                final PartitionExecution partitionExecution = repository.createPartitionExecution(stepExecutionId, partitionId, partitionProperties, new Date());
                 final ExecutionContext partitionContext = new ExecutionContextImpl(
                         context.getJob(),
                         new JobContextImpl(context.getJobContext()),
                         new StepContextImpl(context.getStepContext(), repository),
                         context.getJobExecution(),
                         context.getRestartJobExecution(),
-                        partitionId
+                        partitionExecution.getPartitionExecutionId()
                 );
                 //if (partitions != properties.length) {
                 //    throw new IllegalStateException(Messages.format("CHAINLINK-011000.partition.properties.length", context, partitions, properties.length));
                 //}
                 //TODO Not really sure if this is how properties are meant to be distributed
-                final Properties partitionProperties = partitionId < properties.length ? properties[partitionId] : null;
-                repository.createPartitionExecution(stepExecutionId, partitionId, partitionProperties, new Date());
                 executables[partitionId] = new TaskExecutable(
                         callback,
                         task.partition(new PropertyContextImpl(partitionProperties)),
                         partitionContext,
-                        stepName,
-                        partitionId,
                         timeout
                 );
             }
@@ -187,15 +182,15 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         PartitionStatus partitionStatus = PartitionStatus.COMMIT;
         if (items != null && this.analyser != null) {
             try {
-                    if (this.collector != null) {
-                        for (final Item that : items) {
-                            log.debugf(Messages.get("CHAINLINK-011200.partition.analyse.collector.data"), context, this.analyser.getRef());
-                            this.analyser.analyzeCollectorData(executor, context, that.getData());
-                        }
+                if (this.collector != null) {
+                    for (final Item that : items) {
+                        log.debugf(Messages.get("CHAINLINK-011200.partition.analyse.collector.data"), context, this.analyser.getRef());
+                        this.analyser.analyzeCollectorData(executor, context, that.getData());
                     }
-                    for (final Item item : items) {
-                        this.analyser.analyzeStatus(executor, context, item.getBatchStatus(), item.getExitStatus());
-                    }
+                }
+                for (final Item item : items) {
+                    this.analyser.analyzeStatus(executor, context, item.getBatchStatus(), item.getExitStatus());
+                }
             } catch (final Exception e) {
                 log.infof(e, Messages.get("CHAINLINK-011201.partition.analyser.caught"), context, this.analyser.getRef());
                 partitionStatus = PartitionStatus.ROLLBACK;

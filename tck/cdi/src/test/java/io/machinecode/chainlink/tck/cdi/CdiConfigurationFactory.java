@@ -3,7 +3,7 @@ package io.machinecode.chainlink.tck.cdi;
 import io.machinecode.chainlink.cdi.CdiArtifactLoader;
 import io.machinecode.chainlink.cdi.CdiInjector;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
-import io.machinecode.chainlink.core.local.LocalExecutionRepository;
+import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.core.local.LocalTransactionManager;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
@@ -29,7 +29,7 @@ public class CdiConfigurationFactory implements ConfigurationFactory {
     public Configuration produce() {
         return new Builder()
                 .setLoader(Thread.currentThread().getContextClassLoader())
-                .setRepository(new LocalExecutionRepository())
+                .setRepository(new MemoryExecutionRepository())
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class))
                 .setInjectors(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class))

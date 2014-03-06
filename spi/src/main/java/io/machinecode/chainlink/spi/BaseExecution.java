@@ -12,6 +12,8 @@ public interface BaseExecution {
 
     BatchStatus getBatchStatus();
 
+    Date getCreateTime();
+
     Date getStartTime();
 
     Date getUpdatedTime();

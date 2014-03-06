@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.tck.spring;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
-import io.machinecode.chainlink.core.local.LocalExecutionRepository;
+import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.core.local.LocalTransactionManager;
 import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.Configuration;
@@ -26,7 +26,7 @@ public class SpringConfigurationFactory implements ConfigurationFactory {
     public Configuration produce() {
         return new Builder()
                 .setLoader(Thread.currentThread().getContextClassLoader())
-                .setRepository(new LocalExecutionRepository())
+                .setRepository(new MemoryExecutionRepository())
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(context.getBean(SpringArtifactLoader.class))
                 .build();

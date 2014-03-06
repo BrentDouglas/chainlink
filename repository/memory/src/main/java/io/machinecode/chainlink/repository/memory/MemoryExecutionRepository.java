@@ -1,5 +1,6 @@
-package io.machinecode.chainlink.core.local;
+package io.machinecode.chainlink.repository.memory;
 
+import gnu.trove.impl.Constants;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
@@ -13,12 +14,6 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TLongHashSet;
-import io.machinecode.chainlink.core.impl.JobExecutionImpl;
-import io.machinecode.chainlink.core.impl.JobInstanceImpl;
-import io.machinecode.chainlink.core.impl.MetricImpl;
-import io.machinecode.chainlink.core.impl.MutableMetricImpl;
-import io.machinecode.chainlink.core.impl.PartitionExecutionImpl;
-import io.machinecode.chainlink.core.impl.StepExecutionImpl;
 import io.machinecode.chainlink.spi.ExecutionRepository;
 import io.machinecode.chainlink.spi.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.ExtendedJobInstance;
@@ -28,6 +23,11 @@ import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.repository.core.JobExecutionImpl;
+import io.machinecode.chainlink.repository.core.JobInstanceImpl;
+import io.machinecode.chainlink.repository.core.MutableMetricImpl;
+import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
+import io.machinecode.chainlink.repository.core.StepExecutionImpl;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -60,26 +60,32 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @SuppressWarnings("ALL")
-public class LocalExecutionRepository implements ExecutionRepository {
-    protected final AtomicLong jobInstanceIndex = new AtomicLong();
-    protected final AtomicLong jobExecutionIndex = new AtomicLong();
-    protected final AtomicLong stepExecutionIndex = new AtomicLong();
+public class MemoryExecutionRepository implements ExecutionRepository {
+
+    private static final long FIRST_INDEX = Constants.DEFAULT_LONG_NO_ENTRY_VALUE + 1;
+
+    protected final AtomicLong jobInstanceIndex = new AtomicLong(FIRST_INDEX);
+    protected final AtomicLong jobExecutionIndex = new AtomicLong(FIRST_INDEX);
+    protected final AtomicLong stepExecutionIndex = new AtomicLong(FIRST_INDEX);
+    protected final AtomicLong partitionExecutionIndex = new AtomicLong(FIRST_INDEX);
 
     protected final TLongObjectMap<ExtendedJobInstance> jobInstances = new TLongObjectHashMap<ExtendedJobInstance>();
     protected final TLongObjectMap<ExtendedJobExecution> jobExecutions = new TLongObjectHashMap<ExtendedJobExecution>();
+    protected final TLongObjectMap<ExtendedStepExecution> stepExecutions = new TLongObjectHashMap<ExtendedStepExecution>();
+    protected final TLongObjectMap<PartitionExecution> partitionExecutions = new TLongObjectHashMap<PartitionExecution>();
     protected final TLongObjectMap<TLongList> jobInstanceExecutions = new TLongObjectHashMap<TLongList>();
     protected final TLongLongMap jobExecutionInstances = new TLongLongHashMap();
-    protected final TLongObjectMap<ExtendedStepExecution> stepExecutions = new TLongObjectHashMap<ExtendedStepExecution>();
     protected final TLongObjectMap<TLongSet> jobExecutionStepExecutions = new TLongObjectHashMap<TLongSet>();
     protected final TLongLongMap latestJobExecutionForInstance = new TLongLongHashMap();
-    protected final TLongObjectMap<TIntObjectMap<PartitionExecution>> stepExecutionPartitionExecutions = new TLongObjectHashMap<TIntObjectMap<PartitionExecution>>();
+    protected final TLongObjectMap<TLongList> stepExecutionPartitionExecutions = new TLongObjectHashMap<TLongList>();
     protected final TLongObjectMap<TLongSet> jobExecutionHistory = new TLongObjectHashMap<TLongSet>();
 
     protected final AtomicBoolean jobInstanceLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionLock = new AtomicBoolean(false);
+    protected final AtomicBoolean stepExecutionLock = new AtomicBoolean(false);
+    protected final AtomicBoolean partitionExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobInstanceExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionInstanceLock = new AtomicBoolean(false);
-    protected final AtomicBoolean stepExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionStepExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean latestJobExecutionForInstanceLock = new AtomicBoolean(false);
     protected final AtomicBoolean stepExecutionPartitionExecutionLock = new AtomicBoolean(false);
@@ -87,7 +93,7 @@ public class LocalExecutionRepository implements ExecutionRepository {
 
     @Override
     public JobInstanceImpl createJobInstance(final Job job, final String jslName) {
-        final long id = jobInstanceIndex.incrementAndGet();
+        final long id = jobInstanceIndex.getAndIncrement();
         final JobInstanceImpl instance = new JobInstanceImpl.Builder()
                 .setInstanceId(id)
                 .setJobName(job.getId())
@@ -117,7 +123,7 @@ public class LocalExecutionRepository implements ExecutionRepository {
             if (executions == null) {
                 throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
             }
-            jobExecutionId = jobExecutionIndex.incrementAndGet();
+            jobExecutionId = jobExecutionIndex.getAndIncrement();
             executions.add(jobExecutionId);
         } finally {
             jobInstanceExecutionLock.set(false);
@@ -165,12 +171,25 @@ public class LocalExecutionRepository implements ExecutionRepository {
 
     @Override
     public StepExecutionImpl createStepExecution(final JobExecution jobExecution, final Step<?, ?> step, final Date timestamp) throws Exception {
-        final long stepExecutionId = stepExecutionIndex.incrementAndGet();
+        final long stepExecutionId;
+        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            final TLongSet executionIds = jobExecutionStepExecutions.get(jobExecution.getExecutionId());
+            if (executionIds == null) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
+            }
+            stepExecutionId = stepExecutionIndex.getAndIncrement();
+            executionIds.add(stepExecutionId);
+        } finally {
+            jobExecutionStepExecutionLock.set(false);
+        }
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
                 .setStepExecutionId(stepExecutionId)
                 .setStepName(step.getId())
-                .setStart(timestamp)
+                .setCreated(timestamp)
+                .setUpdated(timestamp)
                 .setBatchStatus(BatchStatus.STARTING)
+                .setMetrics(MutableMetricImpl.empty())
                 .build();
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -182,19 +201,9 @@ public class LocalExecutionRepository implements ExecutionRepository {
         } finally {
             stepExecutionLock.set(false);
         }
-        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
-        try {
-            final TLongSet executionIds = jobExecutionStepExecutions.get(jobExecution.getExecutionId());
-            if (executionIds == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
-            }
-            executionIds.add(stepExecutionId);
-        } finally {
-            jobExecutionStepExecutionLock.set(false);
-        }
         while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
         try {
-            stepExecutionPartitionExecutions.put(stepExecutionId, new TIntObjectHashMap<PartitionExecution>());
+            stepExecutionPartitionExecutions.put(stepExecutionId, new TLongArrayList());
         } finally {
             stepExecutionPartitionExecutionLock.set(false);
         }
@@ -203,45 +212,67 @@ public class LocalExecutionRepository implements ExecutionRepository {
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Date timestamp) throws Exception {
-        final PartitionExecutionImpl execution = new PartitionExecutionImpl.Builder()
-                .setStepExecutionId(stepExecutionId)
-                .setPartitionId(partitionId)
-                .setPartitionProperties(properties)
-                .setStart(timestamp)
-                .setBatchStatus(BatchStatus.STARTING)
-                .build();
+        final long id;
         while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
         try {
-            TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            TLongList partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
             if (partitions == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
-            partitions.put(partitionId, execution);
+            id = partitionExecutionIndex.getAndIncrement();
+            partitions.add(id);
         } finally {
             stepExecutionPartitionExecutionLock.set(false);
+        }
+        final PartitionExecutionImpl execution = new PartitionExecutionImpl.Builder()
+                .setPartitionExecutionId(id)
+                .setStepExecutionId(stepExecutionId)
+                .setPartitionId(partitionId)
+                .setPartitionProperties(properties)
+                .setCreated(timestamp)
+                .setUpdated(timestamp)
+                .setMetrics(MutableMetricImpl.empty())
+                .setBatchStatus(BatchStatus.STARTING)
+                .build();
+        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            partitionExecutions.put(id, execution);
+        } finally {
+            partitionExecutionLock.set(false);
         }
         return execution;
     }
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception {
-        final PartitionExecutionImpl execution = PartitionExecutionImpl.from(partitionExecution)
-                .setStepExecutionId(stepExecutionId)
-                .setStart(timestamp)
-                .setUpdated(null)
-                .setEnd(null)
-                .setBatchStatus(BatchStatus.STARTING)
-                .setExitStatus(null)
-                .build();
+        final long id;
         while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
         try {
-            TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
+            TLongList partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
             if (partitions == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
-            partitions.put(partitionExecution.getPartitionId(), execution);
+            id = partitionExecutionIndex.getAndIncrement();
+            partitions.add(id);
         } finally {
             stepExecutionPartitionExecutionLock.set(false);
+        }
+        final PartitionExecutionImpl execution = PartitionExecutionImpl.from(partitionExecution)
+                .setPartitionExecutionId(id)
+                .setStepExecutionId(stepExecutionId)
+                .setCreated(timestamp)
+                .setUpdated(timestamp)
+                .setStart(null)
+                .setEnd(null)
+                .setMetrics(MutableMetricImpl.empty())
+                .setBatchStatus(BatchStatus.STARTING)
+                .setExitStatus(null)
+                .build();
+        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        try {
+            partitionExecutions.put(id, execution);
+        } finally {
+            partitionExecutionLock.set(false);
         }
         return execution;
     }
@@ -346,6 +377,7 @@ public class LocalExecutionRepository implements ExecutionRepository {
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setStart(timestamp)
+                    .setUpdated(timestamp)
                     .setBatchStatus(BatchStatus.STARTED)
                     .build()
             );
@@ -356,6 +388,7 @@ public class LocalExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        final Serializable _persistentUserData = _clone(persistentUserData);
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
@@ -363,8 +396,9 @@ public class LocalExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
-                    .setPersistentUserData(persistentUserData)
-                    .setMetrics(MetricImpl.copy(metrics))
+                    .setUpdated(timestamp)
+                    .setPersistentUserData(_persistentUserData)
+                    .setMetrics(MutableMetricImpl.copy(metrics))
                     .build()
             );
         } finally {
@@ -374,16 +408,9 @@ public class LocalExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        final Serializable _reader;
-        final Serializable _writer;
-        try {
-            _reader = _clone(readerCheckpoint);
-            _writer = _clone(writerCheckpoint);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e); //TODO
-        } catch (IOException e) {
-            throw new RuntimeException(e); //TODO
-        }
+        final Serializable _persistentUserData = _clone(persistentUserData);
+        final Serializable _reader = _clone(readerCheckpoint);
+        final Serializable _writer = _clone(writerCheckpoint);
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
@@ -391,8 +418,9 @@ public class LocalExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
-                    .setPersistentUserData(persistentUserData)
-                    .setMetrics(MetricImpl.copy(metrics))
+                    .setUpdated(timestamp)
+                    .setPersistentUserData(_persistentUserData)
+                    .setMetrics(MutableMetricImpl.copy(metrics))
                     .setReaderCheckpoint(_reader)
                     .setWriterCheckpoint(_writer)
                     .build()
@@ -407,14 +435,15 @@ public class LocalExecutionRepository implements ExecutionRepository {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
-             if (execution == null) {
-                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
-             }
+            if (execution == null) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setBatchStatus(batchStatus)
                     .setExitStatus(exitStatus)
+                    .setUpdated(timestamp)
                     .setEnd(timestamp)
-                    .setMetrics(MetricImpl.copy(metrics))
+                    .setMetrics(MutableMetricImpl.copy(metrics))
                     .build()
             );
         } finally {
@@ -423,82 +452,68 @@ public class LocalExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        final Serializable _reader;
-        final Serializable _writer;
+    public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        final Serializable _persistentUserData = _clone(persistentUserData);
+        final Serializable _reader = _clone(readerCheckpoint);
+        final Serializable _writer = _clone(writerCheckpoint);
+        while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
-            _reader = _clone(readerCheckpoint);
-            _writer = _clone(writerCheckpoint);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e); //TODO
-        } catch (IOException e) {
-            throw new RuntimeException(e); //TODO
-        }
-        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
-        try {
-            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
-            if (partitions == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
+            if (partition == null) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
-            final PartitionExecution partitionExecution = partitions.get(partitionId);
-            if (partitionExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", stepExecutionId, partitionId));
-            }
-            partitions.put(partitionId, PartitionExecutionImpl.from(partitionExecution)
+            partitionExecutions.put(partitionExecutionId, PartitionExecutionImpl.from(partition)
                     .setUpdated(timestamp)
                     .setReaderCheckpoint(_reader)
                     .setWriterCheckpoint(_writer)
-                    .setPersistentUserData(persistentUserData)
-                    .setMetrics(MetricImpl.copy(metrics))
-                    .build());
+                    .setPersistentUserData(_persistentUserData)
+                    .setMetrics(MutableMetricImpl.copy(metrics))
+                    .build()
+            );
         } finally {
-            stepExecutionPartitionExecutionLock.set(false);
+            partitionExecutionLock.set(false);
         }
     }
 
     @Override
-    public void updatePartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+    public void updatePartitionExecution(final long partitionExecutionId, final Serializable persistentUserData, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {        final Serializable _reader;
+        final Serializable _persistentUserData = _clone(persistentUserData);
+        while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
-            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
-            if (partitions == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
+            if (partition == null) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
-            final PartitionExecution partitionExecution = partitions.get(partitionId);
-            if (partitionExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", stepExecutionId, partitionId));
-            }
-            partitions.put(partitionId, PartitionExecutionImpl.from(partitionExecution)
+            partitionExecutions.put(partitionExecutionId, PartitionExecutionImpl.from(partition)
                     .setUpdated(timestamp)
                     .setBatchStatus(batchStatus)
-                    .setPersistentUserData(persistentUserData)
-                    .build());
+                    .setPersistentUserData(_persistentUserData)
+                    .build()
+            );
         } finally {
-            stepExecutionPartitionExecutionLock.set(false);
+            partitionExecutionLock.set(false);
         }
     }
 
     @Override
-    public void finishPartitionExecution(final long stepExecutionId, final int partitionId, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+    public void finishPartitionExecution(final long partitionExecutionId, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
+        final Serializable _persistentUserData = _clone(persistentUserData);
+        while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
-            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
-            if (partitions == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
+            if (partition == null) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
-            final PartitionExecution partitionExecution = partitions.get(partitionId);
-            if (partitionExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", stepExecutionId, partitionId));
-            }
-            partitions.put(partitionId, PartitionExecutionImpl.from(partitionExecution)
+            partitionExecutions.put(partitionExecutionId, PartitionExecutionImpl.from(partition)
                     .setEnd(timestamp)
                     .setUpdated(timestamp)
                     .setBatchStatus(batchStatus)
                     .setExitStatus(exitStatus)
-                    .setPersistentUserData(persistentUserData)
-                    .build());
+                    .setPersistentUserData(_persistentUserData)
+                    .build()
+            );
         } finally {
-            stepExecutionPartitionExecutionLock.set(false);
+            partitionExecutionLock.set(false);
         }
     }
 
@@ -940,16 +955,27 @@ public class LocalExecutionRepository implements ExecutionRepository {
 
     @Override
     public PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        final TLongList partitionIds;
         while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
         try {
-            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
-            if (partitions.isEmpty()) {
+            partitionIds = stepExecutionPartitionExecutions.get(stepExecutionId);
+            if (partitionIds.isEmpty()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
+        } finally {
+            stepExecutionPartitionExecutionLock.set(false);
+        }
+
+
+        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        try {
             final List<PartitionExecution> ret = new ArrayList<PartitionExecution>();
-            for (final TIntObjectIterator<PartitionExecution> it = partitions.iterator(); it.hasNext();) {
-                it.advance();
-                final PartitionExecution partitionExecution = it.value();
+            for (final TLongIterator it = partitionIds.iterator(); it.hasNext();) {
+                final long partitionExecutionId = it.next();
+                final PartitionExecution partitionExecution = partitionExecutions.get(partitionExecutionId);
+                if (partitionExecution == null) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                }
                 switch (partitionExecution.getBatchStatus()) {
                     case FAILED:
                     case STOPPED:
@@ -964,34 +990,36 @@ public class LocalExecutionRepository implements ExecutionRepository {
             }
             return ret.toArray(new PartitionExecution[ret.size()]);
         } finally {
-            stepExecutionPartitionExecutionLock.set(false);
+            partitionExecutionLock.set(false);
         }
     }
 
     @Override
-    public PartitionExecution getPartitionExecution(final long stepExecutionId, final int partitionId) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+    public PartitionExecution getPartitionExecution(final long partitionExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
-            final TIntObjectMap<PartitionExecution> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
-            if (partitions.isEmpty()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
+            if (partition == null) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
-            final PartitionExecution partitionExecution = partitions.get(partitionId);
-            if (partitionExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", stepExecutionId, partitionId));
-            }
-            return partitionExecution;
+            return partition;
         } finally {
-            stepExecutionPartitionExecutionLock.set(false);
+            partitionExecutionLock.set(false);
         }
     }
 
     //TODO Add recycling
-    private <T> T _clone(final T that) throws IOException, ClassNotFoundException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(that);
-        oos.flush();
-        return (T) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+    private <T> T _clone(final T that) {
+        try {
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(that);
+            oos.flush();
+            return (T) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e); //TODO
+        } catch (IOException e) {
+            throw new RuntimeException(e); //TODO
+        }
     }
 }

@@ -22,7 +22,7 @@ public class ExecutionContextImpl implements ExecutionContext {
     private final ExtendedJobExecution jobExecution;
     private final ExtendedJobExecution restartJobExecution;
     private final long jobExecutionId;
-    private final Integer partitionId;
+    private final Long partitionExecutionId;
     private final MutableJobContext jobContext;
     private String restartElementId;
     private MutableStepContext stepContext;
@@ -34,11 +34,11 @@ public class ExecutionContextImpl implements ExecutionContext {
     private String logString;
 
     private ExecutionContextImpl(final JobWork job, final MutableJobContext jobContext, final ExtendedJobExecution jobExecution,
-                                 final ExtendedJobExecution restartJobExecution, final Integer partitionId, final Item[] items) {
+                                 final ExtendedJobExecution restartJobExecution, final Long partitionExecutionId, final Item[] items) {
         this.job = job;
         this.jobExecution = jobExecution;
         this.restartJobExecution = restartJobExecution;
-        this.partitionId = partitionId;
+        this.partitionExecutionId = partitionExecutionId;
         this.jobExecutionId = jobExecution.getExecutionId();
         this.jobContext = jobContext;
         this.items = items;
@@ -46,19 +46,17 @@ public class ExecutionContextImpl implements ExecutionContext {
 
     public ExecutionContextImpl(final JobWork job, final MutableJobContext jobContext, final MutableStepContext stepContext,
                                 final ExtendedJobExecution jobExecution, final ExtendedJobExecution restartJobExecution,
-                                final Integer partitionId) {
+                                final Long partitionExecutionId) {
         this(
                 job,
                 jobContext,
                 jobExecution,
                 restartJobExecution,
-                partitionId,
+                partitionExecutionId,
                 null
         );
         this.stepContext = stepContext;
-        if (stepContext != null) {
-            this.stepExecutionId = stepContext.getStepExecutionId();
-        }
+        this.stepExecutionId = stepContext == null ? null : stepContext.getStepExecutionId();
         _buildLogString();
     }
 
@@ -68,8 +66,8 @@ public class ExecutionContextImpl implements ExecutionContext {
         if (this.stepExecutionId != null) {
             builder.append(',').append(Messages.raw("prefix.step.execution")).append('=').append(this.stepExecutionId);
         }
-        if (this.partitionId != null) {
-            builder.append(',').append(Messages.raw("prefix.partition")).append('=').append(this.partitionId);
+        if (this.partitionExecutionId != null) {
+            builder.append(',').append(Messages.raw("prefix.partition")).append('=').append(this.partitionExecutionId);
         }
         this.logString = builder.toString();
     }
@@ -110,8 +108,8 @@ public class ExecutionContextImpl implements ExecutionContext {
     }
 
     @Override
-    public Integer getPartitionId() {
-        return partitionId;
+    public Long getPartitionExecutionId() {
+        return partitionExecutionId;
     }
 
     @Override
@@ -127,9 +125,7 @@ public class ExecutionContextImpl implements ExecutionContext {
     @Override
     public void setStepContext(final MutableStepContext stepContext) {
         this.stepContext = stepContext;
-        if (stepContext != null) {
-            this.stepExecutionId = stepContext.getStepExecutionId();
-        }
+        this.stepExecutionId = stepContext == null ? null : stepContext.getStepExecutionId();
         _buildLogString();
     }
 

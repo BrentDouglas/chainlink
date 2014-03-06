@@ -2,6 +2,8 @@ package io.mackinecode.chainlink.test.spring;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
+import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
+import io.machinecode.chainlink.spi.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 import org.junit.BeforeClass;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -18,6 +20,10 @@ public class SpringLocalExecutorTest extends ExecutorTest {
     protected Builder _configuration() {
         return super._configuration()
                 .setArtifactLoaders(context.getBean(SpringArtifactLoader.class));
+    }
+    @Override
+    protected ExecutionRepository _repository() {
+        return new MemoryExecutionRepository();
     }
 
     @BeforeClass

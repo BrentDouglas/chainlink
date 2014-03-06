@@ -11,6 +11,10 @@
 
     <artifactId>chainlink-test-batch</artifactId>
 
+    <properties>
+        <build.properties>../../build.properties</build.properties>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>

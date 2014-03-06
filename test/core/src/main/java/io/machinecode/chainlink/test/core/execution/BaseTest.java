@@ -3,7 +3,6 @@ package io.machinecode.chainlink.test.core.execution;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.chainlink.core.exec.EventedExecutor;
-import io.machinecode.chainlink.core.local.LocalExecutionRepository;
 import io.machinecode.chainlink.core.local.LocalTransactionManager;
 import io.machinecode.chainlink.spi.ExecutionRepository;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -55,11 +54,9 @@ public abstract class BaseTest extends Assert {
                 .setRepository(repository());
     }
 
-    protected final ExecutionRepository _repository() {
-        return new LocalExecutionRepository();
-    }
+    protected abstract ExecutionRepository _repository();
 
-    protected final Executor _executor() {
+    protected Executor _executor() {
         return new EventedExecutor(configuration(), 1);
     }
 

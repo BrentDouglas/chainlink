@@ -7,6 +7,8 @@ import java.util.Properties;
  */
 public interface PartitionExecution extends BaseExecution {
 
+    long getPartitionExecutionId();
+
     long getStepExecutionId();
 
     int getPartitionId();

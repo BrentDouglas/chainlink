@@ -183,8 +183,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
     @Override
     public void run(final Executor executor, final ExecutionContext context, final int timeout) throws Exception {
         this._context = context;
-        final long stepExecutionId = context.getStepExecutionId();
-        final Integer partitionId = context.getPartitionId();
+        final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
         final State state;
         try {
@@ -195,10 +194,9 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             );
         } catch (final Throwable e) {
             reject(e);
-            if (partitionId != null) {
+            if (partitionExecutionId != null) {
                 executor.getRepository().finishPartitionExecution(
-                        stepExecutionId,
-                        partitionId,
+                        partitionExecutionId,
                         stepContext.getPersistentUserData(),
                         BatchStatus.FAILED,
                         stepContext.getExitStatus(),
@@ -209,10 +207,9 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
         }
         try {
             state.stepContext.setBatchStatus(BatchStatus.STARTED);
-            if (partitionId != null) {
+            if (partitionExecutionId != null) {
                 state.repository.updatePartitionExecution(
-                        stepExecutionId,
-                        partitionId,
+                        partitionExecutionId,
                         stepContext.getPersistentUserData(),
                         BatchStatus.STARTED,
                         new Date()
@@ -245,10 +242,9 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
 
             if (state.isFailed()) {
                 reject(state.getFailure());
-                if (partitionId != null) {
+                if (partitionExecutionId != null) {
                     state.repository.finishPartitionExecution(
-                            stepExecutionId,
-                            partitionId,
+                            partitionExecutionId,
                             stepContext.getPersistentUserData(),
                             BatchStatus.FAILED,
                             stepContext.getExitStatus(),
@@ -259,7 +255,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             }
 
             try {
-                while (_loop(state, executor, context)) {
+                while (_loop(state)) {
                     //
                 }
             } catch (final Exception e) {
@@ -306,10 +302,9 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                     batchStatus = BatchStatus.COMPLETED;
                     resolve(context);
                 }
-                if (partitionId != null) {
+                if (partitionExecutionId != null) {
                     state.repository.finishPartitionExecution(
-                            stepExecutionId,
-                            partitionId,
+                            partitionExecutionId,
                             stepContext.getPersistentUserData(),
                             batchStatus,
                             stepContext.getExitStatus(),
@@ -320,19 +315,18 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
         }
     }
 
-    private boolean _loop(final State state, final Executor executor, final ExecutionContext context) throws Exception {
+    private boolean _loop(final State state) throws Exception {
         if (state.isFailed()) {
             return false;
         }
         Exception exception = null;
         switch (state.next) {
             case BEGIN:
+                log.debugf(Messages.get("CHAINLINK-014200.chunk.state.begin"), this._context);
                 final int checkpointTimeout = state.checkpointAlgorithm.checkpointTimeout(state.executor, state.context);
                 log.debugf(Messages.get("CHAINLINK-014100.chunk.transaction.timeout"), this._context, checkpointTimeout);
                 state.transactionManager.setTransactionTimeout(checkpointTimeout);
-                log.debugf(Messages.get("CHAINLINK-014200.chunk.state.begin"), this._context);
                 state.checkpointStartTime = System.currentTimeMillis();
-                state.checkpointAlgorithm.beginCheckpoint(state.executor, state.context);
                 log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), this._context);
                 state.transactionManager.begin();
                 _runBeforeListeners(state);
@@ -844,7 +838,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             state.readInfo = this.reader.checkpointInfo(state.executor, state.context);
             log.debugf(Messages.get("CHAINLINK-014901.chunk.writer.checkpoint"), this._context, this.writer.getRef());
             state.writeInfo = this.writer.checkpointInfo(state.executor, state.context);
-            if (state.partitionId == null) {
+            if (state.partitionExecutionId == null) {
                 Repository.updateStep(
                         state.repository,
                         state.jobExecutionId,
@@ -856,10 +850,8 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 );
             } else {
                 state.repository.updatePartitionExecution(
-                        state.stepExecutionId,
-                        state.partitionId,
-                        state.stepContext.getPersistentUserData(),
-                        state.stepContext.getMetrics(),
+                        state.partitionExecutionId,
+                        state.stepContext.getMetrics(), state.stepContext.getPersistentUserData(),
                         state.readInfo,
                         state.writeInfo,
                         new Date()
@@ -888,6 +880,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             throw exception;
         }
         try {
+            state.checkpointAlgorithm.beginCheckpoint(state.executor, state.context);
             log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), this._context);
             state.transactionManager.commit();
             state.stepContext.getMetric(COMMIT_COUNT).increment();
@@ -1007,7 +1000,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
 
         final long jobExecutionId;
         final long stepExecutionId;
-        final Integer partitionId;
+        final Long partitionExecutionId;
         final TransactionManager transactionManager;
         final ExecutionRepository repository;
         final MutableStepContext stepContext;
@@ -1042,7 +1035,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
         private State(final Executor executor, final ExecutionContext context, final int timeout) throws Exception {
             this.jobExecutionId = context.getJobExecutionId();
             this.stepExecutionId = context.getStepExecutionId();
-            this.partitionId = context.getPartitionId();
+            this.partitionExecutionId = context.getPartitionExecutionId();
             this.transactionManager = executor.getTransactionManager();
             this.repository = executor.getRepository();
             this.stepContext = context.getStepContext();
@@ -1056,9 +1049,9 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             this.retryLimit = ChunkImpl.this.retryLimit == null ? -1 : Integer.parseInt(ChunkImpl.this.retryLimit);
 
             if (context.isRestarting()) {
-                final BaseExecution execution = this.partitionId == null
+                final BaseExecution execution = this.partitionExecutionId == null
                         ? repository.getPreviousStepExecution(this.jobExecutionId, this.stepExecutionId, this.stepContext.getStepName())
-                        : repository.getPartitionExecution(this.stepExecutionId, this.partitionId);
+                        : repository.getPartitionExecution(this.partitionExecutionId);
                 this.readInfo = execution == null ? null : execution.getReaderCheckpoint();
                 this.writeInfo = execution == null ? null : execution.getWriterCheckpoint();
             } else {

@@ -1,6 +1,8 @@
 package io.machinecode.chainlink.core.impl;
 
 import javax.batch.runtime.Metric;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -27,6 +29,14 @@ public class MetricImpl implements Metric {
     @Override
     public long getValue() {
         return value;
+    }
+
+    public static MetricImpl[] empty() {
+        final MetricImpl[] mets = new MetricImpl[MetricType.values().length];
+        for (int i = 0; i < MetricType.values().length; ++i) {
+            mets[i] = new MetricImpl(MetricType.values()[i], 0);
+        }
+        return mets;
     }
 
     public static MetricImpl[] copy(final Metric[] metrics) {

@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.core.model.task;
 
 import io.machinecode.chainlink.core.factory.task.BatchletFactory;
-import io.machinecode.chainlink.core.impl.InjectablesImpl;
 import io.machinecode.chainlink.core.loader.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.model.PropertiesImpl;
 import io.machinecode.chainlink.core.model.PropertyReferenceImpl;
@@ -56,17 +55,15 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             this._context = context;
             this._executor = executor;
         }
-        final Long stepExecutionId = context.getStepExecutionId();
-        final Integer partitionId = context.getPartitionId();
+        final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
         final ExecutionRepository repository = executor.getRepository();
         stepContext.setBatchStatus(BatchStatus.STARTED);
         Throwable throwable = null;
         try {
-            if (partitionId != null) {
+            if (partitionExecutionId != null) {
                 repository.updatePartitionExecution(
-                        stepExecutionId,
-                        partitionId,
+                        partitionExecutionId,
                         stepContext.getPersistentUserData(),
                         BatchStatus.STARTED,
                         new Date()
@@ -77,10 +74,9 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
                     log.debugf(Messages.get("CHAINLINK-013100.batchlet.cancelled"), this._context, getRef());
                     stepContext.setBatchStatus(BatchStatus.STOPPING);
                     resolve(context);
-                    if (partitionId != null) {
+                    if (partitionExecutionId != null) {
                         repository.finishPartitionExecution(
-                                stepExecutionId,
-                                partitionId,
+                                partitionExecutionId,
                                 stepContext.getPersistentUserData(),
                                 BatchStatus.STOPPED,
                                 stepContext.getExitStatus(),
@@ -129,10 +125,9 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
                 batchStatus = BatchStatus.COMPLETED;
                 resolve(context);
             }
-            if (partitionId != null) {
+            if (partitionExecutionId != null) {
                 repository.finishPartitionExecution(
-                        stepExecutionId,
-                        partitionId,
+                        partitionExecutionId,
                         stepContext.getPersistentUserData(),
                         batchStatus,
                         stepContext.getExitStatus(),

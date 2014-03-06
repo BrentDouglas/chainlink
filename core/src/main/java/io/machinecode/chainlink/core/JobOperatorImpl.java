@@ -80,27 +80,65 @@ public class JobOperatorImpl implements JobOperator {
 
     @Override
     public Set<String> getJobNames() throws JobSecurityException {
-        return executor.getRepository().getJobNames();
+        try {
+            return executor.getRepository().getJobNames();
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public int getJobInstanceCount(final String jobName) throws NoSuchJobException, JobSecurityException {
-        return executor.getRepository().getJobInstanceCount(jobName);
+        try {
+            return executor.getRepository().getJobInstanceCount(jobName);
+        } catch (final NoSuchJobException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws NoSuchJobException, JobSecurityException {
-        return executor.getRepository().getJobInstances(jobName, start, count);
+        try {
+            return executor.getRepository().getJobInstances(jobName, start, count);
+        } catch (final NoSuchJobException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException {
-        return executor.getRepository().getRunningExecutions(jobName); //TODO This should probably go through Transport
+        try {
+            return executor.getRepository().getRunningExecutions(jobName); //TODO This should probably go through Transport
+        } catch (final NoSuchJobException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public Properties getParameters(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
-        return executor.getRepository().getParameters(executionId);
+        try {
+            return executor.getRepository().getParameters(executionId);
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
@@ -110,7 +148,7 @@ public class JobOperatorImpl implements JobOperator {
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
             final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, parameters);
 
-            return startJob(job, jslName, parameters).getJobExecutionId();
+            return _startJob(job, jslName, parameters).getJobExecutionId();
         } catch (final JobStartException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -121,6 +159,18 @@ public class JobOperatorImpl implements JobOperator {
     }
 
     public JobOperationImpl startJob(final JobWork job, final String jslName, final Properties parameters) throws Exception {
+        try {
+            return _startJob(job, jslName, parameters);
+        } catch (final JobStartException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobStartException(e);
+        }
+    }
+
+    private JobOperationImpl _startJob(final JobWork job, final String jslName, final Properties parameters) throws Exception {
         JobFactory.INSTANCE.validate(job);
 
         final ExecutionRepository repository = executor.getRepository();
@@ -144,12 +194,20 @@ public class JobOperatorImpl implements JobOperator {
     }
 
     public JobOperationImpl getJobOperation(final long jobExecutionId) throws JobExecutionNotRunningException {
-        final Deferred<?> deferred = executor.getJob(jobExecutionId);
-        return new JobOperationImpl(
-                jobExecutionId,
-                deferred,
-                executor.getRepository()
-        );
+        try {
+            final Deferred<?> deferred = executor.getJob(jobExecutionId);
+            return new JobOperationImpl(
+                    jobExecutionId,
+                    deferred,
+                    executor.getRepository()
+            );
+        } catch (final JobExecutionNotRunningException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobRestartException(e);
+        }
     }
 
     @Override
@@ -199,7 +257,8 @@ public class JobOperatorImpl implements JobOperator {
         }
     }
 
-    private JobOperationImpl _restart(final JobWork job, final long jobExecutionId, final JobInstance instance, final Properties parameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
+    //JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException,
+    private JobOperationImpl _restart(final JobWork job, final long jobExecutionId, final JobInstance instance, final Properties parameters) throws Exception {
         JobFactory.INSTANCE.validate(job);
         final ExecutionRepository repository = executor.getRepository();
         final ExtendedJobExecution lastExecution = repository.getJobExecution(jobExecutionId);
@@ -230,59 +289,111 @@ public class JobOperatorImpl implements JobOperator {
     }
 
     public Deferred<?> stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
-        log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
-        final ExecutionRepository repository = executor.getRepository();
-        repository.getJobExecution(jobExecutionId); //This will throw a NoSuchJobExecutionException if required
-        final Deferred<?> deferred = executor.getJob(jobExecutionId);
-        if (deferred == null) {
-            throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-001002.operator.not.running", jobExecutionId));
+        try {
+            log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
+            final ExecutionRepository repository = executor.getRepository();
+            repository.getJobExecution(jobExecutionId); //This will throw a NoSuchJobExecutionException if required
+            final Deferred<?> deferred = executor.getJob(jobExecutionId);
+            if (deferred == null) {
+                throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-001002.operator.not.running", jobExecutionId));
+            }
+            executor.cancel(deferred);
+            return deferred;
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobExecutionNotRunningException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobStartException(e);
         }
-        executor.cancel(deferred);
-        return deferred;
     }
 
     @Override
     public void abandon(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionIsRunningException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001203.operator.abandon"), jobExecutionId);
         try {
-            executor.getJob(jobExecutionId);
-            throw new JobExecutionIsRunningException(Messages.format("CHAINLINK-001001.operator.running", jobExecutionId));
-        } catch (final JobExecutionNotRunningException e) {
-            Repository.abandonedJob(executor.getRepository(), jobExecutionId);
+            try {
+                executor.getJob(jobExecutionId);
+                throw new JobExecutionIsRunningException(Messages.format("CHAINLINK-001001.operator.running", jobExecutionId));
+            } catch (final JobExecutionNotRunningException e) {
+                Repository.abandonedJob(executor.getRepository(), jobExecutionId);
+            }
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobExecutionIsRunningException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobStartException(e);
         }
     }
 
     @Override
     public JobInstance getJobInstance(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+        try {
         return executor.getRepository().getJobInstanceForExecution(executionId);
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobStartException(e);
+        }
     }
 
     @Override
     public List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException {
-        final ExecutionRepository repository = executor.getRepository();
-        final List<? extends JobExecution> executions =  repository.getJobExecutions(instance);
-        final List<JobExecution> delegates = new ArrayList<JobExecution>(executions.size());
-        for (final JobExecution execution : executions) {
-            delegates.add(new DelegateJobExecutionImpl(execution, repository));
+        try {
+            final ExecutionRepository repository = executor.getRepository();
+            final List<? extends JobExecution> executions =  repository.getJobExecutions(instance);
+            final List<JobExecution> delegates = new ArrayList<JobExecution>(executions.size());
+            for (final JobExecution execution : executions) {
+                delegates.add(new DelegateJobExecutionImpl(execution, repository));
+            }
+            return delegates;
+        } catch (final NoSuchJobInstanceException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobStartException(e);
         }
-        return delegates;
     }
 
     @Override
     public JobExecution getJobExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+        try {
         final ExecutionRepository repository = executor.getRepository();
         return new DelegateJobExecutionImpl(repository.getJobExecution(executionId), repository);
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobStartException(e);
+        }
     }
 
     @Override
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        final ExecutionRepository repository = executor.getRepository();
-        final List<? extends StepExecution> executions =  repository.getStepExecutionsForJob(jobExecutionId);
-        final List<StepExecution> delegates = new ArrayList<StepExecution>(executions.size());
-        for (final StepExecution execution : executions) {
-            delegates.add(new DelegateStepExecutionImpl(execution, repository));
+        try {
+            final ExecutionRepository repository = executor.getRepository();
+            final List<? extends StepExecution> executions =  repository.getStepExecutionsForJob(jobExecutionId);
+            final List<StepExecution> delegates = new ArrayList<StepExecution>(executions.size());
+            for (final StepExecution execution : executions) {
+                delegates.add(new DelegateStepExecutionImpl(execution, repository));
+            }
+            return delegates;
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobStartException(e);
         }
-        return delegates;
     }
 
 }

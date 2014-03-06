@@ -2,15 +2,16 @@ package io.machinecode.chainlink.core.impl;
 
 import io.machinecode.chainlink.spi.ExecutionRepository;
 
+import javax.batch.operations.JobSecurityException;
+import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import java.util.Date;
 import java.util.Properties;
 
 /**
- * @see https://java.net/bugzilla/show_bug.cgi?id=4834
- *
  * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @see https://java.net/bugzilla/show_bug.cgi?id=4834
  */
 public class DelegateJobExecutionImpl implements JobExecution {
     private final long executionId;
@@ -35,36 +36,92 @@ public class DelegateJobExecutionImpl implements JobExecution {
 
     @Override
     public BatchStatus getBatchStatus() {
-        return repository.getJobExecution(executionId).getBatchStatus();
+        try {
+            return repository.getJobExecution(executionId).getBatchStatus();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Date getStartTime() {
-        return repository.getJobExecution(executionId).getStartTime();
+        try {
+            return repository.getJobExecution(executionId).getStartTime();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Date getEndTime() {
-        return repository.getJobExecution(executionId).getEndTime();
+        try {
+            return repository.getJobExecution(executionId).getEndTime();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public String getExitStatus() {
-        return repository.getJobExecution(executionId).getExitStatus();
+        try {
+            return repository.getJobExecution(executionId).getExitStatus();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Date getCreateTime() {
-        return repository.getJobExecution(executionId).getCreateTime();
+        try {
+            return repository.getJobExecution(executionId).getCreateTime();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Date getLastUpdatedTime() {
-        return repository.getJobExecution(executionId).getLastUpdatedTime();
+        try {
+            return repository.getJobExecution(executionId).getLastUpdatedTime();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Properties getJobParameters() {
-        return repository.getJobExecution(executionId).getJobParameters();
+        try {
+            return repository.getJobExecution(executionId).getJobParameters();
+        } catch (final NoSuchJobExecutionException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

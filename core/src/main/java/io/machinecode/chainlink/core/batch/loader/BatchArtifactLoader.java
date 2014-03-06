@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.batch.loader;
 
-import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.batch.BatchArtifactRef;
 import io.machinecode.chainlink.core.batch.BatchArtifacts;
 import io.machinecode.chainlink.spi.loader.ArtifactLoader;

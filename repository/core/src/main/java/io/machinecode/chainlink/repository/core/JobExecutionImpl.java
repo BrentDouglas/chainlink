@@ -1,9 +1,11 @@
-package io.machinecode.chainlink.core.impl;
+package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.ExtendedJobExecution;
 
 import javax.batch.runtime.BatchStatus;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -34,17 +36,25 @@ public class JobExecutionImpl implements ExtendedJobExecution {
         this.restartElementId = builder.restartElementId;
     }
 
-    public JobExecutionImpl(final JobExecutionImpl builder) {
-        this.executionId = builder.executionId;
-        this.jobName = builder.jobName;
-        this.batchStatus = builder.batchStatus;
-        this.start = builder.start;
-        this.end = builder.end;
-        this.exitStatus = builder.exitStatus;
-        this.created = builder.created;
-        this.updated = builder.updated;
-        this.parameters = builder.parameters;
-        this.restartElementId = builder.restartElementId;
+    public JobExecutionImpl(final ExtendedJobExecution builder) {
+        this.executionId = builder.getExecutionId();
+        this.jobName = builder.getJobName();
+        this.batchStatus = builder.getBatchStatus();
+        this.start = builder.getStartTime();
+        this.end = builder.getEndTime();
+        this.exitStatus = builder.getExitStatus();
+        this.created = builder.getCreateTime();
+        this.updated = builder.getLastUpdatedTime();
+        this.parameters = builder.getJobParameters();
+        this.restartElementId = builder.getRestartElementId();
+    }
+
+    public static List<JobExecutionImpl> copy(final List<? extends ExtendedJobExecution> list) {
+        final ArrayList<JobExecutionImpl> copy = new ArrayList<JobExecutionImpl>();
+        for (final ExtendedJobExecution item : list) {
+            copy.add(new JobExecutionImpl(item));
+        }
+        return copy;
     }
 
     @Override

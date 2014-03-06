@@ -20,14 +20,10 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
 
     private static final Logger log = Logger.getLogger(TaskExecutable.class);
 
-    final String stepId;
-    final int partition;
     final int timeout;
 
-    public TaskExecutable(final Executable parent, final TaskWork work, final ExecutionContext context, final String stepId, final int partition, final int timeout) {
+    public TaskExecutable(final Executable parent, final TaskWork work, final ExecutionContext context, final int timeout) {
         super(parent, context, work, null);
-        this.stepId = stepId;
-        this.partition = partition;
         this.timeout = timeout;
     }
 

@@ -148,11 +148,7 @@ public class StepContextImpl implements MutableStepContext {
 
     @Override
     public Metric[] getMetrics() {
-        final MetricImpl[] that = new MetricImpl[metrics.length];
-        for (int i = 0; i < metrics.length; ++i) {
-            that[i] = new MetricImpl(metrics[i]);
-        }
-        return that;
+        return MetricImpl.copy(metrics);
     }
 
     @Override
