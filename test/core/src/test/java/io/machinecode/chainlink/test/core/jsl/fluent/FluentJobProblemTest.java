@@ -25,8 +25,8 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.step()
                         .setId("step1")
                 );
-        final JobImpl impl = JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
-        JobFactory.INSTANCE.validate(impl);
+        final JobImpl impl = JobFactory.produce(job, ExpressionTest.PARAMETERS);
+        JobFactory.validate(impl);
     }
 
     @Test(expected = InvalidJobException.class)
@@ -42,8 +42,8 @@ public class FluentJobProblemTest {
                         .setId("step2")
                         .setNext("step1")
                 );
-        final JobImpl impl = JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
-        JobFactory.INSTANCE.validate(impl);
+        final JobImpl impl = JobFactory.produce(job, ExpressionTest.PARAMETERS);
+        JobFactory.validate(impl);
     }
 
     @Test(expected = InvalidJobException.class)
@@ -66,13 +66,13 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.step()
                         .setId("step2")
                 );
-        final JobImpl impl = JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
-        JobFactory.INSTANCE.validate(impl);
+        final JobImpl impl = JobFactory.produce(job, ExpressionTest.PARAMETERS);
+        JobFactory.validate(impl);
     }
 
     @Test(expected = InvalidJobException.class)
     public void invalidTransitionTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -92,6 +92,6 @@ public class FluentJobProblemTest {
                         .setId("s3")
                         .setTask(Jsl.batchlet().setRef("asdf"))
                 ), ExpressionTest.PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
     }
 }

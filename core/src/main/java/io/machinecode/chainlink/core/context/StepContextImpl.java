@@ -71,6 +71,9 @@ public class StepContextImpl implements MutableStepContext {
         this.exitStatus = null;
         this.persistentUserData = persistentUserData;
         this.metrics = MutableMetricImpl.copy(metrics);
+        for (final MutableMetric metric : this.metrics) {
+            this.metricMap.put(metric.getType(), metric);
+        }
     }
 
     @Override

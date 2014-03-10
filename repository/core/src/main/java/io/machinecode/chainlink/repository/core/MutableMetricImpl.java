@@ -12,14 +12,17 @@ public class MutableMetricImpl implements MutableMetric {
     private final MetricType type;
     private long value;
 
-    public MutableMetricImpl(final MetricType type) {
+    public MutableMetricImpl(final MetricType type, final long value) {
         this.type = type;
-        this.value = 0;
+        this.value = value;
+    }
+
+    public MutableMetricImpl(final MetricType type) {
+        this(type, 0);
     }
 
     public MutableMetricImpl(final Metric metric) {
-        this.type = metric.getType();
-        this.value = metric.getValue();
+        this(metric.getType(), metric.getValue());
     }
 
     @Override
@@ -30,6 +33,11 @@ public class MutableMetricImpl implements MutableMetric {
     @Override
     public long getValue() {
         return value;
+    }
+
+    @Override
+    public void setValue(final long value) {
+        this.value = value;
     }
 
     @Override

@@ -1,1 +1,1 @@
-io.machinecode.chainlink.tck.spring.SpringConfigurationFactory
+io.machinecode.chainlink.tck.spring.${configuration.factory.type}SpringConfigurationFactory

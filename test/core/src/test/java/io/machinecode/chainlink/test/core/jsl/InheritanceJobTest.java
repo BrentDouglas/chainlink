@@ -374,11 +374,11 @@ public abstract class InheritanceJobTest {
     public void defaultValueTest() throws JAXBException {
         final InheritableJob<?,?,?,?> job = repo.load("job-default-1");
 
-        testDefaults(JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS));
+        testDefaults(JobFactory.produce(job, ExpressionTest.PARAMETERS));
     }
 
     public static void testDefaults(final Job job) {
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
         Assert.assertEquals("1.0", job.getVersion());
         Assert.assertEquals("true", job.getRestartable());
 

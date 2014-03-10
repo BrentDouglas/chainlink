@@ -34,7 +34,7 @@ public abstract class ExecutorTest extends BaseTest {
     @Test
     public void runBatchletTest() throws Exception {
         printMethodName();
-        final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final JobImpl job = JobFactory.produce(Jsl.job()
                 .setId("run-job")
                 .addExecution(
                         Jsl.step()
@@ -55,7 +55,7 @@ public abstract class ExecutorTest extends BaseTest {
     @Test
     public void stopBatchletTest() throws Exception {
         printMethodName();
-        final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final JobImpl job = JobFactory.produce(Jsl.job()
                 .setId("stop-job")
                 .addExecution(
                         Jsl.step()
@@ -84,7 +84,7 @@ public abstract class ExecutorTest extends BaseTest {
     @Test
     public void failBatchletTest() throws Exception {
         printMethodName();
-        final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final JobImpl job = JobFactory.produce(Jsl.job()
                 .setId("fail-job")
                 .addExecution(
                         Jsl.step()
@@ -105,7 +105,7 @@ public abstract class ExecutorTest extends BaseTest {
     @Test
     public void injectedBatchletTest() throws Exception {
         printMethodName();
-        final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final JobImpl job = JobFactory.produce(Jsl.job()
                 .setId("injected-job")
                 .addExecution(
                         Jsl.step()

@@ -7,6 +7,8 @@ import javax.batch.runtime.Metric;
  */
 public interface MutableMetric extends Metric {
 
+    void setValue(final long value);
+
     void increment();
 
     void increment(final long value);

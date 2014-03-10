@@ -1,1 +1,1 @@
-io.machinecode.chainlink.tck.cdi.CdiConfigurationFactory
+io.machinecode.chainlink.tck.cdi.${configuration.factory.type}CdiConfigurationFactory

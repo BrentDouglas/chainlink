@@ -13,6 +13,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +31,7 @@ public class JpaJobInstance implements ExtendedJobInstance {
     private long id;
     private String jobName;
     private String jslName;
+    private Date created;
     private List<JpaJobExecution> jobExecutions;
 
     public JpaJobInstance() {
@@ -36,6 +40,7 @@ public class JpaJobInstance implements ExtendedJobInstance {
     public JpaJobInstance(final JpaJobInstance builder) {
         this.jobName = builder.jobName;
         this.jslName = builder.jslName;
+        this.created = builder.created;
         this.jobExecutions = builder.jobExecutions;
     }
 
@@ -71,6 +76,18 @@ public class JpaJobInstance implements ExtendedJobInstance {
 
     public JpaJobInstance setJslName(final String jslName) {
         this.jslName = jslName;
+        return this;
+    }
+
+    @Override
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "create_time", length = 29)
+    public Date getCreateTime() {
+        return created;
+    }
+
+    public JpaJobInstance setCreateTime(final Date created) {
+        this.created = created;
         return this;
     }
 

@@ -62,10 +62,8 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         Throwable throwable = null;
         try {
             if (partitionExecutionId != null) {
-                repository.updatePartitionExecution(
+                repository.startPartitionExecution(
                         partitionExecutionId,
-                        stepContext.getPersistentUserData(),
-                        BatchStatus.STARTED,
                         new Date()
                 );
             }
@@ -77,6 +75,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
                     if (partitionExecutionId != null) {
                         repository.finishPartitionExecution(
                                 partitionExecutionId,
+                                stepContext.getMetrics(),
                                 stepContext.getPersistentUserData(),
                                 BatchStatus.STOPPED,
                                 stepContext.getExitStatus(),
@@ -128,6 +127,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             if (partitionExecutionId != null) {
                 repository.finishPartitionExecution(
                         partitionExecutionId,
+                        stepContext.getMetrics(),
                         stepContext.getPersistentUserData(),
                         batchStatus,
                         stepContext.getExitStatus(),

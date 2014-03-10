@@ -18,7 +18,7 @@ public class ExpressionTest {
 
     @Test
     public void validJobPropertyTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -29,7 +29,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("step3")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3", step.getNext());
@@ -37,7 +37,7 @@ public class ExpressionTest {
 
     @Test
     public void validJobPropertyWithValidDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -48,7 +48,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("step3")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3", step.getNext());
@@ -56,7 +56,7 @@ public class ExpressionTest {
 
     @Test
     public void validJobPropertyWithInvalidDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -67,7 +67,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("step3?:step2") //Stop throwing validation exception
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3?:step2", step.getNext());
@@ -75,7 +75,7 @@ public class ExpressionTest {
 
     @Test
     public void validDefaultJobPropertyTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -86,7 +86,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("step2")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -94,7 +94,7 @@ public class ExpressionTest {
 
     @Test
     public void invalidDefaultJobPropertyTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -105,7 +105,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("?:step2")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("?:step2", step1.getNext());
@@ -113,7 +113,7 @@ public class ExpressionTest {
 
     @Test
     public void multiplePropsTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -126,7 +126,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("step2")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -134,7 +134,7 @@ public class ExpressionTest {
 
     @Test
     public void multiplePropsDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -146,7 +146,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("step2")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -154,7 +154,7 @@ public class ExpressionTest {
 
     @Test
     public void multiplePropsStringLiteralTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -166,7 +166,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId(" ")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals(" ", step1.getNext());
@@ -174,7 +174,7 @@ public class ExpressionTest {
 
     @Test
     public void multiplePropsStringLiteralDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -186,7 +186,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("stepblah")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("stepblah", step1.getNext());
@@ -194,7 +194,7 @@ public class ExpressionTest {
 
     @Test
     public void onlyDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -206,7 +206,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("step2")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -214,7 +214,7 @@ public class ExpressionTest {
 
     @Test
     public void valueAfterDefaultTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -227,7 +227,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("blah not invalid apparently")
                 ), PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
     }
 
     @Test
@@ -237,7 +237,7 @@ public class ExpressionTest {
         final Properties parameters = new Properties();
         parameters.setProperty("myFilename", "testfile1");
 
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -255,7 +255,7 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step()
                         .setId("/test/testfile1.txt")
                 ) , parameters);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         System.clearProperty("file.name.junit");
 

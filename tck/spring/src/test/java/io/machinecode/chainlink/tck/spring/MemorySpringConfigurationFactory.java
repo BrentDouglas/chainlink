@@ -1,28 +1,25 @@
-package io.machinecode.chainlink.tck.cdi;
+package io.machinecode.chainlink.tck.spring;
 
-import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
-import io.machinecode.chainlink.inject.cdi.CdiInjector;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
-import org.jboss.weld.environment.se.Weld;
-import org.jboss.weld.environment.se.WeldContainer;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class CdiConfigurationFactory implements ConfigurationFactory {
+public class MemorySpringConfigurationFactory implements ConfigurationFactory {
 
-    private static Weld weld;
-    private static WeldContainer container;
+    private static AbstractApplicationContext context;
 
     static {
-        weld = new Weld();
-        container = weld.initialize();
+        context = new ClassPathXmlApplicationContext("beans.xml");
     }
 
     @Override
@@ -31,8 +28,7 @@ public class CdiConfigurationFactory implements ConfigurationFactory {
                 .setLoader(Thread.currentThread().getContextClassLoader())
                 .setRepository(new MemoryExecutionRepository())
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
-                .setArtifactLoaders(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class))
-                .setInjectors(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class))
+                .setArtifactLoaders(context.getBean(SpringArtifactLoader.class))
                 .build();
     }
 }

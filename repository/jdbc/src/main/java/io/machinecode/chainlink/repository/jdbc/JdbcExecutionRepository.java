@@ -5,7 +5,6 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.execution.Step;
 
@@ -34,7 +33,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedJobInstance createJobInstance(final Job job, final String jslName) throws Exception {
+    public ExtendedJobInstance createJobInstance(final Job job, final String jslName, final Date timestamp) throws Exception {
         final Connection connection = dataSource.getConnection();
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -85,17 +84,22 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Date timestamp) throws Exception {
+    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
+    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Metric[] metrics, final Date timestamp) throws Exception {
+    public void finishStepExecution(final long stepExecutionId, final Metric[] metrics, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void startPartitionExecution(final long partitionExecutionId, final Date timestamp) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -105,12 +109,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updatePartitionExecution(final long partitionExecutionId, final Serializable persistentUserData, final BatchStatus batchStatus, final Date timestamp) throws Exception {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void finishPartitionExecution(final long partitionExecutionId, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
+    public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

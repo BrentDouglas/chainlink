@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.spi.repository;
 
-import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.execution.Step;
 
@@ -25,157 +24,407 @@ import static javax.batch.runtime.Metric.MetricType;
 public interface ExecutionRepository {
 
     /**
+     * This method must generate a {@code long} to be used as an identifier of the {@link ExtendedJobInstance} returned
+     * which will hereafter be referred to as the jobInstanceId.
+     *
+     * Any {@link JobInstance} with the jobExecutionId obtained from this repository after this method completes
+     * must behave as follows:
+     *
+     * {@link JobInstance#getJobName()} returns {@param job} and
+     * {@link ExtendedJobInstance#getJslName()} returns {@param jslName}.
+     *
      * @param job The id element of the job.
      * @param jslName The name of the xml file containing the job.
-     * @return An instance of {@link ExtendedJobInstance} where:
-     *         {@link ExtendedJobInstance#getJobName()} returns {@param job} and
-     *         {@link ExtendedJobInstance#getJslName()} returns {@param jslName}.
-     *
-     *         This instance must be persisted in the repository and be available to subsequent calls to this repository.
-     * @throws Exception On any error.
+     * @param timestamp The current time on the JVM calling this method.
+     * @return An instance of {@link ExtendedJobInstance} in accordance with the above rules.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
      */
-    ExtendedJobInstance createJobInstance(final Job job, final String jslName) throws Exception;
+    ExtendedJobInstance createJobInstance(final Job job, final String jslName, final Date timestamp) throws Exception;
 
     /**
+     * This method must generate a {@code long} to be used as an identifier of the {@link ExtendedJobExecution} returned
+     * which will hereafter be referred to as the jobExecutionId.
+     *
+     * Any {@link JobExecution} with the jobExecutionId obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to {@link #startJobExecution(long, Date)},
+     * {@link #updateJobExecution(long, BatchStatus, Date)} or {@link #finishJobExecution(long, BatchStatus, String, String, Date)}:
+     *
+     * {@link ExtendedJobExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
+     * {@link ExtendedJobExecution#getExitStatus()} returns null,
+     * {@link ExtendedJobExecution#getCreateTime()} and {@link ExtendedJobExecution#getLastUpdatedTime()}
+     *     return return a {@link Date} equal to either {@param timestamp} or the time on the repository server
+     *     when this method executes,
+     * {@link ExtendedJobExecution#getStartTime()} and {@link ExtendedJobExecution#getEndTime()} return null,
+     * {@link ExtendedJobExecution#getJobParameters()} returns either {@param parameters} and
+     * {@link ExtendedJobExecution#getRestartElementId()} returns null.
+     *
      * @param jobInstance The {@link ExtendedJobInstance} to link this {@link ExtendedJobExecution} with.
      * @param parameters The parameters passed to this execution when it was started or restarted.
      * @param timestamp The current time on the JVM calling this method.
-     * @return An instance of {@link ExtendedJobExecution} where:
-     *         {@link ExtendedJobExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
-     *         {@link ExtendedJobExecution#getExitStatus()} returns null,
-     *         {@link ExtendedJobExecution#getCreateTime()} and {@link ExtendedJobExecution#getLastUpdatedTime()}
-     *             return either {@param timestamp} or the current time of the repository server,
-     *         {@link ExtendedJobExecution#getStartTime()} and {@link ExtendedJobExecution#getEndTime()} return null,
-     *         {@link ExtendedJobExecution#getJobParameters()} returns either {@param parameters} and
-     *         {@link ExtendedJobExecution#getRestartElementId()} returns null.
-     *
-     *         This instance must be persisted in the repository and be available to subsequent calls to this repository.
-     * @throws Exception On any error.
+     * @return An instance of {@link ExtendedJobExecution} in accordance with the above rules.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
      */
     ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception;
 
     /**
+     * This method must generate a {@code long} to be used as an identifier of the {@link ExtendedStepExecution} returned
+     * which will hereafter be referred to as the stepExecutionId.
+     *
+     * Any {@link StepExecution} with the stepExecutionId obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to {@link #startStepExecution(long, Date)},
+     * {@link #updateStepExecution(long, Metric[], Serializable, Date)} or
+     * {@link #updateStepExecution(long, Metric[], Serializable, Serializable, Serializable, Date)} or
+     * {@link #finishStepExecution(long, Metric[], BatchStatus, String, Date)}:
+     *
+     * {@link ExtendedStepExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
+     * {@link ExtendedStepExecution#getExitStatus()} returns null,
+     * {@link ExtendedStepExecution#getCreateTime()} and {@link ExtendedStepExecution#getUpdatedTime()}
+     *     return return a {@link Date} equal to either {@param timestamp} or the time on the repository server
+     *     when this method executes,
+     * {@link ExtendedStepExecution#getStartTime()} and {@link ExtendedStepExecution#getEndTime()} return null,
+     * {@link ExtendedStepExecution#getPersistentUserData()} returns null,
+     * {@link ExtendedStepExecution#getReaderCheckpoint()} returns null,
+     * {@link ExtendedStepExecution#getWriterCheckpoint()} returns null and
+     * {@link ExtendedStepExecution#getMetrics()} returns an array of metrics with one for each {@link MetricType}
+     *     where {@link Metric#getValue()} returns 0.
+     *
      * @param jobExecution The {@link ExtendedJobExecution} to link this {@link ExtendedStepExecution} with.
      * @param step The JSL step this execution represents.
      * @param timestamp The current time on the JVM calling this method.
-     * @return An instance of {@link ExtendedStepExecution} where:
-     *         {@link ExtendedStepExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
-     *         {@link ExtendedStepExecution#getExitStatus()} returns null,
-     *         {@link ExtendedStepExecution#getCreateTime()} and {@link ExtendedStepExecution#getUpdatedTime()}
-     *             return either {@param timestamp} or the current time of the repository server,
-     *         {@link ExtendedStepExecution#getStartTime()} and {@link ExtendedStepExecution#getEndTime()} return null,
-     *         {@link ExtendedStepExecution#getPersistentUserData()} returns null,
-     *         {@link ExtendedStepExecution#getReaderCheckpoint()} returns null,
-     *         {@link ExtendedStepExecution#getWriterCheckpoint()} returns null and
-     *         {@link ExtendedStepExecution#getMetrics()} returns an array of metrics with one for each {@link MetricType}
-     *             where {@link Metric#getValue()} returns 0.
-     *
-     *         This instance must be persisted in the repository and be available to subsequent calls to this repository.
-     * @throws Exception On any error.
+     * @return An instance of {@link ExtendedStepExecution} in accordance with the above rules.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
      */
     ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final Step<?,?> step, final Date timestamp) throws Exception;
 
     /**
+     * This method must generate a {@code long} to be used as an identifier of the {@link PartitionExecution} returned
+     * which will hereafter be referred to as the partitionExecutionId.
+     *
+     * Any {@link PartitionExecution} with the partitionExecutionId obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to {@link #startPartitionExecution(long, Date)}
+     * {@link #updatePartitionExecution(long, Metric[], Serializable, Serializable, Serializable, Date)} or
+     * {@link #finishPartitionExecution(long, Metric[], Serializable, BatchStatus, String, Date)}:
+     *
+     * {@link PartitionExecution#getStepExecutionId()} returns {@param stepExecutionId},
+     * {@link PartitionExecution#getPartitionId()} returns {@param partitionId},
+     * {@link PartitionExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
+     * {@link PartitionExecution#getExitStatus()} returns null,
+     * {@link PartitionExecution#getCreateTime()} and {@link PartitionExecution#getUpdatedTime()}
+     *     return a {@link Date} equal to either {@param timestamp} or the time on the repository server
+     *     when this method executes,
+     * {@link PartitionExecution#getStartTime()} and {@link PartitionExecution#getEndTime()} return null,
+     * {@link PartitionExecution#getPersistentUserData()} returns null,
+     * {@link PartitionExecution#getReaderCheckpoint()} returns null,
+     * {@link PartitionExecution#getWriterCheckpoint()} returns null,
+     * {@link PartitionExecution#getPartitionParameters()} returns {@param properties} and
+     * {@link PartitionExecution#getMetrics()} returns an array of metrics with one for each {@link MetricType}
+     *     where {@link Metric#getValue()} returns 0.
+     *
      * @param stepExecutionId The id of the {@link ExtendedStepExecution} to link this {@link PartitionExecution} with.
      * @param partitionId The index of the partition within the step.
      * @param properties The parameters passed to this partition when it was started or restarted.
      * @param timestamp The current time on the JVM calling this method.
-     * @return An instance of {@link PartitionExecution} where:
-     *         {@link PartitionExecution#getStepExecutionId()} returns {@param stepExecutionId},
-     *         {@link PartitionExecution#getPartitionId()} returns {@param partitionId},
-     *         {@link PartitionExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
-     *         {@link PartitionExecution#getExitStatus()} returns null,
-     *         {@link PartitionExecution#getCreateTime()} and {@link PartitionExecution#getUpdatedTime()}
-     *             return either {@param timestamp} or the current time of the repository server,
-     *         {@link PartitionExecution#getStartTime()} and {@link PartitionExecution#getEndTime()} return null,
-     *         {@link PartitionExecution#getPersistentUserData()} returns null,
-     *         {@link PartitionExecution#getReaderCheckpoint()} returns null,
-     *         {@link PartitionExecution#getWriterCheckpoint()} returns null,
-     *         {@link PartitionExecution#getPartitionParameters()} returns {@param properties} and
-     *         {@link PartitionExecution#getMetrics()} returns an array of metrics with one for each {@link MetricType}
-     *             where {@link Metric#getValue()} returns 0.
-     *
-     *         This instance must be persisted in the repository and be available to subsequent calls to this repository.
-     * @throws Exception On any error.
+     * @return An instance of {@link PartitionExecution} in accordance with the above rules.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
      */
     PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Date timestamp) throws Exception;
 
     /**
+     * This method must generate a {@code long} to be used as an identifier of the {@link PartitionExecution} returned
+     * which will hereafter be referred to as the partitionExecutionId.
+     *
+     * Any {@link PartitionExecution} with the partitionExecutionId obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to {@link #startPartitionExecution(long, Date)}
+     * {@link #updatePartitionExecution(long, Metric[], Serializable, Serializable, Serializable, Date)} or
+     * {@link #finishPartitionExecution(long, Metric[], Serializable, BatchStatus, String, Date)};
+     *
+     * {@link PartitionExecution#getStepExecutionId()} returns {@param stepExecutionId},
+     * {@link PartitionExecution#getPartitionId()} returns {@param partitionExecution#getPartitionId},
+     * {@link PartitionExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
+     * {@link PartitionExecution#getExitStatus()} returns null,
+     * {@link PartitionExecution#getCreateTime()} and {@link PartitionExecution#getUpdatedTime()}
+     *     return will return a {@link Date} equal to either {@param timestamp} or the time on the repository server
+     *     when this method executes,
+     * {@link PartitionExecution#getStartTime()} and {@link PartitionExecution#getEndTime()} return null,
+     * {@link PartitionExecution#getPersistentUserData()} returns {@param partitionExecution#getPersistentUserData}, //TODO Should specify clone of?
+     * {@link PartitionExecution#getReaderCheckpoint()} returns {@param partitionExecution#getReaderCheckpoint},
+     * {@link PartitionExecution#getWriterCheckpoint()} returns {@param partitionExecution#getWriterCheckpoint},
+     * {@link PartitionExecution#getPartitionParameters()} returns {@param partitionExecution#getPartitionParameters} and
+     * {@link PartitionExecution#getMetrics()} returns an array of metrics with one for each {@link MetricType}
+     *     where {@link Metric#getValue()} returns 0.
+     *
      * @param stepExecutionId The id of the {@link ExtendedStepExecution} to link this {@link PartitionExecution} with.
      * @param partitionExecution A previous execution of this partition.
      * @param timestamp The current time on the JVM calling this method.
-     * @return An instance of {@link PartitionExecution} where:
-     *         {@link PartitionExecution#getStepExecutionId()} returns {@param stepExecutionId},
-     *         {@link PartitionExecution#getPartitionId()} returns {@param partitionExecution#getPartitionId},
-     *         {@link PartitionExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
-     *         {@link PartitionExecution#getExitStatus()} returns null,
-     *         {@link PartitionExecution#getCreateTime()} and {@link PartitionExecution#getUpdatedTime()}
-     *             return either {@param timestamp} or the current time of the repository server,
-     *         {@link PartitionExecution#getStartTime()} and {@link PartitionExecution#getEndTime()} return null,
-     *         {@link PartitionExecution#getPersistentUserData()} returns {@param partitionExecution#getPersistentUserData},
-     *         {@link PartitionExecution#getReaderCheckpoint()} returns {@param partitionExecution#getReaderCheckpoint},
-     *         {@link PartitionExecution#getWriterCheckpoint()} returns {@param partitionExecution#getWriterCheckpoint},
-     *         {@link PartitionExecution#getPartitionParameters()} returns {@param partitionExecution#getPartitionParameters} and
-     *         {@link PartitionExecution#getMetrics()} returns an array of metrics with one for each {@link MetricType}
-     *             where {@link Metric#getValue()} returns 0.
-     *
-     *         This instance must be persisted in the repository and be available to subsequent calls to this repository.
-     * @throws Exception On any error.
+     * @return An instance of {@link PartitionExecution} in accordance with the above rules.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
      */
     PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception;
 
-    // Update
-
     /**
-     * The {@link JobExecution} with {@param jobExecutionId} MUST have its batch status set to {@link BatchStatus#STARTED}
-     * after this method finishes. The start time must also be set.
+     * Any {@link JobExecution} with {@param jobExecutionId} obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to {@link #updateJobExecution(long, BatchStatus, Date)}
+     * or {@link #finishJobExecution(long, BatchStatus, String, String, Date)}:
      *
-     * @param jobExecutionId
-     * @param timestamp
-     * @throws NoSuchJobExecutionException
-     * @throws JobSecurityException
+     * {@link JobExecution#getBatchStatus()} will return {@link BatchStatus#STARTED},
+     * {@link JobExecution#getStartTime()} and {@link JobExecution#getLastUpdatedTime()} will return a {@link Date} equal
+     *     to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link JobExecution} and {@link ExtendedJobExecution} not listed will return values as defined
+     * in the javadoc for {@link #createJobExecution(ExtendedJobInstance, Properties, Date)}.
+     *
+     * @param jobExecutionId The id of the {@link ExtendedJobExecution} that will be updated.
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param jobExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
      */
-    //NoSuchJobExecutionException, JobSecurityException,
     void startJobExecution(final long jobExecutionId, final Date timestamp) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     * Any {@link JobExecution} with {@param jobExecutionId} obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to
+     * {@link #finishJobExecution(long, BatchStatus, String, String, Date)}:
+     *
+     * {@link JobExecution#getBatchStatus()} will return {@param batchStatus},
+     * {@link JobExecution#getLastUpdatedTime()} will return a {@link Date} equal to either {@param timestamp} or the
+     *     time on the repository server when this method executes.
+     *
+     * Other methods of {@link JobExecution} and {@link ExtendedJobExecution} not listed will return values as defined
+     * in the javadoc for {@link #startJobExecution(long, Date)}.
+     *
+     * @param jobExecutionId The id of the {@link ExtendedJobExecution} that will be updated.
+     * @param batchStatus The {@link BatchStatus} to update the {@link JobExecution} to.
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param jobExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
     void updateJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final Date timestamp) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     * Any {@link JobExecution} with {@param jobExecutionId} obtained from this repository after this method completes
+     * must behave as follows:
+     *
+     * {@link JobExecution#getBatchStatus()} will return {@param batchStatus},
+     * {@link JobExecution#getExitStatus()} will return {@param exitStatus},
+     * {@link ExtendedJobExecution#getRestartElementId()} will return {@param restartElementId},
+     * {@link JobExecution#getEndTime()} and {@link JobExecution#getLastUpdatedTime()} will return a {@link Date} equal
+     *     to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link JobExecution} and {@link ExtendedJobExecution} not listed will return values as defined
+     * in the javadoc for {@link #updateJobExecution(long, BatchStatus, Date)}.
+     *
+     * @param jobExecutionId The id of the {@link ExtendedJobExecution} that will be updated.
+     * @param batchStatus The {@link BatchStatus} to update the {@link JobExecution} to.
+     * @param exitStatus The exit status to update the {@link JobExecution} to.
+     * @param restartElementId An optional
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param jobExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
     void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId, final Date timestamp) throws Exception;
 
     //NoSuchJobExecutionException, JobSecurityException,
     void linkJobExecutions(final long jobExecutionId, final ExtendedJobExecution restartJobExecution) throws Exception;
 
     /**
-     * The {@link StepExecution} with {@param stepExecutionId} MUST have its batch status set to {@link BatchStatus#STARTED}
-     * after this method finishes.
+     * Any {@link StepExecution} with {@param stepExecutionId} obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to
+     * {@link #updateStepExecution(long, Metric[], Serializable, Date)} or
+     * {@link #updateStepExecution(long, Metric[], Serializable, Serializable, Serializable, Date)} or
+     * {@link #finishStepExecution(long, Metric[], BatchStatus, String, Date)}:
      *
-     * @param stepExecutionId
-     * @param timestamp
-     * @throws NoSuchJobExecutionException
-     * @throws JobSecurityException
+     * {@link StepExecution#getBatchStatus()} will return {@link BatchStatus#STARTED},
+     * {@link StepExecution#getStartTime()} and {@link ExtendedStepExecution#getUpdatedTime()} will return a {@link Date}
+     *     equal to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link StepExecution} and {@link ExtendedStepExecution} not listed will return values as defined
+     * in the javadoc for {@link #createStepExecution(JobExecution, Step, Date)}.
+     *
+     * @param stepExecutionId The id of the {@link ExtendedStepExecution} that will be updated.
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param stepExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
      */
-    //NoSuchJobExecutionException, JobSecurityException,
     void startStepExecution(final long stepExecutionId, final Date timestamp) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
-    void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Date timestamp) throws Exception;
+    /**
+     * Any {@link StepExecution} with {@param stepExecutionId} obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to
+     * {@link #finishStepExecution(long, Metric[], BatchStatus, String, Date)}:
+     *
+     * {@link StepExecution#getMetrics()} will return an array of {@link Metric}'s the same length as {@param metrics}
+     *    such each element of the returned array has values returned from {@link Metric#getType()} and {@link Metric#getValue()}
+     *    that are equal to the values of the same methods called on the {@link Metric} with the same index in {@param metrics},
+     * {@link StepExecution#getPersistentUserData()} will return a copy of {@param persistentUserData} that has been
+     *     serialized and deserialized and is not == to it,
+     * {@link ExtendedStepExecution#getUpdatedTime()} will return a {@link Date} equal
+     *     to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link StepExecution} and {@link ExtendedStepExecution} not listed will return values as defined
+     * in the javadoc for {@link #startStepExecution(long, Date)}.
+     *
+     *
+     * @param stepExecutionId The id of the {@link io.machinecode.chainlink.spi.repository.ExtendedStepExecution} that will be updated.
+     * @param metrics The final metrics of the step.
+     * @param persistentUserData
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param stepExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
+    void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
-    void updateStepExecution(final long stepExecutionId, final Serializable persistentUserData, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception;
+    /**
+     * Any {@link StepExecution} with {@param stepExecutionId} obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to
+     * {@link #finishStepExecution(long, Metric[], BatchStatus, String, Date)}:
+     *
+     * {@link StepExecution#getMetrics()} will return an array of {@link Metric}'s the same length as {@param metrics}
+     *    such each element of the returned array has values returned from {@link Metric#getType()} and {@link Metric#getValue()}
+     *    that are equal to the values of the same methods called on the {@link Metric} with the same index in {@param metrics},
+     * {@link StepExecution#getPersistentUserData()} will return a copy of {@param persistentUserData} that has been
+     *     serialized and deserialized and is not == to it,
+     * {@link ExtendedStepExecution#getReaderCheckpoint()} will return a copy of {@param readerCheckpoint} that has been
+     *     serialized and deserialized and is not == to it,
+     * {@link ExtendedStepExecution#getWriterCheckpoint()} will return a copy of {@param writerCheckpoint} that has been
+     *     serialized and deserialized and is not == to it
+     * {@link ExtendedStepExecution#getUpdatedTime()} will return a {@link Date} equal
+     *     to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link StepExecution} and {@link ExtendedStepExecution} not listed will return values as defined
+     * in the javadoc for {@link #startStepExecution(long, Date)}.
+     *
+     *
+     * @param stepExecutionId The id of the {@link io.machinecode.chainlink.spi.repository.ExtendedStepExecution} that will be updated.
+     * @param metrics The final metrics of the step.
+     * @param persistentUserData
+     * @param readerCheckpoint
+     * @param writerCheckpoint
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param stepExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
+    void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
-    void finishStepExecution(final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Metric[] metrics, final Date timestamp) throws Exception;
+    /**
+     * Any {@link StepExecution} with {@param stepExecutionId} obtained from this repository after this method completes
+     * must behave as follows:
+     *
+     * {@link StepExecution#getMetrics()} will return an array of {@link Metric}'s the same length as {@param metrics}
+     *    such each element of the returned array has values returned from {@link Metric#getType()} and {@link Metric#getValue()}
+     *    that are equal to the values of the same methods called on the {@link Metric} with the same index in {@param metrics},
+     * {@link StepExecution#getBatchStatus()} will return {@param batchStatus},
+     * {@link StepExecution#getExitStatus()} will return {@param exitStatus},
+     * {@link StepExecution#getEndTime()} and {@link ExtendedStepExecution#getUpdatedTime()} will return a {@link Date} equal
+     *     to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link StepExecution} and {@link ExtendedStepExecution} not listed will return values as defined
+     * in the javadoc for {@link #updateStepExecution(long, Metric[], Serializable, Serializable, Serializable, Date)}.
+     *
+     *
+     * @param stepExecutionId The id of the {@link io.machinecode.chainlink.spi.repository.ExtendedStepExecution} that will be updated.
+     * @param metrics The final metrics of the step.
+     * @param batchStatus The {@link BatchStatus} to update the {@link StepExecution} to.
+     * @param exitStatus The exit status to update the {@link StepExecution} to.
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param stepExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
+    void finishStepExecution(final long stepExecutionId, final Metric[] metrics, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     * Any {@link PartitionExecution} with {@param partitionExecutionId} obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to
+     * {@link #updatePartitionExecution(long, Metric[], Serializable, Serializable, Serializable, Date)} or
+     * {@link #finishPartitionExecution(long, Metric[], Serializable, BatchStatus, String, Date)}.
+     *
+     * {@link PartitionExecution#getBatchStatus()} will return {@link BatchStatus#STARTED},
+     * {@link PartitionExecution#getStartTime()} and {@link PartitionExecution#getUpdatedTime()} will return a {@link Date}
+     *     equal to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link PartitionExecution} not listed will return values as defined
+     * in the javadoc for {@link #createPartitionExecution(long, int, Properties, Date)} and
+     * {@link #createPartitionExecution(long, PartitionExecution, Date)}
+     *
+     * @param partitionExecutionId The id of the {@link PartitionExecution} that will be updated.
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param partitionExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
+    void startPartitionExecution(final long partitionExecutionId, final Date timestamp) throws Exception;
+
+    /**
+     * Any {@link PartitionExecution} with {@param partitionExecutionId} obtained from this repository after this method completes
+     * must behave as follows until this behaviour is superseded by a call to
+     * {@link #finishPartitionExecution(long, Metric[], Serializable, BatchStatus, String, Date)}.
+     *
+     * {@link PartitionExecution#getMetrics()} will return an array of {@link Metric}'s the same length as {@param metrics}
+     *    such each element of the returned array has values returned from {@link Metric#getType()} and {@link Metric#getValue()}
+     *    that are equal to the values of the same methods called on the {@link Metric} with the same index in {@param metrics},
+     * {@link PartitionExecution#getPersistentUserData()} will return a copy of {@param persistentUserData} that has been
+     *     serialized and deserialized and is not == to it,
+     * {@link PartitionExecution#getReaderCheckpoint()} will return a copy of {@param readerCheckpoint} that has been
+     *     serialized and deserialized and is not == to it,
+     * {@link PartitionExecution#getWriterCheckpoint()} will return a copy of {@param writerCheckpoint} that has been
+     *     serialized and deserialized and is not == to it
+     * {@link PartitionExecution#getUpdatedTime()} will return a {@link Date} equal
+     *     to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link PartitionExecution} not listed will return values as defined
+     * in the javadoc for {@link #startPartitionExecution(long, Date)}.
+     *
+     * @param partitionExecutionId The id of the {@link PartitionExecution} that will be updated.
+     * @param metrics The current metrics of the partition.
+     * @param persistentUserData
+     * @param readerCheckpoint
+     * @param writerCheckpoint
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param partitionExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
     void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
-    void updatePartitionExecution(final long partitionExecutionId, final Serializable persistentUserData, final BatchStatus batchStatus, final Date timestamp) throws Exception;
-
-    //NoSuchJobExecutionException, JobSecurityException,
-    void finishPartitionExecution(final long partitionExecutionId, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception;
+    /**
+     * Any {@link PartitionExecution} with {@param partitionExecutionId} obtained from this repository after this method completes
+     * must behave as follows:
+     *
+     * {@link PartitionExecution#getMetrics()} will return an array of {@link Metric}'s the same length as {@param metrics}
+     *    such each element of the returned array has values returned from {@link Metric#getType()} and {@link Metric#getValue()}
+     *    that are equal to the values of the same methods called on the {@link Metric} with the same index in {@param metrics},
+     * {@link PartitionExecution#getPersistentUserData()} will return a copy of {@param persistentUserData} that has been
+     *     serialized and deserialized and is not == to it,
+     * {@link PartitionExecution#getBatchStatus()} will return {@param batchStatus},
+     * {@link PartitionExecution#getExitStatus()} will return {@param exitStatus},
+     * {@link PartitionExecution#getEndTime()} and {@link PartitionExecution#getUpdatedTime()} will return a {@link Date} equal
+     *     to either {@param timestamp} or the time on the repository server when this method executes.
+     *
+     * Other methods of {@link PartitionExecution} not listed will return values as defined
+     * in the javadoc for {@link #updatePartitionExecution(long, Metric[], Serializable, Serializable, Serializable, Date)}.
+     *
+     * @param partitionExecutionId The id of the {@link PartitionExecution} that will be updated.
+     * @param metrics The final metrics of the partition.
+     * @param persistentUserData
+     * @param batchStatus
+     * @param exitStatus
+     * @param timestamp The current time on the JVM calling this method.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param partitionExecutionId}
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
+    void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception;
 
     // JobOperator
 

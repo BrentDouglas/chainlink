@@ -17,7 +17,7 @@ public class FluentJobTest {
 
     @Test
     public void fluentJobTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                 .setRestartable("false")
                 .setVersion("1.0")
@@ -195,7 +195,7 @@ public class FluentJobTest {
                                 )
                         )
                 ), ExpressionTest.PARAMETERS);
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         Assert.assertEquals("i1", job.getId());
     }
@@ -203,7 +203,7 @@ public class FluentJobTest {
 
     @Test
     public void defaultValuesTest() {
-        final Job job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final Job job = JobFactory.produce(Jsl.job()
                 .setId("i1")
                         //.setRestartable(false)
                         //.setVersion("1.0")
@@ -282,7 +282,7 @@ public class FluentJobTest {
                 ).addExecution(Jsl.step()
                         .setId("step2")
                 );
-        final JobImpl impl = JobFactory.INSTANCE.produceExecution(job, ExpressionTest.PARAMETERS);
-        JobFactory.INSTANCE.validate(impl);
+        final JobImpl impl = JobFactory.produce(job, ExpressionTest.PARAMETERS);
+        JobFactory.validate(impl);
     }
 }

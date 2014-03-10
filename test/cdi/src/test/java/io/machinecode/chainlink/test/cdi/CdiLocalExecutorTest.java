@@ -55,7 +55,7 @@ public class CdiLocalExecutorTest extends ExecutorTest {
     @Test
     public void unmanagedInjectedBatchletTest() throws Exception {
         printMethodName();
-        final JobImpl job = JobFactory.INSTANCE.produceExecution(Jsl.job()
+        final JobImpl job = JobFactory.produce(Jsl.job()
                 .setId("unmanaged-injected-job")
                 .addExecution(
                         Jsl.step()

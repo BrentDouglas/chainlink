@@ -23,7 +23,11 @@ public class JobFactory {
 
     public static final JobFactory INSTANCE = new JobFactory();
 
-    public JobImpl produceExecution(final Job that, final Properties parameters) throws InvalidJobException {
+    public static JobImpl produce(final Job that, final Properties parameters) throws InvalidJobException {
+        return INSTANCE.produceExecution(that, parameters);
+    }
+
+    private JobImpl produceExecution(final Job that, final Properties parameters) throws InvalidJobException {
         final VisitorNode before = JobValidator.INSTANCE.visit(that);
         if (JobValidator.hasFailed(before)) {
             throw new InvalidJobException(before);
@@ -46,7 +50,7 @@ public class JobFactory {
         );
     }
 
-    public VisitorNode validate(final Job job) {
+    public static VisitorNode validate(final Job job) {
         final VisitorNode node = JobValidator.INSTANCE.visit(job);
         boolean failed = JobValidator.findProblems(node);
         if (failed) {
@@ -55,7 +59,7 @@ public class JobFactory {
         return node;
     }
 
-    public JobImpl producePartition(final JobImpl that) {
+    private JobImpl producePartition(final JobImpl that) {
         final PropertyContextImpl context = new PropertyContextImpl();
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String version = Expression.resolvePartitionProperty(that.getVersion(), context);

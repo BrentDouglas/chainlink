@@ -354,8 +354,8 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                         repository,
                         jobExecutionId,
                         stepExecutionId,
-                        stepContext.getPersistentUserData(),
-                        stepContext.getMetrics()
+                        stepContext.getMetrics(),
+                        stepContext.getPersistentUserData()
                 );
             } catch (final Exception e) {
                 if (exception == null) {
@@ -390,9 +390,9 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     repository,
                     jobExecutionId,
                     stepExecutionId,
+                    stepContext.getMetrics(),
                     batchStatus,
-                    exitStatus,
-                    stepContext.getMetrics()
+                    exitStatus
             );
             log.debugf(Messages.get("CHAINLINK-010204.step.destroy.step.context"), context);
             context.setStepContext(null);
@@ -408,9 +408,9 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     repository,
                     jobExecutionId,
                     stepExecutionId,
+                    stepContext.getMetrics(),
                     FAILED,
-                    stepContext.getExitStatus(),
-                    stepContext.getMetrics()
+                    stepContext.getExitStatus()
             );
             log.debugf(Messages.get("CHAINLINK-010204.step.destroy.step.context"), context);
             context.setStepContext(null);

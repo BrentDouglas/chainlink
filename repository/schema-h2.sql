@@ -23,7 +23,8 @@ create table public.property(
 create table public.job_instance(
   id bigint default nextval('job_instance_id_seq') primary key not null,
   job_name varchar not null,
-  jsl_name varchar not null
+  jsl_name varchar not null,
+  create_time timestamp not null default current_timestamp
 );
 create table public.job_execution(
   id bigint default nextval('job_execution_id_seq') primary key not null,

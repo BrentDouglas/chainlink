@@ -80,7 +80,7 @@ public class DefaultInjector implements Injector {
                     }
                 }
             }
-        } while ((clazz = clazz.getSuperclass()) != Object.class); //TODO Spec doesn't say if we should or not
+        } while ((clazz = clazz.getSuperclass()) != Object.class);
         return true;
     }
 

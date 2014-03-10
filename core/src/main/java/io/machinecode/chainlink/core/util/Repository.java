@@ -36,20 +36,20 @@ public class Repository {
         repository.finishJobExecution(jobExecutionId, batchStatus, es, restartElementId, new Date());
     }
 
-    public static void finishStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId, final BatchStatus batchStatus, final String exitStatus, final Metric[] metrics) throws Exception {
+    public static void finishStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId, final Metric[] metrics, final BatchStatus batchStatus, final String exitStatus) throws Exception {
         final String es = exitStatus == null ? batchStatus.name() : exitStatus;
         log.debugf(Messages.get("CHAINLINK-017001.repository.finish.step.with"), jobExecutionId, stepExecutionId, batchStatus, es);
-        repository.finishStepExecution(stepExecutionId, batchStatus, es, metrics, new Date());
+        repository.finishStepExecution(stepExecutionId, metrics, batchStatus, es, new Date());
     }
 
-    public static void updateStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId,  final Serializable serializable, final Metric[] metrics, final Serializable readerCheckpoint, final Serializable writerCheckpoint) throws Exception {
+    public static void updateStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint) throws Exception {
         log.debugf(Messages.get("CHAINLINK-017004.repository.update.step.checkpoint"), jobExecutionId, stepExecutionId);
-        repository.updateStepExecution(stepExecutionId, serializable, metrics, readerCheckpoint, writerCheckpoint, new Date());
+        repository.updateStepExecution(stepExecutionId, metrics, persistentUserData, readerCheckpoint, writerCheckpoint, new Date());
     }
 
-    public static void updateStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId,  final Serializable serializable, final Metric[] metrics) throws Exception {
+    public static void updateStep(final ExecutionRepository repository, final long jobExecutionId, final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData) throws Exception {
         log.debugf(Messages.get("CHAINLINK-017003.repository.update.step"), jobExecutionId, stepExecutionId);
-        repository.updateStepExecution(stepExecutionId, serializable, metrics, new Date());
+        repository.updateStepExecution(stepExecutionId, metrics, persistentUserData, new Date());
     }
 
     public static void startedJob(final ExecutionRepository repository, final long jobExecutionId) throws Exception {

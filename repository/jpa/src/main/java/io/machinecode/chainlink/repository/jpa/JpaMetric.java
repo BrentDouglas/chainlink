@@ -67,6 +67,7 @@ public class JpaMetric implements MutableMetric {
         return value;
     }
 
+    @Override
     public void setValue(final long value) {
         this.value = value;
     }

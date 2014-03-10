@@ -50,4 +50,24 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/io.machinecode.chainlink.spi.configuration.ConfigurationFactory</include>
+                    <include>**/persistence.xml</include>
+                </includes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/io.machinecode.chainlink.spi.configuration.ConfigurationFactory</exclude>
+                    <exclude>**/persistence.xml</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+    </build>
 </project>

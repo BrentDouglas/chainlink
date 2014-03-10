@@ -54,6 +54,5 @@ public class StepValidator extends ValidatingVisitor<Step> {
         if (that.getProperties() != null) {
             PropertiesValidator.INSTANCE.visit(that.getProperties(), context);
         }
-        //TODO Traverse that.next for cycles
     }
 }

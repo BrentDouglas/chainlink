@@ -144,7 +144,7 @@ public class JobOperatorImpl implements JobOperator {
         log.tracef(Messages.get("CHAINLINK-001200.operator.start"), jslName);
         try {
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
-            final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, parameters);
+            final JobImpl job = JobFactory.produce(theirs, parameters);
 
             return _startJob(job, jslName, parameters).getJobExecutionId();
         } catch (final JobStartException e) {
@@ -169,10 +169,10 @@ public class JobOperatorImpl implements JobOperator {
     }
 
     private JobOperationImpl _startJob(final JobWork job, final String jslName, final Properties parameters) throws Exception {
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
 
         final ExecutionRepository repository = executor.getRepository();
-        final ExtendedJobInstance instance = repository.createJobInstance(job, jslName);
+        final ExtendedJobInstance instance = repository.createJobInstance(job, jslName, new Date());
         final ExtendedJobExecution execution = repository.createJobExecution(instance, parameters, new Date());
         final long jobExecutionId = execution.getExecutionId();
         final ExecutionContext context = new ExecutionContextImpl(
@@ -215,7 +215,7 @@ public class JobOperatorImpl implements JobOperator {
             final ExecutionRepository repository = executor.getRepository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(instance.getJslName());
-            final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, parameters);
+            final JobImpl job = JobFactory.produce(theirs, parameters);
             return _restart(job, jobExecutionId, instance, parameters).getJobExecutionId();
         } catch (final JobExecutionAlreadyCompleteException e) {
             throw e;
@@ -238,7 +238,7 @@ public class JobOperatorImpl implements JobOperator {
             final ExecutionRepository repository = executor.getRepository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(instance.getJslName());
-            final JobImpl job = JobFactory.INSTANCE.produceExecution(theirs, parameters);
+            final JobImpl job = JobFactory.produce(theirs, parameters);
             return _restart(job, jobExecutionId, instance, parameters);
         } catch (final JobExecutionAlreadyCompleteException e) {
             throw e;
@@ -257,7 +257,7 @@ public class JobOperatorImpl implements JobOperator {
 
     //JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException,
     private JobOperationImpl _restart(final JobWork job, final long jobExecutionId, final JobInstance instance, final Properties parameters) throws Exception {
-        JobFactory.INSTANCE.validate(job);
+        JobFactory.validate(job);
         final ExecutionRepository repository = executor.getRepository();
         final ExtendedJobExecution lastExecution = repository.getJobExecution(jobExecutionId);
         final ExtendedJobExecution execution = repository.restartJobExecution(jobExecutionId, parameters);

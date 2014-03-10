@@ -197,6 +197,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             if (partitionExecutionId != null) {
                 executor.getRepository().finishPartitionExecution(
                         partitionExecutionId,
+                        stepContext.getMetrics(),
                         stepContext.getPersistentUserData(),
                         BatchStatus.FAILED,
                         stepContext.getExitStatus(),
@@ -208,10 +209,8 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
         try {
             state.stepContext.setBatchStatus(BatchStatus.STARTED);
             if (partitionExecutionId != null) {
-                state.repository.updatePartitionExecution(
+                state.repository.startPartitionExecution(
                         partitionExecutionId,
-                        stepContext.getPersistentUserData(),
-                        BatchStatus.STARTED,
                         new Date()
                 );
             }
@@ -245,6 +244,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 if (partitionExecutionId != null) {
                     state.repository.finishPartitionExecution(
                             partitionExecutionId,
+                            stepContext.getMetrics(),
                             stepContext.getPersistentUserData(),
                             BatchStatus.FAILED,
                             stepContext.getExitStatus(),
@@ -305,6 +305,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 if (partitionExecutionId != null) {
                     state.repository.finishPartitionExecution(
                             partitionExecutionId,
+                            stepContext.getMetrics(),
                             stepContext.getPersistentUserData(),
                             batchStatus,
                             stepContext.getExitStatus(),
@@ -843,15 +844,16 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                         state.repository,
                         state.jobExecutionId,
                         state.stepExecutionId,
-                        state.stepContext.getPersistentUserData(),
                         state.stepContext.getMetrics(),
+                        state.stepContext.getPersistentUserData(),
                         state.readInfo,
                         state.writeInfo
                 );
             } else {
                 state.repository.updatePartitionExecution(
                         state.partitionExecutionId,
-                        state.stepContext.getMetrics(), state.stepContext.getPersistentUserData(),
+                        state.stepContext.getMetrics(),
+                        state.stepContext.getPersistentUserData(),
                         state.readInfo,
                         state.writeInfo,
                         new Date()

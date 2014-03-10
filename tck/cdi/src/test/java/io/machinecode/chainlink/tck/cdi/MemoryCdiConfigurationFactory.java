@@ -1,28 +1,28 @@
-package io.machinecode.chainlink.tck.seam;
+package io.machinecode.chainlink.tck.cdi;
 
+import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
+import io.machinecode.chainlink.inject.cdi.CdiInjector;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
-import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
-import io.machinecode.chainlink.inject.seam.SeamInjector;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
-import org.jboss.seam.contexts.ServletLifecycle;
-import org.jboss.seam.init.Initialization;
-import org.jboss.seam.mock.MockServletContext;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 
-import javax.servlet.ServletContext;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class SeamConfigurationFactory implements ConfigurationFactory {
+public class MemoryCdiConfigurationFactory implements ConfigurationFactory {
+
+    private static Weld weld;
+    private static WeldContainer container;
 
     static {
-        final ServletContext context = new MockServletContext();
-        ServletLifecycle.beginApplication(context);
-        new Initialization(context).create().init();
+        weld = new Weld();
+        container = weld.initialize();
     }
 
     @Override
@@ -31,8 +31,8 @@ public class SeamConfigurationFactory implements ConfigurationFactory {
                 .setLoader(Thread.currentThread().getContextClassLoader())
                 .setRepository(new MemoryExecutionRepository())
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
-                .setArtifactLoaders(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class))
-                .setInjectors(new SeamInjector())
+                .setArtifactLoaders(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class))
+                .setInjectors(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class))
                 .build();
     }
 }

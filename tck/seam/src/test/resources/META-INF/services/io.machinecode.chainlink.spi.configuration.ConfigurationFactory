@@ -1,1 +1,1 @@
-io.machinecode.chainlink.tck.seam.SeamConfigurationFactory
+io.machinecode.chainlink.tck.seam.${configuration.factory.type}SeamConfigurationFactory

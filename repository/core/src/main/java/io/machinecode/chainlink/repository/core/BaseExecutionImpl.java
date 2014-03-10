@@ -133,22 +133,22 @@ public abstract class BaseExecutionImpl implements BaseExecution {
             return (T)this;
         }
 
-        public T setCreated(final Date create) {
+        public T setCreatedTime(final Date create) {
             this.create = create;
             return (T)this;
         }
 
-        public T setStart(final Date start) {
+        public T setStartTime(final Date start) {
             this.start = start;
             return (T)this;
         }
 
-        public T setUpdated(final Date updated) {
+        public T setUpdatedTime(final Date updated) {
             this.updated = updated;
             return (T)this;
         }
 
-        public T setEnd(final Date end) {
+        public T setEndTime(final Date end) {
             this.end = end;
             return (T)this;
         }
