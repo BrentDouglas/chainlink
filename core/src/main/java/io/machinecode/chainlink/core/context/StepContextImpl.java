@@ -31,7 +31,7 @@ public class StepContextImpl implements MutableStepContext {
     private String exitStatus;
     private MutableMetric[] metrics;
     private transient TMap<MetricType, MutableMetric> metricMap = new THashMap<MetricType, MutableMetric>(MetricType.values().length);
-    private Object transientUserData;
+    private transient Object transientUserData;
     private Serializable persistentUserData;
     private Exception exception;
 
@@ -151,20 +151,5 @@ public class StepContextImpl implements MutableStepContext {
     @Override
     public MutableMetric getMetric(final MetricType type) {
         return this.metricMap.get(type);
-    }
-
-    @Override
-    public MutableMetric[] getMutableMetrics() {
-        return metrics; //TODO Copy instead?
-    }
-
-    @Override
-    public void setFrom(final MutableStepContext stepContext) {
-        this.batchStatus = stepContext.getBatchStatus();
-        this.exitStatus = stepContext.getExitStatus();
-        this.transientUserData = stepContext.getTransientUserData();
-        this.persistentUserData = stepContext.getPersistentUserData();
-        this.exception = stepContext.getException();
-        this.metrics = stepContext.getMutableMetrics();
     }
 }

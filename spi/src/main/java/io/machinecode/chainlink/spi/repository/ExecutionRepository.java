@@ -232,7 +232,7 @@ public interface ExecutionRepository {
     void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId, final Date timestamp) throws Exception;
 
     //NoSuchJobExecutionException, JobSecurityException,
-    void linkJobExecutions(final long jobExecutionId, final ExtendedJobExecution restartJobExecution) throws Exception;
+    void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws Exception;
 
     /**
      * Any {@link StepExecution} with {@param stepExecutionId} obtained from this repository after this method completes

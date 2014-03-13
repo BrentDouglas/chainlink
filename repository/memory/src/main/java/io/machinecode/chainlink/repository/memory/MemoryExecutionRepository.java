@@ -333,15 +333,14 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void linkJobExecutions(final long jobExecutionId, final ExtendedJobExecution restartJobExecution) throws NoSuchJobExecutionException, JobSecurityException {
-        final long restartJobExecutionId = restartJobExecution.getExecutionId();
+    public void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         final TLongSet jobExecutionIds;
         final TLongSet oldJobExecutionIds;
         while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
         try {
             oldJobExecutionIds = jobExecutionHistory.get(restartJobExecutionId);
             if (oldJobExecutionIds == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", restartJobExecution));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", restartJobExecutionId));
             }
             jobExecutionIds = jobExecutionHistory.get(jobExecutionId);
             if (jobExecutionIds == null) {

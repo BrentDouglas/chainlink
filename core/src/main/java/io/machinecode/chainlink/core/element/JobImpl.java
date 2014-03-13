@@ -8,7 +8,6 @@ import io.machinecode.chainlink.core.validation.InvalidJobException;
 import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.core.validation.JobTraversal;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
@@ -126,12 +125,12 @@ public class JobImpl implements Job, JobWork {
             return executor.callback(callback, context);
         }
 
-        final ExtendedJobExecution restartJobExecution = context.getRestartJobExecution();
-        if (restartJobExecution == null) {
+        final Long restartJobExecutionId = context.getRestartJobExecutionId();
+        if (restartJobExecutionId == null) {
             return _runNext(executor, callback, context, this.executions.get(0));
         }
-        repository.linkJobExecutions(jobExecutionId, restartJobExecution);
-        final String restartId = restartJobExecution.getRestartElementId();
+        repository.linkJobExecutions(jobExecutionId, restartJobExecutionId);
+        final String restartId = context.getRestartElementId();
         if (restartId == null) {
             return _runNext(executor, callback, context, this.executions.get(0));
         }

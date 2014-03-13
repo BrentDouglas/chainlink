@@ -19,9 +19,8 @@ public class ExecutionContextImpl implements ExecutionContext {
     private static final Logger log = Logger.getLogger(ExecutionContextImpl.class);
 
     private final JobWork job;
-    private final ExtendedJobExecution jobExecution;
-    private final ExtendedJobExecution restartJobExecution;
     private final long jobExecutionId;
+    private final Long restartJobExecutionId;
     private final Long partitionExecutionId;
     private final MutableJobContext jobContext;
     private String restartElementId;
@@ -33,25 +32,27 @@ public class ExecutionContextImpl implements ExecutionContext {
 
     private String logString;
 
-    private ExecutionContextImpl(final JobWork job, final MutableJobContext jobContext, final ExtendedJobExecution jobExecution,
-                                 final ExtendedJobExecution restartJobExecution, final Long partitionExecutionId, final Item[] items) {
+    private ExecutionContextImpl(final JobWork job, final MutableJobContext jobContext, final long jobExecutionId,
+                                 final Long restartJobExecutionId, final String restartElementId, final Long partitionExecutionId,
+                                 final Item[] items) {
         this.job = job;
-        this.jobExecution = jobExecution;
-        this.restartJobExecution = restartJobExecution;
+        this.jobExecutionId = jobExecutionId;
+        this.restartJobExecutionId = restartJobExecutionId;
+        this.restartElementId = restartElementId;
         this.partitionExecutionId = partitionExecutionId;
-        this.jobExecutionId = jobExecution.getExecutionId();
         this.jobContext = jobContext;
         this.items = items;
     }
 
     public ExecutionContextImpl(final JobWork job, final MutableJobContext jobContext, final MutableStepContext stepContext,
-                                final ExtendedJobExecution jobExecution, final ExtendedJobExecution restartJobExecution,
+                                final long jobExecutionId, final Long restartJobExecutionId, final String restartElementId,
                                 final Long partitionExecutionId) {
         this(
                 job,
                 jobContext,
-                jobExecution,
-                restartJobExecution,
+                jobExecutionId,
+                restartJobExecutionId,
+                restartElementId,
                 partitionExecutionId,
                 null
         );
@@ -83,18 +84,13 @@ public class ExecutionContextImpl implements ExecutionContext {
     }
 
     @Override
-    public ExtendedJobExecution getJobExecution() {
-        return jobExecution;
-    }
-
-    @Override
-    public ExtendedJobExecution getRestartJobExecution() {
-        return restartJobExecution;
+    public Long getRestartJobExecutionId() {
+        return restartJobExecutionId;
     }
 
     @Override
     public boolean isRestarting() {
-        return restartJobExecution != null;
+        return restartJobExecutionId != null;
     }
 
     @Override

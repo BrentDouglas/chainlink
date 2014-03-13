@@ -15,8 +15,4 @@ public interface MutableStepContext extends StepContext {
     void setBatchStatus(BatchStatus batchStatus);
 
     MutableMetric getMetric(MetricType type);
-
-    MutableMetric[] getMutableMetrics();
-
-    void setFrom(final MutableStepContext stepContext);
 }

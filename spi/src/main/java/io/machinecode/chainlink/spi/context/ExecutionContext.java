@@ -12,9 +12,7 @@ public interface ExecutionContext extends Serializable {
 
     JobWork getJob();
 
-    ExtendedJobExecution getJobExecution();
-
-    ExtendedJobExecution getRestartJobExecution();
+    Long getRestartJobExecutionId();
 
     boolean isRestarting();
 

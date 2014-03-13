@@ -59,8 +59,9 @@ public class SplitImpl extends ExecutionImpl implements Split {
                     context.getJob(),
                     new JobContextImpl(context.getJobContext()),
                     null,
-                    context.getJobExecution(),
-                    context.getRestartJobExecution(),
+                    context.getJobExecutionId(),
+                    context.getRestartJobExecutionId(),
+                    context.getRestartElementId(),
                     null
             );
             flows[i] = new ExecutionExecutable(thisCallback, flow, flowContext);

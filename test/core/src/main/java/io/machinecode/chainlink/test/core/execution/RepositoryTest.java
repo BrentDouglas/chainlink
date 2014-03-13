@@ -562,7 +562,7 @@ public abstract class RepositoryTest extends BaseTest {
 
         repository().linkJobExecutions(
                 second.getExecutionId(),
-                first
+                first.getExecutionId()
         );
         Assert.assertEquals(
                 firstS2.getStepExecutionId(),
@@ -571,7 +571,7 @@ public abstract class RepositoryTest extends BaseTest {
 
         repository().linkJobExecutions(
                 third.getExecutionId(),
-                second
+                second.getExecutionId()
         );
         Assert.assertEquals(
                 secondS2.getStepExecutionId(),

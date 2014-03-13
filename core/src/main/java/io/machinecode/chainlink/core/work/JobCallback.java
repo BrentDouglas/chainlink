@@ -29,10 +29,9 @@ public class JobCallback extends ExecutableImpl<JobWork> {
     protected Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final Executable callback,
                                     final ExecutionContext childContext) throws Throwable {
         final MutableJobContext jobContext = context.getJobContext();
-        jobContext.setFrom(childContext.getJobContext());
         final Deferred<?> deferred = new DeferredImpl<Void>();
         try {
-            work.after(executor, threadId, callback, childContext);
+            work.after(executor, threadId, callback, this.context);
             deferred.resolve(null);
             return deferred;
         } catch (final Throwable e) {

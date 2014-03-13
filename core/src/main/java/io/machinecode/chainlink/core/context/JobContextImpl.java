@@ -21,7 +21,7 @@ public class JobContextImpl implements MutableJobContext {
     private final long jobInstanceId;
     private final long jobExecutionId;
     private final Properties properties;
-    private Object transientUserData;
+    private transient Object transientUserData;
     private BatchStatus batchStatus;
     private String exitStatus;
 
@@ -93,12 +93,5 @@ public class JobContextImpl implements MutableJobContext {
     public void setExitStatus(final String exitStatus) {
         log.debugf(Messages.get("CHAINLINK-029001.job.context.exit.status"), jobExecutionId, jobName, exitStatus);
         this.exitStatus = exitStatus;
-    }
-
-    @Override
-    public void setFrom(final JobContext jobContext) {
-        this.batchStatus = jobContext.getBatchStatus();
-        this.exitStatus = jobContext.getExitStatus();
-        this.transientUserData = jobContext.getTransientUserData();
     }
 }

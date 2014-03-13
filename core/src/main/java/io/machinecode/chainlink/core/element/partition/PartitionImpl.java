@@ -124,8 +124,9 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                         context.getJob(),
                         new JobContextImpl(context.getJobContext()),
                         partitionStepContext,
-                        context.getJobExecution(),
-                        context.getRestartJobExecution(),
+                        context.getJobExecutionId(),
+                        context.getRestartJobExecutionId(),
+                        context.getRestartElementId(),
                         partitionExecution.getPartitionExecutionId()
                 );
                 final Properties props = partitionId >= properties.length ? null : properties[partitionId];
@@ -151,8 +152,9 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                         context.getJob(),
                         new JobContextImpl(context.getJobContext()),
                         new StepContextImpl(context.getStepContext()),
-                        context.getJobExecution(),
-                        context.getRestartJobExecution(),
+                        context.getJobExecutionId(),
+                        context.getRestartJobExecutionId(),
+                        context.getRestartElementId(),
                         partitionExecution.getPartitionExecutionId()
                 );
                 //if (partitions != properties.length) {

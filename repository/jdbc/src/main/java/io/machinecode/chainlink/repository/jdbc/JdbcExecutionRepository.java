@@ -74,7 +74,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void linkJobExecutions(final long jobExecutionId, final ExtendedJobExecution restartJobExecution) throws Exception {
+    public void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

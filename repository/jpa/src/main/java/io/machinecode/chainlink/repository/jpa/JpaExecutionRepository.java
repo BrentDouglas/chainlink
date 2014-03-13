@@ -317,7 +317,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void linkJobExecutions(final long jobExecutionId, final ExtendedJobExecution restartJobExecution) throws Exception {
+    public void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws Exception {
         final EntityManager em = em();
         final ExtendedTransactionManager transaction = lookup.getTransactionManager(em);
         try {
@@ -329,9 +329,9 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (jobExecution == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            final JpaJobExecution oldJobExecution = em.find(JpaJobExecution.class, restartJobExecution.getExecutionId());
+            final JpaJobExecution oldJobExecution = em.find(JpaJobExecution.class, restartJobExecutionId);
             if (oldJobExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", restartJobExecution.getExecutionId()));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", restartJobExecutionId));
             }
             jobExecution.setPreviousJobExecution(oldJobExecution);
             em.flush();

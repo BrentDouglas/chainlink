@@ -179,7 +179,8 @@ public class JobOperatorImpl implements JobOperator {
                 job,
                 new JobContextImpl(instance, execution, PropertiesConverter.convert(job.getProperties())),
                 null,
-                execution,
+                jobExecutionId,
+                null,
                 null,
                 null
         );
@@ -269,8 +270,9 @@ public class JobOperatorImpl implements JobOperator {
                 job,
                 new JobContextImpl(instance, execution, PropertiesConverter.convert(job.getProperties())),
                 null,
-                execution,
-                lastExecution,
+                execution.getExecutionId(),
+                lastExecution.getExecutionId(),
+                lastExecution.getRestartElementId(),
                 null
         );
         final Deferred<?> deferred = executor.execute(restartExecutionId, new JobExecutable(null, job, context));

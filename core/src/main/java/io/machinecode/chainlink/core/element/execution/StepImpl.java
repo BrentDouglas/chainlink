@@ -181,7 +181,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         Serializable persistentData = null;
         Long restartStepExecutionId = null;
         if (context.isRestarting()) {
-            final long restartJobExecutionId = context.getRestartJobExecution().getExecutionId();
+            final long restartJobExecutionId = context.getRestartJobExecutionId();
             try {
                 final ExtendedStepExecution restartStepExecution = repository.getLatestStepExecution(restartJobExecutionId, this.id);
                 restartStepExecutionId = restartStepExecution.getStepExecutionId();
@@ -259,8 +259,9 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     context.getJob(),
                     context.getJobContext(),
                     context.getStepContext(),
-                    context.getJobExecution(),
-                    context.getRestartJobExecution(),
+                    context.getJobExecutionId(),
+                    context.getRestartJobExecutionId(),
+                    context.getRestartElementId(),
                     null
             );
             return executor.execute(
@@ -325,9 +326,6 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     return null;
                 }
                 this.partition.reduce(stepContext.getBatchStatus() == FAILED ? ROLLBACK : this._partitionStatus, executor, context, this._transactionManager);
-            } else {
-                context.getJobContext().setFrom(childContext.getJobContext());
-                stepContext.setFrom(childContext.getStepContext());
             }
         } catch (final Throwable e) {
             log.debugf(e, Messages.get("CHAINLINK-010205.step.after.caught.exception"), context);
