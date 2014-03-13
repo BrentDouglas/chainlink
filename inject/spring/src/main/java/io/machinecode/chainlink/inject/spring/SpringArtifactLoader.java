@@ -24,7 +24,7 @@ public class SpringArtifactLoader implements ArtifactLoader, ApplicationContextA
             if (as.isAssignableFrom(that.getClass())) {
                 return as.cast(that);
             }
-            throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getCanonicalName()));
+            throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getSimpleName()));
         } catch (final Exception e) {
             log.tracef(Messages.get("CHAINLINK-025001.artifact.loader.not.found"), id, as.getSimpleName());
             return null;

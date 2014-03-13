@@ -95,7 +95,7 @@ public abstract class BatchArtifactLoader implements ArtifactLoader {
             return null;
         }
         if (!as.isAssignableFrom(that.getClass())) {
-            throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getCanonicalName()));
+            throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getSimpleName()));
         }
         return as.cast(that);
     }

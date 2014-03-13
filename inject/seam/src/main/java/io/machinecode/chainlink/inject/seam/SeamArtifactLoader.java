@@ -42,7 +42,7 @@ public class SeamArtifactLoader implements ArtifactLoader {
             if (as.isAssignableFrom(that.getClass())) {
                 return as.cast(that);
             }
-            throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getCanonicalName()));
+            throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getSimpleName()));
         } else {
             try {
                 Lifecycle.beginCall();
@@ -54,7 +54,7 @@ public class SeamArtifactLoader implements ArtifactLoader {
                 if (as.isAssignableFrom(that.getClass())) {
                     return as.cast(that);
                 }
-                throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getCanonicalName()));
+                throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getSimpleName()));
             } finally {
                 Lifecycle.endCall();
             }

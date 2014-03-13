@@ -17,6 +17,7 @@
         <module>cdi</module>
         <module>spring</module>
         <module>seam</module>
+        <module>jndi</module>
     </modules>
 
 </project>
