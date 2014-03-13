@@ -25,12 +25,17 @@ public class InjectedBatchlet extends javax.batch.api.AbstractBatchlet {
     @BatchProperty
     private String property;
 
+    @Inject
+    @BatchProperty(name = "property")
+    private String otherProperty;
+
     @Override
     public String process() throws Exception {
         hasRun.set(true);
         Assert.assertNotNull(jobContext);
         Assert.assertNotNull(stepContext);
         Assert.assertEquals("value", property);
+        Assert.assertEquals("value", otherProperty);
         return BatchStatus.COMPLETED.toString();
     }
 }

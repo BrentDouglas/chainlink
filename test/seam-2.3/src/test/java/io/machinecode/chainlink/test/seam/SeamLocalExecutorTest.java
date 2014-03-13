@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.test.seam;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
-import io.machinecode.chainlink.inject.seam.SeamInjector;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 import org.jboss.seam.contexts.Lifecycle;
@@ -24,7 +24,7 @@ public class SeamLocalExecutorTest extends ExecutorTest {
     protected Builder _configuration() {
         return super._configuration()
                 .setArtifactLoaders(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class))
-                .setInjectors(new SeamInjector());
+                .setInjectors(new VetoInjector());
     }
     @Override
     protected ExecutionRepository _repository() {

@@ -17,6 +17,7 @@
         <module>repository</module>
         <module>batch</module>
         <module>cdi</module>
+        <module>guice</module>
         <module>spring</module>
         <module>seam-2.2</module>
     </modules>

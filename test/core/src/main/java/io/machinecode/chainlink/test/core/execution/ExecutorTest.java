@@ -68,7 +68,6 @@ public abstract class ExecutorTest extends BaseTest {
         final JobOperationImpl operation = operator.startJob(job, "stop-job", PARAMETERS);
         final JobExecution execution = repository().getJobExecution(operation.getJobExecutionId());
         Thread.sleep(100);
-        Assert.assertTrue("StopBatchlet hasn't run yet", StopBatchlet.hasRun.get());
         operator.stop(operation.getJobExecutionId());
         //Assert.assertTrue("Operation hasn't been cancelled", operation.isDone()); //Some wierdness in AllDeferred's done/Cancelled
         try {

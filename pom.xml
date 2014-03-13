@@ -38,6 +38,9 @@
         <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
         <version.org.jboss.weld.se.weld-se>2.1.0.Final</version.org.jboss.weld.se.weld-se>
 
+        <!-- Guice -->
+        <version.com.google.inject.guice>3.0</version.com.google.inject.guice>
+
         <!-- Seam -->
         <version.org.jboss.seam.jboss-seam>2.2.2.Final</version.org.jboss.seam.jboss-seam>
         <version.org.jboss.seam.jboss-seam-2.3>2.3.1.Final</version.org.jboss.seam.jboss-seam-2.3>
@@ -50,7 +53,8 @@
         <version.org.springframework.spring-core>${version.org.springframework}</version.org.springframework.spring-core>
 
         <!-- Tests -->
-        <version.com.ibm.batch.com.ibm.batch-tck-spi>1.0</version.com.ibm.batch.com.ibm.batch-tck-spi>
+        <version.com.ibm.batch.com.ibm.batch-tck>1.0</version.com.ibm.batch.com.ibm.batch-tck>
+        <version.com.ibm.batch.com.ibm.batch-tck-spi>${version.com.ibm.batch.com.ibm.batch-tck}</version.com.ibm.batch.com.ibm.batch-tck-spi>
         <version.junit.junit>4.10</version.junit.junit>
         <version.org.testng.testng>6.8</version.org.testng.testng>
 
@@ -111,6 +115,11 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-inject-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-inject-guice</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -186,6 +195,13 @@
                 <version>${version.org.jboss.weld.se.weld-se}</version>
             </dependency>
 
+            <!-- Guice -->
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${version.com.google.inject.guice}</version>
+            </dependency>
+
             <!-- Seam -->
             <dependency>
                 <groupId>org.jboss.seam</groupId>
@@ -216,6 +232,11 @@
                 <groupId>com.ibm.jbatch</groupId>
                 <artifactId>com.ibm.jbatch-tck-spi</artifactId>
                 <version>${version.com.ibm.batch.com.ibm.batch-tck-spi}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ibm.jbatch</groupId>
+                <artifactId>com.ibm.jbatch-tck</artifactId>
+                <version>${version.com.ibm.batch.com.ibm.batch-tck}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>

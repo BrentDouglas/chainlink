@@ -2,12 +2,11 @@ package io.machinecode.chainlink.tck.seam;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
-import io.machinecode.chainlink.inject.seam.SeamInjector;
 import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
-import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
 import org.jboss.seam.contexts.ServletLifecycle;
@@ -42,7 +41,7 @@ public class JpaSeamConfigurationFactory implements ConfigurationFactory {
                 }, new ResourceLocalTransactionManagerLookup()))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class))
-                .setInjectors(new SeamInjector())
+                .setInjectors(new VetoInjector())
                 .build();
     }
 }

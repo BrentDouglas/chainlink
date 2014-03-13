@@ -147,6 +147,16 @@
             </modules>
         </profile>
         <profile>
+            <id>tck-guice</id>
+            <activation>
+                <property><name>tck-guice</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>guice</module>
+            </modules>
+        </profile>
+        <profile>
             <id>tck-seam</id>
             <activation>
                 <property><name>tck-seam</name></property>

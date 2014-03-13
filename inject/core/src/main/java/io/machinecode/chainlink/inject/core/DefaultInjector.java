@@ -54,7 +54,7 @@ public class DefaultInjector implements Injector {
                     final int modifiers = field.getModifiers();
                     final BatchProperty batchProperty = field.getAnnotation(BatchProperty.class);
                     if (String.class.equals(field.getType())) {
-                        final String property = _property(batchProperty.name(), field.getName(), injectables.getProperties());
+                        final String property = property(batchProperty.name(), field.getName(), injectables.getProperties());
                         if (property == null || "".equals(property)) {
                             continue;
                         }
@@ -84,7 +84,7 @@ public class DefaultInjector implements Injector {
         return true;
     }
 
-    public static String _property(final String batchProperty, final String defaultName, final List<? extends Pair<String, String>> properties) {
+    public static String property(final String batchProperty, final String defaultName, final List<? extends Pair<String, String>> properties) {
         final String name;
         if ("".equals(batchProperty)) {
             name = defaultName;
@@ -101,7 +101,7 @@ public class DefaultInjector implements Injector {
         return null;
     }
 
-    private static void set(final Field field, final Object bean, final Object value) throws IllegalAccessException {
+    public static void set(final Field field, final Object bean, final Object value) throws IllegalAccessException {
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             @Override
             public Object run() {
