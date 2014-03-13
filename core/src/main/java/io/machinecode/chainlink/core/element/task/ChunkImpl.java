@@ -170,8 +170,9 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
     private static final int PROCESS = 3;
     private static final int ADD = 4;
     private static final int WRITE = 5;
-    private static final int CHECKPOINT = 6;
-    private static final int COMMIT = 7;
+    private static final int AFTER = 6;
+    private static final int CHECKPOINT = 7;
+    private static final int COMMIT = 8;
 
     private transient volatile ExecutionContext _context;
 
@@ -271,12 +272,10 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 state.transactionManager.begin();
                 _closeReader(state);
                 _closeWriter(state);
-                //TODO Spec says to have this here
-                //_collect(state, executor, context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
-                context.setItems(state.items.toArray(new Item[state.items.size()]));
                 if (!state.isFailed()) {
                     log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), this._context);
                     state.transactionManager.commit();
+                    _collect(state, executor, context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
                 } else {
                     log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), this._context);
                     state.transactionManager.rollback();
@@ -286,6 +285,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             } catch (final Throwable e) {
                 state.setThrowable(e);
             } finally {
+                context.setItems(state.items.toArray(new Item[state.items.size()]));
                 _cleanupTx(state);
             }
         } catch (final Throwable e) {
@@ -350,17 +350,21 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 log.debugf(Messages.get("CHAINLINK-014204.chunk.state.write"), this._context);
                 _writeItem(state);
                 break;
-            case CHECKPOINT:
-                log.debugf(Messages.get("CHAINLINK-014205.chunk.state.checkpoint"), this._context);
+            case AFTER:
+                log.debugf(Messages.get("CHAINLINK-014205.chunk.state.after"), this._context);
                 // 11.8 9 m has this outside the write catch block
                 _runAfterListeners(state);
+                state.next(state.finished && state.objects.isEmpty() ? COMMIT : CHECKPOINT);
+                break;
+            case CHECKPOINT:
+                log.debugf(Messages.get("CHAINLINK-014206.chunk.state.checkpoint"), this._context);
                 if (state.isFailed()) {
                     return false;
                 }
                 exception = _checkpoint(state);
                 // Fall through
             case COMMIT:
-                log.debugf(Messages.get("CHAINLINK-014206.chunk.state.commit"), this._context);
+                log.debugf(Messages.get("CHAINLINK-014207.chunk.state.commit"), this._context);
                 _commit(state, exception);
                 if (isCancelled()) {
                     return false;
@@ -516,7 +520,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             if (read == null) {
                 log.debugf(Messages.get("CHAINLINK-014412.chunk.reader.finished"), this._context);
                 state.finished = true;
-                state.next(state.objects.isEmpty() ? CHECKPOINT : WRITE);
+                state.next(state.objects.isEmpty() ? AFTER : WRITE);
                 return;
             }
             state.stepContext.getMetric(READ_COUNT).increment();
@@ -759,7 +763,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 throw exception;
             }
             state.objects.clear();
-            state.next(CHECKPOINT);
+            state.next(AFTER);
         } catch (final Exception e) {
             log.warnf(Messages.get("CHAINLINK-014605.chunk.writer.error"), this._context, this.writer.getRef(), e.getClass().getCanonicalName());
             for (final ListenerImpl listener : state.itemWriteListeners) {
@@ -873,7 +877,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 log.debugf(Messages.get("CHAINLINK-014902.chunk.checkpoint.retry"), this._context, exception.getClass().getCanonicalName());
                 if (getNoRollbackExceptionClasses().matches(exception)) {
                     log.debugf(Messages.get("CHAINLINK-014903.chunk.checkpoint.no.rollback"), this._context, exception.getClass().getCanonicalName());
-                    state.next(CHECKPOINT);
+                    state.next(AFTER);
                     return;
                 }
                 _rollbackTransaction(state);
@@ -893,7 +897,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 log.debugf(Messages.get("CHAINLINK-014902.chunk.checkpoint.retry"), this._context, e.getClass().getCanonicalName());
                 if (getNoRollbackExceptionClasses().matches(e)) {
                     log.debugf(Messages.get("CHAINLINK-014903.chunk.checkpoint.no.rollback"), this._context, e.getClass().getCanonicalName());
-                    state.next(CHECKPOINT);
+                    state.next(AFTER);
                     return;
                 }
                 _rollbackTransaction(state);
