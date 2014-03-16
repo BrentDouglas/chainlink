@@ -11,7 +11,6 @@ import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.element.execution.Step;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -121,7 +120,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertNull(stepExecution.getReaderCheckpoint());
         Assert.assertNull(stepExecution.getWriterCheckpoint());
 
-        _testEmptyMetrics(stepExecution.getMetrics());
+        _isEmptyMetrics(stepExecution.getMetrics());
 
         final ExtendedStepExecution second = repository().createStepExecution(
                 jobExecution,
@@ -171,7 +170,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertNull(partitionExecution.getReaderCheckpoint());
         Assert.assertNull(partitionExecution.getWriterCheckpoint());
 
-        _testEmptyMetrics(partitionExecution.getMetrics());
+        _isEmptyMetrics(partitionExecution.getMetrics());
 
         final Properties params = partitionExecution.getPartitionParameters();
         Assert.assertNotNull(params);
@@ -234,7 +233,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals("reader", partitionExecution.getReaderCheckpoint());
         Assert.assertEquals("writer", partitionExecution.getWriterCheckpoint());
 
-        _testEmptyMetrics(partitionExecution.getMetrics());
+        _isEmptyMetrics(partitionExecution.getMetrics());
 
         final Properties params = partitionExecution.getPartitionParameters();
         Assert.assertNotNull(params);
@@ -440,7 +439,6 @@ public abstract class RepositoryTest extends BaseTest {
 
     //TODO This gets invalid results for getLatest if times are the same
     @Test
-    @Ignore("Fails for JPA repo, looks like a race between create and getLatest")
     public void linkJobExecutionsTest() throws Exception {
         printMethodName();
 
@@ -627,7 +625,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertNull(stepExecution.getReaderCheckpoint());
         Assert.assertNull(stepExecution.getWriterCheckpoint());
 
-        _testEmptyMetrics(stepExecution.getMetrics());
+        _isEmptyMetrics(stepExecution.getMetrics());
     }
 
     @Test
@@ -685,7 +683,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertNull(stepExecution.getReaderCheckpoint());
         Assert.assertNull(stepExecution.getWriterCheckpoint());
 
-        _testSameMetrics(metrics, stepExecution.getMetrics());
+        _isSameMetrics(metrics, stepExecution.getMetrics());
 
         for (final MutableMetric metric : metrics) {
             metric.increment();
@@ -718,7 +716,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertNull(stepExecution.getReaderCheckpoint());
         Assert.assertNull(stepExecution.getWriterCheckpoint());
 
-        _testSameMetrics(metrics, stepExecution.getMetrics());
+        _isSameMetrics(metrics, stepExecution.getMetrics());
 
         try {
             repository().updateStepExecution(
@@ -799,7 +797,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(writer, nextWriter);
         Assert.assertFalse(writer == nextWriter);
 
-        _testSameMetrics(metrics, stepExecution.getMetrics());
+        _isSameMetrics(metrics, stepExecution.getMetrics());
 
         for (final MutableMetric metric : metrics) {
             metric.increment();
@@ -841,7 +839,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(nextWriter, thirdWriter);
         Assert.assertFalse(nextWriter == thirdWriter);
 
-        _testSameMetrics(metrics, stepExecution.getMetrics());
+        _isSameMetrics(metrics, stepExecution.getMetrics());
 
         try {
             repository().updateStepExecution(
@@ -913,7 +911,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertNull(stepExecution.getReaderCheckpoint());
         Assert.assertNull(stepExecution.getWriterCheckpoint());
 
-        _testSameMetrics(metrics, stepExecution.getMetrics());
+        _isSameMetrics(metrics, stepExecution.getMetrics());
 
         try {
             repository().finishStepExecution(
@@ -974,7 +972,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertNull(partition.getReaderCheckpoint());
         Assert.assertNull(partition.getWriterCheckpoint());
 
-        _testEmptyMetrics(partition.getMetrics());
+        _isEmptyMetrics(partition.getMetrics());
 
         final Properties params = partition.getPartitionParameters();
         Assert.assertNotNull(params);
@@ -1007,7 +1005,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertNull(otherPartition.getReaderCheckpoint());
         Assert.assertNull(otherPartition.getWriterCheckpoint());
 
-        _testEmptyMetrics(otherPartition.getMetrics());
+        _isEmptyMetrics(otherPartition.getMetrics());
 
         final Properties otherParams = otherPartition.getPartitionParameters();
         Assert.assertNotNull(otherParams);
@@ -1098,7 +1096,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(writer, nextWriter);
         Assert.assertFalse(writer == nextWriter);
 
-        _testSameMetrics(metrics, partition.getMetrics());
+        _isSameMetrics(metrics, partition.getMetrics());
 
         final Properties params = partition.getPartitionParameters();
         Assert.assertNotNull(params);
@@ -1145,7 +1143,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(nextWriter, thirdWriter);
         Assert.assertFalse(nextWriter == thirdWriter);
 
-        _testSameMetrics(metrics, partition.getMetrics());
+        _isSameMetrics(metrics, partition.getMetrics());
 
 
 
@@ -1189,7 +1187,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(writer, otherNextWriter);
         Assert.assertFalse(writer == otherNextWriter);
 
-        _testSameMetrics(metrics, otherPartition.getMetrics());
+        _isSameMetrics(metrics, otherPartition.getMetrics());
 
         final Properties otherParams = otherPartition.getPartitionParameters();
         Assert.assertNotNull(otherParams);
@@ -1236,7 +1234,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(otherNextWriter, otherThirdWriter);
         Assert.assertFalse(otherNextWriter == otherThirdWriter);
 
-        _testSameMetrics(metrics, otherPartition.getMetrics());
+        _isSameMetrics(metrics, otherPartition.getMetrics());
 
         try {
             repository().updatePartitionExecution(
@@ -1320,7 +1318,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(persist, nextPersist);
         Assert.assertFalse(persist == nextPersist);
 
-        _testSameMetrics(metrics, partition.getMetrics());
+        _isSameMetrics(metrics, partition.getMetrics());
 
         final Properties params = partition.getPartitionParameters();
         Assert.assertNotNull(params);
@@ -1370,7 +1368,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(nextPersist, thirdPersist);
         Assert.assertFalse(nextPersist == thirdPersist);
 
-        _testSameMetrics(metrics, partition.getMetrics());
+        _isSameMetrics(metrics, partition.getMetrics());
 
 
 
@@ -1408,7 +1406,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(persist, otherNextPersist);
         Assert.assertFalse(persist == otherNextPersist);
 
-        _testSameMetrics(metrics, otherPartition.getMetrics());
+        _isSameMetrics(metrics, otherPartition.getMetrics());
 
         final Properties otherParams = otherPartition.getPartitionParameters();
         Assert.assertNotNull(otherParams);
@@ -1457,7 +1455,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(otherNextPersist, otherThirdPersist);
         Assert.assertFalse(otherNextPersist == otherThirdPersist);
 
-        _testSameMetrics(metrics, otherPartition.getMetrics());
+        _isSameMetrics(metrics, otherPartition.getMetrics());
 
 
         try {
@@ -1600,7 +1598,7 @@ public abstract class RepositoryTest extends BaseTest {
         //TODO
     }
 
-    private void _testEmptyMetrics(final Metric[] metrics) {
+    private void _isEmptyMetrics(final Metric[] metrics) {
         Assert.assertNotNull(metrics);
         Assert.assertEquals(8, metrics.length);
         int seen = 0;
@@ -1646,7 +1644,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(98, seen);
     }
 
-    private void _testCopyMetrics(final Metric[] copy) {
+    private void _isCopyMetrics(final Metric[] copy) {
         printMethodName();
 
         Assert.assertNotNull(copy);
@@ -1694,7 +1692,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(98, seen);
     }
 
-    private void _testSameMetrics(final Metric[] source, final Metric[] target) {
+    private void _isSameMetrics(final Metric[] source, final Metric[] target) {
         printMethodName();
 
         Assert.assertNotNull(source);

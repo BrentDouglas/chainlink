@@ -11,8 +11,11 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
+import org.junit.BeforeClass;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.util.concurrent.TimeUnit;
 
@@ -23,12 +26,28 @@ public class JpaCdiConfigurationFactory implements ConfigurationFactory {
 
     private static Weld weld;
     private static WeldContainer container;
+    private static EntityManagerFactory factory;
 
     static {
         weld = new Weld();
         container = weld.initialize();
+        factory = Persistence.createEntityManagerFactory("TestPU");
+        final EntityManager em = factory.createEntityManager();
+        final EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            em.createQuery("delete from JpaJobInstance").executeUpdate();
+            em.createQuery("delete from JpaJobExecution").executeUpdate();
+            em.createQuery("delete from JpaStepExecution").executeUpdate();
+            em.createQuery("delete from JpaMetric").executeUpdate();
+            em.createQuery("delete from JpaProperty").executeUpdate();
+            em.flush();
+            transaction.commit();
+        } catch (final Exception e) {
+            transaction.rollback();
+            throw new RuntimeException(e);
+        }
     }
-
 
     @Override
     public Configuration produce() throws Exception {
@@ -37,7 +56,7 @@ public class JpaCdiConfigurationFactory implements ConfigurationFactory {
                 .setRepository(new JpaExecutionRepository(new EntityManagerLookup() {
                     @Override
                     public EntityManagerFactory getEntityManagerFactory() {
-                        return Persistence.createEntityManagerFactory("TestPU");
+                        return factory;
                     }
                 }, new ResourceLocalTransactionManagerLookup()))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))

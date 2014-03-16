@@ -29,7 +29,6 @@ create table public.job_instance(
 create table public.job_execution(
   id bigint default nextval('job_execution_id_seq') primary key not null,
   job_instance_id int not null references public.job_instance(id) on delete cascade,
-  previous_job_execution_id int references public.job_execution(id) on delete set null,
   job_name varchar not null,
   batch_status varchar not null,
   exit_status varchar,
@@ -38,6 +37,11 @@ create table public.job_execution(
   updated_time timestamp,
   end_time timestamp,
   restart_element_id varchar
+);
+create table public.job_execution_history(
+  id bigint default nextval('job_execution_id_seq'::regclass) primary key not null,
+  job_execution_id int not null references public.job_execution(id) on delete cascade,
+  previous_job_execution_id int references public.job_execution(id) on delete cascade
 );
 create table public.job_execution_property(
   id bigint default nextval('job_execution_property_id_seq') primary key not null,

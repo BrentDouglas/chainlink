@@ -217,7 +217,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                 jobContext.setBatchStatus(FAILED);
                 return executor.callback(parentCallback, context);
             } else {
-                log.infof(Messages.get("CHAINLINK-010214.step.start.limit"), context, this.id, startCount, startLimit);
+                log.debugf(Messages.get("CHAINLINK-010214.step.start.limit"), context, this.id, startCount, startLimit);
             }
         }
         stepExecution = repository.createStepExecution(jobExecution, this, new Date());

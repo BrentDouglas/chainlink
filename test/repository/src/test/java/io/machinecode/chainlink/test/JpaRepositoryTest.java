@@ -48,6 +48,8 @@ public class JpaRepositoryTest extends RepositoryTest {
         try {
             transaction.begin();
             em.createQuery("delete from JpaJobInstance").executeUpdate();
+            em.createQuery("delete from JpaJobExecution").executeUpdate();
+            em.createQuery("delete from JpaStepExecution").executeUpdate();
             em.createQuery("delete from JpaMetric").executeUpdate();
             em.createQuery("delete from JpaProperty").executeUpdate();
             em.flush();

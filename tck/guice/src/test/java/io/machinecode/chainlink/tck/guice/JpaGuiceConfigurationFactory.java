@@ -1,7 +1,5 @@
 package io.machinecode.chainlink.tck.guice;
 
-import com.google.inject.Binder;
-import com.google.inject.name.Names;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.inject.core.VetoInjector;
@@ -13,6 +11,7 @@ import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import org.junit.BeforeClass;
 
 import javax.batch.api.Batchlet;
 import javax.batch.api.Decider;
@@ -36,7 +35,9 @@ import javax.batch.api.partition.PartitionAnalyzer;
 import javax.batch.api.partition.PartitionCollector;
 import javax.batch.api.partition.PartitionMapper;
 import javax.batch.api.partition.PartitionReducer;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class JpaGuiceConfigurationFactory implements ConfigurationFactory {
 
+    private static EntityManagerFactory factory;
+
+    static {
+        factory = Persistence.createEntityManagerFactory("TestPU");
+        final EntityManager em = factory.createEntityManager();
+        final EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            em.createQuery("delete from JpaJobInstance").executeUpdate();
+            em.createQuery("delete from JpaJobExecution").executeUpdate();
+            em.createQuery("delete from JpaStepExecution").executeUpdate();
+            em.createQuery("delete from JpaMetric").executeUpdate();
+            em.createQuery("delete from JpaProperty").executeUpdate();
+            em.flush();
+            transaction.commit();
+        } catch (final Exception e) {
+            transaction.rollback();
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public Configuration produce() throws Exception {
         return new Builder()
@@ -54,7 +76,7 @@ public class JpaGuiceConfigurationFactory implements ConfigurationFactory {
                 .setRepository(new JpaExecutionRepository(new EntityManagerLookup() {
                     @Override
                     public EntityManagerFactory getEntityManagerFactory() {
-                        return Persistence.createEntityManagerFactory("TestPU");
+                        return factory;
                     }
                 }, new ResourceLocalTransactionManagerLookup()))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))

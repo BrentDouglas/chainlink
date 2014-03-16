@@ -25,13 +25,13 @@ import java.util.List;
 @Table(name = "job_instance", schema = "public")
 @NamedQueries({
         @NamedQuery(name = "JpaJobInstance.countWithJobName", query = "select count(i) from JpaJobInstance i where i in (select distinct j from JpaJobInstance j where j.jobName=:jobName)"),
-        @NamedQuery(name = "JpaJobInstance.jobNames", query = "select distinct j.jobName from JpaJobInstance j")
+        @NamedQuery(name = "JpaJobInstance.jobNames", query = "select distinct j.jobName from JpaJobInstance j order by j.jobName asc")
 })
 public class JpaJobInstance implements ExtendedJobInstance {
     private long id;
     private String jobName;
     private String jslName;
-    private Date created;
+    private Date createTime;
     private List<JpaJobExecution> jobExecutions;
 
     public JpaJobInstance() {
@@ -40,7 +40,7 @@ public class JpaJobInstance implements ExtendedJobInstance {
     public JpaJobInstance(final JpaJobInstance builder) {
         this.jobName = builder.jobName;
         this.jslName = builder.jslName;
-        this.created = builder.created;
+        this.createTime = builder.createTime;
         this.jobExecutions = builder.jobExecutions;
     }
 
@@ -83,16 +83,16 @@ public class JpaJobInstance implements ExtendedJobInstance {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time", length = 29)
     public Date getCreateTime() {
-        return created;
+        return createTime;
     }
 
-    public JpaJobInstance setCreateTime(final Date created) {
-        this.created = created;
+    public JpaJobInstance setCreateTime(final Date createTime) {
+        this.createTime = createTime;
         return this;
     }
 
     @OneToMany(mappedBy = "jobInstance", cascade = {CascadeType.ALL})
-    @OrderBy("startDate desc")
+    @OrderBy("createTime desc")
     public List<JpaJobExecution> getJobExecutions() {
         return jobExecutions;
     }

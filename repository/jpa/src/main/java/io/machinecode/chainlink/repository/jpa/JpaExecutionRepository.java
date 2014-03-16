@@ -25,12 +25,13 @@ import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -333,7 +334,19 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (oldJobExecution == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", restartJobExecutionId));
             }
-            jobExecution.setPreviousJobExecution(oldJobExecution);
+            final List<JpaJobExecution> previous = em.createNamedQuery("JpaJobExecution.previous", JpaJobExecution.class)
+                    .setParameter("jobExecutionId", restartJobExecutionId)
+                    .getResultList();
+            em.persist(new JpaJobExecutionHistory()
+                    .setJobExecution(jobExecution)
+                    .setPreviousJobExecution(oldJobExecution)
+            );
+            for (final JpaJobExecution execution : previous) {
+                em.persist(new JpaJobExecutionHistory()
+                        .setJobExecution(jobExecution)
+                        .setPreviousJobExecution(execution)
+                );
+            }
             em.flush();
             transaction.commit();
         } catch (final Exception e) {
@@ -586,11 +599,11 @@ public class JpaExecutionRepository implements ExecutionRepository {
             final long count = em.createNamedQuery("JpaJobInstance.countWithJobName", Long.class)
                     .setParameter("jobName", jobName)
                     .getSingleResult();
+            if (count == 0) {
+                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+            }
             transaction.commit();
             return (int)count;
-        } catch (final NoResultException e) {
-            transaction.rollback();
-            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName), e);
         } catch (final Exception e) {
             transaction.rollback();
             throw e;
@@ -611,16 +624,26 @@ public class JpaExecutionRepository implements ExecutionRepository {
                 em.joinTransaction();
             }
             final List<JpaJobInstance> instances = em.createNamedQuery("JpaJobExecution.withJobName", JpaJobInstance.class)
+                    .setFirstResult(start)
+                    .setMaxResults(count)
                     .setParameter("jobName", jobName)
                     .getResultList();
-            final List<JobInstance> copy = new ArrayList<JobInstance>(instances.size());
+            final int size = instances.size();
+            if (size == 0) {
+                if (em.createNamedQuery("JpaJobInstance.countWithJobName", Long.class)
+                        .setParameter("jobName", jobName)
+                        .getSingleResult() == 0) {
+                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                }
+                transaction.commit();
+                return Collections.emptyList();
+            }
+            final List<JobInstance> copy = new ArrayList<JobInstance>(size);
             for (final JpaJobInstance instance : instances) {
                 copy.add(new JobInstanceImpl(instance));
             }
             transaction.commit();
             return copy;
-        } catch (final NoResultException e) {
-            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName), e);
         } catch (final Exception e) {
             transaction.rollback();
             throw e;
@@ -640,7 +663,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            final List<Long> names = em.createNamedQuery("JpaJobExecution.jobInstanceIdsWithJobName", Long.class)
+            final List<Long> names = em.createNamedQuery("JpaJobExecution.jobExecutionIdsWithJobName", Long.class)
                     .setParameter("jobName", jobName)
                     .getResultList();
             if (names.isEmpty()) {
@@ -800,16 +823,17 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (jobExecution == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            final long instanceId = jobExecution.getJobInstance().getInstanceId();
-            final List<JpaJobExecution> jobExecutions = em.createNamedQuery("JpaJobExecution.byStartDate", JpaJobExecution.class)
+            final long jobInstanceId = jobExecution.getJobInstance().getInstanceId();
+            final List<JpaJobExecution> jobExecutions = em.createNamedQuery("JpaJobExecution.byCreateDate", JpaJobExecution.class)
+                    .setParameter("jobInstanceId", jobInstanceId)
                     .setMaxResults(1)
                     .getResultList();
             if (jobExecutions.isEmpty()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             final JpaJobExecution latest = jobExecutions.get(0);
-            if (jobExecutionId == latest.getExecutionId()) {
-                throw new JobExecutionNotMostRecentException(Messages.format("CHAINLINK-006004.repository.not.most.recent.execution", jobExecutionId, instanceId));
+            if (jobExecutionId != latest.getExecutionId()) {
+                throw new JobExecutionNotMostRecentException(Messages.format("CHAINLINK-006004.repository.not.most.recent.execution", jobExecutionId, jobInstanceId));
             }
             switch (jobExecution.getBatchStatus()) {
                 case STOPPED:
@@ -822,7 +846,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
             }
             final ExtendedJobExecution that = _createJobExecution(
                     em,
-                    getJobInstance(instanceId),
+                    getJobInstance(jobInstanceId),
                     parameters,
                     new Date()
             );
@@ -899,42 +923,15 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            final JpaJobExecution jobExecution = em.find(JpaJobExecution.class, jobExecutionId);
-            if (jobExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
-            }
-            Date currentStepExecutionCreateTime = null;
-            final List<JpaStepExecution> candidates = new ArrayList<JpaStepExecution>();
-            JpaJobExecution next = jobExecution;
-            do {
-                for (final JpaStepExecution that : next.getStepExecutions()) {
-                    if (stepExecutionId == that.getStepExecutionId()) {
-                        currentStepExecutionCreateTime = that.getCreateTime();
-                        continue;
-                    }
-                    candidates.add(that);
-                }
-                next = next.getPreviousJobExecution();
-            } while (next != null);
-
-            JpaStepExecution latest = null;
-            for (final JpaStepExecution candidate : candidates) {
-                final Date candidateTime = candidate.getCreateTime();
-                if (currentStepExecutionCreateTime.before(candidateTime)) {
-                    continue;
-                }
-                if (latest == null) {
-                    latest = candidate;
-                    continue;
-                }
-                if (candidateTime.after(latest.getCreateTime())) {
-                    latest = candidate;
-                }
-            }
-            if (latest == null) {
+            final List<JpaStepExecution> stepExecutions = em.createNamedQuery("JpaStepExecution.previous", JpaStepExecution.class)
+                    .setMaxResults(1)
+                    .setParameter("jobExecutionId", jobExecutionId)
+                    .setParameter("stepExecutionId", stepExecutionId)
+                    .getResultList();
+            if (stepExecutions.isEmpty()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
             }
-            final StepExecutionImpl copy = new StepExecutionImpl(latest);
+            final StepExecutionImpl copy = new StepExecutionImpl(stepExecutions.get(0));
             transaction.commit();
             return copy;
         } catch (final Exception e) {
@@ -947,7 +944,6 @@ public class JpaExecutionRepository implements ExecutionRepository {
         }
     }
 
-    //TOD
     @Override
     public StepExecutionImpl getLatestStepExecution(final long jobExecutionId, final String stepName) throws Exception {
         final EntityManager em = em();
@@ -957,31 +953,15 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            final JpaJobExecution jobExecution = em.find(JpaJobExecution.class, jobExecutionId);
-            if (jobExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
-            }
-            final List<JpaStepExecution> candidates = new ArrayList<JpaStepExecution>();
-            JpaJobExecution next = jobExecution;
-            do {
-                candidates.addAll(next.getStepExecutions());
-                next = next.getPreviousJobExecution();
-            } while (next != null);
-
-            JpaStepExecution latest = null;
-            for (final JpaStepExecution candidate : candidates) {
-                if (latest == null) {
-                    latest = candidate;
-                    continue;
-                }
-                if (candidate.getCreateTime().after(latest.getCreateTime())) {
-                    latest = candidate;
-                }
-            }
-            if (latest == null) {
+            final List<JpaStepExecution> stepExecutions = em.createNamedQuery("JpaStepExecution.latest", JpaStepExecution.class)
+                    .setMaxResults(1)
+                    .setParameter("jobExecutionId", jobExecutionId)
+                    .setParameter("stepName", stepName)
+                    .getResultList();
+            if (stepExecutions.isEmpty()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
             }
-            final StepExecutionImpl copy = new StepExecutionImpl(latest);
+            final StepExecutionImpl copy = new StepExecutionImpl(stepExecutions.get(0));
             transaction.commit();
             return copy;
         } catch (final Exception e) {
@@ -1004,10 +984,9 @@ public class JpaExecutionRepository implements ExecutionRepository {
                 em.joinTransaction();
             }
             final List<JpaStepExecution> stepExecutions = em.createNamedQuery("JpaStepExecution.withJobExecutionIdAndStepName", JpaStepExecution.class)
+                    .setParameter("jobExecutionId", jobExecutionId)
+                    .setParameter("stepName", stepName)
                     .getResultList();
-            if (stepExecutions.isEmpty()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
-            }
             final int count = stepExecutions.size();
             transaction.commit();
             return count;
@@ -1060,11 +1039,13 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            final JpaStepExecution stepExecution = em.find(JpaStepExecution.class, stepExecutionId);
-            if (stepExecution == null) {
+            final List<JpaPartitionExecution> partitionExecutions = em.createNamedQuery("JpaPartitionExecution.unfinishedForStepExecutionId", JpaPartitionExecution.class)
+                    .setParameter("stepExecutionId", stepExecutionId)
+                    .getResultList();
+            if (partitionExecutions.isEmpty()) { //TODO Really?
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
-            final PartitionExecutionImpl[] copy = PartitionExecutionImpl.copy(stepExecution.getPartitionExecutions());
+            final PartitionExecutionImpl[] copy = PartitionExecutionImpl.copy(partitionExecutions);
             transaction.commit();
             return copy;
         } catch (final Exception e) {

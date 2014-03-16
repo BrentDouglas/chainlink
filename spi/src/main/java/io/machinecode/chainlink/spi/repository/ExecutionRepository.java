@@ -4,7 +4,9 @@ import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.execution.Step;
 
 import javax.batch.operations.JobSecurityException;
+import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
+import javax.batch.operations.NoSuchJobInstanceException;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
@@ -231,7 +233,30 @@ public interface ExecutionRepository {
      */
     void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId, final Date timestamp) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     * Any {@link StepExecution} obtained from calls to {@link #getPreviousStepExecution(long, long, String)},
+     * {@link #getStepExecutionCount(long, String)} and {@link #getLatestStepExecution(long, String)} (hereafter referred
+     * to as the search method) with jobExecutionId's equal to {@param jobExecutionId} will obey the following semantics
+     * once this method has executed:
+     *
+     * The set of {@link StepExecution}'s to search will not only include {@link StepExecution}'s identified by {@param jobExecutionId}
+     * according to the procedure documented on the relevant search method, but will also add to that set to be searched
+     * any {@link StepExecution}'s identified by {@param restartStepExecutionId}.
+     *
+     * Should this method have been called prior to the invocation of the search method with {@param restartJobExecutionId}
+     * as the first parameter, the set of {@link StepExecution}'s will be expanded as described in the above paragraph.
+     *
+     * Essentially, each {@link JobExecution} may have one prior {@link JobExecution} and once linked the search set for
+     * the search method's are expanded to encompass not only the previous {@link JobExecution} but any of it's previous
+     * {@link JobExecution}'s.
+     *
+     * @param jobExecutionId The id of the later {@link ExtendedJobExecution}.
+     * @param restartJobExecutionId The id of the earlier {@link ExtendedJobExecution}.
+     * @throws NoSuchJobExecutionException If this repository does not contain a resource identified by {@param jobExecutionId}
+     *         or {@param restartJobExecutionId}.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
     void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws Exception;
 
     /**
@@ -426,42 +451,133 @@ public interface ExecutionRepository {
      */
     void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception;
 
-    // JobOperator
-
-    //JobSecurityException,
+    /**
+     * @return A set of distinct job names that would be obtainable by calling either {@link JobInstance#getJobName()}
+     * or {@link JobExecution#getJobName()} from any of the {@link JobInstance}'s or {@link JobExecution}'s stored in this
+     * repository.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
     Set<String> getJobNames() throws Exception;
 
-    //NoSuchJobException, JobSecurityException,
+    /**
+     * @param jobName The id of the {@link Job} to search for instances of.
+     * @return The number of {@link JobInstance}'s that would return {@param jobName}
+     * from {@link JobInstance#getJobName()}.
+     * @throws NoSuchJobException If this repository does not contain any {@link JobInstance}'s that would return {@param jobName}
+     * from {@link JobInstance#getJobName()}.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
     int getJobInstanceCount(final String jobName) throws Exception;
 
-    //NoSuchJobException, JobSecurityException,
+    /**
+     *
+     * @param jobName The id of the {@link Job} to search for instances of.
+     * @param start
+     * @param count
+     * @return
+     * @throws NoSuchJobException If this repository does not contain any {@link JobInstance}'s that would return {@param jobName}
+     * from {@link JobInstance#getJobName()}.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
     List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws Exception;
 
-    //NoSuchJobException, JobSecurityException,
+    /**
+     *
+     * @param jobName
+     * @return
+     * @throws NoSuchJobException If this repository does not contain any {@link JobExecution}'s that would return {@param jobName}
+     * from {@link JobExecution#getJobName()}.
+     * @throws JobSecurityException TODO
+     * @throws Exception When an error occurs.
+     */
     List<Long> getRunningExecutions(final String jobName) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param jobExecutionId
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     Properties getParameters(final long jobExecutionId) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param jobInstanceId
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     ExtendedJobInstance getJobInstance(final long jobInstanceId) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param jobExecutionId
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     ExtendedJobInstance getJobInstanceForExecution(final long jobExecutionId) throws Exception;
 
-    //NoSuchJobInstanceException, JobSecurityException,
+    /**
+     *
+     * @param instance
+     * @return
+     * @throws NoSuchJobInstanceException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     List<? extends JobExecution> getJobExecutions(final JobInstance instance) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param jobExecutionId
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     ExtendedJobExecution getJobExecution(final long jobExecutionId) throws Exception;
 
     //JobRestartException, NoSuchJobExecutionException, NoSuchJobInstanceException, JobExecutionNotMostRecentException, JobSecurityException,
+
+    /**
+     *
+     * @param jobExecutionId
+     * @param parameters
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws Exception;
 
     //NoSuchJobExecutionException, JobSecurityException,
+
+    /**
+     *
+     * @param jobExecutionId
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     List<? extends StepExecution> getStepExecutionsForJob(final long jobExecutionId) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param stepExecutionId
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     ExtendedStepExecution getStepExecution(final long stepExecutionId) throws Exception;
 
     /**
@@ -472,22 +588,59 @@ public interface ExecutionRepository {
      * @return The latest step execution before the one currently running.
      * @throws NoSuchJobExecutionException
      * @throws JobSecurityException
+     * @throws Exception
      */
-    //NoSuchJobExecutionException, JobSecurityException,
     ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param jobExecutionId
+     * @param stepName
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param jobExecutionId
+     * @param stepName
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     int getStepExecutionCount(final long jobExecutionId, final String stepName) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param stepExecutionIds
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     StepExecution[] getStepExecutions(final long[] stepExecutionIds) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param stepExecutionId
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws Exception;
 
-    //NoSuchJobExecutionException, JobSecurityException,
+    /**
+     *
+     * @param partitionExecutionId
+     * @return
+     * @throws NoSuchJobExecutionException
+     * @throws JobSecurityException TODO
+     * @throws Exception
+     */
     PartitionExecution getPartitionExecution(final long partitionExecutionId) throws Exception;
 }

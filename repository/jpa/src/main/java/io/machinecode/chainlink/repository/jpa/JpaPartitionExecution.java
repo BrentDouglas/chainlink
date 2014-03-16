@@ -20,6 +20,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyEnumerated;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -37,6 +39,9 @@ import java.util.Properties;
  */
 @Entity
 @Table(name = "partition_execution", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "JpaPartitionExecution.unfinishedForStepExecutionId", query = "select p from JpaPartitionExecution p where p.stepExecution.id=:stepExecutionId and p.batchStatus in (javax.batch.runtime.BatchStatus.FAILED, javax.batch.runtime.BatchStatus.STOPPED, javax.batch.runtime.BatchStatus.STOPPING, javax.batch.runtime.BatchStatus.STARTED, javax.batch.runtime.BatchStatus.STARTING)")
+})
 public class JpaPartitionExecution implements PartitionExecution {
     private long id;
     private JpaStepExecution stepExecution;

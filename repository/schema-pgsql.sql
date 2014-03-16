@@ -39,6 +39,11 @@ create table public.job_execution(
   end_time timestamp,
   restart_element_id text
 );
+create table public.job_execution_history(
+  id bigint default nextval('job_execution_id_seq'::regclass) primary key not null,
+  job_execution_id int not null references public.job_execution(id) on delete cascade,
+  previous_job_execution_id int references public.job_execution(id) on delete cascade
+);
 create table public.job_execution_property(
   id bigint default nextval('job_execution_property_id_seq'::regclass) primary key not null,
   job_execution_id int not null references public.job_execution(id) on delete cascade,

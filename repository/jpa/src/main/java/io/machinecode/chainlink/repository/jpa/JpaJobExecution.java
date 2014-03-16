@@ -35,9 +35,10 @@ import java.util.Properties;
 @Entity
 @Table(name = "job_execution", schema = "public")
 @NamedQueries({
-        @NamedQuery(name = "JpaJobExecution.byStartDate", query = "select e from JpaJobExecution e order by e.startTime"),
-        @NamedQuery(name = "JpaJobExecution.jobInstanceIdsWithJobName", query = "select distinct j.jobInstance.id from JpaJobExecution j where j.jobName=:jobName"),
-        @NamedQuery(name = "JpaJobExecution.withJobName", query = "select j from JpaJobInstance j where j.jobName=:jobName")
+        @NamedQuery(name = "JpaJobExecution.byCreateDate", query = "select j from JpaJobExecution j where j.jobInstance.id=:jobInstanceId order by j.createTime desc"),
+        @NamedQuery(name = "JpaJobExecution.jobExecutionIdsWithJobName", query = "select j.id from JpaJobExecution j where j.jobName=:jobName order by j.createTime desc"),
+        @NamedQuery(name = "JpaJobExecution.withJobName", query = "select j from JpaJobInstance j where j.jobName=:jobName order by j.createTime asc"),
+        @NamedQuery(name = "JpaJobExecution.previous", query = "select h.previousJobExecution from JpaJobExecutionHistory h where h.jobExecution.id=:jobExecutionId")
 })
 public class JpaJobExecution implements ExtendedJobExecution {
     private long id;
@@ -50,7 +51,6 @@ public class JpaJobExecution implements ExtendedJobExecution {
     private Date createTime;
     private Date updatedTime;
     private String restartElementId;
-    private JpaJobExecution previousJobExecution;
     private List<JpaProperty> parameters;
     private List<JpaStepExecution> stepExecutions;
 
@@ -67,7 +67,6 @@ public class JpaJobExecution implements ExtendedJobExecution {
         this.updatedTime = builder.updatedTime;
         this.parameters = JpaProperty.copy(builder.parameters);
         this.restartElementId = builder.restartElementId;
-        this.previousJobExecution = builder.previousJobExecution;
         this.jobInstance = builder.jobInstance;
         this.stepExecutions = builder.stepExecutions;
     }
@@ -216,16 +215,6 @@ public class JpaJobExecution implements ExtendedJobExecution {
     public JpaJobExecution setRestartElementId(final String restartElementId) {
         this.restartElementId = restartElementId;
         return this;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "previous_job_execution_id")
-    public JpaJobExecution getPreviousJobExecution() {
-        return previousJobExecution;
-    }
-
-    public void setPreviousJobExecution(final JpaJobExecution previousJobExecution) {
-        this.previousJobExecution = previousJobExecution;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
