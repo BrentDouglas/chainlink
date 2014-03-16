@@ -11,17 +11,6 @@
 
     <artifactId>chainlink-inject-seam</artifactId>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jboss.seam</groupId>
-                <artifactId>jboss-seam</artifactId>
-                <type>ejb</type>
-                <version>${version.org.jboss.seam.jboss-seam}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>

@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.inject.cdi;
 
+import io.machinecode.chainlink.inject.core.DefaultInjector;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.util.Messages;
@@ -54,7 +55,7 @@ public class CdiInjector implements Injector {
     public String getBatchProperty(final InjectionPoint injectionPoint) {
         final BatchProperty batchProperty = injectionPoint.getAnnotated().getAnnotation(BatchProperty.class);
         final Member field = injectionPoint.getMember();
-        final String property = _property(batchProperty.name(), field.getName(), provider.getInjectables().getProperties());
+        final String property = DefaultInjector.property(batchProperty.name(), field.getName(), provider.getInjectables().getProperties());
         if (property == null || "".equals(property)) {
             return null;
         }
@@ -73,22 +74,5 @@ public class CdiInjector implements Injector {
     @Default
     public StepContext getStepContext() {
         return provider.getInjectables().getStepContext();
-    }
-
-    public static String _property(final String batchProperty, final String defaultName, final List<? extends Pair<String, String>> properties) {
-        final String name;
-        if (BatchPropertyLiteral.DEFAULT_NAME.equals(batchProperty)) {
-            name = defaultName;
-        } else {
-            name = batchProperty;
-        }
-        final ListIterator<? extends Pair<String, String>> iterator = properties.listIterator(properties.size());
-        while (iterator.hasPrevious()) {
-            final Pair<String, String> pair = iterator.previous();
-            if (name.equals(pair.getName())) {
-                return pair.getValue();
-            }
-        }
-        return null;
     }
 }
