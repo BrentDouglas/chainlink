@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -156,7 +155,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Date timestamp) throws Exception {
+    public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
         final EntityManager em = em();
         final ExtendedTransactionManager transaction = lookup.getTransactionManager(em);
         try {
@@ -175,48 +174,10 @@ public class JpaExecutionRepository implements ExecutionRepository {
                     .setCreateTime(timestamp)
                     .setUpdatedTime(timestamp)
                     .setMetricsMap(JpaMetric.empty())
+                    .setPersistentUserData(persistentUserData)
+                    .setReaderCheckpoint(readerCheckpoint)
+                    .setWriterCheckpoint(writerCheckpoint)
                     .setBatchStatus(BatchStatus.STARTING);
-            em.persist(execution);
-            em.flush();
-            final PartitionExecutionImpl copy = new PartitionExecutionImpl(execution);
-            transaction.commit();
-            return copy;
-        } catch (final Exception e) {
-            transaction.rollback();
-            throw e;
-        } finally {
-            if (transaction.isResourceLocal()) {
-                em.close();
-            }
-        }
-    }
-
-    @Override
-    public PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception {
-        final EntityManager em = em();
-        final ExtendedTransactionManager transaction = lookup.getTransactionManager(em);
-        try {
-            transaction.begin();
-            if (!transaction.isResourceLocal()) {
-                em.joinTransaction();
-            }
-            final JpaStepExecution stepExecution = em.find(JpaStepExecution.class, stepExecutionId);
-            if (stepExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
-            }
-            final JpaPartitionExecution old = em.find(JpaPartitionExecution.class, partitionExecution.getPartitionExecutionId());
-            if (old == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecution.getPartitionExecutionId()));
-            }
-            final JpaPartitionExecution execution = new JpaPartitionExecution(old)
-                    .setStepExecution(stepExecution)
-                    .setCreateTime(timestamp)
-                    .setUpdatedTime(timestamp)
-                    .setStartTime(null)
-                    .setEndTime(null)
-                    .setMetricsMap(JpaMetric.empty())
-                    .setBatchStatus(BatchStatus.STARTING)
-                    .setExitStatus(null);
             em.persist(execution);
             em.flush();
             final PartitionExecutionImpl copy = new PartitionExecutionImpl(execution);
@@ -663,14 +624,14 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            final List<Long> names = em.createNamedQuery("JpaJobExecution.jobExecutionIdsWithJobName", Long.class)
+            final List<Long> ids = em.createNamedQuery("JpaJobExecution.jobExecutionIdsWithJobName", Long.class)
                     .setParameter("jobName", jobName)
                     .getResultList();
-            if (names.isEmpty()) {
+            if (ids.isEmpty()) {
                 throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
             }
             transaction.commit();
-            return names;
+            return ids;
         } catch (final Exception e) {
             transaction.rollback();
             throw e;
@@ -863,7 +824,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public List<StepExecutionImpl> getStepExecutionsForJob(final long jobExecutionId) throws Exception {
+    public List<StepExecutionImpl> getStepExecutionsForJobExecution(final long jobExecutionId) throws Exception {
         final EntityManager em = em();
         final ExtendedTransactionManager transaction = lookup.getTransactionManager(em);
         try {
@@ -927,6 +888,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
                     .setMaxResults(1)
                     .setParameter("jobExecutionId", jobExecutionId)
                     .setParameter("stepExecutionId", stepExecutionId)
+                    .setParameter("stepName", stepName)
                     .getResultList();
             if (stepExecutions.isEmpty()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
@@ -983,13 +945,12 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            final List<JpaStepExecution> stepExecutions = em.createNamedQuery("JpaStepExecution.withJobExecutionIdAndStepName", JpaStepExecution.class)
+            final long count = em.createNamedQuery("JpaStepExecution.countWithJobExecutionIdAndStepName", Long.class)
                     .setParameter("jobExecutionId", jobExecutionId)
                     .setParameter("stepName", stepName)
-                    .getResultList();
-            final int count = stepExecutions.size();
+                    .getSingleResult();
             transaction.commit();
-            return count;
+            return (int)count;
         } catch (final Exception e) {
             transaction.rollback();
             throw e;

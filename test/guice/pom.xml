@@ -11,9 +11,8 @@
 
     <artifactId>chainlink-test-guice</artifactId>
 
-
     <properties>
-        <build.properties>../../build.properties</build.properties>
+        <test.properties>../../test.properties</test.properties>
     </properties>
 
     <dependencies>

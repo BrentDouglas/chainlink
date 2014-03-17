@@ -155,6 +155,9 @@ public abstract class RepositoryTest extends BaseTest {
                 stepExecution.getStepExecutionId(),
                 4,
                 parameters,
+                null,
+                null,
+                null,
                 new Date()
         );
 
@@ -202,6 +205,9 @@ public abstract class RepositoryTest extends BaseTest {
                 stepExecution.getStepExecutionId(),
                 4,
                 parameters,
+                null,
+                null,
+                null,
                 new Date()
         );
 
@@ -217,7 +223,11 @@ public abstract class RepositoryTest extends BaseTest {
 
         final PartitionExecution partitionExecution = repository().createPartitionExecution(
                 stepExecution.getStepExecutionId(),
-                repository().getPartitionExecution(original.getPartitionExecutionId()),
+                original.getPartitionId(),
+                original.getPartitionParameters(),
+                original.getPersistentUserData(),
+                original.getReaderCheckpoint(),
+                original.getWriterCheckpoint(),
                 new Date()
         );
 
@@ -950,6 +960,9 @@ public abstract class RepositoryTest extends BaseTest {
                 stepExecution.getStepExecutionId(),
                 4,
                 parameters,
+                null,
+                null,
+                null,
                 new Date()
         );
         repository().startPartitionExecution(
@@ -982,7 +995,11 @@ public abstract class RepositoryTest extends BaseTest {
 
         PartitionExecution otherPartition = repository().createPartitionExecution(
                 stepExecution.getStepExecutionId(),
-                partition,
+                partition.getPartitionId(),
+                partition.getPartitionParameters(),
+                partition.getPersistentUserData(),
+                partition.getReaderCheckpoint(),
+                partition.getWriterCheckpoint(),
                 new Date()
         );
         repository().startPartitionExecution(
@@ -1046,6 +1063,9 @@ public abstract class RepositoryTest extends BaseTest {
                 stepExecution.getStepExecutionId(),
                 4,
                 parameters,
+                null,
+                null,
+                null,
                 new Date()
         );
 
@@ -1151,7 +1171,11 @@ public abstract class RepositoryTest extends BaseTest {
 
         PartitionExecution otherPartition = repository().createPartitionExecution(
                 stepExecution.getStepExecutionId(),
-                partition,
+                partition.getPartitionId(),
+                partition.getPartitionParameters(),
+                partition.getPersistentUserData(),
+                partition.getReaderCheckpoint(),
+                partition.getWriterCheckpoint(),
                 new Date()
         );
         repository().updatePartitionExecution(
@@ -1274,6 +1298,9 @@ public abstract class RepositoryTest extends BaseTest {
                 stepExecution.getStepExecutionId(),
                 4,
                 parameters,
+                null,
+                null,
+                null,
                 new Date()
         );
 
@@ -1334,6 +1361,9 @@ public abstract class RepositoryTest extends BaseTest {
                 stepExecution.getStepExecutionId(),
                 5,
                 parameters,
+                null,
+                null,
+                null,
                 new Date()
         );
         repository().startPartitionExecution(
@@ -1376,7 +1406,11 @@ public abstract class RepositoryTest extends BaseTest {
 
         PartitionExecution otherPartition = repository().createPartitionExecution(
                 stepExecution.getStepExecutionId(),
-                partition,
+                partition.getPartitionId(),
+                partition.getPartitionParameters(),
+                partition.getPersistentUserData(),
+                partition.getReaderCheckpoint(),
+                partition.getWriterCheckpoint(),
                 new Date()
         );
         repository().finishPartitionExecution(
@@ -1420,7 +1454,11 @@ public abstract class RepositoryTest extends BaseTest {
 
         otherPartition = repository().createPartitionExecution(
                 stepExecution.getStepExecutionId(),
-                partition,
+                partition.getPartitionId(),
+                partition.getPartitionParameters(),
+                partition.getPersistentUserData(),
+                partition.getReaderCheckpoint(),
+                partition.getWriterCheckpoint(),
                 new Date()
         );
         repository().startPartitionExecution(
@@ -1693,8 +1731,6 @@ public abstract class RepositoryTest extends BaseTest {
     }
 
     private void _isSameMetrics(final Metric[] source, final Metric[] target) {
-        printMethodName();
-
         Assert.assertNotNull(source);
         Assert.assertEquals(8, source.length);
 

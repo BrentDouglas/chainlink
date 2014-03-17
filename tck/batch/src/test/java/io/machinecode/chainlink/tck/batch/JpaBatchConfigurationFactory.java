@@ -7,7 +7,6 @@ import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
-import org.junit.BeforeClass;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -21,23 +20,20 @@ import java.util.concurrent.TimeUnit;
 public class JpaBatchConfigurationFactory implements ConfigurationFactory {
     private static EntityManagerFactory factory;
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    static {
         factory = Persistence.createEntityManagerFactory("TestPU");
         final EntityManager em = factory.createEntityManager();
         final EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
             em.createQuery("delete from JpaJobInstance").executeUpdate();
-            em.createQuery("delete from JpaJobExecution").executeUpdate();
-            em.createQuery("delete from JpaStepExecution").executeUpdate();
             em.createQuery("delete from JpaMetric").executeUpdate();
             em.createQuery("delete from JpaProperty").executeUpdate();
             em.flush();
             transaction.commit();
         } catch (final Exception e) {
             transaction.rollback();
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 

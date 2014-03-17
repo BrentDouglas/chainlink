@@ -13,8 +13,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <build.properties>../../build.properties</build.properties>
-        <tck.properties>../tck.properties</tck.properties>
+        <test.properties>../../test.properties</test.properties>
     </properties>
 
     <dependencies>

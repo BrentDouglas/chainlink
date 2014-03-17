@@ -11,7 +11,6 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
-import org.junit.BeforeClass;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -37,8 +36,6 @@ public class JpaCdiConfigurationFactory implements ConfigurationFactory {
         try {
             transaction.begin();
             em.createQuery("delete from JpaJobInstance").executeUpdate();
-            em.createQuery("delete from JpaJobExecution").executeUpdate();
-            em.createQuery("delete from JpaStepExecution").executeUpdate();
             em.createQuery("delete from JpaMetric").executeUpdate();
             em.createQuery("delete from JpaProperty").executeUpdate();
             em.flush();

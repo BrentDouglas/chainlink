@@ -130,8 +130,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 .setJobName(instance.getJobName())
                 .setBatchStatus(BatchStatus.STARTING)
                 .setParameters(parameters)
-                .setCreated(timestamp)
-                .setUpdated(timestamp)
+                .setCreatedTime(timestamp)
+                .setUpdatedTime(timestamp)
                 .build();
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -208,7 +208,10 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Date timestamp) throws Exception {
+    public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
+        final Serializable clonedPersistentUserData = _clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = _clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = _clone(writerCheckpoint);
         final long id;
         while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -228,42 +231,11 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 .setPartitionProperties(properties)
                 .setCreatedTime(timestamp)
                 .setUpdatedTime(timestamp)
+                .setPersistentUserData(clonedPersistentUserData)
+                .setReaderCheckpoint(clonedReaderCheckpoint)
+                .setWriterCheckpoint(clonedWriterCheckpoint)
                 .setMetrics(MutableMetricImpl.empty())
                 .setBatchStatus(BatchStatus.STARTING)
-                .build();
-        while (!partitionExecutionLock.compareAndSet(false, true)) {}
-        try {
-            partitionExecutions.put(id, execution);
-        } finally {
-            partitionExecutionLock.set(false);
-        }
-        return execution;
-    }
-
-    @Override
-    public PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception {
-        final long id;
-        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
-        try {
-            TLongList partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
-            if (partitions == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
-            }
-            id = partitionExecutionIndex.getAndIncrement();
-            partitions.add(id);
-        } finally {
-            stepExecutionPartitionExecutionLock.set(false);
-        }
-        final PartitionExecutionImpl execution = PartitionExecutionImpl.from(partitionExecution)
-                .setPartitionExecutionId(id)
-                .setStepExecutionId(stepExecutionId)
-                .setCreatedTime(timestamp)
-                .setUpdatedTime(timestamp)
-                .setStartTime(null)
-                .setEndTime(null)
-                .setMetrics(MutableMetricImpl.empty())
-                .setBatchStatus(BatchStatus.STARTING)
-                .setExitStatus(null)
                 .build();
         while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -283,8 +255,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             jobExecutions.put(jobExecutionId, JobExecutionImpl.from(execution)
-                    .setUpdated(timestamp)
-                    .setStart(timestamp)
+                    .setUpdatedTime(timestamp)
+                    .setStartTime(timestamp)
                     .setBatchStatus(BatchStatus.STARTED)
                     .build()
             );
@@ -302,7 +274,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             jobExecutions.put(jobExecutionId, JobExecutionImpl.from(execution)
-                    .setUpdated(timestamp)
+                    .setUpdatedTime(timestamp)
                     .setBatchStatus(batchStatus)
                     .build()
             );
@@ -323,8 +295,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                     .setBatchStatus(batchStatus)
                     .setExitStatus(exitStatus)
                     .setRestartElementId(restartElementId)
-                    .setUpdated(timestamp)
-                    .setEnd(timestamp)
+                    .setUpdatedTime(timestamp)
+                    .setEndTime(timestamp)
                     .build()
             );
         } finally {
@@ -373,8 +345,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        final Serializable _persistentUserData = _clone(persistentUserData);
+    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
+        final Serializable clonedPersistentUserData = _clone(persistentUserData);
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
@@ -383,7 +355,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setUpdatedTime(timestamp)
-                    .setPersistentUserData(_persistentUserData)
+                    .setPersistentUserData(clonedPersistentUserData)
                     .setMetrics(MutableMetricImpl.copy(metrics))
                     .build()
             );
@@ -393,8 +365,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        final Serializable _persistentUserData = _clone(persistentUserData);
+    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
+        final Serializable clonedPersistentUserData = _clone(persistentUserData);
         final Serializable _reader = _clone(readerCheckpoint);
         final Serializable _writer = _clone(writerCheckpoint);
         while (!stepExecutionLock.compareAndSet(false, true)) {}
@@ -405,7 +377,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             }
             stepExecutions.put(stepExecutionId, StepExecutionImpl.from(execution)
                     .setUpdatedTime(timestamp)
-                    .setPersistentUserData(_persistentUserData)
+                    .setPersistentUserData(clonedPersistentUserData)
                     .setMetrics(MutableMetricImpl.copy(metrics))
                     .setReaderCheckpoint(_reader)
                     .setWriterCheckpoint(_writer)
@@ -457,8 +429,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        final Serializable _persistentUserData = _clone(persistentUserData);
+    public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
+        final Serializable clonedPersistentUserData = _clone(persistentUserData);
         final Serializable _reader = _clone(readerCheckpoint);
         final Serializable _writer = _clone(writerCheckpoint);
         while (!partitionExecutionLock.compareAndSet(false, true)) {}
@@ -471,7 +443,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                     .setUpdatedTime(timestamp)
                     .setReaderCheckpoint(_reader)
                     .setWriterCheckpoint(_writer)
-                    .setPersistentUserData(_persistentUserData)
+                    .setPersistentUserData(clonedPersistentUserData)
                     .setMetrics(MutableMetricImpl.copy(metrics))
                     .build()
             );
@@ -481,8 +453,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        final Serializable _persistentUserData = _clone(persistentUserData);
+    public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
+        final Serializable clonedPersistentUserData = _clone(persistentUserData);
         while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
             final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
@@ -494,7 +466,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                     .setUpdatedTime(timestamp)
                     .setBatchStatus(batchStatus)
                     .setExitStatus(exitStatus)
-                    .setPersistentUserData(_persistentUserData)
+                    .setPersistentUserData(clonedPersistentUserData)
                     .setMetrics(MutableMetricImpl.copy(metrics))
                     .build()
             );
@@ -716,7 +688,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public List<StepExecution> getStepExecutionsForJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public List<StepExecution> getStepExecutionsForJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         final TLongSet stepExecutionIds = new TLongHashSet();
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -893,14 +865,9 @@ public class MemoryExecutionRepository implements ExecutionRepository {
         final TLongSet stepExecutionIds = new TLongHashSet();
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
-            TLongSet executionIds = jobExecutionStepExecutions.get(jobExecutionId);
-            if (executionIds == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
-            }
-            stepExecutionIds.addAll(executionIds);
             for (final TLongIterator it = historicJobExecutionIds.iterator(); it.hasNext();) {
                 final long historicJobExecutionId = it.next();
-                executionIds = jobExecutionStepExecutions.get(historicJobExecutionId);
+                TLongSet executionIds = jobExecutionStepExecutions.get(historicJobExecutionId);
                 if (executionIds == null) {
                     throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", historicJobExecutionId));
                 }
@@ -1007,21 +974,14 @@ public class MemoryExecutionRepository implements ExecutionRepository {
         }
     }
 
-    //TODO Add recycling
-    private <T> T _clone(final T that) {
+    private <T> T _clone(final T that) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
-        try {
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(that);
-            oos.flush();
-            return (T) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e); //TODO
-        } catch (IOException e) {
-            throw new RuntimeException(e); //TODO
-        }
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(that);
+        oos.flush();
+        return (T) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
     }
 }

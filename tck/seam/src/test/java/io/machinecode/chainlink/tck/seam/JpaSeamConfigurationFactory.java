@@ -12,7 +12,6 @@ import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
 import org.jboss.seam.contexts.ServletLifecycle;
 import org.jboss.seam.init.Initialization;
 import org.jboss.seam.mock.MockServletContext;
-import org.junit.BeforeClass;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -38,8 +37,6 @@ public class JpaSeamConfigurationFactory implements ConfigurationFactory {
         try {
             transaction.begin();
             em.createQuery("delete from JpaJobInstance").executeUpdate();
-            em.createQuery("delete from JpaJobExecution").executeUpdate();
-            em.createQuery("delete from JpaStepExecution").executeUpdate();
             em.createQuery("delete from JpaMetric").executeUpdate();
             em.createQuery("delete from JpaProperty").executeUpdate();
             em.flush();

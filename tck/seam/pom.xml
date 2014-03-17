@@ -12,8 +12,7 @@
     <artifactId>chainlink-tck-seam</artifactId>
 
     <properties>
-        <build.properties>../../build.properties</build.properties>
-        <tck.properties>../tck.properties</tck.properties>
+        <test.properties>../../test.properties</test.properties>
 
         <version.org.hibernate.hibernate-validator>3.1.0.GA</version.org.hibernate.hibernate-validator>
     </properties>

@@ -211,7 +211,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                 log.debugf(Messages.get("CHAINLINK-010207.step.no.existing.execution"), context, this.id, restartJobExecutionId);
             }
             final int startLimit = Integer.parseInt(this.getStartLimit());
-            final int startCount = repository.getStepExecutionCount(restartJobExecutionId, this.id);
+            final int startCount = repository.getStepExecutionCount(jobContext.getExecutionId(), this.id);
             if (startLimit != 0 && startCount >= startLimit) {
                 log.infof(Messages.get("CHAINLINK-010213.step.start.limit.exceeded"), context, this.id, startCount, startLimit);
                 jobContext.setBatchStatus(FAILED);

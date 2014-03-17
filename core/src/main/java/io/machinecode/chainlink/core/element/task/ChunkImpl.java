@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static javax.batch.runtime.Metric.MetricType.COMMIT_COUNT;
 import static javax.batch.runtime.Metric.MetricType.FILTER_COUNT;
@@ -1050,7 +1051,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             this.items = new ArrayList<Item>();
 
             this.itemCount = Integer.parseInt(ChunkImpl.this.itemCount);
-            this.timeLimit = Integer.parseInt(ChunkImpl.this.timeLimit) * 1000L;
+            this.timeLimit = TimeUnit.SECONDS.toMillis(Integer.parseInt(ChunkImpl.this.timeLimit));
             this.skipLimit = ChunkImpl.this.skipLimit == null ? -1 : Integer.parseInt(ChunkImpl.this.skipLimit);
             this.retryLimit = ChunkImpl.this.retryLimit == null ? -1 : Integer.parseInt(ChunkImpl.this.retryLimit);
 

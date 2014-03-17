@@ -118,9 +118,12 @@ public interface ExecutionRepository {
      *     return a {@link Date} equal to either {@param timestamp} or the time on the repository server
      *     when this method executes,
      * {@link PartitionExecution#getStartTime()} and {@link PartitionExecution#getEndTime()} return null,
-     * {@link PartitionExecution#getPersistentUserData()} returns null,
-     * {@link PartitionExecution#getReaderCheckpoint()} returns null,
-     * {@link PartitionExecution#getWriterCheckpoint()} returns null,
+     * {@link PartitionExecution#getPersistentUserData()} will return a copy of {@param persistentUserData} that has been
+     *     serialized and deserialized and is not == to it,
+     * {@link PartitionExecution#getReaderCheckpoint()} will return a copy of {@param readerCheckpoint} that has been
+     *     serialized and deserialized and is not == to it,
+     * {@link PartitionExecution#getWriterCheckpoint()} will return a copy of {@param writerCheckpoint} that has been
+     *     serialized and deserialized and is not == to it
      * {@link PartitionExecution#getPartitionParameters()} returns {@param properties} and
      * {@link PartitionExecution#getMetrics()} returns an array of metrics with one for each {@link MetricType}
      *     where {@link Metric#getValue()} returns 0.
@@ -128,45 +131,15 @@ public interface ExecutionRepository {
      * @param stepExecutionId The id of the {@link ExtendedStepExecution} to link this {@link PartitionExecution} with.
      * @param partitionId The index of the partition within the step.
      * @param properties The parameters passed to this partition when it was started or restarted.
+     * @param persistentUserData Some data from user space. May be null.
+     * @param readerCheckpoint May be null.
+     * @param writerCheckpoint May be null.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link PartitionExecution} in accordance with the above rules.
      * @throws JobSecurityException TODO
      * @throws Exception When an error occurs.
      */
-    PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Date timestamp) throws Exception;
-
-    /**
-     * This method must generate a {@code long} to be used as an identifier of the {@link PartitionExecution} returned
-     * which will hereafter be referred to as the partitionExecutionId.
-     *
-     * Any {@link PartitionExecution} with the partitionExecutionId obtained from this repository after this method completes
-     * must behave as follows until this behaviour is superseded by a call to {@link #startPartitionExecution(long, Date)}
-     * {@link #updatePartitionExecution(long, Metric[], Serializable, Serializable, Serializable, Date)} or
-     * {@link #finishPartitionExecution(long, Metric[], Serializable, BatchStatus, String, Date)};
-     *
-     * {@link PartitionExecution#getStepExecutionId()} returns {@param stepExecutionId},
-     * {@link PartitionExecution#getPartitionId()} returns {@param partitionExecution#getPartitionId},
-     * {@link PartitionExecution#getBatchStatus()} returns {@link BatchStatus#STARTING},
-     * {@link PartitionExecution#getExitStatus()} returns null,
-     * {@link PartitionExecution#getCreateTime()} and {@link PartitionExecution#getUpdatedTime()}
-     *     return will return a {@link Date} equal to either {@param timestamp} or the time on the repository server
-     *     when this method executes,
-     * {@link PartitionExecution#getStartTime()} and {@link PartitionExecution#getEndTime()} return null,
-     * {@link PartitionExecution#getPersistentUserData()} returns {@param partitionExecution#getPersistentUserData}, //TODO Should specify clone of?
-     * {@link PartitionExecution#getReaderCheckpoint()} returns {@param partitionExecution#getReaderCheckpoint},
-     * {@link PartitionExecution#getWriterCheckpoint()} returns {@param partitionExecution#getWriterCheckpoint},
-     * {@link PartitionExecution#getPartitionParameters()} returns {@param partitionExecution#getPartitionParameters} and
-     * {@link PartitionExecution#getMetrics()} returns an array of metrics with one for each {@link MetricType}
-     *     where {@link Metric#getValue()} returns 0.
-     *
-     * @param stepExecutionId The id of the {@link ExtendedStepExecution} to link this {@link PartitionExecution} with.
-     * @param partitionExecution A previous execution of this partition.
-     * @param timestamp The current time on the JVM calling this method.
-     * @return An instance of {@link PartitionExecution} in accordance with the above rules.
-     * @throws JobSecurityException TODO
-     * @throws Exception When an error occurs.
-     */
-    PartitionExecution createPartitionExecution(final long stepExecutionId, final PartitionExecution partitionExecution, final Date timestamp) throws Exception;
+    PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception;
 
     /**
      * Any {@link JobExecution} with {@param jobExecutionId} obtained from this repository after this method completes
@@ -379,8 +352,7 @@ public interface ExecutionRepository {
      *     equal to either {@param timestamp} or the time on the repository server when this method executes.
      *
      * Other methods of {@link PartitionExecution} not listed will return values as defined
-     * in the javadoc for {@link #createPartitionExecution(long, int, Properties, Date)} and
-     * {@link #createPartitionExecution(long, PartitionExecution, Date)}
+     * in the javadoc for {@link #createPartitionExecution(long, int, Properties, Serializable, Serializable, Serializable, Date)}
      *
      * @param partitionExecutionId The id of the {@link PartitionExecution} that will be updated.
      * @param timestamp The current time on the JVM calling this method.
@@ -568,7 +540,7 @@ public interface ExecutionRepository {
      * @throws JobSecurityException TODO
      * @throws Exception
      */
-    List<? extends StepExecution> getStepExecutionsForJob(final long jobExecutionId) throws Exception;
+    List<? extends StepExecution> getStepExecutionsForJobExecution(final long jobExecutionId) throws Exception;
 
     /**
      *

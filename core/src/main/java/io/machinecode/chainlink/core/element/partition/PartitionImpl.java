@@ -91,7 +91,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     @Override
     public PartitionTarget map(final TaskWork task, final Executor executor, final Executable callback, final ExecutionContext context, final int timeout, final Long restartStepExecutionId) throws Exception {
         final PartitionPlan plan = loadPartitionPlan(executor, context);
-        final boolean restarting = context.isRestarting();
+        final boolean restarting = restartStepExecutionId != null;
         final boolean override = plan.getPartitionsOverride();
         if (this.reducer != null) {
             //TODO Find out why not
@@ -111,9 +111,16 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
             executables = new Executable[partitionExecutions.length];
             for (int id = 0; id < partitionExecutions.length; ++id) {
                 final PartitionExecution execution = partitionExecutions[id];
-                //final Properties properties = execution.getPartitionParameters();
                 final int partitionId = execution.getPartitionId();
-                final PartitionExecution partitionExecution = repository.createPartitionExecution(stepExecutionId, execution, new Date());
+                final PartitionExecution partitionExecution = repository.createPartitionExecution(
+                        stepExecutionId,
+                        partitionId,
+                        execution.getPartitionParameters(),
+                        execution.getPersistentUserData(),
+                        execution.getReaderCheckpoint(),
+                        execution.getWriterCheckpoint(),
+                        new Date()
+                );
                 //TODO Which step execution should this be linked to?
                 final MutableStepContext partitionStepContext = new StepContextImpl(
                         stepContext,
@@ -146,6 +153,9 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
                         stepExecutionId,
                         partitionId,
                         partitionProperties,
+                        null,
+                        null,
+                        null,
                         new Date()
                 );
                 final ExecutionContext partitionContext = new ExecutionContextImpl(

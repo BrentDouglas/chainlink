@@ -149,12 +149,12 @@ public class JobExecutionImpl implements ExtendedJobExecution {
             return this;
         }
 
-        public Builder setStart(final Date start) {
+        public Builder setStartTime(final Date start) {
             this.start = start;
             return this;
         }
 
-        public Builder setEnd(final Date end) {
+        public Builder setEndTime(final Date end) {
             this.end = end;
             return this;
         }
@@ -164,12 +164,12 @@ public class JobExecutionImpl implements ExtendedJobExecution {
             return this;
         }
 
-        public Builder setCreated(final Date created) {
+        public Builder setCreatedTime(final Date created) {
             this.created = created;
             return this;
         }
 
-        public Builder setUpdated(final Date updated) {
+        public Builder setUpdatedTime(final Date updated) {
             this.updated = updated;
             return this;
         }

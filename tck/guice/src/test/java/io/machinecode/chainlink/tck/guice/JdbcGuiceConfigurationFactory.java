@@ -6,11 +6,11 @@ import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
 import io.machinecode.chainlink.jsl.core.util.Triplet;
-import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
-import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
-import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
+import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
+import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import io.machinecode.chainlink.tck.core.DummyDataSource;
 
 import javax.batch.api.Batchlet;
 import javax.batch.api.Decider;
@@ -34,10 +34,8 @@ import javax.batch.api.partition.PartitionAnalyzer;
 import javax.batch.api.partition.PartitionCollector;
 import javax.batch.api.partition.PartitionMapper;
 import javax.batch.api.partition.PartitionReducer;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -45,23 +43,34 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JpaGuiceConfigurationFactory implements ConfigurationFactory {
+public class JdbcGuiceConfigurationFactory implements ConfigurationFactory {
 
-    private static EntityManagerFactory factory;
+    private static DataSource dataSource;
 
     static {
-        factory = Persistence.createEntityManagerFactory("TestPU");
-        final EntityManager em = factory.createEntityManager();
-        final EntityTransaction transaction = em.getTransaction();
         try {
-            transaction.begin();
-            em.createQuery("delete from JpaJobInstance").executeUpdate();
-            em.createQuery("delete from JpaMetric").executeUpdate();
-            em.createQuery("delete from JpaProperty").executeUpdate();
-            em.flush();
-            transaction.commit();
-        } catch (final Exception e) {
-            transaction.rollback();
+            dataSource = new DummyDataSource(System.getProperty("database.url"));
+            Connection connection = null;
+            try {
+                connection = dataSource.getConnection();
+                connection.setAutoCommit(false);
+                connection.prepareStatement("delete from public.job_instance;").executeUpdate();
+                connection.prepareStatement("delete from public.metric;").executeUpdate();
+                connection.prepareStatement("delete from public.property;").executeUpdate();
+                connection.commit();
+            } catch (final Exception e) {
+                if (connection != null) {
+                    connection.rollback();
+                }
+                throw new RuntimeException(e);
+            } finally {
+                if (connection != null) {
+                    connection.close();
+                }
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -70,12 +79,12 @@ public class JpaGuiceConfigurationFactory implements ConfigurationFactory {
     public Configuration produce() throws Exception {
         return new Builder()
                 .setLoader(Thread.currentThread().getContextClassLoader())
-                .setRepository(new JpaExecutionRepository(new EntityManagerLookup() {
+                .setRepository(JdbcExecutionRepository.create(new DataSourceLookup() {
                     @Override
-                    public EntityManagerFactory getEntityManagerFactory() {
-                        return factory;
+                    public DataSource getDataSource() {
+                        return dataSource;
                     }
-                }, new ResourceLocalTransactionManagerLookup()))
+                }, System.getProperty("database.user"), System.getProperty("database.password")))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(new GuiceArtifactLoader(new BindingProvider() {
                     @Override

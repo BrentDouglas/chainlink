@@ -381,7 +381,7 @@ public class JobOperatorImpl implements JobOperator {
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         try {
             final ExecutionRepository repository = executor.getRepository();
-            final List<? extends StepExecution> executions =  repository.getStepExecutionsForJob(jobExecutionId);
+            final List<? extends StepExecution> executions =  repository.getStepExecutionsForJobExecution(jobExecutionId);
             final List<StepExecution> delegates = new ArrayList<StepExecution>(executions.size());
             for (final StepExecution execution : executions) {
                 delegates.add(new DelegateStepExecutionImpl(execution, repository));

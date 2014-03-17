@@ -23,7 +23,7 @@
     </modules>
 
     <properties>
-        <build.properties>../build.properties</build.properties>
+        <test.properties>../test.properties</test.properties>
     </properties>
 
     <dependencies>
@@ -101,7 +101,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${build.properties}</file>
+                                <file>${test.properties}</file>
                             </files>
                         </configuration>
                     </execution>

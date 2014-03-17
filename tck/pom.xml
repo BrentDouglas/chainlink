@@ -16,10 +16,10 @@
     </modules>
 
     <properties>
-        <build.properties>../build.properties</build.properties>
-        <tck.properties>tck.properties</tck.properties>
+        <test.properties>../test.properties</test.properties>
 
         <configuration.factory.type>Memory</configuration.factory.type>
+        <database.type>pgsql</database.type>
     </properties>
 
     <dependencyManagement>
@@ -79,6 +79,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Jdbc -->
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-jdbc</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Jpa -->
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -103,6 +110,16 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>jdbc</id>
+            <activation>
+                <property><name>jdbc</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <configuration.factory.type>Jdbc</configuration.factory.type>
+            </properties>
+        </profile>
         <profile>
             <id>jpa</id>
             <activation>
@@ -191,8 +208,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${build.properties}</file>
-                                <file>${tck.properties}</file>
+                                <file>${test.properties}</file>
                             </files>
                         </configuration>
                     </execution>

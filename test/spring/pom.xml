@@ -12,7 +12,7 @@
     <artifactId>chainlink-test-spring</artifactId>
 
     <properties>
-        <build.properties>../../build.properties</build.properties>
+        <test.properties>../../test.properties</test.properties>
     </properties>
 
     <dependencies>
