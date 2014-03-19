@@ -38,7 +38,7 @@ import java.util.Properties;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @Entity
-@Table(name = "partition_execution", schema = "public")
+@Table(name = "partition_execution")
 @NamedQueries({
         @NamedQuery(name = "JpaPartitionExecution.unfinishedForStepExecutionId", query = "select p from JpaPartitionExecution p where p.stepExecution.id=:stepExecutionId and p.batchStatus in (javax.batch.runtime.BatchStatus.FAILED, javax.batch.runtime.BatchStatus.STOPPED, javax.batch.runtime.BatchStatus.STOPPING, javax.batch.runtime.BatchStatus.STARTED, javax.batch.runtime.BatchStatus.STARTING)")
 })
@@ -264,7 +264,7 @@ public class JpaPartitionExecution implements PartitionExecution {
     @MapKeyEnumerated(EnumType.STRING)
     @MapKeyColumn(name = "metric_type", nullable = false)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "partition_execution_metric", schema = "public",
+    @JoinTable(name = "partition_execution_metric",
             joinColumns = {@JoinColumn(name = "partition_execution_id")},
             inverseJoinColumns = {@JoinColumn(name = "metric_id")
     })
@@ -278,7 +278,7 @@ public class JpaPartitionExecution implements PartitionExecution {
     }
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "partition_execution_property", schema = "public",
+    @JoinTable(name = "partition_execution_property",
             joinColumns = {@JoinColumn(name = "partition_execution_id")},
             inverseJoinColumns = {@JoinColumn(name = "property_id")
     })

@@ -3,9 +3,11 @@ package io.machinecode.chainlink.test.core.execution;
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
@@ -14,19 +16,54 @@ import java.util.logging.Logger;
 public class DummyDataSource implements DataSource {
 
     private final String url;
+    private final String driver;
 
-    public DummyDataSource(final String url) {
+    public DummyDataSource(final String url, final String driver) {
         this.url = url;
+        this.driver = driver;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url);
+        try {
+            Driver driver;
+            try {
+                driver = DriverManager.getDriver(url);
+            } catch (final SQLException e) {
+                driver = Driver.class.cast(Class.forName(this.driver).newInstance());
+                DriverManager.registerDriver(driver);
+            }
+            return driver.connect(url, new Properties());
+        } catch (final ClassNotFoundException cnfe) {
+            throw new SQLException(cnfe);
+        } catch (final InstantiationException ie) {
+            throw new SQLException(ie);
+        } catch (final IllegalAccessException iae) {
+            throw new SQLException(iae);
+        }
     }
 
     @Override
     public Connection getConnection(final String username, final String password) throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        try {
+            Driver driver;
+            try {
+                driver = DriverManager.getDriver(url);
+            } catch (final SQLException e) {
+                driver = Driver.class.cast(Class.forName(this.driver).newInstance());
+                DriverManager.registerDriver(driver);
+            }
+            final Properties properties = new Properties();
+            properties.setProperty("user", username);
+            properties.setProperty("password", password);
+            return driver.connect(url, properties);
+        } catch (final ClassNotFoundException cnfe) {
+            throw new SQLException(cnfe);
+        } catch (final InstantiationException ie) {
+            throw new SQLException(ie);
+        } catch (final IllegalAccessException iae) {
+            throw new SQLException(iae);
+        }
     }
 
     @Override

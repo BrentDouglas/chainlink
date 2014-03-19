@@ -9,9 +9,9 @@
         <jar-file>${env.HOME}/.m2/repository/io/machinecode/chainlink/chainlink-repository-jpa/${project.version}/chainlink-repository-jpa-${project.version}.jar</jar-file>
         <properties>
             <property name="hibernate.connection.driver_class" value="${database.driver}"/>
-            <property name="hibernate.connection.url" value="${database.url}"/>
-            <property name="hibernate.connection.username" value="${database.user}"/>
-            <property name="hibernate.connection.password" value="${database.password}"/>
+            <property name="hibernate.connection.url" value="${@database.url@}"/>
+            <property name="hibernate.connection.username" value="${@database.user@}"/>
+            <property name="hibernate.connection.password" value="${@database.password@}"/>
         </properties>
     </persistence-unit>
 </persistence>

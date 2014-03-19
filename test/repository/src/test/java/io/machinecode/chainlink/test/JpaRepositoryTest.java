@@ -4,6 +4,7 @@ import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.test.core.execution.DummyDataSource;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -13,6 +14,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -32,7 +36,14 @@ public class JpaRepositoryTest extends RepositoryTest {
     }
 
     @BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws Exception {
+        final String prefix = System.getProperty("database.prefix") + ".";
+        try {
+            DriverManager.getDriver(System.getProperty(prefix + "database.url"));
+        } catch (final SQLException e) {
+            final Driver driver = Driver.class.cast(Class.forName(System.getProperty("database.driver")).newInstance());
+            DriverManager.registerDriver(driver);
+        }
         factory = Persistence.createEntityManagerFactory("TestPU");
     }
 
@@ -48,8 +59,6 @@ public class JpaRepositoryTest extends RepositoryTest {
         try {
             transaction.begin();
             em.createQuery("delete from JpaJobInstance").executeUpdate();
-            em.createQuery("delete from JpaJobExecution").executeUpdate();
-            em.createQuery("delete from JpaStepExecution").executeUpdate();
             em.createQuery("delete from JpaMetric").executeUpdate();
             em.createQuery("delete from JpaProperty").executeUpdate();
             em.flush();

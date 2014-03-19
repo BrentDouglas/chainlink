@@ -19,7 +19,8 @@
         <test.properties>../test.properties</test.properties>
 
         <configuration.factory.type>Memory</configuration.factory.type>
-        <database.type>pgsql</database.type>
+        <database.driver>org.h2.Driver</database.driver>
+        <database.prefix>h2</database.prefix>
     </properties>
 
     <dependencyManagement>
@@ -103,6 +104,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
@@ -131,9 +137,9 @@
             </properties>
         </profile>
         <profile>
-            <id>tck-all</id>
+            <id>all</id>
             <activation>
-                <property><name>tck-all</name></property>
+                <property><name>all</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -144,9 +150,9 @@
             </modules>
         </profile>
         <profile>
-            <id>tck-batch</id>
+            <id>batch</id>
             <activation>
-                <property><name>tck-batch</name></property>
+                <property><name>batch</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -154,9 +160,9 @@
             </modules>
         </profile>
         <profile>
-            <id>tck-cdi</id>
+            <id>cdi</id>
             <activation>
-                <property><name>tck-cdi</name></property>
+                <property><name>cdi</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -164,9 +170,9 @@
             </modules>
         </profile>
         <profile>
-            <id>tck-guice</id>
+            <id>guice</id>
             <activation>
-                <property><name>tck-guice</name></property>
+                <property><name>guice</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -174,9 +180,9 @@
             </modules>
         </profile>
         <profile>
-            <id>tck-seam</id>
+            <id>seam</id>
             <activation>
-                <property><name>tck-seam</name></property>
+                <property><name>seam</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -184,18 +190,75 @@
             </modules>
         </profile>
         <profile>
-            <id>tck-spring</id>
+            <id>spring</id>
             <activation>
-                <property><name>tck-spring</name></property>
+                <property><name>spring</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>spring</module>
             </modules>
         </profile>
+
+        <!-- JPA -->
+        <profile>
+            <id>mariadb</id>
+            <activation>
+                <property><name>mariadb</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <database.driver>org.mariadb.jdbc.Driver</database.driver>
+                <database.prefix>mariadb</database.prefix>
+            </properties>
+        </profile>
+        <profile>
+            <id>postgresql</id>
+            <activation>
+                <property><name>postgresql</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <database.driver>org.postgresql.Driver</database.driver>
+                <database.prefix>postgresql</database.prefix>
+            </properties>
+        </profile>
     </profiles>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>create-persistence-xml</id>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <phase>generate-test-resources</phase>
+                            <configuration>
+                                <target>
+                                    <copy file="${project.basedir}/src/test/resources/META-INF/persistence.xml.template"
+                                          tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="database.url" value="${database.prefix}.database.url" />
+                                            <filter token="database.user" value="${database.prefix}.database.user" />
+                                            <filter token="database.password" value="${database.prefix}.database.password" />
+                                        </filterset>
+                                    </copy>
+                                </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -258,36 +321,10 @@
                         <include>**/**Test*.java</include>
                         <include>**/**TestCase*.java</include>
                     </includes>
+                    <systemPropertiesFile>${test.properties}</systemPropertiesFile>
                     <systemPropertyVariables>
-                        <ExecutionTests.testInvokeJobWithUserStop.sleep>${ExecutionTests.testInvokeJobWithUserStop.sleep}</ExecutionTests.testInvokeJobWithUserStop.sleep>
-                        <JobOperatorTests.testInvokeJobWithUserStop.sleep>${JobOperatorTests.testInvokeJobWithUserStop.sleep}</JobOperatorTests.testInvokeJobWithUserStop.sleep>
-                        <JobOperatorTests.testJobOperatorGetRunningJobExecutions.sleep>${JobOperatorTests.testJobOperatorGetRunningJobExecutions.sleep}</JobOperatorTests.testJobOperatorGetRunningJobExecutions.sleep>
-                        <JobOperatorTests.testJobOperatorGetRunningJobExecutions.app.timeinterval>${JobOperatorTests.testJobOperatorGetRunningJobExecutions.app.timeinterval}</JobOperatorTests.testJobOperatorGetRunningJobExecutions.app.timeinterval>
-                        <JobOperatorTests.testJobOperatorGetRunningJobInstancesException.app.timeinterval>${JobOperatorTests.testJobOperatorGetRunningJobInstancesException.app.timeinterval}</JobOperatorTests.testJobOperatorGetRunningJobInstancesException.app.timeinterval>
-                        <JobOperatorTests.testJobOperatorTestAbandonActiveRestart.sleep>${JobOperatorTests.testJobOperatorTestAbandonActiveRestart.sleep}</JobOperatorTests.testJobOperatorTestAbandonActiveRestart.sleep>
-                        <JobOperatorTests.testJobOperatorTestRestartAlreadAbandonedJob.sleep>${JobOperatorTests.testJobOperatorTestRestartAlreadAbandonedJob.sleep}</JobOperatorTests.testJobOperatorTestRestartAlreadAbandonedJob.sleep>
-                        <ParallelExecutionTests.testStopRunningPartitionedStep.sleep>${ParallelExecutionTests.testStopRunningPartitionedStep.sleep}</ParallelExecutionTests.testStopRunningPartitionedStep.sleep>
-                        <ParallelExecutionTests.testStopRestartRunningPartitionedStep.sleep>${ParallelExecutionTests.testStopRestartRunningPartitionedStep.sleep}</ParallelExecutionTests.testStopRestartRunningPartitionedStep.sleep>
-                        <ParallelExecutionTests.testInvokeJobWithOnePartitionedStepExitStatus.sleep>${ParallelExecutionTests.testInvokeJobWithOnePartitionedStepExitStatus.sleep}</ParallelExecutionTests.testInvokeJobWithOnePartitionedStepExitStatus.sleep>
-                        <StopOrFailOnExitStatusWithRestartTests.testInvokeJobWithUserStop.sleep>${StopOrFailOnExitStatusWithRestartTests.testInvokeJobWithUserStop.sleep}</StopOrFailOnExitStatusWithRestartTests.testInvokeJobWithUserStop.sleep>
-                        <TransactionTests.testGlobalTranNoExceptions.sleep>${TransactionTests.testGlobalTranNoExceptions.sleep}</TransactionTests.testGlobalTranNoExceptions.sleep>
-                        <TransactionTests.testGlobalTranForcedExceptionWithRollback.sleep>${TransactionTests.testGlobalTranForcedExceptionWithRollback.sleep}</TransactionTests.testGlobalTranForcedExceptionWithRollback.sleep>
-                        <TransactionTests.testGlobalTranForcedExceptionCheckpointRestart.sleep>${TransactionTests.testGlobalTranForcedExceptionCheckpointRestart.sleep}</TransactionTests.testGlobalTranForcedExceptionCheckpointRestart.sleep>
-                        <TransactionTests.testGlobalTranNoDelayLongTimeout.sleep>${TransactionTests.testGlobalTranNoDelayLongTimeout.sleep}</TransactionTests.testGlobalTranNoDelayLongTimeout.sleep>
-                        <TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.1>${TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.1}</TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.1>
-                        <TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.2>${TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.2}</TransactionTests.testGlobalTranLongDelayShortTimeoutThenNoDelayShortTimeout.sleep.2>
-                        <TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutSteps.sleep>${TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutSteps.sleep}</TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutSteps.sleep>
-                        <TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutStepsCustomCheckpointAlgorithm.sleep>${TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutStepsCustomCheckpointAlgorithm.sleep}</TransactionTests.testGlobalTranLongDelayMixOfLongTimeoutStepsAndShortTimeoutStepsCustomCheckpointAlgorithm.sleep>
-                        <TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.1>${TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.1}</TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.1>
-                        <TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.2>${TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.2}</TransactionTests.testGlobalTranForcedTimeoutCheckpointRestart.sleep.2>
-                        <ChunkTests.testChunkTimeBased10Seconds.sleep>${ChunkTests.testChunkTimeBased10Seconds.sleep}</ChunkTests.testChunkTimeBased10Seconds.sleep>
-                        <ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep>${ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep}</ChunkTests.testChunkRestartTimeBasedCheckpoint.sleep>
-                        <ChunkTests.testChunkTimeBasedTimeLimit0.sleep>${ChunkTests.testChunkTimeBasedTimeLimit0.sleep}</ChunkTests.testChunkTimeBasedTimeLimit0.sleep>
-                        <ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep>${ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep}</ChunkTests.testChunkRestartTimeBasedDefaultCheckpoint.sleep>
-
-                        <database.url>${database.url}</database.url>
-                        <database.user>${database.user}</database.user>
-                        <database.password>${database.password}</database.password>
+                        <database.driver>${database.driver}</database.driver>
+                        <database.prefix>${database.prefix}</database.prefix>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

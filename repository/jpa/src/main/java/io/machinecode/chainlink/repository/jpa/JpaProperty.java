@@ -13,7 +13,7 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @Entity
-@Table(name = "property", schema = "public")
+@Table(name = "property")
 public class JpaProperty {
     private long id;
     private String key;

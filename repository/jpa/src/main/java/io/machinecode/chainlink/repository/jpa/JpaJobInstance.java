@@ -22,7 +22,7 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @Entity
-@Table(name = "job_instance", schema = "public")
+@Table(name = "job_instance")
 @NamedQueries({
         @NamedQuery(name = "JpaJobInstance.countWithJobName", query = "select count(i) from JpaJobInstance i where i in (select distinct j from JpaJobInstance j where j.jobName=:jobName)"),
         @NamedQuery(name = "JpaJobInstance.jobNames", query = "select distinct j.jobName from JpaJobInstance j order by j.jobName asc")

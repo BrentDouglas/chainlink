@@ -14,7 +14,7 @@ import javax.persistence.Table;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @Entity
-@Table(name = "job_execution_history", schema = "public")
+@Table(name = "job_execution_history")
 public class JpaJobExecutionHistory {
     private long id;
     private JpaJobExecution jobExecution;

@@ -21,6 +21,7 @@ idea
 
 # Build
 test.properties
+persistence.xml
 
 # Logging
 log4j.properties

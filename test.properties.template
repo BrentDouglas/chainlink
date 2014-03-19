@@ -1,16 +1,21 @@
+# Database Configuration
+
+h2.database.url=jdbc:h2:mem:chainlink;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM '~/work/chainlink/repository/schema-h2.sql';
+h2.database.user=sa
+
+postgresql.database.url=jdbc:postgresql://localhost/chainlink
+postgresql.database.user=postgres
+postgresql.database.password=
+
+mariadb.database.url=jdbc:mariadb://localhost/chainlink
+mariadb.database.user=root
+mariadb.database.password=
+
+# TCK Configuration
+
 tck.source=
 
-database.url=jdbc:postgresql://localhost/chainlink
-database.user=
-database.password=
-
-pgsql.database.url=jdbc:postgresql://localhost/chainlink
-pgsql.database.user=
-pgsql.database.password=
-
-h2.database.url=dbc:h2:mem:chainlink;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM '~/work/chainlink/repository/schema-h2.sql';
-h2.database.user=
-h2.database.password=
+# TCK Properties
 
 # Test Class: ExecutionTests
 ExecutionTests.testInvokeJobWithUserStop.sleep=1000

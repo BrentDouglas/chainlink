@@ -1440,7 +1440,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected Serializable getLargeObject(final ResultSet result, final int index) throws Exception {
-        return _read(result.getBlob(index).getBinaryStream());
+        return _read(result.getBinaryStream(index));
     }
 
     private PartitionExecutionImpl _pe(final Connection connection, final ResultSet result) throws Exception {
@@ -1572,6 +1572,6 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected Serializable _read(final InputStream that) throws ClassNotFoundException, IOException, SQLException {
-        return (Serializable) new ObjectInputStream(that).readObject();
+        return that == null ? null : (Serializable) new ObjectInputStream(that).readObject();
     }
 }

@@ -33,7 +33,7 @@ import java.util.Properties;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @Entity
-@Table(name = "job_execution", schema = "public")
+@Table(name = "job_execution")
 @NamedQueries({
         @NamedQuery(name = "JpaJobExecution.byCreateDate", query = "select j from JpaJobExecution j where j.jobInstance.id=:jobInstanceId order by j.createTime desc"),
         @NamedQuery(name = "JpaJobExecution.jobExecutionIdsWithJobName", query = "select j.id from JpaJobExecution j where j.jobName=:jobName order by j.createTime desc"),
@@ -193,7 +193,7 @@ public class JpaJobExecution implements ExtendedJobExecution {
     }
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "job_execution_property", schema = "public",
+    @JoinTable(name = "job_execution_property",
             joinColumns = {@JoinColumn(name = "job_execution_id")},
             inverseJoinColumns = {@JoinColumn(name = "property_id")
     })

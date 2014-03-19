@@ -20,7 +20,7 @@ import java.util.Map;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @Entity
-@Table(name = "metric", schema = "public")
+@Table(name = "metric")
 public class JpaMetric implements MutableMetric {
     private long id;
     private MetricType type;

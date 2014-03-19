@@ -38,7 +38,7 @@ import java.util.Map;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @Entity
-@Table(name = "step_execution", schema = "public")
+@Table(name = "step_execution")
 @NamedQueries({
         @NamedQuery(name = "JpaStepExecution.countWithJobExecutionIdAndStepName", query = "select count(s) from JpaStepExecution s join s.jobExecution j where j in (select p from JpaJobExecutionHistory h join h.previousJobExecution p where h.jobExecution.id=:jobExecutionId) and s.stepName=:stepName"),
         @NamedQuery(name = "JpaStepExecution.withJobExecutionIdAndStepName", query = "select s from JpaStepExecution s join s.jobExecution j where (j.id=:jobExecutionId or j in (select p from JpaJobExecutionHistory h join h.previousJobExecution p where h.jobExecution.id=:jobExecutionId)) and s.stepName=:stepName"),
@@ -236,7 +236,7 @@ public class JpaStepExecution implements ExtendedStepExecution {
     @MapKeyEnumerated(EnumType.STRING)
     @MapKeyColumn(name = "metric_type", nullable = false)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "step_execution_metric", schema = "public",
+    @JoinTable(name = "step_execution_metric",
             joinColumns = {@JoinColumn(name = "step_execution_id")},
             inverseJoinColumns = {@JoinColumn(name = "metric_id")
     })

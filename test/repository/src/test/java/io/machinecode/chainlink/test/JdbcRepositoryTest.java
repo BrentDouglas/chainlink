@@ -2,21 +2,12 @@ package io.machinecode.chainlink.test;
 
 import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
 import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
-import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
-import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
-import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.DummyDataSource;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
@@ -30,17 +21,14 @@ public class JdbcRepositoryTest extends RepositoryTest {
 
     @Override
     protected ExecutionRepository _repository() {
+        final String prefix = System.getProperty("database.prefix") + ".";
+        dataSource = new DummyDataSource(System.getProperty(prefix + "database.url"), System.getProperty("database.driver"));
         return JdbcExecutionRepository.create(new DataSourceLookup() {
             @Override
             public DataSource getDataSource() {
                 return dataSource;
             }
-        }, System.getProperty("database.user"), System.getProperty("database.password"));
-    }
-
-    @BeforeClass
-    public static void beforeClass() {
-        dataSource = new DummyDataSource(System.getProperty("database.url"));
+        }, System.getProperty(prefix + "database.user"), System.getProperty(prefix + "database.password", ""));
     }
 
     @After

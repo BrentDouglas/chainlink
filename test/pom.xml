@@ -24,6 +24,9 @@
 
     <properties>
         <test.properties>../test.properties</test.properties>
+
+        <database.driver>org.h2.Driver</database.driver>
+        <database.prefix>h2</database.prefix>
     </properties>
 
     <dependencies>
@@ -81,6 +84,30 @@
                 <module>seam-2.3</module>
             </modules>
         </profile>
+
+        <!-- JPA -->
+        <profile>
+            <id>mariadb</id>
+            <activation>
+                <property><name>mariadb</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <database.driver>org.mariadb.jdbc.Driver</database.driver>
+                <database.prefix>mariadb</database.prefix>
+            </properties>
+        </profile>
+        <profile>
+            <id>postgresql</id>
+            <activation>
+                <property><name>postgresql</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <database.driver>org.postgresql.Driver</database.driver>
+                <database.prefix>postgresql</database.prefix>
+            </properties>
+        </profile>
     </profiles>
 
     <build>
@@ -89,6 +116,40 @@
                 <directory>${project.basedir}/src/test/resources</directory>
             </testResource>
         </testResources>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>create-persistence-xml</id>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <phase>generate-test-resources</phase>
+                            <configuration>
+                                <target>
+                                    <copy file="${project.basedir}/src/test/resources/META-INF/persistence.xml.template"
+                                          tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="database.url" value="${database.prefix}.database.url" />
+                                            <filter token="database.user" value="${database.prefix}.database.user" />
+                                            <filter token="database.password" value="${database.prefix}.database.password" />
+                                        </filterset>
+                                    </copy>
+                                </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -115,10 +176,10 @@
                         <include>**/**Test*.java</include>
                         <include>**/**TestCase*.java</include>
                     </includes>
+                    <systemPropertiesFile>${test.properties}</systemPropertiesFile>
                     <systemPropertyVariables>
-                        <database.url>${database.url}</database.url>
-                        <database.user>${database.user}</database.user>
-                        <database.password>${database.password}</database.password>
+                        <database.driver>${database.driver}</database.driver>
+                        <database.prefix>${database.prefix}</database.prefix>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

@@ -22,7 +22,6 @@
         <module>repository</module>
         <module>core</module>
         <module>test</module>
-        <module>tck</module>
     </modules>
 
     <properties>
@@ -66,8 +65,8 @@
         <version.org.jboss.spec.jboss-javaee-6.0>2.0.0.Final</version.org.jboss.spec.jboss-javaee-6.0>
 
         <!-- Jpa Tests -->
-        <database.driver>org.postgresql.Driver</database.driver>
         <version.org.hibernate>4.2.5.Final</version.org.hibernate>
+        <version.org.h2database.h2>1.3.175</version.org.h2database.h2>
         <version.postgresql.postgresql>9.2-1002.jdbc4</version.postgresql.postgresql>
 
         <!-- Plugins -->
@@ -297,6 +296,11 @@
                 <version>${version.org.hibernate}</version>
             </dependency>
             <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${version.org.h2database.h2}</version>
+            </dependency>
+            <dependency>
                 <groupId>postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgresql.postgresql}</version>
@@ -320,4 +324,17 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>tck</id>
+            <activation>
+                <property><name>tck</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>tck</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
