@@ -11,6 +11,7 @@ import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.core.work.JobExecutable;
 import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.spi.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -45,7 +46,7 @@ import java.util.Set;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobOperatorImpl implements JobOperator {
+public class JobOperatorImpl implements ExtendedJobOperator {
 
     private static final Logger log = Logger.getLogger(JobOperatorImpl.class);
 
@@ -156,7 +157,8 @@ public class JobOperatorImpl implements JobOperator {
         }
     }
 
-    public JobOperationImpl startJob(final JobWork job, final String jslName, final Properties parameters) throws Exception {
+    @Override
+    public JobOperationImpl startJob(final JobWork job, final String jslName, final Properties parameters) throws JobStartException, JobSecurityException {
         try {
             return _startJob(job, jslName, parameters);
         } catch (final JobStartException e) {
@@ -192,6 +194,7 @@ public class JobOperatorImpl implements JobOperator {
         );
     }
 
+    @Override
     public JobOperationImpl getJobOperation(final long jobExecutionId) throws JobExecutionNotRunningException {
         try {
             final Deferred<?> deferred = executor.getJob(jobExecutionId);
@@ -233,6 +236,7 @@ public class JobOperatorImpl implements JobOperator {
         }
     }
 
+    @Override
     public JobOperationImpl restartJob(final long jobExecutionId, final Properties parameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001201.operator.restart"), jobExecutionId);
         try {
@@ -288,6 +292,7 @@ public class JobOperatorImpl implements JobOperator {
         stopJob(jobExecutionId);
     }
 
+    @Override
     public Deferred<?> stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
         try {
             log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
