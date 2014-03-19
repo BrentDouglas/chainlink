@@ -1,0 +1,31 @@
+package io.machinecode.chainlink.spi.management;
+
+/**
+ * @author Brent Douglas <brent.n.douglas@gmail.com>
+ */
+public enum ManagementEventType {
+    CREATED_JOB_INSTANCE,
+    CREATED_JOB_EXECUTION,
+    CREATED_STEP_EXECUTION,
+    CREATED_PARTITION_EXECUTION,
+
+    STARTED_BATCHLET,
+    FINISHED_BATCHLET,
+    CANCELLED_BATCHLET,
+
+    STARTED_CHUNK,
+    FINISHED_CHUNK,
+    CANCELLED_CHUNK,
+    CHECKPOINT_CHUNK,
+    READ_CHUNK,
+    WRITE_CHUNK,
+    PROCESS_CHUNK,
+
+    MAP_PARTITION,
+    COLLECT_PARTITION,
+    ANALYSE_PARTITION,
+    REDUCE_PARTITION,
+
+    TRANSITIONED_TO_EXECUTION,
+    CANCELLED_EXECUTION;
+}

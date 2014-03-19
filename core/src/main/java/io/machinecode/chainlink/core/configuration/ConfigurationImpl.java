@@ -6,6 +6,7 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.loader.JobLoader;
+import io.machinecode.chainlink.spi.security.SecurityCheck;
 
 import javax.transaction.TransactionManager;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +19,7 @@ public class ConfigurationImpl implements Configuration {
     private static final JobLoader[] JOB_LOADERS = new JobLoader[0];
     private static final ArtifactLoader[] ARTIFACT_LOADERS = new ArtifactLoader[0];
     private static final Injector[] INJECTORS = new Injector[0];
+    private static final SecurityCheck[] SECURITY_CHECKS = new SecurityCheck[0];
 
     private final ClassLoader loader;
     private final ExecutionRepository repository;
@@ -25,6 +27,7 @@ public class ConfigurationImpl implements Configuration {
     private final JobLoader[] jobLoaders;
     private final ArtifactLoader[] artifactLoaders;
     private final Injector[] injectors;
+    private final SecurityCheck[] securityChecks;
 
     public ConfigurationImpl(final Configuration configuration) {
         this.loader = configuration.getClassLoader();
@@ -35,6 +38,7 @@ public class ConfigurationImpl implements Configuration {
         this.jobLoaders = configuration.getJobLoaders();
         this.artifactLoaders = configuration.getArtifactLoaders();
         this.injectors = configuration.getInjectors();
+        this.securityChecks = configuration.getSecurityChecks();
     }
 
     public ConfigurationImpl(final Builder builder) {
@@ -44,6 +48,7 @@ public class ConfigurationImpl implements Configuration {
         this.jobLoaders = builder.jobLoaders;
         this.artifactLoaders = builder.artifactLoaders;
         this.injectors = builder.injectors;
+        this.securityChecks = builder.securityChecks;
     }
 
     @Override
@@ -76,6 +81,11 @@ public class ConfigurationImpl implements Configuration {
         return this.injectors;
     }
 
+    @Override
+    public SecurityCheck[] getSecurityChecks() {
+        return securityChecks;
+    }
+
     public static class Builder {
         private ClassLoader loader = Thread.currentThread().getContextClassLoader();
         private ExecutionRepository repository;
@@ -83,6 +93,7 @@ public class ConfigurationImpl implements Configuration {
         private JobLoader[] jobLoaders = JOB_LOADERS;
         private ArtifactLoader[] artifactLoaders = ARTIFACT_LOADERS;
         private Injector[] injectors = INJECTORS;
+        private SecurityCheck[] securityChecks = SECURITY_CHECKS;
 
         public Builder setLoader(final ClassLoader loader) {
             this.loader = loader;
@@ -111,6 +122,11 @@ public class ConfigurationImpl implements Configuration {
 
         public Builder setInjectors(final Injector... injectors) {
             this.injectors = injectors;
+            return this;
+        }
+
+        public Builder setSecurityChecks(final SecurityCheck... securityChecks) {
+            this.securityChecks = securityChecks;
             return this;
         }
 

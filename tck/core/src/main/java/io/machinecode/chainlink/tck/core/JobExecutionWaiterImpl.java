@@ -2,8 +2,8 @@ package io.machinecode.chainlink.tck.core;
 
 import com.ibm.jbatch.tck.spi.JobExecutionTimeoutException;
 import com.ibm.jbatch.tck.spi.JobExecutionWaiter;
-import io.machinecode.chainlink.core.JobOperationImpl;
-import io.machinecode.chainlink.core.JobOperatorImpl;
+import io.machinecode.chainlink.core.management.JobOperationImpl;
+import io.machinecode.chainlink.core.management.JobOperatorImpl;
 
 import javax.batch.operations.JobExecutionNotRunningException;
 import javax.batch.operations.JobOperator;

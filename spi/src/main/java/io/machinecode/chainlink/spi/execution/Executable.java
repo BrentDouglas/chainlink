@@ -17,6 +17,8 @@ public interface Executable extends Deferred<Deferred<?>>, Serializable {
 
     ThreadId getThreadId();
 
+    boolean willSpawnCallback();
+
     void execute(final Executor executor, final ThreadId threadId, final Executable callback,
                  final ExecutionContext context);
 }

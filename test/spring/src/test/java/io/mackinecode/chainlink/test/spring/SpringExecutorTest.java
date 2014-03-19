@@ -12,7 +12,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class SpringLocalExecutorTest extends ExecutorTest {
+public class SpringExecutorTest extends ExecutorTest {
 
     private static AbstractApplicationContext context;
 

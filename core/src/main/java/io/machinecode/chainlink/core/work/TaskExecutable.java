@@ -47,6 +47,11 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
     }
 
     @Override
+    public boolean willSpawnCallback() {
+        return false;
+    }
+
+    @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
         return work.cancel(mayInterruptIfRunning)
                 && super.cancel(mayInterruptIfRunning);

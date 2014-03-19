@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.spi;
+package io.machinecode.chainlink.spi.management;
 
 import javax.batch.runtime.JobExecution;
 import java.util.concurrent.Future;

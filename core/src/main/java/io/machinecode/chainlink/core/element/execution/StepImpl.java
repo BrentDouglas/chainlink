@@ -271,7 +271,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             final PartitionTarget target = this.partition.map(this.task, executor, thisCallback, context, timeout, restartStepExecutionId);
             this._partitions = target.executables.length;
             this._completed = 0;
-            return executor.execute(
+            return executor.distribute(
                     target.threads,
                     target.executables
             );

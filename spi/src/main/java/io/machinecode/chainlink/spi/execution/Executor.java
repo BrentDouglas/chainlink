@@ -29,7 +29,7 @@ public interface Executor {
 
     Deferred<?> execute(final Executable executable);
 
-    Deferred<?> execute(final int maxThreads, final Executable... executables);
+    Deferred<?> distribute(final int maxThreads, final Executable... executables);
 
     Deferred<?> callback(final Executable executable, final ExecutionContext context);
 

@@ -41,6 +41,11 @@ public class ExecutionCallback extends ExecutableImpl<ExecutionWork> {
     }
 
     @Override
+    public boolean willSpawnCallback() {
+        return false;
+    }
+
+    @Override
     protected Logger log() {
         return log;
     }

@@ -1,7 +1,7 @@
-package io.machinecode.chainlink.core;
+package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.JobOperation;
+import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 
 import javax.batch.operations.JobSecurityException;

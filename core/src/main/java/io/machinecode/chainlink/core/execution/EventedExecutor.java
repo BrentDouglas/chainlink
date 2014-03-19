@@ -42,13 +42,6 @@ public class EventedExecutor implements Executor {
 
     private static final Logger log = Logger.getLogger(EventedExecutor.class);
 
-    public static final Comparator<Integer> INTEGER_COMPARATOR = new Comparator<Integer>() {
-        @Override
-        public int compare(final Integer x, final Integer y) {
-            return Integer.compare(x, y);
-        }
-    };
-
     protected final ExecutionRepository repository;
     protected final TransactionManager transactionManager;
     protected final InjectionContext injectionContext;
@@ -150,7 +143,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Deferred<?> execute(final int maxThreads, final Executable... executables) {
+    public Deferred<?> distribute(final int maxThreads, final Executable... executables) {
         final List<WorkerImpl> workers = _leastBusy(this.workers, maxThreads);
         ListIterator<WorkerImpl> it = workers.listIterator();
         for (final Executable executable : executables) {
@@ -209,11 +202,11 @@ public class EventedExecutor implements Executor {
     }
 
     class WorkerImpl extends Thread implements Worker {
-        // Doubles as a lock for #executables
         private final ThreadIdImpl threadId = new ThreadIdImpl(this);
+        private final Object lock = new Object();
         private volatile boolean running = true;
         private final Queue<ExecutableEvent> executables = new LinkedList<ExecutableEvent>();
-        private final Notify notify = new Notify(threadId);
+        private final Notify notify = new Notify(lock);
 
         @Override
         public ThreadId getThreadId() {
@@ -223,9 +216,9 @@ public class EventedExecutor implements Executor {
         @Override
         public void addExecutable(final ExecutableEvent event) {
             log.debugf(Messages.get("CHAINLINK-024005.worker.add.executable"), threadId, event.getExecutable());
-            synchronized (threadId) {
+            synchronized (lock) {
                 executables.add(event);
-                threadId.notifyAll();
+                lock.notifyAll();
             }
         }
 
@@ -235,7 +228,6 @@ public class EventedExecutor implements Executor {
                 runExecutable();
                 awaitIfEmpty();
             }
-            removeFromThreadPool();
         }
 
         void runExecutable() {
@@ -255,10 +247,10 @@ public class EventedExecutor implements Executor {
 
         private void awaitIfEmpty() {
             try {
-                synchronized (threadId) {
+                synchronized (lock) {
                     if (executables.isEmpty()) {
                         log.tracef(Messages.get("CHAINLINK-024002.worker.waiting"), threadId);
-                        threadId.wait();
+                        lock.wait();
                         log.tracef(Messages.get("CHAINLINK-024003.worker.awake"), threadId);
                     }
                 }
@@ -270,7 +262,7 @@ public class EventedExecutor implements Executor {
         }
 
         private ExecutableEvent _nextFromQueue(final Queue<ExecutableEvent> queue) {
-            synchronized (threadId) {
+            synchronized (lock) {
                 try {
                     return queue.remove();
                 } catch (final NoSuchElementException e) {

@@ -42,6 +42,11 @@ public class JobExecutable extends ExecutableImpl<JobWork> {
     }
 
     @Override
+    public boolean willSpawnCallback() {
+        return true;
+    }
+
+    @Override
     protected Logger log() {
         return log;
     }

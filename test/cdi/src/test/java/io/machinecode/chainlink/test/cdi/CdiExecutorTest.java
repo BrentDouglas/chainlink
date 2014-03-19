@@ -2,7 +2,7 @@ package io.machinecode.chainlink.test.cdi;
 
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
 import io.machinecode.chainlink.inject.cdi.CdiInjector;
-import io.machinecode.chainlink.core.JobOperationImpl;
+import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.element.JobImpl;
@@ -24,7 +24,7 @@ import javax.batch.runtime.JobExecution;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class CdiLocalExecutorTest extends ExecutorTest {
+public class CdiExecutorTest extends ExecutorTest {
 
     private static Weld weld;
     private static WeldContainer container;

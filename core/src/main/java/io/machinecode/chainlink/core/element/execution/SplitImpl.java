@@ -67,7 +67,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
             flows[i] = new ExecutionExecutable(thisCallback, flow, flowContext);
         }
         this._completed = 0;
-        return executor.execute(
+        return executor.distribute(
                 flows.length,
                 flows
         );

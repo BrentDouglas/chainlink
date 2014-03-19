@@ -18,7 +18,7 @@ import javax.servlet.ServletContext;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class SeamLocalExecutorTest extends ExecutorTest {
+public class SeamExecutorTest extends ExecutorTest {
 
     @Override
     protected Builder _configuration() {

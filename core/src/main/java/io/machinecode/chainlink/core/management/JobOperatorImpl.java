@@ -1,5 +1,8 @@
-package io.machinecode.chainlink.core;
+package io.machinecode.chainlink.core.management;
 
+import gnu.trove.set.hash.THashSet;
+import io.machinecode.chainlink.core.DelegateJobExecutionImpl;
+import io.machinecode.chainlink.core.DelegateStepExecutionImpl;
 import io.machinecode.chainlink.core.configuration.ConfigurationFactoryImpl;
 import io.machinecode.chainlink.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
@@ -11,13 +14,14 @@ import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.core.work.JobExecutable;
 import io.machinecode.chainlink.core.util.Repository;
-import io.machinecode.chainlink.spi.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.ExecutorFactory;
+import io.machinecode.chainlink.spi.security.SecurityCheck;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.work.JobWork;
@@ -27,7 +31,6 @@ import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
 import javax.batch.operations.JobExecutionNotRunningException;
-import javax.batch.operations.JobOperator;
 import javax.batch.operations.JobRestartException;
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.JobStartException;
@@ -52,6 +55,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     private final RuntimeConfigurationImpl configuration;
     private final Executor executor;
+    private final SecurityCheck securityCheck;
 
     //TODO This whole business needs sorting out
     public JobOperatorImpl() {
@@ -69,18 +73,27 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } else {
             executorFactory = transportFactories.get(0);
         }
-        executor = executorFactory.produce(configuration, 8); //TODO
+        this.executor = executorFactory.produce(configuration, 8); //TODO
+        this.securityCheck = this.configuration.getSecurityCheck();
     }
 
     public JobOperatorImpl(final RuntimeConfigurationImpl configuration, final Executor executor) {
         this.configuration = configuration;
         this.executor = executor;
+        this.securityCheck = this.configuration.getSecurityCheck();
     }
 
     @Override
     public Set<String> getJobNames() throws JobSecurityException {
         try {
-            return executor.getRepository().getJobNames();
+            final Set<String> jobNames = executor.getRepository().getJobNames();
+            final Set<String> copy = new THashSet<String>(jobNames.size());
+            for (final String jobName : jobNames) {
+                if (!this.securityCheck.filterJobName(jobName)) {
+                    copy.add(jobName);
+                }
+            }
+            return copy;
         } catch (final JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
@@ -91,7 +104,8 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     @Override
     public int getJobInstanceCount(final String jobName) throws NoSuchJobException, JobSecurityException {
         try {
-            return executor.getRepository().getJobInstanceCount(jobName);
+            this.securityCheck.canAccessJob(jobName);
+            return executor.getRepository().getJobInstanceCount(jobName); //TODO This needs to fetch a list of id's that we can then filter on
         } catch (final NoSuchJobException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -104,7 +118,15 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws NoSuchJobException, JobSecurityException {
         try {
-            return executor.getRepository().getJobInstances(jobName, start, count);
+            securityCheck.canAccessJob(jobName);
+            final List<JobInstance> jobInstances =  executor.getRepository().getJobInstances(jobName, start, count);
+            final ArrayList<JobInstance> copy = new ArrayList<JobInstance>(jobInstances.size());
+            for (final JobInstance jobInstance : jobInstances) {
+                if (!securityCheck.filterJobInstance(jobInstance.getInstanceId())) {
+                    copy.add(jobInstance);
+                }
+            }
+            return copy;
         } catch (final NoSuchJobException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -117,7 +139,14 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     @Override
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException {
         try {
-            return executor.getRepository().getRunningExecutions(jobName); //TODO This should probably go through Transport
+            final List<Long> jobExecutionIds = executor.getRepository().getRunningExecutions(jobName); //TODO This should probably go through Transport
+            final ArrayList<Long> copy = new ArrayList<Long>(jobExecutionIds.size());
+            for (final Long jobExecutionId : jobExecutionIds) {
+                if (!securityCheck.filterJobExecution(jobExecutionId)) {
+                    copy.add(jobExecutionId);
+                }
+            }
+            return copy;
         } catch (final NoSuchJobException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -128,9 +157,10 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     }
 
     @Override
-    public Properties getParameters(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public Properties getParameters(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         try {
-            return executor.getRepository().getParameters(executionId);
+            this.securityCheck.canAccessJobExecution(jobExecutionId);
+            return executor.getRepository().getParameters(jobExecutionId);
         } catch (final NoSuchJobExecutionException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -143,6 +173,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     @Override
     public long start(final String jslName, final Properties parameters) throws JobStartException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001200.operator.start"), jslName);
+        this.securityCheck.canStartJob(jslName);
         try {
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
             final JobImpl job = JobFactory.produce(theirs, parameters);
@@ -159,6 +190,8 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     @Override
     public JobOperationImpl startJob(final JobWork job, final String jslName, final Properties parameters) throws JobStartException, JobSecurityException {
+        log.tracef(Messages.get("CHAINLINK-001200.operator.start"), jslName);
+        this.securityCheck.canStartJob(jslName);
         try {
             return _startJob(job, jslName, parameters);
         } catch (final JobStartException e) {
@@ -196,6 +229,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     @Override
     public JobOperationImpl getJobOperation(final long jobExecutionId) throws JobExecutionNotRunningException {
+        this.securityCheck.canAccessJobExecution(jobExecutionId);
         try {
             final Deferred<?> deferred = executor.getJob(jobExecutionId);
             return new JobOperationImpl(
@@ -215,6 +249,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     @Override
     public long restart(final long jobExecutionId, final Properties parameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001201.operator.restart"), jobExecutionId);
+        this.securityCheck.canRestartJob(jobExecutionId);
         try {
             final ExecutionRepository repository = executor.getRepository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
@@ -239,6 +274,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     @Override
     public JobOperationImpl restartJob(final long jobExecutionId, final Properties parameters) throws JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001201.operator.restart"), jobExecutionId);
+        this.securityCheck.canRestartJob(jobExecutionId);
         try {
             final ExecutionRepository repository = executor.getRepository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
@@ -260,7 +296,6 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         }
     }
 
-    //JobExecutionAlreadyCompleteException, NoSuchJobExecutionException, JobExecutionNotMostRecentException, JobRestartException, JobSecurityException,
     private JobOperationImpl _restart(final JobWork job, final long jobExecutionId, final JobInstance instance, final Properties parameters) throws Exception {
         JobFactory.validate(job);
         final ExecutionRepository repository = executor.getRepository();
@@ -289,13 +324,15 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     @Override
     public void stop(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
+        this.securityCheck.canStopJob(jobExecutionId);
         stopJob(jobExecutionId);
     }
 
     @Override
     public Deferred<?> stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
+        log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
+        this.securityCheck.canRestartJob(jobExecutionId);
         try {
-            log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
             final ExecutionRepository repository = executor.getRepository();
             repository.getJobExecution(jobExecutionId); //This will throw a NoSuchJobExecutionException if required
             final Deferred<?> deferred = executor.getJob(jobExecutionId);
@@ -318,6 +355,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     @Override
     public void abandon(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionIsRunningException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001203.operator.abandon"), jobExecutionId);
+        this.securityCheck.canAbandonJob(jobExecutionId);
         try {
             try {
                 executor.getJob(jobExecutionId);
@@ -337,9 +375,12 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     }
 
     @Override
-    public JobInstance getJobInstance(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public JobInstance getJobInstance(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        this.securityCheck.canAccessJobExecution(jobExecutionId);
         try {
-        return executor.getRepository().getJobInstanceForExecution(executionId);
+        final JobInstance jobInstance = executor.getRepository().getJobInstanceForExecution(jobExecutionId);
+            this.securityCheck.canAccessJobInstance(jobInstance.getInstanceId());
+            return jobInstance;
         } catch (final NoSuchJobExecutionException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -351,12 +392,15 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     @Override
     public List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException {
+        this.securityCheck.canAccessJobInstance(instance.getInstanceId());
         try {
             final ExecutionRepository repository = executor.getRepository();
-            final List<? extends JobExecution> executions =  repository.getJobExecutions(instance);
-            final List<JobExecution> delegates = new ArrayList<JobExecution>(executions.size());
-            for (final JobExecution execution : executions) {
-                delegates.add(new DelegateJobExecutionImpl(execution, repository));
+            final List<? extends JobExecution> jobExecutions =  repository.getJobExecutions(instance);
+            final List<JobExecution> delegates = new ArrayList<JobExecution>(jobExecutions.size());
+            for (final JobExecution jobExecution : jobExecutions) {
+                if (!this.securityCheck.filterJobExecution(jobExecution.getExecutionId())) {
+                    delegates.add(new DelegateJobExecutionImpl(jobExecution, repository));
+                }
             }
             return delegates;
         } catch (final NoSuchJobInstanceException e) {
@@ -369,10 +413,11 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     }
 
     @Override
-    public JobExecution getJobExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public JobExecution getJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        this.securityCheck.canAccessJobExecution(jobExecutionId);
         try {
-        final ExecutionRepository repository = executor.getRepository();
-        return new DelegateJobExecutionImpl(repository.getJobExecution(executionId), repository);
+            final ExecutionRepository repository = executor.getRepository();
+            return new DelegateJobExecutionImpl(repository.getJobExecution(jobExecutionId), repository);
         } catch (final NoSuchJobExecutionException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -384,12 +429,15 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     @Override
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+        this.securityCheck.canAccessJobExecution(jobExecutionId);
         try {
             final ExecutionRepository repository = executor.getRepository();
-            final List<? extends StepExecution> executions =  repository.getStepExecutionsForJobExecution(jobExecutionId);
-            final List<StepExecution> delegates = new ArrayList<StepExecution>(executions.size());
-            for (final StepExecution execution : executions) {
-                delegates.add(new DelegateStepExecutionImpl(execution, repository));
+            final List<? extends StepExecution> stepExecutions =  repository.getStepExecutionsForJobExecution(jobExecutionId);
+            final List<StepExecution> delegates = new ArrayList<StepExecution>(stepExecutions.size());
+            for (final StepExecution stepExecution : stepExecutions) {
+                if (!this.securityCheck.filterStepExecution(stepExecution.getStepExecutionId())) {
+                    delegates.add(new DelegateStepExecutionImpl(stepExecution, repository));
+                }
             }
             return delegates;
         } catch (final NoSuchJobExecutionException e) {
@@ -400,5 +448,4 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             throw new JobStartException(e);
         }
     }
-
 }
