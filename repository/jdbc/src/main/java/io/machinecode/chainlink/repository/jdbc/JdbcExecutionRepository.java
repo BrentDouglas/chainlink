@@ -188,7 +188,8 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         }
         connection.commit();
         return new JobExecutionImpl.Builder()
-                .setExecutionId(jobExecutionId)
+                .setJobInstanceId(jobInstance.getInstanceId())
+                .setJobExecutionId(jobExecutionId)
                 .setJobName(jobInstance.getJobName())
                 .setBatchStatus(BatchStatus.STARTING)
                 .setParameters(parameters)
@@ -244,6 +245,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             }
             connection.commit();
             return new StepExecutionImpl.Builder()
+                    .setJobExecutionId(jobExecution.getExecutionId())
                     .setStepExecutionId(stepExecutionId)
                     .setStepName(step.getId())
                     .setBatchStatus(BatchStatus.STARTING)
@@ -1372,11 +1374,11 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected String queryJobExecution() {
-        return "select j.id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j where j.id = ?;";
+        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j where j.id = ?;";
     }
 
     protected String queryLatestJobExecution() {
-        return "select j.id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j order by j.create_time desc limit 1;";
+        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j order by j.create_time desc limit 1;";
     }
 
     protected String queryJobExecutionHistory() {
@@ -1392,15 +1394,15 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected String queryJobExecutionsForJobInstance() {
-        return "select j.id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j where j.job_instance_id = ?;";
+        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j where j.job_instance_id = ?;";
     }
 
     protected String queryStepExecutionsForJobExecution() {
-        return "select s.id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s where s.job_execution_id = ?;";
+        return "select s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s where s.job_execution_id = ?;";
     }
 
     protected String queryStepExecution() {
-        return "select s.id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s where s.id = ?;";
+        return "select s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s where s.id = ?;";
     }
 
     protected String queryStepMetric() {
@@ -1408,11 +1410,11 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected String queryPreviousStepExecution() {
-        return "select distinct s.id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s join public.job_execution_history h on (s.job_execution_id=h.previous_job_execution_id and h.job_execution_id = ?) and s.id <> ? and s.create_time < (select t.create_time from public.step_execution t where t.id = ?) and s.step_name = ? order by s.create_time desc;";
+        return "select distinct s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s join public.job_execution_history h on (s.job_execution_id=h.previous_job_execution_id and h.job_execution_id = ?) and s.id <> ? and s.create_time < (select t.create_time from public.step_execution t where t.id = ?) and s.step_name = ? order by s.create_time desc;";
     }
 
     protected String queryLatestStepExecution() {
-        return "select distinct s.id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s join public.job_execution_history h on ((s.job_execution_id=h.previous_job_execution_id and h.job_execution_id = ?) or s.job_execution_id = ?) and s.step_name = ? order by s.create_time desc;";
+        return "select distinct s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s join public.job_execution_history h on ((s.job_execution_id=h.previous_job_execution_id and h.job_execution_id = ?) or s.job_execution_id = ?) and s.step_name = ? order by s.create_time desc;";
     }
 
     protected String queryStepExecutionCount() {
@@ -1492,16 +1494,17 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         final long stepExecutionId = result.getLong(1);
         final StepExecutionImpl.Builder builder = new StepExecutionImpl.Builder()
                 .setStepExecutionId(stepExecutionId)
-                .setStepName(result.getString(2))
-                .setBatchStatus(BatchStatus.valueOf(result.getString(3)))
-                .setExitStatus(result.getString(4))
-                .setCreatedTime(result.getTimestamp(5))
-                .setStartTime(result.getTimestamp(6))
-                .setUpdatedTime(result.getTimestamp(7))
-                .setEndTime(result.getTimestamp(8))
-                .setPersistentUserData(getLargeObject(result, 9))
-                .setReaderCheckpoint(getLargeObject(result, 10))
-                .setWriterCheckpoint(getLargeObject(result, 11));
+                .setJobExecutionId(result.getLong(2))
+                .setStepName(result.getString(3))
+                .setBatchStatus(BatchStatus.valueOf(result.getString(4)))
+                .setExitStatus(result.getString(5))
+                .setCreatedTime(result.getTimestamp(6))
+                .setStartTime(result.getTimestamp(7))
+                .setUpdatedTime(result.getTimestamp(8))
+                .setEndTime(result.getTimestamp(9))
+                .setPersistentUserData(getLargeObject(result, 10))
+                .setReaderCheckpoint(getLargeObject(result, 11))
+                .setWriterCheckpoint(getLargeObject(result, 12));
 
         final PreparedStatement ms = connection.prepareStatement(queryStepMetric());
         ms.setLong(1, stepExecutionId);
@@ -1521,15 +1524,16 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     private JobExecutionImpl _je(final Connection connection, final ResultSet result) throws SQLException {
         final long jobExecutionId = result.getLong(1);
         final JobExecutionImpl.Builder builder = new JobExecutionImpl.Builder()
-            .setExecutionId(jobExecutionId)
-            .setJobName(result.getString(2))
-            .setBatchStatus(BatchStatus.valueOf(result.getString(3)))
-            .setExitStatus(result.getString(4))
-            .setCreatedTime(result.getTimestamp(5))
-            .setStartTime(result.getTimestamp(6))
-            .setUpdatedTime(result.getTimestamp(7))
-            .setEndTime(result.getTimestamp(8))
-            .setRestartElementId(result.getString(9));
+            .setJobExecutionId(jobExecutionId)
+            .setJobInstanceId(result.getLong(2))
+            .setJobName(result.getString(3))
+            .setBatchStatus(BatchStatus.valueOf(result.getString(4)))
+            .setExitStatus(result.getString(5))
+            .setCreatedTime(result.getTimestamp(6))
+            .setStartTime(result.getTimestamp(7))
+            .setUpdatedTime(result.getTimestamp(8))
+            .setEndTime(result.getTimestamp(9))
+            .setRestartElementId(result.getString(10));
 
         final PreparedStatement ps = connection.prepareStatement(queryJobExecutionParameters());
         ps.setLong(1, jobExecutionId);

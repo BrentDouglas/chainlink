@@ -80,6 +80,17 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-infinispan</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Jdbc -->
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -116,6 +127,16 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>infinispan</id>
+            <activation>
+                <property><name>infinispan</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <configuration.factory.type>Infinispan</configuration.factory.type>
+            </properties>
+        </profile>
         <profile>
             <id>jdbc</id>
             <activation>

@@ -126,7 +126,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             jobInstanceExecutionLock.set(false);
         }
         final JobExecutionImpl execution = new JobExecutionImpl.Builder()
-                .setExecutionId(jobExecutionId)
+                .setJobInstanceId(instance.getInstanceId())
+                .setJobExecutionId(jobExecutionId)
                 .setJobName(instance.getJobName())
                 .setBatchStatus(BatchStatus.STARTING)
                 .setParameters(parameters)
@@ -181,6 +182,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             jobExecutionStepExecutionLock.set(false);
         }
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
+                .setJobExecutionId(jobExecution.getExecutionId())
                 .setStepExecutionId(stepExecutionId)
                 .setStepName(step.getId())
                 .setCreatedTime(timestamp)
@@ -540,9 +542,13 @@ public class MemoryExecutionRepository implements ExecutionRepository {
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
             final List<Long> ids = new ArrayList<Long>();
-            for (final JobExecution execution : jobExecutions.valueCollection()) {
-                if (jobName.equals(execution.getJobName())) {
-                    ids.add(execution.getExecutionId());
+            for (final JobExecution jobExecution : jobExecutions.valueCollection()) {
+                if (jobName.equals(jobExecution.getJobName())) {
+                    switch (jobExecution.getBatchStatus()) {
+                        case STARTING:
+                        case STARTED:
+                            ids.add(jobExecution.getExecutionId());
+                    }
                 }
             }
             if (ids.isEmpty()) {

@@ -12,7 +12,8 @@ import java.util.Properties;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class JobExecutionImpl implements ExtendedJobExecution {
-    private final long executionId;
+    private final long jobInstanceId;
+    private final long jobExecutionId;
     private final String jobName;
     private final BatchStatus batchStatus;
     private final Date start;
@@ -24,7 +25,8 @@ public class JobExecutionImpl implements ExtendedJobExecution {
     private final String restartElementId;
 
     public JobExecutionImpl(final Builder builder) {
-        this.executionId = builder.executionId;
+        this.jobInstanceId = builder.jobInstanceId;
+        this.jobExecutionId = builder.jobExecutionId;
         this.jobName = builder.jobName;
         this.batchStatus = builder.batchStatus;
         this.start = builder.start;
@@ -37,7 +39,8 @@ public class JobExecutionImpl implements ExtendedJobExecution {
     }
 
     public JobExecutionImpl(final ExtendedJobExecution builder) {
-        this.executionId = builder.getExecutionId();
+        this.jobInstanceId = builder.getJobInstanceId();
+        this.jobExecutionId = builder.getExecutionId();
         this.jobName = builder.getJobName();
         this.batchStatus = builder.getBatchStatus();
         this.start = builder.getStartTime();
@@ -58,8 +61,13 @@ public class JobExecutionImpl implements ExtendedJobExecution {
     }
 
     @Override
+    public long getJobInstanceId() {
+        return jobInstanceId;
+    }
+
+    @Override
     public long getExecutionId() {
-        return executionId;
+        return jobExecutionId;
     }
 
     @Override
@@ -109,7 +117,8 @@ public class JobExecutionImpl implements ExtendedJobExecution {
 
     public static Builder from(final ExtendedJobExecution builder) {
         final Builder that = new Builder();
-        that.executionId = builder.getExecutionId();
+        that.jobInstanceId = builder.getJobInstanceId();
+        that.jobExecutionId = builder.getExecutionId();
         that.jobName = builder.getJobName();
         that.batchStatus = builder.getBatchStatus();
         that.start = builder.getStartTime();
@@ -123,7 +132,8 @@ public class JobExecutionImpl implements ExtendedJobExecution {
     }
 
     public static class Builder {
-        private long executionId;
+        private long jobInstanceId;
+        private long jobExecutionId;
         private String jobName;
         private BatchStatus batchStatus;
         private Date start;
@@ -134,8 +144,13 @@ public class JobExecutionImpl implements ExtendedJobExecution {
         private Properties parameters;
         private String restartElementId;
 
-        public Builder setExecutionId(final long executionId) {
-            this.executionId = executionId;
+        public Builder setJobInstanceId(final long jobInstanceId) {
+            this.jobInstanceId = jobInstanceId;
+            return this;
+        }
+
+        public Builder setJobExecutionId(final long jobExecutionId) {
+            this.jobExecutionId = jobExecutionId;
             return this;
         }
 

@@ -17,6 +17,7 @@
         <module>memory</module>
         <module>jpa</module>
         <module>jdbc</module>
+        <module>infinispan</module>
     </modules>
 
 </project>

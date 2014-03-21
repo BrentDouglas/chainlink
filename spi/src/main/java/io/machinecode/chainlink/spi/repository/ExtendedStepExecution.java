@@ -7,4 +7,5 @@ import javax.batch.runtime.StepExecution;
  */
 public interface ExtendedStepExecution extends StepExecution, BaseExecution {
 
+    long getJobExecutionId();
 }

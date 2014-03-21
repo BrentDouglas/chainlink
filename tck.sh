@@ -34,6 +34,9 @@ FAILED=""
 # Memory
 run-test -Pall
 
+# Infinispan
+run-test -Pall -Pinfinispan
+
 # Jpa
 run-test -Pall -Pjpa
 run-test -Pall -Pjpa -Ppostgresql

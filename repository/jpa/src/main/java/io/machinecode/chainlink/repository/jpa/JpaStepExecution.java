@@ -259,4 +259,10 @@ public class JpaStepExecution implements ExtendedStepExecution {
         this.partitionExecutions = partitionExecutions;
         return this;
     }
+
+    @Override
+    @Transient
+    public long getJobExecutionId() {
+        return jobExecution.getExecutionId();
+    }
 }

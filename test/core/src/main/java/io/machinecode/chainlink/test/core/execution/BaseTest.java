@@ -9,6 +9,7 @@ import io.machinecode.chainlink.spi.execution.Executor;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
 
+import javax.transaction.TransactionManager;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -23,6 +24,7 @@ public abstract class BaseTest extends Assert {
     private Executor _executor;
     private ExecutionRepository _repository;
     private RuntimeConfigurationImpl _configuration;
+    private TransactionManager _transactionManager;
 
     protected final RuntimeConfigurationImpl configuration() {
         if (this._configuration == null) {
@@ -45,16 +47,27 @@ public abstract class BaseTest extends Assert {
         return _executor;
     }
 
+    protected final TransactionManager transactionManager() {
+        if (this._transactionManager == null) {
+            this._transactionManager = _transactionManager();
+        }
+        return _transactionManager;
+    }
+
     // Override these for different configurations
 
     protected Builder _configuration() {
         return new Builder()
                 .setLoader(Thread.currentThread().getContextClassLoader())
-                .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
+                .setTransactionManager(transactionManager())
                 .setRepository(repository());
     }
 
     protected abstract ExecutionRepository _repository();
+
+    protected final TransactionManager _transactionManager() {
+        return new LocalTransactionManager(180, TimeUnit.SECONDS);
+    }
 
     protected Executor _executor() {
         return new EventedExecutor(configuration(), 1);

@@ -9,18 +9,21 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStepExecution {
-    private final long executionId;
+    private final long jobExecutionId;
+    private final long stepExecutionId;
     private final String stepName;
 
     public StepExecutionImpl(final Builder builder) {
         super(builder);
-        this.executionId = builder.executionId;
+        this.jobExecutionId = builder.jobExecutionId;
+        this.stepExecutionId = builder.stepExecutionId;
         this.stepName = builder.stepName;
     }
 
     public StepExecutionImpl(final ExtendedStepExecution builder) {
         super(builder);
-        this.executionId = builder.getStepExecutionId();
+        this.jobExecutionId = builder.getJobExecutionId();
+        this.stepExecutionId = builder.getStepExecutionId();
         this.stepName = builder.getStepName();
     }
 
@@ -40,13 +43,19 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
 
     protected static void  _from(final Builder builder, final ExtendedStepExecution that) {
         BaseExecutionImpl._from(builder, that);
-        builder.executionId = that.getStepExecutionId();
+        builder.jobExecutionId = that.getJobExecutionId();
+        builder.stepExecutionId = that.getStepExecutionId();
         builder.stepName = that.getStepName();
     }
 
     @Override
+    public long getJobExecutionId() {
+        return jobExecutionId;
+    }
+
+    @Override
     public long getStepExecutionId() {
-        return executionId;
+        return stepExecutionId;
     }
 
     @Override
@@ -55,11 +64,17 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
     }
 
     public static class Builder extends BaseExecutionImpl.Builder<Builder> {
-        private long executionId;
+        private long jobExecutionId;
+        private long stepExecutionId;
         private String stepName;
 
-        public Builder setStepExecutionId(final long executionId) {
-            this.executionId = executionId;
+        public Builder setJobExecutionId(final long jobExecutionId) {
+            this.jobExecutionId = jobExecutionId;
+            return this;
+        }
+
+        public Builder setStepExecutionId(final long stepExecutionId) {
+            this.stepExecutionId = stepExecutionId;
             return this;
         }
 

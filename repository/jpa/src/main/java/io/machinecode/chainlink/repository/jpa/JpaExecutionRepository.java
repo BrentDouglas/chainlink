@@ -624,6 +624,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
+            //TODO Batch Status
             final List<Long> ids = em.createNamedQuery("JpaJobExecution.jobExecutionIdsWithJobName", Long.class)
                     .setParameter("jobName", jobName)
                     .getResultList();

@@ -212,6 +212,12 @@ public class JpaJobExecution implements ExtendedJobExecution {
         return restartElementId;
     }
 
+    @Override
+    @Transient
+    public long getJobInstanceId() {
+        return jobInstance.getInstanceId();
+    }
+
     public JpaJobExecution setRestartElementId(final String restartElementId) {
         this.restartElementId = restartElementId;
         return this;

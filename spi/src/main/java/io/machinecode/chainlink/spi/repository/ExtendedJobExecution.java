@@ -11,4 +11,6 @@ public interface ExtendedJobExecution extends JobExecution {
      * @return The id of the step to restart on if this job was stopped.
      */
     String getRestartElementId();
+
+    long getJobInstanceId();
 }
