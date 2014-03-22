@@ -1,6 +1,8 @@
 package io.machinecode.chainlink.tck.seam;
 
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
@@ -64,8 +66,8 @@ public class JdbcSeamConfigurationFactory implements ConfigurationFactory {
     @Override
     public Configuration produce() {
         return new Builder()
-                .setLoader(Thread.currentThread().getContextClassLoader())
-                .setRepository(JdbcExecutionRepository.create(new DataSourceLookup() {
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setExecutionRepository(JdbcExecutionRepository.create(new DataSourceLookup() {
                     @Override
                     public DataSource getDataSource() {
                         return dataSource;
@@ -74,6 +76,8 @@ public class JdbcSeamConfigurationFactory implements ConfigurationFactory {
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class))
                 .setInjectors(new VetoInjector())
+                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }
 }

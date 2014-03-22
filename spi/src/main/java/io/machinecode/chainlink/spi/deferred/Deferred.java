@@ -22,6 +22,8 @@ public interface Deferred<T> extends Future<T> {
 
     Throwable getFailure(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;
 
+    void always(final Listener listener);
+
     void onResolve(final Listener listener);
 
     void onReject(final Listener listener);

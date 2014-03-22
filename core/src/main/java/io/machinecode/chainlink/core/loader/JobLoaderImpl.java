@@ -24,11 +24,11 @@ public class JobLoaderImpl implements JobLoader {
     private final WarXmlJobLoader warLoader;
     private final Set<JobLoader> loaders;
 
-    public JobLoaderImpl(final Configuration configuration) {
-        this.jarLoader = new JarXmlJobLoader(configuration.getClassLoader());
-        this.warLoader = new WarXmlJobLoader(configuration.getClassLoader());
+    public JobLoaderImpl(final ClassLoader classLoader, final JobLoader... jobLoaders) {
+        this.jarLoader = new JarXmlJobLoader(classLoader);
+        this.warLoader = new WarXmlJobLoader(classLoader);
         this.loaders = new TLinkedHashSet<JobLoader>();
-        Collections.addAll(this.loaders, configuration.getJobLoaders());
+        Collections.addAll(this.loaders, jobLoaders);
     }
 
     @Override

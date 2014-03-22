@@ -1,6 +1,8 @@
 package io.machinecode.chainlink.tck.batch;
 
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
 import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
@@ -62,14 +64,16 @@ public class JdbcBatchConfigurationFactory implements ConfigurationFactory {
     @Override
     public Configuration produce() throws Exception {
         return new Builder()
-                .setLoader(Thread.currentThread().getContextClassLoader())
-                .setRepository(JdbcExecutionRepository.create(new DataSourceLookup() {
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setExecutionRepository(JdbcExecutionRepository.create(new DataSourceLookup() {
                     @Override
                     public DataSource getDataSource() {
                         return dataSource;
                     }
                 }, username, password))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
+                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }
 }

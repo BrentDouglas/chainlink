@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.inject;
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.inject.Injector;
@@ -18,7 +18,7 @@ public class InjectionContextImpl implements InjectionContext {
     private final Injector injector;
     private final InjectablesProvider provider;
 
-    public InjectionContextImpl(final RuntimeConfiguration configuration) {
+    public InjectionContextImpl(final Configuration configuration) {
         this.classLoader = new WeakReference<ClassLoader>(configuration.getClassLoader());
         this.artifactLoader = configuration.getArtifactLoader();
         this.injector = configuration.getInjector();

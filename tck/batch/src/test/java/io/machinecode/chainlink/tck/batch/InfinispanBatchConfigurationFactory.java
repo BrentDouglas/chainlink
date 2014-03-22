@@ -1,6 +1,8 @@
 package io.machinecode.chainlink.tck.batch;
 
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
@@ -8,8 +10,6 @@ import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
-import org.infinispan.eviction.EvictionStrategy;
-import org.infinispan.eviction.EvictionThreadPolicy;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.transaction.LockingMode;
 import org.infinispan.transaction.TransactionMode;
@@ -28,8 +28,8 @@ public class InfinispanBatchConfigurationFactory implements ConfigurationFactory
     public Configuration produce() {
         final LocalTransactionManager transactionManager = new LocalTransactionManager(180, TimeUnit.SECONDS);
         return new Builder()
-                .setLoader(Thread.currentThread().getContextClassLoader())
-                .setRepository(new InfinispanExecutionRepository(
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setExecutionRepository(new InfinispanExecutionRepository(
                         new DefaultCacheManager(
                                 new GlobalConfigurationBuilder()
                                         .clusteredDefault()
@@ -64,6 +64,8 @@ public class InfinispanBatchConfigurationFactory implements ConfigurationFactory
                         transactionManager
                 ))
                 .setTransactionManager(transactionManager)
+                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }
 }

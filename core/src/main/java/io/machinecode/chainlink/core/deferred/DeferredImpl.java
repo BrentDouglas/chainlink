@@ -95,6 +95,27 @@ public class DeferredImpl<T> implements Deferred<T> {
     }
 
     @Override
+    public void always(final Listener listener) {
+        boolean run = false;
+        synchronized (lock) {
+            switch(this.state) {
+                case REJECTED:
+                case CANCELLED:
+                case RESOLVED:
+                    run = true;
+                case PENDING:
+                default:
+                    resolveListeners.add(listener);
+                    rejectListeners.add(listener);
+                    cancelListeners.add(listener);
+            }
+        }
+        if (run) {
+            listener.run(this);
+        }
+    }
+
+    @Override
     public void onResolve(final Listener listener) {
         boolean run = false;
         synchronized (lock) {

@@ -19,9 +19,7 @@ public class AllDeferredImpl<T> extends DeferredImpl<T> {
             }
         };
         for (final Deferred<?> that : chain) {
-            that.onResolve(notify);
-            that.onReject(notify);
-            that.onCancel(notify);
+            that.always(notify);
         }
         resolve(null);
     }

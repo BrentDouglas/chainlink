@@ -27,7 +27,7 @@ public abstract class ExecutorTest extends BaseTest {
     @Before
     public void before() {
         if (operator == null) {
-            operator = new JobOperatorImpl(configuration(), executor());
+            operator = new JobOperatorImpl(configuration());
         }
     }
 

@@ -173,6 +173,11 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
+    public void always(final Listener listener) {
+        delegate.always(listener);
+    }
+
+    @Override
     public void onResolve(final Listener listener) {
         delegate.onResolve(listener);
     }

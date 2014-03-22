@@ -20,13 +20,13 @@ public class ArtifactLoaderImpl implements ArtifactLoader {
     private final ClassLoaderArtifactLoader configuredLoader;
     private final TLinkedHashSet<ArtifactLoader> loaders;
 
-    public ArtifactLoaderImpl(final Configuration configuration) {
-        this.jarBatchLoader = new JarBatchArtifactLoader(configuration.getClassLoader());
-        this.warBatchLoader = new WarBatchArtifactLoader(configuration.getClassLoader());
+    public ArtifactLoaderImpl(final ClassLoader classLoader, final ArtifactLoader... artifactLoaders) {
+        this.jarBatchLoader = new JarBatchArtifactLoader(classLoader);
+        this.warBatchLoader = new WarBatchArtifactLoader(classLoader);
         this.configuredLoader = new ClassLoaderArtifactLoader();
         this.tcclLoader = new TcclArtifactLoader();
         this.loaders = new TLinkedHashSet<ArtifactLoader>();
-        Collections.addAll(this.loaders, configuration.getArtifactLoaders());
+        Collections.addAll(this.loaders, artifactLoaders);
     }
 
 

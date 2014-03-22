@@ -1,9 +1,12 @@
 package io.machinecode.chainlink.test.core.execution;
 
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
-import io.machinecode.chainlink.core.configuration.RuntimeConfigurationImpl;
+import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutor;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.spi.configuration.ExecutorFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.execution.Executor;
 import org.jboss.logging.Logger;
@@ -21,14 +24,14 @@ public abstract class BaseTest extends Assert {
     private static final Logger log = Logger.getLogger(BaseTest.class);
 
     public static final Properties PARAMETERS = new Properties();
-    private Executor _executor;
+    private ExecutorFactory _executor;
     private ExecutionRepository _repository;
-    private RuntimeConfigurationImpl _configuration;
+    private ConfigurationImpl _configuration;
     private TransactionManager _transactionManager;
 
-    protected final RuntimeConfigurationImpl configuration() {
+    protected final ConfigurationImpl configuration() {
         if (this._configuration == null) {
-            this._configuration = new RuntimeConfigurationImpl(_configuration().build());
+            this._configuration = _configuration().build();
         }
         return this._configuration;
     }
@@ -40,7 +43,7 @@ public abstract class BaseTest extends Assert {
         return _repository;
     }
 
-    protected final Executor executor() {
+    protected final ExecutorFactory executor() {
         if (this._executor == null) {
             this._executor = _executor();
         }
@@ -58,9 +61,11 @@ public abstract class BaseTest extends Assert {
 
     protected Builder _configuration() {
         return new Builder()
-                .setLoader(Thread.currentThread().getContextClassLoader())
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
                 .setTransactionManager(transactionManager())
-                .setRepository(repository());
+                .setExecutionRepository(repository())
+                .setExecutorFactory(executor())
+                .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8");
     }
 
     protected abstract ExecutionRepository _repository();
@@ -69,8 +74,8 @@ public abstract class BaseTest extends Assert {
         return new LocalTransactionManager(180, TimeUnit.SECONDS);
     }
 
-    protected Executor _executor() {
-        return new EventedExecutor(configuration(), 1);
+    protected ExecutorFactory _executor() {
+        return new EventedExecutorFactory();
     }
 
     protected void printMethodName() {

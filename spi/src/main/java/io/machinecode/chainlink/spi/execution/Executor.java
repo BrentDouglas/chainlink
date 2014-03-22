@@ -36,4 +36,8 @@ public interface Executor {
     Worker getWorker(final ThreadId threadId);
 
     Future<?> cancel(Deferred<?> deferred);
+
+    void start();
+
+    void stop();
 }

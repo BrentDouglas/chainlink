@@ -1,6 +1,8 @@
 package io.machinecode.chainlink.tck.seam;
 
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
@@ -28,11 +30,13 @@ public class MemorySeamConfigurationFactory implements ConfigurationFactory {
     @Override
     public Configuration produce() {
         return new Builder()
-                .setLoader(Thread.currentThread().getContextClassLoader())
-                .setRepository(new MemoryExecutionRepository())
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setExecutionRepository(new MemoryExecutionRepository())
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class))
                 .setInjectors(new VetoInjector())
+                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }
 }

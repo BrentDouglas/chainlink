@@ -12,8 +12,8 @@ public class SecurityCheckImpl implements SecurityCheck {
 
     private final SecurityCheck[] securityChecks;
 
-    public SecurityCheckImpl(final Configuration configuration) {
-        this.securityChecks = configuration.getSecurityChecks();
+    public SecurityCheckImpl(final SecurityCheck... securityChecks) {
+        this.securityChecks = securityChecks;
     }
 
     @Override

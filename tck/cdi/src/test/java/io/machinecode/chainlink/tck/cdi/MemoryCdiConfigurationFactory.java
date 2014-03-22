@@ -1,5 +1,7 @@
 package io.machinecode.chainlink.tck.cdi;
 
+import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
 import io.machinecode.chainlink.inject.cdi.CdiInjector;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
@@ -28,11 +30,13 @@ public class MemoryCdiConfigurationFactory implements ConfigurationFactory {
     @Override
     public Configuration produce() {
         return new Builder()
-                .setLoader(Thread.currentThread().getContextClassLoader())
-                .setRepository(new MemoryExecutionRepository())
+                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setExecutionRepository(new MemoryExecutionRepository())
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class))
                 .setInjectors(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class))
+                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }
 }

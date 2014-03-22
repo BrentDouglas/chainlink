@@ -7,9 +7,9 @@ import io.machinecode.chainlink.spi.execution.Executor;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class EventedExecutorFactory implements ExecutorFactory {
+public class ThreadedExecutorFactory implements ExecutorFactory {
     @Override
     public Executor produce(final Configuration configuration) {
-        return new EventedExecutor(configuration);
+        return new ThreadedExecutor(configuration);
     }
 }

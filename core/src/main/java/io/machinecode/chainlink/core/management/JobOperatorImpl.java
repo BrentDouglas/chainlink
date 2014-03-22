@@ -4,23 +4,21 @@ import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.DelegateJobExecutionImpl;
 import io.machinecode.chainlink.core.DelegateStepExecutionImpl;
 import io.machinecode.chainlink.core.configuration.ConfigurationFactoryImpl;
-import io.machinecode.chainlink.core.configuration.RuntimeConfigurationImpl;
-import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
+import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
-import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.core.work.JobExecutable;
 import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executor;
-import io.machinecode.chainlink.spi.execution.ExecutorFactory;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.deferred.Deferred;
@@ -53,33 +51,21 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     private static final Logger log = Logger.getLogger(JobOperatorImpl.class);
 
-    private final RuntimeConfigurationImpl configuration;
+    private final Configuration configuration;
     private final Executor executor;
     private final SecurityCheck securityCheck;
 
-    //TODO This whole business needs sorting out
     public JobOperatorImpl() {
-        this.configuration = new RuntimeConfigurationImpl(ConfigurationFactoryImpl.INSTANCE.produce());
-
-        final List<ExecutorFactory> transportFactories;
-        try {
-            transportFactories = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(configuration.getClassLoader());
-        } catch (final ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        final ExecutorFactory executorFactory;
-        if (transportFactories.isEmpty()) {
-            executorFactory = new EventedExecutorFactory();
-        } else {
-            executorFactory = transportFactories.get(0);
-        }
-        this.executor = executorFactory.produce(configuration, 8); //TODO
+        this.configuration = ConfigurationFactoryImpl.INSTANCE.produce();
+        this.executor = configuration.getExecutorFactory().produce(configuration);
+        this.executor.start();
         this.securityCheck = this.configuration.getSecurityCheck();
     }
 
-    public JobOperatorImpl(final RuntimeConfigurationImpl configuration, final Executor executor) {
+    public JobOperatorImpl(final ConfigurationImpl configuration) {
         this.configuration = configuration;
-        this.executor = executor;
+        this.executor = configuration.getExecutorFactory().produce(configuration);
+        this.executor.start();
         this.securityCheck = this.configuration.getSecurityCheck();
     }
 

@@ -20,10 +20,10 @@ public class InjectorImpl implements Injector {
     final Injector injector;
     final Set<Injector> injectors;
 
-    public InjectorImpl(final Configuration configuration) {
+    public InjectorImpl(final Injector... injectors) {
         this.injector = new DefaultInjector();
         this.injectors = new TLinkedHashSet<Injector>();
-        Collections.addAll(this.injectors, configuration.getInjectors());
+        Collections.addAll(this.injectors, injectors);
     }
 
     @Override
