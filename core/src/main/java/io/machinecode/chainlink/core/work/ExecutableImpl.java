@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.Work;
@@ -54,11 +55,10 @@ public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferr
     }
 
     @Override
-    public void execute(final Executor executor, final ThreadId threadId, final Executable callback,
-                        final ExecutionContext context) {
+    public void execute(final Executor executor, final ThreadId threadId, final ExecutableEvent event) {
         try {
             log().tracef(Messages.get("CHAINLINK-015703.executable.execute"), this.context, this);
-            final Deferred<?> next = doExecute(executor, threadId, callback, context);
+            final Deferred<?> next = doExecute(executor, threadId, this.parent, event.getContext());
             // null means that it was an incomplete partition
             if (next == null) {
                 resolve(null); //Need to call notify listener.

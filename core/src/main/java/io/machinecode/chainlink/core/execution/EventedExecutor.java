@@ -4,6 +4,8 @@ import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ThreadId;
+import io.machinecode.chainlink.spi.execution.Executor;
+import io.machinecode.chainlink.spi.execution.Worker;
 import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ public class EventedExecutor extends BaseExecutor {
     }
 
     @Override
-    protected EventedWorker getCallbackWorker(final ThreadId threadId) {
+    public EventedWorker getCallbackWorker(final ThreadId threadId) {
         final EventedWorker worker = getWorker(threadId);
         if (worker != null) {
             return worker;
@@ -52,8 +54,8 @@ public class EventedExecutor extends BaseExecutor {
     }
 
     @Override
-    protected List<BaseWorker> getWorkers(final List<BaseWorker> workers, final int required) {
-        final ArrayList<BaseWorker> ret = new ArrayList<BaseWorker>(required);
+    public List<Worker> getWorkers(final int required) {
+        final ArrayList<Worker> ret = new ArrayList<Worker>(required);
         synchronized (workers) {
             for (int i = 0; i < required; ++i) {
                 if (worker.get() >= workers.size()) {
@@ -66,30 +68,44 @@ public class EventedExecutor extends BaseExecutor {
     }
 
     @Override
-    protected EventedWorker createWorker() {
-        return new EventedWorker();
+    public Worker getWorker() {
+        synchronized (workers) {
+            if (worker.get() >= workers.size()) {
+                worker.set(0);
+            }
+            return workers.get(worker.getAndIncrement());
+        }
     }
 
-    class EventedWorker extends BaseWorker {
+    @Override
+    public EventedWorker createWorker() {
+        return new EventedWorker(this);
+    }
+
+    public static class EventedWorker extends BaseWorker<EventedExecutor> {
+
+        public EventedWorker(final EventedExecutor executor) {
+            super(executor);
+        }
 
         @Override
         protected void addToThreadPool() {
-            while (!EventedExecutor.this.threadsLock.compareAndSet(false, true)) {}
+            while (!executor.threadsLock.compareAndSet(false, true)) {}
             try {
-                EventedExecutor.this.activeThreads.put(threadId, this);
+                executor.activeThreads.put(threadId, this);
             } finally {
-                EventedExecutor.this.threadsLock.set(false);
+                executor.threadsLock.set(false);
             }
         }
 
         @Override
         protected void removeFromThreadPool() {
-            while (!EventedExecutor.this.threadsLock.compareAndSet(false, true)) {}
+            while (!executor.threadsLock.compareAndSet(false, true)) {}
             try {
-                EventedExecutor.this.activeThreads.remove(threadId);
-                EventedExecutor.this.closedThreads.put(threadId, this);
+                executor.activeThreads.remove(threadId);
+                executor.closedThreads.put(threadId, this);
             } finally {
-                EventedExecutor.this.threadsLock.set(false);
+                executor.threadsLock.set(false);
             }
         }
     }

@@ -7,6 +7,8 @@ import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.deferred.Listener;
 import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.execution.Executor;
+import io.machinecode.chainlink.spi.execution.Worker;
 import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class ThreadedExecutor extends BaseExecutor {
     }
 
     @Override
-    protected ThreadedWorker getCallbackWorker(final ThreadId threadId) {
+    public ThreadedWorker getCallbackWorker(final ThreadId threadId) {
         while (!threadsLock.compareAndSet(false, true)) {}
         try {
             final ThreadedWorker worker = blockedThreads.get(threadId);
@@ -56,18 +58,35 @@ public class ThreadedExecutor extends BaseExecutor {
     }
 
     @Override
-    protected List<BaseWorker> getWorkers(final List<BaseWorker> workers, final int required) {
-        final ArrayList<BaseWorker> ret = new ArrayList<BaseWorker>(required);
+    public Worker getWorker() {
         synchronized (workers) {
+            if (currentWorker.get() >= workers.size()) {
+                currentWorker.set(0);
+            }
+            final Worker worker = workers.get(currentWorker.getAndIncrement());
+            while (!threadsLock.compareAndSet(false, true)) {}
+            try {
+                blockedThreads.put(worker.getThreadId(), activeThreads.remove(worker.getThreadId()));
+            } finally {
+                threadsLock.set(false);
+            }
+            return worker;
+        }
+    }
+
+    @Override
+    public List<Worker> getWorkers(final int required) {
+        final ArrayList<Worker> ret = new ArrayList<Worker>(required);
+        synchronized (this.workers) {
             for (int i = 0; i < required; ++i) {
                 if (currentWorker.get() >= workers.size()) {
                     currentWorker.set(0);
                 }
-                final BaseWorker worker = workers.get(currentWorker.getAndIncrement());
+                final Worker worker = workers.get(currentWorker.getAndIncrement());
                 ret.add(worker);
                 while (!threadsLock.compareAndSet(false, true)) {}
                 try {
-                    blockedThreads.put(worker.threadId, activeThreads.remove(worker.threadId));
+                    blockedThreads.put(worker.getThreadId(), activeThreads.remove(worker.getThreadId()));
                 } finally {
                     threadsLock.set(false);
                 }
@@ -77,22 +96,26 @@ public class ThreadedExecutor extends BaseExecutor {
     }
 
     @Override
-    protected ThreadedWorker createWorker() {
-        return new ThreadedWorker();
+    public ThreadedWorker createWorker() {
+        return new ThreadedWorker(this);
     }
 
-    class ThreadedWorker extends BaseWorker {
+    public static class ThreadedWorker extends BaseWorker<ThreadedExecutor> {
         private final Listener listener = new Listener() {
             @Override
             public void run(final Deferred<?> that) {
-                while (!threadsLock.compareAndSet(false, true)) {}
+                while (!executor.threadsLock.compareAndSet(false, true)) {}
                 try {
-                    activeThreads.put(ThreadedWorker.this.threadId, blockedThreads.remove(ThreadedWorker.this.threadId));
+                    executor.activeThreads.put(ThreadedWorker.this.threadId, executor.blockedThreads.remove(ThreadedWorker.this.threadId));
                 } finally {
-                    threadsLock.set(false);
+                    executor.threadsLock.set(false);
                 }
             }
         };
+
+        protected ThreadedWorker(final ThreadedExecutor executor) {
+            super(executor);
+        }
 
         protected void preExecute(final Executable executable) {
             executable.always(listener);
@@ -100,22 +123,22 @@ public class ThreadedExecutor extends BaseExecutor {
 
         @Override
         protected void addToThreadPool() {
-            while (!ThreadedExecutor.this.threadsLock.compareAndSet(false, true)) {}
+            while (!executor.threadsLock.compareAndSet(false, true)) {}
             try {
-                ThreadedExecutor.this.activeThreads.put(threadId, this);
+                executor.activeThreads.put(threadId, this);
             } finally {
-                ThreadedExecutor.this.threadsLock.set(false);
+                executor.threadsLock.set(false);
             }
         }
 
         @Override
         protected void removeFromThreadPool() {
-            while (!ThreadedExecutor.this.threadsLock.compareAndSet(false, true)) {}
+            while (!executor.threadsLock.compareAndSet(false, true)) {}
             try {
-                ThreadedExecutor.this.activeThreads.remove(threadId);
-                ThreadedExecutor.this.closedThreads.put(threadId, this);
+                executor.activeThreads.remove(threadId);
+                executor.closedThreads.put(threadId, this);
             } finally {
-                ThreadedExecutor.this.threadsLock.set(false);
+                executor.threadsLock.set(false);
             }
         }
     }

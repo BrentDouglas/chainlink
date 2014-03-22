@@ -8,6 +8,7 @@ import io.machinecode.chainlink.spi.deferred.Deferred;
 
 import javax.batch.operations.JobExecutionNotRunningException;
 import javax.transaction.TransactionManager;
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -34,6 +35,14 @@ public interface Executor {
     Deferred<?> callback(final Executable executable, final ExecutionContext context);
 
     Worker getWorker(final ThreadId threadId);
+
+    Worker getCallbackWorker(final ThreadId threadId);
+
+    List<Worker> getWorkers(final int required);
+
+    Worker getWorker();
+
+    Worker createWorker();
 
     Future<?> cancel(Deferred<?> deferred);
 

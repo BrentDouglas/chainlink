@@ -43,7 +43,7 @@ public abstract class BaseExecutor implements Executor {
     protected final TransactionManager transactionManager;
     protected final InjectionContext injectionContext;
 
-    protected final List<BaseWorker> workers;
+    protected final List<Worker> workers;
 
     protected final TLongObjectMap<Deferred<?>> jobs = new TLongObjectHashMap<Deferred<?>>();
     protected final AtomicBoolean jobLock = new AtomicBoolean(false);
@@ -57,7 +57,7 @@ public abstract class BaseExecutor implements Executor {
         this.injectionContext = new InjectionContextImpl(configuration);
         //TODO cleanup
         final int threads = Integer.parseInt(configuration.getProperty(Constants.EXECUTOR_THREAD_POOL_SIZE));
-        this.workers = new ArrayList<BaseWorker>(threads);
+        this.workers = new ArrayList<Worker>(threads);
         this.numThreads = threads;
     }
 
@@ -65,10 +65,9 @@ public abstract class BaseExecutor implements Executor {
     public void start() {
         synchronized (workers) {
             for (int i = 0; i < numThreads; ++i) {
-                final BaseWorker worker = createWorker();
+                final Worker worker = createWorker();
                 this.workers.add(worker);
                 worker.start();
-                worker.addToThreadPool();
             }
         }
     }
@@ -139,32 +138,32 @@ public abstract class BaseExecutor implements Executor {
     @Override
     public Deferred<?> execute(final Executable executable) {
         final ThreadId threadId = executable.getThreadId();
-        final BaseWorker worker;
+        final Worker worker;
         if (threadId == null) {
-            worker = getWorkers(workers, 1).get(0);
+            worker = getWorker();
         } else {
             worker = getWorker(threadId);
         }
-        if (executable.willSpawnCallback()) {
-            ++worker.awaiting;
-        }
-        worker.addExecutable(new ExecutableEventImpl(executable));
+        final ExecutableEvent.Type type = executable.willSpawnCallback()
+                ? ExecutableEvent.Type.EXECUTABLE_WITH_CALLBACK
+                : ExecutableEvent.Type.EXECUTABLE;
+        worker.addExecutable(new ExecutableEventImpl(executable, type));
         return executable;
     }
 
     @Override
     public Deferred<?> distribute(final int maxThreads, final Executable... executables) {
-        final List<? extends BaseWorker> workers = getWorkers(this.workers, maxThreads);
-        ListIterator<? extends BaseWorker> it = workers.listIterator();
+        final List<Worker> workers = getWorkers(maxThreads);
+        ListIterator<Worker> it = workers.listIterator();
         for (final Executable executable : executables) {
             if (!it.hasNext()) {
                 it = workers.listIterator();
             }
-            final BaseWorker worker = it.next();
-            if (executable.willSpawnCallback()) {
-                ++worker.awaiting;
-            }
-            worker.addExecutable(new ExecutableEventImpl(executable));
+            final Worker worker = it.next();
+            final ExecutableEvent.Type type = executable.willSpawnCallback()
+                    ? ExecutableEvent.Type.EXECUTABLE_WITH_CALLBACK
+                    : ExecutableEvent.Type.EXECUTABLE;
+            worker.addExecutable(new ExecutableEventImpl(executable, type));
         }
         return new AllDeferredImpl<Executable>(executables);
     }
@@ -172,25 +171,30 @@ public abstract class BaseExecutor implements Executor {
     @Override
     public Deferred<?> callback(final Executable executable, final ExecutionContext context) {
         final ThreadId threadId = executable.getThreadId();
-        BaseWorker worker;
+        Worker worker;
         if (threadId == null) {
-            worker = getWorkers(workers, 1).get(0);
+            worker = getWorker();
         } else {
             worker = getCallbackWorker(threadId);
         }
-        --worker.awaiting;
-        worker.addExecutable(new ExecutableEventImpl(executable, context));
+        worker.addExecutable(new ExecutableEventImpl(executable, context, ExecutableEvent.Type.CALLBACK));
         return executable;
     }
 
     @Override
-    public abstract BaseWorker getWorker(final ThreadId threadId);
+    public abstract Worker getWorker(final ThreadId threadId);
 
-    protected abstract BaseWorker getCallbackWorker(final ThreadId threadId);
+    @Override
+    public abstract Worker getCallbackWorker(final ThreadId threadId);
 
-    protected abstract List<BaseWorker> getWorkers(final List<BaseWorker> workers, final int required);
+    @Override
+    public abstract List<Worker> getWorkers(final int required);
 
-    protected abstract BaseWorker createWorker();
+    @Override
+    public abstract Worker getWorker();
+
+    @Override
+    public abstract Worker createWorker();
 
     @Override
     public Future<?> cancel(final Deferred<?> deferred) {
@@ -202,13 +206,18 @@ public abstract class BaseExecutor implements Executor {
         });
     }
 
-    abstract class BaseWorker extends Thread implements Worker {
+    public abstract static class BaseWorker<T extends Executor> extends Thread implements Worker {
         protected final ThreadIdImpl threadId = new ThreadIdImpl(this);
         protected final Object lock = new Object();
         protected volatile boolean running = true;
         protected final Queue<ExecutableEvent> executables = new LinkedList<ExecutableEvent>();
         protected final Notify notify = new Notify(lock);
         protected int awaiting = 0;
+        protected final T executor;
+
+        protected BaseWorker(final T executor) {
+            this.executor = executor;
+        }
 
         @Override
         public ThreadId getThreadId() {
@@ -218,6 +227,14 @@ public abstract class BaseExecutor implements Executor {
         @Override
         public void addExecutable(final ExecutableEvent event) {
             log.debugf(Messages.get("CHAINLINK-024005.worker.add.executable"), threadId, event.getExecutable());
+            switch (event.getType()) {
+                case CALLBACK:
+                    --this.awaiting;
+                    break;
+                case EXECUTABLE_WITH_CALLBACK:
+                    ++this.awaiting;
+                    break;
+            }
             synchronized (lock) {
                 executables.add(event);
                 lock.notifyAll();
@@ -233,15 +250,15 @@ public abstract class BaseExecutor implements Executor {
         }
 
         void runExecutable() {
-            final ExecutableEvent workEvent = _nextFromQueue(executables);
-            if (workEvent == null) {
+            final ExecutableEvent event = _nextFromQueue(executables);
+            if (event == null) {
                 return;
             }
-            final Executable executable = workEvent.getExecutable();
+            final Executable executable = event.getExecutable();
             try {
                 executable.always(notify);
                 preExecute(executable);
-                executable.execute(BaseExecutor.this, threadId, executable.getParent(), workEvent.getContext());
+                executable.execute(executor, threadId, event);
             } catch (final Throwable e) {
                 log.errorf(e, Messages.get("CHAINLINK-024004.worker.execute.execution"), threadId, executable);
             }
@@ -275,6 +292,12 @@ public abstract class BaseExecutor implements Executor {
                     return null;
                 }
             }
+        }
+
+        @Override
+        public synchronized void start() {
+            super.start();
+            this.addToThreadPool();
         }
 
         protected abstract void addToThreadPool();

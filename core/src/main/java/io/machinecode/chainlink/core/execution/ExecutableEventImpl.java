@@ -7,17 +7,19 @@ import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-class ExecutableEventImpl implements ExecutableEvent {
+public class ExecutableEventImpl implements ExecutableEvent {
     final Executable executable;
     final ExecutionContext context;
+    final Type type;
 
-    ExecutableEventImpl(final Executable executable, final ExecutionContext context) {
+    public ExecutableEventImpl(final Executable executable, final ExecutionContext context, final Type type) {
         this.executable = executable;
         this.context = context;
+        this.type = type;
     }
 
-    ExecutableEventImpl(final Executable executable) {
-        this(executable, null);
+    public ExecutableEventImpl(final Executable executable, final Type type) {
+        this(executable, null, type);
     }
 
     @Override
@@ -28,5 +30,10 @@ class ExecutableEventImpl implements ExecutableEvent {
     @Override
     public ExecutionContext getContext() {
         return context;
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 }

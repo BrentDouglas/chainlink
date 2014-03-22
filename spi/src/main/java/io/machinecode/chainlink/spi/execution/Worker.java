@@ -10,4 +10,6 @@ public interface Worker extends Runnable {
     ThreadId getThreadId();
 
     void addExecutable(final ExecutableEvent event);
+
+    void start();
 }

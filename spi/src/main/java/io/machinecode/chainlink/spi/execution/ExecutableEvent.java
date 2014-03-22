@@ -13,4 +13,12 @@ public interface ExecutableEvent extends Serializable {
     Executable getExecutable();
 
     ExecutionContext getContext();
+
+    Type getType();
+
+    enum Type {
+        EXECUTABLE,
+        CALLBACK,
+        EXECUTABLE_WITH_CALLBACK
+    }
 }

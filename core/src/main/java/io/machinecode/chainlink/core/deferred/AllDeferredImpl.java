@@ -13,9 +13,7 @@ public class AllDeferredImpl<T> extends DeferredImpl<T> {
         final Listener notify = new Listener() {
             @Override
             public void run(final Deferred<?> deferred) {
-                synchronized (lock) {
-                    _notifyAll(); //TODO Why
-                }
+                _notifyAll(); //TODO Why
             }
         };
         for (final Deferred<?> that : chain) {
