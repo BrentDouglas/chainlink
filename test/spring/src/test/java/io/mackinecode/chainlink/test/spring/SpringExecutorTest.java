@@ -17,13 +17,14 @@ public class SpringExecutorTest extends ExecutorTest {
     private static AbstractApplicationContext context;
 
     @Override
-    protected Builder _configuration() {
+    protected Builder _configuration() throws Exception {
         return super._configuration()
                 .setArtifactLoaders(context.getBean(SpringArtifactLoader.class));
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository();
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        return new MemoryExecutionRepository(tccl);
     }
 
     @BeforeClass

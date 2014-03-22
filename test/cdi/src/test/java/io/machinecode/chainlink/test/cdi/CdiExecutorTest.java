@@ -30,14 +30,15 @@ public class CdiExecutorTest extends ExecutorTest {
     private static WeldContainer container;
 
     @Override
-    protected Builder _configuration() {
+    protected Builder _configuration() throws Exception{
         return super._configuration()
                 .setArtifactLoaders(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class))
                 .setInjectors(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class));
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository();
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        return new MemoryExecutionRepository(tccl);
     }
 
     @BeforeClass

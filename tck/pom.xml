@@ -80,6 +80,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Infinispan -->
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-infinispan</artifactId>
@@ -88,6 +89,18 @@
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Redis -->
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-redis</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -155,6 +168,16 @@
             </activation>
             <properties>
                 <configuration.factory.type>Jpa</configuration.factory.type>
+            </properties>
+        </profile>
+        <profile>
+            <id>redis</id>
+            <activation>
+                <property><name>redis</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <configuration.factory.type>Redis</configuration.factory.type>
             </properties>
         </profile>
         <profile>

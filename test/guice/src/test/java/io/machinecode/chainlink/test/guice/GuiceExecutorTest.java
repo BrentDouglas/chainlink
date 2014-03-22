@@ -26,7 +26,7 @@ import java.util.List;
 public class GuiceExecutorTest extends ExecutorTest {
 
     @Override
-    protected Builder _configuration() {
+    protected Builder _configuration() throws Exception {
         return super._configuration()
                 .setArtifactLoaders(new GuiceArtifactLoader(new BindingProvider() {
                     @Override
@@ -43,7 +43,8 @@ public class GuiceExecutorTest extends ExecutorTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository();
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        return new MemoryExecutionRepository(tccl);
     }
 
     @BeforeClass

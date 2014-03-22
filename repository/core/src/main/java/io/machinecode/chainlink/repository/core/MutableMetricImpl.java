@@ -3,11 +3,12 @@ package io.machinecode.chainlink.repository.core;
 import io.machinecode.chainlink.spi.context.MutableMetric;
 
 import javax.batch.runtime.Metric;
+import java.io.Serializable;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class MutableMetricImpl implements MutableMetric {
+public class MutableMetricImpl implements MutableMetric, Serializable {
 
     private final MetricType type;
     private long value;

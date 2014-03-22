@@ -91,8 +91,9 @@ public class JdbcGuiceConfigurationFactory implements ConfigurationFactory {
 
     @Override
     public Configuration produce() throws Exception {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         return new Builder()
-                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setClassLoader(tccl)
                 .setExecutionRepository(JdbcExecutionRepository.create(new DataSourceLookup() {
                     @Override
                     public DataSource getDataSource() {

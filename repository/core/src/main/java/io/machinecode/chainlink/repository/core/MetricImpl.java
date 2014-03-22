@@ -1,11 +1,12 @@
 package io.machinecode.chainlink.repository.core;
 
 import javax.batch.runtime.Metric;
+import java.io.Serializable;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class MetricImpl implements Metric {
+public class MetricImpl implements Metric, Serializable {
 
     private final MetricType type;
     private final long value;

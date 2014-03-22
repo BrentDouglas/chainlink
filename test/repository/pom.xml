@@ -36,6 +36,11 @@
             <artifactId>chainlink-repository-jdbc</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-redis</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -68,6 +73,12 @@
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

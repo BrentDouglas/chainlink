@@ -10,6 +10,7 @@ import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 public class BatchMemoryExecutorTest extends ExecutorTest {
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository();
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        return new MemoryExecutionRepository(tccl);
     }
 }

@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class BaseExecutionImpl implements BaseExecution {
+public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
     private final BatchStatus batchStatus;
     private final Date create;
     private final Date start;

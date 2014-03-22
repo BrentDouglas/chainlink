@@ -24,7 +24,9 @@ public class InfinispanRepositoryTest extends RepositoryTest {
 
     @Override
     protected ExecutionRepository _repository() {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         return new InfinispanExecutionRepository(
+                tccl,
                 new DefaultCacheManager(
                         new GlobalConfigurationBuilder()
                                 .clusteredDefault()

@@ -3,6 +3,7 @@ package io.machinecode.chainlink.repository.core;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 
 import javax.batch.runtime.BatchStatus;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Properties;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobExecutionImpl implements ExtendedJobExecution {
+public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
     private final long jobInstanceId;
     private final long jobExecutionId;
     private final String jobName;

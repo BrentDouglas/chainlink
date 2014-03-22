@@ -2,13 +2,14 @@ package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class PartitionExecutionImpl extends BaseExecutionImpl implements PartitionExecution {
+public class PartitionExecutionImpl extends BaseExecutionImpl implements PartitionExecution, Serializable {
     private final long partitionExecutionId;
     private final long stepExecutionId;
     private final int partitionId;

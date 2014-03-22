@@ -47,8 +47,9 @@ public class JpaSpringConfigurationFactory implements ConfigurationFactory {
 
     @Override
     public Configuration produce() {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         return new Builder()
-                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setClassLoader(tccl)
                 .setExecutionRepository(new JpaExecutionRepository(new EntityManagerLookup() {
                     @Override
                     public EntityManagerFactory getEntityManagerFactory() {

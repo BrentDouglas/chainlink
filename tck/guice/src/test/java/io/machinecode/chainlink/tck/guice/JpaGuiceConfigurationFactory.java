@@ -70,8 +70,9 @@ public class JpaGuiceConfigurationFactory implements ConfigurationFactory {
 
     @Override
     public Configuration produce() throws Exception {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         return new Builder()
-                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setClassLoader(tccl)
                 .setExecutionRepository(new JpaExecutionRepository(new EntityManagerLookup() {
                     @Override
                     public EntityManagerFactory getEntityManagerFactory() {

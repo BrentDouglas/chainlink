@@ -1560,6 +1560,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 .build();
     }
 
+    //TODO These need to be moved to marshalling
     private byte[] _bytes(final Serializable that) throws IOException {
         if (that == null) {
             return null;

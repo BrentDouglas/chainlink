@@ -38,10 +38,12 @@ public class InfinispanCdiConfigurationFactory implements ConfigurationFactory {
 
     @Override
     public Configuration produce() {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         final LocalTransactionManager transactionManager = new LocalTransactionManager(180, TimeUnit.SECONDS);
         return new Builder()
-                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setClassLoader(tccl)
                 .setExecutionRepository(new InfinispanExecutionRepository(
+                        tccl,
                         new DefaultCacheManager(
                                 new GlobalConfigurationBuilder()
                                         .clusteredDefault()

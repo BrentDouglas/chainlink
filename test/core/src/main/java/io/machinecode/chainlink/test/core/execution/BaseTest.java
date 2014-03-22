@@ -29,21 +29,21 @@ public abstract class BaseTest extends Assert {
     private ConfigurationImpl _configuration;
     private TransactionManager _transactionManager;
 
-    protected final ConfigurationImpl configuration() {
+    protected final ConfigurationImpl configuration() throws Exception {
         if (this._configuration == null) {
             this._configuration = _configuration().build();
         }
         return this._configuration;
     }
 
-    protected final ExecutionRepository repository() {
+    protected final ExecutionRepository repository() throws Exception {
         if (this._repository == null) {
             this._repository = _repository();
         }
         return _repository;
     }
 
-    protected final ExecutorFactory executor() {
+    protected final ExecutorFactory executor() throws Exception{
         if (this._executor == null) {
             this._executor = _executor();
         }
@@ -59,22 +59,23 @@ public abstract class BaseTest extends Assert {
 
     // Override these for different configurations
 
-    protected Builder _configuration() {
+    protected Builder _configuration() throws Exception {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         return new Builder()
-                .setClassLoader(Thread.currentThread().getContextClassLoader())
+                .setClassLoader(tccl)
                 .setTransactionManager(transactionManager())
                 .setExecutionRepository(repository())
                 .setExecutorFactory(executor())
                 .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8");
     }
 
-    protected abstract ExecutionRepository _repository();
+    protected abstract ExecutionRepository _repository() throws Exception;
 
     protected final TransactionManager _transactionManager() {
         return new LocalTransactionManager(180, TimeUnit.SECONDS);
     }
 
-    protected ExecutorFactory _executor() {
+    protected ExecutorFactory _executor() throws Exception{
         return new EventedExecutorFactory();
     }
 

@@ -45,9 +45,10 @@ public class MemoryGuiceConfigurationFactory implements ConfigurationFactory {
 
     @Override
     public Configuration produce() {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         return new Builder()
-                .setClassLoader(Thread.currentThread().getContextClassLoader())
-                .setExecutionRepository(new MemoryExecutionRepository())
+                .setClassLoader(tccl)
+                .setExecutionRepository(new MemoryExecutionRepository(tccl))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
                 .setArtifactLoaders(new GuiceArtifactLoader(new BindingProvider() {
                     @Override

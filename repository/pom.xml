@@ -18,6 +18,7 @@
         <module>jpa</module>
         <module>jdbc</module>
         <module>infinispan</module>
+        <module>redis</module>
     </modules>
 
 </project>

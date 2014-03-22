@@ -11,6 +11,7 @@ public class MemoryRepositoryTest extends RepositoryTest {
 
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository();
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        return new MemoryExecutionRepository(tccl);
     }
 }

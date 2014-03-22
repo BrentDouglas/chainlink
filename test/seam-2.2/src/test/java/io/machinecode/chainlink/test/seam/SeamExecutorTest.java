@@ -21,14 +21,15 @@ import javax.servlet.ServletContext;
 public class SeamExecutorTest extends ExecutorTest {
 
     @Override
-    protected Builder _configuration() {
+    protected Builder _configuration() throws Exception {
         return super._configuration()
                 .setArtifactLoaders(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class))
                 .setInjectors(new VetoInjector());
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository();
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        return new MemoryExecutionRepository(tccl);
     }
 
     @BeforeClass

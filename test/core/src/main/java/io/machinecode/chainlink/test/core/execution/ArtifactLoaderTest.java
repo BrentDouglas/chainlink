@@ -15,7 +15,7 @@ import javax.batch.api.Decider;
 public abstract class ArtifactLoaderTest extends BaseTest {
 
     @Test
-    public void testInject() {
+    public void testInject() throws Exception {
         final ArtifactLoader loader = configuration().getArtifactLoader();
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 

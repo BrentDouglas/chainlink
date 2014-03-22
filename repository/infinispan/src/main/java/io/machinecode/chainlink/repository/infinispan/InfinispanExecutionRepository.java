@@ -8,7 +8,9 @@ import io.machinecode.chainlink.repository.core.JobExecutionImpl;
 import io.machinecode.chainlink.repository.core.JobInstanceImpl;
 import io.machinecode.chainlink.repository.core.MutableMetricImpl;
 import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
+import io.machinecode.chainlink.repository.core.Serializer;
 import io.machinecode.chainlink.repository.core.StepExecutionImpl;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -24,6 +26,16 @@ import org.infinispan.distexec.DefaultExecutorService;
 import org.infinispan.distexec.DistributedExecutorService;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.transaction.LockingMode;
+import org.jboss.marshalling.ByteBufferInput;
+import org.jboss.marshalling.Marshaller;
+import org.jboss.marshalling.MarshallerFactory;
+import org.jboss.marshalling.Marshalling;
+import org.jboss.marshalling.MarshallingConfiguration;
+import org.jboss.marshalling.OutputStreamByteOutput;
+import org.jboss.marshalling.Unmarshaller;
+import org.jboss.marshalling.cloner.ClonerConfiguration;
+import org.jboss.marshalling.cloner.ObjectCloner;
+import org.jboss.marshalling.cloner.ObjectCloners;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -37,12 +49,10 @@ import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
 import javax.transaction.TransactionManager;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -93,9 +103,16 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
     protected final EmbeddedCacheManager cacheManager;
     protected final TransactionManager transactionManager;
 
-    public InfinispanExecutionRepository(final EmbeddedCacheManager cacheManager, final TransactionManager transactionManager) {
+    protected final Serializer serializer;
+
+    public InfinispanExecutionRepository(final ClassLoader loader, final EmbeddedCacheManager cacheManager, final TransactionManager transactionManager) {
         this.cacheManager = cacheManager;
         this.transactionManager = transactionManager;
+        this.serializer = new Serializer(
+                Serializer.Type.JBOSS,
+                Marshalling.getMarshallerFactory("river", loader),
+                new MarshallingConfiguration()
+        );
         this.ids = _cache(cacheManager, IDS);
         this.jobInstances = _cache(cacheManager, JOB_INSTANCES);
         this.jobExecutions = _cache(cacheManager, JOB_EXECUTIONS);
@@ -214,9 +231,9 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = _clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = _clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = _clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = serializer.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = serializer.clone(writerCheckpoint);
         final CopyOnWriteArrayList<Long> partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
         if (partitions == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
@@ -315,7 +332,7 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = _clone(persistentUserData);
+        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
         final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
         if (execution == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
@@ -330,9 +347,9 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = _clone(persistentUserData);
-        final Serializable _reader = _clone(readerCheckpoint);
-        final Serializable _writer = _clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = serializer.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = serializer.clone(writerCheckpoint);
         final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
         if (execution == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
@@ -341,8 +358,8 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
                 .setUpdatedTime(timestamp)
                 .setPersistentUserData(clonedPersistentUserData)
                 .setMetrics(MutableMetricImpl.copy(metrics))
-                .setReaderCheckpoint(_reader)
-                .setWriterCheckpoint(_writer)
+                .setReaderCheckpoint(clonedReaderCheckpoint)
+                .setWriterCheckpoint(clonedWriterCheckpoint)
                 .build()
         );
     }
@@ -379,17 +396,17 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = _clone(persistentUserData);
-        final Serializable _reader = _clone(readerCheckpoint);
-        final Serializable _writer = _clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = serializer.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = serializer.clone(writerCheckpoint);
         final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
         if (partition == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
         }
         partitionExecutions.put(partitionExecutionId, PartitionExecutionImpl.from(partition)
                 .setUpdatedTime(timestamp)
-                .setReaderCheckpoint(_reader)
-                .setWriterCheckpoint(_writer)
+                .setReaderCheckpoint(clonedReaderCheckpoint)
+                .setWriterCheckpoint(clonedWriterCheckpoint)
                 .setPersistentUserData(clonedPersistentUserData)
                 .setMetrics(MutableMetricImpl.copy(metrics))
                 .build()
@@ -398,7 +415,7 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
 
     @Override
     public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = _clone(persistentUserData);
+        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
         final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
         if (partition == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
@@ -586,17 +603,16 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
         final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
             for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
                 final long id = it.next();
+                final ExtendedStepExecution stepExecution = stepExecutions.get(id);
                 if (stepExecutionId == id) {
-                    final ExtendedStepExecution stepExecution = stepExecutions.get(id);
                     if (stepExecution == null) {
                         throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
                     }
-                    currentStepExecutionCreateTime = stepExecutions.get(id).getCreateTime();
+                    currentStepExecutionCreateTime = stepExecution.getCreateTime();
                     continue;
                 }
-                final ExtendedStepExecution execution = stepExecutions.get(id);
-                if (stepName.equals(execution.getStepName())) {
-                    candidates.add(execution);
+                if (stepName.equals(stepExecution.getStepName())) {
+                    candidates.add(stepExecution);
                 }
             }
         if (currentStepExecutionCreateTime == null) {
@@ -746,16 +762,5 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
         }
         return partition;
-    }
-
-    private <T> T _clone(final T that) throws ClassNotFoundException, IOException {
-        if (that == null) {
-            return null;
-        }
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(that);
-        oos.flush();
-        return (T) new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
     }
 }

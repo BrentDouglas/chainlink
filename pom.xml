@@ -32,6 +32,7 @@
         <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
         <version.log4j.log4j>1.2.17</version.log4j.log4j>
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
+        <version.org.jboss.marshalling.jboss-marshalling>1.4.5.Final</version.org.jboss.marshalling.jboss-marshalling>
 
         <!-- CDI -->
         <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
@@ -71,6 +72,8 @@
 
         <!-- Infinispan -->
         <version.org.infinispan.infinispan-bom>6.0.2.Final</version.org.infinispan.infinispan-bom>
+
+        <version.redis.clients.jedis>2.2.1</version.redis.clients.jedis>
 
         <!-- Plugins -->
         <version.org.codehaus.mojo.build-helper-maven-plugin>1.8</version.org.codehaus.mojo.build-helper-maven-plugin>
@@ -160,6 +163,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.batch</groupId>
                 <artifactId>javax.batch-api</artifactId>
                 <version>${version.javax.batch.batch-api.version}</version>
@@ -178,6 +186,16 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>${version.org.jboss.logging.jboss-logging}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.marshalling</groupId>
+                <artifactId>jboss-marshalling</artifactId>
+                <version>${version.org.jboss.marshalling.jboss-marshalling}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.marshalling</groupId>
+                <artifactId>jboss-marshalling-river</artifactId>
+                <version>${version.org.jboss.marshalling.jboss-marshalling}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -313,12 +331,19 @@
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgresql.postgresql}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>infinispan-bom</artifactId>
                 <version>${version.org.infinispan.infinispan-bom}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${version.redis.clients.jedis}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

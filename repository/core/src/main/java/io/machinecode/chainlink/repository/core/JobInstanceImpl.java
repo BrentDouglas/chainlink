@@ -2,6 +2,7 @@ package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobInstanceImpl implements ExtendedJobInstance {
+public class JobInstanceImpl implements ExtendedJobInstance, Serializable {
     private final long instanceId;
     private final String jobName;
     private final String jslName;
