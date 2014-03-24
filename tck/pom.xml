@@ -19,6 +19,7 @@
         <test.properties>../test.properties</test.properties>
 
         <configuration.factory.type>Memory</configuration.factory.type>
+        <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
     </properties>
@@ -141,9 +142,29 @@
 
     <profiles>
         <profile>
-            <id>infinispan</id>
+            <id>ex-threaded</id>
             <activation>
-                <property><name>infinispan</name></property>
+                <property><name>ex-threaded</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <executor.factory.class>io.machinecode.chainlink.core.execution.ThreadedExecutorFactory</executor.factory.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>ex-infinispan</id>
+            <activation>
+                <property><name>ex-infinispan</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <executor.factory.class>io.machinecode.chainlink.execution.infinispan.InfinispanExecutorFactory</executor.factory.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>re-infinispan</id>
+            <activation>
+                <property><name>re-infinispan</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
@@ -151,9 +172,9 @@
             </properties>
         </profile>
         <profile>
-            <id>jdbc</id>
+            <id>re-jdbc</id>
             <activation>
-                <property><name>jdbc</name></property>
+                <property><name>re-jdbc</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
@@ -161,9 +182,9 @@
             </properties>
         </profile>
         <profile>
-            <id>jpa</id>
+            <id>re-jpa</id>
             <activation>
-                <property><name>jpa</name></property>
+                <property><name>re-jpa</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
@@ -171,9 +192,9 @@
             </properties>
         </profile>
         <profile>
-            <id>redis</id>
+            <id>re-redis</id>
             <activation>
-                <property><name>redis</name></property>
+                <property><name>re-redis</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
@@ -181,9 +202,9 @@
             </properties>
         </profile>
         <profile>
-            <id>all</id>
+            <id>in-all</id>
             <activation>
-                <property><name>all</name></property>
+                <property><name>in-all</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -194,9 +215,9 @@
             </modules>
         </profile>
         <profile>
-            <id>batch</id>
+            <id>in-batch</id>
             <activation>
-                <property><name>batch</name></property>
+                <property><name>in-batch</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -204,9 +225,9 @@
             </modules>
         </profile>
         <profile>
-            <id>cdi</id>
+            <id>in-cdi</id>
             <activation>
-                <property><name>cdi</name></property>
+                <property><name>in-cdi</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -214,9 +235,9 @@
             </modules>
         </profile>
         <profile>
-            <id>guice</id>
+            <id>in-guice</id>
             <activation>
-                <property><name>guice</name></property>
+                <property><name>in-guice</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -224,9 +245,9 @@
             </modules>
         </profile>
         <profile>
-            <id>seam</id>
+            <id>in-seam</id>
             <activation>
-                <property><name>seam</name></property>
+                <property><name>in-seam</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -234,9 +255,9 @@
             </modules>
         </profile>
         <profile>
-            <id>spring</id>
+            <id>in-spring</id>
             <activation>
-                <property><name>spring</name></property>
+                <property><name>in-spring</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -246,9 +267,9 @@
 
         <!-- JPA -->
         <profile>
-            <id>mariadb</id>
+            <id>db-mariadb</id>
             <activation>
-                <property><name>mariadb</name></property>
+                <property><name>db-mariadb</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
@@ -257,9 +278,9 @@
             </properties>
         </profile>
         <profile>
-            <id>postgresql</id>
+            <id>db-postgresql</id>
             <activation>
-                <property><name>postgresql</name></property>
+                <property><name>db-postgresql</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>

@@ -2,6 +2,7 @@ package io.machinecode.chainlink.tck.guice;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
@@ -9,6 +10,7 @@ import io.machinecode.chainlink.jsl.core.util.Triplet;
 import io.machinecode.chainlink.repository.redis.RedisExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import io.machinecode.chainlink.spi.configuration.ExecutorFactory;
 import redis.clients.jedis.JedisShardInfo;
 
 import javax.batch.api.Batchlet;
@@ -46,6 +48,12 @@ public class RedisGuiceConfigurationFactory implements ConfigurationFactory {
     @Override
     public Configuration produce() throws IOException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final List<ExecutorFactory> factories;
+        try {
+            factories = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
+        } catch (final ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         return new Builder()
                 .setClassLoader(tccl)
                 .setExecutionRepository(new RedisExecutionRepository(
@@ -56,6 +64,7 @@ public class RedisGuiceConfigurationFactory implements ConfigurationFactory {
                         )
                 ))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
+                .setExecutorFactory(factories.get(0))
                 .setArtifactLoaders(new GuiceArtifactLoader(new BindingProvider() {
                     @Override
                     public List<Triplet<Class<?>, String, Class<?>>> getBindings() {

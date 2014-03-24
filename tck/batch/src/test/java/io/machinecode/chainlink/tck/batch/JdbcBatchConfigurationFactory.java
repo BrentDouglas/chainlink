@@ -4,15 +4,18 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
 import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import io.machinecode.chainlink.spi.configuration.ExecutorFactory;
 import io.machinecode.chainlink.tck.core.DummyDataSource;
 import org.jboss.logging.Logger;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -64,6 +67,12 @@ public class JdbcBatchConfigurationFactory implements ConfigurationFactory {
     @Override
     public Configuration produce() throws Exception {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final List<ExecutorFactory> factories;
+        try {
+            factories = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
+        } catch (final ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         return new Builder()
                 .setClassLoader(tccl)
                 .setExecutionRepository(JdbcExecutionRepository.create(new DataSourceLookup() {
@@ -73,7 +82,7 @@ public class JdbcBatchConfigurationFactory implements ConfigurationFactory {
                     }
                 }, username, password))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
-                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setExecutorFactory(factories.get(0))
                 .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }

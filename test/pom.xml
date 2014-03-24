@@ -85,9 +85,9 @@
 
     <profiles>
         <profile>
-            <id>seam-2.3</id>
+            <id>in-seam-2.3</id>
             <activation>
-                <property><name>seam-2.3</name></property>
+                <property><name>in-seam-2.3</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
@@ -97,9 +97,9 @@
 
         <!-- JPA -->
         <profile>
-            <id>mariadb</id>
+            <id>db-mariadb</id>
             <activation>
-                <property><name>mariadb</name></property>
+                <property><name>db-mariadb</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
@@ -108,9 +108,9 @@
             </properties>
         </profile>
         <profile>
-            <id>postgresql</id>
+            <id>db-postgresql</id>
             <activation>
-                <property><name>postgresql</name></property>
+                <property><name>db-postgresql</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>

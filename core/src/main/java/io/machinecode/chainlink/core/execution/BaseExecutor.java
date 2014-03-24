@@ -257,14 +257,14 @@ public abstract class BaseExecutor implements Executor {
             final Executable executable = event.getExecutable();
             try {
                 executable.always(notify);
-                preExecute(executable);
+                preExecute(event);
                 executable.execute(executor, threadId, event);
             } catch (final Throwable e) {
                 log.errorf(e, Messages.get("CHAINLINK-024004.worker.execute.execution"), threadId, executable);
             }
         }
 
-        protected void preExecute(final Executable executable) {
+        protected void preExecute(final ExecutableEvent event) {
             //noop
         }
 

@@ -1,11 +1,7 @@
 package io.machinecode.chainlink.execution.infinispan;
 
-import io.machinecode.chainlink.execution.infinispan.cmd.CancelCommand;
 import io.machinecode.chainlink.execution.infinispan.cmd.ExecuteCommand;
-import io.machinecode.chainlink.execution.infinispan.cmd.RejectCommand;
-import io.machinecode.chainlink.execution.infinispan.cmd.ResolveCommand;
 import io.machinecode.chainlink.spi.context.ThreadId;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Worker;
 import org.infinispan.remoting.transport.Address;

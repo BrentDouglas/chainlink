@@ -31,9 +31,9 @@ public class ExecuteCommand extends BaseCommand {
     public Object perform(final InvocationContext invocationContext) throws Throwable {
         final InfinispanExecutor executor = cache.get(remote);
         final Executable executable = event.getExecutable();
-        executable.onResolve(new CommandListener(origin, new ResolveCommand(cacheName, origin, uuid), executor));
-        executable.onReject(new CommandListener(origin, new RejectCommand(cacheName, origin, uuid), executor));
-        executable.onCancel(new CommandListener(origin, new CancelCommand(cacheName, origin, uuid), executor));
+        executable.onResolve(new CommandListener(origin, new CompletionCommand(cacheName, origin, uuid, Completion.RESOLVE), executor));
+        executable.onReject(new CommandListener(origin, new CompletionCommand(cacheName, origin, uuid, Completion.REJECT), executor));
+        executable.onCancel(new CommandListener(origin, new CompletionCommand(cacheName, origin, uuid, Completion.CANCEL), executor));
         executor.getWorker(threadId).addExecutable(event);
         return true;
     }
@@ -45,13 +45,13 @@ public class ExecuteCommand extends BaseCommand {
 
     @Override
     public Object[] getParameters() {
-        return new Object[]{ cacheName, remote, uuid, threadId, event, uuid };
+        return new Object[]{ cacheName, remote, uuid, threadId, event };
     }
 
     @Override
     public void setParameters(final int commandId, final Object[] parameters) {
         super.setParameters(commandId, parameters);
-        this.event = (ExecutableEvent)parameters[3];
+        this.threadId = (ThreadId)parameters[3];
         this.uuid = (UUID)parameters[4];
     }
 }

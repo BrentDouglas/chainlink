@@ -32,18 +32,21 @@ RETVAL=0
 FAILED=""
 
 # Memory
-run-test -Pall
+run-test -Pin-all
 
 # Infinispan
-run-test -Pall -Pinfinispan
+run-test -Pin-all -Pre-infinispan
 
 # Jpa
-run-test -Pall -Pjpa
-run-test -Pall -Pjpa -Ppostgresql
+run-test -Pin-all -Pre-jpa
+run-test -Pin-all -Pre-jpa -Pdb-postgresql
 
 # Jdbc
-run-test -Pall -Pjdbc
-run-test -Pall -Pjdbc -Ppostgresql
+run-test -Pin-all -Pre-jdbc
+run-test -Pin-all -Pre-jdbc -Pdb-postgresql
+
+# Redis
+run-test -Pin-all -Pre-redis
 
 if [ $RETVAL -eq 0 ]; then
   echo -e "[${GREEN}OK${RESET}]"

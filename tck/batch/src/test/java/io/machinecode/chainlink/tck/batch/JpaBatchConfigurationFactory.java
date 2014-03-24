@@ -4,16 +4,19 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import io.machinecode.chainlink.spi.configuration.ExecutorFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,6 +45,12 @@ public class JpaBatchConfigurationFactory implements ConfigurationFactory {
     @Override
     public Configuration produce() throws Exception {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final List<ExecutorFactory> factories;
+        try {
+            factories = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
+        } catch (final ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         return new Builder()
                 .setClassLoader(tccl)
                 .setExecutionRepository(new JpaExecutionRepository(new EntityManagerLookup() {
@@ -51,7 +60,7 @@ public class JpaBatchConfigurationFactory implements ConfigurationFactory {
                     }
                 }, new ResourceLocalTransactionManagerLookup()))
                 .setTransactionManager(new LocalTransactionManager(180, TimeUnit.SECONDS))
-                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setExecutorFactory(factories.get(0))
                 .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }

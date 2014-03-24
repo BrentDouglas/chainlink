@@ -7,6 +7,7 @@ import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.deferred.Listener;
 import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
 import org.jboss.logging.Logger;
@@ -37,7 +38,12 @@ public class ThreadedExecutor extends BaseExecutor {
     public ThreadedWorker getWorker(final ThreadId threadId) {
         while (!threadsLock.compareAndSet(false, true)) {}
         try {
-            return activeThreads.get(threadId);
+            final ThreadedWorker worker = activeThreads.get(threadId);
+            if (worker != null) {
+                blockedThreads.put(worker.getThreadId(), activeThreads.remove(worker.getThreadId()));
+                return worker;
+            }
+            return blockedThreads.get(threadId);
         } finally {
             threadsLock.set(false);
         }
@@ -117,8 +123,10 @@ public class ThreadedExecutor extends BaseExecutor {
             super(executor);
         }
 
-        protected void preExecute(final Executable executable) {
-            executable.always(listener);
+        protected void preExecute(final ExecutableEvent event) {
+            if (event.getType() == ExecutableEvent.Type.CALLBACK) {
+                event.getExecutable().always(listener);
+            }
         }
 
         @Override

@@ -4,10 +4,12 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
 import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import io.machinecode.chainlink.spi.configuration.ExecutorFactory;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
@@ -20,6 +22,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.transaction.TransactionManager;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,6 +39,12 @@ public class InfinispanSpringConfigurationFactory implements ConfigurationFactor
     @Override
     public Configuration produce() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final List<ExecutorFactory> factories;
+        try {
+            factories = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
+        } catch (final ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         final LocalTransactionManager transactionManager = new LocalTransactionManager(180, TimeUnit.SECONDS);
         return new Builder()
                 .setClassLoader(tccl)
@@ -76,7 +85,7 @@ public class InfinispanSpringConfigurationFactory implements ConfigurationFactor
                 ))
                 .setTransactionManager(transactionManager)
                 .setArtifactLoaders(context.getBean(SpringArtifactLoader.class))
-                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setExecutorFactory(factories.get(0))
                 .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }

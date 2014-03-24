@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
@@ -11,6 +12,7 @@ import io.machinecode.chainlink.jsl.core.util.Triplet;
 import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import io.machinecode.chainlink.spi.configuration.ExecutorFactory;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
@@ -55,6 +57,12 @@ public class InfinispanGuiceConfigurationFactory implements ConfigurationFactory
     @Override
     public Configuration produce() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final List<ExecutorFactory> factories;
+        try {
+            factories = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
+        } catch (final ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         final LocalTransactionManager transactionManager = new LocalTransactionManager(180, TimeUnit.SECONDS);
         return new Builder()
                 .setClassLoader(tccl)
@@ -213,7 +221,7 @@ public class InfinispanGuiceConfigurationFactory implements ConfigurationFactory
                     }
                 }))
                 .setInjectors(new VetoInjector())
-                .setExecutorFactoryClass(EventedExecutorFactory.class)
+                .setExecutorFactory(factories.get(0))
                 .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
                 .build();
     }
