@@ -1,5 +1,14 @@
 package io.machinecode.chainlink.spi.configuration;
 
+import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
+import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
@@ -13,11 +22,33 @@ import javax.transaction.TransactionManager;
  */
 public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
 
+    T setProperty(final String key, final String value);
+
     T setClassLoader(final ClassLoader classLoader);
+
+    T setClassLoaderFactory(final ClassLoaderFactory factory);
+
+    T setClassLoaderFactoryClass(final Class<? extends ClassLoaderFactory> clazz);
+
+    T setClassLoaderFactoryFqcn(final String fqcn);
 
     T setExecutionRepository(final ExecutionRepository repository);
 
+    T setExecutionRepositoryFactory(final ExecutionRepositoryFactory factory);
+
+    T setExecutionRepositoryFactoryClass(final Class<? extends ExecutionRepositoryFactory> clazz);
+
+    T setExecutionRepositoryFactoryFqcn(final String fqcn);
+
     T setTransactionManager(final TransactionManager transactionManager);
+
+    T setTransactionManagerFactory(final TransactionManagerFactory transactionManager);
+
+    T setTransactionManagerFactoryClass(final Class<? extends TransactionManagerFactory> clazz);
+
+    T setTransactionManagerFactoryFqcn(final String fqcn);
+
+    T setExecutor(final Executor executor);
 
     T setExecutorFactory(final ExecutorFactory factory);
 
@@ -25,55 +56,35 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
 
     T setExecutorFactoryFqcn(final String fqcn);
 
-    T setProperty(final String key, final String value);
-
     T setJobLoaders(final JobLoader... jobLoaders);
 
-    T setArtifactLoaders(final ArtifactLoader... artifactLoaders);
+    T setJobLoaderFactories(final JobLoaderFactory... factories);
 
-    T setInjectors(final Injector... injectors);
-
-    T setSecurityChecks(final SecurityCheck... securityChecks);
-
-    T setClassLoaderFactory(final Factory<? extends ClassLoader> classLoader);
-
-    T setRepositoryFactory(final Factory<? extends ExecutionRepository> repository);
-
-    T setTransactionManagerFactory(final Factory<? extends TransactionManager> transactionManager);
-
-    T setJobLoaderFactories(final Factory<JobLoader>... factories);
-
-    T setArtifactLoaderFactories(final Factory<ArtifactLoader>... factories);
-
-    T setInjectorFactories(final Factory<Injector>... factories);
-
-    T setSecurityCheckFactories(final Factory<SecurityCheck>... factories);
-
-    T setClassLoaderFactoryClass(final Class<? extends Factory<? extends ClassLoader>> clazz);
-
-    T setRepositoryFactoryClass(final Class<? extends Factory<? extends ExecutionRepository>> clazz);
-
-    T setTransactionManagerFactoryClass(final Class<? extends Factory<? extends TransactionManager>> clazz);
-
-    T setJobLoaderFactoriesClass(final Class<? extends Factory<? extends JobLoader>>... clazzes);
-
-    T setArtifactLoaderFactoriesClass(final Class<? extends Factory<ArtifactLoader>>... clazzes);
-
-    T setInjectorFactoriesClass(final Class<? extends Factory<? extends Injector>>... clazzes);
-
-    T setSecurityCheckFactoriesClass(final Class<? extends Factory<? extends SecurityCheck>>... clazzes);
-
-    T setClassLoaderFactoryFqcn(final String fqcn);
-
-    T setRepositoryFactoryFqcn(final String fqcn);
-
-    T setTransactionManagerFactoryFqcn(final String fqcn);
+    T setJobLoaderFactoriesClass(final Class<? extends JobLoaderFactory>... clazzes);
 
     T setJobLoaderFactoriesFqcns(final String... fqcns);
 
+    T setArtifactLoaders(final ArtifactLoader... artifactLoaders);
+
+    T setArtifactLoaderFactories(final ArtifactLoaderFactory... factories);
+
+    T setArtifactLoaderFactoriesClass(final Class<? extends ArtifactLoaderFactory>... clazzes);
+
     T setArtifactLoaderFactoriesFqcns(final String... fqcns);
 
+    T setInjectors(final Injector... injectors);
+
+    T setInjectorFactories(final InjectorFactory... factories);
+
+    T setInjectorFactoriesClass(final Class<? extends InjectorFactory>... clazzes);
+
     T setInjectorFactoriesFqcns(final String... fqcns);
+
+    T setSecurityChecks(final SecurityCheck... securityChecks);
+
+    T setSecurityCheckFactories(final SecurityCheckFactory... factories);
+
+    T setSecurityCheckFactoriesClass(final Class<? extends SecurityCheckFactory>... clazzes);
 
     T setSecurityCheckFactoriesFqcns(final String... fqcns);
 }

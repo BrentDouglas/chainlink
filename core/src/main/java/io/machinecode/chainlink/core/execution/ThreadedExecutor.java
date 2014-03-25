@@ -2,13 +2,11 @@ package io.machinecode.chainlink.core.execution;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
-import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.deferred.Listener;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
 import org.jboss.logging.Logger;
 
@@ -30,7 +28,7 @@ public class ThreadedExecutor extends BaseExecutor {
     protected final TMap<ThreadId, ThreadedWorker> closedThreads = new THashMap<ThreadId, ThreadedWorker>();
     protected final AtomicBoolean threadsLock = new AtomicBoolean(false);
 
-    public ThreadedExecutor(final Configuration configuration) {
+    public ThreadedExecutor(final ExecutorConfiguration configuration) {
         super(configuration);
     }
 

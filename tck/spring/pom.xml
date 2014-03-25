@@ -55,8 +55,6 @@
                 <directory>src/test/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/io.machinecode.chainlink.spi.configuration.ConfigurationFactory</include>
-                    <include>**/io.machinecode.chainlink.spi.configuration.ExecutorFactory</include>
                     <include>**/persistence.xml</include>
                 </includes>
             </testResource>
@@ -64,8 +62,6 @@
                 <directory>src/test/resources</directory>
                 <filtering>false</filtering>
                 <excludes>
-                    <exclude>**/io.machinecode.chainlink.spi.configuration.ConfigurationFactory</exclude>
-                    <exclude>**/io.machinecode.chainlink.spi.configuration.ExecutorFactory</exclude>
                     <exclude>**/persistence.xml</exclude>
                 </excludes>
             </testResource>

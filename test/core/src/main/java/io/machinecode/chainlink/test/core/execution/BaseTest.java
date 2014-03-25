@@ -3,12 +3,10 @@ package io.machinecode.chainlink.test.core.execution;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
-import io.machinecode.chainlink.core.execution.EventedExecutor;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
-import io.machinecode.chainlink.spi.configuration.ExecutorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.execution.Executor;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
 

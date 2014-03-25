@@ -57,14 +57,14 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     public JobOperatorImpl() {
         this.configuration = ConfigurationFactoryImpl.INSTANCE.produce();
-        this.executor = configuration.getExecutorFactory().produce(configuration);
+        this.executor = configuration.getExecutor();
         this.executor.start();
         this.securityCheck = this.configuration.getSecurityCheck();
     }
 
     public JobOperatorImpl(final ConfigurationImpl configuration) {
         this.configuration = configuration;
-        this.executor = configuration.getExecutorFactory().produce(configuration);
+        this.executor = configuration.getExecutor();
         this.executor.start();
         this.securityCheck = this.configuration.getSecurityCheck();
     }

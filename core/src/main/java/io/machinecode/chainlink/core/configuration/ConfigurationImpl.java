@@ -5,9 +5,18 @@ import io.machinecode.chainlink.core.inject.InjectorImpl;
 import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.core.security.SecurityCheckImpl;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.spi.configuration.BaseConfiguration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationBuilder;
-import io.machinecode.chainlink.spi.configuration.ExecutorFactory;
-import io.machinecode.chainlink.spi.configuration.Factory;
+import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.Factory;
+import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
+import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.inject.Injector;
@@ -35,71 +44,63 @@ public class ConfigurationImpl implements Configuration {
     private final Injector injector;
     private final SecurityCheck securityCheck;
     private final Properties properties;
-    private final ExecutorFactory executorFactory;
+    private final Executor executor;
 
     protected ConfigurationImpl(final Builder builder) {
+        // Base
+        this.properties = builder.properties;
+        // Layer 1
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        this.classLoader = _get(tccl, builder.classLoader, builder.classLoaderFactory, builder.classLoaderFactoryClass, builder.classLoaderFactoryFqcn, tccl);
-        this.repository = _get(this.classLoader, builder.repository, builder.repositoryFactory, builder.repositoryFactoryClass, builder.repositoryFactoryFqcn, null);
+        this.classLoader = _get(tccl, builder.classLoader, builder.classLoaderFactory, builder.classLoaderFactoryClass, builder.classLoaderFactoryFqcn, tccl, this);
+        // Layer 2
+        this.transactionManager = _get(this.classLoader, builder.transactionManager, builder.transactionManagerFactory, builder.transactionManagerFactoryClass, builder.transactionManagerFactoryFqcn, new LocalTransactionManager(180, TimeUnit.SECONDS), this);
+        // Layer 3
+        final ArrayList<JobLoader> jobLoaders = _arrayGet(this.classLoader, builder.jobLoaders, builder.jobLoaderFactories, builder.jobLoaderFactoriesClass, builder.jobLoaderFactoriesFqcns, this);
+        this.jobLoader = new JobLoaderImpl(this.classLoader, jobLoaders.toArray(new JobLoader[jobLoaders.size()]));
+        final ArrayList<ArtifactLoader> artifactLoaders = _arrayGet(this.classLoader, builder.artifactLoaders, builder.artifactLoaderFactories, builder.artifactLoaderFactoriesClass, builder.artifactLoaderFactoriesFqcns, this);
+        this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, artifactLoaders.toArray(new ArtifactLoader[artifactLoaders.size()]));
+        final ArrayList<Injector> injectors = _arrayGet(this.classLoader, builder.injectors, builder.injectorFactories, builder.injectorFactoriesClass, builder.injectorFactoriesFqcns, this);
+        this.injector = new InjectorImpl(injectors.toArray(new Injector[injectors.size()]));
+        final ArrayList<SecurityCheck> securityChecks = _arrayGet(this.classLoader, builder.securityChecks, builder.securityCheckFactories, builder.securityCheckFactoriesClass, builder.securityCheckFactoriesFqcns, this);
+        this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
+        // Layer 4
+        this.repository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, null, this);
         if (this.repository == null) {
             throw new IllegalStateException(); //TODO Message
         }
-        this.transactionManager = _get(this.classLoader, builder.transactionManager, builder.transactionManagerFactory, builder.transactionManagerFactoryClass, builder.transactionManagerFactoryFqcn, new LocalTransactionManager(180, TimeUnit.SECONDS));
-        final ArrayList<JobLoader> jobLoaders = _get(this.classLoader, builder.jobLoaders, builder.jobLoaderFactories, builder.jobLoaderFactoriesClass, builder.jobLoaderFactoriesFqcns);
-        this.jobLoader = new JobLoaderImpl(this.classLoader, jobLoaders.toArray(new JobLoader[jobLoaders.size()]));
-        final ArrayList<ArtifactLoader> artifactLoaders = _get(this.classLoader, builder.artifactLoaders, builder.artifactLoaderFactories, builder.artifactLoaderFactoriesClass, builder.artifactLoaderFactoriesFqcns);
-        this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, artifactLoaders.toArray(new ArtifactLoader[artifactLoaders.size()]));
-        final ArrayList<Injector> injectors = _get(this.classLoader, builder.injectors, builder.injectorFactories, builder.injectorFactoriesClass, builder.injectorFactoriesFqcns);
-        this.injector = new InjectorImpl(injectors.toArray(new Injector[injectors.size()]));
-        final ArrayList<SecurityCheck> securityChecks = _get(this.classLoader, builder.securityChecks, builder.securityCheckFactories, builder.securityCheckFactoriesClass, builder.securityCheckFactoriesFqcns);
-        this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
-        this.properties = builder.properties;
-        if (builder.executorFactory != null) {
-            this.executorFactory = builder.executorFactory;
-        } else if (builder.executorFactoryClass != null) {
-            try {
-                this.executorFactory = builder.executorFactoryClass.newInstance();
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO
-            }
-        } else if (builder.executorFactoryFqcn != null) {
-            try {
-                this.executorFactory = ((Class<? extends Factory<? extends ExecutorFactory>>)classLoader.loadClass(builder.executorFactoryFqcn)).newInstance().produce();
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO
-            }
-        } else {
+        this.executor = _get(this.classLoader, builder.executor, builder.executorFactory, builder.executorFactoryClass, builder.executorFactoryFqcn, null, this);
+        if (this.executor == null) {
             throw new IllegalStateException(); //TODO Message
         }
     }
 
     protected ConfigurationImpl(final XmlConfiguration builder) {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        this.classLoader = _get(tccl, builder.getClassLoaderFactory().getClazz(), tccl);
-        this.repository = _get(this.classLoader, builder.getExecutionRepositoryFactory().getClazz(), null);
-        if (this.repository == null) {
-            throw new IllegalStateException(); //TODO Message
-        }
-        this.transactionManager = _get(this.classLoader, builder.getTransactionManagerFactory().getClazz(), new LocalTransactionManager(180, TimeUnit.SECONDS));
-        final ArrayList<JobLoader> jobLoaders = _get(this.classLoader, builder.getJobLoaderFactories());
-        this.jobLoader = new JobLoaderImpl(this.classLoader, jobLoaders.toArray(new JobLoader[jobLoaders.size()]));
-        final ArrayList<ArtifactLoader> artifactLoaders = _get(this.classLoader, builder.getArtifactLoaderFactories());
-        this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, artifactLoaders.toArray(new ArtifactLoader[artifactLoaders.size()]));
-        final ArrayList<Injector> injectors = _get(this.classLoader, builder.getInjectorFactories());
-        this.injector = new InjectorImpl(injectors.toArray(new Injector[injectors.size()]));
-        final ArrayList<SecurityCheck> securityChecks = _get(this.classLoader, builder.getSecurityCheckFactories());
-        this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
+        // Base
         this.properties = new Properties();
         for (final XmlProperty property : builder.getProperties()) {
             this.properties.put(property.getKey(), property.getValue());
         }
-        if (builder.getExecutionRepositoryFactory() != null) {
-            try {
-                this.executorFactory = ((Class<? extends Factory<? extends ExecutorFactory>>)classLoader.loadClass(builder.getExecutionRepositoryFactory().getClazz())).newInstance().produce();
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO
-            }
-        } else {
+        // Layer 1
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        this.classLoader = _get(tccl, builder.getClassLoaderFactory().getClazz(), tccl, this);
+        // Layer 2
+        this.transactionManager = _get(this.classLoader, builder.getTransactionManagerFactory().getClazz(), new LocalTransactionManager(180, TimeUnit.SECONDS), this);
+        final ArrayList<JobLoader> jobLoaders = _get(this.classLoader, builder.getJobLoaderFactories(), this);
+        this.jobLoader = new JobLoaderImpl(this.classLoader, jobLoaders.toArray(new JobLoader[jobLoaders.size()]));
+        final ArrayList<ArtifactLoader> artifactLoaders = _get(this.classLoader, builder.getArtifactLoaderFactories(), this);
+        this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, artifactLoaders.toArray(new ArtifactLoader[artifactLoaders.size()]));
+        final ArrayList<Injector> injectors = _get(this.classLoader, builder.getInjectorFactories(), this);
+        this.injector = new InjectorImpl(injectors.toArray(new Injector[injectors.size()]));
+        final ArrayList<SecurityCheck> securityChecks = _get(this.classLoader, builder.getSecurityCheckFactories(), this);
+        this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
+        // Layer 3
+        this.repository = _get(this.classLoader, builder.getExecutionRepositoryFactory().getClazz(), null, this);
+        if (this.repository == null) {
+            throw new IllegalStateException(); //TODO Message
+        }
+        // Layer 4
+        this.executor = _get(this.classLoader, builder.getExecutorFactory().getClazz(), null, this);
+        if (this.executor == null) {
             throw new IllegalStateException(); //TODO Message
         }
     }
@@ -120,8 +121,8 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public ExecutorFactory getExecutorFactory() {
-        return executorFactory;
+    public Executor getExecutor() {
+        return executor;
     }
 
     @Override
@@ -154,24 +155,37 @@ public class ConfigurationImpl implements Configuration {
         return this.securityCheck;
     }
 
-    private <T> T _get(final ClassLoader classLoader, final T that, final Factory<? extends T> factory,
-                       final Class<? extends Factory<? extends T>> clazz, final String fqcn, final T defaultValue) {
+    private <T, U extends BaseConfiguration> T _get(final ClassLoader classLoader, final T that, final Factory<? extends T, U> factory,
+                       final Class<? extends Factory<? extends T, U>> clazz, final String fqcn, final T defaultValue, final U configuration) {
         if (that != null) {
             return that;
         }
         if (factory != null) {
-            return factory.produce();
+            try {
+                final T produced =  factory.produce(configuration);
+                if (produced != null) {
+                    return produced;
+                }
+            } catch (final Exception e) {
+                throw new RuntimeException(e); //TODO
+            }
         }
         if (clazz != null) {
             try {
-                return clazz.newInstance().produce();
+                final T produced = clazz.newInstance().produce(configuration);
+                if (produced != null) {
+                    return produced;
+                }
             } catch (final Exception e) {
                 throw new RuntimeException(e); //TODO
             }
         }
         if (fqcn != null) {
             try {
-                return ((Class<? extends Factory<? extends T>>)classLoader.loadClass(fqcn)).newInstance().produce();
+                final T produced = ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn)).newInstance().produce(configuration);
+                if (produced != null) {
+                    return produced;
+                }
             } catch (final Exception e) {
                 throw new RuntimeException(e); //TODO
             }
@@ -179,10 +193,13 @@ public class ConfigurationImpl implements Configuration {
         return defaultValue;
     }
 
-    private <T> T _get(final ClassLoader classLoader, final String fqcn, final T defaultValue) {
+    private <T, U extends BaseConfiguration> T _get(final ClassLoader classLoader, final String fqcn, final T defaultValue, final U configuration) {
         if (fqcn != null) {
             try {
-                return ((Class<? extends Factory<? extends T>>)classLoader.loadClass(fqcn)).newInstance().produce();
+                final T produced = ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn)).newInstance().produce(configuration);
+                if (produced != null) {
+                    return produced;
+                }
             } catch (final Exception e) {
                 throw new RuntimeException(e); //TODO
             }
@@ -190,21 +207,35 @@ public class ConfigurationImpl implements Configuration {
         return defaultValue;
     }
 
-    private <T> ArrayList<T> _get(final ClassLoader classLoader, final T[] that, final Factory<? extends T>[] factories,
-                                  final Class<? extends Factory<? extends T>>[] clazzes, final String[] fqcns) {
+    private <T, U extends BaseConfiguration> ArrayList<T> _arrayGet(final ClassLoader classLoader, final T[] that, final Factory<? extends T, U>[] factories,
+                                                                    final Class<? extends Factory<? extends T, U>>[] clazzes, final String[] fqcns, final U configuration) {
         final ArrayList<T> ret = new ArrayList<T>();
         if (that != null) {
-            Collections.addAll(ret, that);
+            for (final T t : that) {
+                if (t != null) {
+                    ret.add(t);
+                }
+            }
         }
         if (factories != null) {
-            for (final Factory<? extends T> factory : factories) {
-                ret.add(factory.produce());
+            for (final Factory<? extends T, U> factory : factories) {
+                try {
+                    final T produced = factory.produce(configuration);
+                    if (produced != null) {
+                        ret.add(produced);
+                    }
+                } catch (final Exception e) {
+                    throw new RuntimeException(e); //TODO
+                }
             }
         }
         if (clazzes != null) {
-            for (final Class<? extends Factory<? extends T>> clazz : clazzes) {
+            for (final Class<? extends Factory<? extends T, U>> clazz : clazzes) {
                 try {
-                    ret.add(clazz.newInstance().produce());
+                    final T produced = clazz.newInstance().produce(configuration);
+                    if (produced != null) {
+                        ret.add(produced);
+                    }
                 } catch (final Exception e) {
                     throw new RuntimeException(e); //TODO
                 }
@@ -213,7 +244,10 @@ public class ConfigurationImpl implements Configuration {
         if (fqcns != null) {
             for (final String fqcn : fqcns) {
                 try {
-                    ret.add(((Class<? extends Factory<? extends T>>)classLoader.loadClass(fqcn)).newInstance().produce());
+                    final T produced = ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn)).newInstance().produce(configuration);
+                    if (produced != null) {
+                        ret.add(produced);
+                    }
                 } catch (final Exception e) {
                     throw new RuntimeException(e); //TODO
                 }
@@ -222,12 +256,15 @@ public class ConfigurationImpl implements Configuration {
         return ret;
     }
 
-    private <T> ArrayList<T> _get(final ClassLoader classLoader, final List<XmlFactoryRef> fqcns) {
+    private <T, U extends BaseConfiguration> ArrayList<T> _get(final ClassLoader classLoader, final List<XmlFactoryRef> fqcns, final U configuration) {
         final ArrayList<T> ret = new ArrayList<T>();
         if (fqcns != null) {
             for (final XmlFactoryRef fqcn : fqcns) {
                 try {
-                    ret.add(((Class<? extends Factory<? extends T>>)classLoader.loadClass(fqcn.getClazz())).newInstance().produce());
+                    final T produced = ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn.getClazz())).newInstance().produce(configuration);
+                    if (produced != null) {
+                        ret.add(produced);
+                    }
                 } catch (final Exception e) {
                     throw new RuntimeException(e); //TODO
                 }
@@ -238,7 +275,8 @@ public class ConfigurationImpl implements Configuration {
 
     public static class Builder implements ConfigurationBuilder<Builder> {
         private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        private ExecutionRepository repository;
+        private Executor executor;
+        private ExecutionRepository executionRepository;
         private TransactionManager transactionManager;
         private JobLoader[] jobLoaders;
         private ArtifactLoader[] artifactLoaders;
@@ -247,26 +285,26 @@ public class ConfigurationImpl implements Configuration {
         private Properties properties = new Properties();
 
         private ExecutorFactory executorFactory;
-        private Factory<? extends ClassLoader> classLoaderFactory;
-        private Factory<? extends ExecutionRepository> repositoryFactory;
-        private Factory<? extends TransactionManager> transactionManagerFactory;
-        private Factory<? extends JobLoader>[] jobLoaderFactories;
-        private Factory<? extends ArtifactLoader>[] artifactLoaderFactories;
-        private Factory<? extends Injector>[] injectorFactories;
-        private Factory<? extends SecurityCheck>[] securityCheckFactories;
+        private ClassLoaderFactory classLoaderFactory;
+        private ExecutionRepositoryFactory executionRepositoryFactory;
+        private TransactionManagerFactory transactionManagerFactory;
+        private JobLoaderFactory[] jobLoaderFactories;
+        private ArtifactLoaderFactory[] artifactLoaderFactories;
+        private InjectorFactory[] injectorFactories;
+        private SecurityCheckFactory[] securityCheckFactories;
 
         private Class<? extends ExecutorFactory> executorFactoryClass;
-        private Class<? extends Factory<? extends ClassLoader>> classLoaderFactoryClass;
-        private Class<? extends Factory<? extends ExecutionRepository>> repositoryFactoryClass;
-        private Class<? extends Factory<? extends TransactionManager>> transactionManagerFactoryClass;
-        private Class<? extends Factory<? extends JobLoader>>[] jobLoaderFactoriesClass;
-        private Class<? extends Factory<? extends ArtifactLoader>>[] artifactLoaderFactoriesClass;
-        private Class<? extends Factory<? extends Injector>>[] injectorFactoriesClass;
-        private Class<? extends Factory<? extends SecurityCheck>>[] securityCheckFactoriesClass;
+        private Class<? extends ClassLoaderFactory> classLoaderFactoryClass;
+        private Class<? extends ExecutionRepositoryFactory> executionRepositoryFactoryClass;
+        private Class<? extends TransactionManagerFactory> transactionManagerFactoryClass;
+        private Class<? extends JobLoaderFactory>[] jobLoaderFactoriesClass;
+        private Class<? extends ArtifactLoaderFactory>[] artifactLoaderFactoriesClass;
+        private Class<? extends InjectorFactory>[] injectorFactoriesClass;
+        private Class<? extends SecurityCheckFactory>[] securityCheckFactoriesClass;
 
         private String executorFactoryFqcn;
         private String classLoaderFactoryFqcn;
-        private String repositoryFactoryFqcn;
+        private String executionRepositoryFactoryFqcn;
         private String transactionManagerFactoryFqcn;
         private String[] jobLoaderFactoriesFqcns;
         private String[] artifactLoaderFactoriesFqcns;
@@ -279,8 +317,9 @@ public class ConfigurationImpl implements Configuration {
             return this;
         }
 
-        public Builder setExecutionRepository(final ExecutionRepository repository) {
-            this.repository = repository;
+        @Override
+        public Builder setExecutionRepository(final ExecutionRepository executionRepository) {
+            this.executionRepository = executionRepository;
             return this;
         }
 
@@ -297,19 +336,19 @@ public class ConfigurationImpl implements Configuration {
         }
 
         @Override
-        public Builder setClassLoaderFactory(final Factory<? extends ClassLoader> factory) {
+        public Builder setClassLoaderFactory(final ClassLoaderFactory factory) {
             this.classLoaderFactory = factory;
             return this;
         }
 
         @Override
-        public Builder setRepositoryFactory(final Factory<? extends ExecutionRepository> factory) {
-            this.repositoryFactory = factory;
+        public Builder setExecutionRepositoryFactory(final ExecutionRepositoryFactory factory) {
+            this.executionRepositoryFactory = factory;
             return this;
         }
 
         @Override
-        public Builder setTransactionManagerFactory(final Factory<? extends TransactionManager> factory) {
+        public Builder setTransactionManagerFactory(final TransactionManagerFactory factory) {
             this.transactionManagerFactory = factory;
             return this;
         }
@@ -357,67 +396,67 @@ public class ConfigurationImpl implements Configuration {
         }
 
         @Override
-        public Builder setJobLoaderFactories(final Factory<JobLoader>... jobLoaders) {
+        public Builder setJobLoaderFactories(final JobLoaderFactory... jobLoaders) {
             this.jobLoaderFactories = jobLoaders;
             return this;
         }
 
         @Override
-        public Builder setArtifactLoaderFactories(final Factory<ArtifactLoader>... factories) {
+        public Builder setArtifactLoaderFactories(final ArtifactLoaderFactory... factories) {
             this.artifactLoaderFactories = factories;
             return this;
         }
 
         @Override
-        public Builder setInjectorFactories(final Factory<Injector>... factories) {
+        public Builder setInjectorFactories(final InjectorFactory... factories) {
             this.injectorFactories = factories;
             return this;
         }
 
         @Override
-        public Builder setSecurityCheckFactories(final Factory<SecurityCheck>... factories) {
+        public Builder setSecurityCheckFactories(final SecurityCheckFactory... factories) {
             this.securityCheckFactories = factories;
             return this;
         }
 
         @Override
-        public Builder setClassLoaderFactoryClass(final Class<? extends Factory<? extends ClassLoader>> clazz) {
+        public Builder setClassLoaderFactoryClass(final Class<? extends ClassLoaderFactory> clazz) {
             this.classLoaderFactoryClass = clazz;
             return this;
         }
 
         @Override
-        public Builder setRepositoryFactoryClass(final Class<? extends Factory<? extends ExecutionRepository>> clazz) {
-            this.repositoryFactoryClass = clazz;
+        public Builder setExecutionRepositoryFactoryClass(final Class<? extends ExecutionRepositoryFactory> clazz) {
+            this.executionRepositoryFactoryClass = clazz;
             return this;
         }
 
         @Override
-        public Builder setTransactionManagerFactoryClass(final Class<? extends Factory<? extends TransactionManager>> clazz) {
+        public Builder setTransactionManagerFactoryClass(final Class<? extends TransactionManagerFactory> clazz) {
             this.transactionManagerFactoryClass = clazz;
             return this;
         }
 
         @Override
-        public Builder setJobLoaderFactoriesClass(final Class<? extends Factory<? extends JobLoader>>... clazzes) {
+        public Builder setJobLoaderFactoriesClass(final Class<? extends JobLoaderFactory>... clazzes) {
             this.jobLoaderFactoriesClass = clazzes;
             return this;
         }
 
         @Override
-        public Builder setArtifactLoaderFactoriesClass(final Class<? extends Factory<ArtifactLoader>>... clazzes) {
+        public Builder setArtifactLoaderFactoriesClass(final Class<? extends ArtifactLoaderFactory>... clazzes) {
             this.artifactLoaderFactoriesClass = clazzes;
             return this;
         }
 
         @Override
-        public Builder setInjectorFactoriesClass(final Class<? extends Factory<? extends Injector>>... clazzes) {
+        public Builder setInjectorFactoriesClass(final Class<? extends InjectorFactory>... clazzes) {
             this.injectorFactoriesClass = clazzes;
             return this;
         }
 
         @Override
-        public Builder setSecurityCheckFactoriesClass(final Class<? extends Factory<? extends SecurityCheck>>... clazzes) {
+        public Builder setSecurityCheckFactoriesClass(final Class<? extends SecurityCheckFactory>... clazzes) {
             this.securityCheckFactoriesClass = clazzes;
             return this;
         }
@@ -429,14 +468,20 @@ public class ConfigurationImpl implements Configuration {
         }
 
         @Override
-        public Builder setRepositoryFactoryFqcn(final String fqcn) {
-            this.repositoryFactoryFqcn = fqcn;
+        public Builder setExecutionRepositoryFactoryFqcn(final String fqcn) {
+            this.executionRepositoryFactoryFqcn = fqcn;
             return this;
         }
 
         @Override
         public Builder setTransactionManagerFactoryFqcn(final String fqcn) {
             this.transactionManagerFactoryFqcn = fqcn;
+            return this;
+        }
+
+        @Override
+        public Builder setExecutor(final Executor executor) {
+            this.executor = executor;
             return this;
         }
 

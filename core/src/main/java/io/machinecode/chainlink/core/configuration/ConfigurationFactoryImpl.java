@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.configuration;
 
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.configuration.ConfigurationFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.util.Messages;
 
 import java.util.List;

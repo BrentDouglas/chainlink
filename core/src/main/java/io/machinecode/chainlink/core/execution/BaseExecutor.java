@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.deferred.AllDeferredImpl;
 import io.machinecode.chainlink.core.deferred.Notify;
 import io.machinecode.chainlink.core.inject.InjectionContextImpl;
-import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
@@ -51,7 +51,7 @@ public abstract class BaseExecutor implements Executor {
     private final ExecutorService cancellation = Executors.newCachedThreadPool();
     private volatile int numThreads;
 
-    public BaseExecutor(final Configuration configuration) {
+    public BaseExecutor(final ExecutorConfiguration configuration) {
         this.transactionManager = configuration.getTransactionManager();
         this.repository = configuration.getRepository();
         this.injectionContext = new InjectionContextImpl(configuration);

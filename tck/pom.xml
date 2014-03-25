@@ -18,8 +18,9 @@
     <properties>
         <test.properties>../test.properties</test.properties>
 
-        <configuration.factory.type>Memory</configuration.factory.type>
+        <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
+
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
     </properties>
@@ -168,7 +169,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <configuration.factory.type>Infinispan</configuration.factory.type>
+                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.InfinispanExecutionRepositoryFactory</execution.repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -178,7 +179,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <configuration.factory.type>Jdbc</configuration.factory.type>
+                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.JdbcExecutionRepositoryFactory</execution.repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -188,7 +189,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <configuration.factory.type>Jpa</configuration.factory.type>
+                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.JpaExecutionRepositoryFactory</execution.repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -198,21 +199,8 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <configuration.factory.type>Redis</configuration.factory.type>
+                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.RedisExecutionRepositoryFactory</execution.repository.factory.class>
             </properties>
-        </profile>
-        <profile>
-            <id>in-all</id>
-            <activation>
-                <property><name>in-all</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>batch</module>
-                <module>cdi</module>
-                <module>seam</module>
-                <module>spring</module>
-            </modules>
         </profile>
         <profile>
             <id>in-batch</id>
@@ -230,6 +218,10 @@
                 <property><name>in-cdi</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
+            <properties>
+                <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.CdiArtifactLoaderFactory</artifact.loader.factory.class>
+                <injector.factory.class>io.machinecode.chainlink.tck.core.inject.CdiInjectorFactory</injector.factory.class>
+            </properties>
             <modules>
                 <module>cdi</module>
             </modules>
@@ -240,6 +232,10 @@
                 <property><name>in-guice</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
+            <properties>
+                <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.GuiceArtifactLoaderFactory</artifact.loader.factory.class>
+                <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
+            </properties>
             <modules>
                 <module>guice</module>
             </modules>
@@ -250,6 +246,10 @@
                 <property><name>in-seam</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
+            <properties>
+                <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.SeamArtifactLoaderFactory</artifact.loader.factory.class>
+                <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
+            </properties>
             <modules>
                 <module>seam</module>
             </modules>
@@ -260,6 +260,9 @@
                 <property><name>in-spring</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
+            <properties>
+                <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.SpringArtifactLoaderFactory</artifact.loader.factory.class>
+            </properties>
             <modules>
                 <module>spring</module>
             </modules>
@@ -306,7 +309,11 @@
                             <phase>generate-test-resources</phase>
                             <configuration>
                                 <target>
-                                    <copy file="${project.basedir}/src/test/resources/META-INF/persistence.xml.template"
+                                    <copy file="${project.basedir}/../core/src/test/resources/testng.xml"
+                                          tofile="${project.build.testOutputDirectory}/testng.xml"
+                                          overwrite="true">
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.xml.template"
                                           tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
                                           filtering="true"
                                           overwrite="true">
@@ -314,6 +321,70 @@
                                             <filter token="database.url" value="${database.prefix}.database.url" />
                                             <filter token="database.user" value="${database.prefix}.database.user" />
                                             <filter token="database.password" value="${database.prefix}.database.password" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/com.ibm.jbatch.tck.spi.JobExecutionWaiterFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/com.ibm.jbatch.tck.spi.JobExecutionWaiterFactory"
+                                          overwrite="true">
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory"
+                                          overwrite="true">
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="executor.factory.class" value="${executor.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.InjectorFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.InjectorFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="injector.factory.class" value="${injector.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="security.check.factory.class" value="${security.check.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
                                         </filterset>
                                     </copy>
                                 </target>
