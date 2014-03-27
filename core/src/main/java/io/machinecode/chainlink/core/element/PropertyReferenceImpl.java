@@ -8,10 +8,12 @@ import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.util.Messages;
 
+import java.io.Serializable;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class PropertyReferenceImpl<T> implements PropertyReference {
+public class PropertyReferenceImpl<T> implements PropertyReference, Serializable {
 
     protected final PropertiesImpl properties;
     protected final ArtifactReferenceImpl ref;

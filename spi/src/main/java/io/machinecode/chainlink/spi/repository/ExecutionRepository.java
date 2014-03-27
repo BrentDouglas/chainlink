@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.spi.repository;
 
 import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.execution.Step;
 
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobException;
@@ -93,13 +92,13 @@ public interface ExecutionRepository {
      *     where {@link Metric#getValue()} returns 0.
      *
      * @param jobExecution The {@link ExtendedJobExecution} to link this {@link ExtendedStepExecution} with.
-     * @param step The JSL step this execution represents.
+     * @param stepName The id of the JSL step this execution represents.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link ExtendedStepExecution} in accordance with the above rules.
      * @throws JobSecurityException TODO
      * @throws Exception When an error occurs.
      */
-    ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final Step<?,?> step, final Date timestamp) throws Exception;
+    ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception;
 
     /**
      * This method must generate a {@code long} to be used as an identifier of the {@link PartitionExecution} returned
@@ -244,7 +243,7 @@ public interface ExecutionRepository {
      *     equal to either {@param timestamp} or the time on the repository server when this method executes.
      *
      * Other methods of {@link StepExecution} and {@link ExtendedStepExecution} not listed will return values as defined
-     * in the javadoc for {@link #createStepExecution(JobExecution, Step, Date)}.
+     * in the javadoc for {@link #createStepExecution(JobExecution, String, Date)}.
      *
      * @param stepExecutionId The id of the {@link ExtendedStepExecution} that will be updated.
      * @param timestamp The current time on the JVM calling this method.
@@ -615,4 +614,6 @@ public interface ExecutionRepository {
      * @throws Exception
      */
     PartitionExecution getPartitionExecution(final long partitionExecutionId) throws Exception;
+
+    boolean isLocal();
 }

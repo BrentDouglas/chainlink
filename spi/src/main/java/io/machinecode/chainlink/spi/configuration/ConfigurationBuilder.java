@@ -8,12 +8,15 @@ import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
+import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 import javax.transaction.TransactionManager;
 
@@ -55,6 +58,20 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
     T setExecutorFactoryClass(final Class<? extends ExecutorFactory> clazz);
 
     T setExecutorFactoryFqcn(final String fqcn);
+
+    T setTransport(final Transport transport);
+
+    T setTransportFactory(final TransportFactory factory);
+
+    T setTransportFactoryClass(final Class<? extends TransportFactory> clazz);
+
+    T setTransportFactoryFqcn(final String fqcn);
+
+    T setWorkerFactory(final WorkerFactory factory);
+
+    T setWorkerFactoryClass(final Class<? extends WorkerFactory> clazz);
+
+    T setWorkerFactoryFqcn(final String fqcn);
 
     T setJobLoaders(final JobLoader... jobLoaders);
 

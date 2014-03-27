@@ -4,8 +4,11 @@ import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.core.util.Statuses;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.ThreadId;
+import io.machinecode.chainlink.spi.transport.ExecutableId;
+import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.transport.WorkerId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.element.execution.Split;
 import io.machinecode.chainlink.spi.execution.Executable;
@@ -25,6 +28,8 @@ public class SplitImpl extends ExecutionImpl implements Split {
     private final String next;
     private final List<FlowImpl> flows;
 
+    private transient int _completed;
+
     public SplitImpl(final String id, final String next, final List<FlowImpl> flows) {
         super(id);
         this.next = next;
@@ -43,14 +48,13 @@ public class SplitImpl extends ExecutionImpl implements Split {
 
     // Lifecycle
 
-    private transient int _completed;
-
     @Override
-    public Deferred<?> before(final Executor executor, final ThreadId threadId, final Executable thisCallback,
-                              final Executable parentCallback, final ExecutionContext context) throws Exception {
+    public Deferred<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+                              final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
+                              final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021000.split.before"), context, this.id);
         if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
-            return runCallback(executor, context, parentCallback);
+            return runCallback(configuration, context, parentId);
         }
         final ExecutionExecutable[] flows = new ExecutionExecutable[this.flows.size()];
         for (int i = 0; i < flows.length; ++i) {
@@ -64,18 +68,25 @@ public class SplitImpl extends ExecutionImpl implements Split {
                     context.getRestartElementId(),
                     null
             );
-            flows[i] = new ExecutionExecutable(thisCallback, flow, flowContext);
+            flows[i] = new ExecutionExecutable(
+                    callbackId,
+                    flow,
+                    flowContext,
+                    executionRepositoryId,
+                    null
+            );
         }
         this._completed = 0;
-        return executor.distribute(
+        return configuration.getExecutor().distribute(
                 flows.length,
                 flows
         );
     }
 
     @Override
-    public Deferred<?> after(final Executor executor, final ThreadId threadId, final Executable callback,
-                             final ExecutionContext context, final ExecutionContext childContext) throws Exception {
+    public Deferred<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+                             final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                             final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021001.split.after"), context, this.id);
         final Long stepExecutionId = childContext.getLastStepExecutionId();
         if (stepExecutionId != null) {
@@ -85,9 +96,9 @@ public class SplitImpl extends ExecutionImpl implements Split {
             return null;
         }
         if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
-            return runCallback(executor, context, callback);
+            return runCallback(configuration, context, parentId);
         }
-        return this.next(executor, threadId, context, callback, this.next, null);
+        return this.next(configuration, workerId, context, parentId, executionRepositoryId, this.next, null);
     }
 
     @Override

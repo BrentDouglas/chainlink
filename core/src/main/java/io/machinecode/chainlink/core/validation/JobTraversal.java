@@ -7,12 +7,13 @@ import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.ExecutionWork;
 import org.jboss.logging.Logger;
 
+import java.io.Serializable;
 import java.util.Map.Entry;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public final class JobTraversal {
+public final class JobTraversal implements Serializable {
 
     private static final Logger log = Logger.getLogger(JobTraversal.class);
 

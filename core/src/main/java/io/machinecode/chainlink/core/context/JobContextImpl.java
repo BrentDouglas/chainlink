@@ -8,12 +8,13 @@ import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.context.JobContext;
+import java.io.Serializable;
 import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobContextImpl implements MutableJobContext {
+public class JobContextImpl implements MutableJobContext, Serializable {
 
     private static final Logger log = Logger.getLogger(JobContextImpl.class);
 

@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.spi.execution;
 
+import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 
@@ -14,17 +14,7 @@ import java.util.concurrent.Future;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Executor {
-
-    TransactionManager getTransactionManager();
-
-    ExecutionRepository getRepository();
-
-    InjectionContext getInjectionContext();
-
-    Deferred<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
-
-    Deferred<?> removeJob(long jobExecutionId) throws JobExecutionNotRunningException;
+public interface Executor extends Lifecycle {
 
     Deferred<?> execute(final long jobExecutionId, final Executable executable);
 
@@ -34,19 +24,5 @@ public interface Executor {
 
     Deferred<?> callback(final Executable executable, final ExecutionContext context);
 
-    Worker getWorker(final ThreadId threadId);
-
-    Worker getCallbackWorker(final ThreadId threadId);
-
-    List<Worker> getWorkers(final int required);
-
-    Worker getWorker();
-
-    Worker createWorker();
-
-    Future<?> cancel(Deferred<?> deferred);
-
-    void start();
-
-    void stop();
+    Future<?> cancel(final Deferred<?> deferred);
 }

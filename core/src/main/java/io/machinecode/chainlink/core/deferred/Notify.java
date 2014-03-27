@@ -5,10 +5,12 @@ import io.machinecode.chainlink.spi.deferred.Listener;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
+import java.io.Serializable;
+
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class Notify implements Listener {
+public class Notify implements Listener, Serializable {
 
     private static final Logger log = Logger.getLogger(Notify.class);
 

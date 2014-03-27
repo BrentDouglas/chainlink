@@ -1,47 +1,46 @@
 package io.machinecode.chainlink.core.work;
 
-import io.machinecode.chainlink.core.deferred.DeferredImpl;
+import io.machinecode.chainlink.core.deferred.LinkedDeferred;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.ThreadId;
+import io.machinecode.chainlink.spi.transport.ExecutableId;
+import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.transport.WorkerId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.execution.ExecutableEvent;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.Work;
+import org.jboss.logging.Logger;
+
+import java.io.Serializable;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
-public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferred<?>> implements Executable {
+public abstract class ExecutableImpl<T extends Work> implements Executable, Serializable {
 
     protected final T work;
-    protected final ThreadId threadId;
-    protected final Executable parent;
+    protected final WorkerId workerId;
+    protected final ExecutionRepositoryId executionRepositoryId;
+    protected final ExecutableId parentId;
     protected final ExecutionContext context;
 
-    public ExecutableImpl(final Executable parent, final ExecutionContext context, final T work, final ThreadId threadId) {
-        super(new Deferred[1]);
-        this.parent = parent;
+    public ExecutableImpl(final ExecutableId parentId, final ExecutionContext context,
+                          final T work, final ExecutionRepositoryId executionRepositoryId, final WorkerId workerId) {
+        this.parentId = parentId;
         this.context = context;
         this.work = work;
-        this.threadId = threadId;
+        this.workerId = workerId;
+        this.executionRepositoryId = executionRepositoryId;
     }
 
-    public ExecutableImpl(final ExecutableImpl<T> executable, final ThreadId threadId) {
-        this(executable.getParent(), executable.getContext(), executable.work, threadId);
-    }
-
-    @Override
-    public boolean isCancelled() {
-        synchronized (lock) {
-            return super.isCancelled() || (this.parent != null && this.parent.isCancelled());
-        }
+    public ExecutableImpl(final ExecutableId parentId, final ExecutableImpl<T> executable, final WorkerId workerId) {
+        this(parentId, executable.getContext(), executable.work, executable.executionRepositoryId, workerId);
     }
 
     @Override
-    public Executable getParent() {
-        return parent;
+    public ExecutableId getParentId() {
+        return parentId;
     }
 
     @Override
@@ -50,52 +49,61 @@ public abstract class ExecutableImpl<T extends Work> extends DeferredImpl<Deferr
     }
 
     @Override
-    public ThreadId getThreadId() {
-        return threadId;
+    public WorkerId getWorkerId() {
+        return workerId;
     }
 
     @Override
-    public void execute(final Executor executor, final ThreadId threadId, final ExecutableEvent event) {
+    public ExecutionRepositoryId getExecutionRepositoryId() {
+        return executionRepositoryId;
+    }
+
+    @Override
+    public void execute(final RuntimeConfiguration configuration, final Deferred<?> deferred, final WorkerId workerId, final ExecutionContext childContext) {
         try {
             log().tracef(Messages.get("CHAINLINK-015703.executable.execute"), this.context, this);
-            final Deferred<?> next = doExecute(executor, threadId, this.parent, event.getContext());
-            // null means that it was an incomplete partition
-            if (next == null) {
-                resolve(null); //Need to call notify listener.
-                return;
-            }
-            resolve(setChild(0, next));
+            doExecute(configuration, deferred, workerId, this.parentId, childContext);
         } catch (final Throwable e) {
             log().errorf(e, Messages.get("CHAINLINK-015704.executable.exception"), this.context, this);
-            reject(e);
+            deferred.reject(e);
         }
     }
 
     @Override
-    protected String getResolveLogMessage() {
-        return Messages.format("CHAINLINK-015100.executable.resolve", this.context, this);
-    }
-
-    @Override
-    protected String getRejectLogMessage() {
-        return Messages.format("CHAINLINK-015101.executable.reject", this.context, this);
-    }
-
-    @Override
-    protected String getCancelLogMessage() {
-        return Messages.format("CHAINLINK-015102.executable.cancel", this.context, this);
-    }
-
-    @Override
-    protected String getTimeoutExceptionMessage() {
-        return Messages.format("CHAINLINK-015000.executable.timeout", this.context, this);
-    }
-
-    @Override
     public String toString() {
-        return getClass().getSimpleName() + "[threadId=" + threadId + ",work=" + work + "]";
+        return getClass().getSimpleName() + "[workerId=" + workerId + ",work=" + work + "]";
     }
 
-    protected abstract Deferred<?> doExecute(final Executor executor, final ThreadId threadId, final Executable callback,
-                                             final ExecutionContext context) throws Throwable;
+    public class Delegate extends LinkedDeferred<Deferred<?>> {
+
+        @Override
+        protected String getResolveLogMessage() {
+            return Messages.format("CHAINLINK-015100.executable.resolve", ExecutableImpl.this.context, this);
+        }
+
+        @Override
+        protected String getRejectLogMessage() {
+            return Messages.format("CHAINLINK-015101.executable.reject", ExecutableImpl.this.context, this);
+        }
+
+        @Override
+        protected String getCancelLogMessage() {
+            return Messages.format("CHAINLINK-015102.executable.cancel", ExecutableImpl.this.context, this);
+        }
+
+        @Override
+        protected String getTimeoutExceptionMessage() {
+            return Messages.format("CHAINLINK-015000.executable.timeout", ExecutableImpl.this.context, this);
+        }
+
+        @Override
+        protected Logger log() {
+            return ExecutableImpl.this.log();
+        }
+    }
+
+    protected abstract void doExecute(final RuntimeConfiguration configuration, final Deferred<?> deferred, final WorkerId workerId,
+                                      final ExecutableId parentId, final ExecutionContext context) throws Throwable;
+
+    protected abstract Logger log();
 }

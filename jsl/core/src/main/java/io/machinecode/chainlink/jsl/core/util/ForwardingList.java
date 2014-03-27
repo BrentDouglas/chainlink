@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.jsl.core.util;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.ListIterator;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ForwardingList<T> implements List<T> {
+public class ForwardingList<T> implements List<T>, Serializable {
 
     protected final List<T> delegate;
 

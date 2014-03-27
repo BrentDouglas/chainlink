@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.element.task;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.task.ItemReader;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -20,8 +21,8 @@ public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         super(ref, properties);
     }
 
-    public void open(final Executor executor, final ExecutionContext context, final Serializable checkpoint) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void open(final RuntimeConfiguration configuration, final ExecutionContext context, final Serializable checkpoint) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -31,8 +32,8 @@ public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         }
     }
 
-    public void close(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void close(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -42,8 +43,8 @@ public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         }
     }
 
-    public Object readItem(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public Object readItem(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -53,8 +54,8 @@ public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         }
     }
 
-    public Serializable checkpointInfo(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public Serializable checkpointInfo(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));

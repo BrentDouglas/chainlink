@@ -7,5 +7,5 @@ public class Constants {
 
     public static final String JAVAX_TRANSACTION_GLOBAL_TIMEOUT = "javax.transaction.global.timeout";
 
-    public static final String EXECUTOR_THREAD_POOL_SIZE = "io.machinecode.chainlink.spi.execution.Executor.thread_pool_size";
+    public static final String THREAD_POOL_SIZE = "io.machinecode.chainlink.spi.management.ExtendedJobOperator.thread_pool_size";
 }

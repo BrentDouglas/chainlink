@@ -15,7 +15,6 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -49,6 +48,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -199,14 +199,14 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final Step<?, ?> step, final Date timestamp) throws Exception {
+    public ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
         Connection connection = null;
         try {
             connection = _connection();
             connection.setAutoCommit(false);
             final PreparedStatement statement = connection.prepareStatement(insertStepExecution(), Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, jobExecution.getExecutionId());
-            statement.setString(2, step.getId());
+            statement.setString(2, stepName);
             statement.setString(3, BatchStatus.STARTING.name());
             final Timestamp ts = new Timestamp(timestamp.getTime());
             statement.setTimestamp(4, ts);
@@ -247,7 +247,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             return new StepExecutionImpl.Builder()
                     .setJobExecutionId(jobExecution.getExecutionId())
                     .setStepExecutionId(stepExecutionId)
-                    .setStepName(step.getId())
+                    .setStepName(stepName)
                     .setBatchStatus(BatchStatus.STARTING)
                     .setCreatedTime(timestamp)
                     .setUpdatedTime(timestamp)
@@ -1247,6 +1247,11 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 connection.close();
             }
         }
+    }
+
+    @Override
+    public boolean isLocal() {
+        return false;
     }
 
     private PartitionExecutionImpl _getPartitionExecution(final Connection connection, final long partitionExecutionId) throws Exception {

@@ -1,111 +1,123 @@
 package io.machinecode.chainlink.core.execution;
 
-import gnu.trove.map.TMap;
-import gnu.trove.map.hash.THashMap;
+import io.machinecode.chainlink.core.deferred.AllDeferred;
+import io.machinecode.chainlink.core.deferred.LinkedDeferred;
 import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
-import io.machinecode.chainlink.spi.context.ThreadId;
+import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.deferred.Deferred;
+import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
+import io.machinecode.chainlink.spi.transport.DeferredId;
+import io.machinecode.chainlink.spi.transport.Transport;
+import io.machinecode.chainlink.spi.transport.WorkerId;
+import io.machinecode.chainlink.spi.util.Pair;
 import org.jboss.logging.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ListIterator;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class EventedExecutor extends BaseExecutor {
+public class EventedExecutor implements Executor {
 
     private static final Logger log = Logger.getLogger(EventedExecutor.class);
 
-    protected final AtomicInteger worker = new AtomicInteger(0);
-    protected final TMap<ThreadId, EventedWorker> activeThreads = new THashMap<ThreadId, EventedWorker>();
-    protected final TMap<ThreadId, EventedWorker> closedThreads = new THashMap<ThreadId, EventedWorker>();
-    protected final AtomicBoolean threadsLock = new AtomicBoolean(false);
+    protected final Transport transport;
+    private final ExecutorService cancellation = Executors.newCachedThreadPool();
 
     public EventedExecutor(final ExecutorConfiguration configuration) {
-        super(configuration);
+        this.transport = configuration.getTransport();
+    }
+
+
+    @Override
+    public void startup() {
+        //
     }
 
     @Override
-    public EventedWorker getWorker(final ThreadId threadId) {
-        while (!threadsLock.compareAndSet(false, true)) {}
-        try {
-            return activeThreads.get(threadId);
-        } finally {
-            threadsLock.set(false);
-        }
+    public void shutdown() {
+        this.cancellation.shutdown();
     }
 
     @Override
-    public EventedWorker getCallbackWorker(final ThreadId threadId) {
-        final EventedWorker worker = getWorker(threadId);
-        if (worker != null) {
-            return worker;
-        }
-        while (!threadsLock.compareAndSet(false, true)) {}
-        try {
-            return closedThreads.get(threadId);
-        } finally {
-            threadsLock.set(false);
-        }
+    public Deferred<?> execute(final long jobExecutionId, final Executable executable) {
+        final Deferred<?> deferred = new LinkedDeferred<Void>();
+        final DeferredId deferredId = new UUIDDeferredId(UUID.randomUUID());
+        transport.registerDeferred(jobExecutionId, deferredId, deferred);
+        transport.registerJob(jobExecutionId, deferred);
+        _execute(executable, deferredId);
+        return deferred;
     }
 
     @Override
-    public List<Worker> getWorkers(final int required) {
-        final ArrayList<Worker> ret = new ArrayList<Worker>(required);
-        synchronized (workers) {
-            for (int i = 0; i < required; ++i) {
-                if (worker.get() >= workers.size()) {
-                    worker.set(0);
-                }
-                ret.add(workers.get(worker.getAndIncrement()));
+    public Deferred<?> execute(final Executable executable) {
+        final Deferred<?> deferred = new LinkedDeferred<Void>();
+        final DeferredId deferredId = new UUIDDeferredId(UUID.randomUUID());
+        transport.registerDeferred(executable.getContext().getJobExecutionId(), deferredId, deferred);
+        _execute(executable, deferredId);
+        return deferred;
+    }
+
+    private void _execute(final Executable executable, final DeferredId deferredId) {
+        final WorkerId workerId = executable.getWorkerId();
+        final Worker worker;
+        if (workerId == null) {
+            worker = transport.getWorker();
+        } else {
+            worker = transport.getWorker(workerId);
+        }
+        worker.addExecutable(new ExecutableEventImpl(executable, deferredId));
+    }
+
+    @Override
+    public Deferred<?> distribute(final int maxThreads, final Executable... executables) {
+        final List<Worker> workers = transport.getWorkers(maxThreads);
+        ListIterator<Worker> it = workers.listIterator();
+        final Deferred<?>[] deferreds = new Deferred[executables.length];
+        int i = 0;
+        for (final Executable executable : executables) {
+            if (!it.hasNext()) {
+                it = workers.listIterator();
             }
+            final Worker worker = it.next();
+            final Pair<DeferredId, Deferred<?>> pair = worker.createDistributedDeferred(executable);
+            deferreds[i++] = pair.getValue();
+            transport.registerDeferred(executable.getContext().getJobExecutionId(), pair.getName(), pair.getValue());
+            worker.addExecutable(new ExecutableEventImpl(executable, pair.getName()));
         }
-        return ret;
+        return new AllDeferred<Executable>(deferreds);
     }
 
     @Override
-    public Worker getWorker() {
-        synchronized (workers) {
-            if (worker.get() >= workers.size()) {
-                worker.set(0);
-            }
-            return workers.get(worker.getAndIncrement());
+    public Deferred<?> callback(final Executable executable, final ExecutionContext context) {
+        final WorkerId workerId = executable.getWorkerId();
+        Worker worker;
+        if (workerId == null) {
+            worker = transport.getWorker();
+        } else {
+            worker = transport.getWorker(workerId);
         }
+        final Deferred<?> deferred = new LinkedDeferred<Void>();
+        final DeferredId deferredId = new UUIDDeferredId(UUID.randomUUID());
+        transport.registerDeferred(executable.getContext().getJobExecutionId(), deferredId, deferred);
+        worker.addExecutable(new ExecutableEventImpl(executable, deferredId, context));
+        return deferred;
     }
 
     @Override
-    public EventedWorker createWorker() {
-        return new EventedWorker(this);
-    }
-
-    public static class EventedWorker extends BaseWorker<EventedExecutor> {
-
-        public EventedWorker(final EventedExecutor executor) {
-            super(executor);
-        }
-
-        @Override
-        protected void addToThreadPool() {
-            while (!executor.threadsLock.compareAndSet(false, true)) {}
-            try {
-                executor.activeThreads.put(threadId, this);
-            } finally {
-                executor.threadsLock.set(false);
+    public Future<?> cancel(final Deferred<?> deferred) {
+        return cancellation.submit(new Runnable() {
+            @Override
+            public void run() {
+                deferred.cancel(true);
             }
-        }
-
-        @Override
-        protected void removeFromThreadPool() {
-            while (!executor.threadsLock.compareAndSet(false, true)) {}
-            try {
-                executor.activeThreads.remove(threadId);
-                executor.closedThreads.put(threadId, this);
-            } finally {
-                executor.threadsLock.set(false);
-            }
-        }
+        });
     }
 }

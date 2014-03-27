@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.element.partition;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Mapper;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -27,13 +28,9 @@ public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implement
     }
 
     @Override
-    public PartitionPlan getPartitionPlan(final Executor executor, final ExecutionContext context) throws Exception {
+    public PartitionPlan getPartitionPlan(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-022000.mapper.map.partitions"), context.getJobExecutionId(), ref.ref());
-        return mapPartitions(executor, context);
-    }
-
-    public PartitionPlan mapPartitions(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));

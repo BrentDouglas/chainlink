@@ -4,13 +4,14 @@ import io.machinecode.chainlink.spi.element.task.ExceptionClassFilter;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ExceptionClassFilterImpl implements ExceptionClassFilter {
+public class ExceptionClassFilterImpl implements ExceptionClassFilter, Serializable {
 
     private static final Logger log = Logger.getLogger(ExceptionClassFilterImpl.class);
 

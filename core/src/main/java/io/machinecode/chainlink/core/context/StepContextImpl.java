@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class StepContextImpl implements MutableStepContext {
+public class StepContextImpl implements MutableStepContext, Serializable {
 
     private static final Logger log = Logger.getLogger(StepContextImpl.class);
 

@@ -2,10 +2,12 @@ package io.machinecode.chainlink.core.util;
 
 import io.machinecode.chainlink.spi.util.Resolvable;
 
+import java.io.Serializable;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ResolvableClass<T> implements Resolvable<Class<T>> {
+public class ResolvableClass<T> implements Resolvable<Class<T>>, Serializable {
 
     private final String fqcn;
     private transient Class<T> clazz;

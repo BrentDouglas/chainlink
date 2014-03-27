@@ -20,6 +20,8 @@
 
         <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
+        <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
+        <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
@@ -62,6 +64,11 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-infinispan</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -143,23 +150,13 @@
 
     <profiles>
         <profile>
-            <id>ex-threaded</id>
+            <id>tr-infinispan</id>
             <activation>
-                <property><name>ex-threaded</name></property>
+                <property><name>tr-infinispan</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <executor.factory.class>io.machinecode.chainlink.core.execution.ThreadedExecutorFactory</executor.factory.class>
-            </properties>
-        </profile>
-        <profile>
-            <id>ex-infinispan</id>
-            <activation>
-                <property><name>ex-infinispan</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <executor.factory.class>io.machinecode.chainlink.execution.infinispan.InfinispanExecutorFactory</executor.factory.class>
+                <transport.factory.class>io.machinecode.chainlink.tck.core.transport.InfinispanTransportFactory</transport.factory.class>
             </properties>
         </profile>
         <profile>
@@ -385,6 +382,22 @@
                                           overwrite="true">
                                         <filterset>
                                             <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransportFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransportFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="transport.factory.class" value="${transport.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.WorkerFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.WorkerFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="worker.factory.class" value="${worker.factory.class}" />
                                         </filterset>
                                     </copy>
                                 </target>

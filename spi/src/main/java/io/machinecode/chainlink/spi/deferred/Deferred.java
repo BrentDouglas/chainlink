@@ -4,6 +4,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -13,6 +15,8 @@ public interface Deferred<T> extends Future<T> {
     void resolve(final T that);
 
     void reject(final Throwable that);
+
+    void link(final Deferred<?> that);
 
     boolean isResolved();
 
@@ -30,9 +34,11 @@ public interface Deferred<T> extends Future<T> {
 
     void onCancel(final Listener listener);
 
-    void traverse(final Listener listener);
+    void onLink(final Listener listener);
 
-    void await() throws InterruptedException, ExecutionException;
+    void await(final Lock lock, final Condition condition) throws InterruptedException, ExecutionException;
 
-    void await(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;
+    void await(final long timeout, final TimeUnit unit, final Lock lock, final Condition condition) throws InterruptedException, ExecutionException, TimeoutException;
+
+    void signal();
 }

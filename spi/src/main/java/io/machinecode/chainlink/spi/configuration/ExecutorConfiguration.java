@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.spi.configuration;
 
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface ExecutorConfiguration extends RepositoryConfiguration {
+public interface ExecutorConfiguration extends TransportConfiguration {
 
-    ExecutionRepository getRepository();
+    Transport getTransport();
 }

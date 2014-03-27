@@ -5,9 +5,12 @@ import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
 import io.machinecode.chainlink.core.util.Statuses;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.context.ThreadId;
+import io.machinecode.chainlink.spi.transport.ExecutableId;
+import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.transport.WorkerId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.element.execution.Decision;
 import io.machinecode.chainlink.spi.execution.Executable;
@@ -37,6 +40,8 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     private final PropertiesImpl properties;
     private final ArtifactReferenceImpl ref;
 
+    protected transient Decider _decider;
+
     public DecisionImpl(final String id, final ArtifactReferenceImpl ref, final PropertiesImpl properties,
                         final List<TransitionImpl> transitions) {
         super(id);
@@ -63,34 +68,40 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     // Lifecycle
 
     @Override
-    public Deferred<?> before(final Executor executor, final ThreadId threadId, final Executable thisCallback,
-                              final Executable parentCallback, final ExecutionContext context) throws Exception {
+    public Deferred<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+                              final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
+                              final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-019000.decision.before"), context, this.id);
         final long[] prior = context.getPriorStepExecutionIds();
         final Long last = context.getLastStepExecutionId();
         final long[] actual = prior.length != 0 ? prior : last != null ? new long[]{ last } : NO_STEPS;
         log.debugf(Messages.get("CHAINLINK-019002.decision.decide"), context, this.id, this.ref.ref());
-        final String exitStatus = decide(executor, context,
-                actual == NO_STEPS ? NO_STEP_EXECUTIONS : executor.getRepository().getStepExecutions(actual)
+        final String exitStatus = decide(
+                configuration,
+                context,
+                actual == NO_STEPS
+                        ? NO_STEP_EXECUTIONS
+                        : configuration.getExecutionRepository(executionRepositoryId).getStepExecutions(actual)
         );
         context.getJobContext().setExitStatus(exitStatus);
-        return executor.callback(thisCallback, context);
+        return runCallback(configuration, context, callbackId);
     }
 
     @Override
-    public Deferred<?> after(final Executor executor, final ThreadId threadId, final Executable callback,
-                             final ExecutionContext context, final ExecutionContext childContext) throws Exception {
+    public Deferred<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+                             final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                             final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-019001.decision.after"), context, this.id);
         final MutableJobContext jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
         if (Statuses.isStopping(batchStatus) || Statuses.isFailed(batchStatus)) {
-            return runCallback(executor, context, callback);
+            return runCallback(configuration, context, parentId);
         }
         final TransitionWork transition = this.transition(context, this.transitions, jobContext.getBatchStatus(), jobContext.getExitStatus());
         if (transition != null && transition.isTerminating()) {
-            return runCallback(executor, context, callback);
+            return runCallback(configuration, context, parentId);
         } else {
-            return this.next(executor, threadId, context, callback, null, transition);
+            return this.next(configuration, workerId, context, parentId, executionRepositoryId, null, transition);
         }
     }
 
@@ -99,22 +110,20 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
         return log;
     }
 
-    protected transient Decider _cached;
-
     public Decider load(final InjectionContext injectionContext, final ExecutionContext context) throws Exception {
-        if (this._cached != null) {
-            return this._cached;
+        if (this._decider != null) {
+            return this._decider;
         }
         final Decider that = this.ref.load(Decider.class, injectionContext, context);
         if (that == null) {
             throw new IllegalStateException(Messages.format("CHAINLINK-025004.artifact.null", context, this.ref));
         }
-        this._cached = that;
+        this._decider = that;
         return that;
     }
 
-    public String decide(final Executor executor, final ExecutionContext context, final StepExecution[] executions) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public String decide(final RuntimeConfiguration configuration, final ExecutionContext context, final StepExecution[] executions) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(new InjectablesImpl(

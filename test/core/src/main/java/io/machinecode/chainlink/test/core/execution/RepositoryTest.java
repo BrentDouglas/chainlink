@@ -105,7 +105,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         final ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
 
@@ -124,7 +124,7 @@ public abstract class RepositoryTest extends BaseTest {
 
         final ExtendedStepExecution second = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
 
@@ -147,7 +147,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         final ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
 
@@ -197,7 +197,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         final ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
 
@@ -466,7 +466,7 @@ public abstract class RepositoryTest extends BaseTest {
         Thread.sleep(1);
         ExtendedStepExecution firstS1 = repository().createStepExecution(
                 first,
-                step,
+                step.getId(),
                 new Date()
         );
         Thread.sleep(1);
@@ -482,7 +482,7 @@ public abstract class RepositoryTest extends BaseTest {
         }
         ExtendedStepExecution firstS2 = repository().createStepExecution(
                 first,
-                step,
+                step.getId(),
                 new Date()
         );
         Thread.sleep(1);
@@ -503,7 +503,7 @@ public abstract class RepositoryTest extends BaseTest {
         Thread.sleep(1);
         ExtendedStepExecution secondS1 = repository().createStepExecution(
                 second,
-                step,
+                step.getId(),
                 new Date()
         );
         Thread.sleep(1);
@@ -519,7 +519,7 @@ public abstract class RepositoryTest extends BaseTest {
         }
         ExtendedStepExecution secondS2 = repository().createStepExecution(
                 second,
-                step,
+                step.getId(),
                 new Date()
         );
         Thread.sleep(1);
@@ -540,7 +540,7 @@ public abstract class RepositoryTest extends BaseTest {
         Thread.sleep(1);
         ExtendedStepExecution thirdS1 = repository().createStepExecution(
                 third,
-                step,
+                step.getId(),
                 new Date()
         );
         Thread.sleep(1);
@@ -556,7 +556,7 @@ public abstract class RepositoryTest extends BaseTest {
         }
         ExtendedStepExecution thirdS2 = repository().createStepExecution(
                 third,
-                step,
+                step.getId(),
                 new Date()
         );
         Assert.assertEquals(
@@ -603,7 +603,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
 
@@ -654,7 +654,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
 
@@ -757,7 +757,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
 
@@ -880,7 +880,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
         repository().startStepExecution(
@@ -953,7 +953,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
         PartitionExecution partition = repository().createPartitionExecution(
@@ -1056,7 +1056,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
         PartitionExecution partition = repository().createPartitionExecution(
@@ -1291,7 +1291,7 @@ public abstract class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)),
+                Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
         PartitionExecution partition = repository().createPartitionExecution(

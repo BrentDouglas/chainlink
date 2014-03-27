@@ -2,10 +2,12 @@ package io.machinecode.chainlink.core.element;
 
 import io.machinecode.chainlink.spi.element.Property;
 
+import java.io.Serializable;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class PropertyImpl implements Property {
+public class PropertyImpl implements Property, Serializable {
 
     private final String name;
     private final String value;

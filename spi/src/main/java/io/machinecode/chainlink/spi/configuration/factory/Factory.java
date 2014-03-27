@@ -7,5 +7,5 @@ import io.machinecode.chainlink.spi.configuration.BaseConfiguration;
  */
 public interface Factory<T, U extends BaseConfiguration> {
 
-    T produce(final U that) throws Exception;
+    T produce(final U configuration) throws Exception;
 }

@@ -4,10 +4,12 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.inject.ArtifactReference;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 
+import java.io.Serializable;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ArtifactReferenceImpl implements ArtifactReference {
+public class ArtifactReferenceImpl implements ArtifactReference, Serializable {
 
     private final String ref;
 

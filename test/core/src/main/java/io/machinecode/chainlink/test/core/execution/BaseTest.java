@@ -4,8 +4,12 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
+import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
+import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
@@ -64,7 +68,9 @@ public abstract class BaseTest extends Assert {
                 .setTransactionManager(transactionManager())
                 .setExecutionRepository(repository())
                 .setExecutorFactory(executor())
-                .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8");
+                .setWorkerFactory(_workerFactory())
+                .setTransportFactory(_transportFactory())
+                .setProperty(Constants.THREAD_POOL_SIZE, "8");
     }
 
     protected abstract ExecutionRepository _repository() throws Exception;
@@ -75,6 +81,14 @@ public abstract class BaseTest extends Assert {
 
     protected ExecutorFactory _executor() throws Exception{
         return new EventedExecutorFactory();
+    }
+
+    protected TransportFactory _transportFactory() {
+        return new LocalTransportFactory();
+    }
+
+    protected WorkerFactory _workerFactory() {
+        return new EventedWorkerFactory();
     }
 
     protected void printMethodName() {

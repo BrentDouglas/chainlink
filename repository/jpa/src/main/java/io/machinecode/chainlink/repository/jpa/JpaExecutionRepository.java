@@ -10,7 +10,6 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -34,14 +33,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class JpaExecutionRepository implements ExecutionRepository {
 
-    final EntityManagerFactory factory;
-    final TransactionManagerLookup lookup;
+    protected final EntityManagerFactory factory;
+    protected final TransactionManagerLookup lookup;
 
     public JpaExecutionRepository(final EntityManagerLookup entityManagerLookup, final TransactionManagerLookup transactionManagerLookup) {
         this.factory = entityManagerLookup.getEntityManagerFactory();
@@ -120,7 +120,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final Step<?, ?> step, final Date timestamp) throws Exception {
+    public ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
         final EntityManager em = em();
         final ExtendedTransactionManager transaction = lookup.getTransactionManager(em);
         try {
@@ -136,7 +136,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
                     .setBatchStatus(BatchStatus.STARTING)
                     .setCreateTime(timestamp)
                     .setUpdatedTime(timestamp)
-                    .setStepName(step.getId())
+                    .setStepName(stepName)
                     .setMetricsMap(JpaMetric.empty())
                     .setJobExecution(jpaJobExecution);
             em.persist(execution);
@@ -1044,6 +1044,11 @@ public class JpaExecutionRepository implements ExecutionRepository {
                 em.close();
             }
         }
+    }
+
+    @Override
+    public boolean isLocal() {
+        return false; //TODO This needs to be optional based ona property
     }
 
     public void _updateMetrics(final Metric[] source, final Map<Metric.MetricType, JpaMetric> target) {

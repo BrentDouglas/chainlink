@@ -78,6 +78,8 @@ run-test -Pin-guice -Pre-redis
 run-test -Pin-seam -Pre-redis
 run-test -Pin-spring -Pre-redis
 
+run-test -Pin-cdi -Ptr-infinispan -Djgroups.bind_addr=127.0.0.1 -Djava.net.preferIPv4Stack=true
+
 if [ $RETVAL -eq 0 ]; then
   echo -e "[${GREEN}OK${RESET}]"
 else

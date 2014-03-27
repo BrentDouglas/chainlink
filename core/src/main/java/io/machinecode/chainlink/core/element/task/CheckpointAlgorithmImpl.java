@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.element.task;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.task.CheckpointAlgorithm;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -18,8 +19,8 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         super(ref, properties);
     }
 
-    public int checkpointTimeout(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public int checkpointTimeout(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -29,8 +30,8 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         }
     }
 
-    public void beginCheckpoint(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void beginCheckpoint(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -40,8 +41,8 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         }
     }
 
-    public boolean isReadyToCheckpoint(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public boolean isReadyToCheckpoint(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -51,8 +52,8 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         }
     }
 
-    public void endCheckpoint(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void endCheckpoint(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));

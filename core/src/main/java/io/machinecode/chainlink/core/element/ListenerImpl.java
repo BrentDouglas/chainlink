@@ -2,10 +2,10 @@ package io.machinecode.chainlink.core.element;
 
 import io.machinecode.chainlink.core.inject.InjectablesImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Listener;
 import io.machinecode.chainlink.spi.element.PropertyReference;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
@@ -25,12 +25,13 @@ import javax.batch.api.chunk.listener.SkipReadListener;
 import javax.batch.api.chunk.listener.SkipWriteListener;
 import javax.batch.api.listener.JobListener;
 import javax.batch.api.listener.StepListener;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ListenerImpl implements Listener, PropertyReference {
+public class ListenerImpl implements Listener, PropertyReference, Serializable {
 
     private static final Logger log = Logger.getLogger(ListenerImpl.class);
 
@@ -78,8 +79,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         return that;
     }
 
-    public void beforeChunk(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void beforeChunk(final RuntimeConfiguration configuration,  final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -89,8 +90,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onError(final Executor executor, final ExecutionContext context, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onError(final RuntimeConfiguration configuration,  final ExecutionContext context, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -100,8 +101,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void afterChunk(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void afterChunk(final RuntimeConfiguration configuration,  final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -111,8 +112,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void beforeProcess(final Executor executor, final ExecutionContext context, final Object item) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void beforeProcess(final RuntimeConfiguration configuration,  final ExecutionContext context, final Object item) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -122,8 +123,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void afterProcess(final Executor executor, final ExecutionContext context, final Object item, final Object result) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void afterProcess(final RuntimeConfiguration configuration,  final ExecutionContext context, final Object item, final Object result) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -133,8 +134,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onProcessError(final Executor executor, final ExecutionContext context, final Object item, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onProcessError(final RuntimeConfiguration configuration,  final ExecutionContext context, final Object item, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -144,8 +145,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void beforeRead(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void beforeRead(final RuntimeConfiguration configuration,  final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -155,8 +156,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void afterRead(final Executor executor, final ExecutionContext context, final Object item) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void afterRead(final RuntimeConfiguration configuration,  final ExecutionContext context, final Object item) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -166,8 +167,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onReadError(final Executor executor, final ExecutionContext context, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onReadError(final RuntimeConfiguration configuration,  final ExecutionContext context, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -177,8 +178,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void beforeWrite(final Executor executor, final ExecutionContext context, final List<Object> items) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void beforeWrite(final RuntimeConfiguration configuration,  final ExecutionContext context, final List<Object> items) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -188,8 +189,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void afterWrite(final Executor executor, final ExecutionContext context, final List<Object> items) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void afterWrite(final RuntimeConfiguration configuration,  final ExecutionContext context, final List<Object> items) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -199,8 +200,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onWriteError(final Executor executor, final ExecutionContext context, final List<Object> items, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onWriteError(final RuntimeConfiguration configuration,  final ExecutionContext context, final List<Object> items, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -210,8 +211,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void beforeJob(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void beforeJob(final RuntimeConfiguration configuration,  final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -221,8 +222,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void afterJob(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void afterJob(final RuntimeConfiguration configuration,  final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -232,8 +233,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onRetryProcessException(final Executor executor, final ExecutionContext context, final Object item, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onRetryProcessException(final RuntimeConfiguration configuration,  final ExecutionContext context, final Object item, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -243,8 +244,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onRetryReadException(final Executor executor, final ExecutionContext context, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onRetryReadException(final RuntimeConfiguration configuration,  final ExecutionContext context, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -254,8 +255,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onRetryWriteException(final Executor executor, final ExecutionContext context, final List<Object> items, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onRetryWriteException(final RuntimeConfiguration configuration,  final ExecutionContext context, final List<Object> items, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -265,8 +266,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onSkipProcessItem(final Executor executor, final ExecutionContext context, final Object item, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onSkipProcessItem(final RuntimeConfiguration configuration,  final ExecutionContext context, final Object item, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -276,8 +277,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onSkipReadItem(final Executor executor, final ExecutionContext context, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onSkipReadItem(final RuntimeConfiguration configuration,  final ExecutionContext context, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -287,8 +288,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void onSkipWriteItem(final Executor executor, final ExecutionContext context, final List<Object> items, final Exception exception) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void onSkipWriteItem(final RuntimeConfiguration configuration,  final ExecutionContext context, final List<Object> items, final Exception exception) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -298,8 +299,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void beforeStep(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void beforeStep(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -309,8 +310,8 @@ public class ListenerImpl implements Listener, PropertyReference {
         }
     }
 
-    public void afterStep(final Executor executor, final ExecutionContext context) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void afterStep(final RuntimeConfiguration configuration,  final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));

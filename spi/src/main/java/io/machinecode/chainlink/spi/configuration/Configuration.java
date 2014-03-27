@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.spi.configuration;
 
+import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 
 /**
@@ -8,4 +9,8 @@ import io.machinecode.chainlink.spi.execution.Executor;
 public interface Configuration extends ExecutorConfiguration {
 
     Executor getExecutor();
+
+    WorkerFactory getWorkerFactory();
+
+    RuntimeConfiguration getRuntimeConfiguration();
 }

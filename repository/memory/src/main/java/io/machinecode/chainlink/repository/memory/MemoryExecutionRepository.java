@@ -12,30 +12,20 @@ import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TLongHashSet;
 import io.machinecode.chainlink.repository.core.Serializer;
-import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.repository.core.JobExecutionImpl;
 import io.machinecode.chainlink.repository.core.JobInstanceImpl;
 import io.machinecode.chainlink.repository.core.MutableMetricImpl;
 import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
 import io.machinecode.chainlink.repository.core.StepExecutionImpl;
-import org.jboss.marshalling.ByteBufferInput;
-import org.jboss.marshalling.Marshaller;
-import org.jboss.marshalling.MarshallerFactory;
 import org.jboss.marshalling.Marshalling;
 import org.jboss.marshalling.MarshallingConfiguration;
-import org.jboss.marshalling.OutputStreamByteOutput;
-import org.jboss.marshalling.Unmarshaller;
-import org.jboss.marshalling.cloner.ClonerConfiguration;
-import org.jboss.marshalling.cloner.ObjectCloner;
-import org.jboss.marshalling.cloner.ObjectCloners;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -49,16 +39,15 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -188,7 +177,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public StepExecutionImpl createStepExecution(final JobExecution jobExecution, final Step<?, ?> step, final Date timestamp) throws Exception {
+    public StepExecutionImpl createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
         final long stepExecutionId;
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -204,7 +193,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
                 .setJobExecutionId(jobExecution.getExecutionId())
                 .setStepExecutionId(stepExecutionId)
-                .setStepName(step.getId())
+                .setStepName(stepName)
                 .setCreatedTime(timestamp)
                 .setUpdatedTime(timestamp)
                 .setBatchStatus(BatchStatus.STARTING)
@@ -997,5 +986,10 @@ public class MemoryExecutionRepository implements ExecutionRepository {
         } finally {
             partitionExecutionLock.set(false);
         }
+    }
+
+    @Override
+    public boolean isLocal() {
+        return true;
     }
 }

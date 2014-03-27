@@ -10,9 +10,7 @@ import io.machinecode.chainlink.repository.core.MutableMetricImpl;
 import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
 import io.machinecode.chainlink.repository.core.Serializer;
 import io.machinecode.chainlink.repository.core.StepExecutionImpl;
-import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -26,16 +24,8 @@ import org.infinispan.distexec.DefaultExecutorService;
 import org.infinispan.distexec.DistributedExecutorService;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.transaction.LockingMode;
-import org.jboss.marshalling.ByteBufferInput;
-import org.jboss.marshalling.Marshaller;
-import org.jboss.marshalling.MarshallerFactory;
 import org.jboss.marshalling.Marshalling;
 import org.jboss.marshalling.MarshallingConfiguration;
-import org.jboss.marshalling.OutputStreamByteOutput;
-import org.jboss.marshalling.Unmarshaller;
-import org.jboss.marshalling.cloner.ClonerConfiguration;
-import org.jboss.marshalling.cloner.ObjectCloner;
-import org.jboss.marshalling.cloner.ObjectCloners;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -49,10 +39,7 @@ import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
 import javax.transaction.TransactionManager;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -207,7 +194,7 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public StepExecutionImpl createStepExecution(final JobExecution jobExecution, final Step<?, ?> step, final Date timestamp) throws Exception {
+    public StepExecutionImpl createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
         final CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions.get(jobExecution.getExecutionId());
         if (executionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
@@ -218,7 +205,7 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
                 .setJobExecutionId(jobExecution.getExecutionId())
                 .setStepExecutionId(stepExecutionId)
-                .setStepName(step.getId())
+                .setStepName(stepName)
                 .setCreatedTime(timestamp)
                 .setUpdatedTime(timestamp)
                 .setBatchStatus(BatchStatus.STARTING)
@@ -762,5 +749,10 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
         }
         return partition;
+    }
+
+    @Override
+    public boolean isLocal() {
+        return !cacheManager.getCacheManagerConfiguration().isClustered();
     }
 }

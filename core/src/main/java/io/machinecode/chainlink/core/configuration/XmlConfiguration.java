@@ -24,6 +24,12 @@ public class XmlConfiguration {
     @XmlElement(name = "executor-factory", namespace = NAMESPACE, required = true)
     private XmlFactoryRef executorFactory;
 
+    @XmlElement(name = "transport-factory", namespace = NAMESPACE, required = true)
+    private XmlFactoryRef transportFactory;
+
+    @XmlElement(name = "worker-factory", namespace = NAMESPACE, required = true)
+    private XmlFactoryRef workerFactory;
+
     @XmlElement(name = "execution-repository-factory", namespace = NAMESPACE, required = true)
     private XmlFactoryRef executionRepositoryFactory;
 
@@ -54,6 +60,22 @@ public class XmlConfiguration {
 
     public void setExecutorFactory(final XmlFactoryRef executorFactory) {
         this.executorFactory = executorFactory;
+    }
+
+    public XmlFactoryRef getTransportFactory() {
+        return transportFactory;
+    }
+
+    public void setTransportFactory(final XmlFactoryRef transportFactory) {
+        this.transportFactory = transportFactory;
+    }
+
+    public XmlFactoryRef getWorkerFactory() {
+        return workerFactory;
+    }
+
+    public void setWorkerFactory(final XmlFactoryRef workerFactory) {
+        this.workerFactory = workerFactory;
     }
 
     public XmlFactoryRef getExecutionRepositoryFactory() {

@@ -2,6 +2,7 @@ package io.machinecode.chainlink.tck.core;
 
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
@@ -12,6 +13,9 @@ import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
+import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
+
 import java.util.List;
 import java.util.ServiceConfigurationError;
 
@@ -48,8 +52,10 @@ public class TckConfigurationFactory implements ConfigurationFactory {
         } catch (final ServiceConfigurationError e) {}
         List<ExecutionRepositoryFactory> executionRepositories = new ResolvableService<ExecutionRepositoryFactory>(ExecutionRepositoryFactory.class).resolve(tccl);
         List<ExecutorFactory> executors = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
+        List<TransportFactory> transports = new ResolvableService<TransportFactory>(TransportFactory.class).resolve(tccl);
+        List<WorkerFactory> workers = new ResolvableService<WorkerFactory>(WorkerFactory.class).resolve(tccl);
         return new Builder()
-                .setProperty(Constants.EXECUTOR_THREAD_POOL_SIZE, "8")
+                .setProperty(Constants.THREAD_POOL_SIZE, "8")
                 .setClassLoader(tccl)
                 .setTransactionManagerFactory(transactionManagers == null ? null : transactionManagers.get(0))
                 .setArtifactLoaderFactories(artifactLoaders == null ? null : artifactLoaders.toArray(new ArtifactLoaderFactory[artifactLoaders.size()]))
@@ -58,6 +64,8 @@ public class TckConfigurationFactory implements ConfigurationFactory {
                 .setJobLoaderFactories(jobLoaders == null ? null : jobLoaders.toArray(new JobLoaderFactory[jobLoaders.size()]))
                 .setExecutionRepositoryFactory(executionRepositories.get(0))
                 .setExecutorFactory(executors.get(0))
+                .setWorkerFactory(workers.get(0))
+                .setTransportFactory(transports.get(0))
                 .build();
     }
 }

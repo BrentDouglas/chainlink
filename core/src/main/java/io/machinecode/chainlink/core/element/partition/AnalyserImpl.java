@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.element.partition;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Analyser;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -22,8 +23,8 @@ public class AnalyserImpl extends PropertyReferenceImpl<PartitionAnalyzer> imple
         super(ref, properties);
     }
 
-    public void analyzeCollectorData(final Executor executor, final ExecutionContext context, final Serializable data) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void analyzeCollectorData(final RuntimeConfiguration configuration, final ExecutionContext context, final Serializable data) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
@@ -33,8 +34,8 @@ public class AnalyserImpl extends PropertyReferenceImpl<PartitionAnalyzer> imple
         }
     }
 
-    public void analyzeStatus(final Executor executor, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception {
-        final InjectionContext injectionContext = executor.getInjectionContext();
+    public void analyzeStatus(final RuntimeConfiguration configuration, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));

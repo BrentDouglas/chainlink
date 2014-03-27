@@ -7,9 +7,12 @@ import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.core.validation.InvalidJobException;
 import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.core.validation.JobTraversal;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.transport.ExecutableId;
+import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.transport.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.ThreadId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.execution.Executable;
@@ -21,12 +24,13 @@ import org.jboss.logging.Logger;
 
 import javax.batch.api.listener.JobListener;
 import javax.batch.runtime.BatchStatus;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobImpl implements Job, JobWork {
+public class JobImpl implements Job, JobWork, Serializable {
 
     private static final Logger log = Logger.getLogger(JobImpl.class);
 
@@ -37,6 +41,8 @@ public class JobImpl implements Job, JobWork {
     private final ListenersImpl listeners;
     private final List<ExecutionImpl> executions;
     private final JobTraversal traversal;
+
+    private transient List<ListenerImpl> _listeners;
 
     public JobImpl(final String id, final String version, final String restartable, final PropertiesImpl properties,
                    final ListenersImpl listeners, final List<ExecutionImpl> executions) throws InvalidJobException {
@@ -86,27 +92,25 @@ public class JobImpl implements Job, JobWork {
 
     // Lifecycle
 
-    private transient List<ListenerImpl> _listeners;
-
-    private List<ListenerImpl> _listeners(final Executor executor, final ExecutionContext context) throws Exception {
+    private List<ListenerImpl> _listeners(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
         if (this._listeners == null) {
-            this._listeners = this.listeners.getListenersImplementing(executor, context, JobListener.class);
+            this._listeners = this.listeners.getListenersImplementing(configuration, context, JobListener.class);
         }
         return _listeners;
     }
 
     @Override
-    public Deferred<?> before(final Executor executor, final ThreadId threadId, final Executable callback,
-                              final ExecutionContext context) throws Exception {
-        final ExecutionRepository repository = executor.getRepository();
+    public Deferred<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+                              final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
+        final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
         long jobExecutionId = context.getJobExecutionId();
         Repository.startedJob(repository, jobExecutionId);
         log.debugf(Messages.get("CHAINLINK-018000.job.create.job.context"), context);
         Exception exception = null;
-        for (final ListenerImpl listener : this._listeners(executor, context)) {
+        for (final ListenerImpl listener : this._listeners(configuration, context)) {
             try {
                 log.debugf(Messages.get("CHAINLINK-018001.job.listener.before.job"), context);
-                listener.beforeJob(executor, context);
+                listener.beforeJob(configuration, context);
             } catch (final Exception e) {
                 if (exception == null) {
                     exception = e;
@@ -122,30 +126,31 @@ public class JobImpl implements Job, JobWork {
         final BatchStatus batchStatus = context.getJobContext().getBatchStatus();
         if (Statuses.isStopping(batchStatus)) {
             log.debugf(Messages.get("CHAINLINK-018002.job.status.early.termination"), context, batchStatus);
-            return executor.callback(callback, context);
+            final Executable callback = configuration.getTransport().getExecutable(jobExecutionId, callbackId);
+            return configuration.getExecutor().callback(callback, context);
         }
 
         final Long restartJobExecutionId = context.getRestartJobExecutionId();
         if (restartJobExecutionId == null) {
-            return _runNext(executor, callback, context, this.executions.get(0));
+            return _runNext(configuration, callbackId, context, executionRepositoryId, this.executions.get(0));
         }
         repository.linkJobExecutions(jobExecutionId, restartJobExecutionId);
         final String restartId = context.getRestartElementId();
         if (restartId == null) {
-            return _runNext(executor, callback, context, this.executions.get(0));
+            return _runNext(configuration, callbackId, context, executionRepositoryId, this.executions.get(0));
         }
         log.debugf(Messages.get("CHAINLINK-018004.job.restart.transition"), context, restartId);
-        return _runNext(executor, callback, context, context.getJob().getNextExecution(restartId));
+        return _runNext(configuration, callbackId, context, executionRepositoryId, context.getJob().getNextExecution(restartId));
     }
 
     @Override
-    public void after(final Executor executor, final ThreadId threadId, final Executable callback,
-                      final ExecutionContext context) throws Exception {
+    public void after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+                      final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
         Exception exception = null;
-        for (final ListenerImpl listener : this._listeners(executor, context)) {
+        for (final ListenerImpl listener : this._listeners(configuration, context)) {
             try {
                 log.debugf(Messages.get("CHAINLINK-018003.job.listener.after.job"), context);
-                listener.afterJob(executor, context);
+                listener.afterJob(configuration, context);
             } catch (final Exception e) {
                 if (exception == null) {
                     exception = e;
@@ -164,8 +169,15 @@ public class JobImpl implements Job, JobWork {
         return traversal.next(next);
     }
 
-    private static Deferred<?> _runNext(final Executor executor, final Executable callback,
-                                        final ExecutionContext context, final ExecutionWork next) throws Exception {
-        return executor.execute(new ExecutionExecutable(callback, next, context));
+    private static Deferred<?> _runNext(final RuntimeConfiguration configuration, final ExecutableId callbackId,
+                                        final ExecutionContext context, final ExecutionRepositoryId executionRepositoryId,
+                                        final ExecutionWork next) throws Exception {
+        return configuration.getExecutor().execute(new ExecutionExecutable(
+                callbackId,
+                next,
+                context,
+                executionRepositoryId,
+                null
+        ));
     }
 }

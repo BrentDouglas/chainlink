@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.element;
 
 
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Listeners;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -9,6 +10,7 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import org.jboss.logging.Logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ListenersImpl implements Listeners {
+public class ListenersImpl implements Listeners, Serializable {
 
     private static final Logger log = Logger.getLogger(ListenersImpl.class);
 
@@ -35,9 +37,9 @@ public class ListenersImpl implements Listeners {
         return this.listeners;
     }
 
-    public List<ListenerImpl> getListenersImplementing(final Executor executor, final ExecutionContext context, final Class<?> clazz) throws Exception {
+    public List<ListenerImpl> getListenersImplementing(final RuntimeConfiguration configuration, final ExecutionContext context, final Class<?> clazz) throws Exception {
         final List<ListenerImpl> ret = new ArrayList<ListenerImpl>(this.listeners.size());
-        final InjectionContext injectionContext = executor.getInjectionContext();
+        final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             for (final ListenerImpl listener : this.listeners) {

@@ -9,5 +9,7 @@ public interface BaseConfiguration {
 
     String getProperty(final String key);
 
+    String getProperty(final String key, final String defaultValue);
+
     Properties getProperties();
 }

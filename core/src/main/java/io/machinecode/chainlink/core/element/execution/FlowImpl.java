@@ -3,13 +3,15 @@ package io.machinecode.chainlink.core.element.execution;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
 import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.core.util.Statuses;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.context.ThreadId;
+import io.machinecode.chainlink.spi.transport.ExecutableId;
+import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.transport.WorkerId;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.element.execution.Flow;
 import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.ExecutionWork;
 import io.machinecode.chainlink.spi.work.TransitionWork;
@@ -55,29 +57,35 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     // Lifecycle
 
     @Override
-    public Deferred<?> before(final Executor executor, final ThreadId threadId, final Executable thisCallback,
-                              final Executable parentCallback, final ExecutionContext context) throws Exception {
+    public Deferred<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+                              final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
+                              final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020000.flow.before"), context, id);
         final ExecutionWork execution = this.executions.get(0);
-        return executor.execute(
-                new ExecutionExecutable(thisCallback, execution, context)
-        );
+        return configuration.getExecutor().execute(new ExecutionExecutable(
+                callbackId,
+                execution,
+                context,
+                executionRepositoryId,
+                null
+        ));
     }
 
     @Override
-    public Deferred<?> after(final Executor executor, final ThreadId threadId, final Executable callback,
-                             final ExecutionContext context, final ExecutionContext childContext) throws Exception {
+    public Deferred<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+                             final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                             final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020001.flow.after"), context, id);
         final MutableJobContext jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
         if (Statuses.isStopping(batchStatus) || Statuses.isFailed(batchStatus)) {
-            return runCallback(executor, context, callback);
+            return runCallback(configuration, context, parentId);
         }
         final TransitionWork transition = this.transition(context, this.transitions, jobContext.getBatchStatus(), jobContext.getExitStatus());
         if (transition != null && transition.isTerminating()) {
-            return runCallback(executor, context, callback);
+            return runCallback(configuration, context, parentId);
         } else {
-            return this.next(executor, threadId, context, callback, this.next, transition);
+            return this.next(configuration, workerId, context, parentId, executionRepositoryId, this.next, transition);
         }
     }
 

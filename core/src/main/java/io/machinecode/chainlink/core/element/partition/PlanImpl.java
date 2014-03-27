@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.element.partition;
 
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Plan;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -11,13 +12,14 @@ import org.jboss.logging.Logger;
 
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.operations.BatchRuntimeException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class PlanImpl implements Plan, StrategyWork {
+public class PlanImpl implements Plan, StrategyWork, Serializable {
 
     private static final Logger log = Logger.getLogger(PlanImpl.class);
 
@@ -47,7 +49,7 @@ public class PlanImpl implements Plan, StrategyWork {
     }
 
     @Override
-    public PartitionPlan getPartitionPlan(final Executor executor, final ExecutionContext context) {
+    public PartitionPlan getPartitionPlan(final RuntimeConfiguration configuration, final ExecutionContext context) {
         int threads;
         try {
             threads = Integer.parseInt(this.threads);

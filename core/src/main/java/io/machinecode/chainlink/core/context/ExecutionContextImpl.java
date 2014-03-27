@@ -11,14 +11,16 @@ import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
 import org.jboss.logging.Logger;
 
+import java.io.Serializable;
+
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ExecutionContextImpl implements ExecutionContext {
+public class ExecutionContextImpl implements ExecutionContext, Serializable {
 
     private static final Logger log = Logger.getLogger(ExecutionContextImpl.class);
 
-    private final JobWork job;
+    private transient JobWork job;
     private final long jobExecutionId;
     private final Long restartJobExecutionId;
     private final Long partitionExecutionId;
@@ -30,7 +32,7 @@ public class ExecutionContextImpl implements ExecutionContext {
     private Long lastStepExecutionId;
     private TLongSet priorStepExecutionIds = new TLongHashSet();
 
-    private String logString;
+    private transient String logString;
 
     private ExecutionContextImpl(final JobWork job, final MutableJobContext jobContext, final long jobExecutionId,
                                  final Long restartJobExecutionId, final String restartElementId, final Long partitionExecutionId,
@@ -75,6 +77,9 @@ public class ExecutionContextImpl implements ExecutionContext {
 
     @Override
     public String toString() {
+        if (logString == null) {
+            _buildLogString();
+        }
         return logString;
     }
 
