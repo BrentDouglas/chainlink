@@ -19,6 +19,7 @@
         <module>jdbc</module>
         <module>infinispan</module>
         <module>redis</module>
+        <module>hazelcast</module>
     </modules>
 
 </project>
