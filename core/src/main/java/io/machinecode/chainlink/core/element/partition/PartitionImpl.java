@@ -44,11 +44,6 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     private final ReducerImpl reducer;
     private final T strategy;
 
-    private transient ThreadLocal<PartitionCollector> _collector;
-    private transient PartitionReducer _reducer;
-    private transient PartitionPlan _plan;
-    private transient PartitionAnalyzer _analyser;
-
     public PartitionImpl(final CollectorImpl collector, final AnalyserImpl analyser, final ReducerImpl reducer, final T strategy) {
         this.collector = collector;
         this.analyser = analyser;
@@ -80,10 +75,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         if (strategy == null) {
             return null;
         }
-        if (_plan == null) {
-            _plan = strategy.getPartitionPlan(executor, context);
-        }
-        return _plan;
+        return strategy.getPartitionPlan(executor, context);
     }
 
     // Lifecycle
