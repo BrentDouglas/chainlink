@@ -77,9 +77,6 @@ public class RedisExecutionRepository implements ExecutionRepository {
     protected final byte[] JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX;
 
     protected final byte[] JOB_NAMES;
-    protected final byte[] JOB_INSTANCES;
-    protected final byte[] JOB_EXECUTIONS;
-    protected final byte[] JOB_EXECUTION_INSTANCE;
 
     protected final JedisShardInfo info;
     protected final Serializer serializer;
@@ -115,9 +112,6 @@ public class RedisExecutionRepository implements ExecutionRepository {
         JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX = serializer.bytes("jese_");
 
         JOB_NAMES = serializer.bytes("jn");
-        JOB_INSTANCES = serializer.bytes("ji");
-        JOB_EXECUTIONS = serializer.bytes("je");
-        JOB_EXECUTION_INSTANCE = serializer.bytes("jei");
     }
 
     @Override
@@ -135,7 +129,6 @@ public class RedisExecutionRepository implements ExecutionRepository {
             jedis.set(serializer.bytes(JOB_INSTANCE_PREFIX, id), serializer.bytes(instance));
             jedis.sadd(JOB_NAMES, serializer.bytes(job.getId()));
             jedis.rpush(serializer.bytes(JOB_NAME_JOB_INSTANCES_PREFIX, job.getId()), serializer.bytes(id));
-            jedis.rpush(JOB_INSTANCES, serializer.bytes(id));
             return instance;
         } finally {
             if(jedis != null) {
@@ -169,7 +162,6 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 .setUpdatedTime(timestamp)
                 .build();
         jedis.set(serializer.bytes(JOB_EXECUTION_PREFIX, jobExecutionId), serializer.bytes(execution));
-        jedis.rpush(JOB_EXECUTIONS, serializer.bytes(jobExecutionId));
         jedis.set(
                 serializer.bytes(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, instance.getInstanceId()),
                 serializer.bytes(jobExecutionId)
