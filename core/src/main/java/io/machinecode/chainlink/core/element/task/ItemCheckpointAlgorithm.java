@@ -21,13 +21,12 @@ final class ItemCheckpointAlgorithm extends CheckpointAlgorithmImpl {
 
     @Override
     public int checkpointTimeout(final Executor executor, final ExecutionContext context) throws Exception {
-        current = 0;
         return timeout;
     }
 
     @Override
     public void beginCheckpoint(final Executor executor, final ExecutionContext context) throws Exception {
-        //
+        current = 0;
     }
 
     @Override

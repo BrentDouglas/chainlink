@@ -329,6 +329,7 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
                 log.debugf(Messages.get("CHAINLINK-014100.chunk.transaction.timeout"), this._context, checkpointTimeout);
                 state.transactionManager.setTransactionTimeout(checkpointTimeout);
                 state.checkpointStartTime = System.currentTimeMillis();
+                state.checkpointAlgorithm.beginCheckpoint(state.executor, state.context);
                 log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), this._context);
                 state.transactionManager.begin();
                 _runBeforeListeners(state);
@@ -887,7 +888,6 @@ public class ChunkImpl extends DeferredImpl<ExecutionContext> implements Chunk, 
             throw exception;
         }
         try {
-            state.checkpointAlgorithm.beginCheckpoint(state.executor, state.context);
             log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), this._context);
             state.transactionManager.commit();
             state.stepContext.getMetric(COMMIT_COUNT).increment();
