@@ -4,20 +4,21 @@ import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.DelegateJobExecutionImpl;
 import io.machinecode.chainlink.core.DelegateStepExecutionImpl;
-import io.machinecode.chainlink.core.configuration.ConfigurationFactoryImpl;
-import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
+import io.machinecode.chainlink.core.configuration.ConfigurationManager;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.element.JobImpl;
+import io.machinecode.chainlink.core.management.jmx.JmxOperator;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.work.JobExecutable;
 import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -43,6 +44,8 @@ import javax.batch.operations.NoSuchJobInstanceException;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.StepExecution;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,7 +55,7 @@ import java.util.Set;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobOperatorImpl implements ExtendedJobOperator {
+public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
 
     private static final Logger log = Logger.getLogger(JobOperatorImpl.class);
 
@@ -61,20 +64,9 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     private final Transport transport;
     private final SecurityCheck securityCheck;
     private final ExecutionRepositoryId executionRepositoryId;
+    private ObjectName jmxName;
 
-    public JobOperatorImpl() {
-        this.configuration = ConfigurationFactoryImpl.INSTANCE.produce();
-        this.executor = configuration.getExecutor();
-        this.transport = configuration.getTransport();
-        this.securityCheck = this.configuration.getSecurityCheck();
-        this.executor.startup();
-        this.transport.startup();
-        this.executionRepositoryId = this.transport.generateExecutionRepositoryId(configuration.getRepository());
-        this.transport.registerExecutionRepository(this.executionRepositoryId, configuration.getRepository());
-        this.startup();
-    }
-
-    public JobOperatorImpl(final ConfigurationImpl configuration) {
+    public JobOperatorImpl(final Configuration configuration) {
         this.configuration = configuration;
         this.executor = configuration.getExecutor();
         this.transport = configuration.getTransport();
@@ -83,7 +75,6 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         this.transport.startup();
         this.executionRepositoryId = this.transport.generateExecutionRepositoryId(configuration.getRepository());
         this.transport.registerExecutionRepository(this.executionRepositoryId, configuration.getRepository());
-        this.startup();
     }
 
     @Override
@@ -100,10 +91,40 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             worker.startup();
             this.transport.registerWorker(worker.getWorkerId(), worker);
         }
+        final String domain = ObjectName.quote(configuration.getProperty(Constants.JMX_DOMAIN, Constants.Defaults.JMX_DOMAIN));
+        final MBeanServer server = configuration.getMBeanServer();
+        if (server != null) {
+            try {
+                jmxName = new ObjectName(_objectName(domain));
+                if (!server.isRegistered(jmxName)) {
+                    server.registerMBean(new JmxOperator(this, server, domain), jmxName);
+                }
+            } catch (final Exception e) {
+                throw new RuntimeException(e); //TODO Message
+            }
+        }
+    }
+
+    private String _objectName(final String domain) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(domain)
+                .append(":type=Operator,name=JmxOperator");
+        //TODO This needs to bung on stuff about transport, repo, etc
+        return builder.toString();
     }
 
     @Override
     public void shutdown() {
+        final MBeanServer server = configuration.getMBeanServer();
+        if (server != null) {
+            try {
+                if (server.isRegistered(jmxName)) {
+                    server.unregisterMBean(jmxName);
+                }
+            } catch (final Exception e) {
+                throw new RuntimeException(e); //TODO Message
+            }
+        }
         this.transport.unregisterExecutionRepository(this.executionRepositoryId);
         this.transport.shutdown();
         this.executor.shutdown();
@@ -133,6 +154,20 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             this.securityCheck.canAccessJob(jobName);
             return transport.getExecutionRepository(this.executionRepositoryId).getJobInstanceCount(jobName); //TODO This needs to fetch a list of id's that we can then filter on
         } catch (final NoSuchJobException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public ExtendedJobInstance getJobInstanceById(final long jobInstanceId) throws NoSuchJobInstanceException, JobSecurityException {
+        try {
+            this.securityCheck.canAccessJobInstance(jobInstanceId);
+            return transport.getExecutionRepository(this.executionRepositoryId).getJobInstance(jobInstanceId);
+        } catch (final NoSuchJobInstanceException e) {
             throw e;
         } catch (final JobSecurityException e) {
             throw e;

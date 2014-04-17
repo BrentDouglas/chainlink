@@ -29,11 +29,21 @@ public class ResolvedDeferred<T> extends BaseDeferred<T> {
 
     @Override
     public void await(final Lock lock, final Condition condition) throws InterruptedException {
-        //
+        lock.lock();
+        try {
+            condition.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public void await(final long timeout, final TimeUnit unit, final Lock lock, final Condition condition) throws InterruptedException, TimeoutException {
-        //
+        lock.lock();
+        try {
+            condition.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 }

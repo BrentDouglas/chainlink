@@ -9,7 +9,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlFactoryRef {
+public class XmlClassRef {
 
     @XmlAttribute(name = "class", required = true)
     private String clazz;

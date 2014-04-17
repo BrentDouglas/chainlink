@@ -6,6 +6,7 @@ import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFac
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
@@ -18,6 +19,7 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
 import io.machinecode.chainlink.spi.transport.Transport;
 
+import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
 
 /**
@@ -66,6 +68,14 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
     T setTransportFactoryClass(final Class<? extends TransportFactory> clazz);
 
     T setTransportFactoryFqcn(final String fqcn);
+
+    T setMBeanServer(final MBeanServer mBeanServer);
+
+    T setMBeanServerFactory(final MBeanServerFactory factory);
+
+    T setMBeanServerFactoryClass(final Class<? extends MBeanServerFactory> clazz);
+
+    T setMBeanServerFactoryFqcn(final String fqcn);
 
     T setWorkerFactory(final WorkerFactory factory);
 

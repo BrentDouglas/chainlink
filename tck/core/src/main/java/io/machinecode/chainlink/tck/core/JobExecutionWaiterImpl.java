@@ -2,8 +2,8 @@ package io.machinecode.chainlink.tck.core;
 
 import com.ibm.jbatch.tck.spi.JobExecutionTimeoutException;
 import com.ibm.jbatch.tck.spi.JobExecutionWaiter;
-import io.machinecode.chainlink.core.management.JobOperationImpl;
-import io.machinecode.chainlink.core.management.JobOperatorImpl;
+import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.management.JobOperation;
 
 import javax.batch.operations.JobExecutionNotRunningException;
 import javax.batch.operations.JobOperator;
@@ -17,19 +17,19 @@ import java.util.concurrent.TimeoutException;
  */
 public class JobExecutionWaiterImpl implements JobExecutionWaiter {
     private final long executionId;
-    private final JobOperatorImpl operator;
+    private final ExtendedJobOperator operator;
     private final long timeout;
 
     public JobExecutionWaiterImpl(final long executionId, final JobOperator operator, final long timeout) {
         this.executionId = executionId;
-        this.operator = (JobOperatorImpl) operator;
+        this.operator = (ExtendedJobOperator) operator;
         this.timeout = timeout;
     }
 
     @Override
     public JobExecution awaitTermination() throws JobExecutionTimeoutException {
         try {
-            final JobOperationImpl operation = operator.getJobOperation(executionId);
+            final JobOperation operation = operator.getJobOperation(executionId);
             return operation.get(timeout, TimeUnit.MILLISECONDS);
         } catch (final JobExecutionNotRunningException e) {
             return operator.getJobExecution(executionId);

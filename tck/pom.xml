@@ -21,6 +21,7 @@
         <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
         <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
+        <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
 
         <database.driver>org.h2.Driver</database.driver>
@@ -390,6 +391,14 @@
                                           overwrite="true">
                                         <filterset>
                                             <filter token="transport.factory.class" value="${transport.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
                                         </filterset>
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.WorkerFactory"

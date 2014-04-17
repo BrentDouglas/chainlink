@@ -229,9 +229,15 @@ public abstract class BaseDeferred<T> implements Deferred<T> {
     public boolean cancel(final boolean mayInterruptIfRunning) {
         log().tracef(getCancelLogMessage());
         final CancelListener listener = new CancelListener(mayInterruptIfRunning);
+        RuntimeException exception = null;
         lock.lock();
         try {
             onLink(listener);
+            //try { //TODO This needs to wait on the entire chain to be cancelled
+            //    await(lock, condition);
+            //} catch (final Exception e) {
+            //    exception = new RuntimeException(Messages.format("CHAINLINK-004006.deferred.cancel.exception"), e);
+            //}
             if (listener.exception != null) {
                 signal();
                 throw listener.exception;
@@ -246,7 +252,6 @@ public abstract class BaseDeferred<T> implements Deferred<T> {
         } finally {
             lock.unlock();
         }
-        RuntimeException exception = null;
         while (!listenerLock.compareAndSet(false, true)) {}
         try {
             for (final Listener cancelListener : cancelListeners) {
@@ -450,6 +455,7 @@ public abstract class BaseDeferred<T> implements Deferred<T> {
     public void signal() {
         lock.lock();
         try {
+            condition.signalAll();
             Pair<Lock, Condition> that;
             while ((that = waiting.poll()) != null) {
                 that.getName().lock();
@@ -459,7 +465,6 @@ public abstract class BaseDeferred<T> implements Deferred<T> {
                     that.getName().unlock();
                 }
             }
-            condition.signalAll();
         } finally {
             lock.unlock();
         }

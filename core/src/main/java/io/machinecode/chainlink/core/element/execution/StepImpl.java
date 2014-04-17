@@ -22,8 +22,6 @@ import io.machinecode.chainlink.spi.transport.ExecutableId;
 import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.transport.WorkerId;
 import io.machinecode.chainlink.spi.element.execution.Step;
-import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.work.PartitionTarget;
@@ -146,7 +144,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         this._timeout = 180;
         for (final PropertyImpl property : this.properties.getProperties()) {
             try {
-                if (Constants.JAVAX_TRANSACTION_GLOBAL_TIMEOUT.equals(property.getName())) {
+                if (Constants.GLOBAL_TRANSACTION_TIMEOUT.equals(property.getName())) {
                     this._timeout = Integer.parseInt(property.getValue());
                     return this._timeout;
                 }

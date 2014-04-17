@@ -18,11 +18,14 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
 public class EventedWorker extends Thread implements Worker {
+
+    private static final AtomicLong IDS = new AtomicLong();
 
     private static final Logger log = Logger.getLogger(EventedWorker.class);
 
@@ -34,7 +37,7 @@ public class EventedWorker extends Thread implements Worker {
     protected volatile boolean running = true;
 
     public EventedWorker(final RuntimeConfiguration configuration) {
-        super("Chainlink worker -");
+        super("Chainlink worker - " + IDS.incrementAndGet());
         this.configuration = configuration;
         this.workerId = configuration.getTransport().generateWorkerId(this);
     }

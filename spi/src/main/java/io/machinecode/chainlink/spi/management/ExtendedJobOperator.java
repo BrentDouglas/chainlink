@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.management;
 
-import io.machinecode.chainlink.spi.Lifecycle;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.work.JobWork;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -11,15 +11,15 @@ import javax.batch.operations.JobRestartException;
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.JobStartException;
 import javax.batch.operations.NoSuchJobExecutionException;
-import javax.management.MXBean;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@MXBean
-public interface ExtendedJobOperator extends JobOperator, Lifecycle {
+public interface ExtendedJobOperator extends JobOperator {
+
+    ExtendedJobInstance getJobInstanceById(final long jobInstanceId);
 
     JobOperation startJob(final JobWork job, final String jslName, final Properties parameters) throws JobStartException, JobSecurityException;
 

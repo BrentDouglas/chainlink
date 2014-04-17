@@ -16,6 +16,7 @@ import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.Factory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
@@ -31,6 +32,7 @@ import io.machinecode.chainlink.spi.security.SecurityCheck;
 import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.transport.Transport;
 
+import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
     private final Transport transport;
     private final InjectionContext injectionContext;
     private final WorkerFactory workerFactory;
+    private final MBeanServer mBeanServer;
 
     protected ConfigurationImpl(final Builder builder) {
         this.properties = builder.properties;
@@ -70,7 +73,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
         this.repository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, null, this);
-        this.workerFactory = (WorkerFactory) _getFactory(this.classLoader, builder.workerFactory, builder.workerFactoryClass, builder.workerFactoryFqcn);
+        this.mBeanServer = _get(this.classLoader, builder.mBeanServer, builder.mBeanServerFactory, builder.mBeanServerFactoryClass, builder.mBeanServerFactoryFqcn, null, this);
         if (this.repository == null) {
             throw new IllegalStateException(); //TODO Message
         }
@@ -82,6 +85,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         if (this.executor == null) {
             throw new IllegalStateException(); //TODO Message
         }
+        this.workerFactory = (WorkerFactory) _getFactory(this.classLoader, builder.workerFactory, builder.workerFactoryClass, builder.workerFactoryFqcn);
     }
 
     protected ConfigurationImpl(final XmlConfiguration builder) {
@@ -102,7 +106,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
         this.repository = _get(this.classLoader, builder.getExecutionRepositoryFactory().getClazz(), null, this);
-        this.workerFactory = _getFactory(this.classLoader, builder.getWorkerFactory().getClazz());
+        this.mBeanServer = _get(this.classLoader, builder.getmBeanServerFactory().getClazz(), null, this);
         if (this.repository == null) {
             throw new IllegalStateException(); //TODO Message
         }
@@ -114,6 +118,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         if (this.executor == null) {
             throw new IllegalStateException(); //TODO Message
         }
+        this.workerFactory = _getFactory(this.classLoader, builder.getWorkerFactory().getClazz(), WorkerFactory.class);
     }
 
     @Override
@@ -129,6 +134,11 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
     @Override
     public WorkerFactory getWorkerFactory() {
         return workerFactory;
+    }
+
+    @Override
+    public MBeanServer getMBeanServer() {
+        return mBeanServer;
     }
 
     @Override
@@ -282,10 +292,10 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         return defaultValue;
     }
 
-    private WorkerFactory _getFactory(final ClassLoader classLoader, final String fqcn) {
+    private <T> T _getFactory(final ClassLoader classLoader, final String fqcn, final Class<T> clazz) {
         if (fqcn != null) {
             try {
-                final WorkerFactory produced = ((Class<? extends WorkerFactory>)classLoader.loadClass(fqcn)).newInstance();
+                final T produced = ((Class<? extends T>)classLoader.loadClass(fqcn)).newInstance();
                 if (produced != null) {
                     return produced;
                 }
@@ -345,10 +355,10 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         return ret;
     }
 
-    private <T, U extends BaseConfiguration> ArrayList<T> _get(final ClassLoader classLoader, final List<XmlFactoryRef> fqcns, final U configuration) {
+    private <T, U extends BaseConfiguration> ArrayList<T> _get(final ClassLoader classLoader, final List<XmlClassRef> fqcns, final U configuration) {
         final ArrayList<T> ret = new ArrayList<T>();
         if (fqcns != null) {
-            for (final XmlFactoryRef fqcn : fqcns) {
+            for (final XmlClassRef fqcn : fqcns) {
                 try {
                     final T produced = ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn.getClazz())).newInstance().produce(configuration);
                     if (produced != null) {
@@ -366,6 +376,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         private Executor executor;
         private Transport transport;
+        private MBeanServer mBeanServer;
         private ExecutionRepository executionRepository;
         private TransactionManager transactionManager;
         private JobLoader[] jobLoaders;
@@ -376,6 +387,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
 
         private ExecutorFactory executorFactory;
         private TransportFactory transportFactory;
+        private MBeanServerFactory mBeanServerFactory;
         private WorkerFactory workerFactory;
         private ClassLoaderFactory classLoaderFactory;
         private ExecutionRepositoryFactory executionRepositoryFactory;
@@ -387,6 +399,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
 
         private Class<? extends ExecutorFactory> executorFactoryClass;
         private Class<? extends TransportFactory> transportFactoryClass;
+        private Class<? extends MBeanServerFactory> mBeanServerFactoryClass;
         private Class<? extends WorkerFactory> workerFactoryClass;
         private Class<? extends ClassLoaderFactory> classLoaderFactoryClass;
         private Class<? extends ExecutionRepositoryFactory> executionRepositoryFactoryClass;
@@ -398,6 +411,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
 
         private String executorFactoryFqcn;
         private String transportFactoryFqcn;
+        private String mBeanServerFactoryFqcn;
         private String workerFactoryFqcn;
         private String classLoaderFactoryFqcn;
         private String executionRepositoryFactoryFqcn;
@@ -488,6 +502,30 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         @Override
         public Builder setTransportFactoryFqcn(final String fqcn) {
             this.transportFactoryFqcn = fqcn;
+            return this;
+        }
+
+        @Override
+        public Builder setMBeanServer(final MBeanServer mBeanServer) {
+            this.mBeanServer = mBeanServer;
+            return this;
+        }
+
+        @Override
+        public Builder setMBeanServerFactory(final MBeanServerFactory factory) {
+            this.mBeanServerFactory = factory;
+            return this;
+        }
+
+        @Override
+        public Builder setMBeanServerFactoryClass(final Class<? extends MBeanServerFactory> clazz) {
+            this.mBeanServerFactoryClass = clazz;
+            return this;
+        }
+
+        @Override
+        public Builder setMBeanServerFactoryFqcn(final String fqcn) {
+            this.mBeanServerFactoryFqcn = fqcn;
             return this;
         }
 
