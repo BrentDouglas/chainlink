@@ -116,7 +116,7 @@ public abstract class BaseTest extends Assert {
 
     protected void printMethodName() {
         log.infof("");
-        log.infof("Running test: " + Thread.currentThread().getStackTrace()[2].getMethodName());
+        log.infof("Running test: %s#%s", getClass().getSimpleName(), Thread.currentThread().getStackTrace()[2].getMethodName());
         log.infof("");
     }
 }

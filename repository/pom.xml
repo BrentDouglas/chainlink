@@ -14,6 +14,7 @@
 
     <modules>
         <module>core</module>
+        <module>coherence</module>
         <module>memory</module>
         <module>jpa</module>
         <module>jdbc</module>

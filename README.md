@@ -23,6 +23,7 @@ Job repositories:
 - JDBC (though it has only been tested against postgresql and h2)
 - Redis
 - Infinispan
+- Coherence
 - Hazelcast
 
 Transports:
@@ -36,20 +37,6 @@ inheritance. Built in loaders support:
 - Fluent style
 
 JMX job management.
-
-## Known issues
-
-_Infinispan Transport_
-
-- Doesn't pass the TCK yet as one of the TCK classes `ExternalizableString`
-  is not actually `Externalizable`. When a no-args constructor is added to
-  `ExternalizableString` as per the `Externalizable` requirements it passes
-  all the TCK tests. See [TCK bug #6155](https://java.net/bugzilla/show_bug.cgi?id=6155).
-
-_Guice Injector_
-
-- @javax.inject.Inject does not allow null injection of batch properties
-- Module provider system probably won't work with a real Guice project
 
 ## Building
 
@@ -142,6 +129,30 @@ tests you can run something like this (though any injector and
 repository profile can be used):
 
 `mvn clean install -Ptck -Pin-cdi -Ptr-infinispan -Djgroups.bind_addr=127.0.0.1 -Djava.net.preferIPv4Stack=true`
+
+## Known issues
+
+_Infinispan Transport_
+
+- Doesn't pass the TCK yet as one of the TCK classes `ExternalizableString`
+  is not actually `Externalizable`. When a no-args constructor is added to
+  `ExternalizableString` as per the `Externalizable` requirements it passes
+  all the TCK tests. See [TCK bug #6155](https://java.net/bugzilla/show_bug.cgi?id=6155).
+
+# Work in progress components
+
+_JGroups Transport_
+
+- Distribution doesn't actually work
+
+_Hazelcast Transport_
+
+- Distribution doesn't actually work
+
+_Guice Injector_
+
+- @javax.inject.Inject does not allow null injection of batch properties
+- Module provider system probably won't work with a real Guice project
 
 ## License
 

@@ -53,6 +53,8 @@
         <!-- Cli -->
         <version.gnu-getopt.getopt>1.0.13</version.gnu-getopt.getopt>
 
+        <version.com.oracle.coherence.coherence>12.1.2-0-0</version.com.oracle.coherence.coherence>
+
         <!-- CDI -->
         <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
         <version.org.jboss.weld.se.weld-se>2.1.0.Final</version.org.jboss.weld.se.weld-se>
@@ -185,6 +187,11 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-coherence</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-repository-memory</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -213,6 +220,7 @@
                 <artifactId>chainlink-repository-redis</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-transport-core</artifactId>
@@ -278,6 +286,14 @@
                 <groupId>org.jboss.spec.javax.transaction</groupId>
                 <artifactId>jboss-transaction-api_1.1_spec</artifactId>
                 <version>${version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec}</version>
+            </dependency>
+
+            <!-- Coherence -->
+
+            <dependency>
+                <groupId>com.oracle.coherence</groupId>
+                <artifactId>coherence</artifactId>
+                <version>${version.com.oracle.coherence.coherence}</version>
             </dependency>
 
             <!-- CDI -->
