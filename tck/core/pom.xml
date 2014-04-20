@@ -15,6 +15,11 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-spi</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -107,6 +112,10 @@
             <artifactId>com.ibm.jbatch-tck</artifactId>
             <scope>provided</scope>
             <exclusions>
+                <exclusion>
+                    <groupId>javax.batch</groupId>
+                    <artifactId>javax.batch-api</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>com.ibm.jbatch</groupId>
                     <artifactId>com.ibm.jbatch-model</artifactId>

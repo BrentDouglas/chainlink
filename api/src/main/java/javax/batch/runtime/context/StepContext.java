@@ -1,0 +1,36 @@
+package javax.batch.runtime.context;
+
+import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.Metric;
+import java.io.Serializable;
+import java.util.Properties;
+
+/**
+ * @author Brent Douglas <brent.n.douglas@gmail.com>
+ */
+public interface StepContext {
+
+    String getStepName();
+
+    Object getTransientUserData();
+
+    void setTransientUserData(Object data);
+
+    long getStepExecutionId();
+
+    Properties getProperties();
+
+    Serializable getPersistentUserData();
+
+    void setPersistentUserData(Serializable data);
+
+    BatchStatus getBatchStatus();
+
+    String getExitStatus();
+
+    void setExitStatus(String exitStatus);
+
+    Exception getException();
+
+    Metric[] getMetrics();
+}

@@ -21,11 +21,11 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-spi</artifactId>
+            <artifactId>chainlink-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.batch</groupId>
-            <artifactId>javax.batch-api</artifactId>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>net.sf.trove4j</groupId>
