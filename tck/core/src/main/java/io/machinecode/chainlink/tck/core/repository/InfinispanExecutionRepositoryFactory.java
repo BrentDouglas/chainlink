@@ -21,9 +21,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class InfinispanExecutionRepositoryFactory implements ExecutionRepositoryFactory {
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) {
+    public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
         return new InfinispanExecutionRepository(
-                configuration.getClassLoader(),
+                configuration.getSerializerFactory().produce(configuration),
                 new DefaultCacheManager(
                         new GlobalConfigurationBuilder()
                                 .clusteredDefault()

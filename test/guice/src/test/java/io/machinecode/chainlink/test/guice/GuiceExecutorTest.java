@@ -5,6 +5,7 @@ import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
 import io.machinecode.chainlink.jsl.core.util.Triplet;
+import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
@@ -43,8 +44,7 @@ public class GuiceExecutorTest extends ExecutorTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        return new MemoryExecutionRepository(tccl);
+        return new MemoryExecutionRepository(new JdkSerializer());
     }
 
     @BeforeClass

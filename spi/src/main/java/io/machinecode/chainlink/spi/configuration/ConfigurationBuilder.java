@@ -8,6 +8,7 @@ import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
+import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
@@ -36,6 +37,12 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
     T setClassLoaderFactoryClass(final Class<? extends ClassLoaderFactory> clazz);
 
     T setClassLoaderFactoryFqcn(final String fqcn);
+
+    T setSerializerFactory(final SerializerFactory serializerFactory);
+
+    T setSerializerFactoryClass(final Class<? extends SerializerFactory> clazz);
+
+    T setSerializerFactoryFqcn(final String fqcn);
 
     T setExecutionRepository(final ExecutionRepository repository);
 

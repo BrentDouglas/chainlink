@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.util.Resolvable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -13,26 +14,40 @@ import java.util.ServiceLoader;
  */
 public class ResolvableService<T> implements Resolvable<List<T>> {
 
+    private final String property;
     private final ResolvableClass<T> clazz;
-    private transient List<T> services;
 
     public ResolvableService(final Class<T> clazz) {
+        this(null, clazz);
+    }
+
+    public ResolvableService(final String property, final Class<T> clazz) {
+        this.property = property;
         this.clazz = new ResolvableClass<T>(clazz);
     }
 
     @Override
-    public List<T> resolve(final ClassLoader loader) throws ClassNotFoundException {
-        if (services == null) {
-            final Class<T> clazz = this.clazz.resolve(loader);
-            final ServiceLoader<T> resolvers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<T>>() {
-                public ServiceLoader<T> run() {
-                    return ServiceLoader.load(clazz, loader);
+    public List<T> resolve(final ClassLoader loader) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if (this.property != null) {
+            final String name = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                @Override
+                public String run() {
+                    return System.getProperty(ResolvableService.this.property);
                 }
             });
-            services = new ArrayList<T>();
-            for (final T that : resolvers) {
-                services.add(that);
+            if (name != null) {
+                return Collections.singletonList((T) loader.loadClass(name).newInstance());
             }
+        }
+        final Class<T> clazz = this.clazz.resolve(loader);
+        final ServiceLoader<T> resolvers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<T>>() {
+            public ServiceLoader<T> run() {
+                return ServiceLoader.load(clazz, loader);
+            }
+        });
+        final List<T> services = new ArrayList<T>();
+        for (final T that : resolvers) {
+            services.add(that);
         }
         return services;
     }

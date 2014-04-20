@@ -23,6 +23,7 @@
         <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
+        <serializer.factory.class>io.machinecode.chainlink.repository.core.JdkSerializerFactory</serializer.factory.class>
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
@@ -415,6 +416,14 @@
                                           overwrite="true">
                                         <filterset>
                                             <filter token="worker.factory.class" value="${worker.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SerializerFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SerializerFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="serializer.factory.class" value="${serializer.factory.class}" />
                                         </filterset>
                                     </copy>
                                 </target>

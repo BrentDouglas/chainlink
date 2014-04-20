@@ -4,11 +4,11 @@ import gnu.trove.iterator.TLongIterator;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TLongHashSet;
+import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.core.JobExecutionImpl;
 import io.machinecode.chainlink.repository.core.JobInstanceImpl;
 import io.machinecode.chainlink.repository.core.MutableMetricImpl;
 import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
-import io.machinecode.chainlink.repository.core.Serializer;
 import io.machinecode.chainlink.repository.core.StepExecutionImpl;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -16,6 +16,7 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
+import io.machinecode.chainlink.spi.serialization.Serializer;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
@@ -92,14 +93,10 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
 
     protected final Serializer serializer;
 
-    public InfinispanExecutionRepository(final ClassLoader loader, final EmbeddedCacheManager cacheManager, final TransactionManager transactionManager) {
+    public InfinispanExecutionRepository(final Serializer serializer, final EmbeddedCacheManager cacheManager, final TransactionManager transactionManager) {
         this.cacheManager = cacheManager;
         this.transactionManager = transactionManager;
-        this.serializer = new Serializer(
-                Serializer.Type.JBOSS,
-                Marshalling.getMarshallerFactory("river", loader),
-                new MarshallingConfiguration()
-        );
+        this.serializer = serializer;
         this.ids = _cache(cacheManager, IDS);
         this.jobInstances = _cache(cacheManager, JOB_INSTANCES);
         this.jobExecutions = _cache(cacheManager, JOB_EXECUTIONS);

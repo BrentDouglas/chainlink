@@ -7,6 +7,7 @@ import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
+import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
@@ -37,8 +38,7 @@ public class CdiExecutorTest extends ExecutorTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        return new MemoryExecutionRepository(tccl);
+        return new MemoryExecutionRepository(new JdkSerializer());
     }
 
     @BeforeClass

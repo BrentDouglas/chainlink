@@ -30,6 +30,9 @@ public class XmlConfiguration {
     @XmlElement(name = "worker-factory", namespace = NAMESPACE, required = true)
     private XmlClassRef workerFactory;
 
+    @XmlElement(name = "serializer-factory", namespace = NAMESPACE, required = true)
+    private XmlClassRef serializerFactory;
+
     @XmlElement(name = "mbean-server-factory", namespace = NAMESPACE, required = true)
     private XmlClassRef mBeanServerFactory;
 
@@ -95,6 +98,14 @@ public class XmlConfiguration {
 
     public void setExecutionRepositoryFactory(final XmlClassRef executionRepositoryFactory) {
         this.executionRepositoryFactory = executionRepositoryFactory;
+    }
+
+    public XmlClassRef getSerializerFactory() {
+        return serializerFactory;
+    }
+
+    public void setSerializerFactory(final XmlClassRef serializerFactory) {
+        this.serializerFactory = serializerFactory;
     }
 
     public XmlClassRef getClassLoaderFactory() {

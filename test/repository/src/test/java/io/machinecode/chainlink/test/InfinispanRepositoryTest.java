@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.test;
 
+import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
@@ -24,9 +25,8 @@ public class InfinispanRepositoryTest extends RepositoryTest {
 
     @Override
     protected ExecutionRepository _repository() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         return new InfinispanExecutionRepository(
-                tccl,
+                new JdkSerializer(),
                 new DefaultCacheManager(
                         new GlobalConfigurationBuilder()
                                 .clusteredDefault()

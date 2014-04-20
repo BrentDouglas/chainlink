@@ -11,13 +11,14 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TLongHashSet;
-import io.machinecode.chainlink.repository.core.Serializer;
+import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.element.Job;
+import io.machinecode.chainlink.spi.serialization.Serializer;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.repository.core.JobExecutionImpl;
 import io.machinecode.chainlink.repository.core.JobInstanceImpl;
@@ -47,7 +48,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -88,12 +88,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     protected final Serializer serializer;
 
-    public MemoryExecutionRepository(final ClassLoader loader) {
-        this.serializer = new Serializer(
-                Serializer.Type.JBOSS,
-                Marshalling.getMarshallerFactory("river", loader),
-                new MarshallingConfiguration()
-        );
+    public MemoryExecutionRepository(final Serializer serializer) {
+        this.serializer = serializer;
     }
 
     @Override

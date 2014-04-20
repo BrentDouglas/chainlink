@@ -15,7 +15,6 @@ public class RedisExecutionRepositoryFactory implements ExecutionRepositoryFacto
     @Override
     public ExecutionRepository produce(final RepositoryConfiguration configuration) throws IOException {
         return new RedisExecutionRepository(
-                configuration.getClassLoader(),
                 new JedisShardInfo(
                         System.getProperty("redis.host"),
                         Integer.parseInt(System.getProperty("redis.port"))

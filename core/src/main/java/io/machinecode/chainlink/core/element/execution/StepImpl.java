@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.element.execution;
 
-import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.core.element.ListenerImpl;

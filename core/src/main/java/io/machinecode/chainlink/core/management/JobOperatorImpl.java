@@ -1,10 +1,9 @@
 package io.machinecode.chainlink.core.management;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.core.Constants;
-import io.machinecode.chainlink.core.DelegateJobExecutionImpl;
-import io.machinecode.chainlink.core.DelegateStepExecutionImpl;
-import io.machinecode.chainlink.core.configuration.ConfigurationManager;
+import io.machinecode.chainlink.repository.core.DelegateJobExecution;
+import io.machinecode.chainlink.repository.core.DelegateStepExecution;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
@@ -470,7 +469,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
             final List<JobExecution> delegates = new ArrayList<JobExecution>(jobExecutions.size());
             for (final JobExecution jobExecution : jobExecutions) {
                 if (!this.securityCheck.filterJobExecution(jobExecution.getExecutionId())) {
-                    delegates.add(new DelegateJobExecutionImpl(jobExecution, repository));
+                    delegates.add(new DelegateJobExecution(jobExecution, repository));
                 }
             }
             return delegates;
@@ -488,7 +487,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
         this.securityCheck.canAccessJobExecution(jobExecutionId);
         try {
             final ExecutionRepository repository = transport.getExecutionRepository(this.executionRepositoryId);
-            return new DelegateJobExecutionImpl(repository.getJobExecution(jobExecutionId), repository);
+            return new DelegateJobExecution(repository.getJobExecution(jobExecutionId), repository);
         } catch (final NoSuchJobExecutionException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -507,7 +506,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
             final List<StepExecution> delegates = new ArrayList<StepExecution>(stepExecutions.size());
             for (final StepExecution stepExecution : stepExecutions) {
                 if (!this.securityCheck.filterStepExecution(stepExecution.getStepExecutionId())) {
-                    delegates.add(new DelegateStepExecutionImpl(stepExecution, repository));
+                    delegates.add(new DelegateStepExecution(stepExecution, repository));
                 }
             }
             return delegates;

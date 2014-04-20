@@ -1,10 +1,12 @@
-package io.machinecode.chainlink.core;
+package io.machinecode.chainlink.spi;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class Constants {
     public static final String ENVIRONMENT = "io.machinecode.chainlink.environment";
+
+    public static final String DEFAULT_CONFIGURATION= "default";
 
     public static final String CONFIGURATION_FACTORY_CLASS = "io.machinecode.chainlink.configuration_factory";
 

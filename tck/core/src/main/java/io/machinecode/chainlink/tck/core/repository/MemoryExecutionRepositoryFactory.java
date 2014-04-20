@@ -10,7 +10,7 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
  */
 public class MemoryExecutionRepositoryFactory implements ExecutionRepositoryFactory {
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) {
-        return new MemoryExecutionRepository(configuration.getClassLoader());
+    public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
+        return new MemoryExecutionRepository(configuration.getSerializerFactory().produce(configuration));
     }
 }

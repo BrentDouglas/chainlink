@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.repository.redis;
 
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.core.JobExecutionImpl;
 import io.machinecode.chainlink.repository.core.JobInstanceImpl;
 import io.machinecode.chainlink.repository.core.MutableMetricImpl;
 import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
-import io.machinecode.chainlink.repository.core.Serializer;
 import io.machinecode.chainlink.repository.core.StepExecutionImpl;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -67,19 +67,15 @@ public class RedisExecutionRepository implements ExecutionRepository {
     protected final byte[] JOB_NAMES;
 
     protected final JedisShardInfo info;
-    protected final Serializer serializer;
+    protected final JdkSerializer serializer;
 
     protected final Jedis _open() {
         return info.createResource();
     }
 
-    public RedisExecutionRepository(final ClassLoader loader, final JedisShardInfo info) throws IOException {
+    public RedisExecutionRepository(final JedisShardInfo info) throws IOException {
         this.info = info;
-        this.serializer = new Serializer(
-                Serializer.Type.JDK,
-                Marshalling.getMarshallerFactory("river", loader),
-                new MarshallingConfiguration()
-        );
+        this.serializer = new JdkSerializer();
 
         JOB_INSTANCE_ID = serializer.bytes("ji_id");
         JOB_EXECUTION_ID = serializer.bytes("je_id");

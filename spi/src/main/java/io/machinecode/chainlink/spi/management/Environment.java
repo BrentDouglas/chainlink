@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.management;
 
-import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.inject.DependencyInjectionExtension;
 
 import java.util.List;
 
@@ -9,7 +9,9 @@ import java.util.List;
  */
 public interface Environment {
 
+    void initialize(final List<DependencyInjectionExtension> extensions);
+
     List<ExtendedJobOperator> getJobOperators();
 
-    ExtendedJobOperator getJobOperator(final Configuration configuration);
+    ExtendedJobOperator getJobOperator(final String id);
 }

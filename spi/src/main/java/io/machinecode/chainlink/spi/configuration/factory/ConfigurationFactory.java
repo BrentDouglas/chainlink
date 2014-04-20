@@ -7,5 +7,7 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
  */
 public interface ConfigurationFactory {
 
+    String getId();
+
     Configuration produce() throws Exception;
 }

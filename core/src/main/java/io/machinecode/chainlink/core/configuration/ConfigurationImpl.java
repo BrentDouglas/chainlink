@@ -18,6 +18,7 @@ import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
+import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
@@ -45,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
 
     private final ClassLoader classLoader;
+    private final SerializerFactory serializerFactory;
     private final ExecutionRepository repository;
     private final TransactionManager transactionManager;
     private final JobLoader jobLoader;
@@ -72,11 +74,15 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         final ArrayList<SecurityCheck> securityChecks = _arrayGet(this.classLoader, builder.securityChecks, builder.securityCheckFactories, builder.securityCheckFactoriesClass, builder.securityCheckFactoriesFqcns, this);
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
+        this.serializerFactory = (SerializerFactory) _getFactory(this.classLoader, builder.serializerFactory, builder.serializerFactoryClass, builder.serializerFactoryFqcn);
+        if (this.serializerFactory == null) {
+            throw new IllegalStateException(); //TODO Message
+        }
         this.repository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, null, this);
-        this.mBeanServer = _get(this.classLoader, builder.mBeanServer, builder.mBeanServerFactory, builder.mBeanServerFactoryClass, builder.mBeanServerFactoryFqcn, null, this);
         if (this.repository == null) {
             throw new IllegalStateException(); //TODO Message
         }
+        this.mBeanServer = _get(this.classLoader, builder.mBeanServer, builder.mBeanServerFactory, builder.mBeanServerFactoryClass, builder.mBeanServerFactoryFqcn, null, this);
         this.transport = _get(this.classLoader, builder.transport, builder.transportFactory, builder.transportFactoryClass, builder.transportFactoryFqcn, null, this);
         if (this.transport == null) {
             throw new IllegalStateException(); //TODO Message
@@ -105,11 +111,15 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         final ArrayList<SecurityCheck> securityChecks = _get(this.classLoader, builder.getSecurityCheckFactories(), this);
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
+        this.serializerFactory = _getFactory(this.classLoader, builder.getSerializerFactory().getClazz(), SerializerFactory.class);
+        if (this.serializerFactory == null) {
+            throw new IllegalStateException(); //TODO Message
+        }
         this.repository = _get(this.classLoader, builder.getExecutionRepositoryFactory().getClazz(), null, this);
-        this.mBeanServer = _get(this.classLoader, builder.getmBeanServerFactory().getClazz(), null, this);
         if (this.repository == null) {
             throw new IllegalStateException(); //TODO Message
         }
+        this.mBeanServer = _get(this.classLoader, builder.getmBeanServerFactory().getClazz(), null, this);
         this.transport = _get(this.classLoader, builder.getTransportFactory().getClazz(), null, this);
         if (this.transport == null) {
             throw new IllegalStateException(); //TODO Message
@@ -194,6 +204,11 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
     @Override
     public SecurityCheck getSecurityCheck() {
         return this.securityCheck;
+    }
+
+    @Override
+    public SerializerFactory getSerializerFactory() {
+        return this.serializerFactory;
     }
 
     // Runtime only
@@ -390,6 +405,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         private MBeanServerFactory mBeanServerFactory;
         private WorkerFactory workerFactory;
         private ClassLoaderFactory classLoaderFactory;
+        private SerializerFactory serializerFactory;
         private ExecutionRepositoryFactory executionRepositoryFactory;
         private TransactionManagerFactory transactionManagerFactory;
         private JobLoaderFactory[] jobLoaderFactories;
@@ -402,6 +418,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         private Class<? extends MBeanServerFactory> mBeanServerFactoryClass;
         private Class<? extends WorkerFactory> workerFactoryClass;
         private Class<? extends ClassLoaderFactory> classLoaderFactoryClass;
+        private Class<? extends SerializerFactory> serializerFactoryClass;
         private Class<? extends ExecutionRepositoryFactory> executionRepositoryFactoryClass;
         private Class<? extends TransactionManagerFactory> transactionManagerFactoryClass;
         private Class<? extends JobLoaderFactory>[] jobLoaderFactoriesClass;
@@ -414,6 +431,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         private String mBeanServerFactoryFqcn;
         private String workerFactoryFqcn;
         private String classLoaderFactoryFqcn;
+        private String serializerFactoryFqcn;
         private String executionRepositoryFactoryFqcn;
         private String transactionManagerFactoryFqcn;
         private String[] jobLoaderFactoriesFqcns;
@@ -640,6 +658,24 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         @Override
         public Builder setClassLoaderFactoryFqcn(final String fqcn) {
             this.classLoaderFactoryFqcn = fqcn;
+            return this;
+        }
+
+        @Override
+        public Builder setSerializerFactory(final SerializerFactory serializerFactory) {
+            this.serializerFactory = serializerFactory;
+            return this;
+        }
+
+        @Override
+        public Builder setSerializerFactoryClass(final Class<? extends SerializerFactory> clazz) {
+            this.serializerFactoryClass = clazz;
+            return this;
+        }
+
+        @Override
+        public Builder setSerializerFactoryFqcn(final String fqcn) {
+            this.serializerFactoryFqcn = fqcn;
             return this;
         }
 

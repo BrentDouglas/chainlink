@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.management;
 
-import io.machinecode.chainlink.core.configuration.ConfigurationManager;
+import io.machinecode.chainlink.core.Chainlink;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -32,8 +33,15 @@ public class JobOperatorView implements ExtendedJobOperator {
     private final ExtendedJobOperator delegate;
 
     public JobOperatorView() {
-        delegate = EnvironmentManager.loadEnvironment()
-                .getJobOperator(ConfigurationManager.loadConfiguration());
+        this(Constants.DEFAULT_CONFIGURATION);
+    }
+
+    public JobOperatorView(final String id) {
+        this(Chainlink.environment().getJobOperator(id));
+    }
+
+    public JobOperatorView(final ExtendedJobOperator delegate) {
+        this.delegate = delegate;
     }
 
     @Override

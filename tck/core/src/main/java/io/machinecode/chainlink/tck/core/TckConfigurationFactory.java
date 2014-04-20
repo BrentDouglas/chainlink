@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.tck.core;
 
-import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.configuration.Configuration;
@@ -12,6 +12,7 @@ import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
+import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
@@ -25,6 +26,11 @@ import java.util.ServiceConfigurationError;
 public class TckConfigurationFactory implements ConfigurationFactory {
 
     @Override
+    public String getId() {
+        return Constants.DEFAULT_CONFIGURATION;
+    }
+
+    @Override
     public Configuration produce() throws Exception {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
@@ -34,6 +40,7 @@ public class TckConfigurationFactory implements ConfigurationFactory {
         List<JobLoaderFactory> jobLoaders = null;
         List<SecurityCheckFactory> securityChecks = null;
         List<MBeanServerFactory> mBeanServer = null;
+        List<SerializerFactory> serializerFactory = null;
 
         //These will throw if the properties aren't set but they aren't all required
         try {
@@ -54,6 +61,9 @@ public class TckConfigurationFactory implements ConfigurationFactory {
         try {
             mBeanServer = new ResolvableService<MBeanServerFactory>(MBeanServerFactory.class).resolve(tccl);
         } catch (final ServiceConfigurationError e) {}
+        try {
+            serializerFactory = new ResolvableService<SerializerFactory>(SerializerFactory.class).resolve(tccl);
+        } catch (final ServiceConfigurationError e) {}
         List<ExecutionRepositoryFactory> executionRepositories = new ResolvableService<ExecutionRepositoryFactory>(ExecutionRepositoryFactory.class).resolve(tccl);
         List<ExecutorFactory> executors = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
         List<TransportFactory> transports = new ResolvableService<TransportFactory>(TransportFactory.class).resolve(tccl);
@@ -67,6 +77,7 @@ public class TckConfigurationFactory implements ConfigurationFactory {
                 .setSecurityCheckFactories(securityChecks == null ? null : securityChecks.toArray(new SecurityCheckFactory[securityChecks.size()]))
                 .setJobLoaderFactories(jobLoaders == null ? null : jobLoaders.toArray(new JobLoaderFactory[jobLoaders.size()]))
                 .setMBeanServerFactory(mBeanServer == null || mBeanServer.isEmpty() ? null : mBeanServer.get(0))
+                .setSerializerFactory(serializerFactory == null || serializerFactory.isEmpty() ? null : serializerFactory.get(0))
                 .setExecutionRepositoryFactory(executionRepositories.get(0))
                 .setExecutorFactory(executors.get(0))
                 .setWorkerFactory(workers.get(0))

@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.test.batch;
 
+import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
@@ -10,7 +11,6 @@ import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 public class BatchMemoryExecutorTest extends ExecutorTest {
     @Override
     protected ExecutionRepository _repository() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        return new MemoryExecutionRepository(tccl);
+        return new MemoryExecutionRepository(new JdkSerializer());
     }
 }

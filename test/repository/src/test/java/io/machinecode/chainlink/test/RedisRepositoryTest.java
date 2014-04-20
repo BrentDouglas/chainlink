@@ -14,9 +14,7 @@ public class RedisRepositoryTest extends RepositoryTest {
 
     @Override
     protected ExecutionRepository _repository() throws IOException {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         return new RedisExecutionRepository(
-                tccl,
                 new JedisShardInfo(
                         System.getProperty("redis.host"),
                         Integer.parseInt(System.getProperty("redis.port"))

@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.test.core.execution;
 
-import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.repository.core.JdkSerializerFactory;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
@@ -8,6 +9,7 @@ import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -30,6 +32,7 @@ public abstract class BaseTest extends Assert {
     private ExecutionRepository _repository;
     private ConfigurationImpl _configuration;
     private TransactionManager _transactionManager;
+    private SerializerFactory _serializerFactory;
 
     protected final ConfigurationImpl configuration() throws Exception {
         if (this._configuration == null) {
@@ -59,6 +62,13 @@ public abstract class BaseTest extends Assert {
         return _transactionManager;
     }
 
+    protected final SerializerFactory serializerFactory() {
+        if (this._serializerFactory == null) {
+            this._serializerFactory = _serializerFactory();
+        }
+        return _serializerFactory;
+    }
+
     // Override these for different configurations
 
     protected Builder _configuration() throws Exception {
@@ -70,6 +80,7 @@ public abstract class BaseTest extends Assert {
                 .setExecutorFactory(executor())
                 .setWorkerFactory(_workerFactory())
                 .setTransportFactory(_transportFactory())
+                .setSerializerFactory(serializerFactory())
                 .setProperty(Constants.THREAD_POOL_SIZE, "8");
     }
 
@@ -77,6 +88,10 @@ public abstract class BaseTest extends Assert {
 
     protected final TransactionManager _transactionManager() {
         return new LocalTransactionManager(180, TimeUnit.SECONDS);
+    }
+
+    protected SerializerFactory _serializerFactory() {
+        return new JdkSerializerFactory();
     }
 
     protected ExecutorFactory _executor() throws Exception{

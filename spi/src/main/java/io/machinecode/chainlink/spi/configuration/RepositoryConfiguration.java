@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.spi.configuration;
 
+import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.inject.Injector;
@@ -18,4 +19,6 @@ public interface RepositoryConfiguration extends SecurityConfiguration {
     Injector getInjector();
 
     SecurityCheck getSecurityCheck();
+
+    SerializerFactory getSerializerFactory();
 }
