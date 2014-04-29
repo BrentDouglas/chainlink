@@ -100,8 +100,8 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
             this.properties.put(property.getKey(), property.getValue());
         }
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        this.classLoader = _get(tccl, builder.getClassLoaderFactory().getClazz(), tccl, this);
-        this.transactionManager = _get(this.classLoader, builder.getTransactionManagerFactory().getClazz(), new LocalTransactionManager(180, TimeUnit.SECONDS), this);
+        this.classLoader = _get(tccl, builder.getClassLoaderFactory(), tccl, this);
+        this.transactionManager = _get(this.classLoader, builder.getTransactionManagerFactory(), new LocalTransactionManager(180, TimeUnit.SECONDS), this);
         final ArrayList<JobLoader> jobLoaders = _get(this.classLoader, builder.getJobLoaderFactories(), this);
         this.jobLoader = new JobLoaderImpl(this.classLoader, jobLoaders.toArray(new JobLoader[jobLoaders.size()]));
         final ArrayList<ArtifactLoader> artifactLoaders = _get(this.classLoader, builder.getArtifactLoaderFactories(), this);
@@ -115,16 +115,16 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         if (this.serializerFactory == null) {
             throw new IllegalStateException(); //TODO Message
         }
-        this.repository = _get(this.classLoader, builder.getExecutionRepositoryFactory().getClazz(), null, this);
+        this.repository = _get(this.classLoader, builder.getExecutionRepositoryFactory(), null, this);
         if (this.repository == null) {
             throw new IllegalStateException(); //TODO Message
         }
-        this.mBeanServer = _get(this.classLoader, builder.getmBeanServerFactory().getClazz(), null, this);
-        this.transport = _get(this.classLoader, builder.getTransportFactory().getClazz(), null, this);
+        this.mBeanServer = _get(this.classLoader, builder.getmBeanServerFactory(), null, this);
+        this.transport = _get(this.classLoader, builder.getTransportFactory(), null, this);
         if (this.transport == null) {
             throw new IllegalStateException(); //TODO Message
         }
-        this.executor = _get(this.classLoader, builder.getExecutorFactory().getClazz(), null, this);
+        this.executor = _get(this.classLoader, builder.getExecutorFactory(), null, this);
         if (this.executor == null) {
             throw new IllegalStateException(); //TODO Message
         }
@@ -293,10 +293,10 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         throw new RuntimeException(); //TODO Message
     }
 
-    private <T, U extends BaseConfiguration> T _get(final ClassLoader classLoader, final String fqcn, final T defaultValue, final U configuration) {
-        if (fqcn != null) {
+    private <T, U extends BaseConfiguration> T _get(final ClassLoader classLoader, final XmlClassRef fqcn, final T defaultValue, final U configuration) {
+        if (fqcn != null && fqcn.getClazz() != null) {
             try {
-                final T produced = ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn)).newInstance().produce(configuration);
+                final T produced = ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn.getClazz())).newInstance().produce(configuration);
                 if (produced != null) {
                     return produced;
                 }

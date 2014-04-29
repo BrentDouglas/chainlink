@@ -142,7 +142,7 @@
                             <phase>generate-test-resources</phase>
                             <configuration>
                                 <target>
-                                    <copy file="${project.basedir}/src/test/resources/META-INF/persistence.xml.template"
+                                    <copy file="${project.basedir}/src/test/resources/META-INF/persistence.template.xml"
                                           tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
                                           filtering="true"
                                           overwrite="true">

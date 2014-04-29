@@ -1,25 +1,27 @@
 package io.machinecode.chainlink.core.configuration;
 
+import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
+
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlID;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.machinecode.chainlink.core.configuration.XmlChainlink.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@XmlRootElement(namespace = XmlConfiguration.NAMESPACE, name = XmlConfiguration.ELEMENT)
 @XmlAccessorType(NONE)
-public class XmlConfiguration {
+public class XmlConfiguration implements ConfigurationFactory {
 
-    public static final String ELEMENT = "configuration";
-
-    public static final String SCHEMA_URL = "http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd";
-    public static final String NAMESPACE = "http://xmlns.io.machinecode/xml/ns/chainlink";
+    @XmlID
+    @XmlAttribute(name = "id", required = true)
+    private String id;
 
     @XmlElement(name = "executor-factory", namespace = NAMESPACE, required = true)
     private XmlClassRef executorFactory;
@@ -59,6 +61,15 @@ public class XmlConfiguration {
 
     @XmlElement(name = "property", namespace = NAMESPACE, required = false)
     private List<XmlProperty> properties = new ArrayList<XmlProperty>(0);
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
 
     public XmlClassRef getExecutorFactory() {
         return executorFactory;
@@ -164,7 +175,8 @@ public class XmlConfiguration {
         this.properties = properties;
     }
 
-    public ConfigurationImpl build() {
+    @Override
+    public ConfigurationImpl produce() {
         return new ConfigurationImpl(this);
     }
 }

@@ -12,16 +12,12 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
-import gnu.trove.map.TMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.inject.core.DefaultInjector;
-import io.machinecode.chainlink.jsl.core.util.Triplet;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
-import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.chainlink.spi.util.Pair;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.BatchProperty;
@@ -57,14 +53,14 @@ public class GuiceArtifactLoader implements ArtifactLoader {
         } else {
             throw new IllegalStateException(Messages.format("CHAINLINK-000000.injector.provider.unavailable"));
         }
-        final List<Triplet<Class<?>, String, Class<?>>> bindings = binding.getBindings();
+        final List<BindingProvider.Binding> bindings = binding.getBindings();
         final Set<BatchProperty> props = new THashSet<BatchProperty>();
         this.injector = Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
-                for (final Triplet<Class<?>, String, Class<?>> that : bindings) {
-                    final Class clazz = that.getC();
-                    bind(that.getA()).annotatedWith(Names.named(that.getB())).to(clazz);
+                for (final BindingProvider.Binding that : bindings) {
+                    final Class clazz = that.getType();
+                    bind(that.getSatisfies()).annotatedWith(Names.named(that.getName())).to(clazz);
                     for (final Field field : clazz.getDeclaredFields()) {
                         final BatchProperty batchProperty = field.getAnnotation(BatchProperty.class);
                         if (batchProperty == null || !String.class.equals(field.getType()) || props.contains(batchProperty)) {

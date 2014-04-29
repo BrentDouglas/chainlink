@@ -4,7 +4,6 @@ import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
-import io.machinecode.chainlink.jsl.core.util.Triplet;
 import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -31,12 +30,12 @@ public class GuiceExecutorTest extends ExecutorTest {
         return super._configuration()
                 .setArtifactLoaders(new GuiceArtifactLoader(new BindingProvider() {
                     @Override
-                    public List<Triplet<Class<?>, String, Class<?>>> getBindings() {
-                        return new ArrayList<Triplet<Class<?>, String, Class<?>>>() {{
-                            add(Triplet.<Class<?>, String, Class<?>>of(Batchlet.class, "failBatchlet", FailBatchlet.class));
-                            add(Triplet.<Class<?>, String, Class<?>>of(Batchlet.class, "runBatchlet", RunBatchlet.class));
-                            add(Triplet.<Class<?>, String, Class<?>>of(Batchlet.class, "injectedBatchlet", InjectedBatchlet.class));
-                            add(Triplet.<Class<?>, String, Class<?>>of(Batchlet.class, "stopBatchlet", StopBatchlet.class));
+                    public List<Binding> getBindings() {
+                        return new ArrayList<Binding>() {{
+                            add(Binding.of(Batchlet.class, "failBatchlet", FailBatchlet.class));
+                            add(Binding.of(Batchlet.class, "runBatchlet", RunBatchlet.class));
+                            add(Binding.of(Batchlet.class, "injectedBatchlet", InjectedBatchlet.class));
+                            add(Binding.of(Batchlet.class, "stopBatchlet", StopBatchlet.class));
                         }};
                     }
                 }))

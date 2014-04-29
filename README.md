@@ -12,5 +12,5 @@ To run the TCK from within the build you will need to get the sources of the TCK
 
 ` git clone git://java.net/jbatch~jsr-352-git-repository <target>`
 
-Then copy `test.properties.template` to `test.properties` and set `tck.source` to
+Then copy `test.template.properties` to `test.properties` and set `tck.source` to
 the directory you checked the sources out at (`<target>` in the above command).

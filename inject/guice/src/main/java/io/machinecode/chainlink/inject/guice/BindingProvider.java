@@ -1,7 +1,5 @@
 package io.machinecode.chainlink.inject.guice;
 
-import io.machinecode.chainlink.jsl.core.util.Triplet;
-
 import java.util.List;
 
 /**
@@ -9,5 +7,33 @@ import java.util.List;
  */
 public interface BindingProvider {
 
-    List<Triplet<Class<?>, String, Class<?>>> getBindings();
+    List<Binding> getBindings();
+
+    class Binding {
+        final Class<?> satisfies;
+        final String name;
+        final Class<?> type;
+
+        public Binding(final Class<?> satisfies, final String name, final Class<?> type) {
+            this.satisfies = satisfies;
+            this.name = name;
+            this.type = type;
+        }
+
+        public Class<?> getSatisfies() {
+            return satisfies;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<?> getType() {
+            return type;
+        }
+
+        public static Binding of(final Class<?> satisfies, final String name, final Class<?> type) {
+            return new Binding(satisfies, name, type);
+        }
+    }
 }

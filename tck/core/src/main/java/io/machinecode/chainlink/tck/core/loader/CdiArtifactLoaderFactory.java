@@ -12,12 +12,18 @@ import org.jboss.weld.environment.se.WeldContainer;
  */
 public class CdiArtifactLoaderFactory implements ArtifactLoaderFactory {
 
-    public static Weld weld;
-    public static WeldContainer container;
+    public static final Weld weld;
+    public static final WeldContainer container;
 
     static {
         weld = new Weld();
         container = weld.initialize();
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                weld.shutdown();
+            }
+        }));
     }
 
     @Override

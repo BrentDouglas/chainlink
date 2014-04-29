@@ -320,7 +320,7 @@
                                           tofile="${project.build.testOutputDirectory}/testng.xml"
                                           overwrite="true">
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.xml.template"
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.template.xml"
                                           tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
                                           filtering="true"
                                           overwrite="true">

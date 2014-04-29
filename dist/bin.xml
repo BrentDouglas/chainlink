@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <id>bin</id>
+    <formats>
+        <format>zip</format>
+        <format>tar.gz</format>
+        <format>tar.bz2</format>
+    </formats>
+
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>chainlink-${project.version}</baseDirectory>
+
+    <moduleSets>
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>io.machinecode.chainlink:chainlink-api</include>
+                <include>io.machinecode.chainlink:chainlink-spi</include>
+                <include>io.machinecode.chainlink:chainlink-core</include>
+                <include>io.machinecode.chainlink:chainlink-jsl-core</include>
+                <include>io.machinecode.chainlink:chainlink-jsl-fluent</include>
+                <include>io.machinecode.chainlink:chainlink-jsl-xml</include>
+                <include>io.machinecode.chainlink:chainlink-inject-core</include>
+                <include>io.machinecode.chainlink:chainlink-inject-cdi</include>
+                <include>io.machinecode.chainlink:chainlink-inject-seam</include>
+                <include>io.machinecode.chainlink:chainlink-inject-spring</include>
+                <include>io.machinecode.chainlink:chainlink-repository-core</include>
+                <include>io.machinecode.chainlink:chainlink-repository-infinispan</include>
+                <include>io.machinecode.chainlink:chainlink-repository-jdbc</include>
+                <include>io.machinecode.chainlink:chainlink-repository-jpa</include>
+                <include>io.machinecode.chainlink:chainlink-repository-memory</include>
+                <include>io.machinecode.chainlink:chainlink-repository-redis</include>
+                <include>io.machinecode.chainlink:chainlink-transport-infinispan</include>
+                <include>io.machinecode.chainlink:chainlink-server-chainlinkd</include>
+            </includes>
+            <binaries>
+                <unpack>false</unpack>
+                <outputDirectory>lib</outputDirectory>
+            </binaries>
+        </moduleSet>
+    </moduleSets>
+
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <!-- Api -->
+                <include>javax.enterprise:cdi-api</include>
+                <!-- Spi -->
+                <include>org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec</include>
+                <!-- Core -->
+                <include>log4j:log4j</include>
+                <include>net.sf.trove4j:trove4j</include>
+                <include>org.jboss.logging:jboss-logging</include>
+
+                <include>io.machinecode.then:then-api</include>
+                <include>io.machinecode.protocol:protocol-api</include>
+                <!-- Cli -->
+                <include>io.machinecode.cli:cli-api</include>
+                <include>io.machinecode.cli:cli-core</include>
+                <!-- Repo -->
+                <include>org.jboss.marshalling:jboss-marshalling</include>
+                <include>org.jboss.marshalling:jboss-marshalling-river</include>
+                <!-- Repo: Ispn -->
+                <include>org.infinispan:infinispan-core</include>
+                <!-- Repo: Jdbc -->
+                <include>postgresql:postgresql</include>
+                <!-- Repo: Jpa -->
+                <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
+                <!-- Repo: Redis-->
+                <include>redis.clients:jedis</include>
+                <!-- Inject -->
+                <include>javax.inject:javax.inject</include>
+                <!-- Inject: Guice -->
+                <include>com.google.inject:guice</include>
+                <!-- Inject: Seam -->
+                <include>org.jboss.seam:jboss-seam:ejb</include>
+                <!-- Inject: Spring -->
+                <include>org.springframework:spring-beans</include>
+                <include>org.springframework:spring-context</include>
+                <include>org.springframework:spring-core</include>
+                <!-- Server: Chainlinkd -->
+                <include>gnu-getopt:getopt</include>
+            </includes>
+            <outputDirectory>lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+
+    <files>
+        <file>
+            <source>../README.md</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>../LICENSE.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>../server/chainlinkd/chainlinkd.sh</source>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>754</fileMode>
+        </file>
+        <file>
+            <source>../server/chainlinkd/install.sh</source>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>754</fileMode>
+        </file>
+        <file>
+            <source>../server/chainlinkd/chainlink.xml</source>
+            <outputDirectory>cnf</outputDirectory>
+            <fileMode>664</fileMode>
+        </file>
+    </files>
+</assembly>

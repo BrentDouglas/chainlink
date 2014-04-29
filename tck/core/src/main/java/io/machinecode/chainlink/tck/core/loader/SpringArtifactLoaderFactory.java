@@ -16,6 +16,12 @@ public class SpringArtifactLoaderFactory implements ArtifactLoaderFactory {
 
     static {
         context = new ClassPathXmlApplicationContext("beans.xml");
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                context.close();
+            }
+        }));
     }
     @Override
     public ArtifactLoader produce(final LoaderConfiguration configuration) {

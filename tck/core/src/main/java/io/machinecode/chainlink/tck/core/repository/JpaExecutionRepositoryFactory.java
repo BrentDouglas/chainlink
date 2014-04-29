@@ -34,6 +34,12 @@ public class JpaExecutionRepositoryFactory implements ExecutionRepositoryFactory
             transaction.rollback();
             throw new RuntimeException(e);
         }
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                factory.close();
+            }
+        }));
     }
 
     @Override

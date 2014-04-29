@@ -1,6 +1,6 @@
 @XmlSchema(
-        location = XmlConfiguration.SCHEMA_URL,
-        namespace = XmlConfiguration.NAMESPACE,
+        location = XmlChainlink.SCHEMA_URL,
+        namespace = XmlChainlink.NAMESPACE,
         elementFormDefault = QUALIFIED
 )
 package io.machinecode.chainlink.core.configuration;

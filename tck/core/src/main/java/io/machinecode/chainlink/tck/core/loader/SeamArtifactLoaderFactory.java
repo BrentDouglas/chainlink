@@ -19,6 +19,12 @@ public class SeamArtifactLoaderFactory implements ArtifactLoaderFactory {
         final ServletContext context = new MockServletContext();
         ServletLifecycle.beginApplication(context);
         new Initialization(context).create().init();
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ServletLifecycle.endApplication(context);
+            }
+        }));
     }
 
     @Override

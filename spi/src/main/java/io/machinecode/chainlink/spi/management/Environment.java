@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.spi.management;
 
+import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.inject.DependencyInjectionExtension;
 
 import java.util.List;
@@ -13,5 +14,5 @@ public interface Environment {
 
     List<ExtendedJobOperator> getJobOperators();
 
-    ExtendedJobOperator getJobOperator(final String id);
+    ExtendedJobOperator getJobOperator(final String id) throws NoConfigurationWithIdException;
 }

@@ -75,7 +75,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     public RedisExecutionRepository(final JedisShardInfo info) throws IOException {
         this.info = info;
-        this.serializer = new JdkSerializer();
+        this.serializer = new JdkSerializer(); //TODO For some reason this doesn't work with jboss' serializer
 
         JOB_INSTANCE_ID = serializer.bytes("ji_id");
         JOB_EXECUTION_ID = serializer.bytes("je_id");

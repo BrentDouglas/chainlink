@@ -78,14 +78,19 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
 
     @Override
     public void startup() {
-        final int numThreads = Integer.parseInt(configuration.getProperty(Constants.THREAD_POOL_SIZE));
+        final int numThreads;
+        try {
+            numThreads = Integer.parseInt(configuration.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));
+        } catch (final NumberFormatException e) {
+            throw new RuntimeException(e); //TODO Message
+        }
         final WorkerFactory workerFactory = configuration.getWorkerFactory();
         for (int i = 0; i < numThreads; ++i) {
             final Worker worker;
             try {
                 worker = workerFactory.produce(configuration);
             } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO
+                throw new RuntimeException(e); //TODO Message
             }
             worker.startup();
             this.transport.registerWorker(worker.getWorkerId(), worker);
