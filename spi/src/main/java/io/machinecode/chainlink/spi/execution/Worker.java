@@ -1,19 +1,43 @@
 package io.machinecode.chainlink.spi.execution;
 
 import io.machinecode.chainlink.spi.Lifecycle;
-import io.machinecode.chainlink.spi.deferred.Deferred;
-import io.machinecode.chainlink.spi.transport.DeferredId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
-import io.machinecode.chainlink.spi.util.Pair;
+import io.machinecode.chainlink.spi.registry.ChainId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.then.api.Promise;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public interface Worker extends Runnable, Lifecycle {
 
-    WorkerId getWorkerId();
+    WorkerId id();
 
-    void addExecutable(final ExecutableEvent event);
+    void execute(final ExecutableEvent event);
 
-    Pair<DeferredId, Deferred<?>> createDistributedDeferred(final Executable executable);
+    Promise<ChainAndId> chain(final Executable executable);
+
+    public class ChainAndId {
+        private final ChainId localId;
+        private final ChainId remoteId;
+        private final Chain<?> chain;
+
+        public ChainAndId(final ChainId localId, final ChainId remoteId, final Chain<?> chain) {
+            this.localId = localId;
+            this.remoteId = remoteId;
+            this.chain = chain;
+        }
+
+        public ChainId getLocalId() {
+            return localId;
+        }
+
+        public ChainId getRemoteId() {
+            return remoteId;
+        }
+
+        public Chain<?> getChain() {
+            return chain;
+        }
+    }
 }

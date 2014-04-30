@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chainlink xmlns="http://xmlns.io.machinecode/xml/ns/chainlink"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.io.machinecode/xml/ns/chainlink http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
+
+    <environment class="io.machinecode.chainlink.core.management.StaticEnvironment"/>
+
+    <configuration id="default">
+        <executor-factory class="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
+        <registry-factory class="io.machinecode.chainlink.core.registry.LocalRegistryFactory"/>
+        <worker-factory class="io.machinecode.chainlink.core.execution.EventedWorkerFactory"/>
+        <serializer-factory class="io.machinecode.chainlink.repository.core.JdkSerializerFactory"/>
+        <mbean-server-factory class="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
+        <execution-repository-factory class="io.machinecode.chainlink.repository.memory.MemoryExecutionRepositoryFactory"/>
+    </configuration>
+
+</chainlink>

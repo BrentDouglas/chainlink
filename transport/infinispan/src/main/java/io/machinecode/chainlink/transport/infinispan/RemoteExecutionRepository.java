@@ -7,7 +7,8 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.then.core.PromiseImpl;
 import org.infinispan.remoting.transport.Address;
 
 import javax.batch.runtime.BatchStatus;
@@ -26,183 +27,381 @@ import java.util.Set;
  */
 public class RemoteExecutionRepository implements ExecutionRepository {
 
-    protected final InfinispanTransport executor;
+    protected final InfinispanRegistry registry;
     protected final Address address;
     protected final ExecutionRepositoryId executionRepositoryId;
 
-    public RemoteExecutionRepository(final InfinispanTransport executor, final ExecutionRepositoryId executionRepositoryId, final Address address) {
-        this.executor = executor;
+    public RemoteExecutionRepository(final InfinispanRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Address address) {
+        this.registry = registry;
         this.address = address;
         this.executionRepositoryId = executionRepositoryId;
     }
 
-    private InvokeExecutionRepositoryCommand _cmd(final String name, final Object... params) {
-        return new InvokeExecutionRepositoryCommand(executor.cacheName, address, executionRepositoryId, name, params);
+    private InvokeExecutionRepositoryCommand _cmd(final String name, final boolean willReturn, final Serializable... params) {
+        return new InvokeExecutionRepositoryCommand(registry.cacheName, executionRepositoryId, name, willReturn, params);
     }
 
     @Override
-    public ExtendedJobInstance createJobInstance(final Job job, final String jslName, final Date timestamp) throws Exception {
-        return (ExtendedJobInstance)executor.invokeSync(address, _cmd("createJobInstance", job, jslName, timestamp));
+    public ExtendedJobInstance createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception {
+        try {
+            final PromiseImpl<ExtendedJobInstance> promise = new PromiseImpl<ExtendedJobInstance>();
+            registry.invoke(address, _cmd("createJobInstance", true, jobId, jslName, timestamp), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception {
-        return (ExtendedJobExecution)executor.invokeSync(address, _cmd("createJobExecution", jobInstance, parameters, timestamp));
+        try {
+            final PromiseImpl<ExtendedJobExecution> promise = new PromiseImpl<ExtendedJobExecution>();
+            registry.invoke(address, _cmd("createJobExecution", true, jobInstance, parameters, timestamp), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
-        return (ExtendedStepExecution)executor.invokeSync(address, _cmd("createStepExecution", jobExecution, stepName, timestamp));
+    public ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+        try {
+            final PromiseImpl<ExtendedStepExecution> promise = new PromiseImpl<ExtendedStepExecution>();
+            registry.invoke(address, _cmd("createStepExecution", true, jobExecution, stepName, timestamp), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        return (PartitionExecution)executor.invokeSync(address, _cmd("createPartitionExecution", stepExecutionId, partitionId, properties, persistentUserData, readerCheckpoint, writerCheckpoint, timestamp));
+        try {
+            final PromiseImpl<PartitionExecution> promise = new PromiseImpl<PartitionExecution>();
+            registry.invoke(address, _cmd("createPartitionExecution", true, stepExecutionId, partitionId, properties, persistentUserData, readerCheckpoint, writerCheckpoint, timestamp), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void startJobExecution(final long jobExecutionId, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("startJobExecution", jobExecutionId, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("startJobExecution", false, jobExecutionId, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void updateJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("updateJobExecution", jobExecutionId, batchStatus, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("updateJobExecution", false, jobExecutionId, batchStatus, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("finishJobExecution", jobExecutionId, batchStatus, exitStatus, restartElementId, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("finishJobExecution", false, jobExecutionId, batchStatus, exitStatus, restartElementId, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws Exception {
-        executor.invokeSync(address, _cmd("linkJobExecutions", jobExecutionId, restartJobExecutionId));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("linkJobExecutions", false, jobExecutionId, restartJobExecutionId), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void startStepExecution(final long stepExecutionId, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("startStepExecution", stepExecutionId, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("startStepExecution", false, stepExecutionId, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("updateStepExecution", stepExecutionId, metrics, persistentUserData, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("updateStepExecution", false, stepExecutionId, metrics, persistentUserData, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("updateStepExecution", stepExecutionId, metrics, persistentUserData, readerCheckpoint, writerCheckpoint, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("updateStepExecution", false, stepExecutionId, metrics, persistentUserData, readerCheckpoint, writerCheckpoint, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void finishStepExecution(final long stepExecutionId, final Metric[] metrics, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("finishStepExecution", stepExecutionId, metrics, batchStatus, exitStatus, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("finishStepExecution", false, stepExecutionId, metrics, batchStatus, exitStatus, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void startPartitionExecution(final long partitionExecutionId, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("startPartitionExecution", partitionExecutionId, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("startPartitionExecution", false, partitionExecutionId, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("updatePartitionExecution", partitionExecutionId, metrics, persistentUserData, readerCheckpoint, writerCheckpoint, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("updatePartitionExecution", false, partitionExecutionId, metrics, persistentUserData, readerCheckpoint, writerCheckpoint, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
-        executor.invokeSync(address, _cmd("finishPartitionExecution", partitionExecutionId, metrics, persistentUserData, batchStatus, exitStatus, timestamp));
+        try {
+            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            registry.invoke(address, _cmd("finishPartitionExecution", false, partitionExecutionId, metrics, persistentUserData, batchStatus, exitStatus, timestamp), promise);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Set<String> getJobNames() throws Exception {
-        return (Set<String>)executor.invokeSync(address, _cmd("getJobNames"));
+        try {
+            final PromiseImpl<Set<String>> promise = new PromiseImpl<Set<String>>();
+            registry.invoke(address, _cmd("getJobNames", true), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public int getJobInstanceCount(final String jobName) throws Exception {
-        return (Integer)executor.invokeSync(address, _cmd("getJobInstanceCount", jobName));
+        try {
+            final PromiseImpl<Integer> promise = new PromiseImpl<Integer>();
+            registry.invoke(address, _cmd("getJobInstanceCount", true, jobName), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws Exception {
-        return (List<JobInstance>)executor.invokeSync(address, _cmd("getJobInstances", jobName, start, count));
+        try {
+            final PromiseImpl<List<JobInstance>> promise = new PromiseImpl<List<JobInstance>>();
+            registry.invoke(address, _cmd("getJobInstances", true, jobName, start, count), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<Long> getRunningExecutions(final String jobName) throws Exception {
-        return (List<Long>)executor.invokeSync(address, _cmd("getRunningExecutions", jobName));
+        try {
+            final PromiseImpl<List<Long>> promise = new PromiseImpl<List<Long>>();
+            registry.invoke(address, _cmd("getRunningExecutions", true, jobName), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Properties getParameters(final long jobExecutionId) throws Exception {
-        return (Properties)executor.invokeSync(address, _cmd("getParameters", jobExecutionId));
+        try {
+            final PromiseImpl<Properties> promise = new PromiseImpl<Properties>();
+            registry.invoke(address, _cmd("getParameters", true, jobExecutionId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ExtendedJobInstance getJobInstance(final long jobInstanceId) throws Exception {
-        return (ExtendedJobInstance)executor.invokeSync(address, _cmd("getJobInstance", jobInstanceId));
+        try {
+            final PromiseImpl<ExtendedJobInstance> promise = new PromiseImpl<ExtendedJobInstance>();
+            registry.invoke(address, _cmd("getJobInstance", true, jobInstanceId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ExtendedJobInstance getJobInstanceForExecution(final long jobExecutionId) throws Exception {
-        return (ExtendedJobInstance)executor.invokeSync(address, _cmd("getJobInstanceForExecution", jobExecutionId));
+        try {
+            final PromiseImpl<ExtendedJobInstance> promise = new PromiseImpl<ExtendedJobInstance>();
+            registry.invoke(address, _cmd("getJobInstanceForExecution", true, jobExecutionId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public List<? extends JobExecution> getJobExecutions(final JobInstance instance) throws Exception {
-        return (List<? extends JobExecution>)executor.invokeSync(address, _cmd("getJobExecutions", instance));
+    public List<? extends JobExecution> getJobExecutions(final long jobInstanceId) throws Exception {
+        try {
+            final PromiseImpl<List<? extends JobExecution>> promise = new PromiseImpl<List<? extends JobExecution>>();
+            registry.invoke(address, _cmd("getJobExecutions", true, jobInstanceId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ExtendedJobExecution getJobExecution(final long jobExecutionId) throws Exception {
-        return (ExtendedJobExecution)executor.invokeSync(address, _cmd("getJobExecution", jobExecutionId));
+        try {
+            final PromiseImpl<ExtendedJobExecution> promise = new PromiseImpl<ExtendedJobExecution>();
+            registry.invoke(address, _cmd("getJobExecution", true, jobExecutionId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws Exception {
-        return (ExtendedJobExecution)executor.invokeSync(address, _cmd("restartJobExecution", jobExecutionId, parameters));
+        try {
+            final PromiseImpl<ExtendedJobExecution> promise = new PromiseImpl<ExtendedJobExecution>();
+            registry.invoke(address, _cmd("restartJobExecution", true, jobExecutionId, parameters), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<? extends StepExecution> getStepExecutionsForJobExecution(final long jobExecutionId) throws Exception {
-        return (List<? extends StepExecution>)executor.invokeSync(address, _cmd("getStepExecutionsForJobExecution", jobExecutionId));
+        try {
+            final PromiseImpl<List<? extends StepExecution>> promise = new PromiseImpl<List<? extends StepExecution>>();
+            registry.invoke(address, _cmd("getStepExecutionsForJobExecution", true, jobExecutionId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ExtendedStepExecution getStepExecution(final long stepExecutionId) throws Exception {
-        return (ExtendedStepExecution)executor.invokeSync(address, _cmd("getStepExecution", stepExecutionId));
+        try {
+            final PromiseImpl<ExtendedStepExecution> promise = new PromiseImpl<ExtendedStepExecution>();
+            registry.invoke(address, _cmd("getStepExecution", true, stepExecutionId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws Exception {
-        return (ExtendedStepExecution)executor.invokeSync(address, _cmd("getPreviousStepExecution", jobExecutionId, stepExecutionId, stepName));
+        try {
+            final PromiseImpl<ExtendedStepExecution> promise = new PromiseImpl<ExtendedStepExecution>();
+            registry.invoke(address, _cmd("getPreviousStepExecution", true, jobExecutionId, stepExecutionId, stepName), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws Exception {
-        return (ExtendedStepExecution)executor.invokeSync(address, _cmd("getLatestStepExecution", jobExecutionId, stepName));
+        try {
+            final PromiseImpl<ExtendedStepExecution> promise = new PromiseImpl<ExtendedStepExecution>();
+            registry.invoke(address, _cmd("getLatestStepExecution", true, jobExecutionId, stepName), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public int getStepExecutionCount(final long jobExecutionId, final String stepName) throws Exception {
-        return (Integer)executor.invokeSync(address, _cmd("getStepExecutionCount", jobExecutionId, stepName));
+        try {
+            final PromiseImpl<Integer> promise = new PromiseImpl<Integer>();
+            registry.invoke(address, _cmd("getStepExecutionCount", true, jobExecutionId, stepName), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public StepExecution[] getStepExecutions(final long[] stepExecutionIds) throws Exception {
-        return (StepExecution[])executor.invokeSync(address, _cmd("getStepExecutions", stepExecutionIds));
+        try {
+            final PromiseImpl<StepExecution[]> promise = new PromiseImpl<StepExecution[]>();
+            registry.invoke(address, _cmd("getStepExecutions", true, new Serializable[]{ stepExecutionIds }), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws Exception {
-        return (PartitionExecution[])executor.invokeSync(address, _cmd("getPartitionExecution", stepExecutionId));
+        try {
+            final PromiseImpl<PartitionExecution[]> promise = new PromiseImpl<PartitionExecution[]>();
+            registry.invoke(address, _cmd("getUnfinishedPartitionExecutions", true, stepExecutionId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public PartitionExecution getPartitionExecution(final long partitionExecutionId) throws Exception {
-        return (PartitionExecution)executor.invokeSync(address, _cmd("getPartitionExecution", partitionExecutionId));
+        try {
+            final PromiseImpl<PartitionExecution> promise = new PromiseImpl<PartitionExecution>();
+            registry.invoke(address, _cmd("getPartitionExecution", true, partitionExecutionId), promise);
+            return promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

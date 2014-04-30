@@ -1,23 +1,22 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.core.deferred.LinkedDeferred;
-import io.machinecode.chainlink.core.deferred.Notify;
-import io.machinecode.chainlink.jsl.core.util.ImmutablePair;
+import io.machinecode.chainlink.core.then.Notify;
+import io.machinecode.chainlink.core.registry.UUIDId;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
-import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.transport.DeferredId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.chainlink.spi.util.Pair;
+import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.then.api.Promise;
+import io.machinecode.chainlink.core.then.ChainImpl;
+import io.machinecode.then.core.ResolvedPromise;
 import org.jboss.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -39,16 +38,16 @@ public class EventedWorker extends Thread implements Worker {
     public EventedWorker(final RuntimeConfiguration configuration) {
         super("Chainlink worker - " + IDS.incrementAndGet());
         this.configuration = configuration;
-        this.workerId = configuration.getTransport().generateWorkerId(this);
+        this.workerId = configuration.getRegistry().generateWorkerId(this);
     }
 
     @Override
-    public WorkerId getWorkerId() {
+    public WorkerId id() {
         return workerId;
     }
 
     @Override
-    public void addExecutable(final ExecutableEvent event) {
+    public void execute(final ExecutableEvent event) {
         final Executable executable = event.getExecutable();
         log.debugf(Messages.get("CHAINLINK-024005.worker.add.executable"), this, executable);
         synchronized (lock) {
@@ -58,8 +57,9 @@ public class EventedWorker extends Thread implements Worker {
     }
 
     @Override
-    public Pair<DeferredId, Deferred<?>> createDistributedDeferred(final Executable executable) {
-        return ImmutablePair.<DeferredId, Deferred<?>>of(new UUIDDeferredId(UUID.randomUUID()), new LinkedDeferred<Void>());
+    public Promise<ChainAndId> chain(final Executable executable) {
+        final UUIDId id = new UUIDId();
+        return new ResolvedPromise<ChainAndId>(new ChainAndId(id, id, new ChainImpl<Void>()));
     }
 
     @Override
@@ -76,13 +76,12 @@ public class EventedWorker extends Thread implements Worker {
             return;
         }
         final Executable executable = event.getExecutable();
-        final Deferred<?> deferred = configuration.getTransport().getDeferred(
-                executable.getContext().getJobExecutionId(),
-                event.getDeferredId()
-        );
         try {
-            deferred.always(notify);
-            executable.execute(configuration, deferred, workerId, event.getContext());
+            final Chain<?> chain = configuration.getRegistry()
+                    .getJobRegistry(executable.getContext().getJobExecutionId())
+                    .getChain(event.getChainId());
+            chain.onComplete(notify);
+            executable.execute(configuration, chain, workerId, event.getContext());
         } catch (final Throwable e) {
             log.errorf(e, Messages.get("CHAINLINK-024004.worker.execute.execution"), this, executable);
         }
@@ -99,7 +98,6 @@ public class EventedWorker extends Thread implements Worker {
             }
         } catch (final InterruptedException ie) {
             log.infof(Messages.get("CHAINLINK-024001.worker.interrupted"), this);
-            shutdown();
         }
     }
 

@@ -6,15 +6,14 @@ import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
-import io.machinecode.chainlink.spi.deferred.Deferred;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.element.execution.Flow;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.ExecutionWork;
 import io.machinecode.chainlink.spi.work.TransitionWork;
+import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
@@ -57,7 +56,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     // Lifecycle
 
     @Override
-    public Deferred<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                               final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020000.flow.before"), context, id);
@@ -72,7 +71,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     }
 
     @Override
-    public Deferred<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                              final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                              final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020001.flow.after"), context, id);

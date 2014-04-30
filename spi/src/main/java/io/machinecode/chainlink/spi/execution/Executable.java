@@ -2,10 +2,10 @@ package io.machinecode.chainlink.spi.execution;
 
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.deferred.Deferred;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.spi.then.Chain;
 
 import java.io.Serializable;
 
@@ -22,5 +22,5 @@ public interface Executable extends Serializable {
 
     ExecutionRepositoryId getExecutionRepositoryId();
 
-    void execute(final RuntimeConfiguration configuration, final Deferred<?> deferred, final WorkerId workerId, final ExecutionContext childContext);
+    void execute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId, final ExecutionContext childContext);
 }

@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.transport.infinispan.configuration;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public interface ChainlinkCommand {
 
-    void setTransport(final InfinispanTransport transport);
+    void init(final InfinispanRegistry registry);
 }

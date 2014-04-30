@@ -4,10 +4,9 @@ import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Partition;
 import io.machinecode.chainlink.spi.element.partition.Strategy;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.context.Item;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 
 import javax.batch.runtime.BatchStatus;
 import java.io.Serializable;

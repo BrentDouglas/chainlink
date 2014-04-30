@@ -1,16 +1,16 @@
 package io.machinecode.chainlink.transport.infinispan.callable;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanThreadWorkerId;
-import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
+import io.machinecode.chainlink.transport.infinispan.InfinispanThreadId;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class LeastBusyWorkerCallable extends BaseCallable<Object, Object, InfinispanThreadWorkerId> {
+public class LeastBusyWorkerCallable extends BaseCallable<Object, Object, InfinispanThreadId> {
 
     @Override
-    public InfinispanThreadWorkerId call() throws Exception {
-        final InfinispanTransport transport = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
-        return transport.leastBusyWorker();
+    public InfinispanThreadId call() throws Exception {
+        final InfinispanRegistry registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanRegistry.class);
+        return registry.leastBusyWorker();
     }
 }

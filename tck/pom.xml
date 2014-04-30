@@ -20,13 +20,23 @@
 
         <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
-        <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
+        <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
         <serializer.factory.class>io.machinecode.chainlink.repository.core.JdkSerializerFactory</serializer.factory.class>
 
+        <class.loader.factory.class></class.loader.factory.class>
+        <transaction.manager.factory.class></transaction.manager.factory.class>
+
+        <job.loader.factory.class></job.loader.factory.class>
+        <artifact.loader.factory.class></artifact.loader.factory.class>
+        <injector.factory.class></injector.factory.class>
+        <security.check.factory.class></security.check.factory.class>
+
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
+
+        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.17</version.org.apache.maven.plugins.maven-failsafe-plugin>
     </properties>
 
     <dependencyManagement>
@@ -166,7 +176,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <transport.factory.class>io.machinecode.chainlink.tck.core.transport.InfinispanTransportFactory</transport.factory.class>
+                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.InfinispanRegistryFactory</registry.factory.class>
             </properties>
         </profile>
         <profile>
@@ -309,7 +319,7 @@
                     <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
                     <executions>
                         <execution>
-                            <id>create-persistence-xml</id>
+                            <id>create-persistence-xml-and-services</id>
                             <goals>
                                 <goal>run</goal>
                             </goals>
@@ -394,12 +404,12 @@
                                             <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
                                         </filterset>
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransportFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransportFactory"
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.RegistryFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.RegistryFactory"
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>
-                                            <filter token="transport.factory.class" value="${transport.factory.class}" />
+                                            <filter token="registry.factory.class" value="${registry.factory.class}" />
                                         </filterset>
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory"
@@ -429,12 +439,183 @@
                                 </target>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>copy-test-artifact</id>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <phase>process-test-classes</phase>
+                            <configuration>
+                                <target>
+                                    <jar destfile="${project.build.directory}/chainlink-tck-${tck.test.module.name}-${project.version}.jar" basedir="${project.build.directory}/test-classes"/>
+                                    <copy file="${project.build.directory}/chainlink-tck-${tck.test.module.name}-${project.version}.jar"
+                                          tofile="${tck.work.dir}/chainlink-${project.version}/app/chainlink-tck-${tck.test.module.name}-${project.version}.jar"
+                                          overwrite="true"/>
+                                </target>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>start-background-server</id>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <phase>pre-integration-test</phase>
+                            <configuration>
+                                <target>
+                                    <!-- Setup other instance in case we are testing a clustering registry. Executed from tck-core pom -->
+                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-bin.zip"
+                                           dest="${tck.work.dir}"/>
+                                    <chmod file="${tck.work.dir}/chainlink-${project.version}/install" perm="754"/>
+                                    <exec executable="${tck.work.dir}/chainlink-${project.version}/install"
+                                          dir="${tck.work.dir}/chainlink-${project.version}"/>
+
+                                    <copy file="${project.basedir}/../chainlink-tck.xml"
+                                          tofile="${tck.work.dir}/chainlink-${project.version}/cnf/chainlink-tck.xml"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
+                                            <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
+                                            <filter token="executor.factory.class" value="${executor.factory.class}" />
+                                            <filter token="registry.factory.class" value="${registry.factory.class}" />
+                                            <filter token="injector.factory.class" value="${injector.factory.class}" />
+                                            <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
+                                            <filter token="security.check.factory.class" value="${security.check.factory.class}" />
+                                            <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
+                                            <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
+                                            <filter token="worker.factory.class" value="${worker.factory.class}" />
+                                            <filter token="serializer.factory.class" value="${serializer.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../chainlink-tck.properties"
+                                          tofile="${tck.work.dir}/chainlink-${project.version}/cnf/chainlink-tck.properties"
+                                          overwrite="true">
+                                    </copy>
+
+                                    <chmod file="${tck.work.dir}/chainlink-${project.version}/bin/*" perm="754"/>
+
+                                    <exec executable="${tck.work.dir}/chainlink-${project.version}/bin/chainlink"
+                                          dir="${tck.work.dir}/chainlink-${project.version}/bin">
+                                        <arg value="-p"/>
+                                        <arg value="chainlink-tck.properties"/>
+                                        <arg value="-d"/>
+                                    </exec>
+                                </target>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>stop-background-server</id>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <phase>post-integration-test</phase>
+                            <configuration>
+                                <target>
+                                    <!-- Kill instance. Executed from test modules pom -->
+                                    <exec executable="${tck.work.dir}/chainlink-${project.version}/bin/chainlink"
+                                          dir="${tck.work.dir}/chainlink-${project.version}/bin">
+                                        <arg value="-k"/>
+                                    </exec>
+                                    <exec executable="${tck.work.dir}/chainlink-${project.version}/install"
+                                          dir="${tck.work.dir}/chainlink-${project.version}">
+                                        <arg value="-u"/>
+                                    </exec>
+                                </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>copy</id>
+                            <phase>process-test-classes</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>com.ibm.jbatch</groupId>
+                                <artifactId>com.ibm.jbatch-tck-spi</artifactId>
+                                <version>${version.com.ibm.batch.com.ibm.batch-tck-spi}</version>
+                                <type>jar</type>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${tck.work.dir}/chainlink-${project.version}/app/</outputDirectory>
+                                <destFileName>com.ibm.jbatch-tck-spi-${version.com.ibm.batch.com.ibm.batch-tck-spi}.jar</destFileName>
+                            </artifactItem>
+                            <artifactItem>
+                                <groupId>io.machinecode.chainlink</groupId>
+                                <artifactId>chainlink-tck-core</artifactId>
+                                <version>${project.version}</version>
+                                <type>jar</type>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${tck.work.dir}/chainlink-${project.version}/app/</outputDirectory>
+                                <destFileName>chainlink-tck-core-${project.version}.jar</destFileName>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                            </goals>
+                            <configuration>
+                                <includes>
+                                    <include>**/**Test*.java</include>
+                                    <include>**/**TestCase*.java</include>
+                                </includes>
+                                <systemPropertiesFile>${test.properties}</systemPropertiesFile>
+                                <systemPropertyVariables>
+                                    <database.driver>${database.driver}</database.driver>
+                                    <database.prefix>${database.prefix}</database.prefix>
+                                </systemPropertyVariables>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>verify</id>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
                     </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>create-persistence-xml-and-services</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>copy-test-artifact</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>start-background-server</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>stop-background-server</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -490,17 +671,9 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+                <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <includes>
-                        <include>**/**Test*.java</include>
-                        <include>**/**TestCase*.java</include>
-                    </includes>
-                    <systemPropertiesFile>${test.properties}</systemPropertiesFile>
-                    <systemPropertyVariables>
-                        <database.driver>${database.driver}</database.driver>
-                        <database.prefix>${database.prefix}</database.prefix>
-                    </systemPropertyVariables>
+                    <skipExec>true</skipExec>
                 </configuration>
             </plugin>
         </plugins>

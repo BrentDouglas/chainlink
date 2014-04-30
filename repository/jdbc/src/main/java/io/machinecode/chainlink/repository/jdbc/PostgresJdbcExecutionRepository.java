@@ -26,21 +26,21 @@ public class PostgresJdbcExecutionRepository extends JdbcExecutionRepository {
             statement.setNull(index, Types.BIGINT);
             return;
         }
-        LargeObjectManager manager = ((PGConnection)statement.getConnection()).getLargeObjectAPI();
-        long oid = manager.createLO(LargeObjectManager.READ | LargeObjectManager.WRITE);
-        LargeObject lob = manager.open(oid, LargeObjectManager.WRITE);
+        final LargeObjectManager manager = ((PGConnection)statement.getConnection()).getLargeObjectAPI();
+        final long oid = manager.createLO(LargeObjectManager.READ | LargeObjectManager.WRITE);
+        final LargeObject lob = manager.open(oid, LargeObjectManager.WRITE);
         lob.write(bytes);
         statement.setLong(index, oid);
     }
 
     @Override
     protected Serializable getLargeObject(final ResultSet result, final int index) throws Exception {
-        LargeObjectManager manager = ((PGConnection)result.getStatement().getConnection()).getLargeObjectAPI();
-        long oid = result.getLong(index);
+        final LargeObjectManager manager = ((PGConnection)result.getStatement().getConnection()).getLargeObjectAPI();
+        final long oid = result.getLong(index);
         if (oid == 0) {
             return null;
         }
-        LargeObject lob = manager.open(oid, LargeObjectManager.READ);
+        final LargeObject lob = manager.open(oid, LargeObjectManager.READ);
         return _read(lob.getInputStream());
     }
 }

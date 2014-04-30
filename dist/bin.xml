@@ -53,16 +53,14 @@
                 <include>log4j:log4j</include>
                 <include>net.sf.trove4j:trove4j</include>
                 <include>org.jboss.logging:jboss-logging</include>
-
                 <include>io.machinecode.then:then-api</include>
-                <include>io.machinecode.protocol:protocol-api</include>
-                <!-- Cli -->
-                <include>io.machinecode.cli:cli-api</include>
-                <include>io.machinecode.cli:cli-core</include>
+                <include>io.machinecode.then:then-core</include>
                 <!-- Repo -->
                 <include>org.jboss.marshalling:jboss-marshalling</include>
                 <include>org.jboss.marshalling:jboss-marshalling-river</include>
                 <!-- Repo: Ispn -->
+                <include>org.jgroups:jgroups</include>
+                <include>org.infinispan:infinispan-commons</include>
                 <include>org.infinispan:infinispan-core</include>
                 <!-- Repo: Jdbc -->
                 <include>postgresql:postgresql</include>
@@ -72,10 +70,13 @@
                 <include>redis.clients:jedis</include>
                 <!-- Inject -->
                 <include>javax.inject:javax.inject</include>
+                <!-- Inject: CDI -->
+                <include>org.jboss.weld.se:weld-se</include>
                 <!-- Inject: Guice -->
                 <include>com.google.inject:guice</include>
                 <!-- Inject: Seam -->
                 <include>org.jboss.seam:jboss-seam:ejb</include>
+                <include>javax.servlet:servlet-api</include>
                 <!-- Inject: Spring -->
                 <include>org.springframework:spring-beans</include>
                 <include>org.springframework:spring-context</include>
@@ -98,19 +99,24 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>../server/chainlinkd/chainlinkd.sh</source>
-            <outputDirectory>/</outputDirectory>
+            <source>../server/chainlinkd/bin/chainlink</source>
+            <outputDirectory>bin</outputDirectory>
             <fileMode>754</fileMode>
         </file>
         <file>
-            <source>../server/chainlinkd/install.sh</source>
-            <outputDirectory>/</outputDirectory>
+            <source>../server/chainlinkd/bin/chainlinkd</source>
+            <outputDirectory>bin</outputDirectory>
             <fileMode>754</fileMode>
         </file>
         <file>
-            <source>../server/chainlinkd/chainlink.xml</source>
+            <source>../server/chainlinkd/cnf/chainlink.xml</source>
             <outputDirectory>cnf</outputDirectory>
             <fileMode>664</fileMode>
+        </file>
+        <file>
+            <source>../server/chainlinkd/install</source>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>754</fileMode>
         </file>
     </files>
 </assembly>

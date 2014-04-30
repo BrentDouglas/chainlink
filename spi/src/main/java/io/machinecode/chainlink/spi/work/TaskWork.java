@@ -2,10 +2,10 @@ package io.machinecode.chainlink.spi.work;
 
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.element.task.Task;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.then.api.Deferred;
 
 import java.io.Serializable;
 

@@ -7,7 +7,7 @@
 
     <configuration id="Default">
         <executor-factory class=""/>
-        <transport-factory class=""/>
+        <registry-factory class=""/>
         <worker-factory class=""/>
         <serializer-factory class=""/>
         <mbean-server-factory class="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>

@@ -16,9 +16,9 @@ public final class Messages {
     static {
         ResourceBundle bundle;
         try {
-            bundle = ResourceBundle.getBundle("messages", Locale.getDefault(), Messages.class.getClassLoader());
+            bundle = ResourceBundle.getBundle("ChainlinkMessages", Locale.getDefault(), Messages.class.getClassLoader());
         } catch (final Exception e) {
-            bundle = ResourceBundle.getBundle("messages", Locale.ENGLISH, Messages.class.getClassLoader());
+            bundle = ResourceBundle.getBundle("ChainlinkMessages", Locale.ENGLISH, Messages.class.getClassLoader());
         }
         MESSAGES = bundle;
     }

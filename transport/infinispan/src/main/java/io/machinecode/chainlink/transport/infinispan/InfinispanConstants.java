@@ -5,5 +5,5 @@ package io.machinecode.chainlink.transport.infinispan;
  */
 public class InfinispanConstants {
 
-    public static final String CACHE_NAME = "io.machinecode.chainlink.transport.infinispan.InfinispanTransport.cache_name";
+    public static final String CACHE = "io.machinecode.chainlink.transport.infinispan.InfinispanRegistry.cache";
 }

@@ -93,11 +93,11 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public JobInstanceImpl createJobInstance(final Job job, final String jslName, final Date timestamp) {
+    public JobInstanceImpl createJobInstance(final String jobId, final String jslName, final Date timestamp) {
         final long id = jobInstanceIndex.getAndIncrement();
         final JobInstanceImpl instance = new JobInstanceImpl.Builder()
                 .setInstanceId(id)
-                .setJobName(job.getId())
+                .setJobName(jobId)
                 .setJslName(jslName)
                 .setCreatedTime(timestamp)
                 .build();
@@ -173,7 +173,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public StepExecutionImpl createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public StepExecutionImpl createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
         final long stepExecutionId;
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -609,13 +609,13 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException {
+    public List<JobExecution> getJobExecutions(final long jobInstanceId) throws NoSuchJobInstanceException, JobSecurityException {
         final TLongList jobExecutionIds = new TLongArrayList();
         while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
         try {
-            final TLongList executions = jobInstanceExecutions.get(instance.getInstanceId());
+            final TLongList executions = jobInstanceExecutions.get(jobInstanceId);
             if (executions == null) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
+                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
             }
             jobExecutionIds.addAll(executions);
         } finally {

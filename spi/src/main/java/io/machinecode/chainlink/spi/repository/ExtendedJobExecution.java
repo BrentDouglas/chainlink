@@ -1,11 +1,12 @@
 package io.machinecode.chainlink.spi.repository;
 
 import javax.batch.runtime.JobExecution;
+import java.io.Serializable;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface ExtendedJobExecution extends JobExecution {
+public interface ExtendedJobExecution extends JobExecution, Serializable {
 
     /**
      * @return The id of the step to restart on if this job was stopped.

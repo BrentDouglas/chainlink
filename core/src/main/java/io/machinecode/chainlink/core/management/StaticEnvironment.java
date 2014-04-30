@@ -5,7 +5,6 @@ import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
-import io.machinecode.chainlink.spi.inject.DependencyInjectionExtension;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 
@@ -19,13 +18,6 @@ import java.util.List;
 public class StaticEnvironment implements Environment {
 
     private static final TMap<String, JobOperatorImpl> OPERATORS = new THashMap<String, JobOperatorImpl>();
-
-    private List<DependencyInjectionExtension> extensions;
-
-    @Override
-    public void initialize(final List<DependencyInjectionExtension> extensions) {
-        this.extensions = extensions;
-    }
 
     @Override
     public List<ExtendedJobOperator> getJobOperators() {
@@ -48,9 +40,6 @@ public class StaticEnvironment implements Environment {
             final JobOperatorImpl operator = new JobOperatorImpl(configuration);
             operator.startup();
             OPERATORS.put(id, operator);
-            for (final DependencyInjectionExtension extension : this.extensions) {
-                extension.register(id, new JobOperatorView(operator));
-            }
             return operator;
         }
     }

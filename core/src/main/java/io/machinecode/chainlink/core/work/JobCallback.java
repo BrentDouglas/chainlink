@@ -1,15 +1,17 @@
 package io.machinecode.chainlink.core.work;
 
-import io.machinecode.chainlink.core.deferred.ResolvedDeferred;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
-import io.machinecode.chainlink.spi.deferred.Deferred;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
+import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.chainlink.core.then.ResolvedChain;
+import io.machinecode.then.api.OnResolve;
+import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
@@ -18,7 +20,7 @@ import java.io.Serializable;
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class JobCallback extends ExecutableImpl<JobWork> implements Serializable {
+public class JobCallback extends ExecutableImpl<JobWork> {
 
     private static final Logger log = Logger.getLogger(JobCallback.class);
 
@@ -27,7 +29,7 @@ public class JobCallback extends ExecutableImpl<JobWork> implements Serializable
     }
 
     @Override
-    protected void doExecute(final RuntimeConfiguration configuration, final Deferred<?> deferred, final WorkerId workerId,
+    protected void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
                                     final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
         final MutableJobContext jobContext = context.getJobContext();
         Throwable throwable = null;
@@ -60,13 +62,15 @@ public class JobCallback extends ExecutableImpl<JobWork> implements Serializable
                         jobContext.getExitStatus()
                 );
             }
-            configuration.getTransport().unregisterJob(context.getJobExecutionId());
-        }
-        deferred.link(new ResolvedDeferred<Void>(null));
-        if (throwable == null) {
-            deferred.resolve(null);
-        } else {
-            deferred.reject(throwable);
+            chain.link(new ResolvedChain<Void>(null));
+            if (throwable == null) {
+                chain.resolve(null);
+            } else {
+                chain.reject(throwable);
+            }
+            // TODO There is a race here that needs resolving
+            // Possibly need to change the way JobAlreadyRunning is found or similar
+            configuration.getRegistry().unregisterJob(context.getJobExecutionId());
         }
     }
 

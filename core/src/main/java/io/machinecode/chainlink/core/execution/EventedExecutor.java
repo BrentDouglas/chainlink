@@ -1,22 +1,25 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.core.deferred.AllDeferred;
-import io.machinecode.chainlink.core.deferred.LinkedDeferred;
 import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.transport.DeferredId;
-import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.chainlink.spi.transport.WorkerId;
-import io.machinecode.chainlink.spi.util.Pair;
+import io.machinecode.chainlink.spi.registry.ChainId;
+import io.machinecode.chainlink.spi.registry.Registry;
+import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.then.api.Deferred;
+import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.then.api.OnReject;
+import io.machinecode.then.api.OnResolve;
+import io.machinecode.then.api.Promise;
+import io.machinecode.chainlink.core.then.AllChain;
+import io.machinecode.chainlink.core.then.ChainImpl;
+import io.machinecode.chainlink.core.then.RejectedChain;
 import org.jboss.logging.Logger;
 
 import java.util.List;
 import java.util.ListIterator;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -28,17 +31,16 @@ public class EventedExecutor implements Executor {
 
     private static final Logger log = Logger.getLogger(EventedExecutor.class);
 
-    protected final Transport transport;
+    protected final Registry registry;
     private final ExecutorService cancellation = Executors.newCachedThreadPool();
 
     public EventedExecutor(final ExecutorConfiguration configuration) {
-        this.transport = configuration.getTransport();
+        this.registry = configuration.getRegistry();
     }
-
 
     @Override
     public void startup() {
-        //
+        // no op
     }
 
     @Override
@@ -47,68 +49,98 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Deferred<?> execute(final long jobExecutionId, final Executable executable) {
-        final Deferred<?> deferred = new LinkedDeferred<Void>();
-        final DeferredId deferredId = new UUIDDeferredId(UUID.randomUUID());
-        transport.registerDeferred(jobExecutionId, deferredId, deferred);
-        transport.registerJob(jobExecutionId, deferred);
-        _execute(executable, deferredId);
-        return deferred;
+    public Chain<?> execute(final long jobExecutionId, final Executable executable) {
+        final Chain<?> chain = new ChainImpl<Void>();
+        final ChainId chainId = registry.registerJob(jobExecutionId, registry.generateChainId(), chain);
+        _execute(executable, chainId);
+        return chain;
     }
 
     @Override
-    public Deferred<?> execute(final Executable executable) {
-        final Deferred<?> deferred = new LinkedDeferred<Void>();
-        final DeferredId deferredId = new UUIDDeferredId(UUID.randomUUID());
-        transport.registerDeferred(executable.getContext().getJobExecutionId(), deferredId, deferred);
-        _execute(executable, deferredId);
-        return deferred;
+    public Chain<?> execute(final Executable executable) {
+        final Chain<?> chain = new ChainImpl<Void>();
+        final ChainId chainId = registry.getJobRegistry(executable.getContext().getJobExecutionId())
+                .registerChain(registry.generateChainId(), chain);
+        _execute(executable, chainId);
+        return chain;
     }
 
-    private void _execute(final Executable executable, final DeferredId deferredId) {
+    private void _execute(final Executable executable, final ChainId chainId) {
         final WorkerId workerId = executable.getWorkerId();
         final Worker worker;
         if (workerId == null) {
-            worker = transport.getWorker();
+            worker = registry.getWorker();
         } else {
-            worker = transport.getWorker(workerId);
+            worker = registry.getWorker(workerId);
         }
-        worker.addExecutable(new ExecutableEventImpl(executable, deferredId));
+        worker.execute(new ExecutableEventImpl(executable, chainId));
     }
 
     @Override
-    public Deferred<?> distribute(final int maxThreads, final Executable... executables) {
-        final List<Worker> workers = transport.getWorkers(maxThreads);
+    public Chain<?> distribute(final int maxThreads, final Executable... executables) {
+        final List<Worker> workers = registry.getWorkers(maxThreads);
         ListIterator<Worker> it = workers.listIterator();
-        final Deferred<?>[] deferreds = new Deferred[executables.length];
+        final Chain<?>[] chains = new Chain[executables.length];
+        @SuppressWarnings("unchecked")
+        final Promise<Worker.ChainAndId>[] promises = new Promise[executables.length];
         int i = 0;
         for (final Executable executable : executables) {
             if (!it.hasNext()) {
                 it = workers.listIterator();
             }
             final Worker worker = it.next();
-            final Pair<DeferredId, Deferred<?>> pair = worker.createDistributedDeferred(executable);
-            deferreds[i++] = pair.getValue();
-            transport.registerDeferred(executable.getContext().getJobExecutionId(), pair.getName(), pair.getValue());
-            worker.addExecutable(new ExecutableEventImpl(executable, pair.getName()));
+            final int index = i++;
+            final Collect collect = new Collect() {
+                @Override
+                public void reject(final Throwable fail) {
+                    log.errorf(fail, ""); //TODO Message
+                    chains[index] = new RejectedChain<Void>(fail);
+                }
+
+                @Override
+                public void resolve(final Worker.ChainAndId that) {
+                    chains[index] = that.getChain();
+                    registry.getJobRegistry(executable.getContext().getJobExecutionId())
+                            .registerChain(that.getLocalId(), that.getChain());
+                    worker.execute(new ExecutableEventImpl(executable, that.getRemoteId()));
+                }
+            };
+            (promises[index] = worker.chain(executable))
+                    .onResolve(collect)
+                    .onReject(collect);
         }
-        return new AllDeferred<Executable>(deferreds);
+        for (final Promise<Worker.ChainAndId> promise : promises) {
+            try {
+                promise.get();
+            } catch (final Exception e) {
+                throw new RuntimeException(e); //TODO Message?
+            }
+        }
+        return new AllChain<Executable>(chains);
     }
 
     @Override
-    public Deferred<?> callback(final Executable executable, final ExecutionContext context) {
+    public Chain<?> callback(final Executable executable, final ExecutionContext context) {
         final WorkerId workerId = executable.getWorkerId();
-        Worker worker;
+        final Worker worker;
         if (workerId == null) {
-            worker = transport.getWorker();
+            worker = registry.getWorker();
         } else {
-            worker = transport.getWorker(workerId);
+            worker = registry.getWorker(workerId);
         }
-        final Deferred<?> deferred = new LinkedDeferred<Void>();
-        final DeferredId deferredId = new UUIDDeferredId(UUID.randomUUID());
-        transport.registerDeferred(executable.getContext().getJobExecutionId(), deferredId, deferred);
-        worker.addExecutable(new ExecutableEventImpl(executable, deferredId, context));
-        return deferred;
+        try {
+            return worker.chain(executable)
+                    .onResolve(new OnResolve<Worker.ChainAndId>() {
+                        @Override
+                        public void resolve(final Worker.ChainAndId that) {
+                            registry.getJobRegistry(executable.getContext().getJobExecutionId())
+                                    .registerChain(that.getLocalId(), that.getChain());
+                            worker.execute(new ExecutableEventImpl(executable, that.getRemoteId(), context));
+                        }
+                    }).get().getChain(); //TODO This is rubbish
+        } catch (final Exception e) {
+            throw new RuntimeException(e); //TODO
+        }
     }
 
     @Override
@@ -120,4 +152,6 @@ public class EventedExecutor implements Executor {
             }
         });
     }
+
+    private interface Collect extends OnResolve<Worker.ChainAndId>, OnReject<Throwable> {}
 }

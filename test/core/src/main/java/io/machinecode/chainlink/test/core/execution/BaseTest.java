@@ -7,10 +7,8 @@ import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
-import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
-import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.jboss.logging.Logger;
@@ -79,7 +77,6 @@ public abstract class BaseTest extends Assert {
                 .setExecutionRepository(repository())
                 .setExecutorFactory(executor())
                 .setWorkerFactory(_workerFactory())
-                .setTransportFactory(_transportFactory())
                 .setSerializerFactory(serializerFactory())
                 .setProperty(Constants.THREAD_POOL_SIZE, "8");
     }
@@ -96,10 +93,6 @@ public abstract class BaseTest extends Assert {
 
     protected ExecutorFactory _executor() throws Exception{
         return new EventedExecutorFactory();
-    }
-
-    protected TransportFactory _transportFactory() {
-        return new LocalTransportFactory();
     }
 
     protected WorkerFactory _workerFactory() {

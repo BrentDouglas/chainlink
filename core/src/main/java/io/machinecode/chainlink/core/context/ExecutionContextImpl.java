@@ -20,7 +20,7 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
 
     private static final Logger log = Logger.getLogger(ExecutionContextImpl.class);
 
-    private transient JobWork job;
+    private final JobWork job;
     private final long jobExecutionId;
     private final Long restartJobExecutionId;
     private final Long partitionExecutionId;

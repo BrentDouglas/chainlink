@@ -3,29 +3,29 @@ package io.machinecode.chainlink.core.execution;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
-import io.machinecode.chainlink.spi.transport.DeferredId;
+import io.machinecode.chainlink.spi.registry.ChainId;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
 public class ExecutableEventImpl implements ExecutableEvent {
-    final DeferredId deferredId;
+    final ChainId chainId;
     final Executable executable;
     final ExecutionContext context;
 
-    public ExecutableEventImpl(final Executable executable, final DeferredId deferredId, final ExecutionContext context) {
-        this.deferredId = deferredId;
+    public ExecutableEventImpl(final Executable executable, final ChainId chainId, final ExecutionContext context) {
+        this.chainId = chainId;
         this.executable = executable;
         this.context = context;
     }
 
-    public ExecutableEventImpl(final Executable executable, final DeferredId deferredId) {
-        this(executable, deferredId, null);
+    public ExecutableEventImpl(final Executable executable, final ChainId chainId) {
+        this(executable, chainId, null);
     }
 
     @Override
-    public DeferredId getDeferredId() {
-        return deferredId;
+    public ChainId getChainId() {
+        return chainId;
     }
 
     @Override

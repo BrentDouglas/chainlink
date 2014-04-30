@@ -93,12 +93,12 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedJobInstance createJobInstance(final Job job, final String jslName, final Date timestamp) throws Exception {
+    public ExtendedJobInstance createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception {
         Connection connection = null;
         try {
             connection = _connection();
             final PreparedStatement statement = connection.prepareStatement(insertJobInstance(), Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, job.getId());
+            statement.setString(1, jobId);
             statement.setString(2, jslName);
             statement.setTimestamp(3, new Timestamp(timestamp.getTime()));
             if (statement.executeUpdate() == 0) {
@@ -113,7 +113,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             return new JobInstanceImpl.Builder()
                     .setInstanceId(jobInstanceId)
                     .setCreatedTime(timestamp)
-                    .setJobName(job.getId())
+                    .setJobName(jobId)
                     .setJslName(jslName)
                     .build();
         } finally {
@@ -199,7 +199,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
         Connection connection = null;
         try {
             connection = _connection();
@@ -919,15 +919,15 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public List<JobExecutionImpl> getJobExecutions(final JobInstance instance) throws Exception {
+    public List<JobExecutionImpl> getJobExecutions(final long jobInstanceId) throws Exception {
         Connection connection = null;
         try {
             connection = _connection();
             final PreparedStatement statement = connection.prepareStatement(queryJobExecutionsForJobInstance());
-            statement.setLong(1, instance.getInstanceId());
+            statement.setLong(1, jobInstanceId);
             final ResultSet result = statement.executeQuery();
             if (!result.next()) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
+                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
             }
             final List<JobExecutionImpl> ret = new ArrayList<JobExecutionImpl>();
             do {

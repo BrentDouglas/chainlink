@@ -43,11 +43,11 @@ public abstract class RepositoryTest extends BaseTest {
         printMethodName();
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         Assert.assertEquals("job", jobInstance.getJobName());
         Assert.assertEquals("jsl", jobInstance.getJslName());
 
-        final ExtendedJobInstance second = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance second = repository().createJobInstance(job.getId(), "jsl", new Date());
 
         Assert.assertNotSame(jobInstance.getInstanceId(), second.getInstanceId());
     }
@@ -60,7 +60,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -97,7 +97,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -139,7 +139,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -189,7 +189,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -259,7 +259,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution old = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -296,7 +296,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -372,7 +372,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -457,7 +457,7 @@ public abstract class RepositoryTest extends BaseTest {
 
         final JobImpl job = _job();
         final Step<?,?> step = Step.class.cast(job.getExecutions().get(0));
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         ExtendedJobExecution first = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -595,7 +595,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -646,7 +646,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -749,7 +749,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -872,7 +872,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -945,7 +945,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -1048,7 +1048,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,
@@ -1283,7 +1283,7 @@ public abstract class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final ExtendedJobInstance jobInstance = repository().createJobInstance(job, "jsl", new Date());
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
                 parameters,

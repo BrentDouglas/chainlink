@@ -14,6 +14,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.machinecode.then</groupId>
+            <artifactId>then-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-api</artifactId>
         </dependency>

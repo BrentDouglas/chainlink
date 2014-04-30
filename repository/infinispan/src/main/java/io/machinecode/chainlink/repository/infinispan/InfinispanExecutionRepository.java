@@ -151,11 +151,11 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public JobInstanceImpl createJobInstance(final Job job, final String jslName, final Date timestamp) throws Exception {
+    public JobInstanceImpl createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception {
         final long id = _id(JOB_INSTANCE_ID);
         final JobInstanceImpl instance = new JobInstanceImpl.Builder()
                 .setInstanceId(id)
-                .setJobName(job.getId())
+                .setJobName(jobId)
                 .setJslName(jslName)
                 .setCreatedTime(timestamp)
                 .build();
@@ -191,7 +191,7 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public StepExecutionImpl createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public StepExecutionImpl createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
         final CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions.get(jobExecution.getExecutionId());
         if (executionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
@@ -500,14 +500,14 @@ public class InfinispanExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public List<JobExecution> getJobExecutions(final JobInstance instance) throws Exception {
+    public List<JobExecution> getJobExecutions(final long jobInstanceId) throws Exception {
             final List<JobExecution> executions = new ArrayList<JobExecution>();
-        final List<Future<List<JobExecution>>> futures = jobExecutionExecutor.submitEverywhere(new JobExecutionsForJobInstanceCallable(instance.getInstanceId()));
+        final List<Future<List<JobExecution>>> futures = jobExecutionExecutor.submitEverywhere(new JobExecutionsForJobInstanceCallable(jobInstanceId));
         for (final Future<List<JobExecution>> future : futures) {
             executions.addAll(future.get());
         }
         if (executions.isEmpty()) {
-            throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
+            throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
         }
         return executions;
     }

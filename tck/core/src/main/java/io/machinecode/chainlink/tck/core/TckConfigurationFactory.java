@@ -11,10 +11,10 @@ import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
-import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 
 import java.util.List;
@@ -66,22 +66,22 @@ public class TckConfigurationFactory implements ConfigurationFactory {
         } catch (final ServiceConfigurationError e) {}
         List<ExecutionRepositoryFactory> executionRepositories = new ResolvableService<ExecutionRepositoryFactory>(ExecutionRepositoryFactory.class).resolve(tccl);
         List<ExecutorFactory> executors = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
-        List<TransportFactory> transports = new ResolvableService<TransportFactory>(TransportFactory.class).resolve(tccl);
+        List<RegistryFactory> registries = new ResolvableService<RegistryFactory>(RegistryFactory.class).resolve(tccl);
         List<WorkerFactory> workers = new ResolvableService<WorkerFactory>(WorkerFactory.class).resolve(tccl);
         return new Builder()
                 .setProperty(Constants.THREAD_POOL_SIZE, "8")
                 .setClassLoader(tccl)
-                .setTransactionManagerFactory(transactionManagers == null ? null : transactionManagers.get(0))
-                .setArtifactLoaderFactories(artifactLoaders == null ? null : artifactLoaders.toArray(new ArtifactLoaderFactory[artifactLoaders.size()]))
-                .setInjectorFactories(injectors == null ? null : injectors.toArray(new InjectorFactory[injectors.size()]))
-                .setSecurityCheckFactories(securityChecks == null ? null : securityChecks.toArray(new SecurityCheckFactory[securityChecks.size()]))
-                .setJobLoaderFactories(jobLoaders == null ? null : jobLoaders.toArray(new JobLoaderFactory[jobLoaders.size()]))
+                .setTransactionManagerFactory(transactionManagers == null || transactionManagers.isEmpty() ? null : transactionManagers.get(0))
+                .setArtifactLoaderFactories(artifactLoaders == null || artifactLoaders.isEmpty() ? null : artifactLoaders.toArray(new ArtifactLoaderFactory[artifactLoaders.size()]))
+                .setInjectorFactories(injectors == null || injectors.isEmpty() ? null : injectors.toArray(new InjectorFactory[injectors.size()]))
+                .setSecurityCheckFactories(securityChecks == null || securityChecks.isEmpty() ? null : securityChecks.toArray(new SecurityCheckFactory[securityChecks.size()]))
+                .setJobLoaderFactories(jobLoaders == null || jobLoaders.isEmpty() ? null : jobLoaders.toArray(new JobLoaderFactory[jobLoaders.size()]))
                 .setMBeanServerFactory(mBeanServer == null || mBeanServer.isEmpty() ? null : mBeanServer.get(0))
                 .setSerializerFactory(serializerFactory == null || serializerFactory.isEmpty() ? null : serializerFactory.get(0))
                 .setExecutionRepositoryFactory(executionRepositories.get(0))
                 .setExecutorFactory(executors.get(0))
                 .setWorkerFactory(workers.get(0))
-                .setTransportFactory(transports.get(0))
+                .setRegistryFactory(registries.get(0))
                 .build();
     }
 }

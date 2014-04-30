@@ -14,6 +14,7 @@
 
     <properties>
         <test.properties>../../test.properties</test.properties>
+        <tck.test.module.name>cdi</tck.test.module.name>
     </properties>
 
     <dependencies>
@@ -56,6 +57,41 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>create-persistence-xml-and-services</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>copy-test-artifact</id>
+                        <phase>process-test-classes</phase>
+                    </execution>
+                    <execution>
+                        <id>start-background-server</id>
+                        <phase>pre-integration-test</phase>
+                    </execution>
+                    <execution>
+                        <id>stop-background-server</id>
+                        <phase>post-integration-test</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>process-test-classes</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <skipExec>false</skipExec>
+                </configuration>
             </plugin>
         </plugins>
     </build>

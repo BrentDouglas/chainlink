@@ -1,7 +1,8 @@
 package io.machinecode.chainlink.transport.infinispan.configuration;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import org.infinispan.factories.ComponentRegistry;
+import org.infinispan.factories.GlobalComponentRegistry;
 import org.infinispan.lifecycle.AbstractModuleLifecycle;
 
 /**
@@ -10,9 +11,9 @@ import org.infinispan.lifecycle.AbstractModuleLifecycle;
  */
 public class ChainlinkModuleLifecycle extends AbstractModuleLifecycle {
     @Override
-    public void cacheStarted(final ComponentRegistry registry, final String cacheName) {
-        final ChainlinkModuleCommandInitializer initializer = registry.getComponent(ChainlinkModuleCommandInitializer.class);
-        final InfinispanTransport transport = registry.getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
-        initializer.setTransport(transport);
+    public void cacheStarted(final ComponentRegistry cr, final String cacheName) {
+        final ChainlinkModuleCommandInitializer initializer = cr.getComponent(ChainlinkModuleCommandInitializer.class);
+        final InfinispanRegistry registry = cr.getGlobalComponentRegistry().getComponent(InfinispanRegistry.class);
+        initializer.init(registry);
     }
 }

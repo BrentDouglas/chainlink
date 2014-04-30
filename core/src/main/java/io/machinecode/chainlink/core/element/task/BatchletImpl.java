@@ -7,7 +7,6 @@ import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.element.partition.PartitionImpl;
 import io.machinecode.chainlink.core.context.ItemImpl;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
-import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
@@ -16,9 +15,10 @@ import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.TaskWork;
+import io.machinecode.then.api.Deferred;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.BatchRuntimeException;
@@ -61,7 +61,6 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
                 if (deferred.isCancelled()) {
                     log.debugf(Messages.get("CHAINLINK-013100.batchlet.cancelled"), context, getRef());
                     stepContext.setBatchStatus(BatchStatus.STOPPING);
-                    //deferred.resolve(null);
                     if (partitionExecutionId != null) {
                         repository.finishPartitionExecution(
                                 partitionExecutionId,
@@ -169,7 +168,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     /*
-    private class Delegate extends LinkedDeferred<ExecutionContext> {
+    private class Delegate extends ChainImpl<ExecutionContext> {
         @Override
         protected String getResolveLogMessage() {
             return Messages.format("CHAINLINK-013200.batchlet.resolve", BatchletImpl.this._context, BatchletImpl.this.getRef());

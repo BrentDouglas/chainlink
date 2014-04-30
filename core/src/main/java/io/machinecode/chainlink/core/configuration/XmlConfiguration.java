@@ -26,8 +26,8 @@ public class XmlConfiguration implements ConfigurationFactory {
     @XmlElement(name = "executor-factory", namespace = NAMESPACE, required = true)
     private XmlClassRef executorFactory;
 
-    @XmlElement(name = "transport-factory", namespace = NAMESPACE, required = true)
-    private XmlClassRef transportFactory;
+    @XmlElement(name = "registry-factory", namespace = NAMESPACE, required = true)
+    private XmlClassRef registryFactory;
 
     @XmlElement(name = "worker-factory", namespace = NAMESPACE, required = true)
     private XmlClassRef workerFactory;
@@ -46,6 +46,9 @@ public class XmlConfiguration implements ConfigurationFactory {
 
     @XmlElement(name = "transaction-manager-factory", namespace = NAMESPACE, required = false)
     private XmlClassRef transactionManagerFactory;
+
+    @XmlElement(name = "when-factory", namespace = NAMESPACE, required = false)
+    private XmlClassRef whenFactory;
 
     @XmlElement(name = "job-loader-factory", namespace = NAMESPACE, required = false)
     private List<XmlClassRef> jobLoaderFactories = new ArrayList<XmlClassRef>(0);
@@ -79,12 +82,12 @@ public class XmlConfiguration implements ConfigurationFactory {
         this.executorFactory = executorFactory;
     }
 
-    public XmlClassRef getTransportFactory() {
-        return transportFactory;
+    public XmlClassRef getRegistryFactory() {
+        return registryFactory;
     }
 
-    public void setTransportFactory(final XmlClassRef transportFactory) {
-        this.transportFactory = transportFactory;
+    public void setRegistryFactory(final XmlClassRef registryFactory) {
+        this.registryFactory = registryFactory;
     }
 
     public XmlClassRef getWorkerFactory() {
@@ -133,6 +136,14 @@ public class XmlConfiguration implements ConfigurationFactory {
 
     public void setTransactionManagerFactory(final XmlClassRef transactionManagerFactory) {
         this.transactionManagerFactory = transactionManagerFactory;
+    }
+
+    public XmlClassRef getWhenFactory() {
+        return whenFactory;
+    }
+
+    public void setWhenFactory(final XmlClassRef whenFactory) {
+        this.whenFactory = whenFactory;
     }
 
     public List<XmlClassRef> getJobLoaderFactories() {

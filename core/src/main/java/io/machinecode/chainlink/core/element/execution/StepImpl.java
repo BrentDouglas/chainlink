@@ -13,21 +13,23 @@ import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.work.TaskExecutable;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.registry.JobRegistry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.work.PartitionTarget;
 import io.machinecode.chainlink.spi.work.StrategyWork;
 import io.machinecode.chainlink.spi.work.TaskWork;
 import io.machinecode.chainlink.spi.work.TransitionWork;
+import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.listener.StepListener;
@@ -67,13 +69,10 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     private final T task;
     private final PartitionImpl<U> partition;
 
-    private transient Integer _timeout;
+    private Integer _timeout;
+    private int _partitions;
+
     private transient List<ListenerImpl> _listeners;
-    private transient int _partitions;
-    private transient int _completed;
-    private transient PartitionStatus _partitionStatus;
-    private transient TransactionManager _transactionManager;
-    private transient Transaction _transaction;
 
     public StepImpl(
             final String id,
@@ -170,13 +169,13 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     }
 
     @Override
-    public Deferred<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                               final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010100.step.before"), context, this.id);
         final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
         final MutableJobContext jobContext = context.getJobContext();
-        final JobExecution jobExecution = repository.getJobExecution(jobContext.getExecutionId());
+        final ExtendedJobExecution jobExecution = repository.getJobExecution(jobContext.getExecutionId());
         StepExecution stepExecution;
         Serializable persistentData = null;
         Long restartStepExecutionId = null;
@@ -254,7 +253,6 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
 
         if (!isPartitioned()) {
             this._partitions = 1;
-            this._completed = 0;
             final ExecutionContext clonedContext = new ExecutionContextImpl(
                     context.getJob(),
                     context.getJobContext(),
@@ -269,17 +267,16 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             );
         } else {
             final PartitionTarget target = this.partition.map(configuration, executionRepositoryId, this.task, callbackId, context, timeout, restartStepExecutionId);
-            this._partitions = target.executables.length;
-            this._completed = 0;
+            this._partitions = target.getExecutables().length;
             return configuration.getExecutor().distribute(
-                    target.threads,
-                    target.executables
+                    target.getThreads(),
+                    target.getExecutables()
             );
         }
     }
 
     @Override
-    public Deferred<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                              final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                              final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010101.step.after"), context, childContext);
@@ -287,22 +284,26 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         final long stepExecutionId = context.getStepExecutionId();
         final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
         final MutableStepContext stepContext = context.getStepContext();
-        ++this._completed;
+        final JobRegistry.StepAccumulator accumulator = configuration.getRegistry()
+                .getJobRegistry(context.getJobExecutionId())
+                .getStepAccumulator(id);
+        final long completed = accumulator.incrementAndGetCallbackCount();
         try {
+            final TransactionManager transactionManager = configuration.getTransactionManager();
             if (this.isPartitioned()) {
-                if (this._completed == 1) {
-                    this._transactionManager = configuration.getTransactionManager();
-                    this._partitionStatus = COMMIT;
+                if (completed == 1) {
+                    accumulator.setPartitionStatus(COMMIT);
                     int timeout = _timeout(context);
                     log.debugf(Messages.get("CHAINLINK-010208.step.set.transaction.timeout"), childContext, timeout);
-                    this._transactionManager.setTransactionTimeout(timeout);
+                    transactionManager.setTransactionTimeout(timeout);
                     log.debugf(Messages.get("CHAINLINK-010210.step.begin.transaction"), childContext);
-                    this._transactionManager.begin();
-                } else if (this._partitionStatus == ROLLBACK) {
+                    transactionManager.begin();
+                } else if (accumulator.getPartitionStatus() == ROLLBACK) {
                     return null;
                 } else {
-                    log.debugf(Messages.get("CHAINLINK-010212.step.resume.transaction"), childContext, this._transaction);
-                    this._transactionManager.resume(this._transaction);
+                    final Transaction transaction = accumulator.getTransaction();
+                    log.debugf(Messages.get("CHAINLINK-010212.step.resume.transaction"), childContext, transaction);
+                    transactionManager.resume(transaction);
                 }
                 try {
                     switch (childContext.getStepContext().getBatchStatus()) {
@@ -314,23 +315,26 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                             }
                     }
                     final PartitionStatus partitionStatus = this.partition.analyse(configuration, context, childContext.getItems());
-                    this._partitionStatus = this._partitionStatus == ROLLBACK
-                            ? ROLLBACK
-                            : partitionStatus;
+                    accumulator.setPartitionStatus(
+                            accumulator.getPartitionStatus() == ROLLBACK
+                                    ? ROLLBACK
+                                    : partitionStatus
+                    );
                 } catch (final Exception e) {
                     log.infof(e, Messages.get("CHAINLINK-010209.step.analyse.exception"), childContext);
-                    this._partitionStatus = ROLLBACK;
+                    accumulator.setPartitionStatus(ROLLBACK);
                 }
-                if (this._completed < this._partitions) {
-                    this._transaction = this._transactionManager.suspend();
-                    log.debugf(Messages.get("CHAINLINK-010211.step.suspend.transaction"), childContext, this._transaction);
+                if (completed < this._partitions) {
+                    final Transaction transaction = transactionManager.suspend();
+                    accumulator.setTransaction(transaction);
+                    log.debugf(Messages.get("CHAINLINK-010211.step.suspend.transaction"), childContext, transaction);
                     return null;
                 }
-                this.partition.reduce(configuration, stepContext.getBatchStatus() == FAILED ? ROLLBACK : this._partitionStatus, context);
+                this.partition.reduce(configuration, stepContext.getBatchStatus() == FAILED ? ROLLBACK : accumulator.getPartitionStatus(), context);
             }
         } catch (final Throwable e) {
             log.debugf(e, Messages.get("CHAINLINK-010205.step.after.caught.exception"), context);
-            this._partitionStatus = ROLLBACK;
+            accumulator.setPartitionStatus(ROLLBACK);
             context.getJobContext().setBatchStatus(FAILED);
         }
         try {

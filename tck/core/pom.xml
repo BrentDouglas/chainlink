@@ -12,6 +12,10 @@
     <artifactId>chainlink-tck-core</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
+    <properties>
+        <test.properties>../../test.properties</test.properties>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -186,19 +190,39 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipExec>true</skipExec>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>create-persistence-xml-and-services</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>copy-test-artifact</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>start-background-server</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>stop-background-server</id>
                         <phase>none</phase>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <skipExec>true</skipExec>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

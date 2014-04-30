@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.loader;
 import gnu.trove.set.hash.TLinkedHashSet;
 import io.machinecode.chainlink.jsl.xml.loader.JarXmlJobLoader;
 import io.machinecode.chainlink.jsl.xml.loader.WarXmlJobLoader;
-import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.util.Messages;
@@ -43,10 +42,10 @@ public class JobLoaderImpl implements JobLoader {
         }
         // 2. Archive Loaders
         try {
-            return warLoader.load(jslName);
+            return jarLoader.load(jslName);
         } catch (final NoSuchJobException e) {
-            log.tracef(Messages.get("CHAINLINK-003100.job.loader.not.found"), jslName, warLoader.getClass().getSimpleName());
+            log.tracef(Messages.get("CHAINLINK-003100.job.loader.not.found"), jslName, jarLoader.getClass().getSimpleName());
         }
-        return jarLoader.load(jslName);
+        return warLoader.load(jslName);
     }
 }

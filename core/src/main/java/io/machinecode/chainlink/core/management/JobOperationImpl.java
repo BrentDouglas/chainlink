@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.management.JobOperation;
-import io.machinecode.chainlink.spi.deferred.Deferred;
+import io.machinecode.then.api.Deferred;
 
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobExecutionException;

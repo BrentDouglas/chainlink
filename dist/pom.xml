@@ -25,6 +25,14 @@
         </dependency>
         <!-- Core -->
         <dependency>
+            <groupId>io.machinecode.then</groupId>
+            <artifactId>then-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.then</groupId>
+            <artifactId>then-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
@@ -35,15 +43,6 @@
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
-        </dependency>
-        <!-- Cli -->
-        <dependency>
-            <groupId>io.machinecode.cli</groupId>
-            <artifactId>cli-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.cli</groupId>
-            <artifactId>cli-core</artifactId>
         </dependency>
         <!-- Repo -->
         <dependency>
@@ -79,6 +78,11 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
         </dependency>
+        <!-- Inject: CDI -->
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se</artifactId>
+        </dependency>
         <!-- Inject: Guice -->
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -89,6 +93,10 @@
             <groupId>org.jboss.seam</groupId>
             <artifactId>jboss-seam</artifactId>
             <type>ejb</type>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
         <!-- Inject: Spring -->
         <dependency>

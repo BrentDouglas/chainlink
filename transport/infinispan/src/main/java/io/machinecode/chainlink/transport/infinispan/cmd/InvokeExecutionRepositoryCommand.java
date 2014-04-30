@@ -1,13 +1,16 @@
 package io.machinecode.chainlink.transport.infinispan.cmd;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.transport.infinispan.configuration.ChainlinkCommand;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import org.infinispan.commands.remote.BaseRpcCommand;
 import org.infinispan.context.InvocationContext;
-import org.infinispan.remoting.transport.Address;
+import org.jboss.logging.Logger;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -15,36 +18,39 @@ import java.lang.reflect.Method;
  */
 public class InvokeExecutionRepositoryCommand extends BaseRpcCommand implements ChainlinkCommand {
 
-    public static final byte COMMAND_ID = 63;
+    private static final Logger log = Logger.getLogger(InvokeExecutionRepositoryCommand.class);
 
-    Address remote;
+    public static final byte COMMAND_ID_63 = 63;
+
     ExecutionRepositoryId executionRepositoryId;
     String methodName;
-    Object[] parameters;
+    Boolean willReturn;
+    Serializable[] parameters;
 
-    transient InfinispanTransport transport;
+    transient Registry registry;
 
     public InvokeExecutionRepositoryCommand(final String cacheName) {
         super(cacheName);
     }
 
-    public InvokeExecutionRepositoryCommand(final String cacheName, final Address remote, final ExecutionRepositoryId executionRepositoryId,
-                                            final String methodName, final Object... parameters) {
+    public InvokeExecutionRepositoryCommand(final String cacheName, final ExecutionRepositoryId executionRepositoryId,
+                                            final String methodName, final Boolean willReturn, final Serializable... parameters) {
         super(cacheName);
-        this.remote = remote;
         this.executionRepositoryId = executionRepositoryId;
         this.methodName = methodName;
+        this.willReturn = willReturn;
         this.parameters = parameters;
     }
 
     @Override
-    public void setTransport(final InfinispanTransport transport) {
-        this.transport = transport;
+    public void init(final InfinispanRegistry registry) {
+        this.registry = registry;
     }
 
     @Override
     public Object perform(final InvocationContext context) throws Throwable {
-        final ExecutionRepository repository = transport.getLocalRepository(executionRepositoryId);
+        //TODO Ensure local
+        final ExecutionRepository repository = registry.getExecutionRepository(executionRepositoryId);
         Method method = null;
         for (final Method that : ExecutionRepository.class.getDeclaredMethods()) {
             if (that.getName().equals(methodName) && that.getParameterTypes().length == parameters.length) {
@@ -55,30 +61,42 @@ public class InvokeExecutionRepositoryCommand extends BaseRpcCommand implements 
         if (method == null) {
             throw new IllegalStateException(); //TODO Message
         }
-        return method.invoke(repository, parameters);
+        final Object[] params = new Object[parameters.length];
+        System.arraycopy(parameters, 0, params, 0, parameters.length);
+        try {
+            return method.invoke(repository, params);
+        } catch (final IllegalArgumentException e) {
+            final Throwable cause = e.getCause() == null ? e : e.getCause();
+            log.errorf(cause, ""); //TODO Message
+            throw cause;
+        } catch (final InvocationTargetException e) {
+            final Throwable cause = e.getCause();
+            log.errorf(cause, ""); //TODO Message
+            throw cause;
+        }
     }
 
     @Override
     public byte getCommandId() {
-        return COMMAND_ID;
+        return COMMAND_ID_63;
     }
 
     @Override
     public Object[] getParameters() {
-        return new Object[]{ remote, executionRepositoryId, methodName, parameters };
+        return new Object[]{ executionRepositoryId, methodName, willReturn, parameters };
     }
 
     @Override
     public void setParameters(final int commandId, final Object[] parameters) {
         if (commandId != getCommandId()) throw new IllegalStateException(); //TODO Message
-        this.remote = (Address)parameters[0];
-        this.executionRepositoryId = (ExecutionRepositoryId)parameters[1];
-        this.methodName = (String)parameters[2];
-        this.parameters = (Object[])parameters[3];
+        this.executionRepositoryId = (ExecutionRepositoryId)parameters[0];
+        this.methodName = (String)parameters[1];
+        this.willReturn = (Boolean)parameters[2];
+        this.parameters = (Serializable[])parameters[3];
     }
 
     @Override
     public boolean isReturnValueExpected() {
-        return false;
+        return willReturn;
     }
 }

@@ -1,15 +1,14 @@
 package io.machinecode.chainlink.core.work;
 
-import io.machinecode.chainlink.core.deferred.LinkedDeferred;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
-import io.machinecode.chainlink.spi.deferred.Deferred;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.Work;
+import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
@@ -59,13 +58,14 @@ public abstract class ExecutableImpl<T extends Work> implements Executable, Seri
     }
 
     @Override
-    public void execute(final RuntimeConfiguration configuration, final Deferred<?> deferred, final WorkerId workerId, final ExecutionContext childContext) {
+    public void execute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
+                        final ExecutionContext childContext) {
         try {
-            log().tracef(Messages.get("CHAINLINK-015703.executable.execute"), this.context, this);
-            doExecute(configuration, deferred, workerId, this.parentId, childContext);
+            log().tracef(Messages.get("CHAINLINK-015700.executable.execute"), this.context, this);
+            doExecute(configuration, chain, workerId, this.parentId, childContext);
         } catch (final Throwable e) {
-            log().errorf(e, Messages.get("CHAINLINK-015704.executable.exception"), this.context, this);
-            deferred.reject(e);
+            log().errorf(e, Messages.get("CHAINLINK-015701.executable.exception"), this.context, this);
+            chain.reject(e);
         }
     }
 
@@ -74,35 +74,7 @@ public abstract class ExecutableImpl<T extends Work> implements Executable, Seri
         return getClass().getSimpleName() + "[workerId=" + workerId + ",work=" + work + "]";
     }
 
-    public class Delegate extends LinkedDeferred<Deferred<?>> {
-
-        @Override
-        protected String getResolveLogMessage() {
-            return Messages.format("CHAINLINK-015100.executable.resolve", ExecutableImpl.this.context, this);
-        }
-
-        @Override
-        protected String getRejectLogMessage() {
-            return Messages.format("CHAINLINK-015101.executable.reject", ExecutableImpl.this.context, this);
-        }
-
-        @Override
-        protected String getCancelLogMessage() {
-            return Messages.format("CHAINLINK-015102.executable.cancel", ExecutableImpl.this.context, this);
-        }
-
-        @Override
-        protected String getTimeoutExceptionMessage() {
-            return Messages.format("CHAINLINK-015000.executable.timeout", ExecutableImpl.this.context, this);
-        }
-
-        @Override
-        protected Logger log() {
-            return ExecutableImpl.this.log();
-        }
-    }
-
-    protected abstract void doExecute(final RuntimeConfiguration configuration, final Deferred<?> deferred, final WorkerId workerId,
+    protected abstract void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
                                       final ExecutableId parentId, final ExecutionContext context) throws Throwable;
 
     protected abstract Logger log();

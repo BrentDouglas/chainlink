@@ -18,7 +18,7 @@ public class SpringArtifactLoader implements ArtifactLoader, ApplicationContextA
     private ApplicationContext context;
 
     @Override
-    public <T> T load(final String id, final Class<T> as, final ClassLoader _) {
+    public <T> T load(final String id, final Class<T> as, final ClassLoader _loader) {
         try {
             final Object that = context.getBean(id);
             if (as.isAssignableFrom(that.getClass())) {

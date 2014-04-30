@@ -3,7 +3,6 @@ package io.machinecode.chainlink.spi.work;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Strategy;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
 
 import javax.batch.api.partition.PartitionPlan;
 import java.io.Serializable;

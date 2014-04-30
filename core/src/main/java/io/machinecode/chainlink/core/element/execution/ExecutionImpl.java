@@ -5,15 +5,14 @@ import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
-import io.machinecode.chainlink.spi.deferred.Deferred;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.ExecutionWork;
 import io.machinecode.chainlink.spi.work.TransitionWork;
+import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
@@ -63,7 +62,7 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.elem
         return null;
     }
 
-    public Deferred<?> next(final RuntimeConfiguration configuration, final WorkerId workerId, final ExecutionContext context,
+    public Chain<?> next(final RuntimeConfiguration configuration, final WorkerId workerId, final ExecutionContext context,
                             final ExecutableId parentId, final ExecutionRepositoryId executionRepositoryId, final String next, final TransitionWork transition) throws Exception {
         final MutableJobContext jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
@@ -81,12 +80,12 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.elem
         }
     }
 
-    protected Deferred<?> runCallback(final RuntimeConfiguration configuration, final ExecutionContext context, final ExecutableId parentId) {
-        final Executable callback = configuration.getTransport().getExecutable(context.getJobExecutionId(), parentId);
+    protected Chain<?> runCallback(final RuntimeConfiguration configuration, final ExecutionContext context, final ExecutableId parentId) {
+        final Executable callback = configuration.getRegistry().getJobRegistry(context.getJobExecutionId()).getExecutable(parentId);
         return configuration.getExecutor().callback(callback, context);
     }
 
-    private Deferred<?> _runNextExecution(final RuntimeConfiguration configuration, final ExecutableId parentId, final ExecutionContext context,
+    private Chain<?> _runNextExecution(final RuntimeConfiguration configuration, final ExecutableId parentId, final ExecutionContext context,
                                           final WorkerId workerId, final ExecutionRepositoryId executionRepositoryId, final String next) throws Exception {
         final ExecutionWork execution = context.getJob().getNextExecution(next);
         if (execution == null) {

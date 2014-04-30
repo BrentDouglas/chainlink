@@ -150,6 +150,12 @@ public class StepContextImpl implements MutableStepContext, Serializable {
 
     @Override
     public MutableMetric getMetric(final MetricType type) {
+        if (this.metricMap == null) {
+            this.metricMap = new THashMap<MetricType, MutableMetric>();
+            for (final MutableMetric metric : this.metrics) {
+                this.metricMap.put(metric.getType(), metric);
+            }
+        }
         return this.metricMap.get(type);
     }
 }

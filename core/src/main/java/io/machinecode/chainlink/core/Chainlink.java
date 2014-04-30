@@ -6,7 +6,6 @@ import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
-import io.machinecode.chainlink.spi.inject.DependencyInjectionExtension;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.util.Messages;
 
@@ -35,13 +34,6 @@ public final class Chainlink {
             } catch (final Exception e) {
                 throw new IllegalStateException(Messages.get("CHAINLINK-031003.environment.exception"), e);
             }
-        }
-        try {
-            for (final DependencyInjectionExtension extension : new ResolvableService<DependencyInjectionExtension>(DependencyInjectionExtension.class).resolve(tccl)) {
-                extension.register(environment);
-            }
-        } catch (final Exception e) {
-            throw new IllegalStateException(Messages.get("CHAINLINK-031003.environment.exception"), e);
         }
         return environment;
     }

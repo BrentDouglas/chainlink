@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.inject;
 import gnu.trove.set.hash.TLinkedHashSet;
 import io.machinecode.chainlink.inject.core.JarBatchArtifactLoader;
 import io.machinecode.chainlink.inject.core.WarBatchArtifactLoader;
-import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 

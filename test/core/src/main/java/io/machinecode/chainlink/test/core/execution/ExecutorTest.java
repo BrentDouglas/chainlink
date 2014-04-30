@@ -70,7 +70,7 @@ public abstract class ExecutorTest extends BaseTest {
         final JobExecution execution = repository().getJobExecution(operation.getJobExecutionId());
         Thread.sleep(100);
         operator.stop(operation.getJobExecutionId());
-        //Assert.assertTrue("Operation hasn't been cancelled", operation.isDone()); //Some wierdness in AllDeferred's done/Cancelled
+        //Assert.assertTrue("Operation hasn't been cancelled", operation.isDone()); //Some wierdness in AllChain's done/Cancelled
         try {
             operation.get();
         } catch (final CancellationException e) {

@@ -2,10 +2,9 @@ package io.machinecode.chainlink.transport.infinispan.configuration;
 
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.transport.infinispan.cmd.CleanupCommand;
-import io.machinecode.chainlink.transport.infinispan.cmd.CompletionCommand;
-import io.machinecode.chainlink.transport.infinispan.cmd.CreateDeferredCommand;
+import io.machinecode.chainlink.transport.infinispan.cmd.CreateChainCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.ExecuteCommand;
-import io.machinecode.chainlink.transport.infinispan.cmd.InvokeDeferredCommand;
+import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeExecutionRepositoryCommand;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.commands.module.ExtendedModuleCommandFactory;
@@ -21,23 +20,20 @@ public class ChainlinkModuleCommandFactory implements ExtendedModuleCommandFacto
     public CacheRpcCommand fromStream(final byte commandId, final Object[] args, final String cacheName) {
         final CacheRpcCommand command;
         switch (commandId) {
-            case ExecuteCommand.COMMAND_ID:
+            case ExecuteCommand.COMMAND_ID_61:
                 command = new ExecuteCommand(cacheName);
                 break;
-            case CleanupCommand.COMMAND_ID:
+            case CleanupCommand.COMMAND_ID_62:
                 command = new CleanupCommand(cacheName);
                 break;
-            case CompletionCommand.COMMAND_ID:
-                command = new CompletionCommand(cacheName);
-                break;
-            case InvokeDeferredCommand.COMMAND_ID:
-                command = new InvokeDeferredCommand(cacheName);
-                break;
-            case InvokeExecutionRepositoryCommand.COMMAND_ID:
+            case InvokeExecutionRepositoryCommand.COMMAND_ID_63:
                 command = new InvokeExecutionRepositoryCommand(cacheName);
                 break;
-            case CreateDeferredCommand.COMMAND_ID:
-                command = new CreateDeferredCommand(cacheName);
+            case InvokeChainCommand.COMMAND_ID_64:
+                command = new InvokeChainCommand(cacheName);
+                break;
+            case CreateChainCommand.COMMAND_ID_65:
+                command = new CreateChainCommand(cacheName);
                 break;
             default:
                 throw new IllegalStateException(); //TODO Maybe
@@ -49,12 +45,11 @@ public class ChainlinkModuleCommandFactory implements ExtendedModuleCommandFacto
     @Override
     public Map<Byte, Class<? extends ReplicableCommand>> getModuleCommands() {
         final THashMap<Byte, Class<? extends ReplicableCommand>> map = new THashMap<Byte, Class<? extends ReplicableCommand>>();
-        map.put(ExecuteCommand.COMMAND_ID, ExecuteCommand.class);
-        map.put(CleanupCommand.COMMAND_ID, CleanupCommand.class);
-        map.put(CompletionCommand.COMMAND_ID, CompletionCommand.class);
-        map.put(InvokeDeferredCommand.COMMAND_ID, InvokeDeferredCommand.class);
-        map.put(InvokeExecutionRepositoryCommand.COMMAND_ID, InvokeExecutionRepositoryCommand.class);
-        map.put(CreateDeferredCommand.COMMAND_ID, CreateDeferredCommand.class);
+        map.put(ExecuteCommand.COMMAND_ID_61, ExecuteCommand.class);
+        map.put(CleanupCommand.COMMAND_ID_62, CleanupCommand.class);
+        map.put(InvokeExecutionRepositoryCommand.COMMAND_ID_63, InvokeExecutionRepositoryCommand.class);
+        map.put(InvokeChainCommand.COMMAND_ID_64, InvokeChainCommand.class);
+        map.put(CreateChainCommand.COMMAND_ID_65, CreateChainCommand.class);
         return map;
     }
 

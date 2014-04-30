@@ -20,7 +20,7 @@ public class BatchletFactory implements TaskFactory<Batchlet, BatchletImpl, List
     public static final BatchletFactory INSTANCE = new BatchletFactory();
 
     @Override
-    public BatchletImpl produceExecution(final Batchlet that, final ListenersImpl _, PartitionImpl<?> partition, final JobPropertyContext context) {
+    public BatchletImpl produceExecution(final Batchlet that, final ListenersImpl _listeners, PartitionImpl<?> partition, final JobPropertyContext context) {
         final String ref = Expression.resolveExecutionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
         return new BatchletImpl(
@@ -31,7 +31,7 @@ public class BatchletFactory implements TaskFactory<Batchlet, BatchletImpl, List
     }
 
     @Override
-    public BatchletImpl producePartitioned(final BatchletImpl that, final ListenersImpl _, PartitionImpl<?> partition, final PropertyContext context) {
+    public BatchletImpl producePartitioned(final BatchletImpl that, final ListenersImpl _listeners, PartitionImpl<?> partition, final PropertyContext context) {
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);
         return new BatchletImpl(

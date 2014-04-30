@@ -36,7 +36,7 @@ public class CdiArtifactLoader implements ArtifactLoader, Extension {
     }
 
     @Override
-    public <T> T load(final String id, final Class<T> as, final ClassLoader _) {
+    public <T> T load(final String id, final Class<T> as, final ClassLoader _loader) {
         return _inject(beanManager, as, id, new NamedLiteral(id));
     }
 

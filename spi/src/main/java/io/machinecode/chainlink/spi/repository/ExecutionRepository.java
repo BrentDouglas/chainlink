@@ -41,7 +41,7 @@ public interface ExecutionRepository {
      * @throws JobSecurityException TODO
      * @throws Exception When an error occurs.
      */
-    ExtendedJobInstance createJobInstance(final Job job, final String jslName, final Date timestamp) throws Exception;
+    ExtendedJobInstance createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception;
 
     /**
      * This method must generate a {@code long} to be used as an identifier of the {@link ExtendedJobExecution} returned
@@ -98,7 +98,7 @@ public interface ExecutionRepository {
      * @throws JobSecurityException TODO
      * @throws Exception When an error occurs.
      */
-    ExtendedStepExecution createStepExecution(final JobExecution jobExecution, final String stepName, final Date timestamp) throws Exception;
+    ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception;
 
     /**
      * This method must generate a {@code long} to be used as an identifier of the {@link PartitionExecution} returned
@@ -498,13 +498,13 @@ public interface ExecutionRepository {
 
     /**
      *
-     * @param instance
+     * @param jobInstanceId
      * @return
      * @throws NoSuchJobInstanceException
      * @throws JobSecurityException TODO
      * @throws Exception
      */
-    List<? extends JobExecution> getJobExecutions(final JobInstance instance) throws Exception;
+    List<? extends JobExecution> getJobExecutions(final long jobInstanceId) throws Exception;
 
     /**
      *

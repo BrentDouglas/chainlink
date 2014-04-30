@@ -8,18 +8,17 @@ import io.machinecode.chainlink.core.validation.InvalidJobException;
 import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.core.validation.JobTraversal;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.deferred.Deferred;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.ExecutionWork;
 import io.machinecode.chainlink.spi.work.JobWork;
+import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.listener.JobListener;
@@ -100,7 +99,7 @@ public class JobImpl implements Job, JobWork, Serializable {
     }
 
     @Override
-    public Deferred<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
         final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
         long jobExecutionId = context.getJobExecutionId();
@@ -126,7 +125,7 @@ public class JobImpl implements Job, JobWork, Serializable {
         final BatchStatus batchStatus = context.getJobContext().getBatchStatus();
         if (Statuses.isStopping(batchStatus)) {
             log.debugf(Messages.get("CHAINLINK-018002.job.status.early.termination"), context, batchStatus);
-            final Executable callback = configuration.getTransport().getExecutable(jobExecutionId, callbackId);
+            final Executable callback = configuration.getRegistry().getJobRegistry(jobExecutionId).getExecutable(callbackId);
             return configuration.getExecutor().callback(callback, context);
         }
 
@@ -140,7 +139,7 @@ public class JobImpl implements Job, JobWork, Serializable {
             return _runNext(configuration, callbackId, context, executionRepositoryId, this.executions.get(0));
         }
         log.debugf(Messages.get("CHAINLINK-018004.job.restart.transition"), context, restartId);
-        return _runNext(configuration, callbackId, context, executionRepositoryId, context.getJob().getNextExecution(restartId));
+        return _runNext(configuration, callbackId, context, executionRepositoryId, traversal.next(restartId));
     }
 
     @Override
@@ -169,7 +168,7 @@ public class JobImpl implements Job, JobWork, Serializable {
         return traversal.next(next);
     }
 
-    private static Deferred<?> _runNext(final RuntimeConfiguration configuration, final ExecutableId callbackId,
+    private static Chain<?> _runNext(final RuntimeConfiguration configuration, final ExecutableId callbackId,
                                         final ExecutionContext context, final ExecutionRepositoryId executionRepositoryId,
                                         final ExecutionWork next) throws Exception {
         return configuration.getExecutor().execute(new ExecutionExecutable(

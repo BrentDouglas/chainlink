@@ -6,14 +6,13 @@ import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.transport.ExecutableId;
-import io.machinecode.chainlink.spi.transport.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.transport.WorkerId;
-import io.machinecode.chainlink.spi.deferred.Deferred;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.JobRegistry;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.element.execution.Split;
-import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import java.util.List;
@@ -27,8 +26,6 @@ public class SplitImpl extends ExecutionImpl implements Split {
 
     private final String next;
     private final List<FlowImpl> flows;
-
-    private transient int _completed;
 
     public SplitImpl(final String id, final String next, final List<FlowImpl> flows) {
         super(id);
@@ -49,7 +46,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
     // Lifecycle
 
     @Override
-    public Deferred<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                               final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021000.split.before"), context, this.id);
@@ -76,7 +73,6 @@ public class SplitImpl extends ExecutionImpl implements Split {
                     null
             );
         }
-        this._completed = 0;
         return configuration.getExecutor().distribute(
                 flows.length,
                 flows
@@ -84,15 +80,18 @@ public class SplitImpl extends ExecutionImpl implements Split {
     }
 
     @Override
-    public Deferred<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                              final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                              final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021001.split.after"), context, this.id);
         final Long stepExecutionId = childContext.getLastStepExecutionId();
+        final JobRegistry.Accumulator accumulator = configuration.getRegistry()
+                .getJobRegistry(context.getJobExecutionId())
+                .getSplitAccumulator(id);
         if (stepExecutionId != null) {
             context.addPriorStepExecutionId(stepExecutionId);
         }
-        if (++this._completed < this.flows.size()) {
+        if (accumulator.incrementAndGetCallbackCount() < this.flows.size()) {
             return null;
         }
         if (Statuses.isStopping(context) || Statuses.isComplete(context)) {

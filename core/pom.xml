@@ -37,6 +37,10 @@
             <artifactId>chainlink-repository-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.machinecode.then</groupId>
+            <artifactId>then-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>

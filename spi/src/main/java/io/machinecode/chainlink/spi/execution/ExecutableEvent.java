@@ -1,8 +1,7 @@
 package io.machinecode.chainlink.spi.execution;
 
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.deferred.Deferred;
-import io.machinecode.chainlink.spi.transport.DeferredId;
+import io.machinecode.chainlink.spi.registry.ChainId;
 
 import java.io.Serializable;
 
@@ -11,7 +10,7 @@ import java.io.Serializable;
  */
 public interface ExecutableEvent extends Serializable {
 
-    DeferredId getDeferredId();
+    ChainId getChainId();
 
     Executable getExecutable();
 

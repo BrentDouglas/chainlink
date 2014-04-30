@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.transport.infinispan.callable;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
-import io.machinecode.chainlink.spi.transport.WorkerId;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
+import io.machinecode.chainlink.spi.registry.WorkerId;
 import org.infinispan.remoting.transport.Address;
 
 /**
@@ -17,7 +17,7 @@ public class FindWorkerCallable extends BaseCallable<Object, Object, Address> {
 
     @Override
     public Address call() throws Exception {
-        final InfinispanTransport executor = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
-        return executor.hasWorker(id) ? executor.getLocal() : null;
+        final InfinispanRegistry registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanRegistry.class);
+        return registry.hasWorker(id) ? registry.getLocal() : null;
     }
 }
