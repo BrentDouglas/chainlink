@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.test.core.execution;
 
+import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.repository.core.JdkSerializerFactory;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
@@ -8,6 +9,7 @@ import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -31,6 +33,7 @@ public abstract class BaseTest extends Assert {
     private ConfigurationImpl _configuration;
     private TransactionManager _transactionManager;
     private SerializerFactory _serializerFactory;
+    private RegistryFactory _registryFactory;
 
     protected final ConfigurationImpl configuration() throws Exception {
         if (this._configuration == null) {
@@ -67,6 +70,13 @@ public abstract class BaseTest extends Assert {
         return _serializerFactory;
     }
 
+    protected final RegistryFactory registryFactory() {
+        if (this._registryFactory == null) {
+            this._registryFactory = _registryFactory();
+        }
+        return _registryFactory;
+    }
+
     // Override these for different configurations
 
     protected Builder _configuration() throws Exception {
@@ -78,6 +88,7 @@ public abstract class BaseTest extends Assert {
                 .setExecutorFactory(executor())
                 .setWorkerFactory(_workerFactory())
                 .setSerializerFactory(serializerFactory())
+                .setRegistryFactory(registryFactory())
                 .setProperty(Constants.THREAD_POOL_SIZE, "8");
     }
 
@@ -97,6 +108,10 @@ public abstract class BaseTest extends Assert {
 
     protected WorkerFactory _workerFactory() {
         return new EventedWorkerFactory();
+    }
+
+    protected RegistryFactory _registryFactory() {
+        return new LocalRegistryFactory();
     }
 
     protected void printMethodName() {
