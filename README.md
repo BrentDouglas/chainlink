@@ -51,7 +51,7 @@ Run `mvn clean install`
 
 ## Run the tests
 
-Copy `test.template.properties` to `test.properties`. 
+Copy [test.template.properties](test.template.properties) to `test.properties`. 
 
 You will have to have both postgresql and redis installed and running
 and redis installed and running. These are both configured in
@@ -66,9 +66,9 @@ of the TCK with:
 
 ` git clone git://java.net/jbatch~jsr-352-git-repository <target>`
 
-Make sure you have copied `test.template.properties` to `test.properties`
-and set `tck.source` to the directory you checked the sources out at
-(`<target>` in the above command).
+Make sure you have copied [test.template.properties](test.template.properties)
+to `test.properties` and set `tck.source` to the directory you checked
+the sources out at (`<target>` in the above command).
 
 To run the tck you must select an injector via a maven profile (there is
 no default) and you may select a repository (an in memory repository
