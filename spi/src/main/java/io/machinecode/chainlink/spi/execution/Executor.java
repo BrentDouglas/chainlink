@@ -2,7 +2,7 @@ package io.machinecode.chainlink.spi.execution;
 
 import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
 import io.machinecode.chainlink.spi.then.Chain;
 
 import java.util.concurrent.Future;
@@ -20,5 +20,5 @@ public interface Executor extends Lifecycle {
 
     Chain<?> callback(final Executable executable, final ExecutionContext context);
 
-    Future<?> cancel(final Deferred<?> deferred);
+    Future<?> cancel(final Promise<?> promise);
 }

@@ -5,15 +5,15 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class DeferredCommand extends BaseChainlinkCommand {
+public abstract class PromiseCommand extends BaseChainlinkCommand {
 
     ChainId chainId;
 
-    protected DeferredCommand(final String cacheName) {
+    protected PromiseCommand(final String cacheName) {
         super(cacheName);
     }
 
-    protected DeferredCommand(final String cacheName, final long jobExecutionId, final ChainId chainId) {
+    protected PromiseCommand(final String cacheName, final long jobExecutionId, final ChainId chainId) {
         super(cacheName, jobExecutionId);
         this.chainId = chainId;
     }

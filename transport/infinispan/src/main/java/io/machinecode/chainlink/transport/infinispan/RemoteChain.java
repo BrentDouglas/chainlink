@@ -49,18 +49,6 @@ public class RemoteChain extends ChainImpl<Void> {
     }
 
     @Override
-    public void cancel() {
-        try {
-            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
-            registry.invoke(address, command("cancel", false), promise);
-            super.cancel();
-            promise.get();
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public ChainImpl<Void> link(final Chain<?> that) {
         return super.link(new ResolvedChain<Void>(null));
     }

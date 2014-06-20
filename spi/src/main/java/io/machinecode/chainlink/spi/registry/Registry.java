@@ -50,7 +50,7 @@ public interface Registry extends Lifecycle {
     void onRegisterJob(final On<Long> on);
 
     /**
-     * Should only be executed if the main job Deferred is registered in this repository
+     * Should only be executed if the main job Promise is registered in this repository
      * @param on
      */
     void onUnregisterJob(final On<Long> on);

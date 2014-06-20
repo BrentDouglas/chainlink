@@ -37,21 +37,16 @@ public class ChainImpl<T> extends BaseChain<T> {
             that.previous(this);
         }
         RuntimeException exception = null;
-        _in();
-        try {
-            for (final OnLink on : onLinks) {
-                try {
-                    on.link(that);
-                } catch (final Throwable e) {
-                    if (exception == null) {
-                        exception = new RuntimeException(Messages.format("CHAINLINK-004005.chain.get.exception"), e);
-                    } else {
-                        exception.addSuppressed(e);
-                    }
+        for (final OnLink on : this.<OnLink>_getEvents(ON_LINK)) {
+            try {
+                on.link(that);
+            } catch (final Throwable e) {
+                if (exception == null) {
+                    exception = new RuntimeException(Messages.format("CHAINLINK-004005.chain.get.exception"), e);
+                } else {
+                    exception.addSuppressed(e);
                 }
             }
-        } finally {
-            _out();
         }
         notifyLinked();
         if (exception != null) {
@@ -76,19 +71,14 @@ public class ChainImpl<T> extends BaseChain<T> {
                     throw exception;
                 }
             } else {
-                _in();
-                try {
-                    onLinks.add(then);
-                } finally {
-                    _out();
-                }
+                _addEvent(ON_LINK, then);
             }
         }
         return this;
     }
 
     @Override
-    public Promise<Void> await() {
+    public Promise<Void> awaitLink() {
         return promise;
     }
 
@@ -123,7 +113,7 @@ public class ChainImpl<T> extends BaseChain<T> {
         @Override
         public void link(final Chain<?> chain) {
             try {
-                chain.await()
+                chain.awaitLink()
                         .onResolve(this)
                         .onReject(this);
             } catch (final Throwable e) {

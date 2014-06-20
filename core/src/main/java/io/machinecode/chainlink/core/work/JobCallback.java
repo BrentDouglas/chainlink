@@ -62,6 +62,7 @@ public class JobCallback extends ExecutableImpl<JobWork> {
                         jobContext.getExitStatus()
                 );
             }
+            configuration.getRegistry().unregisterJob(context.getJobExecutionId());
             chain.link(new ResolvedChain<Void>(null));
             if (throwable == null) {
                 chain.resolve(null);
@@ -70,7 +71,6 @@ public class JobCallback extends ExecutableImpl<JobWork> {
             }
             // TODO There is a race here that needs resolving
             // Possibly need to change the way JobAlreadyRunning is found or similar
-            configuration.getRegistry().unregisterJob(context.getJobExecutionId());
         }
     }
 

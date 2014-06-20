@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.test.core;
 
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
 import io.machinecode.chainlink.core.then.AllChain;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import org.junit.Ignore;
@@ -37,7 +37,7 @@ public class ChainTest {
         final Def p3 = new Def();
         final Def p4 = new Def();
 
-        final AllChain<Deferred<?>> all = new AllChain<Deferred<?>>(p1, p2, p3, p4);
+        final AllChain<Promise<?>> all = new AllChain<Promise<?>>(p1, p2, p3, p4);
 
         final CountDownLatch latch = new CountDownLatch(1);
         new Thread(new Runnable() {

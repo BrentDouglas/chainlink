@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.management.JobOperation;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
 
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -16,12 +16,12 @@ import java.util.concurrent.TimeoutException;
 */
 public class JobOperationImpl implements JobOperation {
     private final long id;
-    private final Deferred<?> deferred;
+    private final Promise<?> promise;
     private final ExecutionRepository repository;
 
-    public JobOperationImpl(final long id, final Deferred<?> deferred, final ExecutionRepository repository) {
+    public JobOperationImpl(final long id, final Promise<?> promise, final ExecutionRepository repository) {
         this.id = id;
-        this.deferred = deferred;
+        this.promise = promise;
         this.repository = repository;
     }
 
@@ -32,23 +32,23 @@ public class JobOperationImpl implements JobOperation {
 
     @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
-        return deferred != null && deferred.cancel(mayInterruptIfRunning);
+        return promise != null && promise.cancel(mayInterruptIfRunning);
     }
 
     @Override
     public boolean isCancelled() {
-        return deferred != null && deferred.isCancelled();
+        return promise != null && promise.isCancelled();
     }
 
     @Override
     public boolean isDone() {
-        return deferred == null || deferred.isDone();
+        return promise == null || promise.isDone();
     }
 
     @Override
     public JobExecution get() throws InterruptedException, ExecutionException {
-        if (deferred != null) {
-            deferred.get();
+        if (promise != null) {
+            promise.get();
         }
         try {
             return repository.getJobExecution(id);
@@ -63,8 +63,8 @@ public class JobOperationImpl implements JobOperation {
 
     @Override
     public JobExecution get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        if (deferred != null) {
-            deferred.get(timeout, unit);
+        if (promise != null) {
+            promise.get(timeout, unit);
         }
         try {
             return repository.getJobExecution(id);

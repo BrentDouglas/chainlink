@@ -73,7 +73,7 @@ public class ReturnChain extends ChainImpl<Void> {
     }
 
     @Override
-    public Promise<Void> await() {
+    public Promise<Void> awaitLink() {
         return this.promise;
     }
 
@@ -105,7 +105,7 @@ public class ReturnChain extends ChainImpl<Void> {
 
         @Override
         public void link(final Chain<?> chain) {
-            chain.await()
+            chain.awaitLink()
                     .onResolve(this)
                     .onReject(this);
         }

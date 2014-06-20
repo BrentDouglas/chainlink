@@ -8,11 +8,10 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.OnReject;
 import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.api.Promise;
 import io.machinecode.chainlink.core.then.AllChain;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.RejectedChain;
@@ -137,18 +136,20 @@ public class EventedExecutor implements Executor {
                                     .registerChain(that.getLocalId(), that.getChain());
                             worker.execute(new ExecutableEventImpl(executable, that.getRemoteId(), context));
                         }
-                    }).get().getChain(); //TODO This is rubbish
+                    })
+                    .get()
+                    .getChain(); //TODO This is rubbish
         } catch (final Exception e) {
             throw new RuntimeException(e); //TODO
         }
     }
 
     @Override
-    public Future<?> cancel(final Deferred<?> deferred) {
+    public Future<?> cancel(final Promise<?> promise) {
         return cancellation.submit(new Runnable() {
             @Override
             public void run() {
-                deferred.cancel(true);
+                promise.cancel(true);
             }
         });
     }

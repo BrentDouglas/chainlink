@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.then;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.then.OnLink;
 import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.PromiseImpl;
 import org.jboss.logging.Logger;
@@ -32,7 +31,7 @@ public class AllChain<T> extends BaseChain<T> {
     @Override
     public boolean isDone() {
         boolean done = true;
-        for (final Deferred<?> that : link) {
+        for (final Promise<?> that : link) {
             if (that == null) {
                 continue;
             }
@@ -66,7 +65,7 @@ public class AllChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public Promise<Void> await() {
+    public Promise<Void> awaitLink() {
         return promise;
     }
 
@@ -103,7 +102,7 @@ public class AllChain<T> extends BaseChain<T> {
         @Override
         public void link(final Chain<?> chain) {
             try {
-                chain.await()
+                chain.awaitLink()
                         .onResolve(this)
                         .onReject(this);
             } catch (final Throwable e) {

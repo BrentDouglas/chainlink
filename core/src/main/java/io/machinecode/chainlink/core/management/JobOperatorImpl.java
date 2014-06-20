@@ -27,7 +27,7 @@ import io.machinecode.chainlink.spi.security.SecurityCheck;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -291,7 +291,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
                 null,
                 null
         );
-        final Deferred<?> deferred = executor.execute(jobExecutionId, new JobExecutable(
+        final Promise<?> promise = executor.execute(jobExecutionId, new JobExecutable(
                 null,
                 this.executionRepositoryId,
                 job,
@@ -299,7 +299,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
         ));
         return new JobOperationImpl(
                 jobExecutionId,
-                deferred,
+                promise,
                 repository
         );
     }
@@ -308,10 +308,10 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
     public JobOperationImpl getJobOperation(final long jobExecutionId) throws JobExecutionNotRunningException {
         this.securityCheck.canAccessJobExecution(jobExecutionId);
         try {
-            final Deferred<?> deferred = registry.getJob(jobExecutionId);
+            final Promise<?> promise = registry.getJob(jobExecutionId);
             return new JobOperationImpl(
                     jobExecutionId,
-                    deferred,
+                    promise,
                     registry.getExecutionRepository(this.executionRepositoryId)
             );
         } catch (final JobExecutionNotRunningException e) {
@@ -391,7 +391,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
                 lastExecution.getRestartElementId(),
                 null
         );
-        final Deferred<?> deferred = executor.execute(restartExecutionId, new JobExecutable(
+        final Promise<?> promise = executor.execute(restartExecutionId, new JobExecutable(
                 null,
                 this.executionRepositoryId,
                 job,
@@ -399,7 +399,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
         ));
         return new JobOperationImpl(
                 restartExecutionId,
-                deferred,
+                promise,
                 repository
         );
     }
@@ -411,18 +411,18 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
     }
 
     @Override
-    public Deferred<?> stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
+    public Promise<?> stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
         this.securityCheck.canRestartJob(jobExecutionId);
         try {
             final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
             repository.getJobExecution(jobExecutionId); //This will throw a NoSuchJobExecutionException if required
-            final Deferred<?> deferred = registry.getJob(jobExecutionId);
-            if (deferred == null) {
+            final Promise<?> promise = registry.getJob(jobExecutionId);
+            if (promise == null) {
                 throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-001002.operator.not.running", jobExecutionId));
             }
-            executor.cancel(deferred);
-            return deferred;
+            executor.cancel(promise);
+            return promise;
         } catch (final NoSuchJobExecutionException e) {
             throw e;
         } catch (final JobExecutionNotRunningException e) {

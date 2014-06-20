@@ -3,15 +3,13 @@ package io.machinecode.chainlink.core.then;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.then.OnLink;
 import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.then.api.ListenerException;
 import io.machinecode.then.api.OnCancel;
 import io.machinecode.then.api.OnComplete;
-import io.machinecode.then.core.DeferredImpl;
+import io.machinecode.then.core.PromiseImpl;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -21,12 +19,13 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class BaseChain<T> extends DeferredImpl<T> implements Chain<T> {
+public abstract class BaseChain<T> extends PromiseImpl<T> implements Chain<T> {
 
     private static final Logger log = Logger.getLogger(BaseChain.class);
 
+    protected static final byte ON_LINK = 106;
+
     protected volatile Chain<?> previous;
-    protected final List<OnLink> onLinks = new LinkedList<OnLink>();
 
     @Override
     public Chain<T> previous(final Chain<?> that) {
@@ -49,10 +48,23 @@ public abstract class BaseChain<T> extends DeferredImpl<T> implements Chain<T> {
     }
 
     @Override
-    protected void doCancel(final boolean futureCompatible) {
+    protected boolean setCancelled() {
+        switch (this.state) {
+            case CANCELLED:
+                return true;
+            case REJECTED:
+            case RESOLVED:
+                return false;
+        }
+        this.state = CANCELLED;
+        return false;
+    }
+
+    @Override
+    public boolean cancel(final boolean interrupt) {
         log().tracef(getCancelLogMessage());
         final CancelListener listener = new CancelListener();
-        RuntimeException exception = null;
+        ListenerException exception = null;
         _lock();
         try {
             cancelling(listener);
@@ -60,49 +72,44 @@ public abstract class BaseChain<T> extends DeferredImpl<T> implements Chain<T> {
                 _signalAll();
                 throw listener.exception;
             }
-            if (this.checkCancelled(futureCompatible)) {
-                return;
+            if (setCancelled()) {
+                return isCancelled();
             }
-            this.state = CANCELLED;
         } finally {
             _unlock();
         }
-        _in();
-        try {
-            for (final OnCancel then : onCancels) {
-                try {
-                    then.cancel();
-                } catch (final Throwable e) {
-                    if (exception == null) {
-                        exception = new RuntimeException(Messages.format("CHAINLINK-004006.chain.cancel.exception"), e);
-                    } else {
-                        exception.addSuppressed(e);
-                    }
-                }
-            }
-            for (final OnComplete on : onCompletes) {
-                try {
-                    on.complete();
-                } catch (final Throwable e) {
-                    if (exception == null) {
-                        exception = new RuntimeException(Messages.format("CHAINLINK-004006.chain.cancel.exception"), e);
-                    } else {
-                        exception.addSuppressed(e);
-                    }
-                }
-            }
-            if (exception != null) {
-                throw exception;
-            }
-        } finally {
-            _out();
-            _lock();
+        for (final OnCancel then : this.<OnCancel>_getEvents(ON_CANCEL)) {
             try {
-                _signalAll();
-            } finally {
-                _unlock();
+                then.cancel(interrupt);
+            } catch (final Throwable e) {
+                if (exception == null) {
+                    exception = new ListenerException(io.machinecode.then.core.Messages.format("THEN-000013.promise.cancel.exception"), e);
+                } else {
+                    exception.addSuppressed(e);
+                }
             }
         }
+        for (final OnComplete on : this.<OnComplete>_getEvents(ON_COMPLETE)) {
+            try {
+                on.complete();
+            } catch (final Throwable e) {
+                if (exception == null) {
+                    exception = new ListenerException(io.machinecode.then.core.Messages.format("THEN-000013.promise.cancel.exception"), e);
+                } else {
+                    exception.addSuppressed(e);
+                }
+            }
+        }
+        _lock();
+        try {
+            _signalAll();
+        } finally {
+            _unlock();
+        }
+        if (exception != null) {
+            throw exception;
+        }
+        return true;
     }
 
     protected void cancelling(final OnLink on) {
@@ -110,55 +117,22 @@ public abstract class BaseChain<T> extends DeferredImpl<T> implements Chain<T> {
     }
 
     @Override
-    public T get() throws InterruptedException, ExecutionException, CancellationException {
+    public T get() throws InterruptedException, ExecutionException {
         if (Thread.interrupted()) {
             throw new InterruptedException(getInterruptedExceptionMessage());
         }
-        await().get();
-        _lock();
-        try {
-            for (;;) {
-                switch (this.state) {
-                    case CANCELLED:
-                        throw new CancellationException(Messages.format("CHAINLINK-004002.chain.cancelled"));
-                    case REJECTED:
-                        throw new ExecutionException(Messages.format("CHAINLINK-004001.chain.rejected"), failure);
-                    case RESOLVED:
-                        return value;
-                    //default/PENDING means this thread was notified before the computation actually completed
-                }
-                _await();
-            }
-        } finally {
-            _unlock();
-        }
+        awaitLink().get();
+        return super.get();
     }
 
     @Override
-    public T get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException, CancellationException {
+    public T get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         if (Thread.interrupted()) {
             throw new InterruptedException(getInterruptedExceptionMessage());
         }
         final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-        long nextTimeout = _tryTimeout(end);
-        await().get(nextTimeout, MILLISECONDS);
-        _lock();
-        try {
-            for (;;) {
-                switch (this.state) {
-                    case CANCELLED:
-                        throw new CancellationException(Messages.format("CHAINLINK-004002.chain.cancelled"));
-                    case REJECTED:
-                        throw new ExecutionException(Messages.format("CHAINLINK-004001.chain.rejected"), failure);
-                    case RESOLVED:
-                        return value;
-                }
-                nextTimeout = _tryTimeout(end);
-                _await(nextTimeout, MILLISECONDS);
-            }
-        } finally {
-            _unlock();
-        }
+        awaitLink().get(_tryTimeout(end), MILLISECONDS);
+        return super.get(_tryTimeout(end), MILLISECONDS);
     }
 
     @Override
@@ -197,7 +171,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T> implements Chain<T> {
         @Override
         public void link(final Chain<?> that) {
             try {
-                that.cancel();
+                that.cancel(true);
             } catch (final Throwable e) {
                 if (exception == null) {
                     exception = new RuntimeException(Messages.format("CHAINLINK-004006.chain.cancel.exception"), e);

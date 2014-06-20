@@ -26,11 +26,12 @@ public class OnCommand implements OnResolve<Void>, OnReject<Throwable>, OnCancel
     }
 
     @Override
-    public void cancel() {
+    public boolean cancel(final boolean interrupt) {
         try {
             final PromiseImpl<Void> promise = new PromiseImpl<Void>();
             registry.invoke(address, command, promise);
             promise.get();
+            return true;
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

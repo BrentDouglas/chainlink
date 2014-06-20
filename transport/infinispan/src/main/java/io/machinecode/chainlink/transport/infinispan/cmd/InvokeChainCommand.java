@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class InvokeChainCommand extends DeferredCommand {
+public class InvokeChainCommand extends PromiseCommand {
 
     private static final Logger log = Logger.getLogger(InvokeChainCommand.class);
 

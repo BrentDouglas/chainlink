@@ -37,9 +37,10 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> implements Serializ
         //TODO Check ordering of this and check it is allowed to run in this thread
         chain.onCancel(new OnCancel() {
             @Override
-            public void cancel() {
+            public boolean cancel(final boolean interrupt) {
                 log.debugf(Messages.format("CHAINLINK-023005.work.task.cancel", context));
                 work.cancel(configuration, context);
+                return true;
             }
         });
         final MutableStepContext stepContext = context.getStepContext();

@@ -18,7 +18,7 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.TaskWork;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.BatchRuntimeException;
@@ -43,7 +43,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     // Lifecycle
 
     @Override
-    public void run(final RuntimeConfiguration configuration, final Deferred<?> deferred, final ExecutionRepositoryId executionRepositoryId,
+    public void run(final RuntimeConfiguration configuration, final Promise<?> promise, final ExecutionRepositoryId executionRepositoryId,
                     final ExecutionContext context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
@@ -58,7 +58,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
                 );
             }
             synchronized (this) {
-                if (deferred.isCancelled()) {
+                if (promise.isCancelled()) {
                     log.debugf(Messages.get("CHAINLINK-013100.batchlet.cancelled"), context, getRef());
                     stepContext.setBatchStatus(BatchStatus.STOPPING);
                     if (partitionExecutionId != null) {
@@ -89,7 +89,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
                 stepContext.setBatchStatus(BatchStatus.FAILED);
                 throwable = e;
             }
-            if (deferred.isCancelled()) {
+            if (promise.isCancelled()) {
                 if (stepContext.getBatchStatus() != BatchStatus.FAILED) {
                     stepContext.setBatchStatus(BatchStatus.STOPPING);
                 }
@@ -106,7 +106,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             }
         } finally {
             final BatchStatus batchStatus;
-            if (deferred.isCancelled()) {
+            if (promise.isCancelled()) {
                 stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
             } else if (throwable != null) {
                 batchStatus = BatchStatus.FAILED;

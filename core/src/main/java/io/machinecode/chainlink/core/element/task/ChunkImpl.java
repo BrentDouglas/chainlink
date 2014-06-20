@@ -18,7 +18,7 @@ import io.machinecode.chainlink.spi.expression.PropertyContext;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.TaskWork;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.chunk.listener.ChunkListener;
@@ -183,7 +183,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     }
 
     @Override
-    public void run(final RuntimeConfiguration configuration, final Deferred<?> deferred, final ExecutionRepositoryId executionRepositoryId,
+    public void run(final RuntimeConfiguration configuration, final Promise<?> promise, final ExecutionRepositoryId executionRepositoryId,
                     final ExecutionContext context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
@@ -191,7 +191,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         try {
             state = new State(
                     configuration,
-                    deferred,
+                    promise,
                     executionRepositoryId,
                     context,
                     timeout
@@ -295,7 +295,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         } finally {
             synchronized (this) {
                 final BatchStatus batchStatus;
-                if (deferred.isCancelled()) {
+                if (promise.isCancelled()) {
                     state.stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
                 } else if (state.isFailed()) {
                     batchStatus = BatchStatus.FAILED;
@@ -367,7 +367,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             case COMMIT:
                 log.debugf(Messages.get("CHAINLINK-014207.chunk.state.commit"), state.context);
                 _commit(state, exception);
-                if (state.deferred.isCancelled()) {
+                if (state.promise.isCancelled()) {
                     return false;
                 }
                 if (state.finished) {
@@ -1014,7 +1014,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final ExecutionContext context;
         final Executor executor;
         final RuntimeConfiguration configuration;
-        final Deferred<?> deferred;
+        final Promise<?> promise;
 
         final ArrayList<Item> items;
 
@@ -1041,7 +1041,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final List<ListenerImpl> retryWriteListeners;
         final List<ListenerImpl> skipWriteListeners;
 
-        private State(final RuntimeConfiguration configuration, final Deferred<?> deferred, final ExecutionRepositoryId executionRepositoryId,
+        private State(final RuntimeConfiguration configuration, final Promise<?> promise, final ExecutionRepositoryId executionRepositoryId,
                       final ExecutionContext context, final int timeout) throws Exception {
             this.jobExecutionId = context.getJobExecutionId();
             this.stepExecutionId = context.getStepExecutionId();
@@ -1052,7 +1052,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             this.context = context;
             this.executor = configuration.getExecutor();
             this.configuration = configuration;
-            this.deferred = deferred;
+            this.promise = promise;
             this.items = new ArrayList<Item>();
 
             this.itemCount = Integer.parseInt(ChunkImpl.this.itemCount);
@@ -1101,7 +1101,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         public boolean isReadyToCheckpoint() throws Exception {
             return this.checkpointAlgorithm.isReadyToCheckpoint(this.configuration, this.context)
                     || (0 != this.timeLimit && this.checkpointStartTime + this.timeLimit < System.currentTimeMillis())
-                    || deferred.isCancelled();
+                    || promise.isCancelled();
         }
 
         public void next(final int status) {
