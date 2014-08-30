@@ -16,7 +16,7 @@ public class WhenImpl implements When {
     private final ExecutorService when = Executors.newCachedThreadPool();
 
     @Override
-    public <T> void when(final Future<T> future, final Promise<T> then) {
+    public <T> void when(final Future<T> future, final Promise<T,Throwable> then) {
         this.when.submit(new Runnable() {
             @Override
             public void run() {
@@ -30,7 +30,7 @@ public class WhenImpl implements When {
     }
 
     @Override
-    public <T> void when(final long timeout, final TimeUnit unit, final Future<T> future, final Promise<T> then) {
+    public <T> void when(final long timeout, final TimeUnit unit, final Future<T> future, final Promise<T,Throwable> then) {
         this.when.submit(new Runnable() {
             @Override
             public void run() {

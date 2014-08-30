@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface When extends Lifecycle {
 
-    <T> void when(final Future<T> future, final Promise<T> then);
+    <T> void when(final Future<T> future, final Promise<T,Throwable> then);
 
-    <T> void when(final long timeout, final TimeUnit unit, final Future<T> future, final Promise<T> then);
+    <T> void when(final long timeout, final TimeUnit unit, final Future<T> future, final Promise<T,Throwable> then);
 }

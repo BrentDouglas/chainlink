@@ -18,6 +18,6 @@ public interface TaskWork extends Task, Work, Serializable {
 
     void cancel(final RuntimeConfiguration configuration, final ExecutionContext context);
 
-    void run(final RuntimeConfiguration configuration, final Promise<?> promise, final ExecutionRepositoryId executionRepositoryId,
+    void run(final RuntimeConfiguration configuration, final Promise<?,Throwable> promise, final ExecutionRepositoryId executionRepositoryId,
              final ExecutionContext context, final int timeout) throws Throwable;
 }

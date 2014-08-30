@@ -28,7 +28,7 @@ public class OnCommand implements OnResolve<Void>, OnReject<Throwable>, OnCancel
     @Override
     public boolean cancel(final boolean interrupt) {
         try {
-            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
             registry.invoke(address, command, promise);
             promise.get();
             return true;
@@ -40,7 +40,7 @@ public class OnCommand implements OnResolve<Void>, OnReject<Throwable>, OnCancel
     @Override
     public void reject(final Throwable throwable) {
         try {
-            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
             registry.invoke(address, command, promise);
             promise.get();
         } catch (final Exception e) {
@@ -51,7 +51,7 @@ public class OnCommand implements OnResolve<Void>, OnReject<Throwable>, OnCancel
     @Override
     public void resolve(final Void that) {
         try {
-            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
             registry.invoke(address, command, promise);
             promise.get();
         } catch (final Exception e) {

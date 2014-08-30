@@ -19,7 +19,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class BaseChain<T> extends PromiseImpl<T> implements Chain<T> {
+public abstract class BaseChain<T> extends PromiseImpl<T,Throwable> implements Chain<T> {
 
     private static final Logger log = Logger.getLogger(BaseChain.class);
 

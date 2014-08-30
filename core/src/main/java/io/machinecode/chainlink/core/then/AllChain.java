@@ -31,7 +31,7 @@ public class AllChain<T> extends BaseChain<T> {
     @Override
     public boolean isDone() {
         boolean done = true;
-        for (final Promise<?> that : link) {
+        for (final Promise<?,Throwable> that : link) {
             if (that == null) {
                 continue;
             }
@@ -65,7 +65,7 @@ public class AllChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public Promise<Void> awaitLink() {
+    public Promise<Void,Throwable> awaitLink() {
         return promise;
     }
 
@@ -80,7 +80,7 @@ public class AllChain<T> extends BaseChain<T> {
         return log;
     }
 
-    protected class AwaitPromise extends PromiseImpl<Void> implements OnLink {
+    protected class AwaitPromise extends PromiseImpl<Void,Throwable> implements OnLink {
         final AtomicInteger count = new AtomicInteger();
 
         @Override

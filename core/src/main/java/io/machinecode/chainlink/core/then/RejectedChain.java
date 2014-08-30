@@ -27,7 +27,7 @@ public class RejectedChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public Promise<Void> awaitLink() {
-        return new RejectedPromise<Void>(this.failure);
+    public Promise<Void,Throwable>awaitLink() {
+        return new RejectedPromise<Void,Throwable>(this.failure);
     }
 }

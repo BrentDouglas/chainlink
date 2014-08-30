@@ -57,9 +57,9 @@ public class EventedWorker extends Thread implements Worker {
     }
 
     @Override
-    public Promise<ChainAndId> chain(final Executable executable) {
+    public Promise<ChainAndId,Throwable>chain(final Executable executable) {
         final UUIDId id = new UUIDId();
-        return new ResolvedPromise<ChainAndId>(new ChainAndId(id, id, new ChainImpl<Void>()));
+        return new ResolvedPromise<ChainAndId,Throwable>(new ChainAndId(id, id, new ChainImpl<Void>()));
     }
 
     @Override

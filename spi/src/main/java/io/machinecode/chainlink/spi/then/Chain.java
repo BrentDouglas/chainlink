@@ -5,7 +5,7 @@ import io.machinecode.then.api.Promise;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Chain<T> extends Promise<T> {
+public interface Chain<T> extends Promise<T,Throwable> {
 
     Chain<T> link(final Chain<?> that);
 
@@ -13,7 +13,7 @@ public interface Chain<T> extends Promise<T> {
 
     Chain<T> onLink(final OnLink then);
 
-    Promise<Void> awaitLink();
+    Promise<Void,Throwable> awaitLink();
 
     void notifyLinked();
 }

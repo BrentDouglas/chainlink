@@ -40,7 +40,7 @@ public class RemoteChain extends ChainImpl<Void> {
     @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
         try {
-            final PromiseImpl<Boolean> promise = new PromiseImpl<Boolean>();
+            final PromiseImpl<Boolean,Throwable> promise = new PromiseImpl<Boolean,Throwable>();
             registry.invoke(address, command("cancel", true, mayInterruptIfRunning), promise);
             return super.cancel(mayInterruptIfRunning) && promise.get();
         } catch (final Exception e) {
@@ -64,7 +64,7 @@ public class RemoteChain extends ChainImpl<Void> {
     @Override
     public Void get() throws InterruptedException, ExecutionException {
         try {
-            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
             registry.invoke(address, command("get", true), promise);
             super.get();
             return promise.get();
@@ -77,7 +77,7 @@ public class RemoteChain extends ChainImpl<Void> {
     public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         try {
             final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-            final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
             registry.invoke(address, command("get", true, timeout, unit), promise);
             super.get(_tryTimeout(end), MILLISECONDS);
             return promise.get(_tryTimeout(end), MILLISECONDS);

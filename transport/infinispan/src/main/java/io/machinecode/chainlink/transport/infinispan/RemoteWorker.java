@@ -36,18 +36,18 @@ public class RemoteWorker implements Worker {
 
     @Override
     public void execute(final ExecutableEvent event) {
-        registry.invoke(remote, new ExecuteCommand(registry.cacheName, workerId, event), new PromiseImpl<Object>());
+        registry.invoke(remote, new ExecuteCommand(registry.cacheName, workerId, event), new PromiseImpl<Object,Throwable>());
     }
 
     @Override
-    public Promise<ChainAndId> chain(final Executable executable) {
+    public Promise<ChainAndId,Throwable>chain(final Executable executable) {
         final long jobExecutionId = executable.getContext().getJobExecutionId();
-        final Promise<ChainAndId> promise = new PromiseImpl<ChainAndId>();
+        final Promise<ChainAndId,Throwable> promise = new PromiseImpl<ChainAndId,Throwable>();
         final ChainId localId = registry.generateChainId();
         registry.invoke(
                 remote,
                 new CreateChainCommand(registry.cacheName, jobExecutionId, localId),
-                new PromiseImpl<ChainId>()
+                new PromiseImpl<ChainId,Throwable>()
                         .onResolve(new OnResolve<ChainId>() {
                             @Override
                             public void resolve(final ChainId remoteId) {

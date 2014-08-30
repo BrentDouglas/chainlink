@@ -331,7 +331,7 @@ public class InfinispanRegistry extends LocalRegistry {
         return _localWorker(workerId) != null;
     }
 
-    public <T> void invoke(final Address address, final ReplicableCommand command, final Promise<T> promise) {
+    public <T> void invoke(final Address address, final ReplicableCommand command, final Promise<T,Throwable> promise) {
         rpc.invokeRemotelyInFuture(
                 Collections.singleton(address),
                 command,

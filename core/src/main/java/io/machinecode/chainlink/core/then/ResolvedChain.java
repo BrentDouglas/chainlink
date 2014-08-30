@@ -27,7 +27,7 @@ public class ResolvedChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public Promise<Void> awaitLink() {
-        return new ResolvedPromise<Void>(null);
+    public Promise<Void,Throwable>awaitLink() {
+        return new ResolvedPromise<Void,Throwable>(null);
     }
 }

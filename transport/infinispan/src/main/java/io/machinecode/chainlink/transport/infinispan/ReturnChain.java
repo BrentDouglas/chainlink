@@ -38,7 +38,7 @@ public class ReturnChain extends ChainImpl<Void> {
     @Override
     public void resolve(final Void value) {
         try {
-            final PromiseImpl<Boolean> promise = new PromiseImpl<Boolean>();
+            final PromiseImpl<Boolean,Throwable> promise = new PromiseImpl<Boolean,Throwable>();
             registry.invoke(address, command("resolve", false, new Serializable[]{ null }), promise);
             super.resolve(value);
             promise.get();
@@ -50,7 +50,7 @@ public class ReturnChain extends ChainImpl<Void> {
     @Override
     public void reject(final Throwable failure) {
         try {
-            final PromiseImpl<Boolean> promise = new PromiseImpl<Boolean>();
+            final PromiseImpl<Boolean,Throwable> promise = new PromiseImpl<Boolean,Throwable>();
             registry.invoke(address, command("reject", false, failure), promise);
             super.reject(failure);
             promise.get();
@@ -62,7 +62,7 @@ public class ReturnChain extends ChainImpl<Void> {
     @Override
     public ChainImpl<Void> link(final Chain<?> that) {
         try {
-            final PromiseImpl<Boolean> promise = new PromiseImpl<Boolean>();
+            final PromiseImpl<Boolean,Throwable> promise = new PromiseImpl<Boolean,Throwable>();
             registry.invoke(address, command("link", false, new Serializable[]{ null }), promise);
             super.link(that);
             promise.get();
@@ -73,16 +73,16 @@ public class ReturnChain extends ChainImpl<Void> {
     }
 
     @Override
-    public Promise<Void> awaitLink() {
+    public Promise<Void,Throwable>awaitLink() {
         return this.promise;
     }
 
-    public class Notifier extends PromiseImpl<Void> implements OnLink {
+    public class Notifier extends PromiseImpl<Void,Throwable> implements OnLink {
 
         @Override
         public void reject(final Throwable fail) {
             try {
-                final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+                final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
                 registry.invoke(address, command("notifyLinkRejected", false, fail), promise);
                 super.reject(fail);
                 promise.get();
@@ -94,7 +94,7 @@ public class ReturnChain extends ChainImpl<Void> {
         @Override
         public void resolve(final Void that) {
             try {
-                final PromiseImpl<Void> promise = new PromiseImpl<Void>();
+                final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
                 registry.invoke(address, command("notifyLinkResolved", false), promise);
                 super.resolve(that);
                 promise.get();

@@ -16,10 +16,10 @@ import java.util.concurrent.TimeoutException;
 */
 public class JobOperationImpl implements JobOperation {
     private final long id;
-    private final Promise<?> promise;
+    private final Promise<?,Throwable> promise;
     private final ExecutionRepository repository;
 
-    public JobOperationImpl(final long id, final Promise<?> promise, final ExecutionRepository repository) {
+    public JobOperationImpl(final long id, final Promise<?,Throwable> promise, final ExecutionRepository repository) {
         this.id = id;
         this.promise = promise;
         this.repository = repository;

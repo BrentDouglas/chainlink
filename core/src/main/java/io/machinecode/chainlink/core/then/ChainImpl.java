@@ -78,7 +78,7 @@ public class ChainImpl<T> extends BaseChain<T> {
     }
 
     @Override
-    public Promise<Void> awaitLink() {
+    public Promise<Void,Throwable>awaitLink() {
         return promise;
     }
 
@@ -87,7 +87,7 @@ public class ChainImpl<T> extends BaseChain<T> {
         return log;
     }
 
-    public class AwaitPromise extends PromiseImpl<Void> implements OnLink {
+    public class AwaitPromise extends PromiseImpl<Void,Throwable> implements OnLink {
 
         @Override
         public Void get() throws InterruptedException, ExecutionException {
