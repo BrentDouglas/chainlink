@@ -72,7 +72,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
         log.debugf(Messages.get("CHAINLINK-019000.decision.before"), context, this.id);
         final long[] prior = context.getPriorStepExecutionIds();
         final Long last = context.getLastStepExecutionId();
-        final long[] actual = prior.length != 0 ? prior : last != null ? new long[]{ last } : NO_STEPS;
+        final long[] actual = (prior != null && prior.length != 0) ? prior : last != null ? new long[]{ last } : NO_STEPS;
         log.debugf(Messages.get("CHAINLINK-019002.decision.decide"), context, this.id, this.ref.ref());
         final String exitStatus = decide(
                 configuration,

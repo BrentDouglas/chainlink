@@ -4,7 +4,9 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import io.machinecode.chainlink.core.registry.LocalJobRegistry;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
+import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.When;
 import io.machinecode.chainlink.transport.infinispan.callable.FindExecutionRepositoryWithIdCallable;
@@ -16,7 +18,6 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.JobRegistry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
@@ -33,6 +34,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.rpc.ResponseMode;
 import org.infinispan.remoting.rpc.RpcManager;
 import org.infinispan.remoting.rpc.RpcOptions;
+import org.infinispan.remoting.rpc.RpcOptionsBuilder;
 import org.infinispan.remoting.transport.Address;
 import org.jboss.logging.Logger;
 
@@ -113,27 +115,25 @@ public class InfinispanRegistry extends LocalRegistry {
                 throw new RuntimeException(e);
             }
         }
-        onRegisterJob(new On<Long>() {
-            @Override
-            public void on(final Long jobExecutionId) {
-                remoteExecutions.put(jobExecutionId, new ArrayList<Pair<ChainId, Address>>());
+    }
+
+    @Override
+    protected void onRegisterJob(final long jobExecutionId) {
+        remoteExecutions.put(jobExecutionId, new ArrayList<Pair<ChainId, Address>>());
+    }
+
+    @Override
+    protected void onUnregisterJob(final long jobExecutionId) {
+        for (final Pair<ChainId, Address> pair : remoteExecutions.remove(jobExecutionId)) {
+            final Address address = pair.getValue();
+            if (!address.equals(local)) {
+                rpc.invokeRemotely(
+                        Collections.singleton(address),
+                        new CleanupCommand(cacheName, jobExecutionId),
+                        options
+                );
             }
-        });
-        onUnregisterJob(new On<Long>() {
-            @Override
-            public void on(final Long jobExecutionId) {
-                for (final Pair<ChainId, Address> pair : remoteExecutions.remove(jobExecutionId)) {
-                    final Address address = pair.getValue();
-                    if (!address.equals(local)) {
-                        rpc.invokeRemotely(
-                                Collections.singleton(address),
-                                new CleanupCommand(cacheName, jobExecutionId),
-                                options
-                        );
-                    }
-                }
-            }
-        });
+        }
     }
 
     @Override
@@ -256,23 +256,6 @@ public class InfinispanRegistry extends LocalRegistry {
     }
 
     @Override
-    public InfinispanJobRegistry getJobRegistry(final long jobExecutionId) throws JobExecutionNotRunningException {
-        try {
-            return (InfinispanJobRegistry)super.getJobRegistry(jobExecutionId);
-        } catch (final JobExecutionNotRunningException e) {
-            //
-        }
-        final InfinispanJobRegistry registry = new InfinispanJobRegistry(this, jobExecutionId);
-        while (!jobLock.compareAndSet(false, true)) {}
-        try {
-            this.jobRegistries.put(jobExecutionId, registry);
-        } finally {
-            jobLock.set(false);
-        }
-        return registry;
-    }
-
-    @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
         final ExecutionRepository repository = super.getExecutionRepository(id);
         if (repository != null) {
@@ -305,12 +288,8 @@ public class InfinispanRegistry extends LocalRegistry {
         return  super.getExecutionRepository(id);
     }
 
-    public InfinispanJobRegistry getLocalJobRegistry(final long jobExecutionId) throws JobExecutionNotRunningException {
-        return (InfinispanJobRegistry)super.getJobRegistry(jobExecutionId);
-    }
-
     @Override
-    protected JobRegistry _createJobRegistry(final long jobExecutionId) {
+    protected InfinispanJobRegistry _createJobRegistry(final long jobExecutionId) {
         return new InfinispanJobRegistry(this, jobExecutionId);
     }
 
@@ -336,6 +315,15 @@ public class InfinispanRegistry extends LocalRegistry {
                 Collections.singleton(address),
                 command,
                 options,
+                new InfinispanFuture<Object,T>(this, promise, address, System.currentTimeMillis())
+        );
+    }
+
+    public <T> void invoke(final Address address, final ReplicableCommand command, final Promise<T,Throwable> promise, final long timeout, final TimeUnit unit) {
+        rpc.invokeRemotelyInFuture(
+                Collections.singleton(address),
+                command,
+                new RpcOptionsBuilder(options).timeout(timeout, unit).build(),
                 new InfinispanFuture<Object,T>(this, promise, address, System.currentTimeMillis())
         );
     }

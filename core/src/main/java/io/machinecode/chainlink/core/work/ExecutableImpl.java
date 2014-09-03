@@ -38,6 +38,11 @@ public abstract class ExecutableImpl<T extends Work> implements Executable, Seri
     }
 
     @Override
+    public ExecutableId getId() {
+        return null;
+    }
+
+    @Override
     public ExecutableId getParentId() {
         return parentId;
     }

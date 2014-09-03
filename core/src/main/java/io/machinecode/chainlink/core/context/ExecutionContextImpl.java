@@ -30,7 +30,7 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
     private Long stepExecutionId;
     private Item[] items;
     private Long lastStepExecutionId;
-    private TLongSet priorStepExecutionIds = new TLongHashSet();
+    private long[] priorStepExecutionIds;
 
     private transient String logString;
 
@@ -162,11 +162,11 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
 
     @Override
     public long[] getPriorStepExecutionIds() {
-        return priorStepExecutionIds.toArray();
+        return priorStepExecutionIds;
     }
 
     @Override
-    public void addPriorStepExecutionId(final long priorStepExecutionId) {
-        this.priorStepExecutionIds.add(priorStepExecutionId);
+    public void setPriorStepExecutionId(final long[] priorStepExecutionId) {
+        this.priorStepExecutionIds = priorStepExecutionId;
     }
 }

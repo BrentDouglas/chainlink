@@ -8,7 +8,7 @@ import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.JobRegistry;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.element.execution.Split;
 import io.machinecode.chainlink.spi.util.Messages;
@@ -16,6 +16,9 @@ import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import java.util.List;
+
+import static io.machinecode.chainlink.spi.registry.Registry.Accumulator;
+import static io.machinecode.chainlink.spi.registry.Registry.SplitAccumulator;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -84,16 +87,16 @@ public class SplitImpl extends ExecutionImpl implements Split {
                              final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                              final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021001.split.after"), context, this.id);
+        final long jobExecutionId = context.getJobExecutionId();
         final Long stepExecutionId = childContext.getLastStepExecutionId();
-        final JobRegistry.Accumulator accumulator = configuration.getRegistry()
-                .getJobRegistry(context.getJobExecutionId())
-                .getSplitAccumulator(id);
+        final SplitAccumulator accumulator = configuration.getRegistry().getSplitAccumulator(jobExecutionId, this.id);
         if (stepExecutionId != null) {
-            context.addPriorStepExecutionId(stepExecutionId);
+            accumulator.addPriorStepExecutionId(stepExecutionId);
         }
         if (accumulator.incrementAndGetCallbackCount() < this.flows.size()) {
             return null;
         }
+        context.setPriorStepExecutionId(accumulator.getPriorStepExecutionIds());
         if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
             return runCallback(configuration, context, parentId);
         }

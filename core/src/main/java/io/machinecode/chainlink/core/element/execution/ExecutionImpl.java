@@ -81,7 +81,8 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.elem
     }
 
     protected Chain<?> runCallback(final RuntimeConfiguration configuration, final ExecutionContext context, final ExecutableId parentId) {
-        final Executable callback = configuration.getRegistry().getJobRegistry(context.getJobExecutionId()).getExecutable(parentId);
+        final Executable callback = configuration.getRegistry()
+                .getExecutable(context.getJobExecutionId(), parentId);
         return configuration.getExecutor().callback(callback, context);
     }
 

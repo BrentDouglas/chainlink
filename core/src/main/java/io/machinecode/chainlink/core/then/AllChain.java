@@ -4,10 +4,13 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.then.OnLink;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.PromiseImpl;
 import org.jboss.logging.Logger;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
@@ -17,13 +20,11 @@ public class AllChain<T> extends BaseChain<T> {
     private static final Logger log = Logger.getLogger(AllChain.class);
 
     protected final Chain<?>[] link;
-    protected final AwaitPromise promise = new AwaitPromise();
 
     public AllChain(final Chain<?>... link) {
         this.link = link;
         for (final Chain<?> that : link) {
             that.previous(this);
-            that.onLink(promise);
         }
         resolve(null);
     }
@@ -65,8 +66,26 @@ public class AllChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public Promise<Void,Throwable> awaitLink() {
-        return promise;
+    public void awaitLink() throws InterruptedException, ExecutionException {
+        for (final Chain<?> chain : link) {
+            try {
+                chain.get();
+            } catch (final Exception e) {
+                // Swallow
+            }
+        }
+    }
+
+    @Override
+    public void awaitLink(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
+        final long end = System.currentTimeMillis() + unit.toMillis(timeout);
+        for (final Chain<?> chain : link) {
+            try {
+                chain.get(_tryTimeout(end), MILLISECONDS);
+            } catch (final Exception e) {
+                // Swallow
+            }
+        }
     }
 
     @Override
@@ -78,37 +97,5 @@ public class AllChain<T> extends BaseChain<T> {
     @Override
     protected Logger log() {
         return log;
-    }
-
-    protected class AwaitPromise extends PromiseImpl<Void,Throwable> implements OnLink {
-        final AtomicInteger count = new AtomicInteger();
-
-        @Override
-        public void resolve(final Void value) {
-            if (count.incrementAndGet() < link.length) {
-                return;
-            }
-            super.resolve(value);
-        }
-
-        @Override
-        public void reject(final Throwable failure) {
-            if (count.incrementAndGet() < link.length) {
-                return;
-            }
-            super.reject(failure);
-        }
-
-        @Override
-        public void link(final Chain<?> chain) {
-            try {
-                chain.awaitLink()
-                        .onResolve(this)
-                        .onReject(this);
-            } catch (final Throwable e) {
-                log().warnf(e, Messages.format("CHAINLINK-004005.chain.get.exception"));
-                this.reject(e);
-            }
-        }
     }
 }

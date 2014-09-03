@@ -21,8 +21,16 @@ public class ExecutionCallback extends ExecutableImpl<ExecutionWork> implements 
 
     private static final Logger log = Logger.getLogger(ExecutionCallback.class);
 
-    public ExecutionCallback(final ExecutableId parentId, final ExecutableImpl<ExecutionWork> executable, final WorkerId workerId) {
+    final ExecutableId id;
+
+    public ExecutionCallback(final ExecutableId id, final ExecutableId parentId, final ExecutableImpl<ExecutionWork> executable, final WorkerId workerId) {
         super(parentId, executable, workerId);
+        this.id = id;
+    }
+
+    @Override
+    public ExecutableId getId() {
+        return this.id;
     }
 
     @Override
@@ -43,8 +51,7 @@ public class ExecutionCallback extends ExecutableImpl<ExecutionWork> implements 
             }
             this.context.getJobContext().setBatchStatus(BatchStatus.FAILED);
             final Executable callback = configuration.getRegistry()
-                    .getJobRegistry(context.getJobExecutionId())
-                    .getExecutable(parentId);
+                    .getExecutable(context.getJobExecutionId(), parentId);
             next = configuration.getExecutor().callback(callback, this.context);
             chain.link(next != null ? next : new ResolvedChain<Void>(null));
             chain.reject(e);

@@ -41,5 +41,5 @@ public interface ExecutionContext extends Serializable {
 
     long[] getPriorStepExecutionIds();
 
-    void addPriorStepExecutionId(final long priorStepExecutionId);
+    void setPriorStepExecutionId(final long[] priorStepExecutionId);
 }

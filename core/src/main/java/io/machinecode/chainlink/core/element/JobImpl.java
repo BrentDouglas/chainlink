@@ -125,7 +125,7 @@ public class JobImpl implements Job, JobWork, Serializable {
         final BatchStatus batchStatus = context.getJobContext().getBatchStatus();
         if (Statuses.isStopping(batchStatus)) {
             log.debugf(Messages.get("CHAINLINK-018002.job.status.early.termination"), context, batchStatus);
-            final Executable callback = configuration.getRegistry().getJobRegistry(jobExecutionId).getExecutable(callbackId);
+            final Executable callback = configuration.getRegistry().getExecutable(jobExecutionId, callbackId);
             return configuration.getExecutor().callback(callback, context);
         }
 

@@ -1,12 +1,9 @@
 package io.machinecode.chainlink.transport.infinispan;
 
 import io.machinecode.chainlink.core.registry.LocalJobRegistry;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.chainlink.transport.infinispan.callable.FetchExecutableCallable;
-import io.machinecode.chainlink.transport.infinispan.callable.FindJobRegistryWithIdCallable;
+import io.machinecode.chainlink.transport.infinispan.callable.FindJobRegistryWithChainIdCallable;
 import io.machinecode.chainlink.spi.then.Chain;
 import org.infinispan.remoting.transport.Address;
 
@@ -45,7 +42,7 @@ public class InfinispanJobRegistry extends LocalJobRegistry {
             if (address.equals(registry.local)) {
                 continue;
             }
-            futures.add(registry.distributor.submit(address, new FindJobRegistryWithIdCallable(jobExecutionId, id)));
+            futures.add(registry.distributor.submit(address, new FindJobRegistryWithChainIdCallable(jobExecutionId, id)));
         }
         for (final Future<Address> future : futures) {
             try {
@@ -58,7 +55,7 @@ public class InfinispanJobRegistry extends LocalJobRegistry {
                     throw new IllegalStateException(); //Also should not have been distributed
                 } else {
                     //TODO Cache these?
-                    return new RemoteChain(registry, address, jobExecutionId, id);
+                    return new LocalChain(registry, address, jobExecutionId, id);
                 }
             } catch (final InterruptedException e) {
                 throw new RuntimeException(e);
@@ -69,38 +66,5 @@ public class InfinispanJobRegistry extends LocalJobRegistry {
         throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-005000.registry.no.job", jobExecutionId));
     }
 
-    public Executable getLocalExecutable(final ExecutableId id) {
-        return super.getExecutable(id);
-    }
 
-    @Override
-    public Executable getExecutable(final ExecutableId id) {
-        final Executable executable = super.getExecutable(id);
-        if (executable != null) {
-             return executable;
-        }
-        final List<Address> members = registry.rpc.getMembers();
-        final List<Future<Executable>> futures = new ArrayList<Future<Executable>>();
-        for (final Address address : members) {
-            if (address.equals(registry.local)) {
-                continue;
-            }
-            futures.add(registry.distributor.submit(address, new FetchExecutableCallable(jobExecutionId, id)));
-        }
-        for (final Future<Executable> future : futures) {
-            try {
-                //TODO Search these for completes rather that .get() them in order
-                final Executable remote = future.get();
-                if (remote == null) {
-                    continue;
-                }
-                return remote;
-            } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (final ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-005000.registry.no.job", jobExecutionId));
-    }
 }

@@ -39,11 +39,11 @@ public abstract class BaseChain<T> extends PromiseImpl<T,Throwable> implements C
     public void notifyLinked() {
         final boolean set;
         synchronized (this) {
-            notifyAll();
-            set = previous != null;
+            this.notifyAll();
+            set = this.previous != null;
         }
         if (set) {
-            previous.notifyLinked();
+            this.previous.notifyLinked();
         }
     }
 
@@ -121,7 +121,7 @@ public abstract class BaseChain<T> extends PromiseImpl<T,Throwable> implements C
         if (Thread.interrupted()) {
             throw new InterruptedException(getInterruptedExceptionMessage());
         }
-        awaitLink().get();
+        awaitLink();
         return super.get();
     }
 
@@ -131,7 +131,7 @@ public abstract class BaseChain<T> extends PromiseImpl<T,Throwable> implements C
             throw new InterruptedException(getInterruptedExceptionMessage());
         }
         final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-        awaitLink().get(_tryTimeout(end), MILLISECONDS);
+        awaitLink(_tryTimeout(end), MILLISECONDS);
         return super.get(_tryTimeout(end), MILLISECONDS);
     }
 

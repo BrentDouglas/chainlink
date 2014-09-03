@@ -58,8 +58,7 @@ public class EventedExecutor implements Executor {
     @Override
     public Chain<?> execute(final Executable executable) {
         final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = registry.getJobRegistry(executable.getContext().getJobExecutionId())
-                .registerChain(registry.generateChainId(), chain);
+        final ChainId chainId = registry.registerChain(executable.getContext().getJobExecutionId(), registry.generateChainId(), chain);
         _execute(executable, chainId);
         return chain;
     }
@@ -99,8 +98,7 @@ public class EventedExecutor implements Executor {
                 @Override
                 public void resolve(final Worker.ChainAndId that) {
                     chains[index] = that.getChain();
-                    registry.getJobRegistry(executable.getContext().getJobExecutionId())
-                            .registerChain(that.getLocalId(), that.getChain());
+                    registry.registerChain(executable.getContext().getJobExecutionId(), that.getLocalId(), that.getChain());
                     worker.execute(new ExecutableEventImpl(executable, that.getRemoteId()));
                 }
             };
@@ -132,8 +130,7 @@ public class EventedExecutor implements Executor {
                     .onResolve(new OnResolve<Worker.ChainAndId>() {
                         @Override
                         public void resolve(final Worker.ChainAndId that) {
-                            registry.getJobRegistry(executable.getContext().getJobExecutionId())
-                                    .registerChain(that.getLocalId(), that.getChain());
+                            registry.registerChain(executable.getContext().getJobExecutionId(), that.getLocalId(), that.getChain());
                             worker.execute(new ExecutableEventImpl(executable, that.getRemoteId(), context));
                         }
                     })
@@ -145,7 +142,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Future<?> cancel(final Promise<?,Throwable> promise) {
+    public Future<?> cancel(final Promise<?,?> promise) {
         return cancellation.submit(new Runnable() {
             @Override
             public void run() {

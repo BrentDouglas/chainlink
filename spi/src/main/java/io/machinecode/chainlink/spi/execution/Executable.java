@@ -14,13 +14,21 @@ import java.io.Serializable;
  */
 public interface Executable extends Serializable {
 
-    ExecutionContext getContext();
+    /**
+     * @return The id of this executable.
+     */
+    ExecutableId getId();
 
+    /**
+     * @return The id of the executable that spawned this executable.
+     */
     ExecutableId getParentId();
 
     WorkerId getWorkerId();
 
     ExecutionRepositoryId getExecutionRepositoryId();
+
+    ExecutionContext getContext();
 
     void execute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId, final ExecutionContext childContext);
 }

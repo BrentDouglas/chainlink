@@ -1,13 +1,15 @@
 package io.machinecode.chainlink.spi.registry;
 
 import io.machinecode.chainlink.spi.Lifecycle;
+import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.then.api.On;
 
+import javax.batch.api.partition.PartitionReducer;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobExecutionNotRunningException;
+import javax.transaction.Transaction;
 import java.util.List;
 
 /**
@@ -43,15 +45,40 @@ public interface Registry extends Lifecycle {
 
     Chain<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
 
-    JobRegistry getJobRegistry(long jobExecutionId);
-
     void unregisterJob(long jobExecutionId);
 
-    void onRegisterJob(final On<Long> on);
+    ChainId registerChain(final long jobExecutionId, final ChainId id, final Chain<?> chain);
 
-    /**
-     * Should only be executed if the main job Promise is registered in this repository
-     * @param on
-     */
-    void onUnregisterJob(final On<Long> on);
+    Chain<?> getChain(final long jobExecutionId, final ChainId id);
+
+    void registerExecutable(final long jobExecutionId, final Executable executable);
+
+    Executable getExecutable(final long jobExecutionId, final ExecutableId id);
+
+    StepAccumulator getStepAccumulator(final long jobExecutionId, final String id);
+
+    SplitAccumulator getSplitAccumulator(final long jobExecutionId, final String id);
+
+    interface Accumulator {
+
+        long incrementAndGetCallbackCount();
+    }
+
+    interface SplitAccumulator extends Accumulator {
+
+        long[] getPriorStepExecutionIds();
+
+        void addPriorStepExecutionId(final long priorStepExecutionId);
+    }
+
+    interface StepAccumulator extends Accumulator {;
+
+        PartitionReducer.PartitionStatus getPartitionStatus();
+
+        void setPartitionStatus(final PartitionReducer.PartitionStatus partitionStatus);
+
+        Transaction getTransaction();
+
+        void setTransaction(final Transaction transaction);
+    }
 }

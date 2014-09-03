@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.execution;
 import io.machinecode.chainlink.core.then.Notify;
 import io.machinecode.chainlink.core.registry.UUIDId;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Worker;
@@ -49,7 +50,7 @@ public class EventedWorker extends Thread implements Worker {
     @Override
     public void execute(final ExecutableEvent event) {
         final Executable executable = event.getExecutable();
-        log.debugf(Messages.get("CHAINLINK-024005.worker.add.executable"), this, executable);
+        log.debugf(Messages.get("CHAINLINK-024005.worker.add.executable"), executable.getContext(), this, executable);
         synchronized (lock) {
             executables.add(event);
             lock.notifyAll();
@@ -57,7 +58,7 @@ public class EventedWorker extends Thread implements Worker {
     }
 
     @Override
-    public Promise<ChainAndId,Throwable>chain(final Executable executable) {
+    public Promise<ChainAndId,Throwable> chain(final Executable executable) {
         final UUIDId id = new UUIDId();
         return new ResolvedPromise<ChainAndId,Throwable>(new ChainAndId(id, id, new ChainImpl<Void>()));
     }
@@ -76,14 +77,15 @@ public class EventedWorker extends Thread implements Worker {
             return;
         }
         final Executable executable = event.getExecutable();
+        final ExecutionContext context = executable.getContext();
+        final ExecutionContext previous = event.getContext();
         try {
             final Chain<?> chain = configuration.getRegistry()
-                    .getJobRegistry(executable.getContext().getJobExecutionId())
-                    .getChain(event.getChainId());
+                    .getChain(context.getJobExecutionId(), event.getChainId());
             chain.onComplete(notify);
-            executable.execute(configuration, chain, workerId, event.getContext());
+            executable.execute(configuration, chain, workerId, previous);
         } catch (final Throwable e) {
-            log.errorf(e, Messages.get("CHAINLINK-024004.worker.execute.execution"), this, executable);
+            log.errorf(e, Messages.get("CHAINLINK-024004.worker.execute.execution"), context, this, executable);
         }
     }
 

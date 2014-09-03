@@ -5,6 +5,8 @@ import io.machinecode.chainlink.spi.then.OnLink;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.RejectedPromise;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
@@ -27,7 +29,12 @@ public class RejectedChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public Promise<Void,Throwable>awaitLink() {
-        return new RejectedPromise<Void,Throwable>(this.failure);
+    public void awaitLink() {
+        // no op
+    }
+
+    @Override
+    public void awaitLink(final long timeout, final TimeUnit unit) throws InterruptedException {
+        // no op
     }
 }

@@ -1,20 +1,13 @@
 package io.machinecode.chainlink.transport.infinispan;
 
-import io.machinecode.chainlink.core.then.ResolvedChain;
+import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
-import io.machinecode.chainlink.core.then.ChainImpl;
-import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.PromiseImpl;
 import org.infinispan.remoting.transport.Address;
 
 import java.io.Serializable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -38,11 +31,24 @@ public class RemoteChain extends ChainImpl<Void> {
     }
 
     @Override
-    public boolean cancel(final boolean mayInterruptIfRunning) {
+    public void resolve(final Void value) {
         try {
-            final PromiseImpl<Boolean,Throwable> promise = new PromiseImpl<Boolean,Throwable>();
-            registry.invoke(address, command("cancel", true, mayInterruptIfRunning), promise);
-            return super.cancel(mayInterruptIfRunning) && promise.get();
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            registry.invoke(address, command("resolve", false, new Serializable[]{ null }), promise);
+            super.resolve(value);
+            promise.get();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void reject(final Throwable failure) {
+        try {
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            registry.invoke(address, command("reject", false, failure), promise);
+            super.reject(failure);
+            promise.get();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -50,39 +56,14 @@ public class RemoteChain extends ChainImpl<Void> {
 
     @Override
     public ChainImpl<Void> link(final Chain<?> that) {
-        return super.link(new ResolvedChain<Void>(null));
-    }
-
-    public void notifyLinkRejected(final Throwable fail) {
-        this.promise.reject(fail);
-    }
-
-    public void notifyLinkResolved() {
-        this.promise.resolve(null);
-    }
-
-    @Override
-    public Void get() throws InterruptedException, ExecutionException {
         try {
-            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
-            registry.invoke(address, command("get", true), promise);
-            super.get();
-            return promise.get();
+            final PromiseImpl<Boolean,Throwable> promise = new PromiseImpl<Boolean,Throwable>();
+            registry.invoke(address, command("link", false, new Serializable[]{ null }), promise);
+            super.link(that);
+            promise.get();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        try {
-            final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
-            registry.invoke(address, command("get", true, timeout, unit), promise);
-            super.get(_tryTimeout(end), MILLISECONDS);
-            return promise.get(_tryTimeout(end), MILLISECONDS);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+        return this;
     }
 }

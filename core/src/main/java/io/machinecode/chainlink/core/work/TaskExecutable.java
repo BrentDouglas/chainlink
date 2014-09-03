@@ -45,12 +45,10 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> implements Serializ
         });
         final MutableStepContext stepContext = context.getStepContext();
         final MutableJobContext jobContext = context.getJobContext();
-        final Executable callback = configuration.getRegistry()
-                .getJobRegistry(context.getJobExecutionId())
-                .getExecutable(parentId);
+        final Executable parent = configuration.getRegistry().getExecutable(context.getJobExecutionId(), parentId);
         try {
             work.run(configuration, chain, this.executionRepositoryId, this.context, timeout);
-            final Chain<?> next = configuration.getExecutor().callback(callback, this.context);
+            final Chain<?> next = configuration.getExecutor().callback(parent, this.context);
             chain.link(next);
             chain.resolve(null);
         } catch (final Throwable e) {
@@ -60,7 +58,7 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> implements Serializ
             }
             stepContext.setBatchStatus(BatchStatus.FAILED);
             jobContext.setBatchStatus(BatchStatus.FAILED);
-            final Chain<?> next = configuration.getExecutor().callback(callback, this.context);
+            final Chain<?> next = configuration.getExecutor().callback(parent, this.context);
             chain.link(next);
             chain.reject(e);
         }

@@ -244,4 +244,22 @@ public class JpaJobExecution implements ExtendedJobExecution {
         this.stepExecutions = stepExecutions;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "JpaJobExecution{" +
+                "id=" + id +
+                ", jobInstance=" + jobInstance +
+                ", jobName='" + jobName + '\'' +
+                ", batchStatus=" + batchStatus +
+                ", exitStatus='" + exitStatus + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", createTime=" + createTime +
+                ", updatedTime=" + updatedTime +
+                ", restartElementId='" + restartElementId + '\'' +
+                ", parameters=" + parameters +
+                ", stepExecutions=" + stepExecutions +
+                '}';
+    }
 }

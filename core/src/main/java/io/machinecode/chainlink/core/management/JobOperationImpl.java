@@ -2,7 +2,10 @@ package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.management.JobOperation;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.Promise;
+import org.jboss.logging.Logger;
 
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -15,19 +18,22 @@ import java.util.concurrent.TimeoutException;
 * @author Brent Douglas <brent.n.douglas@gmail.com>
 */
 public class JobOperationImpl implements JobOperation {
-    private final long id;
-    private final Promise<?,Throwable> promise;
+
+    private static final Logger log = Logger.getLogger(JobOperationImpl.class);
+
+    private final long jobExecutionId;
+    private final Promise<?,?> promise;
     private final ExecutionRepository repository;
 
-    public JobOperationImpl(final long id, final Promise<?,Throwable> promise, final ExecutionRepository repository) {
-        this.id = id;
+    public JobOperationImpl(final long jobExecutionId, final Promise<?,?> promise, final ExecutionRepository repository) {
+        this.jobExecutionId = jobExecutionId;
         this.promise = promise;
         this.repository = repository;
     }
 
     @Override
     public long getJobExecutionId() {
-        return id;
+        return jobExecutionId;
     }
 
     @Override
@@ -51,7 +57,9 @@ public class JobOperationImpl implements JobOperation {
             promise.get();
         }
         try {
-            return repository.getJobExecution(id);
+            final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId);
+            log.tracef(Messages.get("CHAINLINK-033000.operation.get"), jobExecutionId, execution);
+            return execution;
         } catch (final NoSuchJobExecutionException e) {
             throw e;
         } catch (final JobSecurityException e) {
@@ -67,7 +75,9 @@ public class JobOperationImpl implements JobOperation {
             promise.get(timeout, unit);
         }
         try {
-            return repository.getJobExecution(id);
+            final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId);
+            log.tracef(Messages.get("CHAINLINK-033000.operation.get"), jobExecutionId, execution);
+            return execution;
         } catch (final NoSuchJobExecutionException e) {
             throw e;
         } catch (final JobSecurityException e) {

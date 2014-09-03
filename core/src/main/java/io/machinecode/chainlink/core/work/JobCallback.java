@@ -24,13 +24,23 @@ public class JobCallback extends ExecutableImpl<JobWork> {
 
     private static final Logger log = Logger.getLogger(JobCallback.class);
 
-    public JobCallback(final ExecutableImpl<JobWork> executable, final WorkerId workerId) {
+    final ExecutableId id;
+    final Chain<?> chain;
+
+    public JobCallback(final ExecutableId id, final ExecutableImpl<JobWork> executable, final WorkerId workerId, final Chain<?> chain) {
         super(null, executable, workerId);
+        this.id = id;
+        this.chain = chain;
+    }
+
+    @Override
+    public ExecutableId getId() {
+        return this.id;
     }
 
     @Override
     protected void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
-                                    final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
+                             final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
         final MutableJobContext jobContext = context.getJobContext();
         Throwable throwable = null;
         try {

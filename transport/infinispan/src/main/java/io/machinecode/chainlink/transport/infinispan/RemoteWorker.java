@@ -2,11 +2,12 @@ package io.machinecode.chainlink.transport.infinispan;
 
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.transport.infinispan.cmd.CreateChainCommand;
+import io.machinecode.chainlink.transport.infinispan.cmd.PushChainCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.ExecuteCommand;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Worker;
+import io.machinecode.chainlink.transport.infinispan.cmd.PushExecutableCommand;
 import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.PromiseImpl;
@@ -36,23 +37,34 @@ public class RemoteWorker implements Worker {
 
     @Override
     public void execute(final ExecutableEvent event) {
-        registry.invoke(remote, new ExecuteCommand(registry.cacheName, workerId, event), new PromiseImpl<Object,Throwable>());
+        final long jobExecutionId = event.getExecutable().getContext().getJobExecutionId();
+        registry.invoke(
+                remote,
+                new PushExecutableCommand(registry.cacheName, jobExecutionId, event.getExecutable()),
+                new PromiseImpl<Object, Throwable>()
+                        .onResolve(new OnResolve<Object>() {
+                            @Override
+                            public void resolve(final Object that) {
+                                registry.invoke(remote, new ExecuteCommand(registry.cacheName, workerId, event), new PromiseImpl<Object,Throwable>());
+                            }
+                        }) //TODO OnReject notify something
+        );
     }
 
     @Override
-    public Promise<ChainAndId,Throwable>chain(final Executable executable) {
+    public Promise<ChainAndId,Throwable> chain(final Executable executable) {
         final long jobExecutionId = executable.getContext().getJobExecutionId();
         final Promise<ChainAndId,Throwable> promise = new PromiseImpl<ChainAndId,Throwable>();
         final ChainId localId = registry.generateChainId();
         registry.invoke(
                 remote,
-                new CreateChainCommand(registry.cacheName, jobExecutionId, localId),
+                new PushChainCommand(registry.cacheName, jobExecutionId, localId),
                 new PromiseImpl<ChainId,Throwable>()
                         .onResolve(new OnResolve<ChainId>() {
                             @Override
                             public void resolve(final ChainId remoteId) {
                                 //This side has a different id than the remote side
-                                promise.resolve(new ChainAndId(localId, remoteId, new RemoteChain(registry, remote, jobExecutionId, remoteId)));
+                                promise.resolve(new ChainAndId(localId, remoteId, new LocalChain(registry, remote, jobExecutionId, remoteId)));
                             }
                         }).onReject(promise)
         );

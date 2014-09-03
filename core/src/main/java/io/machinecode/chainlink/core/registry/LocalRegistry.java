@@ -4,11 +4,13 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
+import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.JobRegistry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.registry.Registry;
@@ -17,7 +19,9 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.On;
 import org.jboss.logging.Logger;
 
+import javax.batch.api.partition.PartitionReducer;
 import javax.batch.operations.JobExecutionNotRunningException;
+import javax.transaction.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -40,10 +44,8 @@ public class LocalRegistry implements Registry {
     protected final AtomicBoolean workerLock = new AtomicBoolean(false);
     protected final AtomicBoolean repositoryLock = new AtomicBoolean(false);
 
-    protected final TLongObjectMap<JobRegistry> jobRegistries = new TLongObjectHashMap<JobRegistry>();
+    protected final TLongObjectMap<LocalJobRegistry> jobRegistries = new TLongObjectHashMap<LocalJobRegistry>();
     protected final TLongObjectMap<Chain<?>> jobs = new TLongObjectHashMap<Chain<?>>();
-    protected final List<On<Long>> onRegisters = new ArrayList<On<Long>>();
-    protected final List<On<Long>> onUnregisters = new ArrayList<On<Long>>();
     protected final AtomicBoolean jobLock = new AtomicBoolean(false);
 
     public LocalRegistry() {
@@ -196,15 +198,13 @@ public class LocalRegistry implements Registry {
 
     @Override
     public ChainId registerJob(final long jobExecutionId, final ChainId chainId, final Chain<?> chain) {
-        final JobRegistry jobRegistry = _createJobRegistry(jobExecutionId);
+        final LocalJobRegistry jobRegistry = _createJobRegistry(jobExecutionId);
         final ChainId id = jobRegistry.registerChain(chainId, chain);
         while (!jobLock.compareAndSet(false, true)) {}
         try {
             this.jobs.put(jobExecutionId, chain);
             this.jobRegistries.put(jobExecutionId, jobRegistry);
-            for (final On<Long> on : onRegisters) {
-                on.on(jobExecutionId);
-            }
+            this.onRegisterJob(jobExecutionId);
             log.debugf(Messages.get("CHAINLINK-005100.registry.put.job"), jobExecutionId);
         } finally {
             jobLock.set(false);
@@ -227,57 +227,148 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public JobRegistry getJobRegistry(final long jobExecutionId) throws JobExecutionNotRunningException {
-        while (!jobLock.compareAndSet(false, true)) {}
-        try {
-            final JobRegistry job = this.jobRegistries.get(jobExecutionId);
-            if (job == null) {
-                throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-005000.registry.no.job", jobExecutionId));
-            }
-            return job;
-        } finally {
-            jobLock.set(false);
-        }
-    }
-
-    @Override
     public void unregisterJob(final long jobExecutionId) {
         while (!jobLock.compareAndSet(false, true)) {}
         try {
-            final Chain<?> job = this.jobs.remove(jobExecutionId);
+            this.jobs.remove(jobExecutionId);
             this.jobRegistries.remove(jobExecutionId);
-            if (job != null) {
-                for (final On<Long> on : onUnregisters) {
-                    on.on(jobExecutionId);
-                }
-            }
+            this.onUnregisterJob(jobExecutionId);
         } finally {
             jobLock.set(false);
         }
         log.debugf(Messages.get("CHAINLINK-005101.registry.removed.job"), jobExecutionId);
     }
 
+    protected void onRegisterJob(final long jobExecutionId) {
+        // noop
+    }
+
+    protected void onUnregisterJob(final long jobExecutionId) {
+        // noop
+    }
+
     @Override
-    public void onRegisterJob(final On<Long> on) {
+    public ChainId registerChain(final long jobExecutionId, final ChainId id, final Chain<?> chain) {
         while (!jobLock.compareAndSet(false, true)) {}
         try {
-            this.onRegisters.add(on);
+            final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
+            if (job == null) {
+                throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-005000.registry.no.job", jobExecutionId));
+            }
+            return job.registerChain(id, chain);
         } finally {
             jobLock.set(false);
         }
     }
 
     @Override
-    public void onUnregisterJob(final On<Long> on) {
+    public Chain<?> getChain(final long jobExecutionId, final ChainId id) {
         while (!jobLock.compareAndSet(false, true)) {}
         try {
-            this.onUnregisters.add(on);
+            final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
+            return job.getChain(id);
         } finally {
             jobLock.set(false);
         }
     }
 
-    protected JobRegistry _createJobRegistry(final long jobExecutionId) {
+    @Override
+    public void registerExecutable(final long jobExecutionId, final Executable executable) {
+        final ExecutableId id = executable.getId();
+        while (!jobLock.compareAndSet(false, true)) {}
+        try {
+            final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
+            job.registerExecutable(id, executable);
+        } finally {
+            jobLock.set(false);
+        }
+    }
+
+    @Override
+    public Executable getExecutable(final long jobExecutionId, final ExecutableId id) {
+        while (!jobLock.compareAndSet(false, true)) {}
+        try {
+            final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
+            return job.getExecutable(id);
+        } finally {
+            jobLock.set(false);
+        }
+    }
+
+    @Override
+    public StepAccumulator getStepAccumulator(final long jobExecutionId, final String id) {
+        while (!jobLock.compareAndSet(false, true)) {}
+        try {
+            final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
+            return job.getStepAccumulator(id);
+        } finally {
+            jobLock.set(false);
+        }
+    }
+
+    @Override
+    public SplitAccumulator getSplitAccumulator(final long jobExecutionId, final String id) {
+        while (!jobLock.compareAndSet(false, true)) {}
+        try {
+            final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
+            return job.getSplitAccumulator(id);
+        } finally {
+            jobLock.set(false);
+        }
+    }
+
+    protected LocalJobRegistry _createJobRegistry(final long jobExecutionId) {
         return new LocalJobRegistry();
+    }
+
+    public static class AccumulatorImpl implements Accumulator {
+
+        private long count = 0;
+
+        @Override
+        public long incrementAndGetCallbackCount() {
+            return ++count;
+        }
+    }
+
+    public static class SplitAccumulatorImpl extends AccumulatorImpl implements SplitAccumulator {
+
+        private final TLongSet priorStepExecutionIds = new TLongHashSet();
+
+        @Override
+        public long[] getPriorStepExecutionIds() {
+            return priorStepExecutionIds.toArray();
+        }
+
+        @Override
+        public void addPriorStepExecutionId(final long priorStepExecutionId) {
+            this.priorStepExecutionIds.add(priorStepExecutionId);
+        }
+    }
+
+    public static class StepAccumulatorImpl extends AccumulatorImpl implements StepAccumulator {
+
+        private PartitionReducer.PartitionStatus partitionStatus;
+        private Transaction transaction;
+
+        @Override
+        public PartitionReducer.PartitionStatus getPartitionStatus() {
+            return partitionStatus;
+        }
+
+        @Override
+        public void setPartitionStatus(final PartitionReducer.PartitionStatus partitionStatus) {
+            this.partitionStatus = partitionStatus;
+        }
+
+        @Override
+        public Transaction getTransaction() {
+            return transaction;
+        }
+
+        @Override
+        public void setTransaction(final Transaction transaction) {
+            this.transaction = transaction;
+        }
     }
 }

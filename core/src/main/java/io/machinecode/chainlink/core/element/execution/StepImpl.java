@@ -13,7 +13,7 @@ import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.work.TaskExecutable;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
-import io.machinecode.chainlink.spi.registry.JobRegistry;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
@@ -35,7 +35,6 @@ import org.jboss.logging.Logger;
 import javax.batch.api.listener.StepListener;
 import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
@@ -43,6 +42,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import static io.machinecode.chainlink.spi.registry.Registry.StepAccumulator;
 import static javax.batch.api.partition.PartitionReducer.PartitionStatus;
 import static javax.batch.api.partition.PartitionReducer.PartitionStatus.COMMIT;
 import static javax.batch.api.partition.PartitionReducer.PartitionStatus.ROLLBACK;
@@ -284,9 +284,8 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         final long stepExecutionId = context.getStepExecutionId();
         final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
         final MutableStepContext stepContext = context.getStepContext();
-        final JobRegistry.StepAccumulator accumulator = configuration.getRegistry()
-                .getJobRegistry(context.getJobExecutionId())
-                .getStepAccumulator(id);
+        final StepAccumulator accumulator = configuration.getRegistry()
+                .getStepAccumulator(jobExecutionId, id);
         final long completed = accumulator.incrementAndGetCallbackCount();
         try {
             final TransactionManager transactionManager = configuration.getTransactionManager();

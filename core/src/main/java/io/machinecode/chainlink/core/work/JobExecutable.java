@@ -32,9 +32,8 @@ public class JobExecutable extends ExecutableImpl<JobWork> implements Serializab
                                  final ExecutableId parentId, final ExecutionContext _context) throws Throwable {
         final Registry registry = configuration.getRegistry();
         try {
-            final ExecutableId callbackId = registry
-                    .getJobRegistry(context.getJobExecutionId())
-                    .registerExecutable(registry.generateExecutableId(), new JobCallback(this, workerId));
+            final ExecutableId callbackId = registry.generateExecutableId();
+            registry.registerExecutable(context.getJobExecutionId(), new JobCallback(callbackId, this, workerId, chain));
             final Chain<?> next = work.before(configuration, this.executionRepositoryId, workerId, callbackId, this.context);
             chain.link(next != null ? next : new ResolvedChain<Void>(null));
             chain.resolve(null);
@@ -45,9 +44,9 @@ public class JobExecutable extends ExecutableImpl<JobWork> implements Serializab
                     this.context.getJobExecutionId(),
                     this.context.getJobContext().getExitStatus()
             );
-            configuration.getRegistry().unregisterJob(this.context.getJobExecutionId());
             chain.link(new ResolvedChain<Void>(null));
             chain.reject(e);
+            configuration.getRegistry().unregisterJob(this.context.getJobExecutionId());
         }
     }
 

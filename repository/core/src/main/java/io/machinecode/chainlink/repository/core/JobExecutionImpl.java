@@ -132,6 +132,23 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
         return that;
     }
 
+    @Override
+    public String toString() {
+        return "JobExecutionImpl{" +
+                "jobInstanceId=" + jobInstanceId +
+                ", jobExecutionId=" + jobExecutionId +
+                ", jobName='" + jobName + '\'' +
+                ", batchStatus=" + batchStatus +
+                ", start=" + start +
+                ", end=" + end +
+                ", exitStatus='" + exitStatus + '\'' +
+                ", created=" + created +
+                ", updated=" + updated +
+                ", parameters=" + parameters +
+                ", restartElementId='" + restartElementId + '\'' +
+                '}';
+    }
+
     public static class Builder {
         private long jobInstanceId;
         private long jobExecutionId;

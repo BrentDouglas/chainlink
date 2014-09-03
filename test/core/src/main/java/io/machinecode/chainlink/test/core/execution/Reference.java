@@ -1,10 +1,11 @@
-package io.machinecode.chainlink.spi.util;
+package io.machinecode.chainlink.test.core.execution;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class Reference<T> {
-    private T value;
+
+    private volatile T value;
 
     public Reference(final T value) {
         this.value = value;

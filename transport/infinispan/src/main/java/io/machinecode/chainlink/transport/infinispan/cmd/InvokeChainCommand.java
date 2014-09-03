@@ -36,7 +36,7 @@ public class InvokeChainCommand extends PromiseCommand {
 
     @Override
     public Object perform(final InvocationContext context) throws Throwable {
-        final Chain<?> chain = registry.getJobRegistry(jobExecutionId).getChain(chainId);
+        final Chain<?> chain = registry.getChain(jobExecutionId, chainId);
         Method method = null;
         for (final Method that : chain.getClass().getMethods()) { //TODO Should use Chain.class once worked around resolveLinkRejected etc
             if (that.getName().equals(methodName) && that.getParameterTypes().length == parameters.length) {

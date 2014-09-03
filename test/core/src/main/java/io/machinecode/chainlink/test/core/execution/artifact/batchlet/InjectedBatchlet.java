@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.test.core.execution.artifact.batchlet;
 
-import io.machinecode.chainlink.spi.util.Reference;
+import io.machinecode.chainlink.test.core.execution.Reference;
 import junit.framework.Assert;
 
 import javax.batch.api.BatchProperty;

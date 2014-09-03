@@ -2,10 +2,11 @@ package io.machinecode.chainlink.transport.infinispan.configuration;
 
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.transport.infinispan.cmd.CleanupCommand;
-import io.machinecode.chainlink.transport.infinispan.cmd.CreateChainCommand;
+import io.machinecode.chainlink.transport.infinispan.cmd.PushChainCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.ExecuteCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeExecutionRepositoryCommand;
+import io.machinecode.chainlink.transport.infinispan.cmd.PushExecutableCommand;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.commands.module.ExtendedModuleCommandFactory;
 import org.infinispan.commands.remote.CacheRpcCommand;
@@ -32,8 +33,11 @@ public class ChainlinkModuleCommandFactory implements ExtendedModuleCommandFacto
             case InvokeChainCommand.COMMAND_ID_64:
                 command = new InvokeChainCommand(cacheName);
                 break;
-            case CreateChainCommand.COMMAND_ID_65:
-                command = new CreateChainCommand(cacheName);
+            case PushChainCommand.COMMAND_ID_65:
+                command = new PushChainCommand(cacheName);
+                break;
+            case PushExecutableCommand.COMMAND_ID_66:
+                command = new PushExecutableCommand(cacheName);
                 break;
             default:
                 throw new IllegalStateException(); //TODO Maybe
@@ -49,7 +53,8 @@ public class ChainlinkModuleCommandFactory implements ExtendedModuleCommandFacto
         map.put(CleanupCommand.COMMAND_ID_62, CleanupCommand.class);
         map.put(InvokeExecutionRepositoryCommand.COMMAND_ID_63, InvokeExecutionRepositoryCommand.class);
         map.put(InvokeChainCommand.COMMAND_ID_64, InvokeChainCommand.class);
-        map.put(CreateChainCommand.COMMAND_ID_65, CreateChainCommand.class);
+        map.put(PushChainCommand.COMMAND_ID_65, PushChainCommand.class);
+        map.put(PushExecutableCommand.COMMAND_ID_66, PushExecutableCommand.class);
         return map;
     }
 

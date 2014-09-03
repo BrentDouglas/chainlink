@@ -21,11 +21,6 @@ public class ChainImpl<T> extends BaseChain<T> {
     private static final Logger log = Logger.getLogger(ChainImpl.class);
 
     protected volatile Chain<?> link;
-    protected final AwaitPromise promise = new AwaitPromise();
-
-    public ChainImpl() {
-        this.onLink(promise);
-    }
 
     @Override
     public ChainImpl<T> link(final Chain<?> that) {
@@ -48,7 +43,7 @@ public class ChainImpl<T> extends BaseChain<T> {
                 }
             }
         }
-        notifyLinked();
+        this.notifyLinked();
         if (exception != null) {
             log().warnf(exception, Messages.format("CHAINLINK-004005.chain.get.exception"));
             throw exception;
@@ -78,48 +73,36 @@ public class ChainImpl<T> extends BaseChain<T> {
     }
 
     @Override
-    public Promise<Void,Throwable>awaitLink() {
-        return promise;
+    public void awaitLink() throws InterruptedException, ExecutionException {
+        synchronized (this) {
+            while (this.link == null) {
+                this.wait();
+            }
+        }
+        try {
+            this.link.get();
+        } catch (final Exception e) {
+            // Swallow
+        }
+    }
+
+    @Override
+    public void awaitLink(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
+        final long end = System.currentTimeMillis() + unit.toMillis(timeout);
+        synchronized (this) {
+            while (this.link == null) {
+                this.wait(_tryTimeout(end));
+            }
+        }
+        try {
+            this.link.get(_tryTimeout(end), MILLISECONDS);
+        } catch (final Exception e) {
+            // Swallow
+        }
     }
 
     @Override
     protected Logger log() {
         return log;
-    }
-
-    public class AwaitPromise extends PromiseImpl<Void,Throwable> implements OnLink {
-
-        @Override
-        public Void get() throws InterruptedException, ExecutionException {
-            synchronized (ChainImpl.this) {
-                while (ChainImpl.this.link == null) {
-                    ChainImpl.this.wait();
-                }
-            }
-            return super.get();
-        }
-
-        @Override
-        public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-            synchronized (ChainImpl.this) {
-                while (ChainImpl.this.link == null) {
-                    ChainImpl.this.wait(unit.toMillis(timeout));
-                }
-            }
-            return super.get(_tryTimeout(end), MILLISECONDS);
-        }
-
-        @Override
-        public void link(final Chain<?> chain) {
-            try {
-                chain.awaitLink()
-                        .onResolve(this)
-                        .onReject(this);
-            } catch (final Throwable e) {
-                log().warnf(e, Messages.format("CHAINLINK-004005.chain.get.exception"));
-                this.reject(e);
-            }
-        }
     }
 }

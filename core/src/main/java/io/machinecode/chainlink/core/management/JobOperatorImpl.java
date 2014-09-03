@@ -25,6 +25,7 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
 import io.machinecode.chainlink.spi.registry.Registry;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
 import io.machinecode.then.api.Promise;
@@ -291,12 +292,13 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
                 null,
                 null
         );
-        final Promise<?,Throwable> promise = executor.execute(jobExecutionId, new JobExecutable(
+        final Promise<?,?> promise = executor.execute(jobExecutionId, new JobExecutable(
                 null,
                 this.executionRepositoryId,
                 job,
                 context
         ));
+        log.tracef(Messages.get("CHAINLINK-001300.operator.started"), jobExecutionId, job.getId());
         return new JobOperationImpl(
                 jobExecutionId,
                 promise,
@@ -308,7 +310,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
     public JobOperationImpl getJobOperation(final long jobExecutionId) throws JobExecutionNotRunningException {
         this.securityCheck.canAccessJobExecution(jobExecutionId);
         try {
-            final Promise<?,Throwable> promise = registry.getJob(jobExecutionId);
+            final Promise<?,?> promise = registry.getJob(jobExecutionId);
             return new JobOperationImpl(
                     jobExecutionId,
                     promise,
@@ -391,12 +393,13 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
                 lastExecution.getRestartElementId(),
                 null
         );
-        final Promise<?,Throwable> promise = executor.execute(restartExecutionId, new JobExecutable(
+        final Promise<?,?> promise = executor.execute(restartExecutionId, new JobExecutable(
                 null,
                 this.executionRepositoryId,
                 job,
                 context
         ));
+        log.tracef(Messages.get("CHAINLINK-001301.operator.restarted"), jobExecutionId, job.getId());
         return new JobOperationImpl(
                 restartExecutionId,
                 promise,
@@ -411,17 +414,18 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
     }
 
     @Override
-    public Promise<?,Throwable>stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
+    public Promise<?,Throwable> stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
         this.securityCheck.canRestartJob(jobExecutionId);
         try {
             final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
-            repository.getJobExecution(jobExecutionId); //This will throw a NoSuchJobExecutionException if required
+            final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId); //This will throw a NoSuchJobExecutionException if required
             final Promise<?,Throwable> promise = registry.getJob(jobExecutionId);
             if (promise == null) {
                 throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-001002.operator.not.running", jobExecutionId));
             }
             executor.cancel(promise);
+            log.tracef(Messages.get("CHAINLINK-001302.operator.stopped"), jobExecutionId, execution.getJobName());
             return promise;
         } catch (final NoSuchJobExecutionException e) {
             throw e;
@@ -445,6 +449,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
                 throw new JobExecutionIsRunningException(Messages.format("CHAINLINK-001001.operator.running", jobExecutionId));
             } catch (final JobExecutionNotRunningException e) {
                 Repository.abandonedJob(registry.getExecutionRepository(this.executionRepositoryId), jobExecutionId);
+                log.tracef(Messages.get("CHAINLINK-001303.operator.abandoned"), jobExecutionId);
             }
         } catch (final NoSuchJobExecutionException e) {
             throw e;
