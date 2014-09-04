@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class WhenImpl implements When {
 
-    private final ExecutorService when = Executors.newCachedThreadPool();
+    private final ExecutorService when = Executors.newSingleThreadExecutor();
 
     @Override
     public <T> void when(final Future<T> future, final Promise<T,Throwable> then) {

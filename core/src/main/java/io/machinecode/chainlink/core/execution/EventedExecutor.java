@@ -31,7 +31,7 @@ public class EventedExecutor implements Executor {
     private static final Logger log = Logger.getLogger(EventedExecutor.class);
 
     protected final Registry registry;
-    private final ExecutorService cancellation = Executors.newCachedThreadPool();
+    private final ExecutorService cancellation = Executors.newSingleThreadExecutor();
 
     public EventedExecutor(final ExecutorConfiguration configuration) {
         this.registry = configuration.getRegistry();
@@ -50,7 +50,8 @@ public class EventedExecutor implements Executor {
     @Override
     public Chain<?> execute(final long jobExecutionId, final Executable executable) {
         final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = registry.registerJob(jobExecutionId, registry.generateChainId(), chain);
+        final ChainId chainId = registry.generateChainId();
+        registry.registerJob(jobExecutionId, chainId, chain);
         _execute(executable, chainId);
         return chain;
     }
@@ -58,7 +59,8 @@ public class EventedExecutor implements Executor {
     @Override
     public Chain<?> execute(final Executable executable) {
         final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = registry.registerChain(executable.getContext().getJobExecutionId(), registry.generateChainId(), chain);
+        final ChainId chainId = registry.generateChainId();
+        registry.registerChain(executable.getContext().getJobExecutionId(), chainId, chain);
         _execute(executable, chainId);
         return chain;
     }
@@ -142,7 +144,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Future<?> cancel(final Promise<?,?> promise) {
+    public Future<?> cancel(final Future<?> promise) {
         return cancellation.submit(new Runnable() {
             @Override
             public void run() {

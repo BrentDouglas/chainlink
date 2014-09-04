@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan.callable;
 
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.transport.infinispan.InfinispanJobRegistry;
 import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import org.infinispan.remoting.transport.Address;
 

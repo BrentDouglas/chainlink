@@ -20,5 +20,5 @@ public interface Executor extends Lifecycle {
 
     Chain<?> callback(final Executable executable, final ExecutionContext context);
 
-    Future<?> cancel(final Promise<?,?> promise);
+    Future<?> cancel(final Future<?> promise);
 }

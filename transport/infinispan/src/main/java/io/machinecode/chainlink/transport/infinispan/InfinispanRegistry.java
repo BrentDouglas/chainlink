@@ -4,11 +4,11 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
-import io.machinecode.chainlink.core.registry.LocalJobRegistry;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
-import io.machinecode.chainlink.spi.management.JobOperation;
+import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.When;
+import io.machinecode.chainlink.transport.infinispan.callable.FindExecutableAndContextCallable;
 import io.machinecode.chainlink.transport.infinispan.callable.FindExecutionRepositoryWithIdCallable;
 import io.machinecode.chainlink.transport.infinispan.callable.FindWorkerCallable;
 import io.machinecode.chainlink.transport.infinispan.callable.LeastBusyWorkerCallable;
@@ -22,7 +22,6 @@ import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.then.api.On;
 import io.machinecode.then.api.Promise;
 import org.infinispan.AdvancedCache;
 import org.infinispan.commands.ReplicableCommand;
@@ -257,11 +256,12 @@ public class InfinispanRegistry extends LocalRegistry {
 
     @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        final ExecutionRepository repository = super.getExecutionRepository(id);
-        if (repository != null) {
-            return repository;
+        final ExecutionRepository ours = super.getExecutionRepository(id);
+        if (ours != null) {
+            return ours;
         }
         final List<Address> members = rpc.getMembers();
+        members.remove(this.local);
         final List<Future<Address>> futures = new ArrayList<Future<Address>>(members.size());
         for (final Address address : members) {
             futures.add(distributor.submit(address, new FindExecutionRepositoryWithIdCallable(id)));
@@ -284,13 +284,36 @@ public class InfinispanRegistry extends LocalRegistry {
         throw new IllegalStateException(); //TODO Message
     }
 
-    public ExecutionRepository getLocalExecutionRepository(final ExecutionRepositoryId id) {
-        return  super.getExecutionRepository(id);
+    @Override
+    public ExecutableAndContext getExecutableAndContext(final long jobExecutionId, final ExecutableId id) {
+        final ExecutableAndContext ours = super.getExecutableAndContext(jobExecutionId, id);
+        if (ours != null) {
+            return ours;
+        }
+        final List<Address> members = rpc.getMembers();
+        members.remove(this.local);
+        final List<Future<ExecutableAndContext>> futures = new ArrayList<Future<ExecutableAndContext>>(members.size());
+        for (final Address address : members) {
+            futures.add(distributor.submit(address, new FindExecutableAndContextCallable(jobExecutionId, id)));
+        }
+        for (final Future<ExecutableAndContext> future : futures) {
+            try {
+                final ExecutableAndContext executable = future.get();
+                if (executable == null) {
+                    continue;
+                }
+                return executable;
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        throw new IllegalStateException(); //TODO Message
     }
 
-    @Override
-    protected InfinispanJobRegistry _createJobRegistry(final long jobExecutionId) {
-        return new InfinispanJobRegistry(this, jobExecutionId);
+    public ExecutionRepository getLocalExecutionRepository(final ExecutionRepositoryId id) {
+        return  super.getExecutionRepository(id);
     }
 
     //TODO

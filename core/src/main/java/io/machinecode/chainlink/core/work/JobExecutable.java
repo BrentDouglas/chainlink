@@ -29,11 +29,11 @@ public class JobExecutable extends ExecutableImpl<JobWork> implements Serializab
 
     @Override
         public void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
-                                 final ExecutableId parentId, final ExecutionContext _context) throws Throwable {
+                                 final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
         final Registry registry = configuration.getRegistry();
         try {
             final ExecutableId callbackId = registry.generateExecutableId();
-            registry.registerExecutable(context.getJobExecutionId(), new JobCallback(callbackId, this, workerId, chain));
+            registry.registerExecutableAndContext(context.getJobExecutionId(), new JobCallback(callbackId, this, workerId, chain), this.context);
             final Chain<?> next = work.before(configuration, this.executionRepositoryId, workerId, callbackId, this.context);
             chain.link(next != null ? next : new ResolvedChain<Void>(null));
             chain.resolve(null);

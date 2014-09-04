@@ -42,13 +42,15 @@ public class LocalChain extends ChainImpl<Void> {
 
     @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
+        boolean cancelled = false;
         try {
             final PromiseImpl<Boolean, Throwable> promise = new PromiseImpl<Boolean, Throwable>();
             registry.invoke(address, command("cancel", true, mayInterruptIfRunning), promise);
-            return super.cancel(mayInterruptIfRunning) && promise.get();
+            cancelled = promise.get();
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            // Swallow transmission errors
         }
+        return super.cancel(mayInterruptIfRunning) && cancelled;
     }
 
     @Override
@@ -82,5 +84,15 @@ public class LocalChain extends ChainImpl<Void> {
         final Void ret = promise.get(_tryTimeout(end), MILLISECONDS);
         waited = true;
         return ret;
+    }
+
+    @Override
+    public String toString() {
+        return "LocalChain{" +
+                "address=" + address +
+                ", jobExecutionId=" + jobExecutionId +
+                ", chainId=" + chainId +
+                ", waited=" + waited +
+                '}';
     }
 }

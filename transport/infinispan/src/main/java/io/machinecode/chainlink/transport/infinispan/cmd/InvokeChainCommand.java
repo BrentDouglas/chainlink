@@ -55,13 +55,9 @@ public class InvokeChainCommand extends PromiseCommand {
                     ? that
                     : null;
         } catch (final IllegalArgumentException e) {
-            final Throwable cause = e.getCause() == null ? e : e.getCause();
-            log.errorf(cause, ""); //TODO Message
-            throw cause;
+            throw e.getCause() == null ? e : e.getCause();
         } catch (final InvocationTargetException e) {
-            final Throwable cause = e.getCause();
-            log.errorf(cause, ""); //TODO Message
-            throw cause;
+            throw e.getCause();
         }
     }
 

@@ -70,7 +70,6 @@ public abstract class ExecutableImpl<T extends Work> implements Executable, Seri
             doExecute(configuration, chain, workerId, this.parentId, childContext);
         } catch (final Throwable e) {
             log().errorf(e, Messages.get("CHAINLINK-015701.executable.exception"), this.context, this);
-            chain.reject(e);
         }
     }
 

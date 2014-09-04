@@ -45,7 +45,9 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> implements Serializ
         });
         final MutableStepContext stepContext = context.getStepContext();
         final MutableJobContext jobContext = context.getJobContext();
-        final Executable parent = configuration.getRegistry().getExecutable(context.getJobExecutionId(), parentId);
+        final Executable parent = configuration.getRegistry()
+                .getExecutableAndContext(context.getJobExecutionId(), parentId)
+                .getExecutable();
         try {
             work.run(configuration, chain, this.executionRepositoryId, this.context, timeout);
             final Chain<?> next = configuration.getExecutor().callback(parent, this.context);

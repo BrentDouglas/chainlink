@@ -36,23 +36,29 @@ public class ExecutionCallback extends ExecutableImpl<ExecutionWork> implements 
     @Override
     public void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
                           final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
+        // This needs to be looked up rather than using this.context in case this is after a partitioned execution
+        // and we are using remoting
+        final ExecutionContext context = configuration.getRegistry()
+                .getExecutableAndContext(this.context.getJobExecutionId(), this.getId())
+                .getContext();
         Chain<?> next;
-        try{
+        try {
             if (chain.isCancelled()) {
-                this.context.getJobContext().setBatchStatus(BatchStatus.STOPPING);
+                context.getJobContext().setBatchStatus(BatchStatus.STOPPING);
             }
-            next = work.after(configuration, this.executionRepositoryId, workerId, parentId, this.context, childContext);
+            next = work.after(configuration, this.executionRepositoryId, workerId, parentId, context, childContext);
             chain.link(next != null ? next : new ResolvedChain<Void>(null));
             chain.resolve(null);
         } catch (final Throwable e) {
-            log.errorf(e, Messages.format("CHAINLINK-023001.work.execution.after.exception", this.context));
-            if (this.context.getStepContext() != null) {
-                this.context.getStepContext().setBatchStatus(BatchStatus.FAILED);
+            log.errorf(e, Messages.format("CHAINLINK-023001.work.execution.after.exception", context));
+            if (context.getStepContext() != null) {
+                context.getStepContext().setBatchStatus(BatchStatus.FAILED);
             }
-            this.context.getJobContext().setBatchStatus(BatchStatus.FAILED);
+            context.getJobContext().setBatchStatus(BatchStatus.FAILED);
             final Executable callback = configuration.getRegistry()
-                    .getExecutable(context.getJobExecutionId(), parentId);
-            next = configuration.getExecutor().callback(callback, this.context);
+                    .getExecutableAndContext(context.getJobExecutionId(), parentId)
+                    .getExecutable();
+            next = configuration.getExecutor().callback(callback, context);
             chain.link(next != null ? next : new ResolvedChain<Void>(null));
             chain.reject(e);
         }

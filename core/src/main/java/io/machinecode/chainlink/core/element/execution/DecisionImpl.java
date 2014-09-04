@@ -67,8 +67,8 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
 
     @Override
     public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
-                              final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
-                              final ExecutionContext context) throws Exception {
+                           final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
+                           final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-019000.decision.before"), context, this.id);
         final long[] prior = context.getPriorStepExecutionIds();
         final Long last = context.getLastStepExecutionId();
@@ -87,8 +87,8 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
 
     @Override
     public Chain<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
-                             final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
-                             final ExecutionContext childContext) throws Exception {
+                          final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                          final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-019001.decision.after"), context, this.id);
         final MutableJobContext jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();

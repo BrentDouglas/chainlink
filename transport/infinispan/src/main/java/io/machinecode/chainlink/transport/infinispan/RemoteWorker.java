@@ -7,7 +7,6 @@ import io.machinecode.chainlink.transport.infinispan.cmd.ExecuteCommand;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.transport.infinispan.cmd.PushExecutableCommand;
 import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.PromiseImpl;
@@ -37,18 +36,7 @@ public class RemoteWorker implements Worker {
 
     @Override
     public void execute(final ExecutableEvent event) {
-        final long jobExecutionId = event.getExecutable().getContext().getJobExecutionId();
-        registry.invoke(
-                remote,
-                new PushExecutableCommand(registry.cacheName, jobExecutionId, event.getExecutable()),
-                new PromiseImpl<Object, Throwable>()
-                        .onResolve(new OnResolve<Object>() {
-                            @Override
-                            public void resolve(final Object that) {
-                                registry.invoke(remote, new ExecuteCommand(registry.cacheName, workerId, event), new PromiseImpl<Object,Throwable>());
-                            }
-                        }) //TODO OnReject notify something
-        );
+        registry.invoke(remote, new ExecuteCommand(registry.cacheName, workerId, event), new PromiseImpl<Object,Throwable>());
     }
 
     @Override

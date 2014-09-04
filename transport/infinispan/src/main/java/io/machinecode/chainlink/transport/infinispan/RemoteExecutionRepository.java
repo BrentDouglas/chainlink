@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan;
 
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeExecutionRepositoryCommand;
-import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;

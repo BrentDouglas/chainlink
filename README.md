@@ -30,7 +30,7 @@ inheritance. Built in loaders support:
 - XML
 - Fluent style
 
-JMX job Management.
+JMX job management.
 
 ## Experimental things that don't work yet
 
@@ -106,4 +106,4 @@ afterwards which you can do by running
 
 ## License
 
-[Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
+[Apache 2.0](LICENSE.txt)

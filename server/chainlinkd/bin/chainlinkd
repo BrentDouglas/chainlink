@@ -8,8 +8,8 @@
 # @author Brent Douglas <brent.n.douglas@gmail.com>
 #
 
-[ -e /etc/sysconfig/chainlink.env ] && {
-  source /etc/sysconfig/chainlink.env
+[ -e /etc/sysconfig/chainlinkd ] && {
+  source /etc/sysconfig/chainlinkd
 }
 [ -e /etc/rc.d/init.d/functions ] && {
   source /etc/rc.d/init.d/functions
@@ -86,10 +86,10 @@ status() {
     local pid=$(cat ${CHAINLINK_PIDFILE})
     ( ps -p ${pid} ) 2>&1 > /dev/null
     if [ $? -eq 0 ]; then
-      echo "running (pid ${pid})"
+      echo "Running (pid ${pid})"
       RETVAL=0
     else
-      echo "dead but pid file exists"
+      echo "Dead but pid file exists"
       RETVAL=1
     fi
   else

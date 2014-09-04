@@ -35,11 +35,11 @@ public class RemoteChain extends ChainImpl<Void> {
         try {
             final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
             registry.invoke(address, command("resolve", false, new Serializable[]{ null }), promise);
-            super.resolve(value);
             promise.get();
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            // Swallow transmission errors
         }
+        super.resolve(value);
     }
 
     @Override
@@ -47,11 +47,11 @@ public class RemoteChain extends ChainImpl<Void> {
         try {
             final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
             registry.invoke(address, command("reject", false, failure), promise);
-            super.reject(failure);
             promise.get();
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            // Swallow transmission errors
         }
+        super.reject(failure);
     }
 
     @Override
@@ -59,11 +59,20 @@ public class RemoteChain extends ChainImpl<Void> {
         try {
             final PromiseImpl<Boolean,Throwable> promise = new PromiseImpl<Boolean,Throwable>();
             registry.invoke(address, command("link", false, new Serializable[]{ null }), promise);
-            super.link(that);
             promise.get();
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            // Swallow transmission errors
         }
+        super.link(that);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "RemoteChain{" +
+                "address=" + address +
+                ", jobExecutionId=" + jobExecutionId +
+                ", chainId=" + chainId +
+                '}';
     }
 }

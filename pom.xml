@@ -39,6 +39,7 @@
     <properties>
         <version.java>1.6</version.java>
 
+        <version.com.boundary.high-scale-lib>1.0.6</version.com.boundary.high-scale-lib>
         <version.javax.inject>1</version.javax.inject>
         <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
         <version.log4j.log4j>1.2.17</version.log4j.log4j>
@@ -104,6 +105,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.boundary</groupId>
+                <artifactId>high-scale-lib</artifactId>
+                <version>${version.com.boundary.high-scale-lib}</version>
+            </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-api</artifactId>

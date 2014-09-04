@@ -13,7 +13,7 @@ import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.work.TaskExecutable;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
-import io.machinecode.chainlink.spi.registry.Registry;
+import io.machinecode.chainlink.spi.registry.StepAccumulator;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
@@ -42,7 +42,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import static io.machinecode.chainlink.spi.registry.Registry.StepAccumulator;
 import static javax.batch.api.partition.PartitionReducer.PartitionStatus;
 import static javax.batch.api.partition.PartitionReducer.PartitionStatus.COMMIT;
 import static javax.batch.api.partition.PartitionReducer.PartitionStatus.ROLLBACK;
@@ -277,8 +276,8 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
 
     @Override
     public Chain<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
-                             final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
-                             final ExecutionContext childContext) throws Exception {
+                          final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                          final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010101.step.after"), context, childContext);
         final long jobExecutionId = context.getJobExecutionId();
         final long stepExecutionId = context.getStepExecutionId();

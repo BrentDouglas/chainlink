@@ -10,12 +10,9 @@ import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.core.then.ResolvedChain;
-import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
-import java.io.Serializable;
 
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>

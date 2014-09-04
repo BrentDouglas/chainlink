@@ -13,6 +13,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.boundary</groupId>
+            <artifactId>high-scale-lib</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-api</artifactId>
         </dependency>

@@ -36,11 +36,12 @@ public class ExecutionExecutable extends ExecutableImpl<ExecutionWork> implement
             //TODO Can link after cancel?
             if (chain.isCancelled()) {
                 this.context.getJobContext().setBatchStatus(BatchStatus.STOPPING);
-                final Executable parent = registry.getExecutable(context.getJobExecutionId(), parentId);
+                final Executable parent = registry.getExecutableAndContext(context.getJobExecutionId(), parentId)
+                        .getExecutable();
                 next = configuration.getExecutor().callback(parent, this.context);
             } else {
                 final ExecutableId callbackId = registry.generateExecutableId();
-                registry.registerExecutable(context.getJobExecutionId(), new ExecutionCallback(callbackId, parentId, this, workerId));
+                registry.registerExecutableAndContext(context.getJobExecutionId(), new ExecutionCallback(callbackId, parentId, this, workerId), context);
                 next = work.before(configuration, this.executionRepositoryId, workerId, callbackId, parentId, this.context);
             }
             chain.link(next != null ? next : new ResolvedChain<Void>(null));
@@ -51,7 +52,8 @@ public class ExecutionExecutable extends ExecutableImpl<ExecutionWork> implement
                 this.context.getStepContext().setBatchStatus(BatchStatus.FAILED);
             }
             this.context.getJobContext().setBatchStatus(BatchStatus.FAILED);
-            final Executable parent = registry.getExecutable(context.getJobExecutionId(), parentId);
+            final Executable parent = registry.getExecutableAndContext(context.getJobExecutionId(), parentId)
+                    .getExecutable();
             final Chain<?> next = configuration.getExecutor().callback(parent, this.context);
             chain.link(next != null ? next : new ResolvedChain<Void>(null));
             chain.reject(e);
