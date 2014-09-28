@@ -380,10 +380,13 @@ public class JGroupsRegistry extends LocalRegistry implements RequestHandler, Me
     public void viewAccepted(final View view) {
         final List<Address> members = this.remotes = _remoteMembers(view.getMembers());
         final StringBuilder builder = new StringBuilder();
-        builder.append("[").append(this.local).append("]");
+        final String nl = System.lineSeparator();
+        builder.append("Members[").append(members.size() + 1).append("] {").append(nl);
+        builder.append("\t").append(this.local).append(" this").append(nl);
         for (final Address member : members) {
-            builder.append(" | ").append(member);
+            builder.append("\t").append(member).append(nl);
         }
+        builder.append("}");
         log.infof("Cluster: %s", builder); //TODO Message
     }
 
