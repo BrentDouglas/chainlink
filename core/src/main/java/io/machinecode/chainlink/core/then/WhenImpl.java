@@ -20,11 +20,13 @@ public class WhenImpl implements When {
         this.when.submit(new Runnable() {
             @Override
             public void run() {
+                T that = null;
                 try {
-                    then.resolve(future.get());
+                    that = future.get();
                 } catch (final Throwable e) {
                     then.reject(e);
                 }
+                then.resolve(that);
             }
         });
     }
@@ -34,11 +36,13 @@ public class WhenImpl implements When {
         this.when.submit(new Runnable() {
             @Override
             public void run() {
+                T that = null;
                 try {
-                    then.resolve(future.get(timeout, unit));
+                    that = future.get(timeout, unit);
                 } catch (final Throwable e) {
                     then.reject(e);
                 }
+                then.resolve(that);
             }
         });
     }

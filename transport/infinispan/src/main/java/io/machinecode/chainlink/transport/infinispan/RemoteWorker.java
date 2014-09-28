@@ -36,7 +36,41 @@ public class RemoteWorker implements Worker {
 
     @Override
     public void execute(final ExecutableEvent event) {
-        registry.invoke(remote, new ExecuteCommand(registry.cacheName, workerId, event), new PromiseImpl<Object,Throwable>());
+        final ExecuteCommand command = new ExecuteCommand(registry.cacheName, workerId, event);
+        registry.invoke(remote, command, new PromiseImpl<ChainAndId,Throwable>());
+        /*
+        registry.invoke(remote, command, new PromiseImpl<ChainAndId,Throwable>().onReject(new OnReject<Throwable>() {
+            @Override
+            public void reject(final Throwable fail) {
+                if (fail instanceof java.io.ObjectStreamException
+                        || fail instanceof org.infinispan.commons.marshall.NotSerializableException) {
+                    final ExecutionContext context = event.getContext();
+                    final MutableStepContext stepContext = context.getStepContext();
+                    final MutableJobContext jobContext = context.getJobContext();
+                    stepContext.setBatchStatus(BatchStatus.FAILED);
+                    jobContext.setBatchStatus(BatchStatus.FAILED);
+                    stepContext.setException((Exception)fail); //TODO Is this right?
+                    // Ideally the only thing that should really be able to mess this up is the transient user data,
+                    // persistent user data and the blobs returned from chunks.
+                    stepContext.setTransientUserData(null);
+                    stepContext.setPersistentUserData(null);
+                    jobContext.setTransientUserData(null);
+                    jobContext.setPersistentUserData(null);
+                    final Item[] old = context.getItems();
+                    if (old != null) {
+                        final Item[] items = new Item[old.length];
+                        for (int i = 0; i < old.length; ++i) {
+                            final item item = old[i];
+                            items[i] = new ItemImpl(null, item.getBatchStatus(), item.getExitStatus());
+                        }
+                        context.setItems(items);
+                    }
+                    registry.invoke(remote, command, new PromiseImpl<Object, Throwable>());
+                    //If this fails a second time execution will halt until the jgroups request times out
+                }
+            }
+        }));
+        */
     }
 
     @Override

@@ -63,12 +63,17 @@ public class LocalChain extends ChainImpl<Void> {
         if (waited) {
             return super.get();
         }
-        final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
-        registry.invoke(address, command("get", true), promise, 0, MILLISECONDS);
-        super.get();
-        final Void ret = promise.get();
-        waited = true;
-        return ret;
+        try {
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            registry.invoke(address, command("get", true), promise, 0, MILLISECONDS);
+            try {
+                super.get();
+            } finally {
+                return promise.get();
+            }
+        } finally {
+            waited = true;
+        }
     }
 
     @Override
@@ -76,14 +81,19 @@ public class LocalChain extends ChainImpl<Void> {
         if (waited) {
             return super.get(timeout, unit);
         }
-        final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-        final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
-        final long t = _tryTimeout(end);
-        registry.invoke(address, command("get", true, t, MILLISECONDS), promise, _tryTimeout(end), MILLISECONDS);
-        super.get(_tryTimeout(end), MILLISECONDS);
-        final Void ret = promise.get(_tryTimeout(end), MILLISECONDS);
-        waited = true;
-        return ret;
+        try {
+            final long end = System.currentTimeMillis() + unit.toMillis(timeout);
+            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            final long millis = _tryTimeout(end);
+            registry.invoke(address, command("get", true, millis, MILLISECONDS), promise, _tryTimeout(end), MILLISECONDS);
+            try {
+                super.get(_tryTimeout(end), MILLISECONDS);
+            } finally {
+                return promise.get(_tryTimeout(end), MILLISECONDS);
+            }
+        } finally {
+            waited = true;
+        }
     }
 
     @Override
