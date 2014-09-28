@@ -70,8 +70,6 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
 
     T setTransactionManagerFactoryFqcn(final String fqcn);
 
-    T setWhen(final When when);
-
     T setWhenFactory(final WhenFactory when);
 
     T setWhenFactoryClass(final Class<? extends WhenFactory> clazz);

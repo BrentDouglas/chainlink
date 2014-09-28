@@ -15,14 +15,14 @@ import org.infinispan.remoting.transport.Address;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class RemoteWorker implements Worker {
+public class InfinispanWorker implements Worker {
 
     final InfinispanRegistry registry;
     final Address local;
     final Address remote;
     final WorkerId workerId;
 
-    public RemoteWorker(final InfinispanRegistry registry, final Address local, final Address remote, final WorkerId workerId) {
+    public InfinispanWorker(final InfinispanRegistry registry, final Address local, final Address remote, final WorkerId workerId) {
         this.registry = registry;
         this.local = local;
         this.remote = remote;
@@ -86,7 +86,7 @@ public class RemoteWorker implements Worker {
                             @Override
                             public void resolve(final ChainId remoteId) {
                                 //This side has a different id than the remote side
-                                promise.resolve(new ChainAndId(localId, remoteId, new LocalChain(registry, remote, jobExecutionId, remoteId)));
+                                promise.resolve(new ChainAndId(localId, remoteId, new InfinispanLocalChain(registry, remote, jobExecutionId, remoteId)));
                             }
                         }).onReject(promise)
         );

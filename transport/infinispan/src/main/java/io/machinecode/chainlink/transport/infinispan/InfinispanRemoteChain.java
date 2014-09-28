@@ -12,14 +12,14 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class RemoteChain extends ChainImpl<Void> {
+public class InfinispanRemoteChain extends ChainImpl<Void> {
 
     protected final InfinispanRegistry registry;
     protected final Address address;
     protected final long jobExecutionId;
     protected final ChainId chainId;
 
-    public RemoteChain(final InfinispanRegistry registry, final Address address, final long jobExecutionId, final ChainId chainId) {
+    public InfinispanRemoteChain(final InfinispanRegistry registry, final Address address, final long jobExecutionId, final ChainId chainId) {
         this.registry = registry;
         this.address = address;
         this.jobExecutionId = jobExecutionId;
@@ -69,7 +69,7 @@ public class RemoteChain extends ChainImpl<Void> {
 
     @Override
     public String toString() {
-        return "RemoteChain{" +
+        return "InfinispanRemoteChain{" +
                 "address=" + address +
                 ", jobExecutionId=" + jobExecutionId +
                 ", chainId=" + chainId +

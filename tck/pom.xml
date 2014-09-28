@@ -92,6 +92,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-jgroups</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
             <scope>test</scope>
@@ -118,6 +123,13 @@
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JGroups -->
+        <dependency>
+            <groupId>org.jgroups</groupId>
+            <artifactId>jgroups</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -177,6 +189,16 @@
             </activation>
             <properties>
                 <registry.factory.class>io.machinecode.chainlink.tck.core.transport.InfinispanRegistryFactory</registry.factory.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>tr-jgroups</id>
+            <activation>
+                <property><name>tr-jgroups</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.JGroupsRegistryFactory</registry.factory.class>
             </properties>
         </profile>
         <profile>
@@ -328,6 +350,10 @@
                                 <target>
                                     <copy file="${project.basedir}/../core/src/test/resources/testng.xml"
                                           tofile="${project.build.testOutputDirectory}/testng.xml"
+                                          overwrite="true">
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/jgroups-udp.xml"
+                                          tofile="${project.build.testOutputDirectory}/jgroups-udp.xml"
                                           overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.template.xml"

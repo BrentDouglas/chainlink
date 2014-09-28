@@ -1,10 +1,12 @@
 package io.machinecode.chainlink.core.configuration;
 
+import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.core.inject.InjectionContextImpl;
 import io.machinecode.chainlink.core.inject.InjectorImpl;
 import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.core.security.SecurityCheckImpl;
+import io.machinecode.chainlink.core.then.WhenFactoryImpl;
 import io.machinecode.chainlink.core.then.WhenImpl;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.spi.configuration.BaseConfiguration;
@@ -41,7 +43,6 @@ import javax.transaction.TransactionManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,7 +55,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
     private final Registry registry;
     private final ExecutionRepository repository;
     private final TransactionManager transactionManager;
-    private final When when;
+    private final WhenFactory whenFactory;
     private final JobLoader jobLoader;
     private final ArtifactLoader artifactLoader;
     private final Injector injector;
@@ -70,7 +71,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         this.classLoader = _get(tccl, builder.classLoader, builder.classLoaderFactory, builder.classLoaderFactoryClass, builder.classLoaderFactoryFqcn, tccl, this);
         this.transactionManager = _get(this.classLoader, builder.transactionManager, builder.transactionManagerFactory, builder.transactionManagerFactoryClass, builder.transactionManagerFactoryFqcn, new LocalTransactionManager(180, TimeUnit.SECONDS), this);
-        this.when = _get(this.classLoader, builder.when, builder.whenFactory, builder.whenFactoryClass, builder.whenFactoryFqcn, new WhenImpl(), this);
+        this.whenFactory = (WhenFactory) _getFactory(this.classLoader, builder.whenFactory, builder.whenFactoryClass, builder.whenFactoryFqcn, WhenFactoryImpl.class);
         final ArrayList<JobLoader> jobLoaders = _arrayGet(this.classLoader, builder.jobLoaders, builder.jobLoaderFactories, builder.jobLoaderFactoriesClass, builder.jobLoaderFactoriesFqcns, this);
         this.jobLoader = new JobLoaderImpl(this.classLoader, jobLoaders.toArray(new JobLoader[jobLoaders.size()]));
         final ArrayList<ArtifactLoader> artifactLoaders = _arrayGet(this.classLoader, builder.artifactLoaders, builder.artifactLoaderFactories, builder.artifactLoaderFactoriesClass, builder.artifactLoaderFactoriesFqcns, this);
@@ -80,7 +81,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         final ArrayList<SecurityCheck> securityChecks = _arrayGet(this.classLoader, builder.securityChecks, builder.securityCheckFactories, builder.securityCheckFactoriesClass, builder.securityCheckFactoriesFqcns, this);
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
-        this.serializerFactory = (SerializerFactory) _getFactory(this.classLoader, builder.serializerFactory, builder.serializerFactoryClass, builder.serializerFactoryFqcn);
+        this.serializerFactory = (SerializerFactory) _getFactory(this.classLoader, builder.serializerFactory, builder.serializerFactoryClass, builder.serializerFactoryFqcn, null);
         if (this.serializerFactory == null) {
             throw new IllegalStateException(); //TODO Message
         }
@@ -97,7 +98,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         if (this.executor == null) {
             throw new IllegalStateException(); //TODO Message
         }
-        this.workerFactory = (WorkerFactory) _getFactory(this.classLoader, builder.workerFactory, builder.workerFactoryClass, builder.workerFactoryFqcn);
+        this.workerFactory = (WorkerFactory) _getFactory(this.classLoader, builder.workerFactory, builder.workerFactoryClass, builder.workerFactoryFqcn, EventedWorkerFactory.class);
     }
 
     protected ConfigurationImpl(final XmlConfiguration builder) {
@@ -108,7 +109,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         this.classLoader = _get(tccl, builder.getClassLoaderFactory(), tccl, this);
         this.transactionManager = _get(this.classLoader, builder.getTransactionManagerFactory(), new LocalTransactionManager(180, TimeUnit.SECONDS), this);
-        this.when = _get(this.classLoader, builder.getWhenFactory(), new WhenImpl(), this);
+        this.whenFactory = _getFactory(this.classLoader, builder.getWhenFactory().getClazz(), WhenFactory.class, WhenFactoryImpl.class);
         final ArrayList<JobLoader> jobLoaders = _get(this.classLoader, builder.getJobLoaderFactories(), this);
         this.jobLoader = new JobLoaderImpl(this.classLoader, jobLoaders.toArray(new JobLoader[jobLoaders.size()]));
         final ArrayList<ArtifactLoader> artifactLoaders = _get(this.classLoader, builder.getArtifactLoaderFactories(), this);
@@ -118,7 +119,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         final ArrayList<SecurityCheck> securityChecks = _get(this.classLoader, builder.getSecurityCheckFactories(), this);
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
-        this.serializerFactory = _getFactory(this.classLoader, builder.getSerializerFactory().getClazz(), SerializerFactory.class);
+        this.serializerFactory = _getFactory(this.classLoader, builder.getSerializerFactory().getClazz(), SerializerFactory.class, null);
         if (this.serializerFactory == null) {
             throw new IllegalStateException(); //TODO Message
         }
@@ -135,7 +136,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         if (this.executor == null) {
             throw new IllegalStateException(); //TODO Message
         }
-        this.workerFactory = _getFactory(this.classLoader, builder.getWorkerFactory().getClazz(), WorkerFactory.class);
+        this.workerFactory = _getFactory(this.classLoader, builder.getWorkerFactory().getClazz(), WorkerFactory.class, EventedWorkerFactory.class);
     }
 
     @Override
@@ -214,8 +215,8 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
     }
 
     @Override
-    public When getWhen() {
-        return when;
+    public WhenFactory getWhenFactory() {
+        return whenFactory;
     }
 
     // Runtime only
@@ -269,7 +270,7 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
     }
 
     private <T, U extends BaseConfiguration> Factory<? extends T, U> _getFactory(final ClassLoader classLoader, final Factory<? extends T, U> factory,
-                                                    final Class<? extends Factory<? extends T, U>> clazz, final String fqcn) {
+                                                    final Class<? extends Factory<? extends T, U>> clazz, final String fqcn, final Class<? extends Factory<? extends T, U>> def) {
         if (factory != null) {
             try {
                 return factory;
@@ -297,6 +298,13 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
                 throw new RuntimeException(e); //TODO
             }
         }
+        if (def != null) {
+            try {
+                return def.newInstance();
+            } catch (final Exception e) {
+                throw new RuntimeException(e); //TODO
+            }
+        }
         throw new RuntimeException(); //TODO Message
     }
 
@@ -314,13 +322,20 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         return defaultValue;
     }
 
-    private <T> T _getFactory(final ClassLoader classLoader, final String fqcn, final Class<T> clazz) {
+    private <T> T _getFactory(final ClassLoader classLoader, final String fqcn, final Class<T> clazz, final Class<? extends T> def) {
         if (fqcn != null) {
             try {
                 final T produced = ((Class<? extends T>)classLoader.loadClass(fqcn)).newInstance();
                 if (produced != null) {
                     return produced;
                 }
+            } catch (final Exception e) {
+                throw new RuntimeException(e); //TODO
+            }
+        }
+        if (def != null) {
+            try {
+                return def.newInstance();
             } catch (final Exception e) {
                 throw new RuntimeException(e); //TODO
             }
@@ -406,7 +421,6 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         private MBeanServer mBeanServer;
         private ExecutionRepository executionRepository;
         private TransactionManager transactionManager;
-        private When when;
         private JobLoader[] jobLoaders;
         private ArtifactLoader[] artifactLoaders;
         private Injector[] injectors;
@@ -470,12 +484,6 @@ public class ConfigurationImpl implements Configuration, RuntimeConfiguration {
         @Override
         public Builder setTransactionManager(final TransactionManager transactionManager) {
             this.transactionManager = transactionManager;
-            return this;
-        }
-
-        @Override
-        public Builder setWhen(final When when) {
-            this.when = when;
             return this;
         }
 

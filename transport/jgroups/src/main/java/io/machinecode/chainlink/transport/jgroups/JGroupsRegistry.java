@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.transport.infinispan;
+package io.machinecode.chainlink.transport.jgroups;
 
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.TMap;
@@ -6,39 +6,37 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.then.WhenImpl;
-import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.then.When;
-import io.machinecode.chainlink.transport.infinispan.callable.FindExecutableAndContextCallable;
-import io.machinecode.chainlink.transport.infinispan.callable.FindExecutionRepositoryWithIdCallable;
-import io.machinecode.chainlink.transport.infinispan.callable.FindWorkerCallable;
-import io.machinecode.chainlink.transport.infinispan.callable.LeastBusyWorkerCallable;
-import io.machinecode.chainlink.transport.infinispan.cmd.CleanupCommand;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
+import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.serialization.Serializer;
+import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.chainlink.spi.then.When;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
-import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.chainlink.transport.jgroups.cmd.CleanupCommand;
+import io.machinecode.chainlink.transport.jgroups.cmd.Command;
+import io.machinecode.chainlink.transport.jgroups.cmd.FindExecutableAndContextCommand;
+import io.machinecode.chainlink.transport.jgroups.cmd.FindExecutionRepositoryWithIdCommand;
+import io.machinecode.chainlink.transport.jgroups.cmd.FindWorkerCommand;
+import io.machinecode.chainlink.transport.jgroups.cmd.LeastBusyWorkerCommand;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.PromiseImpl;
-import org.infinispan.AdvancedCache;
-import org.infinispan.commands.ReplicableCommand;
-import org.infinispan.distexec.DefaultExecutorService;
-import org.infinispan.distexec.DistributedExecutorService;
-import org.infinispan.factories.GlobalComponentRegistry;
-import org.infinispan.lifecycle.ComponentStatus;
-import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.remoting.rpc.ResponseMode;
-import org.infinispan.remoting.rpc.RpcManager;
-import org.infinispan.remoting.rpc.RpcOptions;
-import org.infinispan.remoting.rpc.RpcOptionsBuilder;
-import org.infinispan.remoting.transport.Address;
 import org.jboss.logging.Logger;
+import org.jgroups.Address;
+import org.jgroups.JChannel;
+import org.jgroups.MembershipListener;
+import org.jgroups.Message;
+import org.jgroups.View;
+import org.jgroups.blocks.MessageDispatcher;
+import org.jgroups.blocks.RequestHandler;
+import org.jgroups.blocks.RequestOptions;
 
 import javax.batch.operations.JobExecutionNotRunningException;
 import java.util.ArrayList;
@@ -48,76 +46,52 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class InfinispanRegistry extends LocalRegistry {
+public class JGroupsRegistry extends LocalRegistry implements RequestHandler, MembershipListener {
 
-    private static final Logger log = Logger.getLogger(InfinispanRegistry.class);
+    private static final Logger log = Logger.getLogger(JGroupsRegistry.class);
 
-    final RpcManager rpc;
-    final Address local;
-    final String cacheName;
-    final AdvancedCache<Object, Object> cache;
-    final RpcOptions options;
-    final DistributedExecutorService distributor;
+    final Serializer serializer;
     final When network;
     final When reaper;
+
+    final JChannel channel;
+    final MessageDispatcher dispatcher;
+    final Address local;
+    protected volatile List<Address> remotes;
 
     final TMap<WorkerId, Worker> remoteWorkers = new THashMap<WorkerId, Worker>();
     final TLongObjectMap<List<Pair<ChainId,Address>>> remoteExecutions = new TLongObjectHashMap<List<Pair<ChainId,Address>>>();
 
-    public InfinispanRegistry(final RegistryConfiguration configuration, final EmbeddedCacheManager manager,
-                              final long timeout, final TimeUnit unit) throws Exception {
-        final GlobalComponentRegistry gcr = manager.getGlobalComponentRegistry();
-        gcr.registerComponent(this, InfinispanRegistry.class); //TODO One Registry per config, this will be an issue
-        if (manager.getStatus() == ComponentStatus.INSTANTIATED) {
-            manager.start();
-            gcr.start();
-        }
-        //TODO Add timeout
-        while (manager.getStatus().ordinal() < ComponentStatus.RUNNING.ordinal()) {
-            try {
-                Thread.sleep(100);
-            } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public JGroupsRegistry(final RegistryConfiguration configuration, final JChannel channel, final String clusterName) throws Exception {
+        this.serializer = configuration.getSerializerFactory().produce(configuration);
+        this.channel = channel;
         this.network= configuration.getWhenFactory().produce(configuration);
         this.reaper = configuration.getWhenFactory().produce(configuration);
-        this.local = manager.getAddress();
-        this.cacheName = configuration.getProperty(InfinispanConstants.CACHE, InfinispanConstants.CACHE);
-        this.cache = manager.<Object, Object>getCache(this.cacheName, true).getAdvancedCache();
-        this.rpc = cache.getRpcManager();
-        this.options = new RpcOptions(
-                timeout,
-                unit,
-                null,
-                ResponseMode.SYNCHRONOUS,
-                false,
-                true,
-                false
-        );
-        this.distributor = new DefaultExecutorService(cache);
+        try {
+            channel.connect(clusterName);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        this.local = channel.getAddress();
+        this.dispatcher = new MessageDispatcher(channel, null, this);
+        this.dispatcher.setRequestHandler(this);
     }
 
     @Override
     public void startup() {
         super.startup();
-        final EmbeddedCacheManager manager = cache.getCacheManager();
-        if (!manager.isRunning(this.cacheName)) {
-            manager.startCaches(this.cacheName);
-        }
-        //TODO Add timeout
-        while (!manager.isRunning(this.cacheName)) {
-            try {
-                Thread.sleep(100);
-            } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        this.remotes = _remoteMembers(this.channel.getView().getMembers());
+        log.infof("JGroupsRegistry started on address: [%s]", this.local); //TODO Message
+    }
+
+    @Override
+    public void shutdown() {
+        log.infof("JGroupsRegistry is shutting down."); //TODO Message
+        this.channel.close();
+        super.shutdown();
     }
 
     @Override
@@ -133,11 +107,11 @@ public class InfinispanRegistry extends LocalRegistry {
                 for (final Pair<ChainId, Address> pair : remoteExecutions.remove(jobExecutionId)) {
                     final Address address = pair.getValue();
                     if (!address.equals(local)) {
-                        rpc.invokeRemotely(
-                                Collections.singleton(address),
-                                new CleanupCommand(cacheName, jobExecutionId),
-                                options
-                        );
+                        try {
+                            _invoke(address, new CleanupCommand(jobExecutionId));
+                        } catch (Exception e) {
+                            // TODO
+                        }
                     }
                 }
                 log.debugf(Messages.get("CHAINLINK-005101.registry.removed.job"), jobExecutionId);
@@ -148,32 +122,27 @@ public class InfinispanRegistry extends LocalRegistry {
     }
 
     @Override
-    public void shutdown() {
-        super.shutdown();
-    }
-
-    @Override
     public ChainId generateChainId() {
-        return new InfinispanUUIDId(local);
+        return new JGroupsUUIDId(local);
     }
 
     @Override
     public ExecutableId generateExecutableId() {
-        return new InfinispanUUIDId(local);
+        return new JGroupsUUIDId(local);
     }
 
     @Override
     public WorkerId generateWorkerId(final Worker worker) {
         if (worker instanceof Thread) {
-            return new InfinispanThreadId((Thread)worker, local);
+            return new JGroupsThreadId((Thread)worker, local);
         } else {
-            return new InfinispanUUIDId(local);
+            return new JGroupsUUIDId(local);
         }
     }
 
     @Override
     public ExecutionRepositoryId generateExecutionRepositoryId() {
-        return new InfinispanUUIDId(local);
+        return new JGroupsUUIDId(local);
     }
 
     private Worker _localWorker(final WorkerId workerId) {
@@ -191,21 +160,25 @@ public class InfinispanRegistry extends LocalRegistry {
             return remoteWorker;
         }
         Address remote = null;
-        if (workerId instanceof InfinispanThreadId) {
-            remote = ((InfinispanThreadId) workerId).address;
+        if (workerId instanceof JGroupsThreadId) {
+            remote = ((JGroupsThreadId) workerId).address;
         }
         if (remote != null) {
             if (remote.equals(local)) {
                 throw new IllegalStateException(); //This should have been handled at the start
             }
-            final Worker rpcWorker = new InfinispanWorker(this, local, remote, workerId);
+            final Worker rpcWorker = new JGroupsWorker(this, local, remote, workerId);
             remoteWorkers.put(workerId, rpcWorker);
             return rpcWorker;
         }
-        final List<Address> members = rpc.getMembers();
         final List<Future<Address>> futures = new ArrayList<Future<Address>>();
+        final List<Address> members = this.remotes;
         for (final Address address : members) {
-            futures.add(distributor.submit(address, new FindWorkerCallable(workerId)));
+            try {
+                futures.add(_invoke(address, new FindWorkerCommand(workerId)));
+            } catch (Exception e) {
+                log.errorf(e, ""); //TODO Message
+            }
         }
         for (final Future<Address> future : futures) {
             try {
@@ -218,7 +191,7 @@ public class InfinispanRegistry extends LocalRegistry {
                 if (address.equals(local)) {
                     throw new IllegalStateException(); //Also should not have been distributed
                 } else {
-                    rpcWorker = new InfinispanWorker(this, local, address, workerId);
+                    rpcWorker = new JGroupsWorker(this, local, address, workerId);
                     remoteWorkers.put(workerId, rpcWorker);
                 }
                 return rpcWorker;
@@ -237,19 +210,24 @@ public class InfinispanRegistry extends LocalRegistry {
 
     @Override
     public List<Worker> getWorkers(final int required) {
-        final List<Address> members = rpc.getMembers();
-        final List<Future<InfinispanThreadId>> futures = new ArrayList<Future<InfinispanThreadId>>(required);
+        final List<Address> members = new ArrayList<Address>(this.remotes);
+        members.add(this.local);
+        final List<Future<JGroupsThreadId>> futures = new ArrayList<Future<JGroupsThreadId>>(required);
         for (final Address address : filterMembers(members, required)) {
-            futures.add(distributor.submit(address, new LeastBusyWorkerCallable()));
+            try {
+                futures.add(_invoke(address, new LeastBusyWorkerCommand()));
+            } catch (final Exception e) {
+                log.errorf(e, ""); //TODO Message
+            }
         }
         final ArrayList<Worker> workers = new ArrayList<Worker>(required);
-        for (final Future<InfinispanThreadId> future : futures) {
+        for (final Future<JGroupsThreadId> future : futures) {
             try {
-                final InfinispanThreadId threadId = future.get();
+                final JGroupsThreadId threadId = future.get();
                 if (local.equals(threadId.address)) {
                     workers.add(getWorker(threadId));
                 } else {
-                    workers.add(new InfinispanWorker(this, local, threadId.address, threadId));
+                    workers.add(new JGroupsWorker(this, local, threadId.address, threadId));
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -272,11 +250,14 @@ public class InfinispanRegistry extends LocalRegistry {
         if (ours != null) {
             return ours;
         }
-        final List<Address> members = rpc.getMembers();
-        members.remove(this.local);
+        final List<Address> members = this.remotes;
         final List<Future<Address>> futures = new ArrayList<Future<Address>>(members.size());
         for (final Address address : members) {
-            futures.add(distributor.submit(address, new FindExecutionRepositoryWithIdCallable(id)));
+            try {
+                futures.add(_invoke(address, new FindExecutionRepositoryWithIdCommand(id)));
+            } catch (Exception e) {
+                log.errorf(e, ""); //TODO Message
+            }
         }
         for (final Future<Address> future : futures) {
             try {
@@ -286,7 +267,7 @@ public class InfinispanRegistry extends LocalRegistry {
                 } else if (local.equals(address)) {
                     throw new IllegalStateException(); //TODO Message
                 }
-                return new InfinispanRemoteExecutionRepository(this, id, address);
+                return new JGroupsRemoteExecutionRepository(this, id, address);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } catch (ExecutionException e) {
@@ -302,11 +283,14 @@ public class InfinispanRegistry extends LocalRegistry {
         if (ours != null) {
             return ours;
         }
-        final List<Address> members = rpc.getMembers();
-        members.remove(this.local);
+        final List<Address> members = this.remotes;
         final List<Future<ExecutableAndContext>> futures = new ArrayList<Future<ExecutableAndContext>>(members.size());
         for (final Address address : members) {
-            futures.add(distributor.submit(address, new FindExecutableAndContextCallable(jobExecutionId, id)));
+            try {
+                futures.add(_invoke(address, new FindExecutableAndContextCommand(jobExecutionId, id)));
+            } catch (Exception e) {
+                log.errorf(e, ""); //TODO Message
+            }
         }
         for (final Future<ExecutableAndContext> future : futures) {
             try {
@@ -333,8 +317,8 @@ public class InfinispanRegistry extends LocalRegistry {
         return all.subList(0, required > all.size() ? all.size() : required);
     }
 
-    public InfinispanThreadId leastBusyWorker() {
-        return (InfinispanThreadId)getWorker().id();
+    public JGroupsThreadId leastBusyWorker() {
+        return (JGroupsThreadId)getWorker().id();
     }
 
     public Address getLocal() {
@@ -345,21 +329,76 @@ public class InfinispanRegistry extends LocalRegistry {
         return _localWorker(workerId) != null;
     }
 
-    public <T> void invoke(final Address address, final ReplicableCommand command, final Promise<T,Throwable> promise) {
-        rpc.invokeRemotelyInFuture(
-                Collections.singleton(address),
-                command,
-                options,
-                new InfinispanFuture<Object,T>(this, promise, address, System.currentTimeMillis())
+    @Override
+    public Object handle(final Message msg) throws Exception {
+        final Command<?> command = serializer.read(msg.getBuffer(), Command.class);
+        try {
+            return command.invoke(this, msg.src());
+        } catch (final Exception e) {
+            throw e;
+        } catch (final Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> void invoke(final Address address, final Command command, final Promise<T,Throwable> promise) {
+        try {
+            this.network.when(
+                    this.dispatcher.<T>sendMessageWithFuture(
+                            new Message(address, serializer.bytes(command)),
+                            RequestOptions.SYNC()
+                    ),
+                    promise
+            );
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    public <T> void invoke(final Address address, final Command<T> command, final Promise<T,Throwable> promise, final long timeout, final TimeUnit unit) {
+        try {
+            this.network.when(
+                    this.dispatcher.<T>sendMessageWithFuture(
+                            new Message(address, serializer.bytes(command)),
+                            RequestOptions.SYNC().setTimeout(unit.toMillis(timeout))
+                    ),
+                    promise
+            );
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    private <T> Future<T> _invoke(final Address address, final Command<T> command) throws Exception {
+        return this.dispatcher.sendMessageWithFuture(
+                new Message(address, serializer.bytes(command)),
+                RequestOptions.SYNC()
         );
     }
 
-    public <T> void invoke(final Address address, final ReplicableCommand command, final Promise<T,Throwable> promise, final long timeout, final TimeUnit unit) {
-        rpc.invokeRemotelyInFuture(
-                Collections.singleton(address),
-                command,
-                new RpcOptionsBuilder(options).timeout(timeout, unit).build(),
-                new InfinispanFuture<Object,T>(this, promise, address, System.currentTimeMillis())
-        );
+    @Override
+    public void viewAccepted(final View view) {
+        final List<Address> members = this.remotes = _remoteMembers(view.getMembers());
+        final StringBuilder builder = new StringBuilder();
+        builder.append("[").append(this.local).append("]");
+        for (final Address member : members) {
+            builder.append(" | ").append(member);
+        }
+        log.infof("Cluster: %s", builder); //TODO Message
     }
+
+    private List<Address> _remoteMembers(final List<Address> all) {
+        final List<Address> that = new ArrayList<Address>(all);
+        that.remove(this.local);
+        return Collections.unmodifiableList(that);
+    }
+
+    @Override
+    public void suspect(final Address suspected) {}
+
+    @Override
+    public void block() {}
+
+    @Override
+    public void unblock() {}
 }

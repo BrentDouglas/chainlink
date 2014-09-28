@@ -9,17 +9,17 @@ import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
  */
 public class FindExecutableAndContextCallable extends BaseCallable<Object, Object, ExecutableAndContext> {
 
-    final long jobExecutableId;
+    final long jobExecutionId;
     final ExecutableId id;
 
-    public FindExecutableAndContextCallable(final long jobExecutableId, final ExecutableId id) {
-        this.jobExecutableId = jobExecutableId;
+    public FindExecutableAndContextCallable(final long jobExecutionId, final ExecutableId id) {
+        this.jobExecutionId = jobExecutionId;
         this.id = id;
     }
 
     @Override
     public ExecutableAndContext call() throws Exception {
         final InfinispanRegistry registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanRegistry.class);
-        return registry.getExecutableAndContext(jobExecutableId, id);
+        return registry.getExecutableAndContext(jobExecutionId, id);
     }
 }

@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.transport.infinispan.cmd;
 
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.transport.infinispan.RemoteChain;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRemoteChain;
 import org.infinispan.context.InvocationContext;
 import org.jboss.logging.Logger;
 
@@ -28,7 +28,7 @@ public class PushChainCommand extends BaseChainlinkCommand {
     @Override
     public ChainId perform(final InvocationContext context) throws Throwable {
         final ChainId remoteId = registry.generateChainId();
-        registry.registerChain(jobExecutionId, remoteId, new RemoteChain(registry, getOrigin(), jobExecutionId, chainId));
+        registry.registerChain(jobExecutionId, remoteId, new InfinispanRemoteChain(registry, getOrigin(), jobExecutionId, chainId));
         return remoteId;
     }
 

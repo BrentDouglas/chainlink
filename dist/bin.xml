@@ -33,6 +33,7 @@
                 <include>io.machinecode.chainlink:chainlink-repository-memory</include>
                 <include>io.machinecode.chainlink:chainlink-repository-redis</include>
                 <include>io.machinecode.chainlink:chainlink-transport-infinispan</include>
+                <include>io.machinecode.chainlink:chainlink-transport-jgroups</include>
                 <include>io.machinecode.chainlink:chainlink-server-chainlinkd</include>
             </includes>
             <binaries>

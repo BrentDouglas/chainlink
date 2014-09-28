@@ -200,6 +200,11 @@
                 <artifactId>chainlink-transport-infinispan</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-transport-jgroups</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>io.machinecode.then</groupId>

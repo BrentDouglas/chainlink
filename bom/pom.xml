@@ -105,6 +105,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-transport-jgroups</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.machinecode.then</groupId>
                 <artifactId>then-api</artifactId>
                 <version>${version.io.machinecode.then}</version>

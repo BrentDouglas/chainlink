@@ -24,6 +24,10 @@ Job repositories:
 - Redis
 - Infinispan
 
+Transports:
+- Local only
+- Infinispan
+
 Job loaders that support the job inheritance proposal and a simple api
 and utilities to allow user defined loaders to also support job
 inheritance. Built in loaders support:
@@ -32,20 +36,19 @@ inheritance. Built in loaders support:
 
 JMX job management.
 
-## Experimental things that don't work yet
-
-_Guice Injector_
-
-- @javax.inject.Inject does not allow null injection of batch properties
-- Module provider system probably won't work with a real guice project
+## Known issues
 
 _Infinispan Transport_
 
 - Doesn't pass the TCK yet as one of the TCK classes `ExternalizableString`
-  is not actually `Externalizable`.
-- There is also an issue when calling JobOperator#stop() where the runtime
-  reports that the process has stopped before it actually has which provides
-  false results.
+  is not actually `Externalizable`. When a no-args constructor is added to
+  `ExternalizableString` as per the `Externalizable` requirements it passes
+   all the TCK tests. See [TCK bug #6155](https://java.net/bugzilla/show_bug.cgi?id=6155).
+
+_Guice Injector_
+
+- @javax.inject.Inject does not allow null injection of batch properties
+- Module provider system probably won't work with a real Guice project
 
 ## Building
 

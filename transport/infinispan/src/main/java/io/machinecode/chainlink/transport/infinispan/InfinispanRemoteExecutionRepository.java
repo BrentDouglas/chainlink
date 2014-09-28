@@ -24,13 +24,13 @@ import java.util.Set;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class RemoteExecutionRepository implements ExecutionRepository {
+public class InfinispanRemoteExecutionRepository implements ExecutionRepository {
 
     protected final InfinispanRegistry registry;
     protected final Address address;
     protected final ExecutionRepositoryId executionRepositoryId;
 
-    public RemoteExecutionRepository(final InfinispanRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Address address) {
+    public InfinispanRemoteExecutionRepository(final InfinispanRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Address address) {
         this.registry = registry;
         this.address = address;
         this.executionRepositoryId = executionRepositoryId;

@@ -19,7 +19,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class LocalChain extends ChainImpl<Void> {
+public class InfinispanLocalChain extends ChainImpl<Void> {
 
     protected final InfinispanRegistry registry;
     protected final Address address;
@@ -29,7 +29,7 @@ public class LocalChain extends ChainImpl<Void> {
     // This is to head off any delayed calls to #get after the job has finished and the registry has been cleaned
     volatile boolean waited = false;
 
-    public LocalChain(final InfinispanRegistry registry, final Address address, final long jobExecutionId, final ChainId chainId) {
+    public InfinispanLocalChain(final InfinispanRegistry registry, final Address address, final long jobExecutionId, final ChainId chainId) {
         this.registry = registry;
         this.address = address;
         this.jobExecutionId = jobExecutionId;
@@ -98,7 +98,7 @@ public class LocalChain extends ChainImpl<Void> {
 
     @Override
     public String toString() {
-        return "LocalChain{" +
+        return "InfinispanLocalChain{" +
                 "address=" + address +
                 ", jobExecutionId=" + jobExecutionId +
                 ", chainId=" + chainId +
