@@ -9,7 +9,6 @@ import gnu.trove.set.hash.TLongHashSet;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.registry.Accumulator;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
@@ -22,17 +21,14 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.partition.PartitionReducer;
 import javax.batch.operations.JobExecutionNotRunningException;
 import javax.transaction.Transaction;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,6 +51,8 @@ public class LocalRegistry implements Registry {
     protected final TLongObjectMap<LocalJobRegistry> jobRegistries = new TLongObjectHashMap<LocalJobRegistry>();
     protected final TLongObjectMap<Chain<?>> jobs = new TLongObjectHashMap<Chain<?>>();
     protected final AtomicBoolean jobLock = new AtomicBoolean(false);
+    protected final TLongObjectMap<TMap<Key, Object>> artifacts = new TLongObjectHashMap<TMap<Key, Object>>();
+    protected final AtomicBoolean artifactLock = new AtomicBoolean(false);
 
     public LocalRegistry() {
         this.workerOrder = new ArrayList<Worker>();
@@ -212,6 +210,7 @@ public class LocalRegistry implements Registry {
         try {
             this.jobs.put(jobExecutionId, chain);
             this.jobRegistries.put(jobExecutionId, jobRegistry);
+            this.artifacts.remove(jobExecutionId);
             this.onRegisterJob(jobExecutionId);
             log.debugf(Messages.get("CHAINLINK-005100.registry.put.job"), jobExecutionId);
         } finally {
@@ -334,8 +333,83 @@ public class LocalRegistry implements Registry {
         }
     }
 
+    @Override
+    public <T> T loadArtifact(final Class<T> clazz, final String ref, final ExecutionContext context) {
+        final long jobExecutionId = context.getJobExecutionId();
+        while (!artifactLock.compareAndSet(false, true)) {}
+        try {
+            final TMap<Key, Object> artifacts = this.artifacts.get(jobExecutionId);
+            if (artifacts == null) {
+                return null;
+            }
+            return clazz.cast(artifacts.get(new Key(jobExecutionId, context.getStepExecutionId(), context.getPartitionExecutionId(), ref, clazz)));
+        } finally {
+            artifactLock.set(false);
+        }
+    }
+
+    @Override
+    public <T> void storeArtifact(final Class<T> clazz, final String ref, final ExecutionContext context, final T value) {
+        final long jobExecutionId = context.getJobExecutionId();
+        while (!artifactLock.compareAndSet(false, true)) {}
+        try {
+            TMap<Key, Object> artifacts = this.artifacts.get(jobExecutionId);
+            if (artifacts == null) {
+                artifacts = new THashMap<Key, Object>();
+                this.artifacts.put(jobExecutionId, artifacts);
+            }
+            artifacts.put(new Key(jobExecutionId, context.getStepExecutionId(), context.getPartitionExecutionId(), ref, clazz), value);
+        } finally {
+            artifactLock.set(false);
+        }
+    }
+
     protected LocalJobRegistry _createJobRegistry(final long jobExecutionId) {
         return new LocalJobRegistry();
+    }
+
+    private static class Key {
+        final long jobExecutionId;
+        final Long stepExecutionId;
+        final Long partitionExecutionId;
+        final String ref;
+        final Class<?> clazz;
+
+        private Key(final long jobExecutionId, final Long stepExecutionId, final Long partitionExecutionId, final String ref, final Class<?> clazz) {
+            this.jobExecutionId = jobExecutionId;
+            this.stepExecutionId = stepExecutionId;
+            this.partitionExecutionId = partitionExecutionId;
+            this.ref = ref;
+            this.clazz = clazz;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            final Key key = (Key) o;
+
+            if (jobExecutionId != key.jobExecutionId) return false;
+            if (!clazz.equals(key.clazz)) return false;
+            if (partitionExecutionId != null ? !partitionExecutionId.equals(key.partitionExecutionId) : key.partitionExecutionId != null)
+                return false;
+            if (!ref.equals(key.ref)) return false;
+            if (stepExecutionId != null ? !stepExecutionId.equals(key.stepExecutionId) : key.stepExecutionId != null)
+                return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (int) (jobExecutionId ^ (jobExecutionId >>> 32));
+            result = 31 * result + (stepExecutionId != null ? stepExecutionId.hashCode() : 0);
+            result = 31 * result + (partitionExecutionId != null ? partitionExecutionId.hashCode() : 0);
+            result = 31 * result + ref.hashCode();
+            result = 31 * result + clazz.hashCode();
+            return result;
+        }
     }
 
     public static class AccumulatorImpl implements Accumulator {

@@ -27,7 +27,7 @@ public class CollectorImpl extends PropertyReferenceImpl<PartitionCollector> imp
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            return load(PartitionCollector.class, injectionContext, context).collectPartitionData();
+            return load(PartitionCollector.class, configuration, context).collectPartitionData();
         } finally {
             provider.setInjectables(null);
         }

@@ -59,4 +59,7 @@ public interface Registry extends Lifecycle {
 
     SplitAccumulator getSplitAccumulator(final long jobExecutionId, final String id);
 
+    <T> T loadArtifact(final Class<T> clazz, final String ref, final ExecutionContext context);
+
+    <T> void storeArtifact(final Class<T> clazz, final String ref, final ExecutionContext context, final T value);
 }

@@ -27,7 +27,7 @@ public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(javax.batch.api.chunk.ItemWriter.class, injectionContext, context).open(checkpoint);
+            load(javax.batch.api.chunk.ItemWriter.class, configuration, context).open(checkpoint);
         } finally {
             provider.setInjectables(null);
         }
@@ -38,7 +38,7 @@ public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(javax.batch.api.chunk.ItemWriter.class, injectionContext, context).close();
+            load(javax.batch.api.chunk.ItemWriter.class, configuration, context).close();
         } finally {
             provider.setInjectables(null);
         }
@@ -49,7 +49,7 @@ public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(javax.batch.api.chunk.ItemWriter.class, injectionContext, context).writeItems(items);
+            load(javax.batch.api.chunk.ItemWriter.class, configuration, context).writeItems(items);
         } finally {
             provider.setInjectables(null);
         }
@@ -60,7 +60,7 @@ public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            return load(javax.batch.api.chunk.ItemWriter.class, injectionContext, context).checkpointInfo();
+            return load(javax.batch.api.chunk.ItemWriter.class, configuration, context).checkpointInfo();
         } finally {
             provider.setInjectables(null);
         }

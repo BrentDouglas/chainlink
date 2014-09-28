@@ -26,7 +26,7 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(PartitionReducer.class, injectionContext, context).beginPartitionedStep();
+            load(PartitionReducer.class, configuration, context).beginPartitionedStep();
         } finally {
             provider.setInjectables(null);
         }
@@ -37,7 +37,7 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(PartitionReducer.class, injectionContext, context).beforePartitionedStepCompletion();
+            load(PartitionReducer.class, configuration, context).beforePartitionedStepCompletion();
         } finally {
             provider.setInjectables(null);
         }
@@ -48,7 +48,7 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(PartitionReducer.class, injectionContext, context).rollbackPartitionedStep();
+            load(PartitionReducer.class, configuration, context).rollbackPartitionedStep();
         } finally {
             provider.setInjectables(null);
         }
@@ -59,7 +59,7 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(PartitionReducer.class, injectionContext, context).afterPartitionedStepCompletion(status);
+            load(PartitionReducer.class, configuration, context).afterPartitionedStepCompletion(status);
         } finally {
             provider.setInjectables(null);
         }

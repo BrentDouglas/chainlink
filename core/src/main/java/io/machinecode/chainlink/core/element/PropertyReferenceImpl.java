@@ -2,10 +2,12 @@ package io.machinecode.chainlink.core.element;
 
 import io.machinecode.chainlink.core.inject.InjectablesImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.PropertyReference;
 import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.util.Messages;
 
 import java.io.Serializable;
@@ -17,7 +19,6 @@ public class PropertyReferenceImpl<T> implements PropertyReference, Serializable
 
     protected final PropertiesImpl properties;
     protected final ArtifactReferenceImpl ref;
-    protected transient T _cached;
 
     public PropertyReferenceImpl(final ArtifactReferenceImpl ref, final PropertiesImpl properties) {
         this.ref = ref;
@@ -34,15 +35,18 @@ public class PropertyReferenceImpl<T> implements PropertyReference, Serializable
         return this.properties;
     }
 
-    public synchronized T load(final Class<T> clazz, final InjectionContext injectionContext, final ExecutionContext context) throws Exception {
-        if (this._cached != null) {
-            return this._cached;
+    public synchronized T load(final Class<T> clazz, final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+        final InjectionContext injectionContext = configuration.getInjectionContext();
+        final Registry registry = configuration.getRegistry();
+        final T artifact = registry.loadArtifact(clazz, this.ref.ref(), context);
+        if (artifact != null) {
+            return artifact;
         }
         final T that = this.ref.load(clazz, injectionContext, context);
         if (that == null) {
             throw new IllegalStateException(Messages.format("CHAINLINK-025004.artifact.null", context, this.ref.ref()));
         }
-        this._cached = that;
+        registry.storeArtifact(clazz, this.ref.ref(), context, that);
         return that;
     }
 

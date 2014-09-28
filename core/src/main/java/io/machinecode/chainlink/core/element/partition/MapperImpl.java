@@ -34,7 +34,7 @@ public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implement
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            return load(PartitionMapper.class, injectionContext, context).mapPartitions();
+            return load(PartitionMapper.class, configuration, context).mapPartitions();
         } finally {
             provider.setInjectables(null);
         }

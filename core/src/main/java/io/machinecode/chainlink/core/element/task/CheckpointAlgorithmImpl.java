@@ -24,7 +24,7 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            return load(javax.batch.api.chunk.CheckpointAlgorithm.class, injectionContext, context).checkpointTimeout();
+            return load(javax.batch.api.chunk.CheckpointAlgorithm.class, configuration, context).checkpointTimeout();
         } finally {
             provider.setInjectables(null);
         }
@@ -35,7 +35,7 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(javax.batch.api.chunk.CheckpointAlgorithm.class, injectionContext, context).beginCheckpoint();
+            load(javax.batch.api.chunk.CheckpointAlgorithm.class, configuration, context).beginCheckpoint();
         } finally {
             provider.setInjectables(null);
         }
@@ -46,7 +46,7 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            return load(javax.batch.api.chunk.CheckpointAlgorithm.class, injectionContext, context).isReadyToCheckpoint();
+            return load(javax.batch.api.chunk.CheckpointAlgorithm.class, configuration, context).isReadyToCheckpoint();
         } finally {
             provider.setInjectables(null);
         }
@@ -57,7 +57,7 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            load(javax.batch.api.chunk.CheckpointAlgorithm.class, injectionContext, context).endCheckpoint();
+            load(javax.batch.api.chunk.CheckpointAlgorithm.class, configuration, context).endCheckpoint();
         } finally {
             provider.setInjectables(null);
         }

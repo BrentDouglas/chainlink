@@ -24,7 +24,7 @@ public class ItemProcessorImpl extends PropertyReferenceImpl<javax.batch.api.chu
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             provider.setInjectables(_injectables(context));
-            return load(javax.batch.api.chunk.ItemProcessor.class, injectionContext, context).processItem(item);
+            return load(javax.batch.api.chunk.ItemProcessor.class, configuration, context).processItem(item);
         } finally {
             provider.setInjectables(null);
         }
