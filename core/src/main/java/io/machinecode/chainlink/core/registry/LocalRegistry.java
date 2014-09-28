@@ -6,9 +6,11 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
+import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
+import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.registry.Accumulator;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
@@ -21,6 +23,9 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.then.api.OnComplete;
+import io.machinecode.then.api.Promise;
+import io.machinecode.then.core.ResolvedPromise;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.partition.PartitionReducer;
@@ -29,6 +34,8 @@ import javax.transaction.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,6 +58,7 @@ public class LocalRegistry implements Registry {
     protected final TLongObjectMap<LocalJobRegistry> jobRegistries = new TLongObjectHashMap<LocalJobRegistry>();
     protected final TLongObjectMap<Chain<?>> jobs = new TLongObjectHashMap<Chain<?>>();
     protected final AtomicBoolean jobLock = new AtomicBoolean(false);
+
     protected final TLongObjectMap<TMap<Key, Object>> artifacts = new TLongObjectHashMap<TMap<Key, Object>>();
     protected final AtomicBoolean artifactLock = new AtomicBoolean(false);
 
@@ -233,24 +241,28 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public void unregisterJob(final long jobExecutionId) {
+    public Promise<?,?> unregisterJob(final long jobExecutionId) {
         while (!jobLock.compareAndSet(false, true)) {}
         try {
-            this.jobs.remove(jobExecutionId);
-            this.jobRegistries.remove(jobExecutionId);
-            this.onUnregisterJob(jobExecutionId);
+            final Chain<?> job = this.jobs.remove(jobExecutionId);
+            return this.onUnregisterJob(jobExecutionId, job).onComplete(new OnComplete() {
+                @Override
+                public void complete() {
+                    LocalRegistry.this.jobRegistries.remove(jobExecutionId);
+                }
+            });
         } finally {
             jobLock.set(false);
         }
-        log.debugf(Messages.get("CHAINLINK-005101.registry.removed.job"), jobExecutionId);
     }
 
     protected void onRegisterJob(final long jobExecutionId) {
         // noop
     }
 
-    protected void onUnregisterJob(final long jobExecutionId) {
-        // noop
+    protected Promise<?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
+        log.debugf(Messages.get("CHAINLINK-005101.registry.removed.job"), jobExecutionId);
+        return new ResolvedPromise<Void, Throwable>(null);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
     @Override
     public void notifyDone() {
-        registry.when.when(
+        registry.network.when(
                 System.currentTimeMillis() - start + registry.options.timeUnit().toMillis(registry.options.timeout()),
                 TimeUnit.MILLISECONDS,
                 io,

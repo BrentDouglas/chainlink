@@ -10,6 +10,8 @@ import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.core.then.ResolvedChain;
+import io.machinecode.then.api.OnComplete;
+import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
@@ -69,15 +71,14 @@ public class JobCallback extends ExecutableImpl<JobWork> {
                         jobContext.getExitStatus()
                 );
             }
-            configuration.getRegistry().unregisterJob(context.getJobExecutionId());
+            final Promise<?,?> promise = configuration.getRegistry().unregisterJob(context.getJobExecutionId());
             chain.link(new ResolvedChain<Void>(null));
             if (throwable == null) {
                 chain.resolve(null);
             } else {
                 chain.reject(throwable);
             }
-            // TODO There is a race here that needs resolving
-            // Possibly need to change the way JobAlreadyRunning is found or similar
+            promise.get();
         }
     }
 

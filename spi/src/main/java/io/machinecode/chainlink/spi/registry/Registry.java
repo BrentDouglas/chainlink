@@ -7,6 +7,7 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.then.api.Promise;
 
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobExecutionNotRunningException;
@@ -45,7 +46,7 @@ public interface Registry extends Lifecycle {
 
     Chain<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
 
-    void unregisterJob(long jobExecutionId);
+    Promise<?,?> unregisterJob(long jobExecutionId);
 
     void registerChain(final long jobExecutionId, final ChainId id, final Chain<?> chain);
 

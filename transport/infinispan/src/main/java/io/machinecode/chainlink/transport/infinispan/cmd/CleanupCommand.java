@@ -20,7 +20,7 @@ public class CleanupCommand extends BaseChainlinkCommand {
 
     @Override
     public Object perform(final InvocationContext invocationContext) throws Throwable {
-        registry.unregisterJob(jobExecutionId);
+        registry.unregisterJob(jobExecutionId).get();
         return true;
     }
 

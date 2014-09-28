@@ -4,10 +4,13 @@ import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.then.Chain;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.machinecode.chainlink.spi.registry.ExecutableAndContext;

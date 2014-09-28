@@ -5,6 +5,7 @@ import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
+import io.machinecode.chainlink.core.then.WhenImpl;
 import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.When;
@@ -22,7 +23,9 @@ import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
 import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
+import io.machinecode.then.core.PromiseImpl;
 import org.infinispan.AdvancedCache;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.distexec.DefaultExecutorService;
@@ -41,7 +44,6 @@ import javax.batch.operations.JobExecutionNotRunningException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -59,8 +61,8 @@ public class InfinispanRegistry extends LocalRegistry {
     final AdvancedCache<Object, Object> cache;
     final RpcOptions options;
     final DistributedExecutorService distributor;
-    final Timer timer;
-    final When when;
+    final When network;
+    final When reaper;
 
     final TMap<WorkerId, Worker> remoteWorkers = new THashMap<WorkerId, Worker>();
     final TLongObjectMap<List<Pair<ChainId,Address>>> remoteExecutions = new TLongObjectHashMap<List<Pair<ChainId,Address>>>();
@@ -81,7 +83,8 @@ public class InfinispanRegistry extends LocalRegistry {
                 throw new RuntimeException(e);
             }
         }
-        this.when = configuration.getWhen();
+        this.network = configuration.getWhen();
+        this.reaper = new WhenImpl();
         this.local = manager.getAddress();
         this.cacheName = configuration.getProperty(InfinispanConstants.CACHE, InfinispanConstants.CACHE);
         this.cache = manager.<Object, Object>getCache(this.cacheName, true).getAdvancedCache();
@@ -96,7 +99,6 @@ public class InfinispanRegistry extends LocalRegistry {
                 false
         );
         this.distributor = new DefaultExecutorService(cache);
-        this.timer = new Timer(Messages.get("CHAINLINK-005200.registry.eviction.timer"), true);
     }
 
     @Override
@@ -122,17 +124,25 @@ public class InfinispanRegistry extends LocalRegistry {
     }
 
     @Override
-    protected void onUnregisterJob(final long jobExecutionId) {
-        for (final Pair<ChainId, Address> pair : remoteExecutions.remove(jobExecutionId)) {
-            final Address address = pair.getValue();
-            if (!address.equals(local)) {
-                rpc.invokeRemotely(
-                        Collections.singleton(address),
-                        new CleanupCommand(cacheName, jobExecutionId),
-                        options
-                );
+    protected Promise<?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
+        final Promise<Object, Throwable> promise = new PromiseImpl<Object, Throwable>().onComplete(new OnComplete() {
+            @Override
+            public void complete() {
+                for (final Pair<ChainId, Address> pair : remoteExecutions.remove(jobExecutionId)) {
+                    final Address address = pair.getValue();
+                    if (!address.equals(local)) {
+                        rpc.invokeRemotely(
+                                Collections.singleton(address),
+                                new CleanupCommand(cacheName, jobExecutionId),
+                                options
+                        );
+                    }
+                }
+                log.debugf(Messages.get("CHAINLINK-005101.registry.removed.job"), jobExecutionId);
             }
-        }
+        });
+        this.reaper.when((Future<Object>) job, promise);
+        return promise;
     }
 
     @Override

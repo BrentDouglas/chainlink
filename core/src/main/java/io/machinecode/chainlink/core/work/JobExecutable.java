@@ -46,7 +46,9 @@ public class JobExecutable extends ExecutableImpl<JobWork> implements Serializab
             );
             chain.link(new ResolvedChain<Void>(null));
             chain.reject(e);
-            configuration.getRegistry().unregisterJob(this.context.getJobExecutionId());
+            configuration.getRegistry()
+                    .unregisterJob(this.context.getJobExecutionId())
+                    .get();
         }
     }
 
