@@ -25,7 +25,7 @@ Job repositories:
 - Infinispan
 
 Job loaders that support the job inheritance proposal and a simple api
-and utilitied to allow user defined loaders to also support job
+and utilities to allow user defined loaders to also support job
 inheritance. Built in loaders support:
 - XML
 - Fluent style
@@ -41,9 +41,11 @@ _Guice Injector_
 
 _Infinispan Transport_
 
-- Doesn't work at all currently, Chain#await() promises are resolved
-  before the chain has completely terminated.
-- Need to consider implications of network and repository writes.
+- Doesn't pass the TCK yet as one of the TCK classes `ExternalizableString`
+  is not actually `Externalizable`.
+- There is also an issue when calling JobOperator#stop() where the runtime
+  reports that the process has stopped before it actually has which provides
+  false results.
 
 ## Building
 
@@ -53,9 +55,8 @@ Run `mvn clean install`
 
 Copy [test.template.properties](test.template.properties) to `test.properties`. 
 
-You will have to have both postgresql and redis installed and running
-and redis installed and running. These are both configured in
-`test.properties`.
+You will have to have both postgresql and redis installed and running. These
+are both configured in `test.properties`.
 
 Run `mvn clean install -Ptest`.
 
@@ -66,22 +67,58 @@ of the TCK with:
 
 ` git clone git://java.net/jbatch~jsr-352-git-repository <target>`
 
-Make sure you have copied [test.template.properties](test.template.properties)
+Copy [test.template.properties](test.template.properties)
 to `test.properties` and set `tck.source` to the directory you checked
 the sources out at (`<target>` in the above command).
 
-To run the tck you must select an injector via a maven profile (there is
-no default) and you may select a repository (an in memory repository
-will be used by default).
+Copy [chainlink-tck.template.properties](tck/chainlink-tck.template.properties)
+to `chainlink-tck.properties` though it is only used for transports
+running on two JVM's.
 
-Run `mvn clean install -Ptck -Pin-x -Pre-x` where the in-x and
-re-x are the profiles of injector and repository you wish to use. You
-can see the available tck profiles in [the tck modules pom](tck/pom.xml).
+Create the directories `/var/run/chainlink` and `/var/log/chainlink`
+and make sure the user running the tests has write permissions to them.
+
+Maven will copy the chainlink daemon and relevant test jars into a
+directory specified by the property `tck.work.dir` in `test.properties`
+(/tmp by default), start it before running the tests and stop it afterwards.
+
+If the maven process is killed before shutting down the second process
+you might need to shut it down manually, which you can do by running
+`<tck.work.dir>/chainlink-<version>/bin/chainlink -k`.
+
+To run the TCK you must select an injector via a maven profile (there is
+no default) and you may select an alternate  repository (an in memory
+repository will be used by default) and/or an alternate transport.
+
+Run `mvn clean install -Ptck -Pin-x -Pre-x -Ptr-x` where the in-x, re-x
+and tr-x are the profiles of injector, repository and transport you
+wish to use. You can see the available tck profiles in [the tck modules pom](tck/pom.xml).
+
+An example minimum command to run the TCK is `mvn clean install -Ptck -Pin-cdi`.
+
+## Remote transports
+
+Some transports are designed to run on multiple JVM's, one owned by
+failsafe and one other chainlink process. You can configure the second
+process in two ways.
+
+Primarily, you can provide options to the java process running the tck
+by setting the environment variable `CHAINLINK_OPTS`. For example, to
+enable debugging on both the first and the second process you could
+use:
+
+>     CHAINLINK_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006" \
+>         mvn clean install \
+>             -Ptck -Pin-cdi -Ptr-<x> \
+>             -Dmaven.failsafe.debug
+
+Properties specified in the file `chainlink-tck.properties` will also
+be provided to the chainlink daemon.
 
 ## Infinispan and JGroups Tests
 
-Make sure the relevant properties are set in `test.properties`. You will
-also need to add this route:
+Make sure `tck.source` and `tck.work.dir` are set in `test.properties`.
+You will also need to add this route:
 
 `sudo route add -net 224.0.0.0 netmask 240.0.0.0 dev lo`
 
@@ -89,20 +126,18 @@ And allow jgroups udp traffic:
 
 `sudo iptables -A INPUT -i lo -d 224.0.0.0/4 -j ACCEPT`
 
-Create the directories `/var/run/chainlink` and `/var/log/chainlink`.
+The background process should have the following properties passed to
+it, either through the `CHAINLINK_OPTS` environment variable or
+`chainlink-tck.properties`:
 
-Maven will copy the chainlink daemon and relevent test jars into a directory
-specified in `test.properties` (/tmp by default), start it before running
-the tests and stop it afterwards.
+>     jgroups.bind_address=127.0.0.1
+>     java.net.preferIPv4Stack=true
 
-To execute the tests you can run something like this (though any
-injector and repository profile can be used):
+Failsafe should also be provided the same properties. To execute the
+tests you can run something like this (though any injector and
+repository profile can be used):
 
 `mvn clean install -Ptck -Pin-cdi -Ptr-infinispan -Djgroups.bind_addr=127.0.0.1 -Djava.net.preferIPv4Stack=true`
-
-If you kill maven halfway through execution you might need to shut it down
-afterwards which you can do by running
-`/tmp/chainlink-<version>/bin/chainlink -k`.
 
 ## License
 

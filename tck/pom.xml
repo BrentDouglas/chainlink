@@ -643,7 +643,7 @@
                         <goals><goal>add-test-source</goal></goals>
                         <configuration>
                             <sources>
-                                <source>${tck.source}/src/main/java</source>
+                                <source>${tck.source}/com.ibm.jbatch.tck/src/main/java</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -654,7 +654,7 @@
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>${tck.source}/src/main/resources/testJobXml/META-INF/batch-jobs</directory>
+                                    <directory>${tck.source}/com.ibm.jbatch.tck/src/main/resources/testJobXml/META-INF/batch-jobs</directory>
                                     <targetPath>META-INF/batch-jobs</targetPath>
                                 </resource>
                                 <resource>

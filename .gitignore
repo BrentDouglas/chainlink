@@ -22,6 +22,7 @@ idea
 # Build
 test.properties
 persistence.xml
+chainlink-tck.properties
 
 # Logging
 log4j.properties
