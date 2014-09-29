@@ -13,9 +13,9 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.chainlink.transport.core.DistributedExecutionRepositoryProxy;
-import io.machinecode.chainlink.transport.core.DistributedInvoker;
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.then.api.Promise;
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class HazelcastRegistry extends DistributedRegistry<Member, HazelcastRegistry> implements DistributedInvoker<Member, HazelcastRegistry> {
+public class HazelcastRegistry extends BaseDistributedRegistry<Member, HazelcastRegistry> implements DistributedRegistry<Member, HazelcastRegistry> {
 
     private static final Logger log = Logger.getLogger(HazelcastRegistry.class);
 

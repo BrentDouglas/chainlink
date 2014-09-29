@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class DistributedExecutionRepositoryProxy<A, R extends DistributedInvoker<A, R> & Registry> implements ExecutionRepository {
+public abstract class DistributedExecutionRepositoryProxy<A, R extends DistributedRegistry<A, R>> implements ExecutionRepository {
 
     protected final R registry;
     protected final A address;

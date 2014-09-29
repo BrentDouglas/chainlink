@@ -6,9 +6,9 @@ import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.transport.core.DistributedExecutionRepositoryProxy;
-import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
-import io.machinecode.chainlink.transport.core.DistributedInvoker;
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
+import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
+import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
@@ -19,7 +19,6 @@ import org.jgroups.Message;
 import org.jgroups.View;
 import org.jgroups.blocks.AsyncRequestHandler;
 import org.jgroups.blocks.MessageDispatcher;
-import org.jgroups.blocks.RequestHandler;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.Response;
 
@@ -29,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JGroupsRegistry extends DistributedRegistry<Address,JGroupsRegistry> implements AsyncRequestHandler, MembershipListener, DistributedInvoker<Address,JGroupsRegistry> {
+public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegistry> implements AsyncRequestHandler, MembershipListener, DistributedRegistry<Address,JGroupsRegistry> {
 
     private static final Logger log = Logger.getLogger(JGroupsRegistry.class);
 

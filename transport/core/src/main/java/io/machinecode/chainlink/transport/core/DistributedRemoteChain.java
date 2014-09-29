@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class DistributedRemoteChain<A, R extends DistributedInvoker<A, R> & Registry> extends ChainImpl<Void> {
+public abstract class DistributedRemoteChain<A, R extends DistributedRegistry<A, R>> extends ChainImpl<Void> {
 
     protected final R registry;
     protected final A address;

@@ -28,7 +28,6 @@ Job repositories:
 Transports:
 - Local only
 - Infinispan
-- Hazelcast
 
 Job loaders that support the job inheritance proposal and a simple api
 and utilities to allow user defined loaders to also support job

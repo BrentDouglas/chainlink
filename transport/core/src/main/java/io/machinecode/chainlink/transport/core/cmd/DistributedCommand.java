@@ -1,14 +1,13 @@
 package io.machinecode.chainlink.transport.core.cmd;
 
-import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.transport.core.DistributedInvoker;
+import io.machinecode.chainlink.transport.core.DistributedRegistry;
 
 import java.io.Serializable;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface DistributedCommand<T, A, I extends DistributedInvoker<A,I> & Registry> extends Serializable {
+public interface DistributedCommand<T, A, R extends DistributedRegistry<A, R>> extends Serializable {
 
-    T perform(final I invoker, final A origin) throws Throwable;
+    T perform(final R registry, final A origin) throws Throwable;
 }
