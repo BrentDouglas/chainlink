@@ -29,7 +29,7 @@ public class JGroupsRegistryFactory implements RegistryFactory {
 
     @Override
     public JGroupsRegistry produce(final RegistryConfiguration configuration) throws Exception {
-        final JChannel channel = new JChannel("jgroups-udp.xml");
+        final JChannel channel = new JChannel("tck-udp.xml");
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {

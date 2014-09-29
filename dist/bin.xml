@@ -27,11 +27,14 @@
                 <include>io.machinecode.chainlink:chainlink-inject-seam</include>
                 <include>io.machinecode.chainlink:chainlink-inject-spring</include>
                 <include>io.machinecode.chainlink:chainlink-repository-core</include>
+                <include>io.machinecode.chainlink:chainlink-repository-hazelcast</include>
                 <include>io.machinecode.chainlink:chainlink-repository-infinispan</include>
                 <include>io.machinecode.chainlink:chainlink-repository-jdbc</include>
                 <include>io.machinecode.chainlink:chainlink-repository-jpa</include>
                 <include>io.machinecode.chainlink:chainlink-repository-memory</include>
                 <include>io.machinecode.chainlink:chainlink-repository-redis</include>
+                <include>io.machinecode.chainlink:chainlink-transport-core</include>
+                <include>io.machinecode.chainlink:chainlink-transport-hazelcast</include>
                 <include>io.machinecode.chainlink:chainlink-transport-infinispan</include>
                 <include>io.machinecode.chainlink:chainlink-transport-jgroups</include>
                 <include>io.machinecode.chainlink:chainlink-server-chainlinkd</include>
@@ -59,6 +62,8 @@
                 <!-- Repo -->
                 <include>org.jboss.marshalling:jboss-marshalling</include>
                 <include>org.jboss.marshalling:jboss-marshalling-river</include>
+                <!-- Repo: Hazelcast -->
+                <include>com.hazelcast:hazelcast</include>
                 <!-- Repo: Ispn -->
                 <include>org.jgroups:jgroups</include>
                 <include>org.infinispan:infinispan-commons</include>

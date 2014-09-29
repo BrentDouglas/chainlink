@@ -5,7 +5,7 @@ import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
-import io.machinecode.chainlink.core.then.WhenImpl;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.When;
@@ -47,8 +47,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -65,6 +64,9 @@ public class InfinispanRegistry extends LocalRegistry {
     final DistributedExecutorService distributor;
     final When network;
     final When reaper;
+
+    final long timeout;
+    final TimeUnit unit;
 
     final TMap<WorkerId, Worker> remoteWorkers = new THashMap<WorkerId, Worker>();
     final TLongObjectMap<List<Pair<ChainId,Address>>> remoteExecutions = new TLongObjectHashMap<List<Pair<ChainId,Address>>>();
@@ -101,6 +103,8 @@ public class InfinispanRegistry extends LocalRegistry {
                 false
         );
         this.distributor = new DefaultExecutorService(cache);
+        this.timeout = Long.parseLong(configuration.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
+        this.unit = TimeUnit.valueOf(configuration.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
     }
 
     @Override
@@ -165,7 +169,7 @@ public class InfinispanRegistry extends LocalRegistry {
     @Override
     public WorkerId generateWorkerId(final Worker worker) {
         if (worker instanceof Thread) {
-            return new InfinispanThreadId((Thread)worker, local);
+            return new InfinispanWorkerId((Thread)worker, local);
         } else {
             return new InfinispanUUIDId(local);
         }
@@ -191,8 +195,8 @@ public class InfinispanRegistry extends LocalRegistry {
             return remoteWorker;
         }
         Address remote = null;
-        if (workerId instanceof InfinispanThreadId) {
-            remote = ((InfinispanThreadId) workerId).address;
+        if (workerId instanceof InfinispanWorkerId) {
+            remote = ((InfinispanWorkerId) workerId).getAddress();
         }
         if (remote != null) {
             if (remote.equals(local)) {
@@ -210,7 +214,7 @@ public class InfinispanRegistry extends LocalRegistry {
         for (final Future<Address> future : futures) {
             try {
                 //TODO Search these for completes rather that .get() them in order
-                final Address address = future.get();
+                final Address address = future.get(this.timeout, this.unit);
                 if (address == null) {
                     continue;
                 }
@@ -222,6 +226,8 @@ public class InfinispanRegistry extends LocalRegistry {
                     remoteWorkers.put(workerId, rpcWorker);
                 }
                 return rpcWorker;
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } catch (ExecutionException e) {
@@ -231,26 +237,24 @@ public class InfinispanRegistry extends LocalRegistry {
         throw new IllegalStateException(); //TODO message
     }
 
-    private List<Worker> _localWorkers(final int required) {
-        return super.getWorkers(required);
-    }
-
     @Override
     public List<Worker> getWorkers(final int required) {
         final List<Address> members = rpc.getMembers();
-        final List<Future<InfinispanThreadId>> futures = new ArrayList<Future<InfinispanThreadId>>(required);
+        final List<Future<InfinispanWorkerId>> futures = new ArrayList<Future<InfinispanWorkerId>>(required);
         for (final Address address : filterMembers(members, required)) {
             futures.add(distributor.submit(address, new LeastBusyWorkerCallable()));
         }
         final ArrayList<Worker> workers = new ArrayList<Worker>(required);
-        for (final Future<InfinispanThreadId> future : futures) {
+        for (final Future<InfinispanWorkerId> future : futures) {
             try {
-                final InfinispanThreadId threadId = future.get();
-                if (local.equals(threadId.address)) {
+                final InfinispanWorkerId threadId = future.get(this.timeout, this.unit);
+                if (local.equals(threadId.getAddress())) {
                     workers.add(getWorker(threadId));
                 } else {
-                    workers.add(new InfinispanWorker(this, local, threadId.address, threadId));
+                    workers.add(new InfinispanWorker(this, local, threadId.getAddress(), threadId));
                 }
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } catch (ExecutionException e) {
@@ -272,7 +276,7 @@ public class InfinispanRegistry extends LocalRegistry {
         if (ours != null) {
             return ours;
         }
-        final List<Address> members = rpc.getMembers();
+        final List<Address> members = new ArrayList<Address>(rpc.getMembers());
         members.remove(this.local);
         final List<Future<Address>> futures = new ArrayList<Future<Address>>(members.size());
         for (final Address address : members) {
@@ -280,13 +284,15 @@ public class InfinispanRegistry extends LocalRegistry {
         }
         for (final Future<Address> future : futures) {
             try {
-                final Address address = future.get();
+                final Address address = future.get(this.timeout, this.unit);
                 if (address == null) {
                     continue;
                 } else if (local.equals(address)) {
                     throw new IllegalStateException(); //TODO Message
                 }
-                return new InfinispanRemoteExecutionRepository(this, id, address);
+                return new InfinispanExecutionRepositoryProxy(this, id, address);
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } catch (ExecutionException e) {
@@ -302,7 +308,7 @@ public class InfinispanRegistry extends LocalRegistry {
         if (ours != null) {
             return ours;
         }
-        final List<Address> members = rpc.getMembers();
+        final List<Address> members = new ArrayList<Address>(rpc.getMembers());
         members.remove(this.local);
         final List<Future<ExecutableAndContext>> futures = new ArrayList<Future<ExecutableAndContext>>(members.size());
         for (final Address address : members) {
@@ -310,11 +316,13 @@ public class InfinispanRegistry extends LocalRegistry {
         }
         for (final Future<ExecutableAndContext> future : futures) {
             try {
-                final ExecutableAndContext executable = future.get();
+                final ExecutableAndContext executable = future.get(this.timeout, this.unit);
                 if (executable == null) {
                     continue;
                 }
                 return executable;
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } catch (ExecutionException e) {
@@ -333,8 +341,8 @@ public class InfinispanRegistry extends LocalRegistry {
         return all.subList(0, required > all.size() ? all.size() : required);
     }
 
-    public InfinispanThreadId leastBusyWorker() {
-        return (InfinispanThreadId)getWorker().id();
+    public InfinispanWorkerId leastBusyWorker() {
+        return (InfinispanWorkerId)getWorker().id();
     }
 
     public Address getLocal() {
@@ -350,7 +358,7 @@ public class InfinispanRegistry extends LocalRegistry {
                 Collections.singleton(address),
                 command,
                 options,
-                new InfinispanFuture<Object,T>(this, promise, address, System.currentTimeMillis())
+                new InfinispanFuture<Object, T>(this, promise, address, System.currentTimeMillis())
         );
     }
 

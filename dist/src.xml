@@ -34,13 +34,10 @@
                 <exclude>**/.idea/**</exclude>
 
                 <!-- Ignore other stuff -->
-                <exclude>deploy.properties</exclude>
-                <exclude>*.template</exclude>
+                <exclude>*.template.properties</exclude>
+                <exclude>*.template.xml</exclude>
                 <exclude>fakereplace.index</exclude>
                 <exclude>**/ide-settings/**</exclude>
-                <exclude>**/developer-documents/**</exclude>
-                <exclude>**/database/**</exclude>
-                <exclude>**/analyses/**</exclude>
                 <exclude>**/dist/**</exclude>
                 <exclude>**/doc/**</exclude>
             </excludes>

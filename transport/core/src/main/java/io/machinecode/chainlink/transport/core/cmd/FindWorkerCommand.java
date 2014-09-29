@@ -1,13 +1,12 @@
-package io.machinecode.chainlink.transport.jgroups.cmd;
+package io.machinecode.chainlink.transport.core.cmd;
 
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.transport.jgroups.JGroupsRegistry;
-import org.jgroups.Address;
+import io.machinecode.chainlink.transport.core.DistributedRegistry;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FindWorkerCommand implements Command<Address> {
+public class FindWorkerCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<A,A,R> {
 
     final WorkerId workerId;
 
@@ -16,7 +15,7 @@ public class FindWorkerCommand implements Command<Address> {
     }
 
     @Override
-    public Address invoke(final JGroupsRegistry registry, final Address origin) throws Throwable {
+    public A perform(final R registry, final A origin) throws Throwable {
         return registry.hasWorker(workerId) ? registry.getLocal() : null;
     }
 }

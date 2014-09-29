@@ -204,6 +204,16 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-transport-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-transport-hazelcast</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-transport-infinispan</artifactId>
                 <version>${project.version}</version>
             </dependency>

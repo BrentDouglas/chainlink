@@ -88,6 +88,41 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-infinispan</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-jdbc</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-jpa</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-memory</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-redis</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-hazelcast</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-infinispan</artifactId>
             <scope>test</scope>
         </dependency>
@@ -107,55 +142,14 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Memory -->
         <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-memory</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Infinispan -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-infinispan</artifactId>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- JGroups -->
-        <dependency>
-            <groupId>org.jgroups</groupId>
-            <artifactId>jgroups</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Redis -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-redis</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Jdbc -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-jdbc</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Jpa -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-jpa</artifactId>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -169,8 +163,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jgroups</groupId>
+            <artifactId>jgroups</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -178,9 +177,24 @@
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>tr-hazelcast</id>
+            <activation>
+                <property><name>tr-hazelcast</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.HazelcastRegistryFactory</registry.factory.class>
+            </properties>
+        </profile>
         <profile>
             <id>tr-infinispan</id>
             <activation>
@@ -352,8 +366,12 @@
                                           tofile="${project.build.testOutputDirectory}/testng.xml"
                                           overwrite="true">
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/jgroups-udp.xml"
-                                          tofile="${project.build.testOutputDirectory}/jgroups-udp.xml"
+                                    <copy file="${project.basedir}/../core/src/test/resources/tck-udp.xml"
+                                          tofile="${project.build.testOutputDirectory}/tck-udp.xml"
+                                          overwrite="true">
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/hazelcast.xml"
+                                          tofile="${project.build.testOutputDirectory}/hazelcast.xml"
                                           overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.template.xml"

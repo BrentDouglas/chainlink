@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.then;
 import io.machinecode.chainlink.spi.then.When;
 import io.machinecode.then.api.Promise;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -13,16 +14,22 @@ import java.util.concurrent.TimeUnit;
  */
 public class WhenImpl implements When {
 
-    private final ExecutorService when = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor;
+
+    public WhenImpl(final ExecutorService executor) {
+        this.executor = executor;
+    }
 
     @Override
     public <T> void when(final Future<T> future, final Promise<T,Throwable> then) {
-        this.when.submit(new Runnable() {
+        this.executor.submit(new Runnable() {
             @Override
             public void run() {
                 T that = null;
                 try {
                     that = future.get();
+                } catch (final CancellationException e) {
+                    then.cancel(true);
                 } catch (final Throwable e) {
                     then.reject(e);
                 }
@@ -33,12 +40,14 @@ public class WhenImpl implements When {
 
     @Override
     public <T> void when(final long timeout, final TimeUnit unit, final Future<T> future, final Promise<T,Throwable> then) {
-        this.when.submit(new Runnable() {
+        this.executor.submit(new Runnable() {
             @Override
             public void run() {
                 T that = null;
                 try {
                     that = future.get(timeout, unit);
+                } catch (final CancellationException e) {
+                    then.cancel(true);
                 } catch (final Throwable e) {
                     then.reject(e);
                 }
@@ -54,6 +63,6 @@ public class WhenImpl implements When {
 
     @Override
     public void shutdown() {
-        this.when.shutdown();
+        this.executor.shutdown();
     }
 }

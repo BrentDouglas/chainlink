@@ -1,9 +1,8 @@
-package io.machinecode.chainlink.transport.jgroups.cmd;
+package io.machinecode.chainlink.transport.core.cmd;
 
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.transport.jgroups.JGroupsRegistry;
-import org.jgroups.Address;
+import io.machinecode.chainlink.transport.core.DistributedRegistry;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -12,7 +11,7 @@ import java.lang.reflect.Method;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class InvokeChainCommand<T> implements Command<T> {
+public class InvokeChainCommand<T,A,R extends DistributedRegistry<A,R>> implements DistributedCommand<T,A,R> {
 
     final long jobExecutionId;
     final ChainId chainId;
@@ -28,10 +27,10 @@ public class InvokeChainCommand<T> implements Command<T> {
     }
 
     @Override
-    public T invoke(final JGroupsRegistry registry, final Address origin) throws Throwable {
+    public T perform(final R registry, final A origin) throws Throwable {
         final Chain<?> chain = registry.getChain(jobExecutionId, chainId);
         Method method = null;
-        for (final Method that : Chain.class.getMethods()) {
+        for (final Method that : chain.getClass().getMethods()) {
             if (that.getName().equals(methodName) && that.getParameterTypes().length == parameters.length) {
                 method = that;
                 break;

@@ -1,14 +1,13 @@
-package io.machinecode.chainlink.transport.jgroups.cmd;
+package io.machinecode.chainlink.transport.core.cmd;
 
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.transport.jgroups.JGroupsRegistry;
-import org.jgroups.Address;
+import io.machinecode.chainlink.transport.core.DistributedRegistry;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FindExecutionRepositoryWithIdCommand implements Command<Address> {
+public class FindExecutionRepositoryWithIdCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<A,A,R> {
 
     final ExecutionRepositoryId id;
 
@@ -17,7 +16,7 @@ public class FindExecutionRepositoryWithIdCommand implements Command<Address> {
     }
 
     @Override
-    public Address invoke(final JGroupsRegistry registry, final Address origin) throws Throwable {
+    public A perform(final R registry, final A origin) throws Throwable {
         final ExecutionRepository repository = registry.getLocalExecutionRepository(id);
         if (repository != null) {
             return registry.getLocal();

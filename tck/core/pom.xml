@@ -18,6 +18,34 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.ibm.jbatch</groupId>
+            <artifactId>com.ibm.jbatch-tck</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.batch</groupId>
+                    <artifactId>javax.batch-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch-model</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch-ri-spi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch-runtime</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-api</artifactId>
             <scope>provided</scope>
@@ -25,11 +53,6 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-spi</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-core</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -54,6 +77,46 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-infinispan</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-jdbc</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-jpa</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-memory</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-redis</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-hazelcast</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-infinispan</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -68,8 +131,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -77,15 +140,21 @@
             <artifactId>trove4j</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- JGroups -->
         <dependency>
-            <groupId>org.jgroups</groupId>
-            <artifactId>jgroups</artifactId>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Seam -->
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.jboss.seam</groupId>
             <artifactId>jboss-seam</artifactId>
@@ -93,19 +162,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Cdi -->
-        <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Spring -->
+        <dependency>
+            <groupId>org.jgroups</groupId>
+            <artifactId>jgroups</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -121,79 +186,9 @@
             <artifactId>spring-core</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Guice -->
-        <dependency>
-            <groupId>com.ibm.jbatch</groupId>
-            <artifactId>com.ibm.jbatch-tck</artifactId>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.batch</groupId>
-                    <artifactId>javax.batch-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-model</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-ri-spi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-runtime</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Memory -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-memory</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Infinispan -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-infinispan</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Redis -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-redis</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Jdbc -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-jdbc</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Jpa -->
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-jpa</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

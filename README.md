@@ -23,10 +23,12 @@ Job repositories:
 - JDBC (though it has only been tested against postgresql and h2)
 - Redis
 - Infinispan
+- Hazelcast
 
 Transports:
 - Local only
 - Infinispan
+- Hazelcast
 
 Job loaders that support the job inheritance proposal and a simple api
 and utilities to allow user defined loaders to also support job
@@ -43,7 +45,7 @@ _Infinispan Transport_
 - Doesn't pass the TCK yet as one of the TCK classes `ExternalizableString`
   is not actually `Externalizable`. When a no-args constructor is added to
   `ExternalizableString` as per the `Externalizable` requirements it passes
-   all the TCK tests. See [TCK bug #6155](https://java.net/bugzilla/show_bug.cgi?id=6155).
+  all the TCK tests. See [TCK bug #6155](https://java.net/bugzilla/show_bug.cgi?id=6155).
 
 _Guice Injector_
 

@@ -1,25 +1,32 @@
-package io.machinecode.chainlink.transport.infinispan;
+package io.machinecode.chainlink.transport.core;
 
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import org.infinispan.remoting.transport.Address;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class InfinispanThreadId implements WorkerId {
+public abstract class DistributedWorkerId<A> implements WorkerId {
     final long id;
-    final Address address;
+    final A address;
 
-    public InfinispanThreadId(final Thread thread, final Address address) {
+    public DistributedWorkerId(final Thread thread, final A address) {
         this.id = thread.getId();
         this.address = address;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public A getAddress() {
+        return address;
     }
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final InfinispanThreadId that = (InfinispanThreadId) o;
+        final DistributedWorkerId that = (DistributedWorkerId) o;
         return id == that.id && !(address != null ? !address.equals(that.address) : that.address != null);
     }
 

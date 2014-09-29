@@ -1,14 +1,13 @@
-package io.machinecode.chainlink.transport.jgroups.cmd;
+package io.machinecode.chainlink.transport.core.cmd;
 
 import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.transport.jgroups.JGroupsRegistry;
-import org.jgroups.Address;
+import io.machinecode.chainlink.transport.core.DistributedRegistry;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class FindExecutableAndContextCommand implements Command<ExecutableAndContext> {
+public class FindExecutableAndContextCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<ExecutableAndContext,A,R> {
 
     final long jobExecutionId;
     final ExecutableId id;
@@ -19,7 +18,7 @@ public class FindExecutableAndContextCommand implements Command<ExecutableAndCon
     }
 
     @Override
-    public ExecutableAndContext invoke(final JGroupsRegistry registry, final Address origin) throws Throwable {
+    public ExecutableAndContext perform(final R registry, final A origin) throws Throwable {
         return registry.getExecutableAndContext(jobExecutionId, id);
     }
 }

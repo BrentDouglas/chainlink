@@ -1,14 +1,9 @@
 package io.machinecode.chainlink.transport.infinispan.cmd;
 
 import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
-import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.transport.infinispan.OnCommand;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
-import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.core.then.ChainImpl;
 import org.infinispan.context.InvocationContext;
-import org.infinispan.remoting.transport.Address;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

@@ -1,9 +1,8 @@
-package io.machinecode.chainlink.transport.jgroups.cmd;
+package io.machinecode.chainlink.transport.core.cmd;
 
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.transport.jgroups.JGroupsRegistry;
-import org.jgroups.Address;
+import io.machinecode.chainlink.transport.core.DistributedRegistry;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -12,7 +11,7 @@ import java.lang.reflect.Method;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class InvokeExecutionRepositoryCommand<T> implements Command<T> {
+public class InvokeExecutionRepositoryCommand<T,A,R extends DistributedRegistry<A,R>> implements DistributedCommand<T,A,R> {
 
     final ExecutionRepositoryId executionRepositoryId;
     final String methodName;
@@ -26,7 +25,7 @@ public class InvokeExecutionRepositoryCommand<T> implements Command<T> {
     }
 
     @Override
-    public T invoke(final JGroupsRegistry registry, final Address origin) throws Throwable {
+    public T perform(final R registry, final A origin) throws Throwable {
         //TODO Ensure local
         final ExecutionRepository repository = registry.getExecutionRepository(executionRepositoryId);
         Method method = null;

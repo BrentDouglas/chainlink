@@ -1,14 +1,13 @@
-package io.machinecode.chainlink.transport.jgroups.cmd;
+package io.machinecode.chainlink.transport.core.cmd;
 
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.transport.jgroups.JGroupsRegistry;
-import org.jgroups.Address;
+import io.machinecode.chainlink.transport.core.DistributedRegistry;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class ExecuteCommand implements Command<Void> {
+public class ExecuteCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<Object,A,R> {
 
     final WorkerId workerId;
     final ExecutableEvent event;
@@ -19,7 +18,7 @@ public class ExecuteCommand implements Command<Void> {
     }
 
     @Override
-    public Void invoke(final JGroupsRegistry registry, final Address origin) throws Throwable {
+    public Object perform(final R registry, final A origin) throws Throwable {
         registry.getWorker(workerId).execute(event);
         return null;
     }

@@ -11,7 +11,10 @@
 
     <artifactId>chainlink-transport</artifactId>
     <packaging>pom</packaging>
+
     <modules>
+        <module>core</module>
+        <module>hazelcast</module>
         <module>infinispan</module>
         <module>jgroups</module>
     </modules>
