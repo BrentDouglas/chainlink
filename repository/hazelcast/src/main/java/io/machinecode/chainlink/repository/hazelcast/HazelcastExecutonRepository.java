@@ -2,7 +2,6 @@ package io.machinecode.chainlink.repository.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.hazelcast.map.AbstractEntryProcessor;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
@@ -369,12 +368,7 @@ public class HazelcastExecutonRepository implements ExecutionRepository {
 
     @Override
     public Set<String> getJobNames() throws Exception {
-        final Map<Long, Object> results = jobInstances.executeOnEntries(new AbstractEntryProcessor<Long, ExtendedJobInstance>() {
-            @Override
-            public Object process(final Map.Entry<Long, ExtendedJobInstance> entry) {
-                return entry.getValue().getJobName();
-            }
-        });
+        final Map<Long, Object> results = jobInstances.executeOnEntries(new JobNameProcessor());
         final Set<String> ret = new THashSet<String>();
         for (final Object value : results.entrySet()) {
             ret.add((String) value);
@@ -384,12 +378,7 @@ public class HazelcastExecutonRepository implements ExecutionRepository {
 
     @Override
     public int getJobInstanceCount(final String jobName) throws Exception {
-        final Map<Long, Object> results = jobInstances.executeOnEntries(new AbstractEntryProcessor<Long, ExtendedJobInstance>() {
-            @Override
-            public Object process(final Map.Entry<Long, ExtendedJobInstance> entry) {
-                return jobName.equals(entry.getValue().getJobName());
-            }
-        });
+        final Map<Long, Object> results = jobInstances.executeOnEntries(new JobInstanceCountProcessor(jobName));
         int count = 0;
         for (final Object value : results.values()) {
             if ((Boolean)value) {
@@ -404,16 +393,7 @@ public class HazelcastExecutonRepository implements ExecutionRepository {
 
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws Exception {
-        final Map<Long, Object> results = jobInstances.executeOnEntries(new AbstractEntryProcessor<Long, ExtendedJobInstance>() {
-            @Override
-            public Object process(final Map.Entry<Long, ExtendedJobInstance> entry) {
-                final JobInstance jobInstance = entry.getValue();
-                if (jobName.equals(jobInstance.getJobName())) {
-                    return jobInstance;
-                }
-                return null;
-            }
-        });
+        final Map<Long, Object> results = jobInstances.executeOnEntries(new JobInstanceProcessor(jobName));
         final List<JobInstance> ret = new ArrayList<JobInstance>(count);
         for (final Object value : results.values()) {
             if (value != null) {
@@ -436,20 +416,7 @@ public class HazelcastExecutonRepository implements ExecutionRepository {
 
     @Override
     public List<Long> getRunningExecutions(final String jobName) throws Exception {
-        final Map<Long, Object> results = jobExecutions.executeOnEntries(new AbstractEntryProcessor<Long, ExtendedJobExecution>() {
-            @Override
-            public Object process(final Map.Entry<Long, ExtendedJobExecution> entry) {
-                final ExtendedJobExecution jobExecution = entry.getValue();
-                if (jobName.equals(jobExecution.getJobName())) {
-                    switch (jobExecution.getBatchStatus()) {
-                        case STARTING:
-                        case STARTED:
-                            return jobExecution.getExecutionId();
-                    }
-                }
-                return null;
-            }
-        });
+        final Map<Long, Object> results = jobExecutions.executeOnEntries(new RunningJobExecutionIdProcessor(jobName));
         final List<Long> ids = new ArrayList<Long>();
         for (final Object value : results.values()) {
             if (value != null) {
@@ -491,16 +458,7 @@ public class HazelcastExecutonRepository implements ExecutionRepository {
 
     @Override
     public List<JobExecution> getJobExecutions(final long jobInstanceId) throws Exception {
-        final Map<Long, Object> results = jobExecutions.executeOnEntries(new AbstractEntryProcessor<Long, ExtendedJobExecution>() {
-            @Override
-            public Object process(final Map.Entry<Long, ExtendedJobExecution> entry) {
-                final ExtendedJobExecution jobExecution = entry.getValue();
-                if (jobInstanceId == jobExecution.getJobInstanceId()) {
-                    return jobExecution;
-                }
-                return null;
-            }
-        });
+        final Map<Long, Object> results = jobExecutions.executeOnEntries(new JobExecutionsForJobInstanceProcessor(jobInstanceId));
         final List<JobExecution> executions = new ArrayList<JobExecution>();
         for (final Object result : results.values()) {
             if (result != null) {
