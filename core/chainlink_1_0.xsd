@@ -70,7 +70,7 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="serializer-factory" type="cl:Ref" minOccurs="1" maxOccurs="1">
+            <xs:element name="marshaller-factory" type="cl:Ref" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
 

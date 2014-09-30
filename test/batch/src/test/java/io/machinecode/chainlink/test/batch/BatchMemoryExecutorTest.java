@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.test.batch;
 
-import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
+import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -11,6 +11,6 @@ import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 public class BatchMemoryExecutorTest extends ExecutorTest {
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkSerializer());
+        return new MemoryExecutionRepository(new JdkMarshaller());
     }
 }

@@ -4,7 +4,6 @@ import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
-import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
@@ -12,6 +11,7 @@ import io.machinecode.chainlink.test.core.execution.artifact.batchlet.FailBatchl
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.RunBatchlet;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.StopBatchlet;
+import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -43,7 +43,7 @@ public class GuiceExecutorTest extends ExecutorTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkSerializer());
+        return new MemoryExecutionRepository(new JdkMarshaller());
     }
 
     @BeforeClass

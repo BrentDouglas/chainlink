@@ -26,6 +26,8 @@
                 <include>io.machinecode.chainlink:chainlink-inject-cdi</include>
                 <include>io.machinecode.chainlink:chainlink-inject-seam</include>
                 <include>io.machinecode.chainlink:chainlink-inject-spring</include>
+                <include>io.machinecode.chainlink:chainlink-marshalling-jboss</include>
+                <include>io.machinecode.chainlink:chainlink-marshalling-jdk</include>
                 <include>io.machinecode.chainlink:chainlink-repository-core</include>
                 <include>io.machinecode.chainlink:chainlink-repository-hazelcast</include>
                 <include>io.machinecode.chainlink:chainlink-repository-infinispan</include>
@@ -59,7 +61,7 @@
                 <include>org.jboss.logging:jboss-logging</include>
                 <include>io.machinecode.then:then-api</include>
                 <include>io.machinecode.then:then-core</include>
-                <!-- Repo -->
+                <!-- Marshalling -->
                 <include>org.jboss.marshalling:jboss-marshalling</include>
                 <include>org.jboss.marshalling:jboss-marshalling-river</include>
                 <!-- Repo: Hazelcast -->

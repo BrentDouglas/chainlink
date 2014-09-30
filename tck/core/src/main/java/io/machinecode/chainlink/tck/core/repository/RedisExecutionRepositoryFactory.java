@@ -6,19 +6,18 @@ import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFac
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import redis.clients.jedis.JedisShardInfo;
 
-import java.io.IOException;
-
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class RedisExecutionRepositoryFactory implements ExecutionRepositoryFactory {
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) throws IOException {
+    public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
         return new RedisExecutionRepository(
                 new JedisShardInfo(
                         System.getProperty("redis.host"),
                         Integer.parseInt(System.getProperty("redis.port"))
-                )
+                ),
+                configuration.getMarshallerFactory().produce(configuration)
         );
     }
 }

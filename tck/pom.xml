@@ -23,7 +23,7 @@
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
-        <serializer.factory.class>io.machinecode.chainlink.repository.core.JdkSerializerFactory</serializer.factory.class>
+        <marshaller.factory.class>io.mashinecode.chainlink.marshalling.jdk.JdkMarshallerFactory</marshaller.factory.class>
 
         <class.loader.factory.class></class.loader.factory.class>
         <transaction.manager.factory.class></transaction.manager.factory.class>
@@ -80,6 +80,11 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-marshalling-jdk</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -472,12 +477,12 @@
                                             <filter token="worker.factory.class" value="${worker.factory.class}" />
                                         </filterset>
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SerializerFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SerializerFactory"
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory"
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>
-                                            <filter token="serializer.factory.class" value="${serializer.factory.class}" />
+                                            <filter token="marshaller.factory.class" value="${marshaller.factory.class}" />
                                         </filterset>
                                     </copy>
                                 </target>
@@ -528,7 +533,7 @@
                                             <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
                                             <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
                                             <filter token="worker.factory.class" value="${worker.factory.class}" />
-                                            <filter token="serializer.factory.class" value="${serializer.factory.class}" />
+                                            <filter token="marshaller.factory.class" value="${marshaller.factory.class}" />
                                         </filterset>
                                     </copy>
                                     <copy file="${project.basedir}/../chainlink-tck.properties"

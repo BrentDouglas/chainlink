@@ -11,6 +11,6 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 public class MemoryExecutionRepositoryFactory implements ExecutionRepositoryFactory {
     @Override
     public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
-        return new MemoryExecutionRepository(configuration.getSerializerFactory().produce(configuration));
+        return new MemoryExecutionRepository(configuration.getMarshallerFactory().produce(configuration));
     }
 }

@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.spi.configuration.factory;
 
 import io.machinecode.chainlink.spi.configuration.BaseConfiguration;
-import io.machinecode.chainlink.spi.serialization.Serializer;
+import io.machinecode.chainlink.spi.marshalling.Marshaller;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface SerializerFactory extends Factory<Serializer, BaseConfiguration> {
+public interface MarshallerFactory extends Factory<Marshaller, BaseConfiguration> {
 }

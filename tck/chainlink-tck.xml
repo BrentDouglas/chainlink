@@ -9,7 +9,7 @@
         <executor-factory class="@executor.factory.class@"/>
         <registry-factory class="@registry.factory.class@"/>
         <worker-factory class="@worker.factory.class@"/>
-        <serializer-factory class="@serializer.factory.class@"/>
+        <marshaller-factory class="@marshaller.factory.class@"/>
         <mbean-server-factory class="@mbean.server.factory.class@"/>
         <execution-repository-factory class="@execution.repository.factory.class@"/>
 

@@ -38,7 +38,15 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-marshalling-jdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-memory</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.then</groupId>

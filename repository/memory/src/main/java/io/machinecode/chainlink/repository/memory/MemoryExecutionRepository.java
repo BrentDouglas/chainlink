@@ -11,22 +11,18 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TLongHashSet;
-import io.machinecode.chainlink.repository.core.JdkSerializer;
+import io.machinecode.chainlink.spi.marshalling.Marshaller;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.serialization.Serializer;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.repository.core.JobExecutionImpl;
 import io.machinecode.chainlink.repository.core.JobInstanceImpl;
 import io.machinecode.chainlink.repository.core.MutableMetricImpl;
 import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
 import io.machinecode.chainlink.repository.core.StepExecutionImpl;
-import org.jboss.marshalling.Marshalling;
-import org.jboss.marshalling.MarshallingConfiguration;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -86,10 +82,10 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     protected final AtomicBoolean stepExecutionPartitionExecutionLock = new AtomicBoolean(false);
     protected final AtomicBoolean jobExecutionHistoryLock = new AtomicBoolean(false);
 
-    protected final Serializer serializer;
+    protected final Marshaller marshaller;
 
-    public MemoryExecutionRepository(final Serializer serializer) {
-        this.serializer = serializer;
+    public MemoryExecutionRepository(final Marshaller marshaller) {
+        this.marshaller = marshaller;
     }
 
     @Override
@@ -216,9 +212,9 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = serializer.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = serializer.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = marshaller.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshaller.clone(writerCheckpoint);
         final long id;
         while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -353,7 +349,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
-        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
+        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
@@ -373,9 +369,9 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
-        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
-        final Serializable _reader = serializer.clone(readerCheckpoint);
-        final Serializable _writer = serializer.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
+        final Serializable _reader = marshaller.clone(readerCheckpoint);
+        final Serializable _writer = marshaller.clone(writerCheckpoint);
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
@@ -437,9 +433,9 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
-        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
-        final Serializable _reader = serializer.clone(readerCheckpoint);
-        final Serializable _writer = serializer.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
+        final Serializable _reader = marshaller.clone(readerCheckpoint);
+        final Serializable _writer = marshaller.clone(writerCheckpoint);
         while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
             final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
@@ -461,7 +457,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     @Override
     public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
-        final Serializable clonedPersistentUserData = serializer.clone(persistentUserData);
+        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
         while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
             final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);

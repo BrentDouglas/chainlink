@@ -1,8 +1,7 @@
-package io.machinecode.chainlink.repository.core;
+package io.machinecode.chainlink.marshalling.jboss;
 
-import io.machinecode.chainlink.spi.serialization.Serializer;
+import io.machinecode.chainlink.spi.marshalling.Marshaller;
 import org.jboss.marshalling.ByteBufferInput;
-import org.jboss.marshalling.Marshaller;
 import org.jboss.marshalling.MarshallerFactory;
 import org.jboss.marshalling.MarshallingConfiguration;
 import org.jboss.marshalling.OutputStreamByteOutput;
@@ -14,27 +13,25 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 /**
- * //TODO Move this to separate JBoss module
- *
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JbossSerializer implements Serializer {
+public class JbossMarshaller implements Marshaller {
 
     final MarshallerFactory marshallerFactory;
     final MarshallingConfiguration configuration;
 
-    public JbossSerializer(final MarshallerFactory marshallerFactory, final MarshallingConfiguration configuration) {
+    public JbossMarshaller(final MarshallerFactory marshallerFactory, final MarshallingConfiguration configuration) {
         this.marshallerFactory = marshallerFactory;
         this.configuration = configuration;
     }
 
     @Override
-    public byte[] bytes(final Serializable that) throws IOException {
+    public byte[] marshall(final Serializable that) throws IOException {
         if (that == null) {
             return null;
         }
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        final Marshaller marshaller = marshallerFactory.createMarshaller(configuration);
+        final org.jboss.marshalling.Marshaller marshaller = marshallerFactory.createMarshaller(configuration);
         marshaller.start(new OutputStreamByteOutput(stream));
         marshaller.writeObject(that);
         marshaller.finish();
@@ -44,12 +41,12 @@ public class JbossSerializer implements Serializer {
     }
 
     @Override
-    public byte[] bytes(final Serializable... that) throws IOException {
+    public byte[] marshall(final Serializable... that) throws IOException {
         if (that == null) {
             return null;
         }
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        final Marshaller marshaller = marshallerFactory.createMarshaller(configuration);
+        final org.jboss.marshalling.Marshaller marshaller = marshallerFactory.createMarshaller(configuration);
         marshaller.start(new OutputStreamByteOutput(stream));
         for (final Serializable value : that) {
             marshaller.writeObject(value);
@@ -61,15 +58,15 @@ public class JbossSerializer implements Serializer {
     }
 
     @Override
-    public Serializable read(final byte[] that) throws ClassNotFoundException, IOException {
+    public Serializable unmarshall(final byte[] that) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
-        return read(that, Serializable.class);
+        return unmarshall(that, Serializable.class);
     }
 
     @Override
-    public <T> T read(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException {
+    public <T> T unmarshall(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
@@ -86,6 +83,6 @@ public class JbossSerializer implements Serializer {
         if (that == null) {
             return null;
         }
-        return (T) read(bytes(that));
+        return (T) unmarshall(marshall(that));
     }
 }

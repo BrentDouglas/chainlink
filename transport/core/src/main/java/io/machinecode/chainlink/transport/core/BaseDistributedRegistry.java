@@ -14,7 +14,7 @@ import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.serialization.Serializer;
+import io.machinecode.chainlink.spi.marshalling.Marshaller;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.then.When;
 import io.machinecode.chainlink.spi.util.Messages;
@@ -47,7 +47,7 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
 
     private static final Logger log = Logger.getLogger(BaseDistributedRegistry.class);
 
-    protected final Serializer serializer;
+    protected final Marshaller marshaller;
     protected final When network;
     protected final When reaper;
 
@@ -58,7 +58,7 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
     protected final TimeUnit unit;
 
     public BaseDistributedRegistry(final RegistryConfiguration configuration) throws Exception {
-        this.serializer = configuration.getSerializerFactory().produce(configuration);
+        this.marshaller = configuration.getMarshallerFactory().produce(configuration);
         this.network= configuration.getWhenFactory().produce(configuration);
         this.reaper = configuration.getWhenFactory().produce(configuration);
 

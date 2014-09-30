@@ -109,7 +109,7 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.dispatcher.sendMessageWithFuture(
-                    new Message(address, serializer.bytes(command)),
+                    new Message(address, marshaller.marshall(command)),
                     RequestOptions.SYNC()
                             .setExclusionList(this.local),
                     new JGroupsFutureListener<T>(this.network, promise, this.timeout, this.unit)
@@ -125,7 +125,7 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.dispatcher.sendMessageWithFuture(
-                    new Message(address, serializer.bytes(command)),
+                    new Message(address, marshaller.marshall(command)),
                     RequestOptions.SYNC()
                             .setExclusionList(this.local)
                             .setTimeout(unit.toMillis(timeout)),
@@ -139,7 +139,7 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
     @Override
     public Object handle(final Message msg) throws Exception {
         try {
-            final DistributedCommand<?,Address,JGroupsRegistry> command = serializer.read(msg.getBuffer(), DistributedCommand.class);
+            final DistributedCommand<?,Address,JGroupsRegistry> command = marshaller.unmarshall(msg.getBuffer(), DistributedCommand.class);
             log.tracef("Handling %s from %s.", command, msg.src());
             return command.perform(this, msg.src());
         } catch (final Exception e) {

@@ -2,11 +2,11 @@ package io.machinecode.chainlink.test.seam;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.inject.core.VetoInjector;
-import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
+import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import org.jboss.seam.contexts.Lifecycle;
 import org.jboss.seam.contexts.ServletLifecycle;
 import org.jboss.seam.init.Initialization;
@@ -29,7 +29,7 @@ public class SeamExecutorTest extends ExecutorTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkSerializer());
+        return new MemoryExecutionRepository(new JdkMarshaller());
     }
 
     @BeforeClass

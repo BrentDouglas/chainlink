@@ -2,10 +2,10 @@ package io.machinecode.chainlink.test.spring;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
-import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
+import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import org.junit.BeforeClass;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -24,7 +24,7 @@ public class SpringExecutorTest extends ExecutorTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkSerializer());
+        return new MemoryExecutionRepository(new JdkMarshaller());
     }
 
     @BeforeClass

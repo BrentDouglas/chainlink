@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.test.core.execution;
 
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
-import io.machinecode.chainlink.repository.core.JdkSerializerFactory;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
@@ -10,9 +9,10 @@ import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
-import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.mashinecode.chainlink.marshalling.jdk.JdkMarshallerFactory;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
 
@@ -32,7 +32,7 @@ public abstract class BaseTest extends Assert {
     private ExecutionRepository _repository;
     private ConfigurationImpl _configuration;
     private TransactionManager _transactionManager;
-    private SerializerFactory _serializerFactory;
+    private MarshallerFactory _marshallerFactory;
     private RegistryFactory _registryFactory;
 
     protected final ConfigurationImpl configuration() throws Exception {
@@ -63,11 +63,11 @@ public abstract class BaseTest extends Assert {
         return _transactionManager;
     }
 
-    protected final SerializerFactory serializerFactory() {
-        if (this._serializerFactory == null) {
-            this._serializerFactory = _serializerFactory();
+    protected final MarshallerFactory marshallerFactory() {
+        if (this._marshallerFactory == null) {
+            this._marshallerFactory = _marshallerFactory();
         }
-        return _serializerFactory;
+        return _marshallerFactory;
     }
 
     protected final RegistryFactory registryFactory() {
@@ -87,7 +87,7 @@ public abstract class BaseTest extends Assert {
                 .setExecutionRepository(repository())
                 .setExecutorFactory(executor())
                 .setWorkerFactory(_workerFactory())
-                .setSerializerFactory(serializerFactory())
+                .setMarshallerFactory(marshallerFactory())
                 .setRegistryFactory(registryFactory())
                 .setProperty(Constants.THREAD_POOL_SIZE, "8");
     }
@@ -98,8 +98,8 @@ public abstract class BaseTest extends Assert {
         return new LocalTransactionManager(180, TimeUnit.SECONDS);
     }
 
-    protected SerializerFactory _serializerFactory() {
-        return new JdkSerializerFactory();
+    protected MarshallerFactory _marshallerFactory() {
+        return new JdkMarshallerFactory();
     }
 
     protected ExecutorFactory _executor() throws Exception{

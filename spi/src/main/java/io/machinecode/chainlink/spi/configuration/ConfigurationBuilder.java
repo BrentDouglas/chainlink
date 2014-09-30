@@ -9,7 +9,7 @@ import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
-import io.machinecode.chainlink.spi.configuration.factory.SerializerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WhenFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
@@ -20,7 +20,6 @@ import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
-import io.machinecode.chainlink.spi.then.When;
 
 import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
@@ -40,11 +39,11 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
 
     T setClassLoaderFactoryFqcn(final String fqcn);
 
-    T setSerializerFactory(final SerializerFactory serializerFactory);
+    T setMarshallerFactory(final MarshallerFactory marshallerFactory);
 
-    T setSerializerFactoryClass(final Class<? extends SerializerFactory> clazz);
+    T setMarshallerFactoryClass(final Class<? extends MarshallerFactory> clazz);
 
-    T setSerializerFactoryFqcn(final String fqcn);
+    T setMarshallerFactoryFqcn(final String fqcn);
 
     T setRegistry(final Registry registry);
 

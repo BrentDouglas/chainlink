@@ -32,8 +32,8 @@ public class XmlConfiguration implements ConfigurationFactory {
     @XmlElement(name = "worker-factory", namespace = NAMESPACE, required = true)
     private XmlClassRef workerFactory;
 
-    @XmlElement(name = "serializer-factory", namespace = NAMESPACE, required = true)
-    private XmlClassRef serializerFactory;
+    @XmlElement(name = "marshaller-factory", namespace = NAMESPACE, required = true)
+    private XmlClassRef marshallerFactory;
 
     @XmlElement(name = "mbean-server-factory", namespace = NAMESPACE, required = true)
     private XmlClassRef mBeanServerFactory;
@@ -114,12 +114,12 @@ public class XmlConfiguration implements ConfigurationFactory {
         this.executionRepositoryFactory = executionRepositoryFactory;
     }
 
-    public XmlClassRef getSerializerFactory() {
-        return serializerFactory;
+    public XmlClassRef getMarshallerFactory() {
+        return marshallerFactory;
     }
 
-    public void setSerializerFactory(final XmlClassRef serializerFactory) {
-        this.serializerFactory = serializerFactory;
+    public void setMarshallerFactory(final XmlClassRef marshallerFactory) {
+        this.marshallerFactory = marshallerFactory;
     }
 
     public XmlClassRef getClassLoaderFactory() {
@@ -187,7 +187,7 @@ public class XmlConfiguration implements ConfigurationFactory {
     }
 
     @Override
-    public ConfigurationImpl produce() {
+    public ConfigurationImpl produce() throws Exception {
         return new ConfigurationImpl(this);
     }
 }

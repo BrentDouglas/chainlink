@@ -1,6 +1,6 @@
-package io.machinecode.chainlink.repository.core;
+package io.mashinecode.chainlink.marshalling.jdk;
 
-import io.machinecode.chainlink.spi.serialization.Serializer;
+import io.machinecode.chainlink.spi.marshalling.Marshaller;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,10 +12,10 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JdkSerializer implements Serializer {
+public class JdkMarshaller implements Marshaller {
 
     @Override
-    public byte[] bytes(final Serializable that) throws IOException {
+    public byte[] marshall(final Serializable that) throws IOException {
         if (that == null) {
             return null;
         }
@@ -34,7 +34,7 @@ public class JdkSerializer implements Serializer {
     }
 
     @Override
-    public byte[] bytes(final Serializable... that) throws IOException {
+    public byte[] marshall(final Serializable... that) throws IOException {
         if (that == null) {
             return null;
         }
@@ -55,15 +55,15 @@ public class JdkSerializer implements Serializer {
     }
 
     @Override
-    public Serializable read(final byte[] that) throws ClassNotFoundException, IOException {
+    public Serializable unmarshall(final byte[] that) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
-        return read(that, Serializable.class);
+        return unmarshall(that, Serializable.class);
     }
 
     @Override
-    public <T> T read(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException {
+    public <T> T unmarshall(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
@@ -84,6 +84,6 @@ public class JdkSerializer implements Serializer {
         if (that == null) {
             return null;
         }
-        return (T) read(bytes(that));
+        return (T) unmarshall(marshall(that));
     }
 }

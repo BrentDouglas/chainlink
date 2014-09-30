@@ -7,11 +7,11 @@ import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
-import io.machinecode.chainlink.repository.core.JdkSerializer;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
+import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.AfterClass;
@@ -38,7 +38,7 @@ public class CdiExecutorTest extends ExecutorTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkSerializer());
+        return new MemoryExecutionRepository(new JdkMarshaller());
     }
 
     @BeforeClass

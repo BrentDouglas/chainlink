@@ -71,6 +71,16 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-marshalling-jboss</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-marshalling-jdk</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-repository-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
