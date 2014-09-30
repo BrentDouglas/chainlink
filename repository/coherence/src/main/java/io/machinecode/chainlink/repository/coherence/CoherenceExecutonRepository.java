@@ -3,7 +3,6 @@ package io.machinecode.chainlink.repository.coherence;
 import com.tangosol.net.CacheFactory;
 import com.tangosol.net.NamedCache;
 import com.tangosol.util.Filter;
-import com.tangosol.util.InvocableMap;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;

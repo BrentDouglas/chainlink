@@ -53,6 +53,11 @@
             <groupId>org.jboss.marshalling</groupId>
             <artifactId>jboss-marshalling-river</artifactId>
         </dependency>
+        <!-- Repo: Coherence -->
+        <dependency>
+            <groupId>com.oracle.coherence</groupId>
+            <artifactId>coherence</artifactId>
+        </dependency>
         <!-- Repo: Ispn -->
         <dependency>
             <groupId>org.infinispan</groupId>

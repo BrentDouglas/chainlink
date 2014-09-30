@@ -93,6 +93,16 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-coherence</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-hazelcast</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-infinispan</artifactId>
             <scope>test</scope>
         </dependency>
@@ -119,6 +129,11 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-coherence</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -150,6 +165,11 @@
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.coherence</groupId>
+            <artifactId>coherence</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -191,6 +211,16 @@
 
     <profiles>
         <profile>
+            <id>tr-coherence</id>
+            <activation>
+                <property><name>tr-coherence</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.CoherenceRegistryFactory</registry.factory.class>
+            </properties>
+        </profile>
+        <profile>
             <id>tr-hazelcast</id>
             <activation>
                 <property><name>tr-hazelcast</name></property>
@@ -218,6 +248,26 @@
             </activation>
             <properties>
                 <registry.factory.class>io.machinecode.chainlink.tck.core.transport.JGroupsRegistryFactory</registry.factory.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>re-coherence</id>
+            <activation>
+                <property><name>re-coherence</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.CoherenceExecutionRepositoryFactory</execution.repository.factory.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>re-hazelcast</id>
+            <activation>
+                <property><name>re-hazelcast</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.HazelcastExecutionRepositoryFactory</execution.repository.factory.class>
             </properties>
         </profile>
         <profile>
