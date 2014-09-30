@@ -14,12 +14,12 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-spi</artifactId>
+            <artifactId>chainlink-core</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-core</artifactId>
+            <artifactId>chainlink-spi</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

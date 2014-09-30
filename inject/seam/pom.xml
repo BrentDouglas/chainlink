@@ -14,12 +14,12 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-spi</artifactId>
+            <artifactId>chainlink-inject-core</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-inject-core</artifactId>
+            <artifactId>chainlink-spi</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -28,14 +28,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.seam</groupId>
-            <artifactId>jboss-seam</artifactId>
-            <type>ejb</type>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
+            <groupId>org.jboss.seam</groupId>
+            <artifactId>jboss-seam</artifactId>
+            <type>ejb</type>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -22,10 +22,6 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-spi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-jsl-core</artifactId>
         </dependency>
         <dependency>
@@ -47,6 +43,10 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-memory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.then</groupId>

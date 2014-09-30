@@ -13,25 +13,7 @@
 
     <properties>
         <test.properties>../../test.properties</test.properties>
-
-        <version.org.hibernate.hibernate-validator>3.1.0.GA</version.org.hibernate.hibernate-validator>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${version.org.hibernate.hibernate-validator}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.seam</groupId>
-                <artifactId>jboss-seam</artifactId>
-                <type>ejb</type>
-                <version>${version.org.jboss.seam.jboss-seam}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>

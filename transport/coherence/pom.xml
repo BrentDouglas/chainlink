@@ -11,16 +11,10 @@
 
     <artifactId>chainlink-transport-coherence</artifactId>
 
-
     <dependencies>
         <dependency>
             <groupId>com.oracle.coherence</groupId>
             <artifactId>coherence</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-spi</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -31,6 +25,11 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-spi</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
