@@ -34,7 +34,7 @@ public interface ExecutionRepository {
      * {@link JobInstance#getJobName()} returns {@param job} and
      * {@link ExtendedJobInstance#getJslName()} returns {@param jslName}.
      *
-     * @param job The id element of the job.
+     * @param jobId The id element of the job.
      * @param jslName The name of the xml file containing the job.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link ExtendedJobInstance} in accordance with the above rules.
@@ -243,7 +243,7 @@ public interface ExecutionRepository {
      *     equal to either {@param timestamp} or the time on the repository server when this method executes.
      *
      * Other methods of {@link StepExecution} and {@link ExtendedStepExecution} not listed will return values as defined
-     * in the javadoc for {@link #createStepExecution(JobExecution, String, Date)}.
+     * in the javadoc for {@link #createStepExecution(ExtendedJobExecution, String, Date)}.
      *
      * @param stepExecutionId The id of the {@link ExtendedStepExecution} that will be updated.
      * @param timestamp The current time on the JVM calling this method.
