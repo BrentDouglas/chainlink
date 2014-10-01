@@ -15,7 +15,6 @@ import java.sql.Connection;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-//@Ignore
 public class JdbcRepositoryTest extends RepositoryTest {
 
     private static final Logger log = Logger.getLogger(JdbcRepositoryTest.class);
