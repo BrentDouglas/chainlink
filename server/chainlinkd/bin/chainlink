@@ -137,9 +137,11 @@ else
     RETVAL=1
     count=0
 
+    LOG_FILE="${CHAINLINK_LOG_DIR}/console_${DATE}.log"
+
     until [ ${count} -gt ${START_WAIT} ]
     do
-      ( grep 'CHAINLINK-032000' ${CHAINLINK_LOG_DIR}/console_${DATE}.log ) 2>&1 > /dev/null && {
+      ( test -e ${LOG_FILE} && grep 'CHAINLINK-032000' ${LOG_FILE} ) 2>&1 > /dev/null && {
         RETVAL=0
         break
       }
