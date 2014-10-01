@@ -182,10 +182,6 @@ _MariaDB_
   or may not be a problem depending on the workload (i.e. if your steps
   run for over 1 second it will be fine).
 
-_Redis Repository_
-
-- The redis repository does not work with the JBoss marshaller.
-
 _Infinispan Transport_
 
 - Doesn't pass the TCK yet as one of the TCK classes `ExternalizableString`

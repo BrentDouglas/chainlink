@@ -11,7 +11,7 @@ import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
-import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.AfterClass;

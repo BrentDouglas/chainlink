@@ -1,4 +1,4 @@
-package io.mashinecode.chainlink.marshalling.jdk;
+package io.machinecode.chainlink.marshalling.jdk;
 
 import io.machinecode.chainlink.spi.marshalling.Marshaller;
 

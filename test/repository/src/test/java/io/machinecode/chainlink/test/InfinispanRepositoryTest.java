@@ -3,7 +3,6 @@ package io.machinecode.chainlink.test;
 import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
-import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
@@ -22,9 +21,9 @@ import java.util.concurrent.TimeUnit;
 public class InfinispanRepositoryTest extends RepositoryTest {
 
     @Override
-    protected ExecutionRepository _repository() {
+    protected ExecutionRepository _repository() throws Exception {
         return new InfinispanExecutionRepository(
-                new JdkMarshaller(),
+                marshallerFactory().produce(null),
                 new DefaultCacheManager(
                         new GlobalConfigurationBuilder()
                                 .clusteredDefault()

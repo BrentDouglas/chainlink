@@ -38,7 +38,7 @@ import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
-import io.mashinecode.chainlink.marshalling.jdk.JdkMarshallerFactory;
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory;
 
 import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;

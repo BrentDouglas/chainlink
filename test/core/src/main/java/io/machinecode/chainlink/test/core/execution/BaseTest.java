@@ -12,7 +12,7 @@ import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.mashinecode.chainlink.marshalling.jdk.JdkMarshallerFactory;
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
 
@@ -56,21 +56,21 @@ public abstract class BaseTest extends Assert {
         return _executor;
     }
 
-    protected final TransactionManager transactionManager() {
+    protected final TransactionManager transactionManager() throws Exception {
         if (this._transactionManager == null) {
             this._transactionManager = _transactionManager();
         }
         return _transactionManager;
     }
 
-    protected final MarshallerFactory marshallerFactory() {
+    protected final MarshallerFactory marshallerFactory() throws Exception {
         if (this._marshallerFactory == null) {
             this._marshallerFactory = _marshallerFactory();
         }
         return _marshallerFactory;
     }
 
-    protected final RegistryFactory registryFactory() {
+    protected final RegistryFactory registryFactory() throws Exception {
         if (this._registryFactory == null) {
             this._registryFactory = _registryFactory();
         }
@@ -94,23 +94,23 @@ public abstract class BaseTest extends Assert {
 
     protected abstract ExecutionRepository _repository() throws Exception;
 
-    protected final TransactionManager _transactionManager() {
+    protected final TransactionManager _transactionManager() throws Exception {
         return new LocalTransactionManager(180, TimeUnit.SECONDS);
     }
 
-    protected MarshallerFactory _marshallerFactory() {
-        return new JdkMarshallerFactory();
+    protected MarshallerFactory _marshallerFactory() throws Exception {
+        return (MarshallerFactory) Class.forName(System.getProperty("marshaller.factory.class")).newInstance();
     }
 
-    protected ExecutorFactory _executor() throws Exception{
+    protected ExecutorFactory _executor() throws Exception {
         return new EventedExecutorFactory();
     }
 
-    protected WorkerFactory _workerFactory() {
+    protected WorkerFactory _workerFactory() throws Exception {
         return new EventedWorkerFactory();
     }
 
-    protected RegistryFactory _registryFactory() {
+    protected RegistryFactory _registryFactory() throws Exception {
         return new LocalRegistryFactory();
     }
 

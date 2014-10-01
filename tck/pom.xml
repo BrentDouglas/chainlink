@@ -23,7 +23,7 @@
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
-        <marshaller.factory.class>io.mashinecode.chainlink.marshalling.jdk.JdkMarshallerFactory</marshaller.factory.class>
+        <marshaller.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory</marshaller.factory.class>
 
         <class.loader.factory.class></class.loader.factory.class>
         <transaction.manager.factory.class></transaction.manager.factory.class>
@@ -390,6 +390,16 @@
             <properties>
                 <database.driver>org.postgresql.Driver</database.driver>
                 <database.prefix>postgresql</database.prefix>
+            </properties>
+        </profile>
+        <profile>
+            <id>ma-jboss</id>
+            <activation>
+                <property><name>ma-jboss</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JbossMarshallerFactory</marshaller.factory.class>
             </properties>
         </profile>
     </profiles>

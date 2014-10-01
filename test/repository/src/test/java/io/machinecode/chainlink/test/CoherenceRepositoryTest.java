@@ -4,7 +4,6 @@ import com.tangosol.net.CacheFactory;
 import io.machinecode.chainlink.repository.coherence.CoherenceExecutonRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
-import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -12,10 +11,10 @@ import io.mashinecode.chainlink.marshalling.jdk.JdkMarshaller;
 public class CoherenceRepositoryTest extends RepositoryTest {
 
     @Override
-    protected ExecutionRepository _repository() {
+    protected ExecutionRepository _repository() throws Exception {
         CacheFactory.ensureCluster();
         return new CoherenceExecutonRepository(
-                new JdkMarshaller()
+                marshallerFactory().produce(null)
         );
     }
 }

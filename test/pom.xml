@@ -27,6 +27,7 @@
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
+        <marshaller.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory</marshaller.factory.class>
     </properties>
 
     <dependencies>
@@ -53,6 +54,11 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-marshalling-jdk</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-marshalling-jboss</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -108,6 +114,16 @@
             <properties>
                 <database.driver>org.postgresql.Driver</database.driver>
                 <database.prefix>postgresql</database.prefix>
+            </properties>
+        </profile>
+        <profile>
+            <id>ma-jboss</id>
+            <activation>
+                <property><name>ma-jboss</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JbossMarshallerFactory</marshaller.factory.class>
             </properties>
         </profile>
     </profiles>
@@ -182,6 +198,7 @@
                     <systemPropertyVariables>
                         <database.driver>${database.driver}</database.driver>
                         <database.prefix>${database.prefix}</database.prefix>
+                        <marshaller.factory.class>${marshaller.factory.class}</marshaller.factory.class>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

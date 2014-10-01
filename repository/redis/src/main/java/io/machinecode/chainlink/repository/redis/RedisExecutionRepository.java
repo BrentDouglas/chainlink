@@ -72,7 +72,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     public RedisExecutionRepository(final JedisShardInfo info, final Marshaller marshaller) throws IOException {
         this.info = info;
-        this.marshaller = marshaller; //TODO For some reason this doesn't work with jboss' marshaller
+        this.marshaller = marshaller;
 
         JOB_INSTANCE_ID = marshaller.marshall("ji_id");
         JOB_EXECUTION_ID = marshaller.marshall("je_id");
