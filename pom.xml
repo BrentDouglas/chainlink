@@ -53,7 +53,6 @@
         <version.javax.faces.jsf-api>2.1.23.Final</version.javax.faces.jsf-api>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.servlet.servlet-api>2.5</version.javax.servlet.servlet-api>
-        <version.javax.validation.validation-api>1.1.0.Final</version.javax.validation.validation-api>
         <version.junit.junit>4.10</version.junit.junit>
         <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
         <version.log4j.log4j>1.2.17</version.log4j.log4j>
@@ -65,7 +64,6 @@
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.marshalling.jboss-marshalling>1.4.3.Final</version.org.jboss.marshalling.jboss-marshalling>
         <version.org.jboss.seam.jboss-seam>2.2.2.Final</version.org.jboss.seam.jboss-seam>
-        <version.org.jboss.seam.jboss-seam-2.3>2.3.1.Final</version.org.jboss.seam.jboss-seam-2.3>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>1.0.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>
         <version.org.jboss.weld.se.weld-se>2.1.0.Final</version.org.jboss.weld.se.weld-se>
         <version.org.jboss.spec.jboss-javaee-6.0>2.0.0.Final</version.org.jboss.spec.jboss-javaee-6.0>
@@ -298,11 +296,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>${version.javax.servlet.servlet-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>${version.javax.validation.validation-api}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>

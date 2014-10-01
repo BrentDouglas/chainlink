@@ -15,10 +15,10 @@
     <modules>
         <module>core</module>
         <module>cdi</module>
-        <module>spring</module>
-        <module>seam</module>
-        <module>jndi</module>
         <module>guice</module>
+        <module>jndi</module>
+        <module>seam</module>
+        <module>spring</module>
     </modules>
 
 </project>

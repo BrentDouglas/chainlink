@@ -18,8 +18,8 @@
         <module>batch</module>
         <module>cdi</module>
         <module>guice</module>
+        <module>seam</module>
         <module>spring</module>
-        <module>seam-2.2</module>
     </modules>
 
     <properties>
@@ -88,16 +88,6 @@
     </dependencies>
 
     <profiles>
-        <profile>
-            <id>seam-2.3</id>
-            <activation>
-                <property><name>seam-2.3</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>seam-2.3</module>
-            </modules>
-        </profile>
         <profile>
             <id>db-mariadb</id>
             <activation>

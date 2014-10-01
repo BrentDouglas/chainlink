@@ -9,12 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>chainlink-test-seam-2.3</artifactId>
+    <artifactId>chainlink-test-seam</artifactId>
 
     <properties>
         <test.properties>../../test.properties</test.properties>
-
-        <version.org.jboss.seam.jboss-seam>2.3.1.Final</version.org.jboss.seam.jboss-seam>
     </properties>
 
     <dependencies>
@@ -39,8 +37,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
