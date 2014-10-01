@@ -14,7 +14,7 @@ import java.sql.Connection;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-@Ignore
+//@Ignore
 public class JdbcRepositoryTest extends RepositoryTest {
 
     private static DataSource dataSource;

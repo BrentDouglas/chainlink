@@ -1283,7 +1283,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected String insertProperty() {
-        return "insert into public.property (key, value) values (?, ?);";
+        return "insert into public.property (type, value) values (?, ?);";
     }
 
     protected String insertPropertyToJobExecution() {
@@ -1375,7 +1375,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected String queryJobExecutionParameters() {
-        return "select p.key, p.value from public.property p join public.job_execution_property j on p.id=j.property_id and j.job_execution_id = ?;";
+        return "select p.type, p.value from public.property p join public.job_execution_property j on p.id=j.property_id and j.job_execution_id = ?;";
     }
 
     protected String queryJobExecution() {
@@ -1439,7 +1439,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected String queryPartitionParameters() {
-        return  "select p.key, p.value from public.property p join public.partition_execution_property e on p.id=e.property_id and e.partition_execution_id = ?;";
+        return  "select p.type, p.value from public.property p join public.partition_execution_property e on p.id=e.property_id and e.partition_execution_id = ?;";
     }
 
     protected void setLargeObject(final PreparedStatement statement, final int index, final byte[] bytes) throws SQLException {

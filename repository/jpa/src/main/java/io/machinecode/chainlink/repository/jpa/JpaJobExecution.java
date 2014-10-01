@@ -174,7 +174,7 @@ public class JpaJobExecution implements ExtendedJobExecution {
         }
         final Properties params = new Properties();
         for (final JpaProperty property : parameters) {
-            params.put(property.getKey(), property.getValue());
+            params.put(property.getType(), property.getValue());
         }
         return params;
     }

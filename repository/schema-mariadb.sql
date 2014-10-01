@@ -5,7 +5,7 @@ create table if not exists metric(
 );
 create table if not exists property(
   `id` bigint auto_increment primary key not null,
-  `key` varchar(1024) not null,
+  `type` varchar(1024) not null,
   `value` varchar(1024) not null
 );
 create table if not exists job_instance(
@@ -21,9 +21,9 @@ create table if not exists job_execution(
   `batch_status` varchar(1024) not null,
   `exit_status` varchar(1024),
   `create_time` timestamp not null default current_timestamp,
-  `start_time` timestamp,
-  `updated_time` timestamp,
-  `end_time` timestamp,
+  `start_time` timestamp null,
+  `updated_time` timestamp null,
+  `end_time` timestamp null,
   `restart_element_id` varchar(1024)
 );
 create table if not exists job_execution_history(
@@ -44,9 +44,9 @@ create table if not exists step_execution(
   `batch_status` varchar(1024) not null,
   `exit_status` varchar(1024),
   `create_time` timestamp not null default current_timestamp,
-  `start_time` timestamp,
-  `updated_time` timestamp,
-  `end_time` timestamp,
+  `start_time` timestamp null,
+  `updated_time` timestamp null,
+  `end_time` timestamp null,
   `reader_checkpoint` blob,
   `writer_checkpoint` blob,
   `persistent_user_data` blob
@@ -64,9 +64,9 @@ create table if not exists partition_execution(
   `batch_status` varchar(1024) not null,
   `exit_status` varchar(1024),
   `create_time` timestamp not null default current_timestamp,
-  `start_time` timestamp,
-  `updated_time` timestamp,
-  `end_time` timestamp,
+  `start_time` timestamp null,
+  `updated_time` timestamp null,
+  `end_time` timestamp null,
   `reader_checkpoint` blob,
   `writer_checkpoint` blob,
   `persistent_user_data` blob
