@@ -5,7 +5,7 @@ create table if not exists metric(
 );
 create table if not exists property(
   `id` bigint auto_increment primary key not null,
-  `type` varchar(1024) not null,
+  `name` varchar(1024) not null,
   `value` varchar(1024) not null
 );
 create table if not exists job_instance(

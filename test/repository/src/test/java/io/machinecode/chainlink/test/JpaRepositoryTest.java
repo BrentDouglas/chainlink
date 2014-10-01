@@ -6,6 +6,7 @@ import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLo
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.DummyDataSource;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
+import org.jboss.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -23,6 +24,8 @@ import java.sql.SQLException;
  */
 public class JpaRepositoryTest extends RepositoryTest {
 
+    private static final Logger log = Logger.getLogger(JpaRepositoryTest.class);
+
     private static EntityManagerFactory factory;
 
     @Override
@@ -38,10 +41,13 @@ public class JpaRepositoryTest extends RepositoryTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         final String prefix = System.getProperty("database.prefix") + ".";
+        final String url = System.getProperty(prefix + "database.url");
+        final String driverName = System.getProperty("database.driver");
+        log.infof("Connection: {\n\turl: '%s'\n\tdriver: '%s'\n}", url, driverName);
         try {
-            DriverManager.getDriver(System.getProperty(prefix + "database.url"));
+            DriverManager.getDriver(url);
         } catch (final SQLException e) {
-            final Driver driver = Driver.class.cast(Class.forName(System.getProperty("database.driver")).newInstance());
+            final Driver driver = Driver.class.cast(Class.forName(driverName).newInstance());
             DriverManager.registerDriver(driver);
         }
         factory = Persistence.createEntityManagerFactory("TestPU");

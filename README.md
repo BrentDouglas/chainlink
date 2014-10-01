@@ -15,19 +15,20 @@ of these components for a wide range of external libraries.
 Support for several DI frameworks:
 - CDI
 - Spring
-- Seam 2 (2.2 and 2.3)
+- Seam 2
 
-Job repositories:
-- In memory
+Execution repositories:
+- Memory
 - JPA
-- JDBC (though it has only been tested against postgresql and h2)
+- JDBC (though it has only been tested against H2, PostgreSQL and
+  MariaDB)
 - Redis
 - Infinispan
 - Coherence
 - Hazelcast
 
 Transports:
-- Local only
+- Local
 - Infinispan
 
 Job loaders that support the job inheritance proposal and a simple api
@@ -38,18 +39,50 @@ inheritance. Built in loaders support:
 
 JMX job management.
 
+## Installing coherence
+
+Chainlink has support for running on top of Coherence. Unfortunately
+installing Coherence is a bit of a pain as Oracle is to cool to just
+upload the jars to central.
+
+First you need to sign up for an account on [oracles site](http://www.oracle.com).
+Once you have one you need to [download the coherence installer](http://www.oracle.com/technetwork/middleware/coherence/downloads/coherence-archive-165749.html)
+by selecting 'Coherence Stand-Alone Install'. Run the installer with
+`java -jar /path/to/download/coherence_version.jar` and follow the
+prompts. Now you need to install the coherence jar into your local
+maven repository:
+
+`mvn install:install-file  \
+      -DgroupId=com.oracle.coherence  \
+      -DartifactId=coherence  \
+      -Dversion=<version> \
+      -Dfile=${ORACLE_HOME}/coherence/lib/coherence.jar  \
+      -Dpackaging=jar \
+      -DgeneratePom=true`
+
+Where `ORACLE_HOME` is where you set it in the installer and `<version>`
+is the version of coherence you are installing (which should match the
+version in [pom.xml](pom.xml).
+
 ## Building
 
-Run `mvn clean install`
+To build without coherence run `mvn clean install`, if you do want it
+use `mvn clean install -Pcoherence`
 
 ## Run the tests
 
-Copy [test.template.properties](test.template.properties) to `test.properties`. 
+Copy [test.template.properties](test.template.properties) to `test.properties`.
+This file is used to configure maven to run the tests. All properties in
+this file will be passed to Surefire and available from
+`System.getProperty(...)` in the test JVM.
 
-You will have to have both postgresql and redis installed and running. These
-are both configured in `test.properties`.
+To run the full suite of tests available under the `-Ptest` profile you
+will need to have redis running. If using the `-Pdb-postgresql` or
+`-Pdb-mariadb` profiles you will also require postgresql and mariadb
+running respectively. Connection settings for these are configured in
+`test.properties`.
 
-Run `mvn clean install -Ptest`.
+Run the tests with `mvn clean install -Ptest`.
 
 ## Running TCK Tests from failsafe
 
@@ -60,11 +93,16 @@ of the TCK with:
 
 Copy [test.template.properties](test.template.properties)
 to `test.properties` and set `tck.source` to the directory you checked
-the sources out at (`<target>` in the above command).
+the sources out at (`<target>` in the above command). This file is used
+to configure maven to run the tests. All properties in this file will
+be passed to Failsafe and available from `System.getProperty(...)` in
+the test JVM.
 
 Copy [chainlink-tck.template.properties](tck/chainlink-tck.template.properties)
 to `chainlink-tck.properties` though it is only used for transports
-running on two JVM's.
+running on two JVM's. All properties in this file will be passed to
+Failsafe and available from `System.getProperty(...)` in the secondary
+JVM.
 
 Create the directories `/var/run/chainlink` and `/var/log/chainlink`
 and make sure the user running the tests has write permissions to them.
@@ -106,16 +144,21 @@ use:
 Properties specified in the file `chainlink-tck.properties` will also
 be provided to the chainlink daemon.
 
-## Infinispan and JGroups Tests
+Most/all of the remote transports can be configured for multicast
+discovery in which case you will need to ensure your network is
+correctly configured for it.
 
-Make sure `tck.source` and `tck.work.dir` are set in `test.properties`.
 You will also need to add this route:
 
 `sudo route add -net 224.0.0.0 netmask 240.0.0.0 dev lo`
 
-And allow jgroups udp traffic:
+And allow traffic through iptables:
 
 `sudo iptables -A INPUT -i lo -d 224.0.0.0/4 -j ACCEPT`
+
+## Infinispan and JGroups Tests
+
+Make sure `tck.source` and `tck.work.dir` are set in `test.properties`.
 
 The background process should have the following properties passed to
 it, either through the `CHAINLINK_OPTS` environment variable or
@@ -128,9 +171,20 @@ Failsafe should also be provided the same properties. To execute the
 tests you can run something like this (though any injector and
 repository profile can be used):
 
-`mvn clean install -Ptck -Pin-cdi -Ptr-infinispan -Djgroups.bind_addr=127.0.0.1 -Djava.net.preferIPv4Stack=true`
+`mvn clean install -Ptck -Pin-cdi -Ptr-infinispan`
 
 ## Known issues
+
+_MariaDB_
+
+- MariaDB may not work correctly with both the JDBC and JPA repositories
+  due to the `create_time` field only having second resolution. This may
+  or may not be a problem depending on the workload (i.e. if your steps
+  run for over 1 second it will be fine).
+
+_Redis Repository_
+
+- The redis repository does not work with the JBoss marshaller.
 
 _Infinispan Transport_
 
@@ -148,6 +202,12 @@ _JGroups Transport_
 _Hazelcast Transport_
 
 - Distribution doesn't actually work
+
+_Coherence Transport_
+
+- I can't work out how to configure Coherence but it's likely that when
+  configured correctly distribution will fail for a similar reason to
+  the Hazelcast and JGroups transports.
 
 _Guice Injector_
 

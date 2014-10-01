@@ -5,7 +5,7 @@ create table metric(
 );
 create table property(
   id bigserial primary key not null,
-  type text not null,
+  name text not null,
   value text not null
 );
 create table job_instance(

@@ -400,7 +400,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setTimestamp(2, new Timestamp(timestamp.getTime()));
             statement.setLong(3, jobExecutionId);
             if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             statement.close();
         } finally {
@@ -424,7 +424,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setTimestamp(5, ts);
             statement.setLong(6, jobExecutionId);
             if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             statement.close();
         } finally {
@@ -512,7 +512,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setTimestamp(2, ts);
             statement.setLong(3, stepExecutionId);
             if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             statement.close();
             for (final Metric metric : metrics) {
@@ -595,7 +595,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setTimestamp(4, ts);
             statement.setLong(5, stepExecutionId);
             if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             statement.close();
             for (final Metric metric : metrics) {
@@ -633,7 +633,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setTimestamp(3, ts);
             statement.setLong(4, partitionExecutionId);
             if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
             statement.close();
         } finally {
@@ -660,7 +660,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setTimestamp(4, ts);
             statement.setLong(5, partitionExecutionId);
             if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
             statement.close();
             for (final Metric metric : metrics) {
@@ -702,7 +702,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setTimestamp(5, ts);
             statement.setLong(6, partitionExecutionId);
             if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
             statement.close();
             for (final Metric metric : metrics) {
@@ -1092,9 +1092,10 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             connection.setAutoCommit(false);
             final PreparedStatement statement = connection.prepareStatement(queryPreviousStepExecution());
             statement.setLong(1, jobExecutionId);
-            statement.setLong(2, stepExecutionId);
+            statement.setLong(2, jobExecutionId);
             statement.setLong(3, stepExecutionId);
-            statement.setString(4, stepName);
+            statement.setLong(4, stepExecutionId);
+            statement.setString(5, stepName);
             final ResultSet result = statement.executeQuery();
             if (!result.next()) {
                 statement.close();
@@ -1267,179 +1268,188 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     protected String insertJobInstance() {
-        return "insert into public.job_instance (job_name, jsl_name, create_time) values (?, ?, ?);";
+        return "insert into job_instance (job_name, jsl_name, create_time) values (?, ?, ?);";
     }
 
     protected String insertJobExecution() {
-        return "insert into public.job_execution (job_instance_id, job_name, batch_status, create_time, updated_time) values (?, ?, ?, ?, ?);";
+        return "insert into job_execution (job_instance_id, job_name, batch_status, create_time, updated_time) values (?, ?, ?, ?, ?);";
     }
 
     protected String insertStepExecution() {
-        return "insert into public.step_execution (job_execution_id, step_name, batch_status, create_time, updated_time) values (?, ?, ?, ?, ?);";
+        return "insert into step_execution (job_execution_id, step_name, batch_status, create_time, updated_time) values (?, ?, ?, ?, ?);";
     }
 
     protected String insertPartitionExecution() {
-        return "insert into public.partition_execution (step_execution_id, partition_id, batch_status, persistent_user_data, reader_checkpoint, writer_checkpoint, create_time, updated_time) values (?, ?, ?, ?, ?, ?, ?, ?);";
+        return "insert into partition_execution (step_execution_id, partition_id, batch_status, persistent_user_data, reader_checkpoint, writer_checkpoint, create_time, updated_time) values (?, ?, ?, ?, ?, ?, ?, ?);";
     }
 
     protected String insertProperty() {
-        return "insert into public.property (type, value) values (?, ?);";
+        return "insert into property (name, value) values (?, ?);";
     }
 
     protected String insertPropertyToJobExecution() {
-        return "insert into public.job_execution_property (job_execution_id, property_id) values (?, ?);";
+        return "insert into job_execution_property (job_execution_id, property_id) values (?, ?);";
     }
 
     protected String insertPropertyToPartitionExecution() {
-        return "insert into public.partition_execution_property (partition_execution_id, property_id) values (?, ?);";
+        return "insert into partition_execution_property (partition_execution_id, property_id) values (?, ?);";
     }
 
     protected String insertMetric() {
-        return "insert into public.metric (type, value) values (?, ?);";
+        return "insert into metric (type, value) values (?, ?);";
     }
 
     protected String insertMetricToStepExecution() {
-        return "insert into public.step_execution_metric (step_execution_id, metric_id, metric_type) values (?, ?, ?);";
+        return "insert into step_execution_metric (step_execution_id, metric_id, metric_type) values (?, ?, ?);";
     }
 
     protected String insertMetricToPartitionExecution() {
-        return "insert into public.partition_execution_metric (partition_execution_id, metric_id, metric_type) values (?, ?, ?);";
+        return "insert into partition_execution_metric (partition_execution_id, metric_id, metric_type) values (?, ?, ?);";
     }
 
     protected String insertJobExecutionHistory() {
-        return "insert into public.job_execution_history (job_execution_id, previous_job_execution_id) values (?, ?);";
+        return "insert into job_execution_history (job_execution_id, previous_job_execution_id) values (?, ?);";
     }
 
     protected String updateStartJobExecution() {
-        return "update public.job_execution set batch_status = ?, start_time = ?, updated_time = ? where id = ?;";
+        return "update job_execution set batch_status = ?, start_time = ?, updated_time = ? where id = ?;";
     }
 
     protected String updateUpdateJobExecution() {
-        return "update public.job_execution set batch_status = ?, updated_time = ? where id = ?;";
+        return "update job_execution set batch_status = ?, updated_time = ? where id = ?;";
     }
 
     protected String updateFinishJobExecution() {
-        return "update public.job_execution set batch_status = ?, exit_status = ?, restart_element_id = ?, updated_time = ?, end_time = ? where id = ?;";
+        return "update job_execution set batch_status = ?, exit_status = ?, restart_element_id = ?, updated_time = ?, end_time = ? where id = ?;";
     }
 
     protected String updateStartStepExecution() {
-        return "update public.step_execution set batch_status = ?, start_time = ?, updated_time = ? where id = ?;";
+        return "update step_execution set batch_status = ?, start_time = ?, updated_time = ? where id = ?;";
     }
 
     protected String updateUpdateStepExecution() {
-        return "update public.step_execution set persistent_user_data = ?, updated_time = ? where id = ?;";
+        return "update step_execution set persistent_user_data = ?, updated_time = ? where id = ?;";
     }
 
     protected String updateUpdateStepExecutionWithCheckpoint() {
-        return "update public.step_execution set persistent_user_data = ?, reader_checkpoint = ?, writer_checkpoint = ?, updated_time = ? where id = ?;";
+        return "update step_execution set persistent_user_data = ?, reader_checkpoint = ?, writer_checkpoint = ?, updated_time = ? where id = ?;";
     }
 
     protected String updateFinishStepExecution() {
-        return "update public.step_execution set batch_status = ?, exit_status = ?, updated_time = ?, end_time = ? where id = ?;";
+        return "update step_execution set batch_status = ?, exit_status = ?, updated_time = ?, end_time = ? where id = ?;";
     }
 
     protected String updateStepMetric() {
-        return "update public.metric m set value = ? where m.id in (select e.metric_id from public.step_execution_metric e where e.step_execution_id = ?) and m.type = ?;";
+        return "update metric m set value = ? where m.id in (select e.metric_id from step_execution_metric e where e.step_execution_id = ?) and m.type = ?;";
     }
 
     protected String updateStartPartitionExecution() {
-        return "update public.partition_execution set batch_status = ?, start_time = ?, updated_time = ? where id = ?;";
+        return "update partition_execution set batch_status = ?, start_time = ?, updated_time = ? where id = ?;";
     }
 
     protected String updateUpdatePartitionExecution() {
-        return "update public.partition_execution set persistent_user_data = ?, reader_checkpoint = ?, writer_checkpoint = ?, updated_time = ? where id = ?;";
+        return "update partition_execution set persistent_user_data = ?, reader_checkpoint = ?, writer_checkpoint = ?, updated_time = ? where id = ?;";
     }
 
     protected String updateFinishPartitionExecution() {
-        return "update public.partition_execution set persistent_user_data = ?, batch_status = ?, exit_status = ?, updated_time = ?, end_time = ? where id = ?;";
+        return "update partition_execution set persistent_user_data = ?, batch_status = ?, exit_status = ?, updated_time = ?, end_time = ? where id = ?;";
     }
 
     protected String updatePartitionMetric() {
-        return "update public.metric m set value = ? where m.id in (select e.metric_id from public.partition_execution_metric e where e.partition_execution_id = ?) and m.type = ?;";
+        return "update metric m set value = ? where m.id in (select e.metric_id from partition_execution_metric e where e.partition_execution_id = ?) and m.type = ?;";
     }
 
     protected String queryJobNames() {
-        return "select distinct i.job_name from public.job_instance i order by i.job_name asc;";
+        return "select distinct i.job_name from job_instance i order by i.job_name asc;";
     }
 
     protected String queryJobInstanceCount() {
-        return "select count(i.*) from public.job_instance i where i.job_name = ?;";
+        return "select count(i.*) from job_instance i where i.job_name = ?;";
     }
 
     protected String queryJobInstances() {
-        return "select i.id, i.job_name, i.jsl_name, i.create_time from public.job_instance i where i.job_name = ? order by i.create_time desc;";
+        return "select i.id, i.job_name, i.jsl_name, i.create_time from job_instance i where i.job_name = ? order by i.create_time desc;";
     }
 
     protected String queryRunningExecutions() {
-        return "select j.id from public.job_execution j where j.job_name = ? order by j.create_time desc;";
+        return "select j.id from job_execution j where j.job_name = ? order by j.create_time desc;";
     }
 
     protected String queryJobExecutionParameters() {
-        return "select p.type, p.value from public.property p join public.job_execution_property j on p.id=j.property_id and j.job_execution_id = ?;";
+        return "select p.name, p.value from property p join job_execution_property j on p.id=j.property_id and j.job_execution_id = ?;";
     }
 
     protected String queryJobExecution() {
-        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j where j.id = ?;";
+        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from job_execution j where j.id = ?;";
     }
 
     protected String queryLatestJobExecution() {
-        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j order by j.create_time desc limit 1;";
+        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from job_execution j order by j.create_time desc limit 1;";
     }
 
     protected String queryJobExecutionHistory() {
-        return "select h.previous_job_execution_id from public.job_execution_history h where h.job_execution_id = ?;";
+        return "select h.previous_job_execution_id from job_execution_history h where h.job_execution_id = ?;";
     }
 
     protected String queryJobInstance() {
-        return "select i.id, i.job_name, i.jsl_name, i.create_time from public.job_instance i where i.id = ?;";
+        return "select i.id, i.job_name, i.jsl_name, i.create_time from job_instance i where i.id = ?;";
     }
 
     protected String queryJobInstanceForJobExecution() {
-        return "select i.id, i.job_name, i.jsl_name, i.create_time from public.job_instance i join public.job_execution j on i.id=j.job_instance_id and j.id = ?;";
+        return "select i.id, i.job_name, i.jsl_name, i.create_time from job_instance i join job_execution j on i.id=j.job_instance_id and j.id = ?;";
     }
 
     protected String queryJobExecutionsForJobInstance() {
-        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from public.job_execution j where j.job_instance_id = ?;";
+        return "select j.id, j.job_instance_id, j.job_name, j.batch_status, j.exit_status, j.create_time, j.start_time, j.updated_time, j.end_time, j.restart_element_id from job_execution j where j.job_instance_id = ?;";
     }
 
     protected String queryStepExecutionsForJobExecution() {
-        return "select s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s where s.job_execution_id = ?;";
+        return "select s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from step_execution s where s.job_execution_id = ?;";
     }
 
     protected String queryStepExecution() {
-        return "select s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s where s.id = ?;";
+        return "select s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from step_execution s where s.id = ?;";
     }
 
     protected String queryStepMetric() {
-        return "select m.type, m.value from public.metric m join public.step_execution_metric e on m.id=e.metric_id and e.step_execution_id = ?;";
+        return "select m.type, m.value from metric m join step_execution_metric e on m.id=e.metric_id and e.step_execution_id = ?;";
     }
 
     protected String queryPreviousStepExecution() {
-        return "select distinct s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s join public.job_execution_history h on (s.job_execution_id=h.previous_job_execution_id and h.job_execution_id = ?) and s.id <> ? and s.create_time < (select t.create_time from public.step_execution t where t.id = ?) and s.step_name = ? order by s.create_time desc;";
+        return "select s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint" +
+                " from step_execution s join job_execution j on s.job_execution_id = j.id where" +
+                " (j.id = ? or j.id in" +
+                " (select p.id from job_execution_history h join job_execution p on h.previous_job_execution_id = p.id where h.job_execution_id = ?)" +
+                " ) and s.id <> ? and s.create_time < (select t.create_time from step_execution t where t.id = ?)" +
+                " and s.step_name = ? order by s.create_time desc;";
     }
 
     protected String queryLatestStepExecution() {
-        return "select distinct s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint from public.step_execution s join public.job_execution_history h on ((s.job_execution_id=h.previous_job_execution_id and h.job_execution_id = ?) or s.job_execution_id = ?) and s.step_name = ? order by s.create_time desc;";
+        return "select s.id, s.job_execution_id, s.step_name, s.batch_status, s.exit_status, s.create_time, s.start_time, s.updated_time, s.end_time, s.persistent_user_data, s.reader_checkpoint, s.writer_checkpoint" +
+                " from step_execution s join job_execution j on s.job_execution_id = j.id where" +
+                " (j.id = ? or j.id in" +
+                " (select p.id from job_execution_history h join job_execution p on h.previous_job_execution_id = p.id where h.job_execution_id = ?)" +
+                " ) and s.step_name = ? order by s.create_time desc;";
     }
 
     protected String queryStepExecutionCount() {
-        return "select count(*) from (select distinct s.id from public.step_execution s join public.job_execution_history h on (s.job_execution_id=h.previous_job_execution_id and h.job_execution_id = ?) and s.step_name = ?) as foo;";
+        return "select count(*) from (select distinct s.id from step_execution s join job_execution_history h on (s.job_execution_id=h.previous_job_execution_id and h.job_execution_id = ?) and s.step_name = ?) as foo;";
     }
 
     protected String queryUnfinishedPartitionExecutions() {
-        return "select p.id, p.step_execution_id, p.partition_id, p.batch_status, p.exit_status, p.create_time, p.start_time, p.updated_time, p.end_time, p.persistent_user_data, p.reader_checkpoint, p.writer_checkpoint from public.partition_execution p where p.step_execution_id = ? and (p.batch_status = ? or p.batch_status = ? or p.batch_status = ? or p.batch_status = ? or p.batch_status = ?);";
+        return "select p.id, p.step_execution_id, p.partition_id, p.batch_status, p.exit_status, p.create_time, p.start_time, p.updated_time, p.end_time, p.persistent_user_data, p.reader_checkpoint, p.writer_checkpoint from partition_execution p where p.step_execution_id = ? and (p.batch_status = ? or p.batch_status = ? or p.batch_status = ? or p.batch_status = ? or p.batch_status = ?);";
     }
 
     protected String queryPartitionExecution() {
-        return "select p.id, p.step_execution_id, p.partition_id, p.batch_status, p.exit_status, p.create_time, p.start_time, p.updated_time, p.end_time, p.persistent_user_data, p.reader_checkpoint, p.writer_checkpoint from public.partition_execution p where p.id = ?;";
+        return "select p.id, p.step_execution_id, p.partition_id, p.batch_status, p.exit_status, p.create_time, p.start_time, p.updated_time, p.end_time, p.persistent_user_data, p.reader_checkpoint, p.writer_checkpoint from partition_execution p where p.id = ?;";
     }
 
     protected String queryPartitionMetric() {
-        return "select m.type, m.value from public.metric m join public.partition_execution_metric e on m.id=e.metric_id and e.partition_execution_id = ?;";
+        return "select m.type, m.value from metric m join partition_execution_metric e on m.id=e.metric_id and e.partition_execution_id = ?;";
     }
 
     protected String queryPartitionParameters() {
-        return  "select p.type, p.value from public.property p join public.partition_execution_property e on p.id=e.property_id and e.partition_execution_id = ?;";
+        return  "select p.name, p.value from property p join partition_execution_property e on p.id=e.property_id and e.partition_execution_id = ?;";
     }
 
     protected void setLargeObject(final PreparedStatement statement, final int index, final byte[] bytes) throws SQLException {

@@ -16,19 +16,19 @@ import java.util.List;
 @Table(name = "property")
 public class JpaProperty {
     private long id;
-    private String type;
+    private String name;
     private String value;
 
     public JpaProperty() {
     }
 
     public JpaProperty(final JpaProperty builder) {
-        this.type = builder.type;
+        this.name = builder.name;
         this.value = builder.value;
     }
 
-    public JpaProperty(final String type, final String value) {
-        this.type = type;
+    public JpaProperty(final String name, final String value) {
+        this.name = name;
         this.value = value;
     }
 
@@ -44,13 +44,13 @@ public class JpaProperty {
         return this;
     }
 
-    @Column(name = "type", nullable = false)
-    public String getType() {
-        return type;
+    @Column(name = "name", nullable = false)
+    public String getName() {
+        return name;
     }
 
-    public JpaProperty setType(final String type) {
-        this.type = type;
+    public JpaProperty setName(final String name) {
+        this.name = name;
         return this;
     }
 

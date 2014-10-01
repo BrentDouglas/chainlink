@@ -34,9 +34,9 @@ public class JdbcExecutionRepositoryFactory implements ExecutionRepositoryFactor
                         ? dataSource.getConnection()
                         : dataSource.getConnection(username, password);
                 connection.setAutoCommit(false);
-                connection.prepareStatement("delete from public.job_instance;").executeUpdate();
-                connection.prepareStatement("delete from public.metric;").executeUpdate();
-                connection.prepareStatement("delete from public.property;").executeUpdate();
+                connection.prepareStatement("delete from job_instance;").executeUpdate();
+                connection.prepareStatement("delete from metric;").executeUpdate();
+                connection.prepareStatement("delete from property;").executeUpdate();
                 connection.commit();
             } catch (final Exception e) {
                 if (connection != null) {
