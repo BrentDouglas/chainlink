@@ -20,7 +20,7 @@ public class CoherenceRegistryFactory implements RegistryFactory {
         });
         return new CoherenceRegistry(
                 configuration,
-                "tck-coherernce-invocation-service"
+                "InvocationService"
         );
     }
 }

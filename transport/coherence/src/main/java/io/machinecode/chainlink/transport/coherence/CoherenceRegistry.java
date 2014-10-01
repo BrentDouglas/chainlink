@@ -41,11 +41,9 @@ public class CoherenceRegistry extends BaseDistributedRegistry<Member, Coherence
     public CoherenceRegistry(final RegistryConfiguration configuration, final String invocationServiceName) throws Exception {
         super(configuration);
         this.invocationServiceName = invocationServiceName;
+        final Cluster cluster = CacheFactory.ensureCluster();
         this.executor = (InvocationService) CacheFactory.getService(invocationServiceName);
-
-        executor.setUserContext(this);
-
-        final Cluster cluster = CacheFactory.getCluster();
+        this.executor.setUserContext(this);
         this.local = cluster.getLocalMember();
         this.remotes = _remoteMembers(cluster.getMemberSet());
     }

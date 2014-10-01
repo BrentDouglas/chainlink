@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<cache-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns="http://xmlns.oracle.com/coherence/coherence-cache-config"
+              xsi:schemaLocation="http://xmlns.oracle.com/coherence/coherence-cache-config coherence-cache-config.xsd">
+
+    <caching-scheme-mapping>
+        <cache-mapping>
+            <cache-name>*</cache-name>
+            <scheme-name>distributed</scheme-name>
+        </cache-mapping>
+    </caching-scheme-mapping>
+
+    <caching-schemes>
+        <distributed-scheme>
+            <scheme-name>distributed</scheme-name>
+            <service-name>DistributedCache</service-name>
+            <backing-map-scheme>
+                <local-scheme>
+                    <scheme-ref>unlimited</scheme-ref>
+                </local-scheme>
+            </backing-map-scheme>
+            <autostart>true</autostart>
+        </distributed-scheme>
+        <remote-invocation-scheme>
+            <scheme-name>InvocationService</scheme-name>
+            <service-name>InvocationService</service-name>
+            <initiator-config>
+                <tcp-initiator>
+                    <remote-addresses>
+                        <socket-address>
+                            <address>127.0.0.1</address>
+                            <port system-property="chainlink.coherence.other.port">8090</port>
+                        </socket-address>
+                    </remote-addresses>
+                </tcp-initiator>
+            </initiator-config>
+        </remote-invocation-scheme>
+        <local-scheme>
+            <scheme-name>unlimited</scheme-name>
+        </local-scheme>
+    </caching-schemes>
+</cache-config>

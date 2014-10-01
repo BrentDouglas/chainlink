@@ -410,16 +410,20 @@
                             <phase>generate-test-resources</phase>
                             <configuration>
                                 <target>
-                                    <copy file="${project.basedir}/../core/src/test/resources/testng.xml"
-                                          tofile="${project.build.testOutputDirectory}/testng.xml"
+                                    <copy file="${project.basedir}/../core/src/test/resources/coherence-cache-config.xml"
+                                          tofile="${project.build.testOutputDirectory}/coherence-cache-config.xml"
+                                          overwrite="true">
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/hazelcast.xml"
+                                          tofile="${project.build.testOutputDirectory}/hazelcast.xml"
                                           overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/tck-udp.xml"
                                           tofile="${project.build.testOutputDirectory}/tck-udp.xml"
                                           overwrite="true">
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/hazelcast.xml"
-                                          tofile="${project.build.testOutputDirectory}/hazelcast.xml"
+                                    <copy file="${project.basedir}/../core/src/test/resources/testng.xml"
+                                          tofile="${project.build.testOutputDirectory}/testng.xml"
                                           overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.template.xml"
