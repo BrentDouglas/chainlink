@@ -17,25 +17,25 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
     private final long jobExecutionId;
     private final String jobName;
     private final BatchStatus batchStatus;
-    private final Date start;
-    private final Date end;
+    private final Date startTime;
+    private final Date endTime;
     private final String exitStatus;
-    private final Date created;
-    private final Date updated;
-    private final Properties parameters;
+    private final Date createTime;
+    private final Date lastUpdatedTime;
+    private final Properties jobParameters;
     private final String restartElementId;
 
-    public JobExecutionImpl(final Builder builder) {
+    public JobExecutionImpl(final _Builder builder) {
         this.jobInstanceId = builder.jobInstanceId;
         this.jobExecutionId = builder.jobExecutionId;
         this.jobName = builder.jobName;
         this.batchStatus = builder.batchStatus;
-        this.start = builder.start;
-        this.end = builder.end;
+        this.startTime = builder.startTime;
+        this.endTime = builder.endTime;
         this.exitStatus = builder.exitStatus;
-        this.created = builder.created;
-        this.updated = builder.updated;
-        this.parameters = builder.parameters;
+        this.createTime = builder.createTime;
+        this.lastUpdatedTime = builder.lastUpdatedTime;
+        this.jobParameters = builder.jobParameters;
         this.restartElementId = builder.restartElementId;
     }
 
@@ -44,12 +44,12 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
         this.jobExecutionId = builder.getExecutionId();
         this.jobName = builder.getJobName();
         this.batchStatus = builder.getBatchStatus();
-        this.start = builder.getStartTime();
-        this.end = builder.getEndTime();
+        this.startTime = builder.getStartTime();
+        this.endTime = builder.getEndTime();
         this.exitStatus = builder.getExitStatus();
-        this.created = builder.getCreateTime();
-        this.updated = builder.getLastUpdatedTime();
-        this.parameters = builder.getJobParameters();
+        this.createTime = builder.getCreateTime();
+        this.lastUpdatedTime = builder.getLastUpdatedTime();
+        this.jobParameters = builder.getJobParameters();
         this.restartElementId = builder.getRestartElementId();
     }
 
@@ -83,12 +83,12 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
 
     @Override
     public Date getStartTime() {
-        return start;
+        return startTime;
     }
 
     @Override
     public Date getEndTime() {
-        return end;
+        return endTime;
     }
 
     @Override
@@ -98,17 +98,17 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
 
     @Override
     public Date getCreateTime() {
-        return created;
+        return createTime;
     }
 
     @Override
     public Date getLastUpdatedTime() {
-        return updated;
+        return lastUpdatedTime;
     }
 
     @Override
     public Properties getJobParameters() {
-        return parameters;
+        return jobParameters;
     }
 
     @Override
@@ -116,107 +116,119 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
         return restartElementId;
     }
 
-    public static Builder from(final ExtendedJobExecution builder) {
-        final Builder that = new Builder();
-        that.jobInstanceId = builder.getJobInstanceId();
-        that.jobExecutionId = builder.getExecutionId();
-        that.jobName = builder.getJobName();
-        that.batchStatus = builder.getBatchStatus();
-        that.start = builder.getStartTime();
-        that.end = builder.getEndTime();
-        that.exitStatus = builder.getExitStatus();
-        that.created = builder.getCreateTime();
-        that.updated = builder.getLastUpdatedTime();
-        that.parameters = builder.getJobParameters();
-        that.restartElementId = builder.getRestartElementId();
-        return that;
+    public static Builder from(final ExtendedJobExecution that) {
+        final Builder builder = new Builder();
+        JobExecutionImpl._from(builder, that);
+        return builder;
+    }
+
+    protected static void _from(final _Builder<?> builder, final ExtendedJobExecution that) {
+        builder.jobInstanceId = that.getJobInstanceId();
+        builder.jobExecutionId = that.getExecutionId();
+        builder.jobName = that.getJobName();
+        builder.batchStatus = that.getBatchStatus();
+        builder.startTime = that.getStartTime();
+        builder.endTime = that.getEndTime();
+        builder.exitStatus = that.getExitStatus();
+        builder.createTime = that.getCreateTime();
+        builder.lastUpdatedTime = that.getLastUpdatedTime();
+        builder.jobParameters = that.getJobParameters();
+        builder.restartElementId = that.getRestartElementId();
     }
 
     @Override
     public String toString() {
-        return "JobExecutionImpl{" +
-                "jobInstanceId=" + jobInstanceId +
-                ", jobExecutionId=" + jobExecutionId +
-                ", jobName='" + jobName + '\'' +
-                ", batchStatus=" + batchStatus +
-                ", start=" + start +
-                ", end=" + end +
-                ", exitStatus='" + exitStatus + '\'' +
-                ", created=" + created +
-                ", updated=" + updated +
-                ", parameters=" + parameters +
-                ", restartElementId='" + restartElementId + '\'' +
-                '}';
+        final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
+        _toString(sb);
+        sb.append('}');
+        return sb.toString();
     }
 
-    public static class Builder {
-        private long jobInstanceId;
-        private long jobExecutionId;
-        private String jobName;
-        private BatchStatus batchStatus;
-        private Date start;
-        private Date end;
-        private String exitStatus;
-        private Date created;
-        private Date updated;
-        private Properties parameters;
-        private String restartElementId;
+    protected void _toString(final StringBuilder sb) {
+        sb.append("jobInstanceId=").append(jobInstanceId);
+        sb.append(", jobExecutionId=").append(jobExecutionId);
+        sb.append(", jobName='").append(jobName).append('\'');
+        sb.append(", batchStatus=").append(batchStatus);
+        sb.append(", startTime=").append(startTime);
+        sb.append(", endTime=").append(endTime);
+        sb.append(", exitStatus='").append(exitStatus).append('\'');
+        sb.append(", createTime=").append(createTime);
+        sb.append(", lastUpdatedTime=").append(lastUpdatedTime);
+        sb.append(", jobParameters=").append(jobParameters);
+        sb.append(", restartElementId='").append(restartElementId).append('\'');
+    }
 
-        public Builder setJobInstanceId(final long jobInstanceId) {
+    @SuppressWarnings("unchecked")
+    public static class _Builder<T extends _Builder<T>> {
+        long jobInstanceId;
+        long jobExecutionId;
+        String jobName;
+        BatchStatus batchStatus;
+        Date startTime;
+        Date endTime;
+        String exitStatus;
+        Date createTime;
+        Date lastUpdatedTime;
+        Properties jobParameters;
+        String restartElementId;
+
+        public T setJobInstanceId(final long jobInstanceId) {
             this.jobInstanceId = jobInstanceId;
-            return this;
+            return (T)this;
         }
 
-        public Builder setJobExecutionId(final long jobExecutionId) {
+        public T setJobExecutionId(final long jobExecutionId) {
             this.jobExecutionId = jobExecutionId;
-            return this;
+            return (T)this;
         }
 
-        public Builder setJobName(final String jobName) {
+        public T setJobName(final String jobName) {
             this.jobName = jobName;
-            return this;
+            return (T)this;
         }
 
-        public Builder setBatchStatus(final BatchStatus batchStatus) {
+        public T setBatchStatus(final BatchStatus batchStatus) {
             this.batchStatus = batchStatus;
-            return this;
+            return (T)this;
         }
 
-        public Builder setStartTime(final Date start) {
-            this.start = start;
-            return this;
+        public T setStartTime(final Date startTime) {
+            this.startTime = startTime;
+            return (T)this;
         }
 
-        public Builder setEndTime(final Date end) {
-            this.end = end;
-            return this;
+        public T setEndTime(final Date endTime) {
+            this.endTime = endTime;
+            return (T)this;
         }
 
-        public Builder setExitStatus(final String exitStatus) {
+        public T setExitStatus(final String exitStatus) {
             this.exitStatus = exitStatus;
-            return this;
+            return (T)this;
         }
 
-        public Builder setCreatedTime(final Date created) {
-            this.created = created;
-            return this;
+        public T setCreateTime(final Date createTime) {
+            this.createTime = createTime;
+            return (T)this;
         }
 
-        public Builder setUpdatedTime(final Date updated) {
-            this.updated = updated;
-            return this;
+        public T setLastUpdatedTime(final Date lastUpdatedTime) {
+            this.lastUpdatedTime = lastUpdatedTime;
+            return (T)this;
         }
 
-        public Builder setParameters(final Properties parameters) {
-            this.parameters = parameters;
-            return this;
+        public T setJobParameters(final Properties jobParameters) {
+            this.jobParameters = jobParameters;
+            return (T)this;
         }
 
-        public Builder setRestartElementId(final String restartElementId) {
+        public T setRestartElementId(final String restartElementId) {
             this.restartElementId = restartElementId;
-            return this;
+            return (T)this;
         }
+    }
 
+    public static class Builder extends _Builder<Builder> {
         public JobExecutionImpl build() {
             return new JobExecutionImpl(this);
         }

@@ -35,6 +35,7 @@
                 <include>io.machinecode.chainlink:chainlink-repository-jdbc</include>
                 <include>io.machinecode.chainlink:chainlink-repository-jpa</include>
                 <include>io.machinecode.chainlink:chainlink-repository-memory</include>
+                <include>io.machinecode.chainlink:chainlink-repository-mongo</include>
                 <include>io.machinecode.chainlink:chainlink-repository-redis</include>
                 <include>io.machinecode.chainlink:chainlink-transport-core</include>
                 <include>io.machinecode.chainlink:chainlink-transport-coherence</include>
@@ -54,6 +55,7 @@
         <dependencySet>
             <includes>
                 <include>com.google.inject:guice</include>
+                <include>com.h2database:h2</include>
                 <include>com.hazelcast:hazelcast</include>
                 <include>com.oracle.coherence:coherence</include>
                 <include>gnu-getopt:getopt</include>
@@ -64,6 +66,8 @@
                 <include>javax.servlet:servlet-api</include>
                 <include>log4j:log4j</include>
                 <include>net.sf.trove4j:trove4j</include>
+                <include>org.hibernate:hibernate-core</include>
+                <include>org.hibernate:hibernate-entitymanager</include>
                 <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
                 <include>org.infinispan:infinispan-commons</include>
                 <include>org.infinispan:infinispan-core</include>
@@ -74,6 +78,9 @@
                 <include>org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec</include>
                 <include>org.jboss.weld.se:weld-se</include>
                 <include>org.jgroups:jgroups</include>
+                <include>org.jongo:jongo</include>
+                <include>org.mariadb.jdbc:mariadb-java-client</include>
+                <include>org.mongodb:mongo-java-driver</include>
                 <include>org.springframework:spring-beans</include>
                 <include>org.springframework:spring-context</include>
                 <include>org.springframework:spring-core</include>

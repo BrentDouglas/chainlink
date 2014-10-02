@@ -13,14 +13,14 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
     private final long partitionExecutionId;
     private final long stepExecutionId;
     private final int partitionId;
-    private final Properties partitionProperties;
+    private final Properties partitionParameters;
 
-    public PartitionExecutionImpl(final Builder builder) {
+    public PartitionExecutionImpl(final _Builder builder) {
         super(builder);
         this.partitionExecutionId = builder.partitionExecutionId;
         this.stepExecutionId = builder.stepExecutionId;
         this.partitionId = builder.partitionId;
-        this.partitionProperties = builder.partitionProperties;
+        this.partitionParameters = builder.partitionParameters;
     }
 
     public PartitionExecutionImpl(final PartitionExecution builder) {
@@ -28,7 +28,7 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
         this.partitionExecutionId = builder.getPartitionExecutionId();
         this.stepExecutionId = builder.getStepExecutionId();
         this.partitionId = builder.getPartitionId();
-        this.partitionProperties = builder.getPartitionParameters();
+        this.partitionParameters = builder.getPartitionParameters();
     }
 
     public static PartitionExecutionImpl[] copy(final List<? extends PartitionExecution> list) {
@@ -45,12 +45,12 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
         return builder;
     }
 
-    protected static void  _from(final Builder builder, final PartitionExecution that) {
+    protected static void  _from(final _Builder<?> builder, final PartitionExecution that) {
         BaseExecutionImpl._from(builder, that);
         builder.partitionExecutionId = that.getPartitionExecutionId();
         builder.stepExecutionId = that.getStepExecutionId();
         builder.partitionId = that.getPartitionId();
-        builder.partitionProperties = that.getPartitionParameters();
+        builder.partitionParameters = that.getPartitionParameters();
     }
 
     @Override
@@ -70,35 +70,47 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
 
     @Override
     public Properties getPartitionParameters() {
-        return partitionProperties;
+        return partitionParameters;
     }
 
-    public static class Builder extends BaseExecutionImpl.Builder<Builder> {
-        private long partitionExecutionId;
-        private long stepExecutionId;
-        private int partitionId;
-        private Properties partitionProperties;
+    @Override
+    protected void _toString(final StringBuilder sb) {
+        super._toString(sb);
+        sb.append(", partitionExecutionId=").append(partitionExecutionId);
+        sb.append(", stepExecutionId=").append(stepExecutionId);
+        sb.append(", partitionId=").append(partitionId);
+        sb.append(", partitionParameters=").append(partitionParameters);
+    }
 
-        public Builder setPartitionExecutionId(final long partitionExecutionId) {
+    @SuppressWarnings("unchecked")
+    public static class _Builder<T extends _Builder<T>> extends BaseExecutionImpl._Builder<T> {
+        long partitionExecutionId;
+        long stepExecutionId;
+        int partitionId;
+        Properties partitionParameters;
+
+        public T setPartitionExecutionId(final long partitionExecutionId) {
             this.partitionExecutionId = partitionExecutionId;
-            return this;
+            return (T)this;
         }
 
-        public Builder setStepExecutionId(final long stepExecutionId) {
+        public T setStepExecutionId(final long stepExecutionId) {
             this.stepExecutionId = stepExecutionId;
-            return this;
+            return (T)this;
         }
 
-        public Builder setPartitionId(final int partitionId) {
+        public T setPartitionId(final int partitionId) {
             this.partitionId = partitionId;
-            return this;
+            return (T)this;
         }
 
-        public Builder setPartitionProperties(final Properties partitionProperties) {
-            this.partitionProperties = partitionProperties;
-            return this;
+        public T setPartitionParameters(final Properties partitionParameters) {
+            this.partitionParameters = partitionParameters;
+            return (T)this;
         }
+    }
 
+    public static class Builder extends _Builder<Builder> {
         public PartitionExecutionImpl build() {
             return new PartitionExecutionImpl(this);
         }

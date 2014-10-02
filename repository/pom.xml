@@ -15,12 +15,13 @@
     <modules>
         <module>core</module>
         <module>coherence</module>
-        <module>memory</module>
+        <module>hazelcast</module>
+        <module>infinispan</module>
         <module>jpa</module>
         <module>jdbc</module>
-        <module>infinispan</module>
+        <module>memory</module>
+        <module>mongo</module>
         <module>redis</module>
-        <module>hazelcast</module>
     </modules>
 
 </project>

@@ -19,6 +19,7 @@ Support for several DI frameworks:
 
 Execution repositories:
 - Memory
+- MongoDB
 - JPA
 - JDBC (though it has only been tested against H2, PostgreSQL and
   MariaDB)
@@ -77,10 +78,10 @@ this file will be passed to Surefire and available from
 `System.getProperty(...)` in the test JVM.
 
 To run the full suite of tests available under the `-Ptest` profile you
-will need to have redis running. If using the `-Pdb-postgresql` or
-`-Pdb-mariadb` profiles you will also require postgresql and mariadb
-running respectively. Connection settings for these are configured in
-`test.properties`.
+will need to have redis and mongodb running. If using the
+`-Pdb-postgresql` or `-Pdb-mariadb` profiles you will also require
+postgresql and mariadb running respectively. Connection settings for
+these are configured in `test.properties`.
 
 Run the tests with `mvn clean install -Ptest`.
 

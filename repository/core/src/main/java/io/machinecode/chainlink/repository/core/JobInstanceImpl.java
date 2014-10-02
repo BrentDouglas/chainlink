@@ -11,14 +11,14 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class JobInstanceImpl implements ExtendedJobInstance, Serializable {
-    private final long instanceId;
+    private final long jobInstanceId;
     private final String jobName;
     private final String jslName;
-    private final Date created;
+    private final Date createTime;
 
     @Override
     public long getInstanceId() {
-        return instanceId;
+        return jobInstanceId;
     }
 
     @Override
@@ -33,21 +33,36 @@ public class JobInstanceImpl implements ExtendedJobInstance, Serializable {
 
     @Override
     public Date getCreateTime() {
-        return created;
+        return createTime;
     }
 
-    public JobInstanceImpl(final Builder builder) {
-        this.instanceId = builder.instanceId;
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
+        _toString(sb);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    protected void _toString(final StringBuilder sb) {
+        sb.append("jobInstanceId=").append(jobInstanceId);
+        sb.append(", jobName='").append(jobName).append('\'');
+        sb.append(", jslName='").append(jslName).append('\'');
+        sb.append(", createTime=").append(createTime);
+    }
+
+    public JobInstanceImpl(final _Builder builder) {
+        this.jobInstanceId = builder.jobInstanceId;
         this.jobName = builder.jobName;
         this.jslName = builder.jslName;
-        this.created = builder.created;
+        this.createTime = builder.createTime;
     }
 
     public JobInstanceImpl(final ExtendedJobInstance builder) {
-        this.instanceId = builder.getInstanceId();
+        this.jobInstanceId = builder.getInstanceId();
         this.jobName = builder.getJobName();
         this.jslName = builder.getJslName();
-        this.created = builder.getCreateTime();
+        this.createTime = builder.getCreateTime();
     }
 
     public static List<JobInstanceImpl> copy(final List<? extends ExtendedJobInstance> list) {
@@ -58,32 +73,35 @@ public class JobInstanceImpl implements ExtendedJobInstance, Serializable {
         return copy;
     }
 
-    public static class Builder {
-        private long instanceId;
-        private String jobName;
-        private String jslName;
-        private Date created;
+    @SuppressWarnings("unchecked")
+    public static class _Builder<T extends _Builder<T>> {
+        long jobInstanceId;
+        String jobName;
+        String jslName;
+        Date createTime;
 
-        public Builder setInstanceId(final long instanceId) {
-            this.instanceId = instanceId;
-            return this;
+        public T setInstanceId(final long jobInstanceId) {
+            this.jobInstanceId = jobInstanceId;
+            return (T)this;
         }
 
-        public Builder setJobName(final String jobName) {
+        public T setJobName(final String jobName) {
             this.jobName = jobName;
-            return this;
+            return (T)this;
         }
 
-        public Builder setJslName(final String jslName) {
+        public T setJslName(final String jslName) {
             this.jslName = jslName;
-            return this;
+            return (T)this;
         }
 
-        public Builder setCreatedTime(final Date created) {
-            this.created = created;
-            return this;
+        public T setCreateTime(final Date createTime) {
+            this.createTime = createTime;
+            return (T)this;
         }
+    }
 
+    public static class Builder extends _Builder<Builder> {
         public JobInstanceImpl build() {
             return new JobInstanceImpl(this);
         }

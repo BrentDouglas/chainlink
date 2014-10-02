@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.repository.BaseExecution;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -12,22 +13,22 @@ import java.util.Date;
  */
 public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
     private final BatchStatus batchStatus;
-    private final Date create;
-    private final Date start;
-    private final Date updated;
-    private final Date end;
+    private final Date createTime;
+    private final Date startTime;
+    private final Date updatedTime;
+    private final Date endTime;
     private final String exitStatus;
     private final Serializable persistentUserData;
     private final Metric[] metrics;
     private final Serializable readerCheckpoint;
     private final Serializable writerCheckpoint;
 
-    public BaseExecutionImpl(final Builder builder) {
+    public BaseExecutionImpl(final _Builder builder) {
         this.batchStatus = builder.batchStatus;
-        this.create = builder.create;
-        this.start = builder.start;
-        this.updated = builder.updated;
-        this.end = builder.end;
+        this.createTime = builder.createTime;
+        this.startTime = builder.startTime;
+        this.updatedTime = builder.updatedTime;
+        this.endTime = builder.endTime;
         this.exitStatus = builder.exitStatus;
         this.persistentUserData = builder.persistentUserData;
         this.metrics = builder.metrics;
@@ -37,10 +38,10 @@ public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
 
     public BaseExecutionImpl(final BaseExecution builder) {
         this.batchStatus = builder.getBatchStatus();
-        this.create = builder.getCreateTime();
-        this.start = builder.getStartTime();
-        this.updated = builder.getUpdatedTime();
-        this.end = builder.getEndTime();
+        this.createTime = builder.getCreateTime();
+        this.startTime = builder.getStartTime();
+        this.updatedTime = builder.getUpdatedTime();
+        this.endTime = builder.getEndTime();
         this.exitStatus = builder.getExitStatus();
         this.persistentUserData = builder.getPersistentUserData();
         this.metrics = builder.getMetrics();
@@ -48,17 +49,17 @@ public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
         this.writerCheckpoint = builder.getWriterCheckpoint();
     }
 
-    public static Builder from(final BaseExecutionImpl that) {
-        final Builder builder = new Builder();
+    public static _Builder from(final BaseExecutionImpl that) {
+        final _Builder builder = new _Builder();
         _from(builder, that);
         return builder;
     }
 
-    protected static void  _from(final Builder builder, final BaseExecution that) {
+    protected static void  _from(final _Builder<?> builder, final BaseExecution that) {
         builder.batchStatus = that.getBatchStatus();
-        builder.create = that.getCreateTime();
-        builder.start = that.getStartTime();
-        builder.end = that.getEndTime();
+        builder.createTime = that.getCreateTime();
+        builder.startTime = that.getStartTime();
+        builder.endTime = that.getEndTime();
         builder.exitStatus = that.getExitStatus();
         builder.persistentUserData = that.getPersistentUserData();
         builder.metrics = that.getMetrics();
@@ -73,22 +74,22 @@ public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
 
     @Override
     public Date getCreateTime() {
-        return create;
+        return createTime;
     }
 
     @Override
     public Date getStartTime() {
-        return start;
+        return startTime;
     }
 
     @Override
     public Date getUpdatedTime() {
-        return updated;
+        return updatedTime;
     }
 
     @Override
     public Date getEndTime() {
-        return end;
+        return endTime;
     }
 
     @Override
@@ -116,12 +117,34 @@ public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
         return writerCheckpoint;
     }
 
-    public static class Builder<T extends Builder<T>> {
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
+        _toString(sb);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    protected void _toString(final StringBuilder sb) {
+        sb.append("batchStatus=").append(batchStatus);
+        sb.append(", createTime=").append(createTime);
+        sb.append(", startTime=").append(startTime);
+        sb.append(", updatedTime=").append(updatedTime);
+        sb.append(", endTime=").append(endTime);
+        sb.append(", exitStatus='").append(exitStatus).append('\'');
+        sb.append(", persistentUserData=").append(persistentUserData);
+        sb.append(", metrics=").append(Arrays.toString(metrics));
+        sb.append(", readerCheckpoint=").append(readerCheckpoint);
+        sb.append(", writerCheckpoint=").append(writerCheckpoint);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static class _Builder<T extends _Builder<T>> {
         private BatchStatus batchStatus;
-        private Date create;
-        private Date start;
-        private Date updated;
-        private Date end;
+        private Date createTime;
+        private Date startTime;
+        private Date updatedTime;
+        private Date endTime;
         private String exitStatus;
         private Serializable persistentUserData;
         private Metric[] metrics;
@@ -133,23 +156,23 @@ public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
             return (T)this;
         }
 
-        public T setCreatedTime(final Date create) {
-            this.create = create;
+        public T setCreateTime(final Date create) {
+            this.createTime = create;
             return (T)this;
         }
 
         public T setStartTime(final Date start) {
-            this.start = start;
+            this.startTime = start;
             return (T)this;
         }
 
         public T setUpdatedTime(final Date updated) {
-            this.updated = updated;
+            this.updatedTime = updated;
             return (T)this;
         }
 
         public T setEndTime(final Date end) {
-            this.end = end;
+            this.endTime = end;
             return (T)this;
         }
 

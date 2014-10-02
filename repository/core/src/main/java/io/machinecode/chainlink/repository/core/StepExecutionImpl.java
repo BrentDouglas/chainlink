@@ -14,7 +14,7 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
     private final long stepExecutionId;
     private final String stepName;
 
-    public StepExecutionImpl(final Builder builder) {
+    public StepExecutionImpl(final _Builder builder) {
         super(builder);
         this.jobExecutionId = builder.jobExecutionId;
         this.stepExecutionId = builder.stepExecutionId;
@@ -42,7 +42,7 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
         return builder;
     }
 
-    protected static void  _from(final Builder builder, final ExtendedStepExecution that) {
+    protected static void  _from(final _Builder<?> builder, final ExtendedStepExecution that) {
         BaseExecutionImpl._from(builder, that);
         builder.jobExecutionId = that.getJobExecutionId();
         builder.stepExecutionId = that.getStepExecutionId();
@@ -64,26 +64,37 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
         return stepName;
     }
 
-    public static class Builder extends BaseExecutionImpl.Builder<Builder> {
-        private long jobExecutionId;
-        private long stepExecutionId;
-        private String stepName;
+    @Override
+    protected void _toString(final StringBuilder sb) {
+        super._toString(sb);
+        sb.append(", jobExecutionId=").append(jobExecutionId);
+        sb.append(", stepExecutionId=").append(stepExecutionId);
+        sb.append(", stepName='").append(stepName).append('\'');
+    }
 
-        public Builder setJobExecutionId(final long jobExecutionId) {
+    @SuppressWarnings("unchecked")
+    public static class _Builder<T extends _Builder<T>> extends BaseExecutionImpl._Builder<T> {
+        long jobExecutionId;
+        long stepExecutionId;
+        String stepName;
+
+        public T setJobExecutionId(final long jobExecutionId) {
             this.jobExecutionId = jobExecutionId;
-            return this;
+            return (T)this;
         }
 
-        public Builder setStepExecutionId(final long stepExecutionId) {
+        public T setStepExecutionId(final long stepExecutionId) {
             this.stepExecutionId = stepExecutionId;
-            return this;
+            return (T)this;
         }
 
-        public Builder setStepName(final String stepName) {
+        public T setStepName(final String stepName) {
             this.stepName = stepName;
-            return this;
+            return (T)this;
         }
+    }
 
+    public static class Builder extends _Builder<Builder> {
         public StepExecutionImpl build() {
             return new StepExecutionImpl(this);
         }

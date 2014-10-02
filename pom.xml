@@ -67,7 +67,9 @@
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>1.0.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>
         <version.org.jboss.weld.se.weld-se>2.1.0.Final</version.org.jboss.weld.se.weld-se>
         <version.org.jboss.spec.jboss-javaee-6.0>2.0.0.Final</version.org.jboss.spec.jboss-javaee-6.0>
+        <version.org.jongo.jongo>1.1</version.org.jongo.jongo>
         <version.org.mariadb.jdbc.mariadb-java-client>1.1.7</version.org.mariadb.jdbc.mariadb-java-client>
+        <version.org.mongodb.mongo-java-driver>2.12.3</version.org.mongodb.mongo-java-driver>
         <version.org.springframework>3.1.1.RELEASE</version.org.springframework>
         <version.org.springframework.spring-beans>${version.org.springframework}</version.org.springframework.spring-beans>
         <version.org.springframework.spring-context>${version.org.springframework}</version.org.springframework.spring-context>
@@ -210,6 +212,11 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-repository-memory</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-mongo</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -383,9 +390,19 @@
                 <version>${version.org.jboss.weld.se.weld-se}</version>
             </dependency>
             <dependency>
+                <groupId>org.jongo</groupId>
+                <artifactId>jongo</artifactId>
+                <version>${version.org.jongo.jongo}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.mariadb.jdbc</groupId>
                 <artifactId>mariadb-java-client</artifactId>
                 <version>${version.org.mariadb.jdbc.mariadb-java-client}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${version.org.mongodb.mongo-java-driver}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>

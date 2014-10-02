@@ -14,7 +14,6 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -24,7 +23,6 @@ import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.operations.NoSuchJobInstanceException;
 import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
@@ -48,7 +46,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -112,7 +109,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.close();
             return new JobInstanceImpl.Builder()
                     .setInstanceId(jobInstanceId)
-                    .setCreatedTime(timestamp)
+                    .setCreateTime(timestamp)
                     .setJobName(jobId)
                     .setJslName(jslName)
                     .build();
@@ -192,9 +189,9 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 .setJobExecutionId(jobExecutionId)
                 .setJobName(jobInstance.getJobName())
                 .setBatchStatus(BatchStatus.STARTING)
-                .setParameters(parameters)
-                .setCreatedTime(timestamp)
-                .setUpdatedTime(timestamp)
+                .setJobParameters(parameters)
+                .setCreateTime(timestamp)
+                .setLastUpdatedTime(timestamp)
                 .build();
     }
 
@@ -249,7 +246,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                     .setStepExecutionId(stepExecutionId)
                     .setStepName(stepName)
                     .setBatchStatus(BatchStatus.STARTING)
-                    .setCreatedTime(timestamp)
+                    .setCreateTime(timestamp)
                     .setUpdatedTime(timestamp)
                     .setMetrics(MetricImpl.empty())
                     .build();
@@ -348,9 +345,9 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                     .setStepExecutionId(stepExecutionId)
                     .setPartitionId(partitionId)
                     .setBatchStatus(BatchStatus.STARTING)
-                    .setCreatedTime(timestamp)
+                    .setCreateTime(timestamp)
                     .setUpdatedTime(timestamp)
-                    .setPartitionProperties(properties)
+                    .setPartitionParameters(properties)
                     .setPersistentUserData(_read(bytesPersistentUserData))
                     .setReaderCheckpoint(_read(bytesReaderCheckpoint))
                     .setWriterCheckpoint(_read(bytesWriterCheckpoint))
@@ -1468,7 +1465,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 .setPartitionId(result.getInt(3))
                 .setBatchStatus(BatchStatus.valueOf(result.getString(4)))
                 .setExitStatus(result.getString(5))
-                .setCreatedTime(result.getTimestamp(6))
+                .setCreateTime(result.getTimestamp(6))
                 .setStartTime(result.getTimestamp(7))
                 .setUpdatedTime(result.getTimestamp(8))
                 .setEndTime(result.getTimestamp(9))
@@ -1500,7 +1497,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             );
         }
         ps.close();
-        builder.setPartitionProperties(properties);
+        builder.setPartitionParameters(properties);
 
         return builder.build();
     }
@@ -1513,7 +1510,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 .setStepName(result.getString(3))
                 .setBatchStatus(BatchStatus.valueOf(result.getString(4)))
                 .setExitStatus(result.getString(5))
-                .setCreatedTime(result.getTimestamp(6))
+                .setCreateTime(result.getTimestamp(6))
                 .setStartTime(result.getTimestamp(7))
                 .setUpdatedTime(result.getTimestamp(8))
                 .setEndTime(result.getTimestamp(9))
@@ -1544,9 +1541,9 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             .setJobName(result.getString(3))
             .setBatchStatus(BatchStatus.valueOf(result.getString(4)))
             .setExitStatus(result.getString(5))
-            .setCreatedTime(result.getTimestamp(6))
+            .setCreateTime(result.getTimestamp(6))
             .setStartTime(result.getTimestamp(7))
-            .setUpdatedTime(result.getTimestamp(8))
+            .setLastUpdatedTime(result.getTimestamp(8))
             .setEndTime(result.getTimestamp(9))
             .setRestartElementId(result.getString(10));
 
@@ -1561,7 +1558,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             );
         }
         ps.close();
-        builder.setParameters(properties);
+        builder.setJobParameters(properties);
 
         return builder.build();
     }
@@ -1571,7 +1568,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 .setInstanceId(result.getLong(1))
                 .setJobName(result.getString(2))
                 .setJslName(result.getString(3))
-                .setCreatedTime(result.getTimestamp(4))
+                .setCreateTime(result.getTimestamp(4))
                 .build();
     }
 

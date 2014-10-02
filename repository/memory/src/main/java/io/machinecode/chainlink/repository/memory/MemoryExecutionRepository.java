@@ -95,7 +95,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 .setInstanceId(id)
                 .setJobName(jobId)
                 .setJslName(jslName)
-                .setCreatedTime(timestamp)
+                .setCreateTime(timestamp)
                 .build();
         while (!jobInstanceLock.compareAndSet(false, true)) {}
         try {
@@ -131,9 +131,9 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 .setJobExecutionId(jobExecutionId)
                 .setJobName(instance.getJobName())
                 .setBatchStatus(BatchStatus.STARTING)
-                .setParameters(parameters)
-                .setCreatedTime(timestamp)
-                .setUpdatedTime(timestamp)
+                .setJobParameters(parameters)
+                .setCreateTime(timestamp)
+                .setLastUpdatedTime(timestamp)
                 .build();
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
@@ -186,7 +186,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 .setJobExecutionId(jobExecution.getExecutionId())
                 .setStepExecutionId(stepExecutionId)
                 .setStepName(stepName)
-                .setCreatedTime(timestamp)
+                .setCreateTime(timestamp)
                 .setUpdatedTime(timestamp)
                 .setBatchStatus(BatchStatus.STARTING)
                 .setMetrics(MutableMetricImpl.empty())
@@ -231,8 +231,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 .setPartitionExecutionId(id)
                 .setStepExecutionId(stepExecutionId)
                 .setPartitionId(partitionId)
-                .setPartitionProperties(properties)
-                .setCreatedTime(timestamp)
+                .setPartitionParameters(properties)
+                .setCreateTime(timestamp)
                 .setUpdatedTime(timestamp)
                 .setPersistentUserData(clonedPersistentUserData)
                 .setReaderCheckpoint(clonedReaderCheckpoint)
@@ -258,7 +258,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             jobExecutions.put(jobExecutionId, JobExecutionImpl.from(execution)
-                    .setUpdatedTime(timestamp)
+                    .setLastUpdatedTime(timestamp)
                     .setStartTime(timestamp)
                     .setBatchStatus(BatchStatus.STARTED)
                     .build()
@@ -277,7 +277,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             jobExecutions.put(jobExecutionId, JobExecutionImpl.from(execution)
-                    .setUpdatedTime(timestamp)
+                    .setLastUpdatedTime(timestamp)
                     .setBatchStatus(batchStatus)
                     .build()
             );
@@ -298,7 +298,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                     .setBatchStatus(batchStatus)
                     .setExitStatus(exitStatus)
                     .setRestartElementId(restartElementId)
-                    .setUpdatedTime(timestamp)
+                    .setLastUpdatedTime(timestamp)
                     .setEndTime(timestamp)
                     .build()
             );
@@ -370,8 +370,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
         final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
-        final Serializable _reader = marshaller.clone(readerCheckpoint);
-        final Serializable _writer = marshaller.clone(writerCheckpoint);
+        final Serializable clonedReaderCheckpoint = marshaller.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshaller.clone(writerCheckpoint);
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
@@ -382,8 +382,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                     .setUpdatedTime(timestamp)
                     .setPersistentUserData(clonedPersistentUserData)
                     .setMetrics(MutableMetricImpl.copy(metrics))
-                    .setReaderCheckpoint(_reader)
-                    .setWriterCheckpoint(_writer)
+                    .setReaderCheckpoint(clonedReaderCheckpoint)
+                    .setWriterCheckpoint(clonedWriterCheckpoint)
                     .build()
             );
         } finally {
@@ -434,8 +434,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     @Override
     public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
         final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
-        final Serializable _reader = marshaller.clone(readerCheckpoint);
-        final Serializable _writer = marshaller.clone(writerCheckpoint);
+        final Serializable clonedReaderCheckpoint = marshaller.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshaller.clone(writerCheckpoint);
         while (!partitionExecutionLock.compareAndSet(false, true)) {}
         try {
             final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
@@ -444,8 +444,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             }
             partitionExecutions.put(partitionExecutionId, PartitionExecutionImpl.from(partition)
                     .setUpdatedTime(timestamp)
-                    .setReaderCheckpoint(_reader)
-                    .setWriterCheckpoint(_writer)
+                    .setReaderCheckpoint(clonedReaderCheckpoint)
+                    .setWriterCheckpoint(clonedWriterCheckpoint)
                     .setPersistentUserData(clonedPersistentUserData)
                     .setMetrics(MutableMetricImpl.copy(metrics))
                     .build()
@@ -646,11 +646,11 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     @Override
     public ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws JobRestartException, NoSuchJobExecutionException, NoSuchJobInstanceException, JobExecutionNotMostRecentException, JobSecurityException {
-        final long instanceId;
+        final long jobInstanceId;
         while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
         try {
-            instanceId = jobExecutionInstances.get(jobExecutionId);
-            if (instanceId == jobExecutionInstances.getNoEntryValue()) {
+            jobInstanceId = jobExecutionInstances.get(jobExecutionId);
+            if (jobInstanceId == jobExecutionInstances.getNoEntryValue()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
         } finally {
@@ -659,12 +659,12 @@ public class MemoryExecutionRepository implements ExecutionRepository {
         final long latest;
         while (!latestJobExecutionForInstanceLock.compareAndSet(false, true)) {}
         try {
-            latest = latestJobExecutionForInstance.get(instanceId);
+            latest = latestJobExecutionForInstance.get(jobInstanceId);
             if (latest == latestJobExecutionForInstance.getNoEntryValue()) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobExecutionId));
+                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
             }
             if (latest != jobExecutionId) {
-                throw new JobExecutionNotMostRecentException(Messages.format("CHAINLINK-006004.repository.not.most.recent.execution", jobExecutionId, instanceId));
+                throw new JobExecutionNotMostRecentException(Messages.format("CHAINLINK-006004.repository.not.most.recent.execution", jobExecutionId, jobInstanceId));
             }
         } finally {
             latestJobExecutionForInstanceLock.set(false);
@@ -688,7 +688,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             jobExecutionLock.set(false);
         }
         return createJobExecution(
-                getJobInstance(instanceId),
+                getJobInstance(jobInstanceId),
                 parameters,
                 new Date()
         );
@@ -721,36 +721,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     @Override
     public ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException {
-        final TLongSet historicJobExecutionIds = new TLongHashSet();
-        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
-        try {
-            final TLongSet executions = jobExecutionHistory.get(jobExecutionId);
-            if (executions == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
-            }
-            historicJobExecutionIds.addAll(executions);
-        } finally {
-            jobExecutionHistoryLock.set(false);
-        }
-        final TLongSet stepExecutionIds = new TLongHashSet();
-        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
-        try {
-            TLongSet executionIds = jobExecutionStepExecutions.get(jobExecutionId);
-            if (executionIds == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
-            }
-            stepExecutionIds.addAll(executionIds);
-            for (final TLongIterator it = historicJobExecutionIds.iterator(); it.hasNext();) {
-                final long historicJobExecutionId = it.next();
-                executionIds = jobExecutionStepExecutions.get(historicJobExecutionId);
-                if (executionIds == null) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", historicJobExecutionId));
-                }
-                stepExecutionIds.addAll(executionIds);
-            }
-        } finally {
-            jobExecutionStepExecutionLock.set(false);
-        }
+        final TLongSet stepExecutionIds = _stepExecutionHistory(jobExecutionId);
         Date currentStepExecutionCreateTime = null;
         final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
         while (!stepExecutionLock.compareAndSet(false, true)) {}
@@ -797,6 +768,36 @@ public class MemoryExecutionRepository implements ExecutionRepository {
 
     @Override
     public ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException {
+        final TLongSet stepExecutionIds = _stepExecutionHistory(jobExecutionId);
+        final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
+        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        try {
+            for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
+                final ExtendedStepExecution execution = stepExecutions.get(it.next());
+                if (stepName.equals(execution.getStepName())) {
+                    candidates.add(execution);
+                }
+            }
+        } finally {
+            stepExecutionLock.set(false);
+        }
+        ExtendedStepExecution latest = null;
+        for (final ExtendedStepExecution candidate : candidates) {
+            if (latest == null) {
+                latest = candidate;
+                continue;
+            }
+            if (candidate.getCreateTime().after(latest.getCreateTime())) {
+                latest = candidate;
+            }
+        }
+        if (latest == null) {
+            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+        }
+        return latest;
+    }
+
+    protected TLongSet _stepExecutionHistory(final long jobExecutionId) {
         final TLongSet historicJobExecutionIds = new TLongHashSet();
         while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
         try {
@@ -827,32 +828,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
         } finally {
             jobExecutionStepExecutionLock.set(false);
         }
-        final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
-        try {
-            for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
-                final ExtendedStepExecution execution = stepExecutions.get(it.next());
-                if (stepName.equals(execution.getStepName())) {
-                    candidates.add(execution);
-                }
-            }
-        } finally {
-            stepExecutionLock.set(false);
-        }
-        ExtendedStepExecution latest = null;
-        for (final ExtendedStepExecution candidate : candidates) {
-            if (latest == null) {
-                latest = candidate;
-                continue;
-            }
-            if (candidate.getCreateTime().after(latest.getCreateTime())) {
-                latest = candidate;
-            }
-        }
-        if (latest == null) {
-            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
-        }
-        return latest;
+        return stepExecutionIds;
     }
 
     @Override
@@ -905,7 +881,11 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     public ExtendedStepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         while (!stepExecutionLock.compareAndSet(false, true)) {}
         try {
-            return stepExecutions.get(stepExecutionId);
+            final ExtendedStepExecution stepExecution = stepExecutions.get(stepExecutionId);
+            if (stepExecution == null) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            }
+            return stepExecution;
         } finally {
             stepExecutionLock.set(false);
         }

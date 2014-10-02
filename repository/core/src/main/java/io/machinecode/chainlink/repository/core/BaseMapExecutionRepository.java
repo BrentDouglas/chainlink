@@ -77,7 +77,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
                 .setInstanceId(id)
                 .setJobName(jobId)
                 .setJslName(jslName)
-                .setCreatedTime(timestamp)
+                .setCreateTime(timestamp)
                 .build();
         jobInstances().put(id, instance);
         jobInstanceExecutions().put(id, new CopyOnWriteArrayList<Long>());
@@ -98,9 +98,9 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
                 .setJobExecutionId(jobExecutionId)
                 .setJobName(instance.getJobName())
                 .setBatchStatus(BatchStatus.STARTING)
-                .setParameters(parameters)
-                .setCreatedTime(timestamp)
-                .setUpdatedTime(timestamp)
+                .setJobParameters(parameters)
+                .setCreateTime(timestamp)
+                .setLastUpdatedTime(timestamp)
                 .build();
         jobExecutions().put(jobExecutionId, execution);
         jobExecutionInstances().put(jobExecutionId, instance.getInstanceId());
@@ -123,7 +123,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
                 .setJobExecutionId(jobExecution.getExecutionId())
                 .setStepExecutionId(stepExecutionId)
                 .setStepName(stepName)
-                .setCreatedTime(timestamp)
+                .setCreateTime(timestamp)
                 .setUpdatedTime(timestamp)
                 .setBatchStatus(BatchStatus.STARTING)
                 .setMetrics(MutableMetricImpl.empty())
@@ -149,8 +149,8 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
                 .setPartitionExecutionId(id)
                 .setStepExecutionId(stepExecutionId)
                 .setPartitionId(partitionId)
-                .setPartitionProperties(properties)
-                .setCreatedTime(timestamp)
+                .setPartitionParameters(properties)
+                .setCreateTime(timestamp)
                 .setUpdatedTime(timestamp)
                 .setPersistentUserData(clonedPersistentUserData)
                 .setReaderCheckpoint(clonedReaderCheckpoint)
@@ -169,7 +169,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
         }
         jobExecutions().put(jobExecutionId, JobExecutionImpl.from(execution)
-                .setUpdatedTime(timestamp)
+                .setLastUpdatedTime(timestamp)
                 .setStartTime(timestamp)
                 .setBatchStatus(BatchStatus.STARTED)
                 .build()
@@ -183,7 +183,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
         }
         jobExecutions().put(jobExecutionId, JobExecutionImpl.from(execution)
-                .setUpdatedTime(timestamp)
+                .setLastUpdatedTime(timestamp)
                 .setBatchStatus(batchStatus)
                 .build()
         );
@@ -199,7 +199,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
                 .setBatchStatus(batchStatus)
                 .setExitStatus(exitStatus)
                 .setRestartElementId(restartElementId)
-                .setUpdatedTime(timestamp)
+                .setLastUpdatedTime(timestamp)
                 .setEndTime(timestamp)
                 .build()
         );

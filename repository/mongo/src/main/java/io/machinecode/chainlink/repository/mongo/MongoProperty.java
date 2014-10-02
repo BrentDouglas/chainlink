@@ -1,0 +1,28 @@
+package io.machinecode.chainlink.repository.mongo;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * @author Brent Douglas <brent.n.douglas@gmail.com>
+ */
+public class MongoProperty {
+    final String key;
+    final String value;
+
+    @JsonCreator
+    public MongoProperty(@JsonProperty(Fields.K) final String key, @JsonProperty(Fields.V) final String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    @JsonProperty(Fields.K)
+    public String getKey() {
+        return key;
+    }
+
+    @JsonProperty(Fields.V)
+    public String getValue() {
+        return value;
+    }
+}

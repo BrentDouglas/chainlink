@@ -127,6 +127,11 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-mongo</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-redis</artifactId>
             <scope>test</scope>
         </dependency>
@@ -181,8 +186,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.jongo</groupId>
+            <artifactId>jongo</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -203,6 +218,7 @@
     </dependencies>
 
     <profiles>
+        <!-- Transport -->
         <profile>
             <id>tr-coherence</id>
             <activation>
@@ -243,6 +259,8 @@
                 <registry.factory.class>io.machinecode.chainlink.tck.core.transport.JGroupsRegistryFactory</registry.factory.class>
             </properties>
         </profile>
+
+        <!-- ExecutionRepository -->
         <profile>
             <id>re-coherence</id>
             <activation>
@@ -294,6 +312,16 @@
             </properties>
         </profile>
         <profile>
+            <id>re-mongo</id>
+            <activation>
+                <property><name>re-mongo</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MongoExecutionRepositoryFactory</execution.repository.factory.class>
+            </properties>
+        </profile>
+        <profile>
             <id>re-redis</id>
             <activation>
                 <property><name>re-redis</name></property>
@@ -303,6 +331,8 @@
                 <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.RedisExecutionRepositoryFactory</execution.repository.factory.class>
             </properties>
         </profile>
+
+        <!-- Injector -->
         <profile>
             <id>in-batch</id>
             <activation>
@@ -369,7 +399,7 @@
             </modules>
         </profile>
 
-        <!-- JPA -->
+        <!-- Database -->
         <profile>
             <id>db-mariadb</id>
             <activation>
@@ -392,6 +422,8 @@
                 <database.prefix>postgresql</database.prefix>
             </properties>
         </profile>
+
+        <!-- Marshaller -->
         <profile>
             <id>ma-jboss</id>
             <activation>
