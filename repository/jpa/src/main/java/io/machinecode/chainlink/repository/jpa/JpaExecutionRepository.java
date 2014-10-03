@@ -1043,11 +1043,6 @@ public class JpaExecutionRepository implements ExecutionRepository {
         }
     }
 
-    @Override
-    public boolean isLocal() {
-        return false; //TODO This needs to be optional based ona property
-    }
-
     public void _updateMetrics(final Metric[] source, final Map<Metric.MetricType, JpaMetric> target) {
         for (final Metric metric : source) {
             target.get(metric.getType()).setValue(metric.getValue());

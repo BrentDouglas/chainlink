@@ -819,11 +819,6 @@ public class MongoExecutionRepository implements ExecutionRepository {
         }
     }
 
-    @Override
-    public boolean isLocal() {
-        return true;
-    }
-
     private Long _jobInstanceId(final long jobExecutionId, final MongoCollection jobExecutions) throws NoSuchJobExecutionException, IOException {
         final MongoCursor<Long> jec = jobExecutions.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
                 .projection("{" + Fields.JOB_INSTANCE_ID + ":1,_id:0}")

@@ -959,9 +959,4 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             partitionExecutionLock.set(false);
         }
     }
-
-    @Override
-    public boolean isLocal() {
-        return true;
-    }
 }

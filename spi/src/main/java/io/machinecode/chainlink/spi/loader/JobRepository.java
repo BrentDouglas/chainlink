@@ -23,7 +23,7 @@ public interface JobRepository {
      *
      * @param clazz The type of element to find.
      * @param id The id of the element to find.
-     * @param id The jsl-name of the element to find.
+     * @param jslName The jsl-name of the element to find.
      * @param <T>
      * @return The parent element.
      * @throws ParentNotFoundException If the parent element is not in this repository.

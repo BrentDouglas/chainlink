@@ -402,9 +402,4 @@ public class InfinispanProxyExecutionRepository implements ExecutionRepository {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public boolean isLocal() {
-        return false;
-    }
 }

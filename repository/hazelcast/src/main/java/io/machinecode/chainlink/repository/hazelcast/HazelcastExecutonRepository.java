@@ -181,9 +181,4 @@ public class HazelcastExecutonRepository extends BaseMapExecutionRepository {
         }
         return ret;
     }
-
-    @Override
-    public boolean isLocal() {
-        return true;
-    }
 }

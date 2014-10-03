@@ -189,9 +189,4 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
         }
         return ret;
     }
-
-    @Override
-    public boolean isLocal() {
-        return true;
-    }
 }

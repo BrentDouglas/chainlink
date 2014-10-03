@@ -1247,11 +1247,6 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         }
     }
 
-    @Override
-    public boolean isLocal() {
-        return false;
-    }
-
     private PartitionExecutionImpl _getPartitionExecution(final Connection connection, final long partitionExecutionId) throws Exception {
         final PreparedStatement statement = connection.prepareStatement(queryPartitionExecution());
         statement.setLong(1, partitionExecutionId);

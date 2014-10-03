@@ -975,11 +975,6 @@ public class RedisExecutionRepository implements ExecutionRepository {
         }
     }
 
-    @Override
-    public boolean isLocal() {
-        return false;
-    }
-
     private ExtendedJobInstance _ji(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(JOB_INSTANCE_PREFIX, id));
         return response == null ? null : (ExtendedJobInstance) marshaller.unmarshall(response);

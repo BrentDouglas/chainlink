@@ -399,9 +399,4 @@ public abstract class DistributedProxyExecutionRepository<A, R extends Distribut
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public boolean isLocal() {
-        return false;
-    }
 }

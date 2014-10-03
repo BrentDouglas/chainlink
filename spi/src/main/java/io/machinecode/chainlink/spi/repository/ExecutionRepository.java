@@ -30,8 +30,8 @@ public interface ExecutionRepository {
      * @param jslName The name of the xml file containing the job.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link ExtendedJobInstance} in accordance with the above rules.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedJobInstance createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception;
 
@@ -56,8 +56,8 @@ public interface ExecutionRepository {
      * @param parameters The parameters passed to this execution when it was started or restarted.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link ExtendedJobExecution} in accordance with the above rules.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception;
 
@@ -87,8 +87,8 @@ public interface ExecutionRepository {
      * @param stepName The id of the JSL step this execution represents.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link ExtendedStepExecution} in accordance with the above rules.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception;
 
@@ -127,8 +127,8 @@ public interface ExecutionRepository {
      * @param writerCheckpoint May be null.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link PartitionExecution} in accordance with the above rules.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception;
 
@@ -146,9 +146,10 @@ public interface ExecutionRepository {
      *
      * @param jobExecutionId The id of the {@link ExtendedJobExecution} that will be updated.
      * @param timestamp The current time on the JVM calling this method.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param jobExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param jobExecutionId}
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void startJobExecution(final long jobExecutionId, final Date timestamp) throws Exception;
 
@@ -167,9 +168,10 @@ public interface ExecutionRepository {
      * @param jobExecutionId The id of the {@link ExtendedJobExecution} that will be updated.
      * @param batchStatus The {@link BatchStatus} to update the {@link JobExecution} to.
      * @param timestamp The current time on the JVM calling this method.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param jobExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param jobExecutionId}
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void updateJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final Date timestamp) throws Exception;
 
@@ -191,9 +193,10 @@ public interface ExecutionRepository {
      * @param exitStatus The exit status to update the {@link JobExecution} to.
      * @param restartElementId An optional
      * @param timestamp The current time on the JVM calling this method.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param jobExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param jobExecutionId}
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId, final Date timestamp) throws Exception;
 
@@ -216,10 +219,11 @@ public interface ExecutionRepository {
      *
      * @param jobExecutionId The id of the later {@link ExtendedJobExecution}.
      * @param restartJobExecutionId The id of the earlier {@link ExtendedJobExecution}.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param jobExecutionId}
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param jobExecutionId}
      *         or {@param restartJobExecutionId}.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws Exception;
 
@@ -239,9 +243,10 @@ public interface ExecutionRepository {
      *
      * @param stepExecutionId The id of the {@link ExtendedStepExecution} that will be updated.
      * @param timestamp The current time on the JVM calling this method.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param stepExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param stepExecutionId}
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void startStepExecution(final long stepExecutionId, final Date timestamp) throws Exception;
 
@@ -264,11 +269,12 @@ public interface ExecutionRepository {
      *
      * @param stepExecutionId The id of the {@link io.machinecode.chainlink.spi.repository.ExtendedStepExecution} that will be updated.
      * @param metrics The final metrics of the step.
-     * @param persistentUserData
+     * @param persistentUserData From {@link javax.batch.runtime.context.StepContext#getPersistentUserData()}.
      * @param timestamp The current time on the JVM calling this method.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param stepExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param stepExecutionId}
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws Exception;
 
@@ -295,13 +301,14 @@ public interface ExecutionRepository {
      *
      * @param stepExecutionId The id of the {@link io.machinecode.chainlink.spi.repository.ExtendedStepExecution} that will be updated.
      * @param metrics The final metrics of the step.
-     * @param persistentUserData
-     * @param readerCheckpoint
-     * @param writerCheckpoint
+     * @param persistentUserData From {@link javax.batch.runtime.context.StepContext#getPersistentUserData()}.
+     * @param readerCheckpoint From {@link javax.batch.api.chunk.ItemReader#checkpointInfo()}.
+     * @param writerCheckpoint From {@link javax.batch.api.chunk.ItemWriter#checkpointInfo()}.
      * @param timestamp The current time on the JVM calling this method.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param stepExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param stepExecutionId}
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception;
 
@@ -327,8 +334,8 @@ public interface ExecutionRepository {
      * @param exitStatus The exit status to update the {@link StepExecution} to.
      * @param timestamp The current time on the JVM calling this method.
      * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param stepExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void finishStepExecution(final long stepExecutionId, final Metric[] metrics, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception;
 
@@ -347,9 +354,10 @@ public interface ExecutionRepository {
      *
      * @param partitionExecutionId The id of the {@link PartitionExecution} that will be updated.
      * @param timestamp The current time on the JVM calling this method.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param partitionExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param partitionExecutionId}
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void startPartitionExecution(final long partitionExecutionId, final Date timestamp) throws Exception;
 
@@ -375,13 +383,13 @@ public interface ExecutionRepository {
      *
      * @param partitionExecutionId The id of the {@link PartitionExecution} that will be updated.
      * @param metrics The current metrics of the partition.
-     * @param persistentUserData
-     * @param readerCheckpoint
-     * @param writerCheckpoint
+     * @param persistentUserData From {@link javax.batch.runtime.context.StepContext#getPersistentUserData()}.
+     * @param readerCheckpoint From {@link javax.batch.api.chunk.ItemReader#checkpointInfo()}.
+     * @param writerCheckpoint From {@link javax.batch.api.chunk.ItemWriter#checkpointInfo()}.
      * @param timestamp The current time on the JVM calling this method.
      * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param partitionExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception;
 
@@ -404,77 +412,100 @@ public interface ExecutionRepository {
      *
      * @param partitionExecutionId The id of the {@link PartitionExecution} that will be updated.
      * @param metrics The final metrics of the partition.
-     * @param persistentUserData
-     * @param batchStatus
-     * @param exitStatus
+     * @param persistentUserData From {@link javax.batch.runtime.context.StepContext#getPersistentUserData()}.
+     * @param batchStatus From {@link javax.batch.runtime.context.StepContext#getBatchStatus()}
+     * @param exitStatus From {@link javax.batch.runtime.context.StepContext#getExitStatus()}.
      * @param timestamp The current time on the JVM calling this method.
-     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource identified by {@param partitionExecutionId}
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
+     * identified by {@param partitionExecutionId}
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception;
 
     /**
+     * @see {@link javax.batch.operations.JobOperator#getJobNames()}
+     * 
      * @return A set of distinct job names that would be obtainable by calling either {@link JobInstance#getJobName()}
      * or {@link JobExecution#getJobName()} from any of the {@link JobInstance}'s or {@link JobExecution}'s stored in this
      * repository.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     Set<String> getJobNames() throws Exception;
 
     /**
-     * @param jobName The id of the {@link io.machinecode.chainlink.spi.element.Job} to search for instances of.
+     * @see {@link javax.batch.operations.JobOperator#getJobInstanceCount(String)}
+     * 
+     * @param jobName The search term.
      * @return The number of {@link JobInstance}'s that would return {@param jobName}
      * from {@link JobInstance#getJobName()}.
-     * @throws javax.batch.operations.NoSuchJobException If this repository does not contain any {@link JobInstance}'s that would return {@param jobName}
+     * @throws javax.batch.operations.NoSuchJobException If this repository does not contain any {@link JobInstance}'s
+     * that would return {@param jobName}
      * from {@link JobInstance#getJobName()}.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     int getJobInstanceCount(final String jobName) throws Exception;
 
     /**
-     *
-     * @param jobName The id of the {@link io.machinecode.chainlink.spi.element.Job} to search for instances of.
-     * @param start
-     * @param count
-     * @return
-     * @throws javax.batch.operations.NoSuchJobException If this repository does not contain any {@link JobInstance}'s that would return {@param jobName}
+     * @see {@link javax.batch.operations.JobOperator#getJobInstances(String, int, int)}
+     * 
+     * @param jobName The search term.
+     * @param start The index of the first {@link JobInstance} to be included in the results.
+     * @param count The maximum number of {@link JobInstance}'s to return.
+     * @return A refined {@link List} of {@link JobInstance}'s matching the provided search parameters or an empty list,
+     * MUST not return null. A matching {@link JobInstance} is defined as one where {@param jobName} would equal
+     * the result of calling {@link JobInstance#getJobName()}.
+     * The refined list is defined as an operation applied to a list of every match ordered by the result of
+     * {@link javax.batch.runtime.JobInstance#getInstanceId()} where the first {@param start} of the
+     * matching results are discarded and any more that {@param count} matching results are also discarded.
+     * @throws javax.batch.operations.NoSuchJobException If this repository does not contain any matching {@link JobInstance}'s.
      * from {@link JobInstance#getJobName()}.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws Exception;
 
     /**
+     * @see {@link javax.batch.operations.JobOperator#getRunningExecutions(String)}
      *
-     * @param jobName
-     * @return
-     * @throws javax.batch.operations.NoSuchJobException If this repository does not contain any {@link JobExecution}'s that would return {@param jobName}
+     * @param jobName The search term.
+     * @return A refined {@link List} containing the results of calling {@link javax.batch.runtime.JobExecution#getExecutionId()}
+     * on every matching {@link JobExecution} stored in this repository. MUST not be null.
+     * A matching {@link JobExecution} is defined as one where {@param jobName} equals the result of calling
+     * {@link javax.batch.runtime.JobExecution#getJobName()}.
+     * The refined list is defined as an operation applied to a list of every match where the result of calling
+     * {@link javax.batch.runtime.JobExecution#getBatchStatus()} is either {@link BatchStatus#STARTING} or
+     * {@link BatchStatus#STARTED}. The list may be empty if the refining process excludes all matches.
+     * @throws javax.batch.operations.NoSuchJobException If this repository does not contain any matching {@link JobExecution}'s.
      * from {@link JobExecution#getJobName()}.
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception When an error occurs.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     List<Long> getRunningExecutions(final String jobName) throws Exception;
 
     /**
+     * @see {@link javax.batch.operations.JobOperator#getParameters(long)}
      *
-     * @param jobExecutionId
-     * @return
-     * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @param jobExecutionId The search term.
+     * @return The result of calling {@link javax.batch.runtime.JobExecution#getJobParameters()} on the matching
+     * {@link ExtendedJobExecution} stored in this repository. A matching {@link JobExecution} is defined as one where
+     * calling {@link javax.batch.runtime.JobExecution#getExecutionId()} equals {@param jobExecutionId}.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If no matching {@link ExtendedJobExecution} is found.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     Properties getParameters(final long jobExecutionId) throws Exception;
 
     /**
+     * @see {@link javax.batch.operations.JobOperator#getJobInstance(long)}
      *
      * @param jobInstanceId
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedJobInstance getJobInstance(final long jobInstanceId) throws Exception;
 
@@ -483,32 +514,38 @@ public interface ExecutionRepository {
      * @param jobExecutionId
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedJobInstance getJobInstanceForExecution(final long jobExecutionId) throws Exception;
 
     /**
+     * @see {@link javax.batch.operations.JobOperator#getJobExecutions(javax.batch.runtime.JobInstance)} 
      *
      * @param jobInstanceId
      * @return
      * @throws javax.batch.operations.NoSuchJobInstanceException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     List<? extends JobExecution> getJobExecutions(final long jobInstanceId) throws Exception;
 
     /**
+     * @see {@link javax.batch.operations.JobOperator#getJobExecution(long)}
      *
-     * @param jobExecutionId
-     * @return
-     * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @param jobExecutionId The search term.
+     * @return The matching {@link ExtendedJobExecution} stored in this repository. A matching {@link JobExecution}
+     * is defined as one where calling {@link javax.batch.runtime.JobExecution#getExecutionId()}
+     * equals {@param jobExecutionId}.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If no matching {@link ExtendedJobExecution} is found.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedJobExecution getJobExecution(final long jobExecutionId) throws Exception;
 
-    //JobRestartException, javax.batch.operations.NoSuchJobExecutionException, javax.batch.operations.NoSuchJobInstanceException, JobExecutionNotMostRecentException, javax.batch.operations.JobSecurityException,
+    //JobRestartException, javax.batch.operations.NoSuchJobExecutionException,
+    // javax.batch.operations.NoSuchJobInstanceException,
+    // JobExecutionNotMostRecentException, javax.batch.operations.JobSecurityException,
 
     /**
      *
@@ -516,20 +553,22 @@ public interface ExecutionRepository {
      * @param parameters
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws Exception;
 
-    //javax.batch.operations.NoSuchJobExecutionException, javax.batch.operations.JobSecurityException,
-
     /**
-     *
-     * @param jobExecutionId
-     * @return
-     * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @param jobExecutionId The {@link javax.batch.runtime.JobExecution#getExecutionId()} to search.
+     * @return Every {@link StepExecution} that has been registered to this repository by calling {@link #createStepExecution(ExtendedJobExecution, String, java.util.Date)}
+     * where {@param jobExecutionId} matches the result of calling {@link javax.batch.runtime.JobExecution#getExecutionId()}
+     * on the first parameter. This list may be empty if a {@link JobExecution} stored in this repository matches but no
+     * {@link StepExecution}'s have been. MUST not return null.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If no {@link JobExecution} where calling
+     * {@link javax.batch.runtime.JobExecution#getExecutionId()} would match {@param jobExecutionId} are stored in this
+     * repository.
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     List<? extends StepExecution> getStepExecutionsForJobExecution(final long jobExecutionId) throws Exception;
 
@@ -538,42 +577,40 @@ public interface ExecutionRepository {
      * @param stepExecutionId
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedStepExecution getStepExecution(final long stepExecutionId) throws Exception;
 
     /**
-     *
-     * @param jobExecutionId
+     * @param jobExecutionId The id on the {@link JobExecution} to search.
      * @param stepExecutionId The id of the step execution currently running.
-     * @param stepName
+     * @param stepName The name of the step to find.
      * @return The latest step execution before the one currently running.
      * @throws javax.batch.operations.NoSuchJobExecutionException
      * @throws javax.batch.operations.JobSecurityException
-     * @throws Exception
+     * @throws Exception For implementation specific issues.
      */
     ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws Exception;
 
     /**
-     *
-     * @param jobExecutionId
-     * @param stepName
+     * @param jobExecutionId The id on the {@link JobExecution} to search.
+     * @param stepName The name of the step to find.
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws Exception;
 
     /**
-     *
-     * @param jobExecutionId
-     * @param stepName
-     * @return
+     * @param jobExecutionId The id on the {@link JobExecution} to search.
+     * @param stepName The name of the step to find.
+     * @return The number of {@link StepExecution}'s with {@param stepName} in the sequence on job executions
+     *         headed by {@param jobExecutionId} as described in the javadoc of {@link #linkJobExecutions(long, long)}.
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     int getStepExecutionCount(final long jobExecutionId, final String stepName) throws Exception;
 
@@ -582,8 +619,8 @@ public interface ExecutionRepository {
      * @param stepExecutionIds
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     StepExecution[] getStepExecutions(final long[] stepExecutionIds) throws Exception;
 
@@ -592,8 +629,8 @@ public interface ExecutionRepository {
      * @param stepExecutionId
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws Exception;
 
@@ -602,10 +639,8 @@ public interface ExecutionRepository {
      * @param partitionExecutionId
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
-     * @throws javax.batch.operations.JobSecurityException TODO
-     * @throws Exception
+     * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
+     * @throws Exception For implementation specific issues.
      */
     PartitionExecution getPartitionExecution(final long partitionExecutionId) throws Exception;
-
-    boolean isLocal();
 }

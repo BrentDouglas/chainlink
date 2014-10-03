@@ -241,9 +241,4 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
         }
         return ret;
     }
-
-    @Override
-    public boolean isLocal() {
-        return !cacheManager.getCacheManagerConfiguration().isClustered();
-    }
 }

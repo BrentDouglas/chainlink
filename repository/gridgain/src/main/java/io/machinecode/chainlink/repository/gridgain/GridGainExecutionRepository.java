@@ -214,11 +214,6 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
         return ret;
     }
 
-    @Override
-    public boolean isLocal() {
-        return true;
-    }
-
     protected GridGainJobInstance.Builder newJobInstanceBuilder() {
         return new GridGainJobInstance.Builder();
     }
