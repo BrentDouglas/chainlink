@@ -1,0 +1,34 @@
+<ehcache>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.ids"
+           maxBytesLocalHeap="16M" eternal="true"/>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.jobInstances"
+           maxBytesLocalHeap="16M" eternal="true">
+        <searchable>
+            <searchAttribute name="job_name" expression="value.getJobName()"/>
+        </searchable>
+    </cache>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.jobExecutions"
+           maxBytesLocalHeap="16M" eternal="true">
+        <searchable>
+            <searchAttribute name="job_name" expression="value.getJobName()"/>
+            <searchAttribute name="job_instance_id" expression="value.getJobInstanceId()"/>
+            <searchAttribute name="batch_status" expression="value.getBatchStatus()"/>
+        </searchable>
+    </cache>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.stepExecutions"
+           maxBytesLocalHeap="16M" eternal="true"/>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.partitionExecutions"
+           maxBytesLocalHeap="16M" eternal="true"/>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.jobInstanceExecutions"
+           maxBytesLocalHeap="16M" eternal="true"/>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.jobExecutionInstances"
+           maxBytesLocalHeap="16M" eternal="true"/>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.jobExecutionStepExecutions"
+           maxBytesLocalHeap="16M" eternal="true"/>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.latestJobExecutionForInstance"
+           maxBytesLocalHeap="16M" eternal="true"/>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.stepExecutionPartitionExecutions"
+           maxBytesLocalHeap="16M" eternal="true"/>
+    <cache name="io.machinecode.chainlink.repository.ehcache.EhCacheExecutionRepository.jobExecutionHistory"
+           maxBytesLocalHeap="16M" eternal="true"/>
+</ehcache>

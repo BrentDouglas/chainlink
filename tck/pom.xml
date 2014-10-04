@@ -102,6 +102,11 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-ehcache</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-hazelcast</artifactId>
             <scope>test</scope>
         </dependency>
@@ -158,6 +163,11 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-jgroups</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -269,6 +279,16 @@
             </activation>
             <properties>
                 <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.CoherenceExecutionRepositoryFactory</execution.repository.factory.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>re-ehcache</id>
+            <activation>
+                <property><name>re-ehcache</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.EhCacheExecutionRepositoryFactory</execution.repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -454,6 +474,10 @@
                                 <target>
                                     <copy file="${project.basedir}/../core/src/test/resources/coherence-cache-config.xml"
                                           tofile="${project.build.testOutputDirectory}/coherence-cache-config.xml"
+                                          overwrite="true">
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/ehcache.xml"
+                                          tofile="${project.build.testOutputDirectory}/ehcache.xml"
                                           overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/hazelcast.xml"

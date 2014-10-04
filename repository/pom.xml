@@ -22,6 +22,7 @@
         <module>memory</module>
         <module>mongo</module>
         <module>redis</module>
+        <module>ehcache</module>
     </modules>
 
 </project>

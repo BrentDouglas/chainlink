@@ -54,6 +54,7 @@
         <version.javax.inject>1</version.javax.inject>
         <version.javax.servlet.servlet-api>2.5</version.javax.servlet.servlet-api>
         <version.junit.junit>4.10</version.junit.junit>
+        <version.net.sf.ehcache.ehcache-core>2.6.9</version.net.sf.ehcache.ehcache-core>
         <version.net.sf.trove4j.trove4j>3.0.3</version.net.sf.trove4j.trove4j>
         <version.log4j.log4j>1.2.17</version.log4j.log4j>
         <version.org.h2database.h2>1.3.175</version.org.h2database.h2>
@@ -211,12 +212,7 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-memory</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-mongo</artifactId>
+                <artifactId>chainlink-repository-ehcache</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -237,6 +233,16 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-repository-jpa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-memory</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-repository-mongo</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -313,6 +319,11 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${version.log4j.log4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache-core</artifactId>
+                <version>${version.net.sf.ehcache.ehcache-core}</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.trove4j</groupId>
