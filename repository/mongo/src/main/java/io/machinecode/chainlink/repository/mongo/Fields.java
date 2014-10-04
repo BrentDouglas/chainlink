@@ -10,6 +10,7 @@ public class Fields {
     public static final String JOB_NAME = "job_name";
     public static final String JSL_NAME = "jsl_name";
     public static final String CREATE_TIME = "create_time";
+    public static final String LATEST_JOB_EXECUTION_ID = "latest_job_execution_id";
 
     public static final String JOB_EXECUTION_ID = "job_execution_id";
     public static final String JOB_PARAMETERS = "job_parameters";
@@ -19,6 +20,7 @@ public class Fields {
     public static final String EXIT_STATUS = "exit_status";
     public static final String LAST_UPDATED_TIME = "last_updated_time";
     public static final String RESTART_ELEMENT_ID = "restart_element_id";
+    public static final String PREVIOUS_JOB_EXECUTION_IDS = "previous_job_execution_ids";
 
     public static final String STEP_EXECUTION_ID = "step_execution_id";
     public static final String STEP_NAME = "step_name";

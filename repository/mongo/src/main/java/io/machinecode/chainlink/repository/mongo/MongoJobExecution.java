@@ -9,7 +9,9 @@ import io.machinecode.chainlink.repository.core.JobExecutionImpl;
 import org.bson.types.ObjectId;
 
 import javax.batch.runtime.BatchStatus;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
@@ -28,15 +30,22 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 public class MongoJobExecution extends JobExecutionImpl {
 
     private final ObjectId _id;
+    private final List<Long> previousJobExecutionIds;
 
-    public MongoJobExecution(final _Builder builder) {
+    public MongoJobExecution(final _Builder<?> builder) {
         super(builder);
         this._id = builder._id;
+        this.previousJobExecutionIds = builder.previousJobExecutionIds;
     }
 
     @JsonProperty(Fields._ID)
     public ObjectId get_id() {
         return _id;
+    }
+
+    @JsonProperty(Fields.PREVIOUS_JOB_EXECUTION_IDS)
+    public List<Long> getPreviousJobExecutionIds() {
+        return previousJobExecutionIds;
     }
 
     @Override
@@ -138,10 +147,17 @@ public class MongoJobExecution extends JobExecutionImpl {
     @SuppressWarnings("unchecked")
     public static class _Builder<T extends _Builder<T>> extends JobExecutionImpl._Builder<T> {
         ObjectId _id;
+        List<Long> previousJobExecutionIds = Collections.emptyList();
 
         @JsonProperty(Fields._ID)
         public T set_id(final ObjectId _id) {
             this._id = _id;
+            return (T)this;
+        }
+
+        @JsonProperty(Fields.PREVIOUS_JOB_EXECUTION_IDS)
+        public T setPreviousJobExecutionIds(final List<Long> previousJobExecutionIds) {
+            this.previousJobExecutionIds = previousJobExecutionIds;
             return (T)this;
         }
 

@@ -25,15 +25,22 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 public class MongoJobInstance extends JobInstanceImpl {
 
     private final ObjectId _id;
+    private final Long latestJobInstanceId;
 
     public MongoJobInstance(final _Builder builder) {
         super(builder);
         this._id = builder._id;
+        this.latestJobInstanceId = builder.latestJobInstanceId;
     }
 
     @JsonProperty(Fields._ID)
     public ObjectId get_id() {
         return _id;
+    }
+
+    @JsonProperty(Fields.LATEST_JOB_EXECUTION_ID)
+    public Long getLatestJobInstanceId() {
+        return latestJobInstanceId;
     }
 
     @Override
@@ -76,6 +83,7 @@ public class MongoJobInstance extends JobInstanceImpl {
     @SuppressWarnings("unchecked")
     public static class _Builder<T extends _Builder<T>> extends JobInstanceImpl._Builder<T> {
         ObjectId _id;
+        Long latestJobInstanceId;
 
         @JsonProperty(Fields._ID)
         public T set_id(final ObjectId _id) {
@@ -105,6 +113,12 @@ public class MongoJobInstance extends JobInstanceImpl {
         @JsonProperty(Fields.CREATE_TIME)
         public T setCreateTime(final Date createTime) {
             return super.setCreateTime(createTime);
+        }
+
+        @JsonProperty(Fields.LATEST_JOB_EXECUTION_ID)
+        public T setLatestJobInstanceId(final Long latestJobInstanceId) {
+            this.latestJobInstanceId = latestJobInstanceId;
+            return (T)this;
         }
     }
 

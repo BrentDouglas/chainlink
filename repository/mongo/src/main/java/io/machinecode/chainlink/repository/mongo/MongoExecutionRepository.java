@@ -55,9 +55,6 @@ public class MongoExecutionRepository implements ExecutionRepository {
     protected static final String STEP_EXECUTIONS = "step_executions";
     protected static final String PARTITION_EXECUTIONS = "partition_executions";
 
-    protected static final String LATEST_JOB_EXECUTIONS = "latest_job_executions";
-    protected static final String JOB_EXECUTION_HISTORY = "job_execution_history";
-
     public static final ResultHandler<Void> DO_NOTHING = new ResultHandler<Void>() {
         @Override
         public Void map(final DBObject result) {
@@ -112,14 +109,11 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final MongoCollection jobExecutions = jongo.getCollection(JOB_EXECUTIONS);
         jobExecutions.insert(execution);
 
-        final MongoCollection latest = jongo.getCollection(LATEST_JOB_EXECUTIONS);
-        latest.findAndModify("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstance.getInstanceId())
-                .with("{$set:{" + Fields.JOB_EXECUTION_ID + ":#}}", jobExecutionId)
+        final MongoCollection jobInstances = jongo.getCollection(JOB_INSTANCES);
+        jobInstances.findAndModify("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstance.getInstanceId())
+                .with("{$set:{" + Fields.LATEST_JOB_EXECUTION_ID + ":#}}", jobExecutionId)
                 .upsert()
                 .map(DO_NOTHING);
-
-        final MongoCollection history = jongo.getCollection(JOB_EXECUTION_HISTORY);
-        history.insert("{" + Fields.JOB_EXECUTION_ID + ":#,history:[]}", jobExecutionId);
 
         return execution;
     }
@@ -232,14 +226,14 @@ public class MongoExecutionRepository implements ExecutionRepository {
 
     @Override
     public void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws NoSuchJobExecutionException, IOException {
-        final MongoCollection history = jongo.getCollection(JOB_EXECUTION_HISTORY);
-        final Set<Long> oldJobExecutionIds = _jobExecutionHistory(restartJobExecutionId, history);
-        final Set<Long> jobExecutionIds = _jobExecutionHistory(jobExecutionId, history);
+        final MongoCollection jobExecutions = jongo.getCollection(JOB_EXECUTIONS);
+        final Set<Long> oldJobExecutionIds = _jobExecutionHistory(restartJobExecutionId, jobExecutions);
+        final Set<Long> jobExecutionIds = _jobExecutionHistory(jobExecutionId, jobExecutions);
         jobExecutionIds.add(restartJobExecutionId);
         jobExecutionIds.addAll(oldJobExecutionIds);
 
-        history.update("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
-                .with("{$set:{history:#}}", jobExecutionIds);
+        jobExecutions.update("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
+                .with("{$set:{" + Fields.PREVIOUS_JOB_EXECUTION_IDS + ":#}}", jobExecutionIds);
     }
 
     @Override
@@ -552,11 +546,10 @@ public class MongoExecutionRepository implements ExecutionRepository {
     public ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws Exception {
         final MongoCollection jobInstances = jongo.getCollection(JOB_INSTANCES);
         final MongoCollection jobExecutions = jongo.getCollection(JOB_EXECUTIONS);
-        final MongoCollection lje = jongo.getCollection(LATEST_JOB_EXECUTIONS);
         final Long jobInstanceId = _jobInstanceId(jobExecutionId, jobExecutions);
-        final MongoCursor<Long> cursor = lje.find("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstanceId)
-                .projection("{" + Fields.JOB_EXECUTION_ID + ":1,_id:0}")
-                .map(new Handler<Long>(Fields.JOB_EXECUTION_ID));
+        final MongoCursor<Long> cursor = jobInstances.find("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstanceId)
+                .projection("{" + Fields.LATEST_JOB_EXECUTION_ID + ":1,_id:0}")
+                .map(new Handler<Long>(Fields.LATEST_JOB_EXECUTION_ID));
         try {
             if (!cursor.hasNext()) {
                 throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
@@ -685,9 +678,10 @@ public class MongoExecutionRepository implements ExecutionRepository {
         return latest;
     }
 
-    private Set<Long> _jobExecutionHistory(final long jobExecutionId, final MongoCollection history) throws IOException, NoSuchJobExecutionException {
-        final MongoCursor<List<Long>> c = history.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
-                .map(new Handler<List<Long>>("history"));
+    private Set<Long> _jobExecutionHistory(final long jobExecutionId, final MongoCollection jobExecutions) throws IOException, NoSuchJobExecutionException {
+        final MongoCursor<List<Long>> c = jobExecutions.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
+                .projection("{" + Fields.PREVIOUS_JOB_EXECUTION_IDS + ":1,_id:0}")
+                .map(new Handler<List<Long>>(Fields.PREVIOUS_JOB_EXECUTION_IDS));
         final Set<Long> jobExecutionIds = new THashSet<Long>();
         try {
             if (!c.hasNext()) {
@@ -703,20 +697,8 @@ public class MongoExecutionRepository implements ExecutionRepository {
     }
 
     protected Set<MongoStepExecution> _stepExecutionHistory(final long jobExecutionId) throws IOException {
-        final MongoCollection history = jongo.getCollection(JOB_EXECUTION_HISTORY);
-        final Set<Long> historicJobExecutionIds = new THashSet<Long>();
-        final MongoCursor<List<Long>> oc = history.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
-                .map(new Handler<List<Long>>("history"));
-        try  {
-            if (!oc.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
-            }
-            while (oc.hasNext()) {
-                historicJobExecutionIds.addAll(oc.next());
-            }
-        } finally {
-            oc.close();
-        }
+        final MongoCollection jobExecutions = jongo.getCollection(JOB_EXECUTIONS);
+        final Set<Long> historicJobExecutionIds = _jobExecutionHistory(jobExecutionId, jobExecutions);
 
         final MongoCollection stepExecutions = jongo.getCollection(STEP_EXECUTIONS);
         final MongoCursor<MongoStepExecution> sec = stepExecutions.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
@@ -758,8 +740,8 @@ public class MongoExecutionRepository implements ExecutionRepository {
 
     @Override
     public int getStepExecutionCount(final long jobExecutionId, final String stepName) throws Exception {
-        final MongoCollection history = jongo.getCollection(JOB_EXECUTION_HISTORY);
-        final Set<Long> jobExecutionIds = _jobExecutionHistory(jobExecutionId, history);
+        final MongoCollection jobExecutions = jongo.getCollection(JOB_EXECUTIONS);
+        final Set<Long> jobExecutionIds = _jobExecutionHistory(jobExecutionId, jobExecutions);
         final MongoCollection stepExecutions = jongo.getCollection(STEP_EXECUTIONS);
         final Object[] params = new Object[jobExecutionIds.size() + 2];
         final StringBuilder query = new StringBuilder("{").append(Fields.JOB_EXECUTION_ID).append(":{$in:[");
