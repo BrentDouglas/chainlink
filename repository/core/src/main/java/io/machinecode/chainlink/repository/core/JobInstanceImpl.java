@@ -104,6 +104,8 @@ public class JobInstanceImpl implements ExtendedJobInstance, Serializable {
             this.createTime = createTime;
             return (T)this;
         }
+
+        public abstract ExtendedJobInstance build();
     }
 
     public static class Builder extends _Builder<Builder> {

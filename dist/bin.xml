@@ -31,6 +31,7 @@
                 <include>io.machinecode.chainlink:chainlink-repository-core</include>
                 <include>io.machinecode.chainlink:chainlink-repository-coherence</include>
                 <include>io.machinecode.chainlink:chainlink-repository-ehcache</include>
+                <include>io.machinecode.chainlink:chainlink-repository-gridgain</include>
                 <include>io.machinecode.chainlink:chainlink-repository-hazelcast</include>
                 <include>io.machinecode.chainlink:chainlink-repository-infinispan</include>
                 <include>io.machinecode.chainlink:chainlink-repository-jdbc</include>
@@ -68,6 +69,8 @@
                 <include>log4j:log4j</include>
                 <include>net.sf.ehcache:ehcache-core</include>
                 <include>net.sf.trove4j:trove4j</include>
+                <include>org.gridgain:gridgain-core</include>
+                <include>org.gridgain:gridgain-indexing</include>
                 <include>org.hibernate:hibernate-core</include>
                 <include>org.hibernate:hibernate-entitymanager</include>
                 <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>

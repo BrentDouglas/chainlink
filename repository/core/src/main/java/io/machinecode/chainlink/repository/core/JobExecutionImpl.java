@@ -238,6 +238,8 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
             this.restartElementId = restartElementId;
             return (T)this;
         }
+
+        public abstract ExtendedJobExecution build();
     }
 
     public static class Builder extends _Builder<Builder> {

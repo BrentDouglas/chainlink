@@ -19,7 +19,7 @@ public class JdbcRepositoryTest extends RepositoryTest {
 
     private static final Logger log = Logger.getLogger(JdbcRepositoryTest.class);
 
-    private static DataSource dataSource;
+    private static volatile DataSource dataSource;
 
     final String prefix = System.getProperty("database.prefix") + ".";
     final String url = System.getProperty(prefix + "database.url");
@@ -30,7 +30,9 @@ public class JdbcRepositoryTest extends RepositoryTest {
     @Override
     protected ExecutionRepository _repository() {
         log.infof("Connection: {\n\turl: '%s'\n\tdriver: '%s'\n\tuser: '%s'\n\tpassword: '%s'\n}", this.url, this.driverName, this.user, this.password);
-        dataSource = new DummyDataSource(this.url, this.driverName);
+        if (dataSource == null) {
+            dataSource = new DummyDataSource(this.url, this.driverName);
+        }
         return JdbcExecutionRepository.create(new DataSourceLookup() {
             @Override
             public DataSource getDataSource() {
@@ -43,6 +45,9 @@ public class JdbcRepositoryTest extends RepositoryTest {
     public void after() throws Exception {
         Connection connection = null;
         try {
+            if (dataSource == null) {
+                dataSource = new DummyDataSource(this.url, this.driverName);
+            }
             connection = dataSource.getConnection(this.user, this.password);
             connection.setAutoCommit(false);
             connection.prepareStatement("delete from job_instance;").executeUpdate();

@@ -27,6 +27,7 @@ Execution repositories:
 - Infinispan
 - Coherence
 - Hazelcast
+- GridGain
 
 Transports:
 - Local

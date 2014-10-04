@@ -96,6 +96,8 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
             this.stepName = stepName;
             return (T)this;
         }
+
+        public abstract ExtendedStepExecution build();
     }
 
     public static class Builder extends _Builder<Builder> {

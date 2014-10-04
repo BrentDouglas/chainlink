@@ -113,6 +113,8 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
             this.partitionParameters = partitionParameters;
             return (T)this;
         }
+
+        public abstract PartitionExecution build();
     }
 
     public static class Builder extends _Builder<Builder> {

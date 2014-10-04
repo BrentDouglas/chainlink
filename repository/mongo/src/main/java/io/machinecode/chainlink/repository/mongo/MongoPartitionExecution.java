@@ -266,6 +266,7 @@ public class MongoPartitionExecution extends PartitionExecutionImpl {
 
     @JsonPOJOBuilder(withPrefix = "set")
     public static class Builder extends _Builder<Builder> {
+        @Override
         public MongoPartitionExecution build() {
             return new MongoPartitionExecution(this);
         }

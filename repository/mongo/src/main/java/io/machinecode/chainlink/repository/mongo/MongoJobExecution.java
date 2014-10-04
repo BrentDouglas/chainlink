@@ -235,6 +235,7 @@ public class MongoJobExecution extends JobExecutionImpl {
 
     @JsonPOJOBuilder(withPrefix = "set")
     public static class Builder extends _Builder<Builder> {
+        @Override
         public MongoJobExecution build() {
             return new MongoJobExecution(this);
         }

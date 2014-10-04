@@ -6,9 +6,13 @@ import gnu.trove.set.hash.TLongHashSet;
 import io.machinecode.chainlink.spi.marshalling.Marshaller;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecutionBuilder;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstanceBuilder;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecutionBuilder;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.PartitionExecutionBuilder;
 import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -71,9 +75,9 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
     protected abstract Collection<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception;
 
     @Override
-    public JobInstanceImpl createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception {
+    public ExtendedJobInstance createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception {
         final long id = _id(JOB_INSTANCE_ID);
-        final JobInstanceImpl instance = new JobInstanceImpl.Builder()
+        final ExtendedJobInstance instance = newJobInstanceBuilder()
                 .setJobInstanceId(id)
                 .setJobName(jobId)
                 .setJslName(jslName)
@@ -85,7 +89,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
     }
 
     @Override
-    public JobExecutionImpl createJobExecution(final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws Exception {
+    public ExtendedJobExecution createJobExecution(final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws Exception {
         final CopyOnWriteArrayList<Long> executions = jobInstanceExecutions().get(instance.getInstanceId());
         if (executions == null) {
             throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
@@ -93,7 +97,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
         final long jobExecutionId = _id(JOB_EXECUTION_ID);
         executions.add(jobExecutionId);
         jobInstanceExecutions().put(instance.getInstanceId(), executions);
-        final JobExecutionImpl execution = new JobExecutionImpl.Builder()
+        final ExtendedJobExecution execution = newJobExecutionBuilder()
                 .setJobInstanceId(instance.getInstanceId())
                 .setJobExecutionId(jobExecutionId)
                 .setJobName(instance.getJobName())
@@ -111,7 +115,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
     }
 
     @Override
-    public StepExecutionImpl createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
         final CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions().get(jobExecution.getExecutionId());
         if (executionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
@@ -119,7 +123,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
         final long stepExecutionId = _id(STEP_EXECUTION_ID);
         executionIds.add(stepExecutionId);
         jobExecutionStepExecutions().put(jobExecution.getExecutionId(), executionIds);
-        final StepExecutionImpl execution = new StepExecutionImpl.Builder()
+        final ExtendedStepExecution execution = newStepExecutionBuilder()
                 .setJobExecutionId(jobExecution.getExecutionId())
                 .setStepExecutionId(stepExecutionId)
                 .setStepName(stepName)
@@ -145,7 +149,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
         final long id = _id(PARTITION_EXECUTION_ID);
         partitions.add(id);
         stepExecutionPartitionExecutions().put(stepExecutionId, partitions);
-        final PartitionExecutionImpl execution = new PartitionExecutionImpl.Builder()
+        final PartitionExecution execution = newPartitionExecutionBuilder()
                 .setPartitionExecutionId(id)
                 .setStepExecutionId(stepExecutionId)
                 .setPartitionId(partitionId)
@@ -651,5 +655,21 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
         }
         return partition;
+    }
+
+    protected ExtendedJobInstanceBuilder<?> newJobInstanceBuilder() {
+        return new JobInstanceImpl.Builder();
+    }
+
+    protected ExtendedJobExecutionBuilder<?> newJobExecutionBuilder() {
+        return new JobExecutionImpl.Builder();
+    }
+
+    protected ExtendedStepExecutionBuilder<?> newStepExecutionBuilder() {
+        return new StepExecutionImpl.Builder();
+    }
+
+    protected PartitionExecutionBuilder<?> newPartitionExecutionBuilder() {
+        return new PartitionExecutionImpl.Builder();
     }
 }

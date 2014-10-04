@@ -48,6 +48,11 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-repository-gridgain</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-hazelcast</artifactId>
             <scope>test</scope>
         </dependency>
@@ -84,6 +89,16 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.gridgain</groupId>
+            <artifactId>gridgain-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.gridgain</groupId>
+            <artifactId>gridgain-indexing</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
