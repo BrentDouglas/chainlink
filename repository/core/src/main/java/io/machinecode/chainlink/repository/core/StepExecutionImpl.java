@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecutionBuilder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -73,21 +74,24 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
     }
 
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> extends BaseExecutionImpl._Builder<T> {
+    public abstract static class _Builder<T extends _Builder<T>> extends BaseExecutionImpl._Builder<T> implements ExtendedStepExecutionBuilder<T> {
         long jobExecutionId;
         long stepExecutionId;
         String stepName;
 
+        @Override
         public T setJobExecutionId(final long jobExecutionId) {
             this.jobExecutionId = jobExecutionId;
             return (T)this;
         }
 
+        @Override
         public T setStepExecutionId(final long stepExecutionId) {
             this.stepExecutionId = stepExecutionId;
             return (T)this;
         }
 
+        @Override
         public T setStepName(final String stepName) {
             this.stepName = stepName;
             return (T)this;
@@ -95,6 +99,7 @@ public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStep
     }
 
     public static class Builder extends _Builder<Builder> {
+        @Override
         public StepExecutionImpl build() {
             return new StepExecutionImpl(this);
         }

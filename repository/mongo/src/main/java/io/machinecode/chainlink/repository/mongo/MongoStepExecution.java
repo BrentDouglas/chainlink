@@ -139,7 +139,7 @@ public class MongoStepExecution extends StepExecutionImpl {
     }
 
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> extends StepExecutionImpl._Builder<T> {
+    public abstract static class _Builder<T extends _Builder<T>> extends StepExecutionImpl._Builder<T> {
         ObjectId _id;
 
         @JsonProperty(Fields._ID)

@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.PartitionExecutionBuilder;
 
 import java.io.Serializable;
 import java.util.List;
@@ -83,27 +84,31 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
     }
 
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> extends BaseExecutionImpl._Builder<T> {
+    public abstract static class _Builder<T extends _Builder<T>> extends BaseExecutionImpl._Builder<T> implements PartitionExecutionBuilder<T> {
         long partitionExecutionId;
         long stepExecutionId;
         int partitionId;
         Properties partitionParameters;
 
+        @Override
         public T setPartitionExecutionId(final long partitionExecutionId) {
             this.partitionExecutionId = partitionExecutionId;
             return (T)this;
         }
 
+        @Override
         public T setStepExecutionId(final long stepExecutionId) {
             this.stepExecutionId = stepExecutionId;
             return (T)this;
         }
 
+        @Override
         public T setPartitionId(final int partitionId) {
             this.partitionId = partitionId;
             return (T)this;
         }
 
+        @Override
         public T setPartitionParameters(final Properties partitionParameters) {
             this.partitionParameters = partitionParameters;
             return (T)this;
@@ -111,6 +116,7 @@ public class PartitionExecutionImpl extends BaseExecutionImpl implements Partiti
     }
 
     public static class Builder extends _Builder<Builder> {
+        @Override
         public PartitionExecutionImpl build() {
             return new PartitionExecutionImpl(this);
         }

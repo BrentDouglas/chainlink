@@ -145,7 +145,7 @@ public class MongoJobExecution extends JobExecutionImpl {
             creatorVisibility = NONE
     )
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> extends JobExecutionImpl._Builder<T> {
+    public abstract static class _Builder<T extends _Builder<T>> extends JobExecutionImpl._Builder<T> {
         ObjectId _id;
         List<Long> previousJobExecutionIds = Collections.emptyList();
 

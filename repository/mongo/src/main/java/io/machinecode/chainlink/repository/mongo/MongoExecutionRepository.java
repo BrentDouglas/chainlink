@@ -27,7 +27,6 @@ import javax.batch.runtime.StepExecution;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -84,7 +83,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
     @Override
     public ExtendedJobInstance createJobInstance(final String jobId, final String jslName, final Date timestamp) {
         final MongoJobInstance instance = new MongoJobInstance.Builder()
-                .setInstanceId(_id(JOB_INSTANCE_ID))
+                .setJobInstanceId(_id(JOB_INSTANCE_ID))
                 .setJobName(jobId)
                 .setJslName(jslName)
                 .setCreateTime(timestamp)

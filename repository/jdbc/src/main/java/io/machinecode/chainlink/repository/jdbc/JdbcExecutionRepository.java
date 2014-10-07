@@ -108,7 +108,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             final long jobInstanceId = result.getLong(1);
             statement.close();
             return new JobInstanceImpl.Builder()
-                    .setInstanceId(jobInstanceId)
+                    .setJobInstanceId(jobInstanceId)
                     .setCreateTime(timestamp)
                     .setJobName(jobId)
                     .setJslName(jslName)
@@ -1565,7 +1565,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
 
     private JobInstanceImpl _ji(final ResultSet result) throws SQLException {
         return new JobInstanceImpl.Builder()
-                .setInstanceId(result.getLong(1))
+                .setJobInstanceId(result.getLong(1))
                 .setJobName(result.getString(2))
                 .setJslName(result.getString(3))
                 .setCreateTime(result.getTimestamp(4))

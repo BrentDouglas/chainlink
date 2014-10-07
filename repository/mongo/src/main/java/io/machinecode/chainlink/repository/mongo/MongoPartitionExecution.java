@@ -161,7 +161,7 @@ public class MongoPartitionExecution extends PartitionExecutionImpl {
             creatorVisibility = NONE
     )
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> extends PartitionExecutionImpl._Builder<T> {
+    public abstract static class _Builder<T extends _Builder<T>> extends PartitionExecutionImpl._Builder<T> {
         private ObjectId _id;
 
         @JsonProperty(Fields._ID)

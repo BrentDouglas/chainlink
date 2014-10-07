@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
+import io.machinecode.chainlink.spi.repository.ExtendedJobInstanceBuilder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -74,27 +75,31 @@ public class JobInstanceImpl implements ExtendedJobInstance, Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> {
+    public abstract static class _Builder<T extends _Builder<T>> implements ExtendedJobInstanceBuilder<T> {
         long jobInstanceId;
         String jobName;
         String jslName;
         Date createTime;
 
-        public T setInstanceId(final long jobInstanceId) {
+        @Override
+        public T setJobInstanceId(final long jobInstanceId) {
             this.jobInstanceId = jobInstanceId;
             return (T)this;
         }
 
+        @Override
         public T setJobName(final String jobName) {
             this.jobName = jobName;
             return (T)this;
         }
 
+        @Override
         public T setJslName(final String jslName) {
             this.jslName = jslName;
             return (T)this;
         }
 
+        @Override
         public T setCreateTime(final Date createTime) {
             this.createTime = createTime;
             return (T)this;
@@ -102,6 +107,7 @@ public class JobInstanceImpl implements ExtendedJobInstance, Serializable {
     }
 
     public static class Builder extends _Builder<Builder> {
+        @Override
         public JobInstanceImpl build() {
             return new JobInstanceImpl(this);
         }

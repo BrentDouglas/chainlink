@@ -102,7 +102,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             jedis = _open();
             final long id = jedis.incr(JOB_INSTANCE_ID);
             final JobInstanceImpl instance = new JobInstanceImpl.Builder()
-                    .setInstanceId(id)
+                    .setJobInstanceId(id)
                     .setJobName(jobId)
                     .setJslName(jslName)
                     .setCreateTime(timestamp)

@@ -28,7 +28,7 @@ public class JobExecutable extends ExecutableImpl<JobWork> implements Serializab
     }
 
     @Override
-        public void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
+    public void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
                                  final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
         final Registry registry = configuration.getRegistry();
         try {

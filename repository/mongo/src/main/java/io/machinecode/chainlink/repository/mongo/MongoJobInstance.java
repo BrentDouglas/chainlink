@@ -81,7 +81,7 @@ public class MongoJobInstance extends JobInstanceImpl {
             creatorVisibility = NONE
     )
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> extends JobInstanceImpl._Builder<T> {
+    public abstract static class _Builder<T extends _Builder<T>> extends JobInstanceImpl._Builder<T> {
         ObjectId _id;
         Long latestJobInstanceId;
 
@@ -93,8 +93,8 @@ public class MongoJobInstance extends JobInstanceImpl {
 
         @Override
         @JsonProperty(Fields.JOB_INSTANCE_ID)
-        public T setInstanceId(final long instanceId) {
-            return super.setInstanceId(instanceId);
+        public T setJobInstanceId(final long instanceId) {
+            return super.setJobInstanceId(instanceId);
         }
 
         @Override

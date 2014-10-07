@@ -74,7 +74,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
     public JobInstanceImpl createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception {
         final long id = _id(JOB_INSTANCE_ID);
         final JobInstanceImpl instance = new JobInstanceImpl.Builder()
-                .setInstanceId(id)
+                .setJobInstanceId(id)
                 .setJobName(jobId)
                 .setJslName(jslName)
                 .setCreateTime(timestamp)

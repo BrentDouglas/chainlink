@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.repository.BaseExecution;
+import io.machinecode.chainlink.spi.repository.BaseExecutionBuilder;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
@@ -47,12 +48,6 @@ public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
         this.metrics = builder.getMetrics();
         this.readerCheckpoint = builder.getReaderCheckpoint();
         this.writerCheckpoint = builder.getWriterCheckpoint();
-    }
-
-    public static _Builder from(final BaseExecutionImpl that) {
-        final _Builder builder = new _Builder();
-        _from(builder, that);
-        return builder;
     }
 
     protected static void  _from(final _Builder<?> builder, final BaseExecution that) {
@@ -139,7 +134,7 @@ public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> {
+    public abstract static class _Builder<T extends _Builder<T>> implements BaseExecutionBuilder<T> {
         private BatchStatus batchStatus;
         private Date createTime;
         private Date startTime;
@@ -151,51 +146,61 @@ public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
         private Serializable readerCheckpoint;
         private Serializable writerCheckpoint;
 
+        @Override
         public T setBatchStatus(final BatchStatus batchStatus) {
             this.batchStatus = batchStatus;
             return (T)this;
         }
 
+        @Override
         public T setCreateTime(final Date create) {
             this.createTime = create;
             return (T)this;
         }
 
+        @Override
         public T setStartTime(final Date start) {
             this.startTime = start;
             return (T)this;
         }
 
+        @Override
         public T setUpdatedTime(final Date updated) {
             this.updatedTime = updated;
             return (T)this;
         }
 
+        @Override
         public T setEndTime(final Date end) {
             this.endTime = end;
             return (T)this;
         }
 
+        @Override
         public T setExitStatus(final String exitStatus) {
             this.exitStatus = exitStatus;
             return (T)this;
         }
 
+        @Override
         public T setPersistentUserData(final Serializable persistentUserData) {
             this.persistentUserData = persistentUserData;
             return (T)this;
         }
 
+        @Override
         public T setMetrics(final Metric[] metrics) {
             this.metrics = metrics;
             return (T)this;
         }
 
+        @Override
         public T setReaderCheckpoint(final Serializable reader) {
             this.readerCheckpoint = reader;
             return (T)this;
         }
 
+        @Override
         public T setWriterCheckpoint(final Serializable writer) {
             this.writerCheckpoint = writer;
             return (T)this;

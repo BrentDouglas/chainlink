@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.repository.core;
 
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecutionBuilder;
 
 import javax.batch.runtime.BatchStatus;
 import java.io.Serializable;
@@ -159,7 +160,7 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public static class _Builder<T extends _Builder<T>> {
+    public abstract static class _Builder<T extends _Builder<T>> implements ExtendedJobExecutionBuilder<T> {
         long jobInstanceId;
         long jobExecutionId;
         String jobName;
@@ -172,56 +173,67 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
         Properties jobParameters;
         String restartElementId;
 
+        @Override
         public T setJobInstanceId(final long jobInstanceId) {
             this.jobInstanceId = jobInstanceId;
             return (T)this;
         }
 
+        @Override
         public T setJobExecutionId(final long jobExecutionId) {
             this.jobExecutionId = jobExecutionId;
             return (T)this;
         }
 
+        @Override
         public T setJobName(final String jobName) {
             this.jobName = jobName;
             return (T)this;
         }
 
+        @Override
         public T setBatchStatus(final BatchStatus batchStatus) {
             this.batchStatus = batchStatus;
             return (T)this;
         }
 
+        @Override
         public T setStartTime(final Date startTime) {
             this.startTime = startTime;
             return (T)this;
         }
 
+        @Override
         public T setEndTime(final Date endTime) {
             this.endTime = endTime;
             return (T)this;
         }
 
+        @Override
         public T setExitStatus(final String exitStatus) {
             this.exitStatus = exitStatus;
             return (T)this;
         }
 
+        @Override
         public T setCreateTime(final Date createTime) {
             this.createTime = createTime;
             return (T)this;
         }
 
+        @Override
         public T setLastUpdatedTime(final Date lastUpdatedTime) {
             this.lastUpdatedTime = lastUpdatedTime;
             return (T)this;
         }
 
+        @Override
         public T setJobParameters(final Properties jobParameters) {
             this.jobParameters = jobParameters;
             return (T)this;
         }
 
+        @Override
         public T setRestartElementId(final String restartElementId) {
             this.restartElementId = restartElementId;
             return (T)this;
@@ -229,6 +241,7 @@ public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
     }
 
     public static class Builder extends _Builder<Builder> {
+        @Override
         public JobExecutionImpl build() {
             return new JobExecutionImpl(this);
         }

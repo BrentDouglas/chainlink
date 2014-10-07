@@ -92,7 +92,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     public JobInstanceImpl createJobInstance(final String jobId, final String jslName, final Date timestamp) {
         final long id = jobInstanceIndex.getAndIncrement();
         final JobInstanceImpl instance = new JobInstanceImpl.Builder()
-                .setInstanceId(id)
+                .setJobInstanceId(id)
                 .setJobName(jobId)
                 .setJslName(jslName)
                 .setCreateTime(timestamp)
