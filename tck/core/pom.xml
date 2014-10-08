@@ -147,6 +147,11 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-gridgain</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-hazelcast</artifactId>
             <scope>provided</scope>
         </dependency>

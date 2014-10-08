@@ -41,6 +41,7 @@
                 <include>io.machinecode.chainlink:chainlink-repository-redis</include>
                 <include>io.machinecode.chainlink:chainlink-transport-core</include>
                 <include>io.machinecode.chainlink:chainlink-transport-coherence</include>
+                <include>io.machinecode.chainlink:chainlink-transport-gridgain</include>
                 <include>io.machinecode.chainlink:chainlink-transport-hazelcast</include>
                 <include>io.machinecode.chainlink:chainlink-transport-infinispan</include>
                 <include>io.machinecode.chainlink:chainlink-transport-jgroups</include>

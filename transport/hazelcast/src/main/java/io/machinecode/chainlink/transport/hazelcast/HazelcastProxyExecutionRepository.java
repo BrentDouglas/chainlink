@@ -2,7 +2,7 @@ package io.machinecode.chainlink.transport.hazelcast;
 
 import com.hazelcast.core.Member;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.transport.core.DistributedExecutionRepositoryProxy;
+import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.transport.core.cmd.InvokeExecutionRepositoryCommand;
 
 import java.io.Serializable;
@@ -10,9 +10,9 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class HazelcastExecutionRepositoryProxy extends DistributedExecutionRepositoryProxy<Member,HazelcastRegistry> {
+public class HazelcastProxyExecutionRepository extends DistributedProxyExecutionRepository<Member,HazelcastRegistry> {
 
-    public HazelcastExecutionRepositoryProxy(final HazelcastRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Member address) {
+    public HazelcastProxyExecutionRepository(final HazelcastRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Member address) {
         super(registry, executionRepositoryId, address);
     }
 

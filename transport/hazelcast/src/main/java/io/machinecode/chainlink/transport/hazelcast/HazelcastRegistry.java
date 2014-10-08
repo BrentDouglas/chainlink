@@ -15,7 +15,7 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
-import io.machinecode.chainlink.transport.core.DistributedExecutionRepositoryProxy;
+import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.then.api.Promise;
@@ -115,8 +115,8 @@ public class HazelcastRegistry extends BaseDistributedRegistry<Member, Hazelcast
     }
 
     @Override
-    protected DistributedExecutionRepositoryProxy<Member, HazelcastRegistry> createDistributedExecutionRepository(final ExecutionRepositoryId id, final Member address) {
-        return new HazelcastExecutionRepositoryProxy(this, id, address);
+    protected DistributedProxyExecutionRepository<Member, HazelcastRegistry> createDistributedExecutionRepository(final ExecutionRepositoryId id, final Member address) {
+        return new HazelcastProxyExecutionRepository(this, id, address);
     }
 
     @Override

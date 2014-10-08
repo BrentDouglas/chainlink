@@ -2,7 +2,7 @@ package io.machinecode.chainlink.transport.coherence;
 
 import com.tangosol.net.Member;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.transport.core.DistributedExecutionRepositoryProxy;
+import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.transport.core.cmd.InvokeExecutionRepositoryCommand;
 
 import java.io.Serializable;
@@ -10,9 +10,9 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class CoherenceExecutionRepositoryProxy extends DistributedExecutionRepositoryProxy<Member,CoherenceRegistry> {
+public class CoherenceProxyExecutionRepository extends DistributedProxyExecutionRepository<Member,CoherenceRegistry> {
 
-    public CoherenceExecutionRepositoryProxy(final CoherenceRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Member address) {
+    public CoherenceProxyExecutionRepository(final CoherenceRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Member address) {
         super(registry, executionRepositoryId, address);
     }
 

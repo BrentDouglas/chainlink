@@ -157,6 +157,11 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-transport-gridgain</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-hazelcast</artifactId>
             <scope>test</scope>
         </dependency>
@@ -252,6 +257,16 @@
             </activation>
             <properties>
                 <registry.factory.class>io.machinecode.chainlink.tck.core.transport.CoherenceRegistryFactory</registry.factory.class>
+            </properties>
+        </profile>
+        <profile>
+            <id>tr-gridgain</id>
+            <activation>
+                <property><name>tr-gridgain</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.GridGainRegistryFactory</registry.factory.class>
             </properties>
         </profile>
         <profile>

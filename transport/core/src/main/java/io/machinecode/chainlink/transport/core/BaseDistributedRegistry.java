@@ -97,7 +97,7 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
 
     protected abstract DistributedWorker<A, R> createDistributedWorker(final A address, final WorkerId workerId);
 
-    protected abstract DistributedExecutionRepositoryProxy<A, R> createDistributedExecutionRepository(final ExecutionRepositoryId id, final A address);
+    protected abstract DistributedProxyExecutionRepository<A, R> createDistributedExecutionRepository(final ExecutionRepositoryId id, final A address);
 
     @Override
     public Worker getWorker(final WorkerId workerId) {

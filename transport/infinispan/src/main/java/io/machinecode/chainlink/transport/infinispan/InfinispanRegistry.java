@@ -290,7 +290,7 @@ public class InfinispanRegistry extends LocalRegistry {
                 } else if (local.equals(address)) {
                     throw new IllegalStateException(); //TODO Message
                 }
-                return new InfinispanExecutionRepositoryProxy(this, id, address);
+                return new InfinispanProxyExecutionRepository(this, id, address);
             } catch (TimeoutException e) {
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {

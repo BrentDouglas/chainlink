@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.transport.jgroups;
 
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.transport.core.DistributedExecutionRepositoryProxy;
+import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.transport.core.cmd.InvokeExecutionRepositoryCommand;
 import org.jgroups.Address;
 
@@ -10,9 +10,9 @@ import java.io.Serializable;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JGroupsExecutionRepositoryProxy extends DistributedExecutionRepositoryProxy<Address,JGroupsRegistry> {
+public class JGroupsProxyExecutionRepository extends DistributedProxyExecutionRepository<Address,JGroupsRegistry> {
 
-    public JGroupsExecutionRepositoryProxy(final JGroupsRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Address address) {
+    public JGroupsProxyExecutionRepository(final JGroupsRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Address address) {
         super(registry, executionRepositoryId, address);
     }
 

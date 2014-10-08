@@ -146,6 +146,11 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-transport-gridgain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-transport-hazelcast</artifactId>
                 <version>${project.version}</version>
             </dependency>

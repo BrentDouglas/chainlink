@@ -201,6 +201,10 @@ _Hazelcast Transport_
 
 - Distribution doesn't actually work
 
+_GridGain Transport_
+
+- Distribution doesn't actually work
+
 _Coherence Transport_
 
 - I can't work out how to configure Coherence but it's likely that when

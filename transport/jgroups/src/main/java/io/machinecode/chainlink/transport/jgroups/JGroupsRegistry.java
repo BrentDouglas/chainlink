@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.transport.core.DistributedExecutionRepositoryProxy;
+import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
@@ -99,8 +99,8 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
     }
 
     @Override
-    protected DistributedExecutionRepositoryProxy<Address, JGroupsRegistry> createDistributedExecutionRepository(final ExecutionRepositoryId id, final Address address) {
-        return new JGroupsExecutionRepositoryProxy(this, id, address);
+    protected DistributedProxyExecutionRepository<Address, JGroupsRegistry> createDistributedExecutionRepository(final ExecutionRepositoryId id, final Address address) {
+        return new JGroupsProxyExecutionRepository(this, id, address);
     }
 
     @Override

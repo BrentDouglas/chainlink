@@ -18,6 +18,7 @@
         <module>hazelcast</module>
         <module>infinispan</module>
         <module>jgroups</module>
+        <module>gridgain</module>
     </modules>
 
 </project>

@@ -1,25 +1,24 @@
-package io.machinecode.chainlink.tck.core.repository;
+package io.machinecode.chainlink.tck.core.transport;
 
 import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
+import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
+import io.machinecode.chainlink.transport.gridgain.GridGainRegistry;
+import io.machinecode.chainlink.transport.jgroups.JGroupsRegistry;
 import org.gridgain.grid.GridConfiguration;
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridGain;
 import org.gridgain.grid.GridGainState;
 import org.gridgain.grid.cache.GridCacheAtomicityMode;
 import org.gridgain.grid.cache.GridCacheConfiguration;
-import org.gridgain.grid.cache.GridCacheMode;
 import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMulticastIpFinder;
-
-import java.util.concurrent.TimeUnit;
+import org.jgroups.JChannel;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFactory {
+public class GridGainRegistryFactory implements RegistryFactory {
 
     public static final String CHAINLINK_TCK_GRID = "chainlink-tck-grid";
 
@@ -69,9 +68,9 @@ public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFa
     }
 
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
-        return new GridGainExecutionRepository(
-                configuration.getMarshallerFactory().produce(configuration),
+    public GridGainRegistry produce(final RegistryConfiguration configuration) throws Exception {
+        return new GridGainRegistry(
+                configuration,
                 GridGain.grid(CHAINLINK_TCK_GRID)
         );
     }

@@ -13,7 +13,7 @@ import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
-import io.machinecode.chainlink.transport.core.DistributedExecutionRepositoryProxy;
+import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
@@ -96,8 +96,8 @@ public class CoherenceRegistry extends BaseDistributedRegistry<Member, Coherence
     }
 
     @Override
-    protected DistributedExecutionRepositoryProxy<Member, CoherenceRegistry> createDistributedExecutionRepository(final ExecutionRepositoryId id, final Member address) {
-        return new CoherenceExecutionRepositoryProxy(this, id, address);
+    protected DistributedProxyExecutionRepository<Member, CoherenceRegistry> createDistributedExecutionRepository(final ExecutionRepositoryId id, final Member address) {
+        return new CoherenceProxyExecutionRepository(this, id, address);
     }
 
     @Override
