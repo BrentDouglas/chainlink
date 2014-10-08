@@ -35,14 +35,12 @@ public class GridGainRegistry extends BaseDistributedRegistry<UUID,GridGainRegis
 
     final Grid grid;
     final UUID local;
-    protected volatile List<UUID> remotes;
 
     public GridGainRegistry(final RegistryConfiguration configuration, final Grid grid) throws Exception {
         super(configuration);
         this.grid = grid;
         this.local = grid.localNode().id();
         grid.nodeLocalMap().addIfAbsent(GridGainRegistry.class.getName(), this);
-        this.remotes = _remoteMemberIdsFromNodes(this.grid.nodes());
     }
 
     protected List<UUID> _remoteMemberIdsFromNodes(final Collection<GridNode> all) {
@@ -98,7 +96,7 @@ public class GridGainRegistry extends BaseDistributedRegistry<UUID,GridGainRegis
 
     @Override
     protected List<UUID> getRemotes() {
-        return remotes;
+        return _remoteMemberIdsFromNodes(this.grid.nodes());
     }
 
     @Override
