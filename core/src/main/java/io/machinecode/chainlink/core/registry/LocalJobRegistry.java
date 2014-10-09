@@ -2,10 +2,8 @@ package io.machinecode.chainlink.core.registry;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
-import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.SplitAccumulator;
 import io.machinecode.chainlink.spi.registry.StepAccumulator;
@@ -19,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class LocalJobRegistry {
 
     protected final TMap<ChainId, Chain<?>> chains;
-    protected final TMap<ExecutableId, ExecutableAndContext> executables;
+    protected final TMap<ExecutableId, Executable> executables;
     protected final TMap<String, SplitAccumulator> splits;
     protected final TMap<String, StepAccumulator> steps;
 
@@ -30,7 +28,7 @@ public class LocalJobRegistry {
 
     public LocalJobRegistry() {
         this.chains = new THashMap<ChainId, Chain<?>>();
-        this.executables = new THashMap<ExecutableId, ExecutableAndContext>();
+        this.executables = new THashMap<ExecutableId, Executable>();
         this.splits = new THashMap<String, SplitAccumulator>();
         this.steps = new THashMap<String, StepAccumulator>();
     }
@@ -53,16 +51,16 @@ public class LocalJobRegistry {
         }
     }
 
-    public void registerExecutable(final ExecutableId id, final Executable executable, final ExecutionContext context) {
+    public void registerExecutable(final ExecutableId id, final Executable executable) {
         while (!executableLock.compareAndSet(false, true)) {}
         try {
-            this.executables.put(id, new ExecutableAndContextImpl(executable, context));
+            this.executables.put(id, executable);
         } finally {
             executableLock.set(false);
         }
     }
 
-    public ExecutableAndContext getExecutable(final ExecutableId id) {
+    public Executable getExecutable(final ExecutableId id) {
         while (!executableLock.compareAndSet(false, true)) {}
         try {
             return this.executables.get(id);
@@ -78,7 +76,7 @@ public class LocalJobRegistry {
             if (step != null) {
                 return step;
             }
-            steps.put(id, step = new LocalRegistry.StepAccumulatorImpl());
+            steps.put(id, step = new StepAccumulatorImpl());
             return step;
         } finally {
             stepLock.set(false);
@@ -92,7 +90,7 @@ public class LocalJobRegistry {
             if (split != null) {
                 return split;
             }
-            splits.put(id, split = new LocalRegistry.SplitAccumulatorImpl());
+            splits.put(id, split = new SplitAccumulatorImpl());
             return split;
         } finally {
             splitLock.set(false);

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan.configuration;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
+import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.commands.module.ModuleCommandInitializer;
 
@@ -9,16 +9,16 @@ import org.infinispan.commands.module.ModuleCommandInitializer;
  */
 public class ChainlinkModuleCommandInitializer implements ModuleCommandInitializer {
 
-    private InfinispanRegistry registry;
+    private InfinispanTransport transport;
 
-    public void init(final InfinispanRegistry registry) {
-        this.registry = registry;
+    public void init(final InfinispanTransport transport) {
+        this.transport = transport;
     }
 
     @Override
     public void initializeReplicableCommand(final ReplicableCommand command, final boolean isRemote) {
         if (command instanceof ChainlinkCommand) {
-            ((ChainlinkCommand)command).init(registry);
+            ((ChainlinkCommand)command).init(transport);
         }
     }
 }

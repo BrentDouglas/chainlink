@@ -21,13 +21,13 @@ import java.util.concurrent.TimeoutException;
 */
 public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
-    private final InfinispanRegistry registry;
+    private final InfinispanTransport registry;
     private final Deferred<U,Throwable,?> promise;
     private final Address address;
     private final long start;
     private Future<T> io;
 
-    public InfinispanFuture(final InfinispanRegistry registry, final Deferred<U,Throwable,?> promise, final Address address, final long start) {
+    public InfinispanFuture(final InfinispanTransport registry, final Deferred<U,Throwable,?> promise, final Address address, final long start) {
         this.registry = registry;
         this.promise = promise;
         this.address = address;
@@ -36,13 +36,14 @@ public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
     @Override
     public void notifyDone() {
-        final FutureDeferred<T,Throwable> deferred = new FutureDeferred<T, Throwable>(
+        final FutureDeferred<T,Throwable> deferred = new FutureDeferred<>(
                 io,
                 System.currentTimeMillis() - start + registry.options.timeUnit().toMillis(registry.options.timeout()),
                 TimeUnit.MILLISECONDS
         );
         deferred.onResolve(new OnResolve<T>() {
                     @Override
+                    @SuppressWarnings("unchecked")
                     public void resolve(final T ret) {
                         try {
                             if (ret == null || !(ret instanceof Map)) {

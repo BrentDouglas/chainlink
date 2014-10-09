@@ -10,14 +10,14 @@ import java.io.Serializable;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class JGroupsProxyExecutionRepository extends DistributedProxyExecutionRepository<Address,JGroupsRegistry> {
+public class JGroupsProxyExecutionRepository extends DistributedProxyExecutionRepository<Address> {
 
-    public JGroupsProxyExecutionRepository(final JGroupsRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Address address) {
+    public JGroupsProxyExecutionRepository(final JGroupsTransport registry, final ExecutionRepositoryId executionRepositoryId, final Address address) {
         super(registry, executionRepositoryId, address);
     }
 
     @Override
-    protected <T> InvokeExecutionRepositoryCommand<T,Address,JGroupsRegistry> _cmd(final String name, final Serializable... params) {
+    protected <T> InvokeExecutionRepositoryCommand<T,Address> _cmd(final String name, final Serializable... params) {
         return new InvokeExecutionRepositoryCommand<>(executionRepositoryId, name, params);
     }
 }

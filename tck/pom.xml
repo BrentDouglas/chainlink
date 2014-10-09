@@ -23,6 +23,7 @@
         <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
+        <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
         <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshalling.provider.factory.class>
@@ -295,7 +296,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <registry.factory.class>io.machinecode.chainlink.tck.coherence.CoherenceRegistryFactory</registry.factory.class>
+                <transport.factory.class>io.machinecode.chainlink.tck.coherence.transport.CoherenceTransportFactory</transport.factory.class>
             </properties>
             <modules>
                 <module>coherence</module>
@@ -325,7 +326,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.GridGainRegistryFactory</registry.factory.class>
+                <transport.factory.class>io.machinecode.chainlink.tck.core.transport.GridGainTransportFactory</transport.factory.class>
             </properties>
         </profile>
         <profile>
@@ -335,7 +336,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.HazelcastRegistryFactory</registry.factory.class>
+                <transport.factory.class>io.machinecode.chainlink.tck.core.transport.HazelcastTransportFactory</transport.factory.class>
             </properties>
         </profile>
         <profile>
@@ -345,7 +346,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.InfinispanRegistryFactory</registry.factory.class>
+                <transport.factory.class>io.machinecode.chainlink.tck.core.transport.InfinispanTransportFactory</transport.factory.class>
             </properties>
         </profile>
         <profile>
@@ -355,7 +356,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.JGroupsRegistryFactory</registry.factory.class>
+                <transport.factory.class>io.machinecode.chainlink.tck.core.transport.JGroupsTransportFactory</transport.factory.class>
             </properties>
         </profile>
 
@@ -837,6 +838,14 @@
                                           overwrite="true">
                                         <filterset>
                                             <filter token="registry.factory.class" value="${registry.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransportFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransportFactory"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="transport.factory.class" value="${transport.factory.class}" />
                                         </filterset>
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory"

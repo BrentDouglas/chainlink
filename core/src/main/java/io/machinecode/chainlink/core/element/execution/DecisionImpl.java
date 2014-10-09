@@ -81,7 +81,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
                         : configuration.getExecutionRepository(executionRepositoryId).getStepExecutions(actual)
         );
         context.getJobContext().setExitStatus(exitStatus);
-        return runCallback(configuration, context, callbackId);
+        return configuration.getExecutor().callback(callbackId, context);
     }
 
     @Override
@@ -92,11 +92,11 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
         final MutableJobContext jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
         if (Statuses.isStopping(batchStatus) || Statuses.isFailed(batchStatus)) {
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         }
         final TransitionWork transition = this.transition(context, this.transitions, jobContext.getBatchStatus(), jobContext.getExitStatus());
         if (transition != null && transition.isTerminating()) {
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         } else {
             return this.next(configuration, workerId, context, parentId, executionRepositoryId, null, transition);
         }

@@ -10,14 +10,14 @@ import java.io.Serializable;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class CoherenceProxyExecutionRepository extends DistributedProxyExecutionRepository<Member,CoherenceRegistry> {
+public class CoherenceProxyExecutionRepository extends DistributedProxyExecutionRepository<Member> {
 
-    public CoherenceProxyExecutionRepository(final CoherenceRegistry registry, final ExecutionRepositoryId executionRepositoryId, final Member address) {
+    public CoherenceProxyExecutionRepository(final CoherenceTransport registry, final ExecutionRepositoryId executionRepositoryId, final Member address) {
         super(registry, executionRepositoryId, address);
     }
 
     @Override
-    protected <T> InvokeExecutionRepositoryCommand<T,Member,CoherenceRegistry> _cmd(final String name, final Serializable... params) {
-        return new InvokeExecutionRepositoryCommand<T,Member,CoherenceRegistry>(executionRepositoryId, name, params);
+    protected <T> InvokeExecutionRepositoryCommand<T,Member> _cmd(final String name, final Serializable... params) {
+        return new InvokeExecutionRepositoryCommand<>(executionRepositoryId, name, params);
     }
 }

@@ -25,6 +25,9 @@ public class XmlConfiguration {
     @XmlElement(name = "registry-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef registryFactory;
 
+    @XmlElement(name = "transport-factory", namespace = XmlChainlink.NAMESPACE, required = true)
+    private XmlClassRef transportFactory;
+
     @XmlElement(name = "worker-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef workerFactory;
 
@@ -80,6 +83,14 @@ public class XmlConfiguration {
 
     public void setRegistryFactory(final XmlClassRef registryFactory) {
         this.registryFactory = registryFactory;
+    }
+
+    public XmlClassRef getTransportFactory() {
+        return transportFactory;
+    }
+
+    public void setTransportFactory(final XmlClassRef transportFactory) {
+        this.transportFactory = transportFactory;
     }
 
     public XmlClassRef getWorkerFactory() {

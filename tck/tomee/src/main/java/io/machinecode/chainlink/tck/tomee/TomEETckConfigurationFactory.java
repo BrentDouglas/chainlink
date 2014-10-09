@@ -18,7 +18,7 @@ public class TomEETckConfigurationFactory implements ConfigurationFactory {
     }
 
     @Override
-    public ConfigurationBuilder<?> produce() throws Exception {
-        return TckConfigurator.produce(new TomEEConfiguration.Builder());
+    public ConfigurationBuilder<?> produce(final ClassLoader loader) throws Exception {
+        return TckConfigurator.produce(new TomEEConfiguration.Builder(), loader);
     }
 }

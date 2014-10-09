@@ -4,7 +4,6 @@ import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
@@ -17,7 +16,7 @@ import org.jboss.logging.Logger;
 import javax.batch.runtime.BatchStatus;
 
 /**
-* Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class TaskExecutable extends ExecutableImpl<TaskWork> {
     private static final long serialVersionUID = 1L;
@@ -45,14 +44,10 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
         });
         final MutableStepContext stepContext = context.getStepContext();
         final MutableJobContext jobContext = context.getJobContext();
-        final Executable parent = configuration.getRegistry()
-                .getExecutableAndContext(context.getJobExecutionId(), parentId)
-                .getExecutable();
         try {
             work.run(configuration, chain, this.executionRepositoryId, this.context, timeout);
-            final Chain<?> next = configuration.getExecutor().callback(parent, this.context);
-            chain.link(next);
-            chain.resolve(null);
+            final Chain<?> next = configuration.getExecutor().callback(parentId, this.context);
+            chain.linkAndResolve(null, next);
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("CHAINLINK-023004.work.task.run.exception", this.context));
             if (e instanceof Exception) {
@@ -60,9 +55,8 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
             }
             stepContext.setBatchStatus(BatchStatus.FAILED);
             jobContext.setBatchStatus(BatchStatus.FAILED);
-            final Chain<?> next = configuration.getExecutor().callback(parent, this.context);
-            chain.link(next);
-            chain.reject(e);
+            final Chain<?> next = configuration.getExecutor().callback(parentId, this.context);
+            chain.linkAndReject(e, next);
         }
     }
 

@@ -9,8 +9,9 @@ import io.machinecode.chainlink.core.inject.InjectorImpl;
 import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.core.security.SecurityCheckImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.configuration.ConfigurationDefaults;import io.machinecode.chainlink.spi.configuration.FinalConfiguration;
+import io.machinecode.chainlink.spi.configuration.ConfigurationDefaults;
 import io.machinecode.chainlink.spi.configuration.ConfigurationBuilder;
+import io.machinecode.chainlink.spi.configuration.FinalConfiguration;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
@@ -24,6 +25,7 @@ import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFac
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
@@ -34,6 +36,7 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
@@ -50,6 +53,7 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
     protected final ClassLoader classLoader;
     protected final MarshallingProviderFactory marshallingProviderFactory;
     protected final Registry registry;
+    protected final Transport<?> transport;
     protected final ExecutionRepository executionRepository;
     protected final TransactionManager transactionManager;
     protected final JobLoader jobLoader;
@@ -80,6 +84,7 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
         this.executionRepository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, builder.defaults.getExecutionRepository(this), this);
         this.mBeanServer = _get(this.classLoader, builder.mBeanServer, builder.mBeanServerFactory, builder.mBeanServerFactoryClass, builder.mBeanServerFactoryFqcn, builder.defaults.getMBeanServer(this), this);
         this.registry = _get(this.classLoader, builder.registry, builder.registryFactory, builder.registryFactoryClass, builder.registryFactoryFqcn, builder.defaults.getRegistry(this), this);
+        this.transport = _get(this.classLoader, null, builder.transportFactory, builder.transportFactoryClass, builder.transportFactoryFqcn, builder.defaults.getTransport(this), this);
         this.executor = _get(this.classLoader, builder.executor, builder.executorFactory, builder.executorFactoryClass, builder.executorFactoryFqcn, builder.defaults.getExecutor(this), this);
         this.workerFactory = (WorkerFactory) _getFactory(this.classLoader, builder.workerFactory, builder.workerFactoryClass, builder.workerFactoryFqcn, builder.defaults.getWorkerFactory(this));
     }
@@ -163,7 +168,7 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
 
     @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        return registry.getExecutionRepository(id);
+        return transport.getExecutionRepository(id);
     }
 
     @Override
@@ -297,6 +302,11 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
         return registry;
     }
 
+    @Override
+    public Transport<?> getTransport() {
+        return transport;
+    }
+
     public static <T extends _Builder<T>> T configureBuilder(final T builder, final XmlConfiguration xml) {
         for (final XmlProperty property : xml.getProperties()) {
             builder.setProperty(property.getKey(), property.getValue());
@@ -344,6 +354,7 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
 
         private ExecutorFactory executorFactory;
         private RegistryFactory registryFactory;
+        private TransportFactory transportFactory;
         private MBeanServerFactory mBeanServerFactory;
         private WorkerFactory workerFactory;
         private ClassLoaderFactory classLoaderFactory;
@@ -357,6 +368,7 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
 
         private Class<? extends ExecutorFactory> executorFactoryClass;
         private Class<? extends RegistryFactory> registryFactoryClass;
+        private Class<? extends TransportFactory> transportFactoryClass;
         private Class<? extends MBeanServerFactory> mBeanServerFactoryClass;
         private Class<? extends WorkerFactory> workerFactoryClass;
         private Class<? extends ClassLoaderFactory> classLoaderFactoryClass;
@@ -370,6 +382,7 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
 
         private String executorFactoryFqcn;
         private String registryFactoryFqcn;
+        private String transportFactoryFqcn;
         private String mBeanServerFactoryFqcn;
         private String workerFactoryFqcn;
         private String classLoaderFactoryFqcn;
@@ -624,6 +637,24 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
         @Override
         public T setRegistryFactoryFqcn(final String fqcn) {
             this.registryFactoryFqcn = fqcn;
+            return (T)this;
+        }
+
+        @Override
+        public T setTransportFactory(final TransportFactory factory) {
+            this.transportFactory = factory;
+            return (T)this;
+        }
+
+        @Override
+        public T setTransportFactoryClass(final Class<? extends TransportFactory> clazz) {
+            this.transportFactoryClass = clazz;
+            return (T)this;
+        }
+
+        @Override
+        public T setTransportFactoryFqcn(final String fqcn) {
+            this.transportFactoryFqcn = fqcn;
             return (T)this;
         }
 

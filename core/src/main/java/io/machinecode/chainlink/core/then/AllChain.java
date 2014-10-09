@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
- * Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class AllChain<T> extends BaseChain<T> {
 
@@ -27,6 +27,15 @@ public class AllChain<T> extends BaseChain<T> {
             that.previous(this);
         }
         resolve(null);
+    }
+
+    @Override
+    public void previous(final Chain<?> that) {
+        synchronized (this) {
+            this.previous = that;
+            this.notifyAll();
+        }
+        that.notifyLinked();
     }
 
     @Override
@@ -89,7 +98,7 @@ public class AllChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public AllChain<T> link(final Chain<?> that) {
+    public void link(final Chain<?> that) {
         // These should always be provided when being constructed
         throw new IllegalStateException(); //TODO Message
     }

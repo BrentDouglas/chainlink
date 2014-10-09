@@ -4,7 +4,7 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Named;
 
 /**
- * Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class NamedLiteral extends AnnotationLiteral<Named> implements Named {
     private static final long serialVersionUID = 1L;

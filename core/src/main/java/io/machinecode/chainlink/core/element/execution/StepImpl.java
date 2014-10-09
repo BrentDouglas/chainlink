@@ -192,7 +192,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                             context.setLastStepExecutionId(restartStepExecutionId);
                             final TransitionWork transition = this.transition(context, this.transitions, batchStatus, exitStatus);
                             if (transition != null && transition.isTerminating()) {
-                                return runCallback(configuration, context, parentId);
+                                return configuration.getExecutor().callback(parentId, context);
                             } else {
                                 return this.next(configuration, workerId, context, parentId, executionRepositoryId, this.next, transition);
                             }
@@ -213,7 +213,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             if (startLimit != 0 && startCount >= startLimit) {
                 log.infof(Messages.get("CHAINLINK-010213.step.start.limit.exceeded"), context, this.id, startCount, startLimit);
                 jobContext.setBatchStatus(FAILED);
-                return runCallback(configuration, context, parentId);
+                return configuration.getExecutor().callback(parentId, context);
             } else {
                 log.debugf(Messages.get("CHAINLINK-010214.step.start.limit"), context, this.id, startCount, startLimit);
             }
@@ -400,7 +400,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             log.debugf(Messages.get("CHAINLINK-010204.step.destroy.step.context"), context);
             context.setStepContext(null);
             if (transition != null && transition.isTerminating()) {
-                return runCallback(configuration, context, parentId);
+                return configuration.getExecutor().callback(parentId, context);
             } else {
                 return this.next(configuration, workerId, context, parentId, executionRepositoryId, this.next, transition);
             }
@@ -417,7 +417,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             );
             log.debugf(Messages.get("CHAINLINK-010204.step.destroy.step.context"), context);
             context.setStepContext(null);
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         }
     }
 

@@ -2,7 +2,8 @@ package io.machinecode.chainlink.transport.core.cmd;
 
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.transport.core.DistributedRegistry;
+import io.machinecode.chainlink.spi.transport.Command;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -11,7 +12,7 @@ import java.lang.reflect.Method;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class InvokeChainCommand<T,A,R extends DistributedRegistry<A,R>> implements DistributedCommand<T,A,R> {
+public class InvokeChainCommand<T,A> implements Command<T,A> {
     private static final long serialVersionUID = 1L;
 
     final long jobExecutionId;
@@ -28,8 +29,8 @@ public class InvokeChainCommand<T,A,R extends DistributedRegistry<A,R>> implemen
     }
 
     @Override
-    public T perform(final R registry, final A origin) throws Throwable {
-        final Chain<?> chain = registry.getChain(jobExecutionId, chainId);
+    public T perform(final Transport<A> transport, final A origin) throws Throwable {
+        final Chain<?> chain = transport.getRegistry().getChain(jobExecutionId, chainId);
         Method method = null;
         for (final Method that : chain.getClass().getMethods()) {
             if (that.getName().equals(methodName) && that.getParameterTypes().length == parameters.length) {

@@ -92,8 +92,7 @@ public class SeEnvironment implements Environment, AutoCloseable {
                 for (final ConfigurationFactory factory : factories) {
                     operators.put(
                             factory.getId(),
-                            new JobOperatorImpl(factory
-                                    .produce()
+                            new JobOperatorImpl(factory.produce(tccl)
                                     .setConfigurationDefaults(defaults)
                                     .build()
                             )

@@ -16,7 +16,7 @@ public class ResolvedChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public ResolvedChain<T> link(final Chain<?> that) {
+    public void link(final Chain<?> that) {
         throw new IllegalStateException(); //TODO Message This is a terminal link
     }
 

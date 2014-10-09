@@ -10,14 +10,14 @@ import java.util.UUID;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class GridGainProxyExecutionRepository extends DistributedProxyExecutionRepository<UUID,GridGainRegistry> {
+public class GridGainProxyExecutionRepository extends DistributedProxyExecutionRepository<UUID> {
 
-    public GridGainProxyExecutionRepository(final GridGainRegistry registry, final ExecutionRepositoryId executionRepositoryId, final UUID address) {
+    public GridGainProxyExecutionRepository(final GridGainTransport registry, final ExecutionRepositoryId executionRepositoryId, final UUID address) {
         super(registry, executionRepositoryId, address);
     }
 
     @Override
-    protected <T> InvokeExecutionRepositoryCommand<T,UUID,GridGainRegistry> _cmd(final String name, final Serializable... params) {
-        return new InvokeExecutionRepositoryCommand<T,UUID,GridGainRegistry>(executionRepositoryId, name, params);
+    protected <T> InvokeExecutionRepositoryCommand<T,UUID> _cmd(final String name, final Serializable... params) {
+        return new InvokeExecutionRepositoryCommand<>(executionRepositoryId, name, params);
     }
 }

@@ -1,11 +1,12 @@
 package io.machinecode.chainlink.transport.core.cmd;
 
-import io.machinecode.chainlink.transport.core.DistributedRegistry;
+import io.machinecode.chainlink.spi.transport.Command;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class CleanupCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<Void,A,R> {
+public class CleanupCommand<A> implements Command<Void,A> {
     private static final long serialVersionUID = 1L;
 
     final long jobExecutionId;
@@ -15,8 +16,8 @@ public class CleanupCommand<A,R extends DistributedRegistry<A,R>> implements Dis
     }
 
     @Override
-    public Void perform(final R registry, final A origin) throws Throwable {
-        registry.unregisterJob(jobExecutionId).get();
+    public Void perform(final Transport<A> transport, final A origin) throws Throwable {
+        transport.getRegistry().unregisterJob(jobExecutionId).get();
         return null;
     }
 }

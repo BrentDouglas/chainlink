@@ -18,7 +18,7 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 
 /**
- * Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CdiArtifactLoader implements ArtifactLoader, Extension {
 

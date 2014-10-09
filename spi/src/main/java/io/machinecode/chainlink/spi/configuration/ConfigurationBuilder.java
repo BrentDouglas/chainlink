@@ -11,6 +11,7 @@ import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFac
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
@@ -53,6 +54,12 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
     T setRegistryFactoryClass(final Class<? extends RegistryFactory> clazz);
 
     T setRegistryFactoryFqcn(final String fqcn);
+
+    T setTransportFactory(final TransportFactory factory);
+
+    T setTransportFactoryClass(final Class<? extends TransportFactory> clazz);
+
+    T setTransportFactoryFqcn(final String fqcn);
 
     T setExecutionRepository(final ExecutionRepository repository);
 

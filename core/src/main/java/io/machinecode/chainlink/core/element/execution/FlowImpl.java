@@ -77,11 +77,11 @@ public class FlowImpl extends ExecutionImpl implements Flow {
         final MutableJobContext jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
         if (Statuses.isStopping(batchStatus) || Statuses.isFailed(batchStatus)) {
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         }
         final TransitionWork transition = this.transition(context, this.transitions, jobContext.getBatchStatus(), jobContext.getExitStatus());
         if (transition != null && transition.isTerminating()) {
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         } else {
             return this.next(configuration, workerId, context, parentId, executionRepositoryId, this.next, transition);
         }

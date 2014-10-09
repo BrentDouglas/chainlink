@@ -3,6 +3,7 @@ package io.machinecode.chainlink.ee.tomee;
 import io.machinecode.chainlink.core.execution.EventedExecutor;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
+import io.machinecode.chainlink.core.transport.LocalTransport;
 import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
@@ -11,12 +12,14 @@ import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
 import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
 import io.machinecode.chainlink.spi.configuration.WorkerConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
@@ -64,6 +67,11 @@ public class TomEEConfigurationDefaults implements ConfigurationDefaults {
     @Override
     public Registry getRegistry(final RegistryConfiguration configuration) {
         return new LocalRegistry();
+    }
+
+    @Override
+    public Transport<?> getTransport(final TransportConfiguration configuration) {
+        return new LocalTransport(configuration);
     }
 
     @Override

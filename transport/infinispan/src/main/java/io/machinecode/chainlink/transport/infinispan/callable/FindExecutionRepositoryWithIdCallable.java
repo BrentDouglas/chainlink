@@ -2,7 +2,7 @@ package io.machinecode.chainlink.transport.infinispan.callable;
 
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
+import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
 import org.infinispan.remoting.transport.Address;
 
 /**
@@ -19,7 +19,7 @@ public class FindExecutionRepositoryWithIdCallable extends BaseCallable<Object, 
 
     @Override
     public Address call() throws Exception {
-        final InfinispanRegistry registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanRegistry.class);
+        final InfinispanTransport registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
         final ExecutionRepository repository = registry.getLocalExecutionRepository(id);
         if (repository != null) {
             return registry.getLocal();

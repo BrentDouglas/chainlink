@@ -9,5 +9,5 @@ public interface ConfigurationFactory {
 
     String getId();
 
-    ConfigurationBuilder<?> produce() throws Exception;
+    ConfigurationBuilder<?> produce(final ClassLoader loader) throws Exception;
 }

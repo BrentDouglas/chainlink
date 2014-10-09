@@ -15,6 +15,11 @@ public class ThreadId implements WorkerId {
     }
 
     @Override
+    public Object getAddress() {
+        return null;
+    }
+
+    @Override
     public boolean equals(final Object that) {
         return this == that
                 || (that instanceof ThreadId && id == ((ThreadId)that).id);

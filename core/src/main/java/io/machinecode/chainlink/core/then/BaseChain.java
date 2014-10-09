@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
- * Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implements Chain<T> {
 
@@ -28,11 +28,22 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
     protected volatile Chain<?> previous;
 
     @Override
-    public Chain<T> previous(final Chain<?> that) {
+    public void linkAndResolve(final T value, final Chain<?> link) {
+        this.link(link);
+        this.resolve(value);
+    }
+
+    @Override
+    public void linkAndReject(final Throwable failure, final Chain<?> link) {
+        this.link(link);
+        this.reject(failure);
+    }
+
+    @Override
+    public void previous(final Chain<?> that) {
         synchronized (this) {
             this.previous = that;
         }
-        return this;
     }
 
     @Override

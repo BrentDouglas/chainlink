@@ -15,6 +15,7 @@
             <Package name="io.machinecode.chainlink.tck.core.loader"/>
             <Package name="io.machinecode.chainlink.tck.core.transport"/>
             <Package name="io.machinecode.chainlink.tck.core.repository"/>
+            <Package name="io.machinecode.chainlink.tck.coherence.transport"/>
         </Or>
         <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON"/>
     </Match>

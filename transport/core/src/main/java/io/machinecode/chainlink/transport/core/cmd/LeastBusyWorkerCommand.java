@@ -1,12 +1,13 @@
 package io.machinecode.chainlink.transport.core.cmd;
 
-import io.machinecode.chainlink.transport.core.DistributedRegistry;
-import io.machinecode.chainlink.transport.core.DistributedWorkerId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.spi.transport.Command;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class LeastBusyWorkerCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<DistributedWorkerId<A>,A,R> {
+public class LeastBusyWorkerCommand<A> implements Command<WorkerId,A> {
     private static final long serialVersionUID = 1L;
 
     public LeastBusyWorkerCommand() {
@@ -14,7 +15,7 @@ public class LeastBusyWorkerCommand<A,R extends DistributedRegistry<A,R>> implem
     }
 
     @Override
-    public DistributedWorkerId<A> perform(final R registry, final A origin) throws Throwable {
-        return registry.leastBusyWorker();
+    public WorkerId perform(final Transport<A> transport, final A origin) throws Throwable {
+        return transport.leastBusyWorker();
     }
 }

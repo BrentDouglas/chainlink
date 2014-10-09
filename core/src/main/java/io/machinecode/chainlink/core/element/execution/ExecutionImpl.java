@@ -5,7 +5,6 @@ import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
@@ -64,11 +63,12 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.elem
     }
 
     public Chain<?> next(final RuntimeConfiguration configuration, final WorkerId workerId, final ExecutionContext context,
-                            final ExecutableId parentId, final ExecutionRepositoryId executionRepositoryId, final String next, final TransitionWork transition) throws Exception {
+                         final ExecutableId parentId, final ExecutionRepositoryId executionRepositoryId, final String next,
+                         final TransitionWork transition) throws Exception {
         final MutableJobContext jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
         if (Statuses.isStopping(context) || Statuses.isFailed(batchStatus)) {
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         }
         if (transition != null && transition.getNext() != null) {
             log().debugf(Messages.get("CHAINLINK-009100.execution.transition"), context, id, transition.getNext());
@@ -77,19 +77,12 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.elem
             log().debugf(Messages.get("CHAINLINK-009100.execution.transition"), context, id, next);
             return _runNextExecution(configuration, parentId, context, workerId, executionRepositoryId, next);
         } else {
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         }
     }
 
-    protected Chain<?> runCallback(final RuntimeConfiguration configuration, final ExecutionContext context, final ExecutableId parentId) {
-        final Executable callback = configuration.getRegistry()
-                .getExecutableAndContext(context.getJobExecutionId(), parentId)
-                .getExecutable();
-        return configuration.getExecutor().callback(callback, context);
-    }
-
     private Chain<?> _runNextExecution(final RuntimeConfiguration configuration, final ExecutableId parentId, final ExecutionContext context,
-                                          final WorkerId workerId, final ExecutionRepositoryId executionRepositoryId, final String next) throws Exception {
+                                       final WorkerId workerId, final ExecutionRepositoryId executionRepositoryId, final String next) throws Exception {
         final ExecutionWork execution = context.getJob().getNextExecution(next);
         if (execution == null) {
             throw new IllegalStateException(Messages.format("CHAINLINK-009000.execution.transition.invalid", context, id, next));

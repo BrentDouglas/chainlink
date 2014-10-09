@@ -25,6 +25,11 @@ public class UUIDId implements ChainId, ExecutableId, WorkerId, ExecutionReposit
     }
 
     @Override
+    public Object getAddress() {
+        return null;
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

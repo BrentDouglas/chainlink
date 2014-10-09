@@ -25,6 +25,7 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
+import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
 import io.machinecode.then.api.Promise;
@@ -58,20 +59,22 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     private static final Logger log = Logger.getLogger(JobOperatorImpl.class);
 
-    private final FinalConfiguration configuration;
-    private final Executor executor;
-    private final Registry registry;
-    private final SecurityCheck securityCheck;
-    private final ExecutionRepositoryId executionRepositoryId;
-    private ObjectName jmxName;
+    protected final FinalConfiguration configuration;
+    protected final Executor executor;
+    protected final Transport<?> transport;
+    protected final Registry registry;
+    protected final SecurityCheck securityCheck;
+    protected final ExecutionRepositoryId executionRepositoryId;
+    protected ObjectName jmxName;
 
     public JobOperatorImpl(final FinalConfiguration configuration) {
         this.configuration = configuration;
         this.executor = configuration.getExecutor();
+        this.transport = configuration.getTransport();
         this.registry = configuration.getRegistry();
         this.securityCheck = this.configuration.getSecurityCheck();
         this.executionRepositoryId = this.registry.registerExecutionRepository(
-                registry.generateExecutionRepositoryId(),
+                transport.generateExecutionRepositoryId(),
                 configuration.getExecutionRepository()
         );
         final int numThreads;
@@ -89,7 +92,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                 throw new RuntimeException(e); //TODO Message
             }
             worker.start();
-            this.registry.registerWorker(worker.id(), worker);
+            this.transport.registerWorker(worker.id(), worker);
         }
         final String domain = ObjectName.quote(configuration.getProperty(Constants.JMX_DOMAIN, Constants.Defaults.JMX_DOMAIN));
         final MBeanServer server = configuration.getMBeanServer();
@@ -125,6 +128,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                 throw new RuntimeException(e); //TODO Message
             }
         }
+        this.transport.close();
         this.registry.unregisterExecutionRepository(this.executionRepositoryId);
         this.registry.close();
         this.executor.close();

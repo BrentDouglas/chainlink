@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.registry.ChainId;
@@ -13,16 +12,10 @@ public class ExecutableEventImpl implements ExecutableEvent {
 
     final ChainId chainId;
     final Executable executable;
-    final ExecutionContext context;
-
-    public ExecutableEventImpl(final Executable executable, final ChainId chainId, final ExecutionContext context) {
-        this.chainId = chainId;
-        this.executable = executable;
-        this.context = context;
-    }
 
     public ExecutableEventImpl(final Executable executable, final ChainId chainId) {
-        this(executable, chainId, null);
+        this.chainId = chainId;
+        this.executable = executable;
     }
 
     @Override
@@ -36,7 +29,11 @@ public class ExecutableEventImpl implements ExecutableEvent {
     }
 
     @Override
-    public ExecutionContext getContext() {
-        return context;
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ExecutableEventImpl{");
+        sb.append("chainId=").append(chainId);
+        sb.append(", executable=").append(executable);
+        sb.append('}');
+        return sb.toString();
     }
 }

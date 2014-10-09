@@ -12,6 +12,12 @@ public abstract class DistributedWorkerId<A> implements WorkerId {
     final A address;
 
     public DistributedWorkerId(final Thread thread, final A address) {
+        if (thread == null) {
+            throw new IllegalArgumentException(); //TODO Message
+        }
+        if (address == null) {
+            throw new IllegalArgumentException(); //TODO Message
+        }
         this.id = thread.getId();
         this.address = address;
     }
@@ -20,6 +26,7 @@ public abstract class DistributedWorkerId<A> implements WorkerId {
         return id;
     }
 
+    @Override
     public A getAddress() {
         return address;
     }

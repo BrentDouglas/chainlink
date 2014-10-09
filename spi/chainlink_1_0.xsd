@@ -56,6 +56,13 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="transport-factory" type="cl:RefType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="worker-factory" type="cl:RefType" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>

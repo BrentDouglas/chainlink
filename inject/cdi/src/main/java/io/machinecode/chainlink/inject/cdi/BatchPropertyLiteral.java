@@ -4,7 +4,7 @@ import javax.batch.api.BatchProperty;
 import javax.enterprise.util.AnnotationLiteral;
 
 /**
- * Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class BatchPropertyLiteral extends AnnotationLiteral<BatchProperty> implements BatchProperty {
     private static final long serialVersionUID = 1L;

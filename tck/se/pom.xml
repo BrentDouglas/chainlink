@@ -108,6 +108,7 @@
                                         <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
                                         <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
                                         <filter token="executor.factory.class" value="${executor.factory.class}" />
+                                        <filter token="transport.factory.class" value="${transport.factory.class}" />
                                         <filter token="registry.factory.class" value="${registry.factory.class}" />
                                         <filter token="injector.factory.class" value="${injector.factory.class}" />
                                         <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
@@ -214,7 +215,7 @@
                 <executions>
                     <execution>
                         <id>copy-tck</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>process-test-classes</phase>
                     </execution>
                     <execution>
                         <id>unpack-tck</id>

@@ -14,7 +14,7 @@ import io.machinecode.chainlink.spi.work.JobWork;
 import org.jboss.logging.Logger;
 
 /**
-* Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class JobExecutable extends ExecutableImpl<JobWork> {
     private static final long serialVersionUID = 1L;
@@ -31,11 +31,10 @@ public class JobExecutable extends ExecutableImpl<JobWork> {
                                  final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
         final Registry registry = configuration.getRegistry();
         try {
-            final ExecutableId callbackId = registry.generateExecutableId();
-            registry.registerExecutableAndContext(context.getJobExecutionId(), new JobCallback(callbackId, this, workerId, chain), this.context);
+            final ExecutableId callbackId = configuration.getTransport().generateExecutableId();
+            registry.registerExecutable(context.getJobExecutionId(), new JobCallback(callbackId, this, workerId, chain));
             final Chain<?> next = work.before(configuration, this.executionRepositoryId, workerId, callbackId, this.context);
-            chain.link(next != null ? next : new ResolvedChain<Void>(null));
-            chain.resolve(null);
+            chain.linkAndResolve(null, next != null ? next : new ResolvedChain<Void>(null));
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("CHAINLINK-023002.work.job.before.exception", this.context));
             Repository.failedJob(
@@ -43,8 +42,7 @@ public class JobExecutable extends ExecutableImpl<JobWork> {
                     this.context.getJobExecutionId(),
                     this.context.getJobContext().getExitStatus()
             );
-            chain.link(new ResolvedChain<Void>(null));
-            chain.reject(e);
+            chain.linkAndReject(e, new ResolvedChain<Void>(null));
             configuration.getRegistry()
                     .unregisterJob(this.context.getJobExecutionId())
                     .get();

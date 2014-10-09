@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
@@ -26,6 +27,8 @@ public interface ConfigurationDefaults {
     MBeanServer getMBeanServer(final LoaderConfiguration configuration);
 
     Registry getRegistry(final RegistryConfiguration configuration);
+
+    Transport<?> getTransport(final TransportConfiguration configuration);
 
     Executor getExecutor(final ExecutorConfiguration configuration);
 

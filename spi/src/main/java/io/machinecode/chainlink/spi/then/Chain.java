@@ -11,9 +11,13 @@ import java.util.concurrent.TimeoutException;
  */
 public interface Chain<T> extends Deferred<T,Throwable,Void> {
 
-    Chain<T> link(final Chain<?> that);
+    void link(final Chain<?> link);
 
-    Chain<T> previous(final Chain<?> that);
+    void linkAndResolve(final T value, final Chain<?> link);
+
+    void linkAndReject(final Throwable failure, final Chain<?> link);
+
+    void previous(final Chain<?> that);
 
     Chain<T> onLink(final OnLink then);
 

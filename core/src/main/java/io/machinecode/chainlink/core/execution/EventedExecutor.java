@@ -5,13 +5,16 @@ import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.RejectedChain;
 import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.execution.ChainAndIds;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.OnReject;
 import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
@@ -30,10 +33,12 @@ public class EventedExecutor implements Executor {
 
     private static final Logger log = Logger.getLogger(EventedExecutor.class);
 
+    protected final Transport<?> transport;
     protected final Registry registry;
     private final ExecutorService cancellation = Executors.newSingleThreadExecutor();
 
     public EventedExecutor(final ExecutorConfiguration configuration) {
+        this.transport = configuration.getTransport();
         this.registry = configuration.getRegistry();
     }
 
@@ -45,7 +50,7 @@ public class EventedExecutor implements Executor {
     @Override
     public Chain<?> execute(final long jobExecutionId, final Executable executable) {
         final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = registry.generateChainId();
+        final ChainId chainId = transport.generateChainId();
         registry.registerJob(jobExecutionId, chainId, chain);
         _execute(executable, chainId);
         return chain;
@@ -54,7 +59,7 @@ public class EventedExecutor implements Executor {
     @Override
     public Chain<?> execute(final Executable executable) {
         final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = registry.generateChainId();
+        final ChainId chainId = transport.generateChainId();
         registry.registerChain(executable.getContext().getJobExecutionId(), chainId, chain);
         _execute(executable, chainId);
         return chain;
@@ -64,20 +69,20 @@ public class EventedExecutor implements Executor {
         final WorkerId workerId = executable.getWorkerId();
         final Worker worker;
         if (workerId == null) {
-            worker = registry.getWorker();
+            worker = transport.getWorker();
         } else {
-            worker = registry.getWorker(workerId);
+            worker = transport.getWorker(workerId);
         }
         worker.execute(new ExecutableEventImpl(executable, chainId));
     }
 
     @Override
     public Chain<?> distribute(final int maxThreads, final Executable... executables) {
-        final List<Worker> workers = registry.getWorkers(maxThreads);
+        final List<Worker> workers = transport.getWorkers(maxThreads);
         ListIterator<Worker> it = workers.listIterator();
         final Chain<?>[] chains = new Chain[executables.length];
         @SuppressWarnings("unchecked")
-        final Promise<Worker.ChainAndId,Throwable,?>[] promises = new Promise[executables.length];
+        final Promise<ChainAndIds,Throwable,?>[] promises = new Promise[executables.length];
         int i = 0;
         for (final Executable executable : executables) {
             if (!it.hasNext()) {
@@ -85,6 +90,7 @@ public class EventedExecutor implements Executor {
             }
             final Worker worker = it.next();
             final int index = i++;
+            final long jobExecutionId = executable.getContext().getJobExecutionId();
             final Collect collect = new Collect() {
                 @Override
                 public void reject(final Throwable fail) {
@@ -93,17 +99,17 @@ public class EventedExecutor implements Executor {
                 }
 
                 @Override
-                public void resolve(final Worker.ChainAndId that) {
+                public void resolve(final ChainAndIds that) {
                     chains[index] = that.getChain();
-                    registry.registerChain(executable.getContext().getJobExecutionId(), that.getLocalId(), that.getChain());
+                    registry.registerChain(jobExecutionId, that.getLocalId(), that.getChain());
                     worker.execute(new ExecutableEventImpl(executable, that.getRemoteId()));
                 }
             };
-            (promises[index] = worker.chain(executable))
+            (promises[index] = worker.chain(jobExecutionId))
                     .onResolve(collect)
                     .onReject(collect);
         }
-        for (final Promise<Worker.ChainAndId,Throwable,?> promise : promises) {
+        for (final Promise<ChainAndIds,Throwable,?> promise : promises) {
             try {
                 promise.get();
             } catch (final Exception e) {
@@ -114,21 +120,16 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Chain<?> callback(final Executable executable, final ExecutionContext context) {
-        final WorkerId workerId = executable.getWorkerId();
-        final Worker worker;
-        if (workerId == null) {
-            worker = registry.getWorker();
-        } else {
-            worker = registry.getWorker(workerId);
-        }
+    public Chain<?> callback(final ExecutableId executableId, final ExecutionContext context) {
+        final long jobExecutionId = context.getJobExecutionId();
+        final Worker worker = transport.getWorker(jobExecutionId, executableId);
         try {
-            return worker.chain(executable)
-                    .onResolve(new OnResolve<Worker.ChainAndId>() {
+            return worker.chain(jobExecutionId)
+                    .onResolve(new OnResolve<ChainAndIds>() {
                         @Override
-                        public void resolve(final Worker.ChainAndId that) {
-                            registry.registerChain(executable.getContext().getJobExecutionId(), that.getLocalId(), that.getChain());
-                            worker.execute(new ExecutableEventImpl(executable, that.getRemoteId(), context));
+                        public void resolve(final ChainAndIds that) {
+                            registry.registerChain(jobExecutionId, that.getLocalId(), that.getChain());
+                            worker.callback(new CallbackEventImpl(jobExecutionId, executableId, that.getRemoteId(), context));
                         }
                     })
                     .get()
@@ -148,5 +149,5 @@ public class EventedExecutor implements Executor {
         });
     }
 
-    private interface Collect extends OnResolve<Worker.ChainAndId>, OnReject<Throwable> {}
+    private interface Collect extends OnResolve<ChainAndIds>, OnReject<Throwable> {}
 }

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan.callable;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
+import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
 import io.machinecode.chainlink.transport.infinispan.InfinispanWorkerId;
 
 /**
@@ -11,7 +11,7 @@ public class LeastBusyWorkerCallable extends BaseCallable<Object, Object, Infini
 
     @Override
     public InfinispanWorkerId call() throws Exception {
-        final InfinispanRegistry registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanRegistry.class);
+        final InfinispanTransport registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
         return registry.leastBusyWorker();
     }
 }

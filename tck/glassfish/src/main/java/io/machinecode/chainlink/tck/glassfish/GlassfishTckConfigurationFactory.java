@@ -18,7 +18,7 @@ public class GlassfishTckConfigurationFactory implements ConfigurationFactory {
     }
 
     @Override
-    public ConfigurationBuilder<?> produce() throws Exception {
-        return TckConfigurator.produce(new GlassfishConfigutation.Builder());
+    public ConfigurationBuilder<?> produce(final ClassLoader loader) throws Exception {
+        return TckConfigurator.produce(new GlassfishConfigutation.Builder(), loader);
     }
 }

@@ -2,27 +2,17 @@ package io.machinecode.chainlink.spi.registry;
 
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobExecutionNotRunningException;
-import java.util.List;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface Registry extends AutoCloseable {
-
-    ChainId generateChainId();
-
-    ExecutableId generateExecutableId();
-
-    WorkerId generateWorkerId(final Worker worker);
-
-    ExecutionRepositoryId generateExecutionRepositoryId();
 
     ExecutionRepositoryId registerExecutionRepository(final ExecutionRepositoryId repositoryId, final ExecutionRepository repository);
 
@@ -30,29 +20,19 @@ public interface Registry extends AutoCloseable {
 
     ExecutionRepository unregisterExecutionRepository(final ExecutionRepositoryId id);
 
-    void registerWorker(final WorkerId id, final Worker worker);
-
-    Worker getWorker(final WorkerId id);
-
-    Worker getWorker();
-
-    List<Worker> getWorkers(final int required);
-
-    Worker unregisterWorker(final WorkerId id);
-
-    void registerJob(final long jobExecutionId, final ChainId chainId, final Chain<?> chain) throws JobExecutionIsRunningException;
-
-    Chain<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
+    Promise<?,?,?> registerJob(final long jobExecutionId, final ChainId chainId, final Chain<?> chain) throws JobExecutionIsRunningException;
 
     Promise<?,?,?> unregisterJob(long jobExecutionId);
+
+    Chain<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
 
     void registerChain(final long jobExecutionId, final ChainId id, final Chain<?> chain);
 
     Chain<?> getChain(final long jobExecutionId, final ChainId id);
 
-    void registerExecutableAndContext(final long jobExecutionId, final Executable executable, final ExecutionContext context);
+    void registerExecutable(final long jobExecutionId, final Executable executable);
 
-    ExecutableAndContext getExecutableAndContext(final long jobExecutionId, final ExecutableId id);
+    Executable getExecutable(final long jobExecutionId, final ExecutableId id);
 
     StepAccumulator getStepAccumulator(final long jobExecutionId, final String id);
 
@@ -61,4 +41,8 @@ public interface Registry extends AutoCloseable {
     <T> T loadArtifact(final Class<T> clazz, final String ref, final ExecutionContext context);
 
     <T> void storeArtifact(final Class<T> clazz, final String ref, final ExecutionContext context, final T value);
+
+    void registerJobEventListener(final String key, final JobEventListener on);
+
+    void unregisterJobEventListener(final String key);
 }

@@ -11,7 +11,7 @@ import org.jboss.logging.Logger;
 import java.io.Serializable;
 
 /**
- * Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ExecutionContextImpl implements ExecutionContext, Serializable {
     private static final long serialVersionUID = 1L;

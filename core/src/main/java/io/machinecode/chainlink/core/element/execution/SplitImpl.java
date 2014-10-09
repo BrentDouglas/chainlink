@@ -51,7 +51,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
                            final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021000.split.before"), context, this.id);
         if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         }
         final ExecutionExecutable[] flows = new ExecutionExecutable[this.flows.size()];
         for (int i = 0; i < flows.length; ++i) {
@@ -95,7 +95,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
         }
         context.setPriorStepExecutionId(accumulator.getPriorStepExecutionIds());
         if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
-            return runCallback(configuration, context, parentId);
+            return configuration.getExecutor().callback(parentId, context);
         }
         return this.next(configuration, workerId, context, parentId, executionRepositoryId, this.next, null);
     }

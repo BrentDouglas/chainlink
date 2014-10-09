@@ -1,112 +1,24 @@
 package io.machinecode.chainlink.transport.infinispan;
 
-import io.machinecode.chainlink.core.then.ChainImpl;
-import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
-import io.machinecode.then.core.DeferredImpl;
+import io.machinecode.chainlink.spi.transport.Transport;
+import io.machinecode.chainlink.transport.core.DistributedLocalChain;
+import io.machinecode.chainlink.transport.core.cmd.InvokeChainCommand;
 import org.infinispan.remoting.transport.Address;
-import org.jboss.logging.Logger;
 
 import java.io.Serializable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class InfinispanLocalChain extends ChainImpl<Void> {
+public class InfinispanLocalChain extends DistributedLocalChain<Address> {
 
-    private static final Logger log = Logger.getLogger(InfinispanLocalChain.class);
-
-    protected final InfinispanRegistry registry;
-    protected final Address address;
-    protected final long jobExecutionId;
-    protected final ChainId chainId;
-
-    // This is to head off any delayed calls to #get after the job has finished and the registry has been cleaned
-    volatile boolean waited = false;
-
-    public InfinispanLocalChain(final InfinispanRegistry registry, final Address address, final long jobExecutionId, final ChainId chainId) {
-        this.registry = registry;
-        this.address = address;
-        this.jobExecutionId = jobExecutionId;
-        this.chainId = chainId;
-    }
-
-    protected InvokeChainCommand command(final String name, final boolean willReturn, final Serializable... params) {
-        return new InvokeChainCommand(registry.cacheName, jobExecutionId, chainId, name, willReturn, params);
+    public InfinispanLocalChain(final Transport<Address> transport, final Address address, final long jobExecutionId, final ChainId chainId) {
+        super(transport, address, jobExecutionId, chainId);
     }
 
     @Override
-    public boolean cancel(final boolean mayInterruptIfRunning) {
-        boolean cancelled = false;
-        try {
-            final DeferredImpl<Boolean, Throwable,Void> promise = new DeferredImpl<Boolean, Throwable,Void>();
-            registry.invoke(address, command("cancel", true, mayInterruptIfRunning), promise);
-            cancelled = promise.get();
-        } catch (final InterruptedException | ExecutionException | CancellationException e) {
-            log.error("", e);
-            // Swallow transmission errors
-        }
-        return super.cancel(mayInterruptIfRunning) && cancelled;
-    }
-
-    @Override
-    public ChainImpl<Void> link(final Chain<?> that) {
-        return super.link(new ResolvedChain<Void>(null));
-    }
-
-    @Override
-    public Void get() throws InterruptedException, ExecutionException {
-        if (waited) {
-            return super.get();
-        }
-        try {
-            final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
-            registry.invoke(address, command("get", true), promise, 0, MILLISECONDS);
-            try {
-                super.get();
-            } finally {
-                return promise.get();
-            }
-        } finally {
-            waited = true;
-        }
-    }
-
-    @Override
-    public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        if (waited) {
-            return super.get(timeout, unit);
-        }
-        try {
-            final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-            final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
-            final long millis = _tryTimeout(end);
-            registry.invoke(address, command("get", true, millis, MILLISECONDS), promise, _tryTimeout(end), MILLISECONDS);
-            try {
-                super.get(_tryTimeout(end), MILLISECONDS);
-            } finally {
-                return promise.get(_tryTimeout(end), MILLISECONDS);
-            }
-        } finally {
-            waited = true;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "InfinispanLocalChain{" +
-                "address=" + address +
-                ", jobExecutionId=" + jobExecutionId +
-                ", chainId=" + chainId +
-                ", waited=" + waited +
-                '}';
+    protected <T> InvokeChainCommand<T, Address> command(final String name, final Serializable... params) {
+        return new InvokeChainCommand<>(jobExecutionId, chainId, name, params);
     }
 }

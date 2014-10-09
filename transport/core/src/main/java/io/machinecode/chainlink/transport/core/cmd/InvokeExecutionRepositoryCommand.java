@@ -2,7 +2,8 @@ package io.machinecode.chainlink.transport.core.cmd;
 
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.transport.core.DistributedRegistry;
+import io.machinecode.chainlink.spi.transport.Command;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -11,7 +12,7 @@ import java.lang.reflect.Method;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class InvokeExecutionRepositoryCommand<T,A,R extends DistributedRegistry<A,R>> implements DistributedCommand<T,A,R> {
+public class InvokeExecutionRepositoryCommand<T,A> implements Command<T,A> {
     private static final long serialVersionUID = 1L;
 
     final ExecutionRepositoryId executionRepositoryId;
@@ -26,9 +27,9 @@ public class InvokeExecutionRepositoryCommand<T,A,R extends DistributedRegistry<
     }
 
     @Override
-    public T perform(final R registry, final A origin) throws Throwable {
+    public T perform(final Transport<A> transport, final A origin) throws Throwable {
         //TODO Ensure local
-        final ExecutionRepository repository = registry.getExecutionRepository(executionRepositoryId);
+        final ExecutionRepository repository = transport.getRegistry().getExecutionRepository(executionRepositoryId);
         Method method = null;
         for (final Method that : ExecutionRepository.class.getDeclaredMethods()) {
             if (that.getName().equals(methodName) && that.getParameterTypes().length == parameters.length) {

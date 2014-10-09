@@ -105,7 +105,7 @@ public class GlassfishEnvironment implements Environment {
                     for (final ConfigurationFactory configuration : factories) {
                         app.ops.put(
                                 configuration.getId(),
-                                new JobOperatorImpl(configuration.produce()
+                                new JobOperatorImpl(configuration.produce(loader)
                                         .setConfigurationDefaults(defaults)
                                         .build()
                                 )

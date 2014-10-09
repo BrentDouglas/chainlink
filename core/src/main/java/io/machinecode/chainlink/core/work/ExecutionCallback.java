@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.work;
 import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
@@ -14,7 +13,7 @@ import org.jboss.logging.Logger;
 import javax.batch.runtime.BatchStatus;
 
 /**
-* Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class ExecutionCallback extends ExecutableImpl<ExecutionWork> {
 
@@ -35,31 +34,21 @@ public class ExecutionCallback extends ExecutableImpl<ExecutionWork> {
     @Override
     public void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
                           final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
-        // This needs to be looked up rather than using this.context in case this is after a partitioned execution
-        // and we are using remoting
-        final ExecutionContext context = configuration.getRegistry()
-                .getExecutableAndContext(this.context.getJobExecutionId(), this.getId())
-                .getContext();
         Chain<?> next;
         try {
             if (chain.isCancelled()) {
                 context.getJobContext().setBatchStatus(BatchStatus.STOPPING);
             }
             next = work.after(configuration, this.executionRepositoryId, workerId, parentId, context, childContext);
-            chain.link(next != null ? next : new ResolvedChain<Void>(null));
-            chain.resolve(null);
+            chain.linkAndResolve(null, next != null ? next : new ResolvedChain<Void>(null));
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("CHAINLINK-023001.work.execution.after.exception", context));
             if (context.getStepContext() != null) {
                 context.getStepContext().setBatchStatus(BatchStatus.FAILED);
             }
             context.getJobContext().setBatchStatus(BatchStatus.FAILED);
-            final Executable callback = configuration.getRegistry()
-                    .getExecutableAndContext(context.getJobExecutionId(), parentId)
-                    .getExecutable();
-            next = configuration.getExecutor().callback(callback, context);
-            chain.link(next != null ? next : new ResolvedChain<Void>(null));
-            chain.reject(e);
+            next = configuration.getExecutor().callback(parentId, context);
+            chain.linkAndReject(e, next != null ? next : new ResolvedChain<Void>(null));
         }
     }
 

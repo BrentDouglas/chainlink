@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.se.configuration.SeConfiguration;
 import io.machinecode.chainlink.se.configuration.SeConfigurationDefaults;
+import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
@@ -11,6 +12,7 @@ import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.jboss.logging.Logger;
@@ -35,6 +37,7 @@ public abstract class BaseTest extends Assert {
     private TransactionManager _transactionManager;
     private MarshallingProviderFactory _marshallingProviderFactory;
     private RegistryFactory _registryFactory;
+    private TransportFactory _transportFactory;
 
     protected final SeConfiguration configuration() throws Exception {
         if (this._configuration == null) {
@@ -80,6 +83,13 @@ public abstract class BaseTest extends Assert {
         return _registryFactory;
     }
 
+    protected final TransportFactory transportFactory() throws Exception {
+        if (this._transportFactory == null) {
+            this._transportFactory = _transportFactory();
+        }
+        return _transportFactory;
+    }
+
     // Override these for different configurations
 
     protected Builder _configuration() throws Exception {
@@ -92,6 +102,7 @@ public abstract class BaseTest extends Assert {
                 .setWorkerFactory(_workerFactory())
                 .setMarshallingProviderFactory(marshallingProviderFactory())
                 .setRegistryFactory(registryFactory())
+                .setTransportFactory(transportFactory())
                 .setProperty(Constants.THREAD_POOL_SIZE, "8");
     }
 
@@ -115,6 +126,10 @@ public abstract class BaseTest extends Assert {
 
     protected RegistryFactory _registryFactory() throws Exception {
         return new LocalRegistryFactory();
+    }
+
+    protected TransportFactory _transportFactory() throws Exception {
+        return new LocalTransportFactory();
     }
 
     protected void printMethodName() {

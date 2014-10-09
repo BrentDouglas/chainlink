@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 import javax.transaction.TransactionManager;
 
@@ -16,6 +17,8 @@ public interface RuntimeConfiguration {
     Executor getExecutor();
 
     Registry getRegistry();
+
+    Transport<?> getTransport();
 
     TransactionManager getTransactionManager();
 

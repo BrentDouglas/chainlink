@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.transport.infinispan.callable;
 
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
+import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
 import org.infinispan.remoting.transport.Address;
 
 import javax.batch.operations.JobExecutionNotRunningException;
@@ -22,13 +22,13 @@ public class FindJobRegistryWithChainIdCallable extends BaseCallable<Object, Obj
 
     @Override
     public Address call() throws Exception {
-        final InfinispanRegistry registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanRegistry.class);
+        final InfinispanTransport registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
         try {
             if (id == null) {
                 return registry.getLocal(); //If this search is for the root job
             } else {
                 // TODO Can this throw?
-                return registry.getChain(jobExecutionId, id) == null ? null : registry.getLocal();
+                return registry.getRegistry().getChain(jobExecutionId, id) == null ? null : registry.getLocal();
             }
         } catch (final JobExecutionNotRunningException e) {
             //

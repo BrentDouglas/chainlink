@@ -17,7 +17,7 @@ public class SeTckConfigurationFactory implements ConfigurationFactory {
     }
 
     @Override
-    public ConfigurationBuilder<?> produce() throws Exception {
-        return TckConfigurator.produce(new SeConfiguration.Builder());
+    public ConfigurationBuilder<?> produce(final ClassLoader loader) throws Exception {
+        return TckConfigurator.produce(new SeConfiguration.Builder(), loader);
     }
 }

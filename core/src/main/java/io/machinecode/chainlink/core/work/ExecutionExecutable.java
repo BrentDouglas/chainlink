@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.work;
 import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
@@ -16,7 +15,7 @@ import org.jboss.logging.Logger;
 import javax.batch.runtime.BatchStatus;
 
 /**
-* Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class ExecutionExecutable extends ExecutableImpl<ExecutionWork> {
     private static final long serialVersionUID = 1L;
@@ -36,27 +35,21 @@ public class ExecutionExecutable extends ExecutableImpl<ExecutionWork> {
             //TODO Can link after cancel?
             if (chain.isCancelled()) {
                 this.context.getJobContext().setBatchStatus(BatchStatus.STOPPING);
-                final Executable parent = registry.getExecutableAndContext(context.getJobExecutionId(), parentId)
-                        .getExecutable();
-                next = configuration.getExecutor().callback(parent, this.context);
+                next = configuration.getExecutor().callback(parentId, this.context);
             } else {
-                final ExecutableId callbackId = registry.generateExecutableId();
-                registry.registerExecutableAndContext(context.getJobExecutionId(), new ExecutionCallback(callbackId, parentId, this, workerId), context);
+                final ExecutableId callbackId = configuration.getTransport().generateExecutableId();
+                registry.registerExecutable(context.getJobExecutionId(), new ExecutionCallback(callbackId, parentId, this, workerId));
                 next = work.before(configuration, this.executionRepositoryId, workerId, callbackId, parentId, this.context);
             }
-            chain.link(next != null ? next : new ResolvedChain<Void>(null));
-            chain.resolve(null);
+            chain.linkAndResolve(null, next != null ? next : new ResolvedChain<Void>(null));
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("CHAINLINK-023000.work.execution.before.exception", this.context));
             if (this.context.getStepContext() != null) {
                 this.context.getStepContext().setBatchStatus(BatchStatus.FAILED);
             }
             this.context.getJobContext().setBatchStatus(BatchStatus.FAILED);
-            final Executable parent = registry.getExecutableAndContext(context.getJobExecutionId(), parentId)
-                    .getExecutable();
-            final Chain<?> next = configuration.getExecutor().callback(parent, this.context);
-            chain.link(next != null ? next : new ResolvedChain<Void>(null));
-            chain.reject(e);
+            final Chain<?> next = configuration.getExecutor().callback(parentId, this.context);
+            chain.linkAndReject(e, next != null ? next : new ResolvedChain<Void>(null));
         }
     }
 

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.gridgain;
 
-import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
+import io.machinecode.chainlink.spi.transport.Command;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridGain;
 
@@ -14,11 +14,11 @@ import java.util.concurrent.Callable;
 public class GridGainCallable<T> implements Callable<T>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    final DistributedCommand<T,UUID, GridGainRegistry> command;
+    final Command<T,UUID> command;
     final UUID origin;
     final String gridName;
 
-    public GridGainCallable(final DistributedCommand<T, UUID, GridGainRegistry> command, final UUID origin, final Grid grid) {
+    public GridGainCallable(final Command<T, UUID> command, final UUID origin, final Grid grid) {
         this.command = command;
         this.origin = origin;
         this.gridName = grid.configuration().getGridName();
@@ -27,7 +27,7 @@ public class GridGainCallable<T> implements Callable<T>, Serializable {
     @Override
     public T call() throws Exception {
         try {
-            final GridGainRegistry registry = GridGain.grid(gridName).<String, GridGainRegistry>nodeLocalMap().get(GridGainRegistry.class.getName());
+            final GridGainTransport registry = GridGain.grid(gridName).<String, GridGainTransport>nodeLocalMap().get(GridGainTransport.class.getName());
             return command.perform(registry, origin);
         } catch (final Throwable e) {
             throw new Exception(e);

@@ -10,7 +10,6 @@ import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
@@ -124,10 +123,7 @@ public class JobImpl implements Job, JobWork, Serializable {
         final BatchStatus batchStatus = context.getJobContext().getBatchStatus();
         if (Statuses.isStopping(batchStatus)) {
             log.debugf(Messages.get("CHAINLINK-018002.job.status.early.termination"), context, batchStatus);
-            final Executable callback = configuration.getRegistry()
-                    .getExecutableAndContext(jobExecutionId, callbackId)
-                    .getExecutable();
-            return configuration.getExecutor().callback(callback, context);
+            return configuration.getExecutor().callback(callbackId, context);
         }
 
         final Long restartJobExecutionId = context.getRestartJobExecutionId();

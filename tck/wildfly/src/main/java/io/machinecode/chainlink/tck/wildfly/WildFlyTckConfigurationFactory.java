@@ -18,7 +18,7 @@ public class WildFlyTckConfigurationFactory implements ConfigurationFactory {
     }
 
     @Override
-    public ConfigurationBuilder<?> produce() throws Exception {
-        return TckConfigurator.produce(new WildFlyConfiguration.Builder());
+    public ConfigurationBuilder<?> produce(final ClassLoader loader) throws Exception {
+        return TckConfigurator.produce(new WildFlyConfiguration.Builder(), loader);
     }
 }

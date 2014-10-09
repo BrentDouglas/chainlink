@@ -16,7 +16,7 @@ import org.jboss.logging.Logger;
 import javax.batch.runtime.BatchStatus;
 
 /**
-* Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class JobCallback extends ExecutableImpl<JobWork> {
 
@@ -71,11 +71,10 @@ public class JobCallback extends ExecutableImpl<JobWork> {
                 );
             }
             final Promise<?,?,?> promise = configuration.getRegistry().unregisterJob(context.getJobExecutionId());
-            chain.link(new ResolvedChain<Void>(null));
             if (throwable == null) {
-                chain.resolve(null);
+                chain.linkAndResolve(null, new ResolvedChain<Void>(null));
             } else {
-                chain.reject(throwable);
+                chain.linkAndReject(throwable, new ResolvedChain<Void>(null));
             }
             promise.get();
         }

@@ -12,7 +12,7 @@ import java.util.concurrent.TimeoutException;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
- * Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ChainImpl<T> extends BaseChain<T> {
 
@@ -21,7 +21,7 @@ public class ChainImpl<T> extends BaseChain<T> {
     protected volatile Chain<?> link;
 
     @Override
-    public ChainImpl<T> link(final Chain<?> that) {
+    public void link(final Chain<?> that) {
         if (that == null) {
             throw new IllegalArgumentException(Messages.format("CHAINLINK-004200.chain.argument.required", "link"));
         }
@@ -46,7 +46,6 @@ public class ChainImpl<T> extends BaseChain<T> {
             log().warnf(exception, Messages.format("CHAINLINK-004005.chain.get.exception"));
             throw exception;
         }
-        return this;
     }
 
     @Override

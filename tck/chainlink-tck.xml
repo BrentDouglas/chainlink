@@ -6,6 +6,7 @@
     <job-operator name="default">
         <executor-factory class="@executor.factory.class@"/>
         <registry-factory class="@registry.factory.class@"/>
+        <transport-factory class="@transport.factory.class@"/>
         <worker-factory class="@worker.factory.class@"/>
         <marshalling-provider-factory class="@marshalling.provider.factory.class@"/>
         <mbean-server-factory class="@mbean.server.factory.class@"/>

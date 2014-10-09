@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.spi.configuration;
 
-import io.machinecode.chainlink.spi.registry.Registry;
+import io.machinecode.chainlink.spi.transport.Transport;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public interface ExecutorConfiguration extends RegistryConfiguration {
+public interface ExecutorConfiguration extends TransportConfiguration {
 
-    Registry getRegistry();
+    Transport<?> getTransport();
 }

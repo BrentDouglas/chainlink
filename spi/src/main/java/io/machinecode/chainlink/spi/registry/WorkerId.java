@@ -7,6 +7,8 @@ import java.io.Serializable;
  */
 public interface WorkerId extends Serializable {
 
+    Object getAddress();
+
     @Override
     boolean equals(final Object that);
 
