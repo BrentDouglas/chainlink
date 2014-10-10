@@ -247,7 +247,7 @@ public class LocalRegistry implements Registry {
             final Chain<?> job = this.jobs.remove(jobExecutionId);
             return this.onUnregisterJob(jobExecutionId, job).onComplete(new OnComplete() {
                 @Override
-                public void complete() {
+                public void complete(final int state) {
                     LocalRegistry.this.jobRegistries.remove(jobExecutionId);
                 }
             });

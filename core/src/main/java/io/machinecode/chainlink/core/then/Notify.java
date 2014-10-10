@@ -18,7 +18,7 @@ public class Notify implements OnComplete { //TODO Why is this serializable?
     }
 
     @Override
-    public void complete() {
+    public void complete(final int state) {
         synchronized (lock) {
             lock.notifyAll();
         }

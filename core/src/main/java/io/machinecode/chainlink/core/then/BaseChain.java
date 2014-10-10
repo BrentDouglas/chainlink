@@ -65,6 +65,7 @@ public abstract class BaseChain<T> extends PromiseImpl<T,Throwable> implements C
         log().tracef(getCancelLogMessage());
         final CancelListener listener = new CancelListener();
         ListenerException exception = null;
+        final int state;
         _lock();
         try {
             cancelling(listener);
@@ -75,6 +76,7 @@ public abstract class BaseChain<T> extends PromiseImpl<T,Throwable> implements C
             if (setCancelled()) {
                 return isCancelled();
             }
+            state = this.state;
         } finally {
             _unlock();
         }
@@ -91,7 +93,7 @@ public abstract class BaseChain<T> extends PromiseImpl<T,Throwable> implements C
         }
         for (final OnComplete on : this.<OnComplete>_getEvents(ON_COMPLETE)) {
             try {
-                on.complete();
+                on.complete(state);
             } catch (final Throwable e) {
                 if (exception == null) {
                     exception = new ListenerException(io.machinecode.then.core.Messages.format("THEN-000013.promise.cancel.exception"), e);

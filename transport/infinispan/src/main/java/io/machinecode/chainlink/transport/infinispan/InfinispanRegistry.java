@@ -133,7 +133,7 @@ public class InfinispanRegistry extends LocalRegistry {
     protected Promise<?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
         final Promise<Object, Throwable> promise = new PromiseImpl<Object, Throwable>().onComplete(new OnComplete() {
             @Override
-            public void complete() {
+            public void complete(final int state) {
                 for (final Pair<ChainId, Address> pair : remoteExecutions.remove(jobExecutionId)) {
                     final Address address = pair.getValue();
                     if (!address.equals(local)) {

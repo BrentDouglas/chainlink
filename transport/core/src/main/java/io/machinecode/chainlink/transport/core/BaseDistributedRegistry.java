@@ -75,7 +75,7 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
     protected Promise<?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
         final Promise<Object, Throwable> promise = new PromiseImpl<Object, Throwable>().onComplete(new OnComplete() {
             @Override
-            public void complete() {
+            public void complete(final int state) {
                 for (final Pair<ChainId, A> pair : remoteExecutions.remove(jobExecutionId)) {
                     final A address = pair.getValue();
                     if (!address.equals(getLocal())) {
