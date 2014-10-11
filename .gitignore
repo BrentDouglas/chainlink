@@ -1,6 +1,9 @@
 # Maven output
 target
 
+# Versions plugin
+*.versionsBackup
+
 # VIM
 *.swp
 

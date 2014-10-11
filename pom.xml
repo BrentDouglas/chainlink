@@ -6,8 +6,8 @@
 
     <parent>
         <groupId>io.machinecode</groupId>
-        <artifactId>machinecode-parent-pom</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <artifactId>machinecode-parent</artifactId>
+        <version>1.0.3</version>
     </parent>
 
     <groupId>io.machinecode.chainlink</groupId>
@@ -17,11 +17,25 @@
 
     <developers>
         <developer>
+            <id>brentdouglas</id>
             <name>Brent Douglas</name>
             <email>brent.n.douglas@gmail.com</email>
-            <url>http://machinecode.io</url>
         </developer>
     </developers>
+
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://repository.jboss.org/licenses/apache-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:${git.machinecode.io}/chainlink.git</connection>
+        <developerConnection>scm:git:${git.machinecode.io}/chainlink.git</developerConnection>
+        <url>${github.machinecode.io}/chainlink</url>
+    </scm>
 
     <modules>
         <module>api</module>
@@ -48,7 +62,7 @@
         <version.com.oracle.coherence.coherence>12.1.2-0-0</version.com.oracle.coherence.coherence>
         <version.dom4j>1.6.1</version.dom4j>
         <version.gnu-getopt.getopt>1.0.13</version.gnu-getopt.getopt>
-        <version.io.machinecode.then>1.0.0-SNAPSHOT</version.io.machinecode.then>
+        <version.io.machinecode.then>0.1.0</version.io.machinecode.then>
         <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
         <version.javax.faces.jsf-api>2.1.23.Final</version.javax.faces.jsf-api>
         <version.javax.inject>1</version.javax.inject>
