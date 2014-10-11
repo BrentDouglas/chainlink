@@ -1,6 +1,6 @@
 # Chainlink
 
-A JSR-352 implementation.
+An implementation of JSR-352.
 
 ## Aims
 
@@ -12,7 +12,7 @@ of these components for a wide range of external libraries.
 
 ## Features
 
-Support for several DI frameworks:
+Dependency injection frameworks:
 - CDI
 - Spring
 - Seam 2
@@ -54,13 +54,15 @@ by selecting 'Coherence Stand-Alone Install'. Run the installer with
 prompts. Now you need to install the coherence jar into your local
 maven repository:
 
-`mvn install:install-file  \
+```shell
+mvn install:install-file  \
       -DgroupId=com.oracle.coherence  \
       -DartifactId=coherence  \
       -Dversion=<version> \
       -Dfile=${ORACLE_HOME}/coherence/lib/coherence.jar  \
       -Dpackaging=jar \
-      -DgeneratePom=true`
+      -DgeneratePom=true
+```
 
 Where `ORACLE_HOME` is where you set it in the installer and `<version>`
 is the version of coherence you are installing (which should match the
@@ -91,7 +93,9 @@ Run the tests with `mvn clean install -Ptest`.
 To run the TCK from within the build you will need to get the sources
 of the TCK with:
 
-` git clone git://java.net/jbatch~jsr-352-git-repository <target>`
+```shell
+git clone git://java.net/jbatch~jsr-352-git-repository <target>
+```
 
 Copy [test.template.properties](test.template.properties)
 to `test.properties` and set `tck.source` to the directory you checked
@@ -138,10 +142,12 @@ by setting the environment variable `CHAINLINK_OPTS`. For example, to
 enable debugging on both the first and the second process you could
 use:
 
->     CHAINLINK_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006" \
->         mvn clean install \
->             -Ptck -Pin-cdi -Ptr-<x> \
->             -Dmaven.failsafe.debug
+```shell
+CHAINLINK_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006" \
+    mvn clean install \
+        -Ptck -Pin-cdi -Ptr-<x> \
+        -Dmaven.failsafe.debug
+```
 
 Properties specified in the file `chainlink-tck.properties` will also
 be provided to the chainlink daemon.
@@ -166,8 +172,10 @@ The background process should have the following properties passed to
 it, either through the `CHAINLINK_OPTS` environment variable or
 `chainlink-tck.properties`:
 
->     jgroups.bind_address=127.0.0.1
->     java.net.preferIPv4Stack=true
+```ini
+jgroups.bind_address=127.0.0.1
+java.net.preferIPv4Stack=true
+```
 
 Failsafe should also be provided the same properties. To execute the
 tests you can run something like this (though any injector and
