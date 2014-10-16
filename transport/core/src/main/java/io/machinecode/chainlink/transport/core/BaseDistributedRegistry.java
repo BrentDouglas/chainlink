@@ -81,8 +81,8 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
                     if (!address.equals(getLocal())) {
                         try {
                             _invoke(address, new CleanupCommand<A, R>(jobExecutionId));
-                        } catch (Exception e) {
-                            // TODO
+                        } catch (final Exception e) {
+                            log.errorf(e,""); // TODO Message
                         }
                     }
                 }
