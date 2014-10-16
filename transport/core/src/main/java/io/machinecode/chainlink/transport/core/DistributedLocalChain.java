@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 
 import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
@@ -39,7 +39,7 @@ public abstract class DistributedLocalChain<A, R extends DistributedRegistry<A, 
     public boolean cancel(final boolean mayInterruptIfRunning) {
         boolean cancelled = false;
         try {
-            final PromiseImpl<Boolean, Throwable> promise = new PromiseImpl<Boolean, Throwable>();
+            final DeferredImpl<Boolean, Throwable, Void> promise = new DeferredImpl<Boolean, Throwable, Void>();
             registry.invoke(address, this.<Boolean>command("cancel", mayInterruptIfRunning), promise);
             cancelled = promise.get();
         } catch (final Exception e) {
@@ -59,7 +59,7 @@ public abstract class DistributedLocalChain<A, R extends DistributedRegistry<A, 
             return super.get();
         }
         try {
-            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
             registry.invoke(address, this.<Void>command("get"), promise, 0, MILLISECONDS);
             try {
                 super.get();
@@ -78,7 +78,7 @@ public abstract class DistributedLocalChain<A, R extends DistributedRegistry<A, 
         }
         try {
             final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
             final long millis = _tryTimeout(end);
             registry.invoke(address, this.<Void>command("get", millis, MILLISECONDS), promise, _tryTimeout(end), MILLISECONDS);
             try {

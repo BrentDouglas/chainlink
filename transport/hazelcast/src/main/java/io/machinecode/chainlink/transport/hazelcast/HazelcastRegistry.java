@@ -18,7 +18,7 @@ import io.machinecode.chainlink.transport.core.DistributedProxyExecutionReposito
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
-import io.machinecode.then.api.Promise;
+import io.machinecode.then.api.Deferred;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
@@ -120,7 +120,7 @@ public class HazelcastRegistry extends BaseDistributedRegistry<Member, Hazelcast
     }
 
     @Override
-    public <T> void invoke(final Member address, final DistributedCommand<T, Member, HazelcastRegistry> command, final Promise<T, Throwable> promise) {
+    public <T> void invoke(final Member address, final DistributedCommand<T, Member, HazelcastRegistry> command, final Deferred<T, Throwable,?> promise) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.network.when(
@@ -137,7 +137,7 @@ public class HazelcastRegistry extends BaseDistributedRegistry<Member, Hazelcast
     }
 
     @Override
-    public <T> void invoke(final Member address, final DistributedCommand<T, Member, HazelcastRegistry> command, final Promise<T, Throwable> promise, final long timeout, final TimeUnit unit) {
+    public <T> void invoke(final Member address, final DistributedCommand<T, Member, HazelcastRegistry> command, final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.network.when(

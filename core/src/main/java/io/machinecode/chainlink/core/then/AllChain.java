@@ -32,7 +32,7 @@ public class AllChain<T> extends BaseChain<T> {
     @Override
     public boolean isDone() {
         boolean done = true;
-        for (final Promise<?,Throwable> that : link) {
+        for (final Promise<?,Throwable,?> that : link) {
             if (that == null) {
                 continue;
             }

@@ -23,7 +23,7 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.ResolvedPromise;
+import io.machinecode.then.core.ResolvedDeferred;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.partition.PartitionReducer;
@@ -237,7 +237,7 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public Promise<?,?> unregisterJob(final long jobExecutionId) {
+    public Promise<?,?,?> unregisterJob(final long jobExecutionId) {
         while (!jobLock.compareAndSet(false, true)) {}
         try {
             final Chain<?> job = this.jobs.remove(jobExecutionId);
@@ -256,9 +256,9 @@ public class LocalRegistry implements Registry {
         // noop
     }
 
-    protected Promise<?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
+    protected Promise<?,?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
         log.debugf(Messages.get("CHAINLINK-005101.registry.removed.job"), jobExecutionId);
-        return new ResolvedPromise<Void, Throwable>(null);
+        return new ResolvedDeferred<Void, Throwable, Void>(null);
     }
 
     @Override

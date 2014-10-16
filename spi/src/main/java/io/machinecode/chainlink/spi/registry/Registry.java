@@ -45,7 +45,7 @@ public interface Registry extends Lifecycle {
 
     Chain<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
 
-    Promise<?,?> unregisterJob(long jobExecutionId);
+    Promise<?,?,?> unregisterJob(long jobExecutionId);
 
     void registerChain(final long jobExecutionId, final ChainId id, final Chain<?> chain);
 

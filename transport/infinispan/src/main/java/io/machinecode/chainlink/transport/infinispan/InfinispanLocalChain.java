@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 import org.infinispan.remoting.transport.Address;
 
 import java.io.Serializable;
@@ -43,7 +43,7 @@ public class InfinispanLocalChain extends ChainImpl<Void> {
     public boolean cancel(final boolean mayInterruptIfRunning) {
         boolean cancelled = false;
         try {
-            final PromiseImpl<Boolean, Throwable> promise = new PromiseImpl<Boolean, Throwable>();
+            final DeferredImpl<Boolean, Throwable,Void> promise = new DeferredImpl<Boolean, Throwable,Void>();
             registry.invoke(address, command("cancel", true, mayInterruptIfRunning), promise);
             cancelled = promise.get();
         } catch (final Exception e) {
@@ -63,7 +63,7 @@ public class InfinispanLocalChain extends ChainImpl<Void> {
             return super.get();
         }
         try {
-            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
             registry.invoke(address, command("get", true), promise, 0, MILLISECONDS);
             try {
                 super.get();
@@ -82,7 +82,7 @@ public class InfinispanLocalChain extends ChainImpl<Void> {
         }
         try {
             final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
             final long millis = _tryTimeout(end);
             registry.invoke(address, command("get", true, millis, MILLISECONDS), promise, _tryTimeout(end), MILLISECONDS);
             try {

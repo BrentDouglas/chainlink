@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.transport.infinispan;
 
+import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 import org.infinispan.commons.util.concurrent.FutureListener;
 import org.infinispan.commons.util.concurrent.NotifyingNotifiableFuture;
 import org.infinispan.remoting.responses.ExceptionResponse;
@@ -22,12 +22,12 @@ import java.util.concurrent.TimeoutException;
 public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
     private final InfinispanRegistry registry;
-    private final Promise<U,Throwable> promise;
+    private final Deferred<U,Throwable,?> promise;
     private final Address address;
     private final long start;
     private Future<T> io;
 
-    public InfinispanFuture(final InfinispanRegistry registry, final Promise<U,Throwable> promise, final Address address, final long start) {
+    public InfinispanFuture(final InfinispanRegistry registry, final Deferred<U,Throwable,?> promise, final Address address, final long start) {
         this.registry = registry;
         this.promise = promise;
         this.address = address;
@@ -40,7 +40,7 @@ public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
                 System.currentTimeMillis() - start + registry.options.timeUnit().toMillis(registry.options.timeout()),
                 TimeUnit.MILLISECONDS,
                 io,
-                new PromiseImpl<T,Throwable>().onResolve(new OnResolve<T>() {
+                new DeferredImpl<T, Throwable, Void>().onResolve(new OnResolve<T>() {
                     @Override
                     public void resolve(final T ret) {
                         try {

@@ -70,7 +70,7 @@ public class JobCallback extends ExecutableImpl<JobWork> {
                         jobContext.getExitStatus()
                 );
             }
-            final Promise<?,?> promise = configuration.getRegistry().unregisterJob(context.getJobExecutionId());
+            final Promise<?,?,?> promise = configuration.getRegistry().unregisterJob(context.getJobExecutionId());
             chain.link(new ResolvedChain<Void>(null));
             if (throwable == null) {
                 chain.resolve(null);

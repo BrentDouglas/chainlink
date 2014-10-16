@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.spi.element.execution;
 
-import io.machinecode.chainlink.spi.element.PropertiesElement;
 import io.machinecode.chainlink.spi.element.Listeners;
+import io.machinecode.chainlink.spi.element.PropertiesElement;
 import io.machinecode.chainlink.spi.element.partition.Partition;
 import io.machinecode.chainlink.spi.element.partition.Strategy;
 import io.machinecode.chainlink.spi.element.task.Task;

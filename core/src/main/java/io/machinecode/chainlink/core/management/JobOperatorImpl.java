@@ -291,7 +291,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
                 null,
                 null
         );
-        final Promise<?,?> promise = executor.execute(jobExecutionId, new JobExecutable(
+        final Promise<?,?,?> promise = executor.execute(jobExecutionId, new JobExecutable(
                 null,
                 this.executionRepositoryId,
                 job,
@@ -309,7 +309,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
     public JobOperationImpl getJobOperation(final long jobExecutionId) throws JobExecutionNotRunningException {
         this.securityCheck.canAccessJobExecution(jobExecutionId);
         try {
-            final Promise<?,?> promise = registry.getJob(jobExecutionId);
+            final Promise<?,?,?> promise = registry.getJob(jobExecutionId);
             return new JobOperationImpl(
                     jobExecutionId,
                     promise,
@@ -392,7 +392,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
                 lastExecution.getRestartElementId(),
                 null
         );
-        final Promise<?,?> promise = executor.execute(restartExecutionId, new JobExecutable(
+        final Promise<?,?,?> promise = executor.execute(restartExecutionId, new JobExecutable(
                 null,
                 this.executionRepositoryId,
                 job,
@@ -413,13 +413,13 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
     }
 
     @Override
-    public Promise<?,Throwable> stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
+    public Promise<?,Throwable,?> stopJob(final long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
         this.securityCheck.canRestartJob(jobExecutionId);
         try {
             final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
             final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId); //This will throw a NoSuchJobExecutionException if required
-            final Promise<?,Throwable> promise = registry.getJob(jobExecutionId);
+            final Promise<?,Throwable,?> promise = registry.getJob(jobExecutionId);
             if (promise == null) {
                 throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-001002.operator.not.running", jobExecutionId));
             }

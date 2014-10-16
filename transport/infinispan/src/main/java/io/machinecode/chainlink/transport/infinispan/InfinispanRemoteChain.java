@@ -4,7 +4,7 @@ import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 import org.infinispan.remoting.transport.Address;
 
 import java.io.Serializable;
@@ -33,7 +33,7 @@ public class InfinispanRemoteChain extends ChainImpl<Void> {
     @Override
     public void resolve(final Void value) {
         try {
-            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
             registry.invoke(address, command("resolve", false, new Serializable[]{ null }), promise);
             promise.get();
         } catch (final Exception e) {
@@ -45,7 +45,7 @@ public class InfinispanRemoteChain extends ChainImpl<Void> {
     @Override
     public void reject(final Throwable failure) {
         try {
-            final PromiseImpl<Void,Throwable> promise = new PromiseImpl<Void,Throwable>();
+            final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
             registry.invoke(address, command("reject", false, failure), promise);
             promise.get();
         } catch (final Exception e) {
@@ -57,7 +57,7 @@ public class InfinispanRemoteChain extends ChainImpl<Void> {
     @Override
     public ChainImpl<Void> link(final Chain<?> that) {
         try {
-            final PromiseImpl<Boolean,Throwable> promise = new PromiseImpl<Boolean,Throwable>();
+            final DeferredImpl<Boolean,Throwable,Void> promise = new DeferredImpl<Boolean,Throwable,Void>();
             registry.invoke(address, command("link", false, new Serializable[]{ null }), promise);
             promise.get();
         } catch (final Exception e) {

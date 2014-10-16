@@ -4,7 +4,6 @@ import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.transport.gridgain.GridGainRegistry;
-import io.machinecode.chainlink.transport.jgroups.JGroupsRegistry;
 import org.gridgain.grid.GridConfiguration;
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridGain;
@@ -13,7 +12,6 @@ import org.gridgain.grid.cache.GridCacheAtomicityMode;
 import org.gridgain.grid.cache.GridCacheConfiguration;
 import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMulticastIpFinder;
-import org.jgroups.JChannel;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

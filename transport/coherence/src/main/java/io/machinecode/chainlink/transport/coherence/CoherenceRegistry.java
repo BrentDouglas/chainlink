@@ -17,7 +17,7 @@ import io.machinecode.chainlink.transport.core.DistributedProxyExecutionReposito
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
-import io.machinecode.then.api.Promise;
+import io.machinecode.then.api.Deferred;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
@@ -101,7 +101,7 @@ public class CoherenceRegistry extends BaseDistributedRegistry<Member, Coherence
     }
 
     @Override
-    public <T> void invoke(final Member address, final DistributedCommand<T, Member, CoherenceRegistry> command, final Promise<T, Throwable> promise) {
+    public <T> void invoke(final Member address, final DistributedCommand<T, Member, CoherenceRegistry> command, final Deferred<T, Throwable,?> promise) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.executor.execute(
@@ -133,7 +133,7 @@ public class CoherenceRegistry extends BaseDistributedRegistry<Member, Coherence
     }
 
     @Override
-    public <T> void invoke(final Member address, final DistributedCommand<T, Member, CoherenceRegistry> command, final Promise<T, Throwable> promise, final long timeout, final TimeUnit unit) {
+    public <T> void invoke(final Member address, final DistributedCommand<T, Member, CoherenceRegistry> command, final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
         invoke(address, command, promise);
     }
 

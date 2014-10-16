@@ -12,7 +12,7 @@ import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.ResolvedPromise;
+import io.machinecode.then.core.ResolvedDeferred;
 import org.jboss.logging.Logger;
 
 import java.util.LinkedList;
@@ -58,9 +58,9 @@ public class EventedWorker extends Thread implements Worker {
     }
 
     @Override
-    public Promise<ChainAndId,Throwable> chain(final Executable executable) {
+    public Promise<ChainAndId,Throwable,?> chain(final Executable executable) {
         final UUIDId id = new UUIDId();
-        return new ResolvedPromise<ChainAndId,Throwable>(new ChainAndId(id, id, new ChainImpl<Void>()));
+        return new ResolvedDeferred<ChainAndId,Throwable,Void>(new ChainAndId(id, id, new ChainImpl<Void>()));
     }
 
     @Override

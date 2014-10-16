@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.then;
 
 import io.machinecode.chainlink.spi.then.When;
-import io.machinecode.then.api.Promise;
+import io.machinecode.then.api.Deferred;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +20,7 @@ public class WhenImpl implements When {
     }
 
     @Override
-    public <T> void when(final Future<T> future, final Promise<T,Throwable> then) {
+    public <T> void when(final Future<T> future, final Deferred<T,Throwable,?> then) {
         this.executor.submit(new Runnable() {
             @Override
             public void run() {
@@ -38,7 +38,7 @@ public class WhenImpl implements When {
     }
 
     @Override
-    public <T> void when(final long timeout, final TimeUnit unit, final Future<T> future, final Promise<T,Throwable> then) {
+    public <T> void when(final long timeout, final TimeUnit unit, final Future<T> future, final Deferred<T,Throwable,?> then) {
         this.executor.submit(new Runnable() {
             @Override
             public void run() {

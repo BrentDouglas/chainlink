@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.ListenerException;
 import io.machinecode.then.api.OnCancel;
 import io.machinecode.then.api.OnComplete;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
@@ -19,7 +19,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
-public abstract class BaseChain<T> extends PromiseImpl<T,Throwable> implements Chain<T> {
+public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implements Chain<T> {
 
     private static final Logger log = Logger.getLogger(BaseChain.class);
 

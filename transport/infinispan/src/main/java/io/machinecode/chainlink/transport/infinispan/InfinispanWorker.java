@@ -7,9 +7,10 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.transport.infinispan.cmd.ExecuteCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.PushChainCommand;
+import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 import org.infinispan.remoting.transport.Address;
 
 /**
@@ -37,9 +38,9 @@ public class InfinispanWorker implements Worker {
     @Override
     public void execute(final ExecutableEvent event) {
         final ExecuteCommand command = new ExecuteCommand(registry.cacheName, workerId, event);
-        registry.invoke(remote, command, new PromiseImpl<ChainAndId,Throwable>());
+        registry.invoke(remote, command, new DeferredImpl<ChainAndId,Throwable,Void>());
         /*
-        registry.invoke(remote, command, new PromiseImpl<ChainAndId,Throwable>().onReject(new OnReject<Throwable>() {
+        registry.invoke(remote, command, new DeferredImpl<ChainAndId,Throwable>().onReject(new OnReject<Throwable>() {
             @Override
             public void reject(final Throwable fail) {
                 if (fail instanceof java.io.ObjectStreamException
@@ -65,7 +66,7 @@ public class InfinispanWorker implements Worker {
                         }
                         context.setItems(items);
                     }
-                    registry.invoke(remote, command, new PromiseImpl<Object, Throwable>());
+                    registry.invoke(remote, command, new DeferredImpl<Object, Throwable>());
                     //If this fails a second time execution will halt until the jgroups request times out
                 }
             }
@@ -74,14 +75,14 @@ public class InfinispanWorker implements Worker {
     }
 
     @Override
-    public Promise<ChainAndId,Throwable> chain(final Executable executable) {
+    public Promise<ChainAndId,Throwable,?> chain(final Executable executable) {
         final long jobExecutionId = executable.getContext().getJobExecutionId();
-        final Promise<ChainAndId,Throwable> promise = new PromiseImpl<ChainAndId,Throwable>();
+        final Deferred<ChainAndId,Throwable,Void> promise = new DeferredImpl<ChainAndId,Throwable,Void>();
         final ChainId localId = registry.generateChainId();
         registry.invoke(
                 remote,
                 new PushChainCommand(registry.cacheName, jobExecutionId, localId),
-                new PromiseImpl<ChainId,Throwable>()
+                new DeferredImpl<ChainId,Throwable,Void>()
                         .onResolve(new OnResolve<ChainId>() {
                             @Override
                             public void resolve(final ChainId remoteId) {

@@ -23,9 +23,10 @@ import io.machinecode.chainlink.transport.infinispan.callable.FindExecutionRepos
 import io.machinecode.chainlink.transport.infinispan.callable.FindWorkerCallable;
 import io.machinecode.chainlink.transport.infinispan.callable.LeastBusyWorkerCallable;
 import io.machinecode.chainlink.transport.infinispan.cmd.CleanupCommand;
+import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 import org.infinispan.AdvancedCache;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.distexec.DefaultExecutorService;
@@ -130,8 +131,8 @@ public class InfinispanRegistry extends LocalRegistry {
     }
 
     @Override
-    protected Promise<?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
-        final Promise<Object, Throwable> promise = new PromiseImpl<Object, Throwable>().onComplete(new OnComplete() {
+    protected Promise<?,?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
+        final Deferred<Object, Throwable,Void> promise = new DeferredImpl<Object, Throwable,Void>().onComplete(new OnComplete() {
             @Override
             public void complete(final int state) {
                 for (final Pair<ChainId, Address> pair : remoteExecutions.remove(jobExecutionId)) {
@@ -353,7 +354,7 @@ public class InfinispanRegistry extends LocalRegistry {
         return _localWorker(workerId) != null;
     }
 
-    public <T> void invoke(final Address address, final ReplicableCommand command, final Promise<T,Throwable> promise) {
+    public <T> void invoke(final Address address, final ReplicableCommand command, final Deferred<T,Throwable,?> promise) {
         rpc.invokeRemotelyInFuture(
                 Collections.singleton(address),
                 command,
@@ -362,7 +363,7 @@ public class InfinispanRegistry extends LocalRegistry {
         );
     }
 
-    public <T> void invoke(final Address address, final ReplicableCommand command, final Promise<T,Throwable> promise, final long timeout, final TimeUnit unit) {
+    public <T> void invoke(final Address address, final ReplicableCommand command, final Deferred<T,Throwable,?> promise, final long timeout, final TimeUnit unit) {
         rpc.invokeRemotelyInFuture(
                 Collections.singleton(address),
                 command,

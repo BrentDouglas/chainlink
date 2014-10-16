@@ -1,14 +1,12 @@
 package io.machinecode.chainlink.tck.core.transport;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.manager.DefaultCacheManager;
-import org.infinispan.remoting.rpc.ResponseMode;
-import org.infinispan.remoting.rpc.RpcOptions;
 import org.infinispan.transaction.LockingMode;
 import org.infinispan.transaction.TransactionMode;
 import org.infinispan.transaction.lookup.TransactionManagerLookup;

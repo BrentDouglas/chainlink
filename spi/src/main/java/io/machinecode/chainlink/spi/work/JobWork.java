@@ -2,10 +2,10 @@ package io.machinecode.chainlink.spi.work;
 
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.then.Chain;
 
 import java.io.Serializable;

@@ -22,10 +22,10 @@ public class JobOperationImpl implements JobOperation {
     private static final Logger log = Logger.getLogger(JobOperationImpl.class);
 
     private final long jobExecutionId;
-    private final Promise<?,?> promise;
+    private final Promise<?,?,?> promise;
     private final ExecutionRepository repository;
 
-    public JobOperationImpl(final long jobExecutionId, final Promise<?,?> promise, final ExecutionRepository repository) {
+    public JobOperationImpl(final long jobExecutionId, final Promise<?,?,?> promise, final ExecutionRepository repository) {
         this.jobExecutionId = jobExecutionId;
         this.promise = promise;
         this.repository = repository;

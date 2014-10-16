@@ -23,7 +23,7 @@ public class AllChainTest {
         final ChainImpl<Void> p2 = new ChainImpl<Void>();
         final ChainImpl<Void> p3 = new ChainImpl<Void>();
         final ChainImpl<Void> p4 = new ChainImpl<Void>();
-        final AllChain<Promise<?,?>> all = new AllChain<Promise<?,?>>(p1, p2, p3, p4);
+        final AllChain<Promise<?,?,?>> all = new AllChain<Promise<?,?,?>>(p1, p2, p3, p4);
 
         Assert.assertFalse(p1.isDone());
         Assert.assertFalse(p2.isDone());
@@ -102,7 +102,7 @@ public class AllChainTest {
         final ChainImpl<Void> p2 = new ChainImpl<Void>();
         final ChainImpl<Void> p3 = new ChainImpl<Void>();
         final ChainImpl<Void> p4 = new ChainImpl<Void>();
-        final AllChain<Promise<?,?>> all = new AllChain<Promise<?,?>>(p1, p2, p3, p4);
+        final AllChain<Promise<?,?,?>> all = new AllChain<Promise<?,?,?>>(p1, p2, p3, p4);
 
         Assert.assertFalse(p1.isDone());
         Assert.assertFalse(p2.isDone());
@@ -181,7 +181,7 @@ public class AllChainTest {
         final ChainImpl<Void> p2 = new ChainImpl<Void>();
         final ChainImpl<Void> p3 = new ChainImpl<Void>();
         final ChainImpl<Void> p4 = new ChainImpl<Void>();
-        final AllChain<Promise<?,?>> all = new AllChain<Promise<?,?>>(p1, p2, p3, p4);
+        final AllChain<Promise<?,?,?>> all = new AllChain<Promise<?,?,?>>(p1, p2, p3, p4);
 
         Assert.assertFalse(p1.isDone());
         Assert.assertFalse(p2.isDone());

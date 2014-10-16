@@ -8,9 +8,10 @@ import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.chainlink.transport.core.cmd.ExecuteCommand;
+import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -37,9 +38,9 @@ public abstract class DistributedWorker<A, R extends DistributedRegistry<A, R>> 
     @Override
     public void execute(final ExecutableEvent event) {
         final DistributedCommand<Object, A, R> command = new ExecuteCommand<A, R>(workerId, event);
-        registry.invoke(remote, command, new PromiseImpl<Object,Throwable>());
+        registry.invoke(remote, command, new DeferredImpl<Object, Throwable, Void>());
         /*
-        registry.invoke(remote, command, new PromiseImpl<ChainAndId,Throwable>().onReject(new OnReject<Throwable>() {
+        registry.invoke(remote, command, new DeferredImpl<ChainAndId,Throwable,Void>().onReject(new OnReject<Throwable>() {
             @Override
             public void reject(final Throwable fail) {
                 if (fail instanceof java.io.ObjectStreamException
@@ -65,7 +66,7 @@ public abstract class DistributedWorker<A, R extends DistributedRegistry<A, R>> 
                         }
                         context.setItems(items);
                     }
-                    registry.invoke(remote, command, new PromiseImpl<Object, Throwable>());
+                    registry.invoke(remote, command, new DeferredImpl<Object, Throwable,Void>());
                     //If this fails a second time execution will halt until the jgroups request times out
                 }
             }
@@ -74,14 +75,14 @@ public abstract class DistributedWorker<A, R extends DistributedRegistry<A, R>> 
     }
 
     @Override
-    public Promise<Worker.ChainAndId,Throwable> chain(final Executable executable) {
+    public Promise<Worker.ChainAndId,Throwable,?> chain(final Executable executable) {
         final long jobExecutionId = executable.getContext().getJobExecutionId();
-        final Promise<Worker.ChainAndId,Throwable> promise = new PromiseImpl<Worker.ChainAndId,Throwable>();
+        final Deferred<ChainAndId,Throwable,Void> promise = new DeferredImpl<ChainAndId, Throwable, Void>();
         final ChainId localId = registry.generateChainId();
         registry.invoke(
                 remote,
                 createPushChainCommand(jobExecutionId, localId),
-                new PromiseImpl<ChainId,Throwable>()
+                new DeferredImpl<ChainId, Throwable, Void>()
                         .onResolve(new OnResolve<ChainId>() {
                             @Override
                             public void resolve(final ChainId remoteId) {

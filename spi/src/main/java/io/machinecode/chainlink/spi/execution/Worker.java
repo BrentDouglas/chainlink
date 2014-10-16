@@ -15,7 +15,7 @@ public interface Worker extends Runnable, Lifecycle {
 
     void execute(final ExecutableEvent event);
 
-    Promise<ChainAndId,Throwable> chain(final Executable executable);
+    Promise<ChainAndId,Throwable,?> chain(final Executable executable);
 
     public class ChainAndId {
         private final ChainId localId;

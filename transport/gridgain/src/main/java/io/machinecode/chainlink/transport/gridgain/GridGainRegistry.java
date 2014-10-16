@@ -10,9 +10,9 @@ import io.machinecode.chainlink.transport.core.DistributedProxyExecutionReposito
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
+import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridFuture;
@@ -111,13 +111,13 @@ public class GridGainRegistry extends BaseDistributedRegistry<UUID,GridGainRegis
 
     @Override
     public <T> void invoke(final UUID address, final DistributedCommand<T, UUID, GridGainRegistry> command,
-                           final Promise<T, Throwable> promise) {
+                           final Deferred<T, Throwable, ?> promise) {
         this.invoke(address, command, promise, timeout, unit);
     }
 
     @Override
     public <T> void invoke(final UUID address, final DistributedCommand<T, UUID, GridGainRegistry> command,
-                           final Promise<T, Throwable> promise, final long timeout, final TimeUnit unit) {
+                           final Deferred<T, Throwable, ?> promise, final long timeout, final TimeUnit unit) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
             final GridFuture<T> future = this.grid.forNodeId(address)
@@ -126,7 +126,7 @@ public class GridGainRegistry extends BaseDistributedRegistry<UUID,GridGainRegis
             network.when(
                     timeout, unit,
                     new GridGainFuture<T>(future),
-                    new PromiseImpl<T, Throwable>().onResolve(new OnResolve<T>() {
+                    new DeferredImpl<T, Throwable, Void>().onResolve(new OnResolve<T>() {
                         @Override
                         public void resolve(final T ret) {
                             try {

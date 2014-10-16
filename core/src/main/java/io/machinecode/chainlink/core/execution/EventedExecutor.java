@@ -82,7 +82,7 @@ public class EventedExecutor implements Executor {
         ListIterator<Worker> it = workers.listIterator();
         final Chain<?>[] chains = new Chain[executables.length];
         @SuppressWarnings("unchecked")
-        final Promise<Worker.ChainAndId,Throwable>[] promises = new Promise[executables.length];
+        final Promise<Worker.ChainAndId,Throwable,?>[] promises = new Promise[executables.length];
         int i = 0;
         for (final Executable executable : executables) {
             if (!it.hasNext()) {
@@ -108,7 +108,7 @@ public class EventedExecutor implements Executor {
                     .onResolve(collect)
                     .onReject(collect);
         }
-        for (final Promise<Worker.ChainAndId,Throwable> promise : promises) {
+        for (final Promise<Worker.ChainAndId,Throwable,?> promise : promises) {
             try {
                 promise.get();
             } catch (final Exception e) {

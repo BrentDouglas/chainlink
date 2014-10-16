@@ -2,9 +2,9 @@ package io.machinecode.chainlink.spi.work;
 
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.element.partition.Partition;
 import io.machinecode.chainlink.spi.element.partition.Strategy;
-import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 

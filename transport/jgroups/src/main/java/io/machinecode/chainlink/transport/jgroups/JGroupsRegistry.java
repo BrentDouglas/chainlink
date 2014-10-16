@@ -10,7 +10,7 @@ import io.machinecode.chainlink.transport.core.DistributedProxyExecutionReposito
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
-import io.machinecode.then.api.Promise;
+import io.machinecode.then.api.Deferred;
 import org.jboss.logging.Logger;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -105,7 +105,7 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
 
     @Override
     public <T> void invoke(final Address address, final DistributedCommand<T, Address, JGroupsRegistry> command,
-                           final Promise<T, Throwable> promise) {
+                           final Deferred<T, Throwable,?> promise) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.dispatcher.sendMessageWithFuture(
@@ -121,7 +121,7 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
 
     @Override
     public <T> void invoke(final Address address, final DistributedCommand<T, Address, JGroupsRegistry> command,
-                           final Promise<T, Throwable> promise, final long timeout, final TimeUnit unit) {
+                           final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.dispatcher.sendMessageWithFuture(

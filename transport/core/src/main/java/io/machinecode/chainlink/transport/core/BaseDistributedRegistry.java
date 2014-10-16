@@ -25,9 +25,10 @@ import io.machinecode.chainlink.transport.core.cmd.FindExecutableAndContextComma
 import io.machinecode.chainlink.transport.core.cmd.FindExecutionRepositoryWithIdCommand;
 import io.machinecode.chainlink.transport.core.cmd.FindWorkerCommand;
 import io.machinecode.chainlink.transport.core.cmd.LeastBusyWorkerCommand;
+import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.PromiseImpl;
+import io.machinecode.then.core.DeferredImpl;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.JobExecutionNotRunningException;
@@ -72,8 +73,8 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
     }
 
     @Override
-    protected Promise<?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
-        final Promise<Object, Throwable> promise = new PromiseImpl<Object, Throwable>().onComplete(new OnComplete() {
+    protected Promise<?,?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
+        final Deferred<Object, Throwable,Void> promise = new DeferredImpl<Object, Throwable,Void>().onComplete(new OnComplete() {
             @Override
             public void complete(final int state) {
                 for (final Pair<ChainId, A> pair : remoteExecutions.remove(jobExecutionId)) {
@@ -276,7 +277,7 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
     }
 
     protected <T> Future<T> _invoke(final A address, final DistributedCommand<T, A, R> command) throws Exception {
-        final Promise<T,Throwable> promise = new PromiseImpl<T, Throwable>();
+        final Deferred<T,Throwable,Void> promise = new DeferredImpl<T, Throwable,Void>();
         invoke(address, command, promise);
         return promise;
     }
