@@ -3,7 +3,6 @@ package io.machinecode.chainlink.transport.core;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.core.PromiseImpl;

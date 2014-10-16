@@ -9,7 +9,6 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -19,7 +18,6 @@ import javax.batch.operations.NoSuchJobException;
 import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.operations.NoSuchJobInstanceException;
 import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.persistence.EntityManager;
@@ -33,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

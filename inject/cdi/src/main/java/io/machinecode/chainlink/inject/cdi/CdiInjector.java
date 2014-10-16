@@ -4,7 +4,6 @@ import io.machinecode.chainlink.inject.core.DefaultInjector;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.chainlink.spi.util.Pair;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.runtime.context.JobContext;
@@ -17,8 +16,6 @@ import java.lang.reflect.Member;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.ServiceLoader;
 
 /**

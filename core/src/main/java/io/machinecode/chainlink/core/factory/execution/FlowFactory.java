@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.core.factory.execution;
 
-import io.machinecode.chainlink.core.expression.Expression;
-import io.machinecode.chainlink.core.factory.transition.Transitions;
 import io.machinecode.chainlink.core.element.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.element.execution.FlowImpl;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
-import io.machinecode.chainlink.spi.element.execution.Flow;
+import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.factory.ElementFactory;
+import io.machinecode.chainlink.core.factory.transition.Transitions;
+import io.machinecode.chainlink.spi.element.execution.Flow;
 import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 

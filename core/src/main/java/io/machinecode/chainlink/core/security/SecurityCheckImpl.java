@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.security;
 
-import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
 
 import javax.batch.operations.JobSecurityException;

@@ -4,10 +4,9 @@ package io.machinecode.chainlink.core.element;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Listeners;
-import io.machinecode.chainlink.spi.execution.Executor;
+import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
-import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;

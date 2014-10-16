@@ -9,10 +9,10 @@ import io.machinecode.chainlink.core.element.task.ItemProcessorImpl;
 import io.machinecode.chainlink.core.element.task.ItemReaderImpl;
 import io.machinecode.chainlink.core.element.task.ItemWriterImpl;
 import io.machinecode.chainlink.core.expression.Expression;
+import io.machinecode.chainlink.core.factory.TaskFactory;
 import io.machinecode.chainlink.spi.element.task.Chunk;
 import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
-import io.machinecode.chainlink.core.factory.TaskFactory;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

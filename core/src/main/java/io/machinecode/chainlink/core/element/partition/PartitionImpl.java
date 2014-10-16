@@ -1,21 +1,21 @@
 package io.machinecode.chainlink.core.element.partition;
 
-import io.machinecode.chainlink.core.expression.PropertyContextImpl;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
+import io.machinecode.chainlink.core.context.ItemImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
-import io.machinecode.chainlink.core.context.ItemImpl;
+import io.machinecode.chainlink.core.expression.PropertyContextImpl;
 import io.machinecode.chainlink.core.work.TaskExecutable;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.element.partition.Partition;
 import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.PartitionTarget;
 import io.machinecode.chainlink.spi.work.PartitionWork;

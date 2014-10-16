@@ -2,7 +2,6 @@ package io.machinecode.chainlink.spi.context;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric.MetricType;
-import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 
 /**

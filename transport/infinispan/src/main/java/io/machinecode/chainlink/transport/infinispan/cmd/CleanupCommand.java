@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan.cmd;
 
 import org.infinispan.context.InvocationContext;
-import org.infinispan.remoting.transport.Address;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

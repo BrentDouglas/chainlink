@@ -1,12 +1,11 @@
 package io.machinecode.chainlink.core.element.task;
 
-import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
+import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.task.ItemProcessor;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 

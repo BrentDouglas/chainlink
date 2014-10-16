@@ -2,7 +2,6 @@ package io.machinecode.chainlink.repository.infinispan;
 
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 
-import javax.batch.runtime.JobExecution;
 import java.util.ArrayList;
 import java.util.List;
 

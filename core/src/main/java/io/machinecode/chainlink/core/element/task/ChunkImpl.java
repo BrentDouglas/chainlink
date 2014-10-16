@@ -1,21 +1,21 @@
 package io.machinecode.chainlink.core.element.task;
 
-import io.machinecode.chainlink.core.factory.task.ChunkFactory;
+import io.machinecode.chainlink.core.context.ItemImpl;
 import io.machinecode.chainlink.core.element.ListenerImpl;
 import io.machinecode.chainlink.core.element.ListenersImpl;
 import io.machinecode.chainlink.core.element.partition.PartitionImpl;
-import io.machinecode.chainlink.core.context.ItemImpl;
+import io.machinecode.chainlink.core.factory.task.ChunkFactory;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
-import io.machinecode.chainlink.spi.repository.BaseExecution;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.element.task.Chunk;
 import io.machinecode.chainlink.spi.execution.Executor;
-import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.repository.BaseExecution;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.TaskWork;
 import io.machinecode.then.api.Promise;

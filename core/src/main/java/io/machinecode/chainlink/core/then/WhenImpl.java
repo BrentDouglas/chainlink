@@ -5,7 +5,6 @@ import io.machinecode.then.api.Promise;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 

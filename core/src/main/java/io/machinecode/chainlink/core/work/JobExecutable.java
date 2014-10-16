@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.work;
 
+import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -7,10 +8,9 @@ import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
-import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.core.then.ResolvedChain;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;

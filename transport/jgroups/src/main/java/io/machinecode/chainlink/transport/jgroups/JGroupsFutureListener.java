@@ -6,7 +6,6 @@ import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.PromiseImpl;
 import org.jgroups.util.FutureListener;
 
-import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 

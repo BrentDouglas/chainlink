@@ -1,11 +1,10 @@
 package io.machinecode.chainlink.transport.infinispan;
 
+import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
-import io.machinecode.chainlink.core.then.ChainImpl;
-import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.PromiseImpl;
 import org.infinispan.remoting.transport.Address;
 

@@ -1,24 +1,24 @@
 package io.machinecode.chainlink.core.element;
 
 import io.machinecode.chainlink.core.element.execution.ExecutionImpl;
-import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.core.validation.InvalidJobException;
-import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.core.validation.JobTraversal;
+import io.machinecode.chainlink.core.validation.JobValidator;
+import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.element.Job;
+import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.ExecutionWork;
 import io.machinecode.chainlink.spi.work.JobWork;
-import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.listener.JobListener;

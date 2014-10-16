@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.transport.infinispan;
 
-import io.machinecode.chainlink.transport.infinispan.cmd.InvokeExecutionRepositoryCommand;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.transport.infinispan.cmd.InvokeExecutionRepositoryCommand;
 import io.machinecode.then.core.PromiseImpl;
 import org.infinispan.remoting.transport.Address;
 

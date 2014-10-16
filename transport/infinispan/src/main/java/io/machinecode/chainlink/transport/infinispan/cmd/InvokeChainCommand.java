@@ -3,7 +3,6 @@ package io.machinecode.chainlink.transport.infinispan.cmd;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import org.infinispan.context.InvocationContext;
-import org.infinispan.remoting.transport.Address;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;

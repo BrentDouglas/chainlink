@@ -1,17 +1,17 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.core.then.Notify;
 import io.machinecode.chainlink.core.registry.UUIDId;
+import io.machinecode.chainlink.core.then.ChainImpl;
+import io.machinecode.chainlink.core.then.Notify;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.Promise;
-import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.then.core.ResolvedPromise;
 import org.jboss.logging.Logger;
 

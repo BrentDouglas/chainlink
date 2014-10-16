@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.core.factory.partition;
 
-import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.partition.MapperImpl;
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
+import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.spi.element.partition.Mapper;
 import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;

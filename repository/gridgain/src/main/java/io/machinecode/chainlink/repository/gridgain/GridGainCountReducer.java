@@ -5,7 +5,6 @@ import org.gridgain.grid.lang.GridReducer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
 * @author Brent Douglas <brent.n.douglas@gmail.com>

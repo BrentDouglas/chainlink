@@ -3,7 +3,6 @@ package io.machinecode.chainlink.transport.infinispan.cmd;
 import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import io.machinecode.chainlink.transport.infinispan.configuration.ChainlinkCommand;
 import org.infinispan.commands.remote.BaseRpcCommand;
-import org.infinispan.remoting.transport.Address;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

@@ -6,13 +6,11 @@ import io.machinecode.chainlink.jsl.fluent.FluentListeners;
 import io.machinecode.chainlink.jsl.fluent.FluentProperties;
 import io.machinecode.chainlink.jsl.fluent.FluentProperty;
 import io.machinecode.chainlink.jsl.fluent.partition.FluentPartition;
-import io.machinecode.chainlink.jsl.fluent.partition.FluentStrategy;
 import io.machinecode.chainlink.jsl.fluent.task.FluentBatchlet;
 import io.machinecode.chainlink.jsl.fluent.task.FluentChunk;
 import io.machinecode.chainlink.jsl.fluent.task.FluentTask;
 import io.machinecode.chainlink.jsl.fluent.transition.FluentTransition;
 import io.machinecode.chainlink.jsl.core.inherit.execution.InheritableStep;
-import io.machinecode.chainlink.spi.Copyable;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.ArrayList;

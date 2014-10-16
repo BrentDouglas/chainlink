@@ -1,12 +1,9 @@
 package io.machinecode.chainlink.core.context;
 
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
-import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
-import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
 import org.jboss.logging.Logger;

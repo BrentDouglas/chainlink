@@ -2,7 +2,6 @@ package io.machinecode.chainlink.repository.coherence;
 
 import com.tangosol.util.InvocableMap;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 
 import java.io.Serializable;
 import java.util.Map;

@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.transport.core;
 
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;

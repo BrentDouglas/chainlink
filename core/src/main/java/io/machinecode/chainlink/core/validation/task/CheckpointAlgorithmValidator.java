@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.validation.task;
 
-import io.machinecode.chainlink.spi.element.task.CheckpointAlgorithm;
 import io.machinecode.chainlink.core.validation.PropertyReferenceValidator;
+import io.machinecode.chainlink.spi.element.task.CheckpointAlgorithm;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

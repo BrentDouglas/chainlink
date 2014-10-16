@@ -10,7 +10,6 @@ import org.bson.types.ObjectId;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;
-
 import java.io.Serializable;
 import java.util.Date;
 

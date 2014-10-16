@@ -4,9 +4,9 @@ import com.tangosol.net.Member;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.chainlink.transport.coherence.cmd.CoherencePushChainCommand;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
-import io.machinecode.chainlink.transport.coherence.cmd.CoherencePushChainCommand;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

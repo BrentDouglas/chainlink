@@ -14,10 +14,10 @@ import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
-import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
+import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 

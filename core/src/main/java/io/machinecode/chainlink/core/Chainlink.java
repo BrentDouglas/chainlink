@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.core;
 
 import io.machinecode.chainlink.core.management.StaticEnvironment;
-import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.util.ResolvableService;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;

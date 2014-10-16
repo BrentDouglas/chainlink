@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.element.execution;
 
-import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.core.element.ListenerImpl;
@@ -12,24 +11,25 @@ import io.machinecode.chainlink.core.element.transition.TransitionImpl;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.work.TaskExecutable;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
-import io.machinecode.chainlink.spi.registry.StepAccumulator;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
+import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.StepAccumulator;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.element.execution.Step;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.PartitionTarget;
 import io.machinecode.chainlink.spi.work.StrategyWork;
 import io.machinecode.chainlink.spi.work.TaskWork;
 import io.machinecode.chainlink.spi.work.TransitionWork;
-import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.listener.StepListener;

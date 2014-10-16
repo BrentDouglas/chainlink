@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.transport.infinispan.cmd;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
-import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
+import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import org.infinispan.context.InvocationContext;
 
 /**

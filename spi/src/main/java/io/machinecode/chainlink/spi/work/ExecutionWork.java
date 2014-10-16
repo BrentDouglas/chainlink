@@ -6,7 +6,6 @@ import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.element.execution.Execution;
-import io.machinecode.then.api.Promise;
 import io.machinecode.chainlink.spi.then.Chain;
 
 import java.io.Serializable;

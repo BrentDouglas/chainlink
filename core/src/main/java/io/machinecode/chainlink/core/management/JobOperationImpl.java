@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.management;
 
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.management.JobOperation;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.Promise;

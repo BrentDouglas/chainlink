@@ -6,8 +6,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.xml.bind.annotation.XmlAccessType.NONE;
 import static io.machinecode.chainlink.inject.core.batch.BatchArtifacts.NAMESPACE;
+import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

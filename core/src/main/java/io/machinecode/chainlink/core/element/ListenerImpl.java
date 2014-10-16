@@ -1,15 +1,15 @@
 package io.machinecode.chainlink.core.element;
 
-import io.machinecode.chainlink.core.inject.InjectablesImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
+import io.machinecode.chainlink.core.inject.InjectablesImpl;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Listener;
 import io.machinecode.chainlink.spi.element.PropertyReference;
+import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
-import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 

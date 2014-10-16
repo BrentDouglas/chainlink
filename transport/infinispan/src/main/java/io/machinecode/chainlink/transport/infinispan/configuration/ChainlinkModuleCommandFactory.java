@@ -2,10 +2,10 @@ package io.machinecode.chainlink.transport.infinispan.configuration;
 
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.transport.infinispan.cmd.CleanupCommand;
-import io.machinecode.chainlink.transport.infinispan.cmd.PushChainCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.ExecuteCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeExecutionRepositoryCommand;
+import io.machinecode.chainlink.transport.infinispan.cmd.PushChainCommand;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.commands.module.ExtendedModuleCommandFactory;
 import org.infinispan.commands.remote.CacheRpcCommand;

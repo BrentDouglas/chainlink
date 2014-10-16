@@ -1,5 +1,8 @@
 package io.machinecode.chainlink.core.execution;
 
+import io.machinecode.chainlink.core.then.AllChain;
+import io.machinecode.chainlink.core.then.ChainImpl;
+import io.machinecode.chainlink.core.then.RejectedChain;
 import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
@@ -8,13 +11,10 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.then.api.Promise;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.OnReject;
 import io.machinecode.then.api.OnResolve;
-import io.machinecode.chainlink.core.then.AllChain;
-import io.machinecode.chainlink.core.then.ChainImpl;
-import io.machinecode.chainlink.core.then.RejectedChain;
+import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import java.util.List;

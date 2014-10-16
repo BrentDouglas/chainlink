@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.core.validation.execution;
 
 import io.machinecode.chainlink.core.validation.ListenersValidator;
+import io.machinecode.chainlink.core.validation.PropertiesValidator;
 import io.machinecode.chainlink.core.validation.partition.PartitionValidator;
 import io.machinecode.chainlink.core.validation.task.TaskValidator;
 import io.machinecode.chainlink.core.validation.transition.TransitionValidator;
-import io.machinecode.chainlink.core.validation.PropertiesValidator;
 import io.machinecode.chainlink.core.validation.visitor.ValidatingVisitor;
 import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
 import io.machinecode.chainlink.spi.element.execution.Step;

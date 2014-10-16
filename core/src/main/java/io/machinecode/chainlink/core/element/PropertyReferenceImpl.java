@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.element;
 
-import io.machinecode.chainlink.core.inject.InjectablesImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
+import io.machinecode.chainlink.core.inject.InjectablesImpl;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.PropertyReference;

@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.core.inject;
 
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.inject.Injector;
-import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 
 import java.lang.ref.WeakReference;
 

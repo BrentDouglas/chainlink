@@ -2,7 +2,6 @@ package io.machinecode.chainlink.transport.infinispan.configuration;
 
 import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import org.infinispan.factories.ComponentRegistry;
-import org.infinispan.factories.GlobalComponentRegistry;
 import org.infinispan.lifecycle.AbstractModuleLifecycle;
 
 /**

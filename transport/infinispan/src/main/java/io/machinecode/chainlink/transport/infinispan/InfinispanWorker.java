@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.transport.infinispan;
 
 import io.machinecode.chainlink.spi.execution.Executable;
-import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.transport.infinispan.cmd.PushChainCommand;
-import io.machinecode.chainlink.transport.infinispan.cmd.ExecuteCommand;
-import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Worker;
+import io.machinecode.chainlink.spi.registry.ChainId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.transport.infinispan.cmd.ExecuteCommand;
+import io.machinecode.chainlink.transport.infinispan.cmd.PushChainCommand;
 import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.PromiseImpl;

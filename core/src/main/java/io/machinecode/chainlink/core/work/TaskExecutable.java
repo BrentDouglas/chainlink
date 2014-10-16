@@ -4,13 +4,13 @@ import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
+import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.TaskWork;
-import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.OnCancel;
 import org.jboss.logging.Logger;
 

@@ -5,11 +5,11 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
-import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
-import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
+import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 import org.jgroups.Address;
@@ -139,6 +139,7 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
     @Override
     public Object handle(final Message msg) throws Exception {
         try {
+            @SuppressWarnings("unchecked")
             final DistributedCommand<?,Address,JGroupsRegistry> command = marshaller.unmarshall(msg.getBuffer(), DistributedCommand.class);
             log.tracef("Handling %s from %s.", command, msg.src());
             return command.perform(this, msg.src());

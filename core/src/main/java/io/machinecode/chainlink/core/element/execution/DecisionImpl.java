@@ -1,22 +1,22 @@
 package io.machinecode.chainlink.core.element.execution;
 
-import io.machinecode.chainlink.core.inject.InjectablesImpl;
-import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
+import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
+import io.machinecode.chainlink.core.inject.InjectablesImpl;
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.element.execution.Decision;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
+import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.TransitionWork;
-import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.Decider;

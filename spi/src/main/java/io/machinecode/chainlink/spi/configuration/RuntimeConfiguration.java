@@ -6,7 +6,6 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.then.When;
 
 import javax.transaction.TransactionManager;
 

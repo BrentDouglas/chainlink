@@ -9,7 +9,6 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

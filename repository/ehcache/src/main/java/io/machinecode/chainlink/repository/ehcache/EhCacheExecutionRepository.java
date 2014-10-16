@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.repository.ehcache;
 
-import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.repository.core.BaseMapExecutionRepository;
 import io.machinecode.chainlink.spi.marshalling.Marshaller;
@@ -9,11 +8,9 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import net.sf.ehcache.search.Result;
 import net.sf.ehcache.search.Results;
 import net.sf.ehcache.search.aggregator.Aggregators;
-import net.sf.ehcache.search.attribute.DynamicAttributesExtractor;
 import net.sf.ehcache.search.expression.AlwaysMatch;
 import net.sf.ehcache.search.expression.EqualTo;
 import net.sf.ehcache.search.expression.InCollection;
@@ -24,7 +21,6 @@ import javax.batch.runtime.JobInstance;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

@@ -2,17 +2,17 @@ package io.machinecode.chainlink.core.element.execution;
 
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
-import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.core.util.Statuses;
+import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.element.execution.Split;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.SplitAccumulator;
 import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.element.execution.Split;
-import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import java.util.List;

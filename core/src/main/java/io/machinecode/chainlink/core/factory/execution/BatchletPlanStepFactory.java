@@ -1,11 +1,5 @@
 package io.machinecode.chainlink.core.factory.execution;
 
-import io.machinecode.chainlink.core.expression.Expression;
-import io.machinecode.chainlink.core.factory.PropertiesFactory;
-import io.machinecode.chainlink.core.factory.StepListenersFactory;
-import io.machinecode.chainlink.core.factory.partition.PlanPartitionFactory;
-import io.machinecode.chainlink.core.factory.task.BatchletFactory;
-import io.machinecode.chainlink.core.factory.transition.Transitions;
 import io.machinecode.chainlink.core.element.ListenersImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.execution.StepImpl;
@@ -13,10 +7,16 @@ import io.machinecode.chainlink.core.element.partition.PartitionImpl;
 import io.machinecode.chainlink.core.element.partition.PlanImpl;
 import io.machinecode.chainlink.core.element.task.BatchletImpl;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
+import io.machinecode.chainlink.core.expression.Expression;
+import io.machinecode.chainlink.core.factory.ElementFactory;
+import io.machinecode.chainlink.core.factory.PropertiesFactory;
+import io.machinecode.chainlink.core.factory.StepListenersFactory;
+import io.machinecode.chainlink.core.factory.partition.PlanPartitionFactory;
+import io.machinecode.chainlink.core.factory.task.BatchletFactory;
+import io.machinecode.chainlink.core.factory.transition.Transitions;
 import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.element.partition.Plan;
 import io.machinecode.chainlink.spi.element.task.Batchlet;
-import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 

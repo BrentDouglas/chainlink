@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.core.factory;
 
-import io.machinecode.chainlink.core.expression.Expression;
-import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.element.ListenerImpl;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
+import io.machinecode.chainlink.core.expression.Expression;
+import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.spi.element.Listener;
 import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;

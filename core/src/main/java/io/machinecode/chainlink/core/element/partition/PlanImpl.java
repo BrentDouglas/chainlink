@@ -5,7 +5,6 @@ import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Plan;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.StrategyWork;
 import org.jboss.logging.Logger;

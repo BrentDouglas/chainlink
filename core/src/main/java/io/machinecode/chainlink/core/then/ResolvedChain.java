@@ -2,8 +2,6 @@ package io.machinecode.chainlink.core.then;
 
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.then.OnLink;
-import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.ResolvedPromise;
 
 import java.util.concurrent.TimeUnit;
 

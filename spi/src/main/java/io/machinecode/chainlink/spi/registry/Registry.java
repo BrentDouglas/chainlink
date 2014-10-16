@@ -4,7 +4,6 @@ import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;

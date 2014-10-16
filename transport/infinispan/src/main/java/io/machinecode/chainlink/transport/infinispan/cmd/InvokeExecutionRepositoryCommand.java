@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.transport.infinispan.cmd;
 
-import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
-import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.transport.infinispan.configuration.ChainlinkCommand;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.Registry;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
+import io.machinecode.chainlink.transport.infinispan.configuration.ChainlinkCommand;
 import org.infinispan.commands.remote.BaseRpcCommand;
 import org.infinispan.context.InvocationContext;
 import org.jboss.logging.Logger;
