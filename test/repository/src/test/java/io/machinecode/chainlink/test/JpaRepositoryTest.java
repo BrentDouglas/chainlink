@@ -4,7 +4,6 @@ import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.DummyDataSource;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.jboss.logging.Logger;
 import org.junit.After;

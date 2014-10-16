@@ -1,18 +1,17 @@
 package io.machinecode.chainlink.test.core.execution;
 
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
-import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
-import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
 

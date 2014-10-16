@@ -10,11 +10,8 @@ import org.gridgain.grid.GridGain;
 import org.gridgain.grid.GridGainState;
 import org.gridgain.grid.cache.GridCacheAtomicityMode;
 import org.gridgain.grid.cache.GridCacheConfiguration;
-import org.gridgain.grid.cache.GridCacheMode;
 import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMulticastIpFinder;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

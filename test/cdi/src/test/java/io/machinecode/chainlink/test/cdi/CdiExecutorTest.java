@@ -1,17 +1,17 @@
 package io.machinecode.chainlink.test.cdi;
 
+import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.core.element.JobImpl;
+import io.machinecode.chainlink.core.factory.JobFactory;
+import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
 import io.machinecode.chainlink.inject.cdi.CdiInjector;
-import io.machinecode.chainlink.core.management.JobOperationImpl;
-import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
-import io.machinecode.chainlink.core.factory.JobFactory;
-import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.ExecutorTest;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.AfterClass;

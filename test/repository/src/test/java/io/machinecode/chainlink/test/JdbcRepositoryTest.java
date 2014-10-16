@@ -7,7 +7,6 @@ import io.machinecode.chainlink.test.core.execution.DummyDataSource;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.jboss.logging.Logger;
 import org.junit.After;
-import org.junit.Ignore;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

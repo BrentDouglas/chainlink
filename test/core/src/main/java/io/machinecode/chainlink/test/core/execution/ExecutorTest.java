@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.test.core.execution;
 
-import io.machinecode.chainlink.core.management.JobOperatorImpl;
-import io.machinecode.chainlink.core.management.JobOperationImpl;
-import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.element.JobImpl;
+import io.machinecode.chainlink.core.factory.JobFactory;
+import io.machinecode.chainlink.core.management.JobOperationImpl;
+import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.FailBatchlet;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;

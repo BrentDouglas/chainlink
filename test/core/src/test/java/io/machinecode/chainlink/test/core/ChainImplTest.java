@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.test.core;
 
-import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.core.then.ChainImpl;
+import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.test.core.execution.Reference;
 import org.junit.Assert;
 import org.junit.Test;

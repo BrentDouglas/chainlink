@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.test.core.jsl.fluent;
 
-import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.element.JobImpl;
-import io.machinecode.chainlink.jsl.fluent.Jsl;
+import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.validation.InvalidJobException;
+import io.machinecode.chainlink.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.test.core.ExpressionTest;
 import org.junit.Test;

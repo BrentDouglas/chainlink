@@ -6,8 +6,6 @@ import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.jongo.Jongo;
-import org.jongo.Mapper;
-import org.jongo.marshall.jackson.JacksonMapper;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

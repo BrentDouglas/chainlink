@@ -6,8 +6,6 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.jboss.logging.Logger;
 import org.jongo.Jongo;
-import org.jongo.Mapper;
-import org.jongo.marshall.jackson.JacksonMapper;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>

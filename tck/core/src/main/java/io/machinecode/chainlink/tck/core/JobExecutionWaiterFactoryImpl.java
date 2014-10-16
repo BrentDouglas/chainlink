@@ -5,8 +5,6 @@ import com.ibm.jbatch.tck.spi.JobExecutionWaiterFactory;
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.management.Environment;
-import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 
 import javax.batch.operations.JobOperator;
 
