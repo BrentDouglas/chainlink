@@ -21,6 +21,7 @@
                 <include>io.machinecode.chainlink:chainlink-core</include>
                 <include>io.machinecode.chainlink:chainlink-jsl-core</include>
                 <include>io.machinecode.chainlink:chainlink-jsl-fluent</include>
+                <include>io.machinecode.chainlink:chainlink-jsl-groovy</include>
                 <include>io.machinecode.chainlink:chainlink-jsl-xml</include>
                 <include>io.machinecode.chainlink:chainlink-inject-core</include>
                 <include>io.machinecode.chainlink:chainlink-inject-cdi</include>

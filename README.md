@@ -30,14 +30,15 @@ Execution repositories:
 - GridGain
 
 Transports:
-- Local
+- Local JVM
 - Infinispan
 
 Job loaders that support the job inheritance proposal and a simple api
 and utilities to allow user defined loaders to also support job
 inheritance. Built in loaders support:
 - XML
-- Fluent style
+- Java
+- Groovy DSL
 
 JMX job management.
 

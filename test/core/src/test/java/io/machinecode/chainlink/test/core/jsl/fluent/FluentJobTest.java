@@ -6,7 +6,7 @@ import io.machinecode.chainlink.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.task.Chunk.CheckpointPolicy;
 import io.machinecode.chainlink.test.core.ExpressionTest;
-import io.machinecode.chainlink.test.core.jsl.xml.XmlJobTest;
+import io.machinecode.chainlink.test.core.jsl.InheritanceJobTest;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -260,7 +260,7 @@ public class FluentJobTest {
                         .setId("step2")
                 ), ExpressionTest.PARAMETERS);
 
-        XmlJobTest.testDefaults(job);
+        InheritanceJobTest.testDefaults(job);
     }
 
     @Test

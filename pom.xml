@@ -74,6 +74,7 @@
         <version.org.gridgain>6.5.0</version.org.gridgain>
         <version.org.gridgain.gridgain-core>${version.org.gridgain}</version.org.gridgain.gridgain-core>
         <version.org.gridgain.gridgain-indexing>${version.org.gridgain}</version.org.gridgain.gridgain-indexing>
+        <version.org.codehaus.groovy.groovy-all>2.3.7</version.org.codehaus.groovy.groovy-all>
         <version.org.h2database.h2>1.3.175</version.org.h2database.h2>
         <version.org.hibernate>4.2.5.Final</version.org.hibernate>
         <version.org.hibernate.hibernate-validator>3.1.0.GA</version.org.hibernate.hibernate-validator>
@@ -180,6 +181,11 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-jsl-fluent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-jsl-groovy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -368,6 +374,11 @@
                 <version>${version.org.gridgain.gridgain-indexing}</version>
             </dependency>
             <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${version.org.codehaus.groovy.groovy-all}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${version.org.hibernate}</version>
@@ -497,6 +508,57 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>properties-maven-plugin</artifactId>
                     <version>${version.org.codehaus.mojo.properties-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>groovy-compile</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc">
+                                        <classpath refid="maven.compile.classpath" />
+                                        <classpath refid="maven.plugin.classpath" />
+                                    </taskdef>
+                                    <mkdir dir="${project.build.outputDirectory}" />
+                                    <groovyc srcdir="${basedir}/src/main/groovy" destdir="${project.build.outputDirectory}" encoding="${project.build.sourceEncoding}">
+                                        <classpath refid="maven.compile.classpath" />
+                                    </groovyc>
+                                </target>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>groovy-test-compile</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc">
+                                        <classpath refid="maven.test.classpath" />
+                                        <classpath refid="maven.plugin.classpath" />
+                                    </taskdef>
+                                    <mkdir dir="${project.build.testOutputDirectory}" />
+                                    <groovyc srcdir="${basedir}/src/test/groovy" destdir="${project.build.testOutputDirectory}" encoding="${project.build.sourceEncoding}">
+                                        <classpath refid="maven.test.classpath" />
+                                    </groovyc>
+                                </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-all</artifactId>
+                            <version>${version.org.codehaus.groovy.groovy-all}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
