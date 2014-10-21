@@ -271,8 +271,8 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             try {
                 log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
                 state.transactionManager.begin();
-                _closeReader(state);
                 _closeWriter(state);
+                _closeReader(state);
                 if (!state.isFailed()) {
                     log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
                     state.transactionManager.commit();
