@@ -28,6 +28,8 @@ import javax.transaction.TransactionManager;
  */
 public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
 
+    T setConfigurationDefaults(final ConfigurationDefaults defaults);
+
     T setProperty(final String key, final String value);
 
     T setClassLoader(final ClassLoader classLoader);

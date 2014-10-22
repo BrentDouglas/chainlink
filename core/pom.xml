@@ -13,10 +13,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.boundary</groupId>
-            <artifactId>high-scale-lib</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-api</artifactId>
         </dependency>
@@ -34,15 +30,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-marshalling-jdk</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-memory</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>

@@ -9,14 +9,12 @@ import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
  */
 public class GlassfishConfigutation extends ConfigurationImpl {
 
-    static GlassfishConfigurationDefaults defaults;
-
     public GlassfishConfigutation(final Builder builder) throws Exception {
-        super(builder, defaults);
+        super(builder);
     }
 
     public static Builder xmlToBuilder(final XmlConfiguration xml) {
-        return _configureBuilder(new Builder(), xml);
+        return configureBuilder(new Builder(), xml);
     }
 
 

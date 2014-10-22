@@ -68,7 +68,7 @@ public class GlassfishEnvironment implements Environment {
         }
         try {
             final TransactionManager transactionManager = InitialContext.doLookup("java:appserver/TransactionManager");
-            GlassfishConfigutation.defaults = new GlassfishConfigurationDefaults(info.getAppClassLoader(), transactionManager);
+            final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(info.getAppClassLoader(), transactionManager);
 
             boolean haveDefault = false;
             if (factories.isEmpty()) {
@@ -82,6 +82,7 @@ public class GlassfishEnvironment implements Environment {
                         app.ops.put(
                                 configuration.getId(),
                                 new JobOperatorImpl(GlassfishConfigutation.xmlToBuilder(configuration)
+                                        .setConfigurationDefaults(defaults)
                                         .build()
                                 )
                         );
@@ -95,6 +96,7 @@ public class GlassfishEnvironment implements Environment {
                     app.ops.put(
                             configuration.getId(),
                             new JobOperatorImpl(configuration.produce()
+                                    .setConfigurationDefaults(defaults)
                                     .build()
                             )
                     );
@@ -107,6 +109,7 @@ public class GlassfishEnvironment implements Environment {
                 app.ops.put(
                         Constants.DEFAULT_CONFIGURATION,
                         new JobOperatorImpl(new GlassfishConfigutation.Builder()
+                                .setConfigurationDefaults(defaults)
                                 .build()
                         )
                 );

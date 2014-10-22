@@ -21,13 +21,13 @@ install() {
     mkdir ${BACKUP_DIR}
   }
   mv ${MODULES_DIR}/{glassfish-batch-connector.jar,glassfish-batch-commands.jar,com.ibm.jbatch-ri-spi.jar,com.ibm.jbatch-runtime-all.jar} ${BACKUP_DIR}
-  mv ${CHAINLINK_LIB_DIR}/{then-*,chainlink-*,trove4j-*}.jar ${MODULES_DIR}
+  cp ${CHAINLINK_LIB_DIR}/{then-*,chainlink-*,trove4j-*}.jar ${MODULES_DIR}
   echo "Installed Chainlink."
 }
 
 uninstall() {
   mv ${BACKUP_DIR}/{glassfish-batch-connector.jar,glassfish-batch-commands.jar,com.ibm.jbatch-ri-spi.jar,com.ibm.jbatch-runtime-all.jar} ${MODULES_DIR}
-  mv ${MODULES_DIR}/{then-*,chainlink-*,trove4j-*}.jar ${CHAINLINK_LIB_DIR}
+  rm ${MODULES_DIR}/{then-*,chainlink-*,trove4j-*}.jar
   echo "Uninstalled Chainlink."
 }
 

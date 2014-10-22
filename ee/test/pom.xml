@@ -91,5 +91,15 @@
                 <module>tomee</module>
             </modules>
         </profile>
+        <profile>
+            <id>wildfly</id>
+            <activation>
+                <property><name>wildfly</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>wildfly</module>
+            </modules>
+        </profile>
     </profiles>
 </project>

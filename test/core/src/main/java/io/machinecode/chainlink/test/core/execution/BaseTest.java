@@ -3,6 +3,7 @@ package io.machinecode.chainlink.test.core.execution;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.se.configuration.SeConfiguration;
+import io.machinecode.chainlink.se.configuration.SeConfigurationDefaults;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
@@ -37,7 +38,9 @@ public abstract class BaseTest extends Assert {
 
     protected final SeConfiguration configuration() throws Exception {
         if (this._configuration == null) {
-            this._configuration = _configuration().build();
+            this._configuration = _configuration()
+                    .setConfigurationDefaults(new SeConfigurationDefaults())
+                    .build();
         }
         return this._configuration;
     }

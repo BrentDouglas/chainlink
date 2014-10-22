@@ -9,7 +9,7 @@ import io.machinecode.chainlink.core.inject.InjectorImpl;
 import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.core.security.SecurityCheckImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.configuration.FinalConfiguration;
+import io.machinecode.chainlink.spi.configuration.ConfigurationDefaults;import io.machinecode.chainlink.spi.configuration.FinalConfiguration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationBuilder;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
@@ -45,7 +45,7 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
  * @since 1.0
  */
-public abstract class ConfigurationImpl implements FinalConfiguration, RuntimeConfiguration {
+public class ConfigurationImpl implements FinalConfiguration, RuntimeConfiguration {
 
     protected final ClassLoader classLoader;
     protected final MarshallingProviderFactory marshallingProviderFactory;
@@ -62,11 +62,11 @@ public abstract class ConfigurationImpl implements FinalConfiguration, RuntimeCo
     protected final WorkerFactory workerFactory;
     protected final MBeanServer mBeanServer;
 
-    protected ConfigurationImpl(final _Builder<?> builder, final ConfigurationDefaults defaults) throws Exception {
+    public ConfigurationImpl(final _Builder<?> builder) throws Exception {
         this.properties = builder.properties;
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        this.classLoader = _get(tccl, builder.classLoader, builder.classLoaderFactory, builder.classLoaderFactoryClass, builder.classLoaderFactoryFqcn, defaults.getClassLoader(this), this);
-        this.transactionManager = _get(this.classLoader, builder.transactionManager, builder.transactionManagerFactory, builder.transactionManagerFactoryClass, builder.transactionManagerFactoryFqcn, defaults.getTransactionManager(this), this);
+        this.classLoader = _get(tccl, builder.classLoader, builder.classLoaderFactory, builder.classLoaderFactoryClass, builder.classLoaderFactoryFqcn, builder.defaults.getClassLoader(this), this);
+        this.transactionManager = _get(this.classLoader, builder.transactionManager, builder.transactionManagerFactory, builder.transactionManagerFactoryClass, builder.transactionManagerFactoryFqcn, builder.defaults.getTransactionManager(this), this);
         final ArrayList<JobLoader> jobLoaders = _arrayGet(this.classLoader, builder.jobLoaders, builder.jobLoaderFactories, builder.jobLoaderFactoriesClass, builder.jobLoaderFactoriesFqcns, this);
         this.jobLoader = new JobLoaderImpl(this.classLoader, jobLoaders.toArray(new JobLoader[jobLoaders.size()]));
         final ArrayList<ArtifactLoader> artifactLoaders = _arrayGet(this.classLoader, builder.artifactLoaders, builder.artifactLoaderFactories, builder.artifactLoaderFactoriesClass, builder.artifactLoaderFactoriesFqcns, this);
@@ -76,12 +76,12 @@ public abstract class ConfigurationImpl implements FinalConfiguration, RuntimeCo
         final ArrayList<SecurityCheck> securityChecks = _arrayGet(this.classLoader, builder.securityChecks, builder.securityCheckFactories, builder.securityCheckFactoriesClass, builder.securityCheckFactoriesFqcns, this);
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
-        this.marshallingProviderFactory = (MarshallingProviderFactory) _getFactory(this.classLoader, builder.marshallingProviderFactory, builder.marshallingProviderFactoryClass, builder.marshallingProviderFactoryFqcn, defaults.getMarshallerFactory(this));
-        this.repository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, defaults.getRepository(this), this);
-        this.mBeanServer = _get(this.classLoader, builder.mBeanServer, builder.mBeanServerFactory, builder.mBeanServerFactoryClass, builder.mBeanServerFactoryFqcn, defaults.getMBeanServer(this), this);
-        this.registry = _get(this.classLoader, builder.registry, builder.registryFactory, builder.registryFactoryClass, builder.registryFactoryFqcn, defaults.getRegistry(this), this);
-        this.executor = _get(this.classLoader, builder.executor, builder.executorFactory, builder.executorFactoryClass, builder.executorFactoryFqcn, defaults.getExecutor(this), this);
-        this.workerFactory = (WorkerFactory) _getFactory(this.classLoader, builder.workerFactory, builder.workerFactoryClass, builder.workerFactoryFqcn, defaults.getWorkerFactory(this));
+        this.marshallingProviderFactory = (MarshallingProviderFactory) _getFactory(this.classLoader, builder.marshallingProviderFactory, builder.marshallingProviderFactoryClass, builder.marshallingProviderFactoryFqcn, builder.defaults.getMarshallerFactory(this));
+        this.repository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, builder.defaults.getRepository(this), this);
+        this.mBeanServer = _get(this.classLoader, builder.mBeanServer, builder.mBeanServerFactory, builder.mBeanServerFactoryClass, builder.mBeanServerFactoryFqcn, builder.defaults.getMBeanServer(this), this);
+        this.registry = _get(this.classLoader, builder.registry, builder.registryFactory, builder.registryFactoryClass, builder.registryFactoryFqcn, builder.defaults.getRegistry(this), this);
+        this.executor = _get(this.classLoader, builder.executor, builder.executorFactory, builder.executorFactoryClass, builder.executorFactoryFqcn, builder.defaults.getExecutor(this), this);
+        this.workerFactory = (WorkerFactory) _getFactory(this.classLoader, builder.workerFactory, builder.workerFactoryClass, builder.workerFactoryFqcn, builder.defaults.getWorkerFactory(this));
     }
 
     @Override
@@ -323,7 +323,7 @@ public abstract class ConfigurationImpl implements FinalConfiguration, RuntimeCo
         return registry;
     }
 
-    public static <T extends _Builder<T>> T _configureBuilder(final T builder, final XmlConfiguration xml) {
+    public static <T extends _Builder<T>> T configureBuilder(final T builder, final XmlConfiguration xml) {
         for (final XmlProperty property : xml.getProperties()) {
             builder.setProperty(property.getKey(), property.getValue());
         }
@@ -354,6 +354,8 @@ public abstract class ConfigurationImpl implements FinalConfiguration, RuntimeCo
 
     @SuppressWarnings("unchecked")
     public abstract static class _Builder<T extends _Builder<T>> implements ConfigurationBuilder<T> {
+        private ConfigurationDefaults defaults;
+
         private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         private Executor executor;
         private Registry registry;
@@ -404,6 +406,12 @@ public abstract class ConfigurationImpl implements FinalConfiguration, RuntimeCo
         private String[] artifactLoaderFactoriesFqcns;
         private String[] injectorFactoriesFqcns;
         private String[] securityCheckFactoriesFqcns;
+
+        @Override
+        public T setConfigurationDefaults(final ConfigurationDefaults defaults) {
+            this.defaults = defaults;
+            return (T)this;
+        }
 
         @Override
         public T setClassLoader(final ClassLoader classLoader) {

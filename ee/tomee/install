@@ -19,12 +19,12 @@ install() {
   [ -d ${BACKUP_DIR} ] || {
     mkdir ${BACKUP_DIR}
   }
-  mv ${CHAINLINK_LIB_DIR}/{then-*,chainlink-*,trove4j-*,jboss-logging-*}.jar ${MODULES_DIR}
+  cp ${CHAINLINK_LIB_DIR}/{then-*,chainlink-*,trove4j-*,jboss-logging-*}.jar ${MODULES_DIR}
   echo "Installed Chainlink."
 }
 
 uninstall() {
-  mv ${MODULES_DIR}/{then-*,chainlink-*,trove4j-*,jboss-logging-*}.jar ${CHAINLINK_LIB_DIR}
+  rm ${MODULES_DIR}/{then-*,chainlink-*,trove4j-*,jboss-logging-*}.jar
   echo "Uninstalled Chainlink."
 }
 

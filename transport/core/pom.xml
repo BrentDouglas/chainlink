@@ -22,6 +22,11 @@
             <artifactId>chainlink-spi</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

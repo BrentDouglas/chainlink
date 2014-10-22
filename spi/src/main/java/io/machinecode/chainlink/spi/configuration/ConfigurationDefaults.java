@@ -1,11 +1,5 @@
-package io.machinecode.chainlink.core.configuration;
+package io.machinecode.chainlink.spi.configuration;
 
-import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
-import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
-import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
-import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
-import io.machinecode.chainlink.spi.configuration.WorkerConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;

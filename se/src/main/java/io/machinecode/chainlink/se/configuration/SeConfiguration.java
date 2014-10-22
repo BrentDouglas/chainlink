@@ -10,11 +10,11 @@ import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
 public class SeConfiguration extends ConfigurationImpl {
 
     public SeConfiguration(final Builder builder) throws Exception {
-        super(builder, new SeConfigurationDefaults());
+        super(builder);
     }
 
     public static Builder xmlToBuilder(final XmlConfiguration xml) {
-        return _configureBuilder(new Builder(), xml);
+        return configureBuilder(new Builder(), xml);
     }
 
     public static class Builder extends _Builder<Builder> {

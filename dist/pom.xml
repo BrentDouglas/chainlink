@@ -27,6 +27,10 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-ee-wildfly</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-jsl-core</artifactId>
         </dependency>
         <dependency>
@@ -306,6 +310,7 @@
                                 <descriptor>chainlinkd.xml</descriptor>
                                 <descriptor>glassfish.xml</descriptor>
                                 <descriptor>tomee.xml</descriptor>
+                                <descriptor>wildfly.xml</descriptor>
                                 <descriptor>src.xml</descriptor>
                             </descriptors>
                             <finalName>chainlink-${project.version}</finalName>

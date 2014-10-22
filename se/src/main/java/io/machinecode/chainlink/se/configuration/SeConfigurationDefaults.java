@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.se.configuration;
 
-import io.machinecode.chainlink.core.configuration.ConfigurationDefaults;
+import io.machinecode.chainlink.spi.configuration.ConfigurationDefaults;
 import io.machinecode.chainlink.core.execution.EventedExecutor;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
 * @since 1.0
 */
-class SeConfigurationDefaults implements ConfigurationDefaults {
+public class SeConfigurationDefaults implements ConfigurationDefaults {
 
     final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 

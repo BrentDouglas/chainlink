@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="io.machinecode.chainlink.inject.cdi">
+    <resources>
+        <resource-root path="chainlink-inject-cdi-${project.version}.jar"/>
+    </resources>
+
+    <dependencies>
+        <module name="io.machinecode.chainlink"/>
+        <module name="javax.inject"/>
+        <module name="javax.enterprise.api"/>
+    </dependencies>
+</module>

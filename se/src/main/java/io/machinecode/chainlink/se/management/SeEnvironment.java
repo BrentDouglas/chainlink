@@ -6,6 +6,7 @@ import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
 import io.machinecode.chainlink.se.configuration.SeConfiguration;
+import io.machinecode.chainlink.se.configuration.SeConfigurationDefaults;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
@@ -72,6 +73,7 @@ public class SeEnvironment implements Environment {
         } catch (final Exception e) {
             throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
         }
+        final SeConfigurationDefaults defaults = new SeConfigurationDefaults();
         if (factories.isEmpty()) {
             try {
                 final JAXBContext context = JAXBContext.newInstance(XmlChainlink.class);
@@ -82,6 +84,7 @@ public class SeEnvironment implements Environment {
                     operators.put(
                             configuration.getId(),
                             new JobOperatorImpl(SeConfiguration.xmlToBuilder(configuration)
+                                    .setConfigurationDefaults(defaults)
                                     .build()
                             )
                     );

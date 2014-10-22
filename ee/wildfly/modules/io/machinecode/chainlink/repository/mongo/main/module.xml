@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="io.machinecode.chainlink.repository.mongo">
+    <resources>
+        <resource-root path="chainlink-repository-mongo-${project.version}.jar"/>
+    </resources>
+
+    <dependencies>
+        <module name="gnu.trove"/>
+        <module name="io.machinecode.chainlink"/>
+        <module name="io.machinecode.chainlink.marshalling.jdk"/>
+        <module name="org.jongo"/>
+    </dependencies>
+</module>

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.ee.glassfish;
 
-import io.machinecode.chainlink.core.configuration.ConfigurationDefaults;
+import io.machinecode.chainlink.spi.configuration.ConfigurationDefaults;
 import io.machinecode.chainlink.core.execution.EventedExecutor;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
@@ -26,7 +26,7 @@ import java.lang.management.ManagementFactory;
 * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
 * @since 1.0
 */
-class GlassfishConfigurationDefaults implements ConfigurationDefaults {
+public class GlassfishConfigurationDefaults implements ConfigurationDefaults {
 
     final ClassLoader loader;
     final TransactionManager transactionManager;

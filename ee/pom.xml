@@ -15,6 +15,7 @@
     <modules>
         <module>glassfish</module>
         <module>tomee</module>
+        <module>wildfly</module>
     </modules>
 
     <properties>
@@ -27,6 +28,9 @@
         <version.org.apache.openejb.arquillian-tomee-remote>${version.org.apache.openejb.tomee}</version.org.apache.openejb.arquillian-tomee-remote>
         <version.org.jboss.arquillian.arquillian-bom>1.1.0.Final</version.org.jboss.arquillian.arquillian-bom>
         <version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1>1.0.0.CR4</version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1>
+        <version.org.wildfly>9.0.0.Alpha1</version.org.wildfly>
+        <version.org.wildfly.wildfly-transactions>${version.org.wildfly}</version.org.wildfly.wildfly-transactions>
+        <version.org.wildfly.arquillian.wildfly-arquillian-container-managed>1.0.0.Alpha2</version.org.wildfly.arquillian.wildfly-arquillian-container-managed>
 
         <version.org.glassfish.hk2.hk2-inhabitant-generator>2.3.0</version.org.glassfish.hk2.hk2-inhabitant-generator>
     </properties>
@@ -64,6 +68,16 @@
                 <groupId>org.apache.openejb</groupId>
                 <artifactId>openejb-core</artifactId>
                 <version>${version.org.apache.openejb.openejb-core}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-transactions</artifactId>
+                <version>${version.org.wildfly.wildfly-transactions}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.arquillian</groupId>
+                <artifactId>wildfly-arquillian-container-managed</artifactId>
+                <version>${version.org.wildfly.arquillian.wildfly-arquillian-container-managed}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
