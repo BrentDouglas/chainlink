@@ -11,8 +11,7 @@ import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.api.Deferred;
-import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.core.DeferredImpl;
+import io.machinecode.then.core.FutureDeferred;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridFuture;
@@ -41,6 +40,7 @@ public class GridGainRegistry extends BaseDistributedRegistry<UUID,GridGainRegis
         this.grid = grid;
         this.local = grid.localNode().id();
         grid.nodeLocalMap().addIfAbsent(GridGainRegistry.class.getName(), this);
+        log.infof("GridGainRegistry started on address: [%s]", this.local); //TODO Message
     }
 
     protected List<UUID> _remoteMemberIdsFromNodes(final Collection<GridNode> all) {
@@ -53,20 +53,14 @@ public class GridGainRegistry extends BaseDistributedRegistry<UUID,GridGainRegis
     }
 
     @Override
-    public void startup() {
-        super.startup();
-        log.infof("GridGainRegistry started on address: [%s]", this.local); //TODO Message
-    }
-
-    @Override
-    public void shutdown() {
+    public void close() throws Exception {
         log.infof("GridGainRegistry is shutting down."); //TODO Message
         try {
             this.grid.close();
         } catch (final GridException e) {
             throw new RuntimeException(e);
         } finally {
-            super.shutdown();
+            super.close();
         }
     }
 
@@ -123,20 +117,11 @@ public class GridGainRegistry extends BaseDistributedRegistry<UUID,GridGainRegis
             final GridFuture<T> future = this.grid.forNodeId(address)
                     .compute()
                     .call(new GridGainCallable<T>(command, getLocal(), grid));
-            network.when(
-                    timeout, unit,
-                    new GridGainFuture<T>(future),
-                    new DeferredImpl<T, Throwable, Void>().onResolve(new OnResolve<T>() {
-                        @Override
-                        public void resolve(final T ret) {
-                            try {
-                                promise.resolve(ret);
-                            } catch (final Throwable e) {
-                                promise.reject(e);
-                            }
-                        }
-                    }).onReject(promise)
-            );
+            final FutureDeferred<T, Void> run = new FutureDeferred<T, Void>(new GridGainFuture<T>(future), timeout, unit);
+            run.onResolve(promise)
+                    .onReject(promise)
+                    .onCancel(promise);
+            network.execute(run);
         } catch (Exception e) {
             promise.reject(e);
         }

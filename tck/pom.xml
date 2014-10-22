@@ -147,6 +147,11 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-se</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-core</artifactId>
             <scope>test</scope>
         </dependency>
@@ -491,7 +496,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JbossMarshallerFactory</marshaller.factory.class>
+                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallerFactory</marshaller.factory.class>
             </properties>
         </profile>
     </profiles>
@@ -504,6 +509,27 @@
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
                     <executions>
+                        <execution>
+                            <id>validate-tck-source</id>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <phase>none</phase>
+                            <configuration>
+                                <target>
+                                    <condition property="invalid.tck.source">
+                                        <not>
+                                            <and>
+                                                <resourcecontains resource="${tck.source}/pom.xml" substring="groupId>javax.batch"/>
+                                                <resourcecontains resource="${tck.source}/pom.xml" substring="artifactId>jbatch"/>
+                                                <resourcecontains resource="${tck.source}/pom.xml" substring="name>com.ibm.jbatch"/>
+                                            </and>
+                                        </not>
+                                    </condition>
+                                    <fail if="invalid.tck.source" message="Make sure the 'tck.source' property is test in 'test.properties' to point to a copy of the RI's git repo. Found 'tck.source'='${tck.source}'" />
+                                </target>
+                            </configuration>
+                        </execution>
                         <execution>
                             <id>create-persistence-xml-and-services</id>
                             <goals>
@@ -800,6 +826,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
+                    <execution>
+                        <id>validate-tck-source</id>
+                        <phase>generate-test-sources</phase>
+                    </execution>
                     <execution>
                         <id>create-persistence-xml-and-services</id>
                         <phase>none</phase>

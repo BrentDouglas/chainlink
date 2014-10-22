@@ -175,8 +175,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         return this.noRollbackExceptionClasses;
     }
 
-    // Lifecycle
-
     @Override
     public TaskWork partition(final PropertyContext context) {
         return ChunkFactory.INSTANCE.producePartitioned(this, this.listeners, this.partition, context);

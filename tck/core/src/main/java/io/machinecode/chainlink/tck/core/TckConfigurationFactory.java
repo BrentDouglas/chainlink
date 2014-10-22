@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.tck.core;
 
-import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;

@@ -63,8 +63,6 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
         return this.properties;
     }
 
-    // Lifecycle
-
     @Override
     public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,

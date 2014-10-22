@@ -1,81 +1,69 @@
 package io.machinecode.chainlink.core;
 
-import io.machinecode.chainlink.core.management.StaticEnvironment;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
-import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.util.Messages;
+import org.jboss.logging.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @since 1.0
  */
 public final class Chainlink {
 
-    public static Environment environment() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        final List<Environment> environments;
+    private static final Logger log = Logger.getLogger(Chainlink.class);
+
+    private static volatile Environment environment;
+    private static final Lock lock = new ReentrantLock();
+    private static final Condition condition = lock.newCondition();
+
+    private Chainlink(){}
+
+    public static void setEnvironment(final Environment environment) {
+        lock.lock();
         try {
-            environments = new ResolvableService<Environment>(Constants.ENVIRONMENT, Environment.class).resolve(tccl);
-        } catch (final Exception e) {
-            throw new RuntimeException(Messages.get("CHAINLINK-031003.environment.exception"), e);
+            Chainlink.environment = environment;
+            log.infof("Setting environment to: %s", environment);
+            condition.signalAll();
+        } finally {
+            lock.unlock();
         }
-        final Environment environment;
-        if (environments.isEmpty()) {
-            environment = new StaticEnvironment();
-        } else {
-            try {
-                environment = environments.get(0);
-            } catch (final Exception e) {
-                throw new IllegalStateException(Messages.get("CHAINLINK-031003.environment.exception"), e);
-            }
-        }
-        return environment;
     }
 
-    public static Configuration configuration(final String id) throws NoConfigurationWithIdException {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        final List<ConfigurationFactory> factories;
+    public static Environment getEnvironment() {
+        lock.lock();
         try {
-            factories = new ResolvableService<ConfigurationFactory>(Constants.CONFIGURATION_FACTORY_CLASS, ConfigurationFactory.class)
-                    .resolve(tccl);
-        } catch (final Exception e) {
-            throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
-        }
-        if (factories.isEmpty()) {
-            throw new IllegalStateException(Messages.get("CHAINLINK-031000.configuration.not.provided"));
-        } else {
+            if (Chainlink.environment != null) {
+                return Chainlink.environment;
+            }
             try {
-                for (final ConfigurationFactory factory : factories) {
-                    if (id.equals(factory.getId())) {
-                        return factory.produce();
-                    }
+                final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+                final List<Environment> environments = new ResolvableService<Environment>(Constants.ENVIRONMENT, Environment.class)
+                        .resolve(tccl);
+                if (!environments.isEmpty()) {
+                    Chainlink.environment = environments.get(0);
+                    return Chainlink.environment;
                 }
             } catch (final Exception e) {
-                throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
+                throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
             }
+            while (Chainlink.environment == null) {
+                try {
+                    log.infof("Waiting for environment to be set.");
+                    condition.await();
+                } catch (InterruptedException e) {
+                    //
+                }
+            }
+            return Chainlink.environment;
+        } finally {
+            lock.unlock();
         }
-        throw new NoConfigurationWithIdException(Messages.format("CHAINLINK-031004.no.configuration.with.id", id));
-    }
-
-    public static List<String> configurations() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        final List<? extends ConfigurationFactory> factories;
-        try {
-            factories = new ResolvableService<ConfigurationFactory>(Constants.CONFIGURATION_FACTORY_CLASS, ConfigurationFactory.class)
-                    .resolve(tccl);
-        } catch (final Exception e) {
-            throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
-        }
-        final List<String> ids = new ArrayList<String>(factories.size());
-        for (final ConfigurationFactory factory : factories) {
-            ids.add(factory.getId());
-        }
-        return ids;
     }
 }

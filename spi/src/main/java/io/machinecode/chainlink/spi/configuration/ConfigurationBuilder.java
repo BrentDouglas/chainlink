@@ -11,7 +11,6 @@ import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
-import io.machinecode.chainlink.spi.configuration.factory.WhenFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
@@ -68,12 +67,6 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
     T setTransactionManagerFactoryClass(final Class<? extends TransactionManagerFactory> clazz);
 
     T setTransactionManagerFactoryFqcn(final String fqcn);
-
-    T setWhenFactory(final WhenFactory when);
-
-    T setWhenFactoryClass(final Class<? extends WhenFactory> clazz);
-
-    T setWhenFactoryFqcn(final String fqcn);
 
     T setExecutor(final Executor executor);
 

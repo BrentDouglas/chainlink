@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.spi.configuration;
 
 import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
-import io.machinecode.chainlink.spi.configuration.factory.WhenFactory;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
@@ -21,6 +20,4 @@ public interface RepositoryConfiguration extends SecurityConfiguration {
     SecurityCheck getSecurityCheck();
 
     MarshallerFactory getMarshallerFactory();
-
-    WhenFactory getWhenFactory();
 }

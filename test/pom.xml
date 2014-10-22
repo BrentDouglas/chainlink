@@ -67,6 +67,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-se</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <scope>test</scope>
@@ -123,7 +128,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JbossMarshallerFactory</marshaller.factory.class>
+                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallerFactory</marshaller.factory.class>
             </properties>
         </profile>
     </profiles>

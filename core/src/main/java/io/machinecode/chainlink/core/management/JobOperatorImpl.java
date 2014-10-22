@@ -12,7 +12,6 @@ import io.machinecode.chainlink.core.work.JobExecutable;
 import io.machinecode.chainlink.repository.core.DelegateJobExecution;
 import io.machinecode.chainlink.repository.core.DelegateStepExecution;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -54,11 +53,10 @@ import java.util.Set;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
+public class JobOperatorImpl implements ExtendedJobOperator {
 
     private static final Logger log = Logger.getLogger(JobOperatorImpl.class);
 
-    private boolean started = false;
     private final Configuration configuration;
     private final Executor executor;
     private final Registry registry;
@@ -75,16 +73,6 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
                 registry.generateExecutionRepositoryId(),
                 configuration.getRepository()
         );
-    }
-
-    @Override
-    public void startup() {
-        if (started) {
-            throw new IllegalStateException(); //TODO Maybe just return?
-        }
-        this.started = true;
-        this.executor.startup();
-        this.registry.startup();
         final int numThreads;
         try {
             numThreads = Integer.parseInt(configuration.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));
@@ -99,7 +87,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
             } catch (final Exception e) {
                 throw new RuntimeException(e); //TODO Message
             }
-            worker.startup();
+            worker.start();
             this.registry.registerWorker(worker.id(), worker);
         }
         final String domain = ObjectName.quote(configuration.getProperty(Constants.JMX_DOMAIN, Constants.Defaults.JMX_DOMAIN));
@@ -125,7 +113,7 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
     }
 
     @Override
-    public void shutdown() {
+    public void close() throws Exception {
         final MBeanServer server = configuration.getMBeanServer();
         if (server != null) {
             try {
@@ -137,8 +125,8 @@ public class JobOperatorImpl implements ExtendedJobOperator, Lifecycle {
             }
         }
         this.registry.unregisterExecutionRepository(this.executionRepositoryId);
-        this.registry.shutdown();
-        this.executor.shutdown();
+        this.registry.close();
+        this.executor.close();
     }
 
     @Override

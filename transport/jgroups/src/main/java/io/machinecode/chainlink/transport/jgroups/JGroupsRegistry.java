@@ -49,19 +49,14 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
         this.remotes = _remoteMembers(this.channel.getView().getMembers());
         this.dispatcher = new MessageDispatcher(channel, null, this);
         this.dispatcher.setRequestHandler(this);
-    }
-
-    @Override
-    public void startup() {
-        super.startup();
         log.infof("JGroupsRegistry started on address: [%s]", this.local); //TODO Message
     }
 
     @Override
-    public void shutdown() {
+    public void close() throws Exception {
         log.infof("JGroupsRegistry is shutting down."); //TODO Message
         this.channel.close();
-        super.shutdown();
+        super.close();
     }
 
     @Override

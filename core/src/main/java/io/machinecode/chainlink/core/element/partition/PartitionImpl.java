@@ -78,8 +78,6 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return strategy.getPartitionPlan(configuration, context);
     }
 
-    // Lifecycle
-
     @Override
     public PartitionTarget map(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId, final TaskWork task, final ExecutableId callbackId, final ExecutionContext context, final int timeout, final Long restartStepExecutionId) throws Exception {
         final PartitionPlan plan = loadPartitionPlan(configuration, context);

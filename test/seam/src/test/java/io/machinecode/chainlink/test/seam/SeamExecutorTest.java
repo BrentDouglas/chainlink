@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.test.seam;
 
-import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
 import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;

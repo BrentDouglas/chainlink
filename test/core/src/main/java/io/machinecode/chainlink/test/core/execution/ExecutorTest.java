@@ -28,7 +28,6 @@ public abstract class ExecutorTest extends BaseTest {
     public void before() throws Exception {
         if (operator == null) {
             operator = new JobOperatorImpl(configuration());
-            operator.startup();
         }
     }
 

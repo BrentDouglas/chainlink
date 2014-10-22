@@ -89,8 +89,6 @@ public class JobImpl implements Job, JobWork, Serializable {
         return this.executions;
     }
 
-    // Lifecycle
-
     private List<ListenerImpl> _listeners(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
         if (this._listeners == null) {
             this._listeners = this.listeners.getListenersImplementing(configuration, context, JobListener.class);

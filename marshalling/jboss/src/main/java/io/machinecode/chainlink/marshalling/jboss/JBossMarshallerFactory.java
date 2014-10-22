@@ -9,9 +9,9 @@ import org.jboss.marshalling.river.RiverMarshallerFactory;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JbossMarshallerFactory implements MarshallerFactory {
+public class JBossMarshallerFactory implements MarshallerFactory {
     @Override
     public Marshaller produce(final BaseConfiguration configuration) throws Exception {
-        return new JbossMarshaller(new RiverMarshallerFactory(), new MarshallingConfiguration());
+        return new JBossMarshaller(new RiverMarshallerFactory(), new MarshallingConfiguration());
     }
 }

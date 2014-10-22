@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.test.guice;
 
-import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
+import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;

@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface ExtendedJobOperator extends JobOperator {
+public interface ExtendedJobOperator extends JobOperator, AutoCloseable {
 
     ExtendedJobInstance getJobInstanceById(final long jobInstanceId);
 

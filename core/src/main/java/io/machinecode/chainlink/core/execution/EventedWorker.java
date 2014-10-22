@@ -114,12 +114,7 @@ public class EventedWorker extends Thread implements Worker {
     }
 
     @Override
-    public synchronized void startup() {
-        super.start();
-    }
-
-    @Override
-    public void shutdown() {
+    public void close() {
         running = false;
     }
 

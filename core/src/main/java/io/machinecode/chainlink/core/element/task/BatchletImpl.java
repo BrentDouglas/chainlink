@@ -40,8 +40,6 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         this.partition = partition;
     }
 
-    // Lifecycle
-
     @Override
     public void run(final RuntimeConfiguration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
                     final ExecutionContext context, final int timeout) throws Throwable {

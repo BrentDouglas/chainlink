@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.spi.execution;
 
-import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
@@ -9,7 +8,9 @@ import io.machinecode.then.api.Promise;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Worker extends Runnable, Lifecycle {
+public interface Worker extends Runnable, AutoCloseable {
+
+    void start();
 
     WorkerId id();
 

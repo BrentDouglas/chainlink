@@ -17,16 +17,15 @@
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
                 <include>io.machinecode.chainlink:chainlink-api</include>
-                <include>io.machinecode.chainlink:chainlink-spi</include>
                 <include>io.machinecode.chainlink:chainlink-core</include>
-                <include>io.machinecode.chainlink:chainlink-jsl-core</include>
-                <include>io.machinecode.chainlink:chainlink-jsl-fluent</include>
-                <include>io.machinecode.chainlink:chainlink-jsl-groovy</include>
-                <include>io.machinecode.chainlink:chainlink-jsl-xml</include>
                 <include>io.machinecode.chainlink:chainlink-inject-core</include>
                 <include>io.machinecode.chainlink:chainlink-inject-cdi</include>
                 <include>io.machinecode.chainlink:chainlink-inject-seam</include>
                 <include>io.machinecode.chainlink:chainlink-inject-spring</include>
+                <include>io.machinecode.chainlink:chainlink-jsl-core</include>
+                <include>io.machinecode.chainlink:chainlink-jsl-fluent</include>
+                <include>io.machinecode.chainlink:chainlink-jsl-groovy</include>
+                <include>io.machinecode.chainlink:chainlink-jsl-xml</include>
                 <include>io.machinecode.chainlink:chainlink-marshalling-jboss</include>
                 <include>io.machinecode.chainlink:chainlink-marshalling-jdk</include>
                 <include>io.machinecode.chainlink:chainlink-repository-core</include>
@@ -40,13 +39,15 @@
                 <include>io.machinecode.chainlink:chainlink-repository-memory</include>
                 <include>io.machinecode.chainlink:chainlink-repository-mongo</include>
                 <include>io.machinecode.chainlink:chainlink-repository-redis</include>
+                <include>io.machinecode.chainlink:chainlink-se</include>
+                <include>io.machinecode.chainlink:chainlink-server-chainlinkd</include>
+                <include>io.machinecode.chainlink:chainlink-spi</include>
                 <include>io.machinecode.chainlink:chainlink-transport-core</include>
                 <include>io.machinecode.chainlink:chainlink-transport-coherence</include>
                 <include>io.machinecode.chainlink:chainlink-transport-gridgain</include>
                 <include>io.machinecode.chainlink:chainlink-transport-hazelcast</include>
                 <include>io.machinecode.chainlink:chainlink-transport-infinispan</include>
                 <include>io.machinecode.chainlink:chainlink-transport-jgroups</include>
-                <include>io.machinecode.chainlink:chainlink-server-chainlinkd</include>
             </includes>
             <binaries>
                 <unpack>false</unpack>

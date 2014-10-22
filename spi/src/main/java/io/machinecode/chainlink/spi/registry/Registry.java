@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.spi.registry;
 
-import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
@@ -15,7 +14,7 @@ import java.util.List;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Registry extends Lifecycle {
+public interface Registry extends AutoCloseable {
 
     ChainId generateChainId();
 

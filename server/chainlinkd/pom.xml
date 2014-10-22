@@ -24,6 +24,10 @@
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-se</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

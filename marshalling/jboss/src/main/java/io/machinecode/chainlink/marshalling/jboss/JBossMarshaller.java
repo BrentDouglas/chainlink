@@ -15,12 +15,12 @@ import java.nio.ByteBuffer;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class JbossMarshaller implements Marshaller {
+public class JBossMarshaller implements Marshaller {
 
     final MarshallerFactory marshallerFactory;
     final MarshallingConfiguration configuration;
 
-    public JbossMarshaller(final MarshallerFactory marshallerFactory, final MarshallingConfiguration configuration) {
+    public JBossMarshaller(final MarshallerFactory marshallerFactory, final MarshallingConfiguration configuration) {
         this.marshallerFactory = marshallerFactory;
         this.configuration = configuration;
     }

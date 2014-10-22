@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.test.core.execution;
 
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
-import io.machinecode.chainlink.core.configuration.ConfigurationImpl.Builder;
-import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
+import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
+import io.machinecode.chainlink.se.configuration.SeConfiguration;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
@@ -29,12 +29,12 @@ public abstract class BaseTest extends Assert {
     public static final Properties PARAMETERS = new Properties();
     private ExecutorFactory _executor;
     private ExecutionRepository _repository;
-    private ConfigurationImpl _configuration;
+    private SeConfiguration _configuration;
     private TransactionManager _transactionManager;
     private MarshallerFactory _marshallerFactory;
     private RegistryFactory _registryFactory;
 
-    protected final ConfigurationImpl configuration() throws Exception {
+    protected final SeConfiguration configuration() throws Exception {
         if (this._configuration == null) {
             this._configuration = _configuration().build();
         }

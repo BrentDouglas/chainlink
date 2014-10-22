@@ -15,7 +15,6 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.spi.then.When;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
 import io.machinecode.chainlink.transport.infinispan.callable.FindExecutableAndContextCallable;
@@ -26,7 +25,7 @@ import io.machinecode.chainlink.transport.infinispan.cmd.CleanupCommand;
 import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.DeferredImpl;
+import io.machinecode.then.core.FutureDeferred;
 import org.infinispan.AdvancedCache;
 import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.distexec.DefaultExecutorService;
@@ -46,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -63,8 +64,8 @@ public class InfinispanRegistry extends LocalRegistry {
     final AdvancedCache<Object, Object> cache;
     final RpcOptions options;
     final DistributedExecutorService distributor;
-    final When network;
-    final When reaper;
+    final Executor network;
+    final Executor reaper;
 
     final long timeout;
     final TimeUnit unit;
@@ -88,8 +89,8 @@ public class InfinispanRegistry extends LocalRegistry {
                 throw new RuntimeException(e);
             }
         }
-        this.network= configuration.getWhenFactory().produce(configuration);
-        this.reaper = configuration.getWhenFactory().produce(configuration);
+        this.network = Executors.newSingleThreadExecutor();
+        this.reaper = Executors.newSingleThreadExecutor();
         this.local = manager.getAddress();
         this.cacheName = configuration.getProperty(InfinispanConstants.CACHE, InfinispanConstants.CACHE);
         this.cache = manager.<Object, Object>getCache(this.cacheName, true).getAdvancedCache();
@@ -106,12 +107,7 @@ public class InfinispanRegistry extends LocalRegistry {
         this.distributor = new DefaultExecutorService(cache);
         this.timeout = Long.parseLong(configuration.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
         this.unit = TimeUnit.valueOf(configuration.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
-    }
 
-    @Override
-    public void startup() {
-        super.startup();
-        final EmbeddedCacheManager manager = cache.getCacheManager();
         if (!manager.isRunning(this.cacheName)) {
             manager.startCaches(this.cacheName);
         }
@@ -132,7 +128,8 @@ public class InfinispanRegistry extends LocalRegistry {
 
     @Override
     protected Promise<?,?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
-        final Deferred<Object, Throwable,Void> promise = new DeferredImpl<Object, Throwable,Void>().onComplete(new OnComplete() {
+        final FutureDeferred<Object, Void> promise = new FutureDeferred<Object, Void>((Future<Object>)job);
+        promise.onComplete(new OnComplete() {
             @Override
             public void complete(final int state) {
                 for (final Pair<ChainId, Address> pair : remoteExecutions.remove(jobExecutionId)) {
@@ -148,13 +145,8 @@ public class InfinispanRegistry extends LocalRegistry {
                 log.debugf(Messages.get("CHAINLINK-005101.registry.removed.job"), jobExecutionId);
             }
         });
-        this.reaper.when((Future<Object>) job, promise);
+        this.reaper.execute(promise);
         return promise;
-    }
-
-    @Override
-    public void shutdown() {
-        super.shutdown();
     }
 
     @Override

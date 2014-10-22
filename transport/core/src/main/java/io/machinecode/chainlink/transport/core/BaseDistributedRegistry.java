@@ -16,7 +16,6 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.spi.then.When;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
 import io.machinecode.chainlink.transport.core.cmd.CleanupCommand;
@@ -29,6 +28,7 @@ import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.DeferredImpl;
+import io.machinecode.then.core.FutureDeferred;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.JobExecutionNotRunningException;
@@ -37,6 +37,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -49,8 +51,8 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
     private static final Logger log = Logger.getLogger(BaseDistributedRegistry.class);
 
     protected final Marshaller marshaller;
-    protected final When network;
-    protected final When reaper;
+    protected final Executor network;
+    protected final Executor reaper;
 
     final TMap<WorkerId, Worker> remoteWorkers = new THashMap<WorkerId, Worker>();
     final TLongObjectMap<List<Pair<ChainId,A>>> remoteExecutions = new TLongObjectHashMap<List<Pair<ChainId,A>>>();
@@ -60,8 +62,8 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
 
     public BaseDistributedRegistry(final RegistryConfiguration configuration) throws Exception {
         this.marshaller = configuration.getMarshallerFactory().produce(configuration);
-        this.network= configuration.getWhenFactory().produce(configuration);
-        this.reaper = configuration.getWhenFactory().produce(configuration);
+        this.network= Executors.newSingleThreadExecutor();
+        this.reaper = Executors.newSingleThreadExecutor();
 
         this.timeout = Long.parseLong(configuration.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
         this.unit = TimeUnit.valueOf(configuration.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
@@ -74,7 +76,8 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
 
     @Override
     protected Promise<?,?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
-        final Deferred<Object, Throwable,Void> promise = new DeferredImpl<Object, Throwable,Void>().onComplete(new OnComplete() {
+        final FutureDeferred<Object, Void> promise = new FutureDeferred<Object, Void>((Future<Object>)job);
+        promise.onComplete(new OnComplete() {
             @Override
             public void complete(final int state) {
                 for (final Pair<ChainId, A> pair : remoteExecutions.remove(jobExecutionId)) {
@@ -90,7 +93,7 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
                 log.debugf(Messages.get("CHAINLINK-005101.registry.removed.job"), jobExecutionId);
             }
         });
-        this.reaper.when(this.timeout, this.unit, (Future<Object>) job, promise);
+        this.reaper.execute(promise);
         return promise;
     }
 

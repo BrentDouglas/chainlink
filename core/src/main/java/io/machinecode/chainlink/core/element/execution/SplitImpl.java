@@ -44,8 +44,6 @@ public class SplitImpl extends ExecutionImpl implements Split {
         return this.flows;
     }
 
-    // Lifecycle
-
     @Override
     public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,

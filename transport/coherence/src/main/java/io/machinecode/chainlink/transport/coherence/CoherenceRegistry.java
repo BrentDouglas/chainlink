@@ -46,19 +46,14 @@ public class CoherenceRegistry extends BaseDistributedRegistry<Member, Coherence
         this.executor.setUserContext(this);
         this.local = cluster.getLocalMember();
         this.remotes = _remoteMembers(cluster.getMemberSet());
-    }
-
-    @Override
-    public void startup() {
-        super.startup();
         log.infof("CoherenceRegistry started on address: [%s]", this.local); //TODO Message
     }
 
     @Override
-    public void shutdown() {
+    public void close() throws Exception {
         log.infof("CoherenceRegistry is shutting down."); //TODO Message
         this.executor.shutdown();
-        super.shutdown();
+        super.close();
     }
 
     @Override

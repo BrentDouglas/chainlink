@@ -95,12 +95,12 @@ public class InfinispanWorker implements Worker {
     }
 
     @Override
-    public void startup() {
+    public void start() {
         //no-op
     }
 
     @Override
-    public void shutdown() {
+    public void close() {
         //no-op
     }
 

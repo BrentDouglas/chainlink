@@ -37,7 +37,7 @@ public class JobOperatorView implements ExtendedJobOperator {
     }
 
     public JobOperatorView(final String id) {
-        this(Chainlink.environment().getJobOperator(id));
+        this(Chainlink.getEnvironment().getJobOperator(id));
     }
 
     public JobOperatorView(final ExtendedJobOperator delegate) {
@@ -132,5 +132,10 @@ public class JobOperatorView implements ExtendedJobOperator {
     @Override
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         return delegate.getStepExecutions(jobExecutionId);
+    }
+
+    @Override
+    public void close() throws Exception {
+        delegate.close();
     }
 }

@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.spi.execution;
 
-import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.then.Chain;
 
@@ -9,7 +8,7 @@ import java.util.concurrent.Future;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public interface Executor extends Lifecycle {
+public interface Executor extends AutoCloseable {
 
     Chain<?> execute(final long jobExecutionId, final Executable executable);
 

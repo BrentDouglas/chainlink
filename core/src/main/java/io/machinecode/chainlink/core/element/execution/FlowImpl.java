@@ -53,8 +53,6 @@ public class FlowImpl extends ExecutionImpl implements Flow {
         return this.transitions;
     }
 
-    // Lifecycle
-
     @Override
     public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,

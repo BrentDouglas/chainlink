@@ -99,12 +99,12 @@ public abstract class DistributedWorker<A, R extends DistributedRegistry<A, R>> 
     protected abstract Chain<?> createLocalChain(final long jobExecutionId, final ChainId remoteId);
 
     @Override
-    public void startup() {
+    public void start() {
         //no-op
     }
 
     @Override
-    public void shutdown() {
+    public void close() {
         //no-op
     }
 

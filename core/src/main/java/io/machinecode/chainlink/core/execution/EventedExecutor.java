@@ -38,12 +38,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public void startup() {
-        // no op
-    }
-
-    @Override
-    public void shutdown() {
+    public void close() {
         this.cancellation.shutdown();
     }
 

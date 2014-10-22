@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.spi.configuration;
 
-import io.machinecode.chainlink.spi.configuration.factory.WhenFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
@@ -23,6 +22,4 @@ public interface RuntimeConfiguration {
     ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id);
 
     InjectionContext getInjectionContext();
-
-    WhenFactory getWhenFactory();
 }

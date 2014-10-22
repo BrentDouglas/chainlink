@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.core.configuration;
+package io.machinecode.chainlink.se.configuration.xml;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -20,19 +20,8 @@ public class XmlChainlink {
     public static final String SCHEMA_URL = "http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd";
     public static final String NAMESPACE = "http://xmlns.io.machinecode/xml/ns/chainlink";
 
-    @XmlElement(name = "environment", namespace = NAMESPACE, required = true)
-    private XmlClassRef environment;
-
     @XmlElement(name = "configuration", namespace = NAMESPACE, required = false)
     private List<XmlConfiguration> configurations = new ArrayList<XmlConfiguration>(0);
-
-    public XmlClassRef getEnvironment() {
-        return environment;
-    }
-
-    public void setEnvironment(final XmlClassRef environment) {
-        this.environment = environment;
-    }
 
     public List<XmlConfiguration> getConfigurations() {
         return configurations;

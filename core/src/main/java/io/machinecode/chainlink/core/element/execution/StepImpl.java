@@ -153,8 +153,6 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         return this._timeout;
     }
 
-    // Lifecycle
-
     private boolean isPartitioned() {
         //TODO This looks like a bug in the xsl
         return this.partition != null && this.partition.getStrategy() != null;

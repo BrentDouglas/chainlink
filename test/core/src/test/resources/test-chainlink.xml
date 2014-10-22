@@ -3,8 +3,6 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://xmlns.io.machinecode/xml/ns/chainlink http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
 
-    <environment class="io.machinecode.chainlink.core.management.StaticEnvironment"/>
-
     <configuration id="Default">
         <executor-factory class=""/>
         <registry-factory class=""/>

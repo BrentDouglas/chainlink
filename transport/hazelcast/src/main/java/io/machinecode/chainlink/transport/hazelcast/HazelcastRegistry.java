@@ -19,6 +19,7 @@ import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.api.Deferred;
+import io.machinecode.then.core.FutureDeferred;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
@@ -64,20 +65,15 @@ public class HazelcastRegistry extends BaseDistributedRegistry<Member, Hazelcast
             public void memberAttributeChanged(final MemberAttributeEvent memberAttributeEvent) {
             }
         });
-    }
-
-    @Override
-    public void startup() {
-        super.startup();
         log.infof("HazelcastRegistry started on address: [%s]", this.local); //TODO Message
     }
 
     @Override
-    public void shutdown() {
+    public void close() throws Exception {
         log.infof("HazelcastRegistry is shutting down."); //TODO Message
         this.executor.shutdown();
         this.hazelcast.shutdown();
-        super.shutdown();
+        super.close();
     }
 
     @Override
@@ -123,14 +119,14 @@ public class HazelcastRegistry extends BaseDistributedRegistry<Member, Hazelcast
     public <T> void invoke(final Member address, final DistributedCommand<T, Member, HazelcastRegistry> command, final Deferred<T, Throwable,?> promise) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
-            this.network.when(
-                    this.timeout, this.unit,
-                    this.executor.<T>submitToMember(
-                            new Invocation<T>(command, this.local),
-                            address
-                    ),
-                    promise
-            );
+            final FutureDeferred<T, Void> run = new FutureDeferred<T, Void>(this.executor.<T>submitToMember(
+                    new Invocation<T>(command, this.local),
+                    address
+            ), this.timeout, this.unit);
+            run.onResolve(promise)
+                    .onReject(promise)
+                    .onCancel(promise);
+            network.execute(run);
         } catch (Exception e) {
             promise.reject(e);
         }
@@ -140,14 +136,14 @@ public class HazelcastRegistry extends BaseDistributedRegistry<Member, Hazelcast
     public <T> void invoke(final Member address, final DistributedCommand<T, Member, HazelcastRegistry> command, final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
-            this.network.when(
-                    timeout, unit,
-                    this.executor.<T>submitToMember(
-                            new Invocation<T>(command, this.local),
-                            address
-                    ),
-                    promise
-            );
+            final FutureDeferred<T, Void> run = new FutureDeferred<T, Void>(this.executor.<T>submitToMember(
+                    new Invocation<T>(command, this.local),
+                    address
+            ), timeout, unit);
+            run.onResolve(promise)
+                    .onReject(promise)
+                    .onCancel(promise);
+            network.execute(run);
         } catch (Exception e) {
             promise.reject(e);
         }

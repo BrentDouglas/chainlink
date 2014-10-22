@@ -1,5 +1,6 @@
-package io.machinecode.chainlink.core.configuration;
+package io.machinecode.chainlink.se.configuration.xml;
 
+import io.machinecode.chainlink.se.configuration.SeConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -9,7 +10,6 @@ import javax.xml.bind.annotation.XmlID;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.chainlink.core.configuration.XmlChainlink.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
@@ -22,46 +22,43 @@ public class XmlConfiguration implements ConfigurationFactory {
     @XmlAttribute(name = "id", required = true)
     private String id;
 
-    @XmlElement(name = "executor-factory", namespace = NAMESPACE, required = true)
+    @XmlElement(name = "executor-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef executorFactory;
 
-    @XmlElement(name = "registry-factory", namespace = NAMESPACE, required = true)
+    @XmlElement(name = "registry-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef registryFactory;
 
-    @XmlElement(name = "worker-factory", namespace = NAMESPACE, required = true)
+    @XmlElement(name = "worker-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef workerFactory;
 
-    @XmlElement(name = "marshaller-factory", namespace = NAMESPACE, required = true)
+    @XmlElement(name = "marshaller-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef marshallerFactory;
 
-    @XmlElement(name = "mbean-server-factory", namespace = NAMESPACE, required = true)
+    @XmlElement(name = "mbean-server-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef mBeanServerFactory;
 
-    @XmlElement(name = "execution-repository-factory", namespace = NAMESPACE, required = true)
+    @XmlElement(name = "execution-repository-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef executionRepositoryFactory;
 
-    @XmlElement(name = "class-loader-factory", namespace = NAMESPACE, required = false)
+    @XmlElement(name = "class-loader-factory", namespace = XmlChainlink.NAMESPACE, required = false)
     private XmlClassRef classLoaderFactory;
 
-    @XmlElement(name = "transaction-manager-factory", namespace = NAMESPACE, required = false)
+    @XmlElement(name = "transaction-manager-factory", namespace = XmlChainlink.NAMESPACE, required = false)
     private XmlClassRef transactionManagerFactory;
 
-    @XmlElement(name = "when-factory", namespace = NAMESPACE, required = false)
-    private XmlClassRef whenFactory;
-
-    @XmlElement(name = "job-loader-factory", namespace = NAMESPACE, required = false)
+    @XmlElement(name = "job-loader-factory", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlClassRef> jobLoaderFactories = new ArrayList<XmlClassRef>(0);
 
-    @XmlElement(name = "artifact-loader-factory", namespace = NAMESPACE, required = false)
+    @XmlElement(name = "artifact-loader-factory", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlClassRef> artifactLoaderFactories = new ArrayList<XmlClassRef>(0);
 
-    @XmlElement(name = "injector-factory", namespace = NAMESPACE, required = false)
+    @XmlElement(name = "injector-factory", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlClassRef> injectorFactories = new ArrayList<XmlClassRef>(0);
 
-    @XmlElement(name = "security-check-factory", namespace = NAMESPACE, required = false)
+    @XmlElement(name = "security-check-factory", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlClassRef> securityCheckFactories = new ArrayList<XmlClassRef>(0);
 
-    @XmlElement(name = "property", namespace = NAMESPACE, required = false)
+    @XmlElement(name = "property", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlProperty> properties = new ArrayList<XmlProperty>(0);
 
     @Override
@@ -137,14 +134,6 @@ public class XmlConfiguration implements ConfigurationFactory {
         this.transactionManagerFactory = transactionManagerFactory;
     }
 
-    public XmlClassRef getWhenFactory() {
-        return whenFactory;
-    }
-
-    public void setWhenFactory(final XmlClassRef whenFactory) {
-        this.whenFactory = whenFactory;
-    }
-
     public List<XmlClassRef> getJobLoaderFactories() {
         return jobLoaderFactories;
     }
@@ -186,7 +175,7 @@ public class XmlConfiguration implements ConfigurationFactory {
     }
 
     @Override
-    public ConfigurationImpl produce() throws Exception {
-        return new ConfigurationImpl(this);
+    public SeConfiguration produce() throws Exception {
+        return new SeConfiguration(this);
     }
 }

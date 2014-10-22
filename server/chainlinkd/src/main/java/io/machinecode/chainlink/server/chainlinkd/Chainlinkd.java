@@ -3,19 +3,13 @@ package io.machinecode.chainlink.server.chainlinkd;
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 import io.machinecode.chainlink.core.Chainlink;
-import io.machinecode.chainlink.core.configuration.XmlChainlink;
-import io.machinecode.chainlink.core.configuration.XmlConfiguration;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
-import io.machinecode.chainlink.spi.management.Environment;
+import io.machinecode.chainlink.se.management.SeEnvironment;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import static java.lang.System.out;
@@ -54,8 +48,6 @@ public class Chainlinkd {
                 }
             }
 
-            final Environment environment;
-            final List<JobOperatorImpl> operators = new ArrayList<JobOperatorImpl>();
             if (props != null) {
                 final File propertiesFile = new File(props);
                 if (propertiesFile.exists()) {
@@ -69,31 +61,28 @@ public class Chainlinkd {
                     System.setProperties(properties);
                 }
             }
-            if (config != null) {
-                final JAXBContext context = JAXBContext.newInstance(XmlChainlink.class);
-                final Unmarshaller unmarshaller = context.createUnmarshaller();
-                final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(new File(config));
-                environment = (Environment) Class.forName(xml.getEnvironment().getClazz()).newInstance();
-
-                for (final XmlConfiguration configuration : xml.getConfigurations()) {
-                    final JobOperatorImpl operator = new JobOperatorImpl(configuration.produce());
-                    operator.startup();
-                    operators.add(operator);
-                }
-            } else {
-                environment = Chainlink.environment();
-            }
-            for (final String id : Chainlink.configurations()) {
-                environment.getJobOperator(id);
-            }
+            final SeEnvironment environment = new SeEnvironment(config);
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for (final JobOperatorImpl operator : operators) {
-                        operator.shutdown();
+                    Exception exception = null;
+                    for (final JobOperatorImpl operator : environment.getJobOperators().values()) {
+                        try {
+                            operator.close();
+                        } catch (final Exception e) {
+                            if (exception == null) {
+                                exception = e;
+                            } else {
+                                exception.addSuppressed(e);
+                            }
+                        }
+                    }
+                    if (exception != null) {
+                        throw new RuntimeException(exception);
                     }
                 }
             }));
+            Chainlink.setEnvironment(environment);
             log.info(Messages.get("CHAINLINK-032000.chainlinkd.started"));
             final Object lock = new Object();
             while (true) {

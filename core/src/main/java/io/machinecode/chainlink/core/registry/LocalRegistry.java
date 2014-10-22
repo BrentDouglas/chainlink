@@ -65,19 +65,26 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public void startup() {
-        //
-    }
-
-    @Override
-    public void shutdown() {
+    public void close() throws Exception {
         while (!workerLock.compareAndSet(false, true)) {}
         try {
             this.workerOrder.clear();
+            Exception exception = null;
             for (final Worker worker : this.workers.values()) {
-                worker.shutdown();
+                try {
+                    worker.close();
+                } catch (final Exception e) {
+                    if (exception == null) {
+                        exception = e;
+                    } else {
+                        exception.addSuppressed(e);
+                    }
+                }
             }
             this.workers.clear();
+            if (exception != null) {
+                throw exception;
+            }
         } finally {
             workerLock.set(false);
         }

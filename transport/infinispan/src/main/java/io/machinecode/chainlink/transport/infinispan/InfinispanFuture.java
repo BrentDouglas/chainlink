@@ -2,7 +2,7 @@ package io.machinecode.chainlink.transport.infinispan;
 
 import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.core.DeferredImpl;
+import io.machinecode.then.core.FutureDeferred;
 import org.infinispan.commons.util.concurrent.FutureListener;
 import org.infinispan.commons.util.concurrent.NotifyingNotifiableFuture;
 import org.infinispan.remoting.responses.ExceptionResponse;
@@ -36,11 +36,12 @@ public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
     @Override
     public void notifyDone() {
-        registry.network.when(
-                System.currentTimeMillis() - start + registry.options.timeUnit().toMillis(registry.options.timeout()),
-                TimeUnit.MILLISECONDS,
+        final FutureDeferred<T,Throwable> deferred = new FutureDeferred<T, Throwable>(
                 io,
-                new DeferredImpl<T, Throwable, Void>().onResolve(new OnResolve<T>() {
+                System.currentTimeMillis() - start + registry.options.timeUnit().toMillis(registry.options.timeout()),
+                TimeUnit.MILLISECONDS
+        );
+        deferred.onResolve(new OnResolve<T>() {
                     @Override
                     public void resolve(final T ret) {
                         try {
@@ -48,14 +49,14 @@ public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
                                 promise.reject(new IllegalStateException()); //TODO Message
                                 return;
                             }
-                            final Response response = ((Map<Address, Response>)ret).get(address);
+                            final Response response = ((Map<Address, Response>) ret).get(address);
                             if (response == null) {
                                 promise.resolve(null);
                             } else if (response.isSuccessful()) {
                                 promise.resolve((U) ((SuccessfulResponse) response).getResponseValue());
                             } else {
                                 if (response instanceof ExceptionResponse) {
-                                    promise.reject(((ExceptionResponse)response).getException());
+                                    promise.reject(((ExceptionResponse) response).getException());
                                 } else {
                                     promise.reject(new IllegalStateException()); //TODO Message
                                 }
@@ -64,8 +65,8 @@ public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
                             promise.reject(e);
                         }
                     }
-                }).onReject(promise)
-        );
+                }).onReject(promise);
+        registry.network.execute(deferred);
     }
 
     @Override
