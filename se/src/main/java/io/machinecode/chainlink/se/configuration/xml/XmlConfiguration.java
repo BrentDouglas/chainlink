@@ -175,7 +175,7 @@ public class XmlConfiguration implements ConfigurationFactory {
     }
 
     @Override
-    public SeConfiguration produce() throws Exception {
-        return new SeConfiguration(this);
+    public SeConfiguration.Builder produce() throws Exception {
+        return SeConfiguration.toBuilder(this);
     }
 }

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.configuration.factory;
 
-import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.ConfigurationBuilder;
 
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
@@ -9,5 +9,5 @@ public interface ConfigurationFactory {
 
     String getId();
 
-    Configuration produce() throws Exception;
+    ConfigurationBuilder<?> produce() throws Exception;
 }

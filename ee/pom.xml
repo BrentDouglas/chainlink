@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>chainlink-parent</artifactId>
+        <groupId>io.machinecode.chainlink</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>chainlink-ee</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>glassfish</module>
+    </modules>
+
+    <properties>
+        <version.org.glassfish.major>4</version.org.glassfish.major>
+        <version.org.glassfish>${version.org.glassfish.major}.1</version.org.glassfish>
+        <version.org.glassfish.main.common.glassfish-api>${version.org.glassfish}</version.org.glassfish.main.common.glassfish-api>
+        <version.org.glassfish.main.common.internal-api>${version.org.glassfish}</version.org.glassfish.main.common.internal-api>
+        <version.org.jboss.arquillian.arquillian-bom>1.1.0.Final</version.org.jboss.arquillian.arquillian-bom>
+        <version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1>1.0.0.CR4</version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.glassfish.main.common</groupId>
+                <artifactId>glassfish-api</artifactId>
+                <version>${version.org.glassfish.main.common.glassfish-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.main.common</groupId>
+                <artifactId>internal-api</artifactId>
+                <version>${version.org.glassfish.main.common.internal-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>${version.org.jboss.arquillian.arquillian-bom}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.container</groupId>
+                <artifactId>arquillian-glassfish-managed-3.1</artifactId>
+                <version>${version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>ee-test</id>
+            <activation>
+                <property><name>ee-test</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>test</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>

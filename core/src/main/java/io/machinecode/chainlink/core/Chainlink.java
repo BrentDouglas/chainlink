@@ -29,7 +29,7 @@ public final class Chainlink {
         lock.lock();
         try {
             Chainlink.environment = environment;
-            log.infof("Setting environment to: %s", environment);
+            log.debugf("Setting environment to: %s", environment); // TODO Message
             condition.signalAll();
         } finally {
             lock.unlock();
@@ -55,7 +55,7 @@ public final class Chainlink {
             }
             while (Chainlink.environment == null) {
                 try {
-                    log.infof("Waiting for environment to be set.");
+                    log.debugf("Waiting for environment to be set."); // TODO Message
                     condition.await();
                 } catch (InterruptedException e) {
                     //

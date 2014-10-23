@@ -78,7 +78,13 @@ public class SeEnvironment implements Environment {
                 final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(new File(config));
 
                 for (final XmlConfiguration configuration : xml.getConfigurations()) {
-                    operators.put(configuration.getId(), new JobOperatorImpl(configuration.produce()));
+                    operators.put(
+                            configuration.getId(),
+                            new JobOperatorImpl(configuration
+                                    .produce()
+                                    .build()
+                            )
+                    );
                 }
             } catch (Exception e) {
                 throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
@@ -86,7 +92,13 @@ public class SeEnvironment implements Environment {
         } else {
             try {
                 for (final ConfigurationFactory factory : factories) {
-                    operators.put(factory.getId(), new JobOperatorImpl(factory.produce()));
+                    operators.put(
+                            factory.getId(),
+                            new JobOperatorImpl(factory
+                                    .produce()
+                                    .build()
+                            )
+                    );
                 }
             } catch (final Exception e) {
                 throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);

@@ -653,7 +653,5 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
             this.securityCheckFactoriesFqcns = fqcns;
             return (T)this;
         }
-
-        public abstract ConfigurationImpl build() throws Exception;
     }
 }

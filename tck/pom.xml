@@ -691,7 +691,7 @@
                             <configuration>
                                 <target>
                                     <!-- Setup other instance in case we are testing a clustering registry. Executed from tck-core pom -->
-                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-bin.zip"
+                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-chainlinkd.zip"
                                            dest="${tck.work.dir}"/>
                                     <chmod file="${tck.work.dir}/chainlink-${project.version}/install" perm="754"/>
                                     <exec executable="${tck.work.dir}/chainlink-${project.version}/install"

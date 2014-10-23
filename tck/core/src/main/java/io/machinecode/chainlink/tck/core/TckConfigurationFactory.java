@@ -3,7 +3,6 @@ package io.machinecode.chainlink.tck.core;
 import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
@@ -31,7 +30,7 @@ public class TckConfigurationFactory implements ConfigurationFactory {
     }
 
     @Override
-    public Configuration produce() throws Exception {
+    public Builder produce() throws Exception {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
         List<TransactionManagerFactory> transactionManagers = null;
@@ -81,7 +80,6 @@ public class TckConfigurationFactory implements ConfigurationFactory {
                 .setExecutionRepositoryFactory(executionRepositories.get(0))
                 .setExecutorFactory(executors.get(0))
                 .setWorkerFactory(workers.get(0))
-                .setRegistryFactory(registries.get(0))
-                .build();
+                .setRegistryFactory(registries.get(0));
     }
 }

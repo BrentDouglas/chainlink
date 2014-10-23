@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.machinecode</groupId>
         <artifactId>machinecode-parent</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6</version>
     </parent>
 
     <groupId>io.machinecode.chainlink</groupId>
@@ -47,6 +47,7 @@
         <module>repository</module>
         <module>transport</module>
         <module>se</module>
+        <module>ee</module>
         <module>server</module>
         <module>bom</module>
         <module>dist</module>
@@ -82,7 +83,7 @@
         <version.org.infinispan.infinispan-bom>6.0.2.Final</version.org.infinispan.infinispan-bom>
         <version.org.javassist.javassist>3.13.0-GA</version.org.javassist.javassist>
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
-        <version.org.jboss.marshalling.jboss-marshalling>1.4.8.Final</version.org.jboss.marshalling.jboss-marshalling>
+        <version.org.jboss.marshalling.jboss-marshalling>1.4.10.Final</version.org.jboss.marshalling.jboss-marshalling>
         <version.org.jboss.seam.jboss-seam>2.2.2.Final</version.org.jboss.seam.jboss-seam>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>1.0.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>
         <version.org.jboss.weld.se.weld-se>2.1.0.Final</version.org.jboss.weld.se.weld-se>
@@ -162,6 +163,17 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-dist</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-ee-glassfish</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -286,6 +298,11 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-server-chainlinkd</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-tck-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -370,6 +387,11 @@
                 <version>${version.net.sf.trove4j.trove4j}</version>
             </dependency>
             <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${version.org.codehaus.groovy.groovy-all}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.gridgain</groupId>
                 <artifactId>gridgain-core</artifactId>
                 <version>${version.org.gridgain.gridgain-core}</version>
@@ -378,11 +400,6 @@
                 <groupId>org.gridgain</groupId>
                 <artifactId>gridgain-indexing</artifactId>
                 <version>${version.org.gridgain.gridgain-indexing}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-all</artifactId>
-                <version>${version.org.codehaus.groovy.groovy-all}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -506,16 +523,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>${version.org.codehaus.mojo.build-helper-maven-plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>properties-maven-plugin</artifactId>
-                    <version>${version.org.codehaus.mojo.properties-maven-plugin}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <executions>
@@ -566,10 +573,41 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${version.org.codehaus.mojo.build-helper-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>${version.org.codehaus.mojo.properties-maven-plugin}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
-    </build>
 
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>

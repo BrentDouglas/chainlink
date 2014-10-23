@@ -21,7 +21,7 @@ public class SeConfiguration extends ConfigurationImpl {
         super(toBuilder(xml), new SeConfigurationDefaults());
     }
 
-    protected static Builder toBuilder(final XmlConfiguration xml) {
+    public static Builder toBuilder(final XmlConfiguration xml) {
         final Builder builder = new Builder();
         for (final XmlProperty property : xml.getProperties()) {
             builder.setProperty(property.getKey(), property.getValue());

@@ -28,7 +28,6 @@ while getopts "hu" opt; do
       usage
       ;;
 
-    # Set the config file name
     u)
       UNINSTALL=1
       ;;

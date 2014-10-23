@@ -121,4 +121,6 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
     T setSecurityCheckFactoriesClass(final Class<? extends SecurityCheckFactory>... clazzes);
 
     T setSecurityCheckFactoriesFqcns(final String... fqcns);
+
+    Configuration build() throws Exception;
 }
