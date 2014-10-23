@@ -516,13 +516,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             }
             log.debugf(Messages.get("CHAINLINK-014403.chunk.reader.read"), state.context, this.reader.getRef());
             final Object read = this.reader.readItem(state.configuration, state.context);
-            if (read == null) {
-                log.debugf(Messages.get("CHAINLINK-014412.chunk.reader.finished"), state.context);
-                state.finished = true;
-                state.next(state.objects.isEmpty() ? AFTER : WRITE);
-                return;
-            }
-            state.stepContext.getMetric(READ_COUNT).increment();
             for (final ListenerImpl listener : state.itemReadListeners) {
                 try {
                     log.debugf(Messages.get("CHAINLINK-014404.chunk.reader.after"), state.context);
@@ -535,6 +528,13 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                     }
                 }
             }
+            if (read == null) {
+                log.debugf(Messages.get("CHAINLINK-014412.chunk.reader.finished"), state.context);
+                state.finished = true;
+                state.next(state.objects.isEmpty() ? AFTER : WRITE);
+                return;
+            }
+            state.stepContext.getMetric(READ_COUNT).increment();
             if (exception != null) {
                 throw exception;
             }
