@@ -2,10 +2,10 @@ package io.machinecode.chainlink.se.management;
 
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
-import io.machinecode.chainlink.spi.work.JobWork;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
@@ -54,8 +54,8 @@ public class SeJobOperator implements ExtendedJobOperator {
     }
 
     @Override
-    public JobOperation startJob(final JobWork job, final String jslName, final Properties parameters) throws JobStartException, JobSecurityException {
-        return delegate.startJob(job, jslName, parameters);
+    public JobOperation startJob(final String jslName, final Properties parameters) throws JobStartException, JobSecurityException {
+        return delegate.startJob(jslName, parameters);
     }
 
     @Override

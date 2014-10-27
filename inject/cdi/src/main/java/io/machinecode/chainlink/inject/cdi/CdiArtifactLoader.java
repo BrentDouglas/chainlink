@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.inject.cdi;
 
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
@@ -48,6 +49,9 @@ public class CdiArtifactLoader implements ArtifactLoader, Extension {
         final Set<Bean<?>> beans = beanManager.getBeans(as, annotation);
         final Bean<?> bean = beanManager.resolve(beans);
         if (bean == null) {
+            if (!beanManager.getBeans(id).isEmpty()) {
+                throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getSimpleName()));
+            }
             log.tracef(Messages.get("CHAINLINK-025001.artifact.loader.not.found"), id, as.getSimpleName());
             return null;
         }

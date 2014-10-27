@@ -15,6 +15,7 @@ import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
@@ -237,7 +238,6 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         try {
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
             final JobImpl job = JobFactory.produce(theirs, parameters);
-
             return _startJob(job, jslName, parameters).getJobExecutionId();
         } catch (final JobStartException e) {
             throw e;
@@ -249,10 +249,27 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     }
 
     @Override
-    public JobOperationImpl startJob(final JobWork job, final String jslName, final Properties parameters) throws JobStartException, JobSecurityException {
+    public JobOperationImpl startJob(final String jslName, final Properties parameters) throws JobStartException, JobSecurityException {
         log.tracef(Messages.get("CHAINLINK-001200.operator.start"), jslName);
         this.securityCheck.canStartJob(jslName);
         try {
+            final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
+            final JobImpl job = JobFactory.produce(theirs, parameters);
+            return _startJob(job, jslName, parameters);
+        } catch (final JobStartException e) {
+            throw e;
+        } catch (final JobSecurityException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new JobStartException(e);
+        }
+    }
+
+    public JobOperationImpl startJob(final Job theirs, final String jslName, final Properties parameters) throws JobStartException, JobSecurityException {
+        log.tracef(Messages.get("CHAINLINK-001200.operator.start"), jslName);
+        this.securityCheck.canStartJob(jslName);
+        try {
+            final JobImpl job = JobFactory.produce(theirs, parameters);
             return _startJob(job, jslName, parameters);
         } catch (final JobStartException e) {
             throw e;

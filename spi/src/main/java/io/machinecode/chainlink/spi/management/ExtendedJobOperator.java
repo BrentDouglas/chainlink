@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.spi.management;
 
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
-import io.machinecode.chainlink.spi.work.JobWork;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -21,7 +20,7 @@ public interface ExtendedJobOperator extends JobOperator, AutoCloseable {
 
     ExtendedJobInstance getJobInstanceById(final long jobInstanceId);
 
-    JobOperation startJob(final JobWork job, final String jslName, final Properties parameters) throws JobStartException, JobSecurityException;
+    JobOperation startJob(final String jslName, final Properties parameters) throws JobStartException, JobSecurityException;
 
     JobOperation getJobOperation(final long jobExecutionId) throws JobExecutionNotRunningException;
 

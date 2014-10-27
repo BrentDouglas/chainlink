@@ -20,7 +20,8 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @since 1.0
  */
 public abstract class BaseTest extends Assert {
 
@@ -93,7 +94,7 @@ public abstract class BaseTest extends Assert {
 
     protected abstract ExecutionRepository _repository() throws Exception;
 
-    protected final TransactionManager _transactionManager() throws Exception {
+    protected TransactionManager _transactionManager() throws Exception {
         return new LocalTransactionManager(180, TimeUnit.SECONDS);
     }
 

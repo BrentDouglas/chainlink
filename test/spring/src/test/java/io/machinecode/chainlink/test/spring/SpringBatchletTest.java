@@ -5,7 +5,7 @@ import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
 import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.ExecutorTest;
+import io.machinecode.chainlink.test.core.execution.BatchletTest;
 import org.junit.BeforeClass;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -13,7 +13,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class SpringExecutorTest extends ExecutorTest {
+public class SpringBatchletTest extends BatchletTest {
 
     private static AbstractApplicationContext context;
 

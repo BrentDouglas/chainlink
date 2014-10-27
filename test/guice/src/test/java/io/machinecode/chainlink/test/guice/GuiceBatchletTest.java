@@ -7,7 +7,7 @@ import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
 import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.ExecutorTest;
+import io.machinecode.chainlink.test.core.execution.BatchletTest;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.FailBatchlet;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
 import io.machinecode.chainlink.test.core.execution.artifact.batchlet.RunBatchlet;
@@ -23,7 +23,7 @@ import java.util.List;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 //@Ignore("Guice injector doesn't work properties deferring to the field name.")
-public class GuiceExecutorTest extends ExecutorTest {
+public class GuiceBatchletTest extends BatchletTest {
 
     @Override
     protected Builder _configuration() throws Exception {

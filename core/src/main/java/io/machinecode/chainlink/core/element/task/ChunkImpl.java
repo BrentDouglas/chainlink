@@ -65,8 +65,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     private static final int ADD = 4;
     private static final int WRITE = 5;
     private static final int AFTER = 6;
-    private static final int CHECKPOINT = 7;
-    private static final int COMMIT = 8;
 
     private final String checkpointPolicy;
     private final String itemCount;
@@ -222,15 +220,23 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
                 state.transactionManager.begin();
                 _openReader(state);
-                _openWriter(state);
-                if (!state.isFailed()) {
-                    log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
-                    state.transactionManager.commit();
-                } else {
+                if (state.isFailed()) {
                     _closeReader(state);
-                    _closeWriter(state);
                     log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
+                    _runErrorListeners(state);
                     state.transactionManager.rollback();
+                } else {
+                    _openWriter(state);
+                    if (!state.isFailed()) {
+                        log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
+                        state.transactionManager.commit();
+                    } else {
+                        _closeWriter(state);
+                        _closeReader(state);
+                        log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
+                        _runErrorListeners(state);
+                        state.transactionManager.rollback();
+                    }
                 }
             } catch (final Exception e) {
                 _handleException(state, e);
@@ -268,19 +274,26 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
 
             try {
                 log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
-                state.transactionManager.begin();
-                _closeWriter(state);
-                _closeReader(state);
-                if (!state.isFailed()) {
-                    log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
-                    state.transactionManager.commit();
-                    _collect(state, context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
-                } else {
-                    log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-                    state.transactionManager.rollback();
+                final Exception e = state._takeException();
+                final Throwable f = state._takeFailure();
+                try {
+                    state.transactionManager.begin();
+                    _closeWriter(state);
+                    _closeReader(state);
+                    if (!state.isFailed()) {
+                        log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
+                        state.transactionManager.commit();
+                        //_collect(state, context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
+                    } else {
+                        log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
+                        _runErrorListeners(state);
+                        state.transactionManager.rollback();
+                    }
+                } finally {
+                    state._give(e ,f);
                 }
             } catch (final Exception e) {
-                _handleExceptionInTransaction(state, e);
+                _handleException(state, e);
             } catch (final Throwable e) {
                 state.setThrowable(e);
             } finally {
@@ -291,25 +304,23 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 throw state.getFailure();
             }
         } finally {
-            synchronized (this) {
-                final BatchStatus batchStatus;
-                if (promise.isCancelled()) {
-                    state.stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
-                } else if (state.isFailed()) {
-                    batchStatus = BatchStatus.FAILED;
-                } else {
-                    batchStatus = BatchStatus.COMPLETED;
-                }
-                if (partitionExecutionId != null) {
-                    state.repository.finishPartitionExecution(
-                            partitionExecutionId,
-                            stepContext.getMetrics(),
-                            stepContext.getPersistentUserData(),
-                            batchStatus,
-                            stepContext.getExitStatus(),
-                            new Date()
-                    );
-                }
+            final BatchStatus batchStatus;
+            if (promise.isCancelled()) {
+                state.stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
+            } else if (state.isFailed()) {
+                batchStatus = BatchStatus.FAILED;
+            } else {
+                batchStatus = BatchStatus.COMPLETED;
+            }
+            if (partitionExecutionId != null) {
+                state.repository.finishPartitionExecution(
+                        partitionExecutionId,
+                        stepContext.getMetrics(),
+                        stepContext.getPersistentUserData(),
+                        batchStatus,
+                        stepContext.getExitStatus(),
+                        new Date()
+                );
             }
         }
     }
@@ -318,7 +329,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         if (state.isFailed()) {
             return false;
         }
-        Exception exception = null;
         switch (state.next) {
             case BEGIN:
                 log.debugf(Messages.get("CHAINLINK-014200.chunk.state.begin"), state.context);
@@ -353,17 +363,11 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 log.debugf(Messages.get("CHAINLINK-014205.chunk.state.after"), state.context);
                 // 11.8 9 m has this outside the write catch block
                 _runAfterListeners(state);
-                state.next(state.finished && state.objects.isEmpty() ? COMMIT : CHECKPOINT);
-                break;
-            case CHECKPOINT:
-                log.debugf(Messages.get("CHAINLINK-014206.chunk.state.checkpoint"), state.context);
+                state.objects.clear();
                 if (state.isFailed()) {
                     return false;
                 }
-                exception = _checkpoint(state);
-                // Fall through
-            case COMMIT:
-                log.debugf(Messages.get("CHAINLINK-014207.chunk.state.commit"), state.context);
+                final Exception exception = _checkpoint(state);
                 _commit(state, exception);
                 if (state.promise.isCancelled()) {
                     return false;
@@ -400,7 +404,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             log.debugf(Messages.get("CHAINLINK-014400.chunk.reader.open"), state.context, this.reader.getRef());
             this.reader.open(state.configuration, state.context, state.readInfo);
         } catch (final Exception e) {
-            _handleExceptionInTransaction(state, e);
+            _handleException(state, e);
             log.infof(e, Messages.format("CHAINLINK-014702.chunk.reader.exception.opening", state.context, this.reader.getRef()));
         } catch (final Throwable e) {
             state.setThrowable(e);
@@ -413,7 +417,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             log.debugf(Messages.get("CHAINLINK-014401.chunk.reader.close"), state.context, this.reader.getRef());
             this.reader.close(state.configuration, state.context);
         } catch (final Exception e) {
-            _handleExceptionInTransaction(state, e);
+            _handleException(state, e);
             log.infof(e, Messages.format("CHAINLINK-014706.chunk.reader.exception.closing", state.context, this.reader.getRef()));
         } catch (final Throwable e) {
             state.setThrowable(e);
@@ -426,7 +430,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             log.debugf(Messages.get("CHAINLINK-014600.chunk.writer.open"), state.context, this.writer.getRef());
             this.writer.open(state.configuration, state.context, state.writeInfo);
         } catch (final Exception e) {
-            _handleExceptionInTransaction(state, e);
+            _handleException(state, e);
             log.infof(e, Messages.format("CHAINLINK-014704.chunk.writer.exception.opening", state.context, this.writer.getRef()));
         } catch (final Throwable e) {
             state.setThrowable(e);
@@ -439,7 +443,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             log.debugf(Messages.get("CHAINLINK-014601.chunk.writer.close"), state.context, this.writer.getRef());
             this.writer.close(state.configuration, state.context);
         } catch (final Exception e) {
-            _handleExceptionInTransaction(state, e);
+            _handleException(state, e);
             log.infof(e, Messages.format("CHAINLINK-014708.chunk.writer.exception.closing", state.context, this.writer.getRef()));
         } catch (final Throwable e) {
             state.setThrowable(e);
@@ -462,7 +466,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             }
         }
         if (exception != null) {
-            _handleExceptionInTransaction(state, exception);
+            _handleException(state, exception);
         }
     }
 
@@ -485,7 +489,12 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         }
     }
 
-    private void _runErrorListeners(final State state, final Exception exception) {
+    private void _runErrorListeners(final State state) {
+        final Exception exception = state._exception;
+        if (exception == null) {
+            // This means the rollback was triggered by a Throwable which we can't pass
+            return;
+        }
         for (final ListenerImpl listener : state.chunkListeners) {
             try {
                 log.debugf(Messages.get("CHAINLINK-014302.chunk.listener.error"), state.context);
@@ -761,7 +770,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             if (exception != null) {
                 throw exception;
             }
-            state.objects.clear();
             state.next(AFTER);
         } catch (final Exception e) {
             log.warnf(Messages.get("CHAINLINK-014605.chunk.writer.error"), state.context, this.writer.getRef(), e.getClass().getCanonicalName());
@@ -801,8 +809,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 if (exception != null) {
                     throw exception;
                 }
-                state.next(COMMIT);
-                state.objects.clear();
+                state.next(AFTER);
                 return;
             }
             if (getRetryableExceptionClasses().matches(e) && state.isRetryAllowed()) {
@@ -908,22 +915,30 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     private void _rollbackTransaction(final State state) throws Exception {
         state.stepContext.getMetric(ROLLBACK_COUNT).increment();
         try {
-            _closeReader(state);
             _closeWriter(state);
+            _closeReader(state);
         } finally {
             log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
+            _runErrorListeners(state);
             state.transactionManager.rollback();
         }
         log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
-        state.transactionManager.begin();
-        _openReader(state);
-        _openWriter(state);
-        if (!state.isFailed()) {
-            log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
-            state.transactionManager.commit();
-        } else {
-            log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-            state.transactionManager.rollback();
+        final Exception e = state._takeException();
+        final Throwable f = state._takeFailure();
+        try {
+            state.transactionManager.begin();
+            _openReader(state);
+            _openWriter(state);
+            if (!state.isFailed()) {
+                log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
+                state.transactionManager.commit();
+            } else {
+                log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
+                _runErrorListeners(state);
+                state.transactionManager.rollback();
+            }
+        } finally {
+            state._give(e, f);
         }
         state.objects.clear();
         state.next(BEGIN);
@@ -933,6 +948,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         try {
             if (state.isFailed() && state.transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION) {
                 log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
+                _runErrorListeners(state);
                 state.transactionManager.rollback();
             }
         } catch (final Exception e) {
@@ -944,11 +960,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
 
     private void _handleException(final State state, final Exception exception) {
         state.setException(exception);
-        _runErrorListeners(state, exception);
-    }
-
-    private void _handleExceptionInTransaction(final State state, final Exception exception) {
-        state.setException(exception);
         try {
             if (state.transactionManager.getStatus() == Status.STATUS_ACTIVE) {
                 log.debugf(Messages.get("CHAINLINK-014104.chunk.transaction.rollback.only"), state.context);
@@ -957,7 +968,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         } catch (final SystemException e) {
             exception.addSuppressed(e);
         }
-        _runErrorListeners(state, exception);
     }
 
     @Override
@@ -1129,6 +1139,35 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 this.stepContext.setBatchStatus(BatchStatus.FAILED);
             } else {
                 this._exception.addSuppressed(e);
+            }
+        }
+
+        Exception _takeException() {
+            final Exception that = this._exception;
+            this._exception = null;
+            return that;
+        }
+
+        Throwable _takeFailure() {
+            final Throwable that = this._failure;
+            this._failure = null;
+            return that;
+        }
+
+        void _give(final Exception e, final Throwable f) {
+            if (e != null) {
+                final Exception oldE = this._exception;
+                this._exception = e;
+                if (oldE != null) {
+                    e.addSuppressed(oldE);
+                }
+            }
+            if (f != null) {
+                final Throwable oldF = this._failure;
+                this._failure = f;
+                if (oldF != null) {
+                    f.addSuppressed(oldF);
+                }
             }
         }
 

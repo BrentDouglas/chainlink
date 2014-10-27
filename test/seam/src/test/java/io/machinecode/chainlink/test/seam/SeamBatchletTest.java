@@ -6,7 +6,7 @@ import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
 import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.ExecutorTest;
+import io.machinecode.chainlink.test.core.execution.BatchletTest;
 import org.jboss.seam.contexts.Lifecycle;
 import org.jboss.seam.contexts.ServletLifecycle;
 import org.jboss.seam.init.Initialization;
@@ -19,7 +19,7 @@ import javax.servlet.ServletContext;
 /**
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
-public class SeamExecutorTest extends ExecutorTest {
+public class SeamBatchletTest extends BatchletTest {
 
     @Override
     protected Builder _configuration() throws Exception {
