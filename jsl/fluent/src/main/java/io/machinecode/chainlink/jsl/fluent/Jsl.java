@@ -28,16 +28,12 @@ import io.machinecode.chainlink.jsl.fluent.transition.FluentStop;
  */
 public class Jsl {
 
-    public static FluentJob job() {
-        return new FluentJob();
+    public static FluentJob job(final String id) {
+        return new FluentJob().setId(id);
     }
 
-    public static FluentJob job(final String name) {
-        return new FluentJob().setJslName(name);
-    }
-
-    public static FluentListener listener() {
-        return new FluentListener();
+    public static FluentListener listener(final String ref) {
+        return new FluentListener().setRef(ref);
     }
 
     public static FluentListeners listeners() {
@@ -54,55 +50,23 @@ public class Jsl {
 
     // Execution
 
-    public static FluentDecision executionAsDecision() {
-        return decision();
+    public static FluentDecision decision(final String id) {
+        return new FluentDecision().setId(id);
     }
 
-    public static FluentFlow executionAsFlow() {
-        return flow();
+    public static FluentFlow flow(final String id) {
+        return new FluentFlow().setId(id);
     }
 
-    public static FluentSplit executionAsSplit() {
-        return split();
+    public static FluentSplit split(final String id) {
+        return new FluentSplit().setId(id);
     }
 
-    public static FluentStep executionAsStep() {
-        return step();
-    }
-
-    public static FluentDecision decision() {
-        return new FluentDecision();
-    }
-
-    public static FluentFlow flow() {
-        return new FluentFlow();
-    }
-
-    public static FluentSplit split() {
-        return new FluentSplit();
-    }
-
-    public static FluentStep step() {
-        return new FluentStep();
+    public static FluentStep step(final String id) {
+        return new FluentStep().setId(id);
     }
 
     // Transition
-
-    public static FluentEnd transitionAsEnd() {
-        return end();
-    }
-
-    public static FluentFail transitionAsFail() {
-        return fail();
-    }
-
-    public static FluentNext transitionAsNext() {
-        return next();
-    }
-
-    public static FluentStop transitionAsStop() {
-        return stop();
-    }
 
     public static FluentEnd end() {
         return new FluentEnd();
@@ -122,54 +86,39 @@ public class Jsl {
 
     // Partition
 
-    public static FluentAnalyser analyser() {
-        return new FluentAnalyser();
+    public static FluentAnalyser analyser(final String ref) {
+        return new FluentAnalyser().setRef(ref);
     }
 
-    public static FluentCollector collector() {
-        return new FluentCollector();
+    public static FluentCollector collector(final String ref) {
+        return new FluentCollector().setRef(ref);
     }
 
     public static FluentPartition partition() {
         return new FluentPartition();
     }
 
-    public static FluentMapper strategyAsMapper() {
-        return mapper();
-    }
-
-    public static FluentPlan strategyAsPlan() {
-        return plan();
-    }
-
-    public static FluentMapper mapper() {
-        return new FluentMapper();
+    public static FluentMapper mapper(final String ref) {
+        return new FluentMapper().setRef(ref);
     }
 
     public static FluentPlan plan() {
         return new FluentPlan();
     }
 
-    public static FluentReducer reducer() {
-        return new FluentReducer();
+    public static FluentReducer reducer(final String ref) {
+        return new FluentReducer().setRef(ref);
     }
+
 
     // Task
 
-    public static FluentBatchlet taskAsBatchlet() {
-        return batchlet();
+    public static FluentBatchlet batchlet(final String ref) {
+        return new FluentBatchlet().setRef(ref);
     }
 
-    public static FluentChunk taskAsChunk() {
-        return chunk();
-    }
-
-    public static FluentBatchlet batchlet() {
-        return new FluentBatchlet();
-    }
-
-    public static FluentCheckpointAlgorithm checkpointAlgorithm() {
-        return new FluentCheckpointAlgorithm();
+    public static FluentCheckpointAlgorithm checkpointAlgorithm(final String ref) {
+        return new FluentCheckpointAlgorithm().setRef(ref);
     }
 
     public static FluentChunk chunk() {
@@ -196,15 +145,15 @@ public class Jsl {
         return filter();
     }
 
-    public static FluentItemProcessor processor() {
-        return new FluentItemProcessor();
+    public static FluentItemProcessor processor(final String ref) {
+        return new FluentItemProcessor().setRef(ref);
     }
 
-    public static FluentItemReader reader() {
-        return new FluentItemReader();
+    public static FluentItemReader reader(final String ref) {
+        return new FluentItemReader().setRef(ref);
     }
 
-    public static FluentItemWriter writer() {
-        return new FluentItemWriter();
+    public static FluentItemWriter writer(final String ref) {
+        return new FluentItemWriter().setRef(ref);
     }
 }

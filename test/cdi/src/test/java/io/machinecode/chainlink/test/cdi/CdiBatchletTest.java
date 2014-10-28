@@ -55,14 +55,11 @@ public class CdiBatchletTest extends BatchletTest {
     @Test
     public void unmanagedInjectedBatchletTest() throws Exception {
         printMethodName();
-        final JobImpl job = JobFactory.produce(Jsl.job()
-                .setId("unmanaged-injected-job")
+        final JobImpl job = JobFactory.produce(Jsl.job("unmanaged-injected-job")
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
-                                        Jsl.batchlet()
-                                                .setRef("unmanagedInjectedBatchlet")
+                                        Jsl.batchlet("unmanagedInjectedBatchlet")
                                                 .addProperty("property", "value")
                                 )
                 ), PARAMETERS);

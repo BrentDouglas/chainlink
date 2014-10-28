@@ -56,22 +56,20 @@ public abstract class SkipChunkTest extends OperatorTest {
     public void skipReadChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
                                                 .setSkipLimit("2")
-                                                .setReader(Jsl.reader().setRef("failReadEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
+                                                .setReader(Jsl.reader("failReadEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
                                                 .setSkippableExceptionClasses(Jsl.skippableExceptionClasses()
                                                         .addInclude(FailReadException.class)
                                                 )
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "skip-read-item", PARAMETERS);
         operation.get();
@@ -106,22 +104,20 @@ public abstract class SkipChunkTest extends OperatorTest {
     public void skipReadCheckpointTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
                                                 .setSkipLimit("2")
-                                                .setReader(Jsl.reader().setRef("failCheckpointEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
+                                                .setReader(Jsl.reader("failCheckpointEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
                                                 .setSkippableExceptionClasses(Jsl.skippableExceptionClasses()
                                                         .addInclude(FailReadException.class)
                                                 )
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items-six-count", PARAMETERS);
         operation.get();

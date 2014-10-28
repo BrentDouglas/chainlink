@@ -22,14 +22,11 @@ public abstract class BatchletTest extends OperatorTest {
     @Test
     public void runBatchletTest() throws Exception {
         printMethodName();
-        final Job job = Jsl.job()
-                .setId("run-job")
+        final Job job = Jsl.job("run-job")
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
-                                        Jsl.batchlet()
-                                                .setRef("runBatchlet")
+                                        Jsl.batchlet("runBatchlet")
                                 )
                 );
         final JobOperationImpl operation = operator.startJob(job, "run-job", PARAMETERS);
@@ -41,14 +38,11 @@ public abstract class BatchletTest extends OperatorTest {
     @Test
     public void stopBatchletTest() throws Exception {
         printMethodName();
-        final Job job = Jsl.job()
-                .setId("stop-job")
+        final Job job = Jsl.job("stop-job")
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
-                                        Jsl.batchlet()
-                                                .setRef("stopBatchlet")
+                                        Jsl.batchlet("stopBatchlet")
                                 )
                 );
         final JobOperationImpl operation = operator.startJob(job, "stop-job", PARAMETERS);
@@ -67,14 +61,11 @@ public abstract class BatchletTest extends OperatorTest {
     @Test
     public void failBatchletTest() throws Exception {
         printMethodName();
-        final Job job = Jsl.job()
-                .setId("fail-job")
+        final Job job = Jsl.job("fail-job")
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
-                                        Jsl.batchlet()
-                                                .setRef("failBatchlet")
+                                        Jsl.batchlet("failBatchlet")
                                 )
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-job", PARAMETERS);
@@ -86,14 +77,11 @@ public abstract class BatchletTest extends OperatorTest {
     @Test
     public void injectedBatchletTest() throws Exception {
         printMethodName();
-        final Job job = Jsl.job()
-                .setId("injected-job")
+        final Job job = Jsl.job("injected-job")
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
-                                        Jsl.batchlet()
-                                                .setRef("injectedBatchlet")
+                                        Jsl.batchlet("injectedBatchlet")
                                                 .addProperty("property", "value")
                                 )
                 );

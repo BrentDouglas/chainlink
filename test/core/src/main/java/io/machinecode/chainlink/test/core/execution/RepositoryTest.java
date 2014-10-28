@@ -27,14 +27,11 @@ import java.util.Properties;
 public abstract class RepositoryTest extends BaseTest {
 
     private JobImpl _job() {
-        return JobFactory.produce(Jsl.job()
-                .setId("job")
+        return JobFactory.produce(Jsl.job("job")
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
-                                        Jsl.batchlet()
-                                                .setRef("runBatchlet")
+                                        Jsl.batchlet("runBatchlet")
                                 )
                 ), PARAMETERS);
     }

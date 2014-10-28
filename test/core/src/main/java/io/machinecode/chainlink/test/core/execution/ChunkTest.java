@@ -54,18 +54,16 @@ public abstract class ChunkTest extends OperatorTest {
     public void noItemChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("neverEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("neverEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-item", PARAMETERS);
         operation.get();
@@ -95,18 +93,16 @@ public abstract class ChunkTest extends OperatorTest {
     public void oneItemChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("oneEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("oneEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "one-item", PARAMETERS);
         operation.get();
@@ -139,19 +135,17 @@ public abstract class ChunkTest extends OperatorTest {
     public void oneItemOneCountChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
                                                 .setItemCount("1")
-                                                .setReader(Jsl.reader().setRef("oneEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("oneEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "one-item-one-count", PARAMETERS);
         operation.get();
@@ -189,18 +183,16 @@ public abstract class ChunkTest extends OperatorTest {
     public void sixItemsChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("sixEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("sixEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items", PARAMETERS);
         operation.get();
@@ -243,19 +235,17 @@ public abstract class ChunkTest extends OperatorTest {
     public void sixItemsTwoCountChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
                                                 .setItemCount("2")
-                                                .setReader(Jsl.reader().setRef("sixEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("sixEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items-two-count", PARAMETERS);
         operation.get();
@@ -315,19 +305,17 @@ public abstract class ChunkTest extends OperatorTest {
     public void sixItemsFourCountChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
                                                 .setItemCount("4")
-                                                .setReader(Jsl.reader().setRef("sixEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("sixEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items-four-count", PARAMETERS);
         operation.get();
@@ -376,19 +364,17 @@ public abstract class ChunkTest extends OperatorTest {
     public void sixItemsSixCountChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
                                                 .setItemCount("6")
-                                                .setReader(Jsl.reader().setRef("sixEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("sixEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items-six-count", PARAMETERS);
         operation.get();

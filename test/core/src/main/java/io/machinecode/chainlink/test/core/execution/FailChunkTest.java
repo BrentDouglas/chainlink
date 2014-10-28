@@ -56,18 +56,16 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failReadChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("failReadEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("failReadEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-read-item", PARAMETERS);
         operation.get();
@@ -99,18 +97,16 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failProcessChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("sixEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("failEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("sixEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("failEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-process-item", PARAMETERS);
         operation.get();
@@ -143,19 +139,17 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failWriteChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
                                                 .setItemCount("1")
-                                                .setReader(Jsl.reader().setRef("sixEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("failWriteEventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("sixEventOrderReader"))
+                                                .setWriter(Jsl.writer("failWriteEventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-write-item", PARAMETERS);
         operation.get();
@@ -200,18 +194,16 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failReadCheckpointTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("failCheckpointEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("failCheckpointEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-read-checkpoint", PARAMETERS);
         operation.get();
@@ -246,19 +238,17 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failWriteCheckpointTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
                                                 .setItemCount("1")
-                                                .setReader(Jsl.reader().setRef("sixEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("failCheckpointEventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("sixEventOrderReader"))
+                                                .setWriter(Jsl.writer("failCheckpointEventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-write-checkpoint", PARAMETERS);
         operation.get();
@@ -303,18 +293,16 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failReaderOpenChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("failOpenEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("failOpenEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-read-open", PARAMETERS);
         operation.get();
@@ -336,18 +324,16 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failWriterOpenChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("neverEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("failOpenEventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("neverEventOrderReader"))
+                                                .setWriter(Jsl.writer("failOpenEventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-write-open", PARAMETERS);
         operation.get();
@@ -371,18 +357,16 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failReaderCloseChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("failCloseEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("eventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("failCloseEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-read-close", PARAMETERS);
         operation.get();
@@ -417,18 +401,16 @@ public abstract class FailChunkTest extends OperatorTest {
     public void failWriterCloseChunkTest() throws Exception {
         printMethodName();
         EventOrderAccumulator.reset();
-        final Job job = Jsl.job()
-                .setId("job")
-                .addListener(Jsl.listener().setRef("eventOrderListener"))
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
                 .addExecution(
-                        Jsl.step()
-                                .setId("step")
+                        Jsl.step("step")
                                 .setTask(
                                         Jsl.chunk()
-                                                .setReader(Jsl.reader().setRef("neverEventOrderReader"))
-                                                .setWriter(Jsl.writer().setRef("failCloseEventOrderWriter"))
-                                                .setProcessor(Jsl.processor().setRef("neverEventOrderProcessor"))
-                                ).addListener(Jsl.listener().setRef("eventOrderListener"))
+                                                .setReader(Jsl.reader("neverEventOrderReader"))
+                                                .setWriter(Jsl.writer("failCloseEventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-write-close", PARAMETERS);
         operation.get();
