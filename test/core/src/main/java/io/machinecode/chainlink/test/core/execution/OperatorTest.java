@@ -22,7 +22,7 @@ public abstract class OperatorTest extends BaseTest {
         }
     }
 
-    protected void _assertFinishedWith(final BatchStatus status, final long jobExecutionId) throws Exception {
+    protected void assertFinishedWith(final BatchStatus status, final long jobExecutionId) throws Exception {
         final JobExecution execution = repository().getJobExecution(jobExecutionId);
         Assert.assertEquals("Batch Status", status, execution.getBatchStatus());
         Assert.assertEquals("Exit Status", status.name(), execution.getExitStatus());

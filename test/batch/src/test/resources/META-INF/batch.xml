@@ -2,8 +2,8 @@
 <batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/batchXML_1_0.xsd">
-    <ref id="runBatchlet" class="io.machinecode.chainlink.test.core.execution.artifact.batchlet.RunBatchlet" />
-    <ref id="stopBatchlet" class="io.machinecode.chainlink.test.core.execution.artifact.batchlet.StopBatchlet" />
-    <ref id="failBatchlet" class="io.machinecode.chainlink.test.core.execution.artifact.batchlet.FailBatchlet" />
-    <ref id="injectedBatchlet" class="io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet" />
+    <ref id="runBatchlet" class="io.machinecode.chainlink.test.core.execution.batchlet.artifact.RunBatchlet" />
+    <ref id="stopBatchlet" class="io.machinecode.chainlink.test.core.execution.batchlet.artifact.StopBatchlet" />
+    <ref id="failBatchlet" class="io.machinecode.chainlink.test.core.execution.batchlet.artifact.FailBatchlet" />
+    <ref id="injectedBatchlet" class="io.machinecode.chainlink.test.core.execution.batchlet.artifact.InjectedBatchlet" />
 </batch-artifacts>

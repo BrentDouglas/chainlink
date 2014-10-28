@@ -10,8 +10,8 @@ import io.machinecode.chainlink.jsl.fluent.Jsl;
 import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.BatchletTest;
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.BatchletTest;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.InjectedBatchlet;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.AfterClass;
@@ -22,7 +22,8 @@ import org.junit.Test;
 import javax.batch.runtime.BatchStatus;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @since 1.0
  */
 public class CdiBatchletTest extends BatchletTest {
 
@@ -66,6 +67,6 @@ public class CdiBatchletTest extends BatchletTest {
         final JobOperationImpl operation = operator.startJob(job, "unmanaged-injected-job", PARAMETERS);
         operation.get();
         Assert.assertTrue(InjectedBatchlet.hasRun.get());
-        _assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
     }
 }

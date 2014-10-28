@@ -26,7 +26,7 @@ final class ItemCheckpointAlgorithm extends CheckpointAlgorithmImpl {
 
     @Override
     public void beginCheckpoint(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
-        current = 0;
+        //
     }
 
     @Override
@@ -39,6 +39,6 @@ final class ItemCheckpointAlgorithm extends CheckpointAlgorithmImpl {
 
     @Override
     public void endCheckpoint(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
-        //
+        current = 0;
     }
 }

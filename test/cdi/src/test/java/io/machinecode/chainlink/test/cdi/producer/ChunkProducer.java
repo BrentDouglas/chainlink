@@ -1,30 +1,36 @@
 package io.machinecode.chainlink.test.cdi.producer;
 
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.listener.ExpectFailReadOpenExceptionEventOrderListener;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.listener.ExpectFailWriteOpenExceptionEventOrderListener;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.processor.AlwaysEventOrderProcessor;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.processor.FailEventOrderProcessor;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.FailCheckpointAndCloseEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.FailCheckpointEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.FailCloseAlwaysEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.FailCloseEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.FailOpenAndCloseEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.FailOpenEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.FailReadAndCloseEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.FailReadEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.OneEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.listener.EventOrderListener;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.processor.NeverEventOrderProcessor;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.NeverEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.writer.EventOrderWriter;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.reader.SixEventOrderReader;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.writer.FailCheckpointAndCloseEventOrderWriter;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.writer.FailCheckpointEventOrderWriter;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.writer.FailCloseEventOrderWriter;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.writer.FailOpenAndCloseEventOrderWriter;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.writer.FailOpenEventOrderWriter;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.writer.FailWriteAndCloseEventOrderWriter;
-import io.machinecode.chainlink.test.core.execution.artifact.chunk.writer.FailWriteEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.listener.ExpectFailReadOpenExceptionEventOrderListener;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.listener.ExpectFailWriteOpenExceptionEventOrderListener;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.processor.AlwaysEventOrderProcessor;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.processor.FailEventOrderProcessor;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.processor.OnceFailEventOrderProcessor;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailCheckpointAndCloseEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailCheckpointEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailCloseAlwaysEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailCloseEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailOpenAndCloseEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailOpenEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailReadAndCloseEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailReadEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.FailTwiceTwiceReadEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.OnceFailCheckpointEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.OnceFailReadEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.OneEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.listener.EventOrderListener;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.processor.NeverEventOrderProcessor;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.NeverEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.EventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.reader.SixEventOrderReader;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.FailCheckpointAndCloseEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.FailCheckpointEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.FailCloseEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.FailOpenAndCloseEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.FailOpenEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.FailWriteAndCloseEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.FailWriteEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.OnceFailCheckpointEventOrderWriter;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.writer.OnceFailWriteEventOrderWriter;
 
 import javax.enterprise.inject.New;
 import javax.enterprise.inject.Produces;
@@ -104,6 +110,24 @@ public class ChunkProducer {
         return that;
     }
 
+    @Produces
+    @Named("onceFailReadEventOrderReader")
+    public OnceFailReadEventOrderReader onceFailReadEventOrderReader(@New OnceFailReadEventOrderReader that) {
+        return that;
+    }
+
+    @Produces
+    @Named("onceFailCheckpointEventOrderReader")
+    public OnceFailCheckpointEventOrderReader onceFailCheckpointEventOrderReader(@New OnceFailCheckpointEventOrderReader that) {
+        return that;
+    }
+
+    @Produces
+    @Named("failTwiceTwiceReadEventOrderReader")
+    public FailTwiceTwiceReadEventOrderReader failTwiceTwiceReadEventOrderReader(@New FailTwiceTwiceReadEventOrderReader that) {
+        return that;
+    }
+
     //Processor
 
     @Produces
@@ -121,6 +145,12 @@ public class ChunkProducer {
     @Produces
     @Named("failEventOrderProcessor")
     public FailEventOrderProcessor failEventOrderProcessor(@New FailEventOrderProcessor that) {
+        return that;
+    }
+
+    @Produces
+    @Named("onceFailEventOrderProcessor")
+    public OnceFailEventOrderProcessor onceFailEventOrderProcessor(@New OnceFailEventOrderProcessor that) {
         return that;
     }
 
@@ -171,6 +201,18 @@ public class ChunkProducer {
     @Produces
     @Named("failCheckpointAndCloseEventOrderWriter")
     public FailCheckpointAndCloseEventOrderWriter failCheckpointAndCloseEventOrderWriter(@New FailCheckpointAndCloseEventOrderWriter that) {
+        return that;
+    }
+
+    @Produces
+    @Named("onceFailWriteEventOrderWriter")
+    public OnceFailWriteEventOrderWriter onceFailWriteEventOrderWriter(@New OnceFailWriteEventOrderWriter that) {
+        return that;
+    }
+
+    @Produces
+    @Named("onceFailCheckpointEventOrderWriter")
+    public OnceFailCheckpointEventOrderWriter onceFailCheckpointEventOrderWriter(@New OnceFailCheckpointEventOrderWriter that) {
         return that;
     }
 

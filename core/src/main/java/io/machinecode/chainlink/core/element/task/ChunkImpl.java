@@ -21,6 +21,7 @@ import io.machinecode.chainlink.spi.work.TaskWork;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
+import javax.batch.api.chunk.CheckpointAlgorithm;
 import javax.batch.api.chunk.listener.ChunkListener;
 import javax.batch.api.chunk.listener.ItemProcessListener;
 import javax.batch.api.chunk.listener.ItemReadListener;
@@ -65,6 +66,10 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     private static final int ADD = 4;
     private static final int WRITE = 5;
     private static final int AFTER = 6;
+    private static final int READER_CHECKPOINT = 7;
+    private static final int WRITER_CHECKPOINT = 8;
+    private static final int COLLECT = 9;
+    private static final int COMMIT = 10;
 
     private final String checkpointPolicy;
     private final String itemCount;
@@ -223,7 +228,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 if (state.isFailed()) {
                     _closeReader(state);
                     log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-                    _runErrorListeners(state);
+                    _runErrorListeners(state, state._exception);
                     state.transactionManager.rollback();
                 } else {
                     _openWriter(state);
@@ -234,7 +239,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                         _closeWriter(state);
                         _closeReader(state);
                         log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-                        _runErrorListeners(state);
+                        _runErrorListeners(state, state._exception);
                         state.transactionManager.rollback();
                     }
                 }
@@ -274,8 +279,8 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
 
             try {
                 log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
-                final Exception e = state._takeException();
-                final Throwable f = state._takeFailure();
+                final Exception e = state.takeException();
+                final Throwable f = state.takeFailure();
                 try {
                     state.transactionManager.begin();
                     _closeWriter(state);
@@ -286,11 +291,11 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                         //_collect(state, context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
                     } else {
                         log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-                        _runErrorListeners(state);
+                        _runErrorListeners(state, state._exception);
                         state.transactionManager.rollback();
                     }
                 } finally {
-                    state._give(e ,f);
+                    state.give(e, f);
                 }
             } catch (final Exception e) {
                 _handleException(state, e);
@@ -332,11 +337,11 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         switch (state.next) {
             case BEGIN:
                 log.debugf(Messages.get("CHAINLINK-014200.chunk.state.begin"), state.context);
-                final int checkpointTimeout = state.checkpointAlgorithm.checkpointTimeout(state.configuration, state.context);
+                final int checkpointTimeout = state.checkpointTimeout();
                 log.debugf(Messages.get("CHAINLINK-014100.chunk.transaction.timeout"), state.context, checkpointTimeout);
                 state.transactionManager.setTransactionTimeout(checkpointTimeout);
                 state.checkpointStartTime = System.currentTimeMillis();
-                state.checkpointAlgorithm.beginCheckpoint(state.configuration, state.context);
+                state.beginCheckpoint();
                 log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
                 state.transactionManager.begin();
                 _runBeforeListeners(state);
@@ -364,11 +369,27 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 // 11.8 9 m has this outside the write catch block
                 _runAfterListeners(state);
                 state.objects.clear();
+                // Fall through
+            case READER_CHECKPOINT:
                 if (state.isFailed()) {
                     return false;
                 }
-                final Exception exception = _checkpoint(state);
-                _commit(state, exception);
+                state.next(_readerCheckpoint(state));
+                break;
+            case WRITER_CHECKPOINT:
+                if (state.isFailed()) {
+                    return false;
+                }
+                state.next(_writerCheckpoint(state));
+                break;
+            case COLLECT:
+                if (state.isFailed()) {
+                    return false;
+                }
+                _collect(state, state.context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
+                //Fall through
+            case COMMIT:
+                _commit(state);
                 if (state.promise.isCancelled()) {
                     return false;
                 }
@@ -383,7 +404,28 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         return true;
     }
 
-    private void _collect(final State state, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) {
+    private void _collect(final State state, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception {
+        // TODO #checkpointInfo failed maybe it would be better to ignore updating that part
+        if (state.partitionExecutionId == null) {
+            Repository.updateStep(
+                    state.repository,
+                    state.jobExecutionId,
+                    state.stepExecutionId,
+                    state.stepContext.getMetrics(),
+                    state.stepContext.getPersistentUserData(),
+                    state.readInfo,
+                    state.writeInfo
+            );
+        } else {
+            state.repository.updatePartitionExecution(
+                    state.partitionExecutionId,
+                    state.stepContext.getMetrics(),
+                    state.stepContext.getPersistentUserData(),
+                    state.readInfo,
+                    state.writeInfo,
+                    new Date()
+            );
+        }
         try {
             if (partition != null) {
                 state.items.add(partition.collect(state.configuration, context, batchStatus, exitStatus));
@@ -489,8 +531,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         }
     }
 
-    private void _runErrorListeners(final State state) {
-        final Exception exception = state._exception;
+    private void _runErrorListeners(final State state, final Exception exception) {
         if (exception == null) {
             // This means the rollback was triggered by a Throwable which we can't pass
             return;
@@ -566,57 +607,61 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             if (exception != null) {
                 throw exception;
             }
-            if (getSkippableExceptionClasses().matches(e) && state.isSkipAllowed()) {
-                ++state.skipped;
-                state.stepContext.getMetric(READ_SKIP_COUNT).increment();
-                log.debugf(Messages.get("CHAINLINK-014406.chunk.reader.skip"), state.context, this.reader.getRef(), e.getClass().getCanonicalName());
-                for (final ListenerImpl listener : state.skipReadListeners) {
-                    try {
-                        log.debugf(Messages.get("CHAINLINK-014408.chunk.reader.skip.listener"), state.context);
-                        listener.onSkipReadItem(state.configuration, state.context, e);
-                    } catch (final Exception s) {
-                        if (exception == null) {
-                            exception = s;
-                            exception.addSuppressed(e);
-                        } else {
-                            exception.addSuppressed(s);
+            final Match match = _tryMatchException(state, e);
+            switch (match) {
+                case SKIP:
+                    ++state.skipped;
+                    state.stepContext.getMetric(READ_SKIP_COUNT).increment();
+                    log.debugf(Messages.get("CHAINLINK-014406.chunk.reader.skip"), state.context, this.reader.getRef(), e.getClass().getCanonicalName());
+                    for (final ListenerImpl listener : state.skipReadListeners) {
+                        try {
+                            log.debugf(Messages.get("CHAINLINK-014408.chunk.reader.skip.listener"), state.context);
+                            listener.onSkipReadItem(state.configuration, state.context, e);
+                        } catch (final Exception s) {
+                            if (exception == null) {
+                                exception = s;
+                                exception.addSuppressed(e);
+                            } else {
+                                exception.addSuppressed(s);
+                            }
                         }
                     }
-                }
-                if (exception != null) {
-                    throw exception;
-                }
-                state.next(READ);
-                return;
-            }
-            if (getRetryableExceptionClasses().matches(e) && state.isRetryAllowed()) {
-                ++state.retried;
-                log.debugf(Messages.get("CHAINLINK-014407.chunk.reader.retry"), state.context, this.reader.getRef(), e.getClass().getCanonicalName());
-                for (final ListenerImpl listener : state.retryReadListeners) {
-                    try {
-                        log.debugf(Messages.get("CHAINLINK-014409.chunk.reader.retry.listener"), state.context);
-                        listener.onRetryReadException(state.configuration, state.context, e);
-                    } catch (final Exception s) {
-                        if (exception == null) {
-                            exception = s;
-                            exception.addSuppressed(e);
-                        } else {
-                            exception.addSuppressed(s);
-                        }
+                    if (exception != null) {
+                        throw exception;
                     }
-                }
-                if (exception != null) {
-                    throw exception;
-                }
-                if (getNoRollbackExceptionClasses().matches(e)) {
-                    log.debugf(Messages.get("CHAINLINK-014411.chunk.reader.no.rollback"), state.context, this.reader.getRef(), e.getClass().getCanonicalName());
                     state.next(READ);
                     return;
-                }
-                _rollbackTransaction(state);
-                return;
+                case RETRY:
+                case NO_ROLLBACK:
+                    ++state.retried;
+                    log.debugf(Messages.get("CHAINLINK-014407.chunk.reader.retry"), state.context, this.reader.getRef(), e.getClass().getCanonicalName());
+                    for (final ListenerImpl listener : state.retryReadListeners) {
+                        try {
+                            log.debugf(Messages.get("CHAINLINK-014409.chunk.reader.retry.listener"), state.context);
+                            listener.onRetryReadException(state.configuration, state.context, e);
+                        } catch (final Exception s) {
+                            if (exception == null) {
+                                exception = s;
+                                exception.addSuppressed(e);
+                            } else {
+                                exception.addSuppressed(s);
+                            }
+                        }
+                    }
+                    if (exception != null) {
+                        throw exception;
+                    }
+                    if (match == Match.NO_ROLLBACK) {
+                        log.debugf(Messages.get("CHAINLINK-014411.chunk.reader.no.rollback"), state.context, this.reader.getRef(), e.getClass().getCanonicalName());
+                        state.next(READ);
+                        return;
+                    }
+                    _rollbackTransaction(state, e);
+                    state.next(BEGIN);
+                    return;
+                default:
+                    throw e;
             }
-            throw e;
         }
     }
 
@@ -680,57 +725,61 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             if (exception != null) {
                 throw exception;
             }
-            if (getSkippableExceptionClasses().matches(e) && state.isSkipAllowed()) {
-                ++state.skipped;
-                state.stepContext.getMetric(PROCESS_SKIP_COUNT).increment();
-                log.debugf(Messages.get("CHAINLINK-014504.chunk.processor.skip"), state.context, this.processor.getRef(), e.getClass().getCanonicalName());
-                for (final ListenerImpl listener : state.skipProcessListeners) {
-                    try {
-                        log.debugf(Messages.get("CHAINLINK-014506.chunk.processor.skip.listener"), state.context);
-                        listener.onSkipProcessItem(state.configuration, state.context, read, e);
-                    } catch (final Exception s) {
-                        if (exception == null) {
-                            exception = s;
-                            exception.addSuppressed(e);
-                        } else {
-                            exception.addSuppressed(s);
+            final Match match = _tryMatchException(state, e);
+            switch (match) {
+                case SKIP:
+                    ++state.skipped;
+                    state.stepContext.getMetric(PROCESS_SKIP_COUNT).increment();
+                    log.debugf(Messages.get("CHAINLINK-014504.chunk.processor.skip"), state.context, this.processor.getRef(), e.getClass().getCanonicalName());
+                    for (final ListenerImpl listener : state.skipProcessListeners) {
+                        try {
+                            log.debugf(Messages.get("CHAINLINK-014506.chunk.processor.skip.listener"), state.context);
+                            listener.onSkipProcessItem(state.configuration, state.context, read, e);
+                        } catch (final Exception s) {
+                            if (exception == null) {
+                                exception = s;
+                                exception.addSuppressed(e);
+                            } else {
+                                exception.addSuppressed(s);
+                            }
                         }
                     }
-                }
-                if (exception != null) {
-                    throw exception;
-                }
-                state.next(READ);
-                return;
-            }
-            if (getRetryableExceptionClasses().matches(e) && state.isRetryAllowed()) {
-                ++state.retried;
-                log.debugf(Messages.get("CHAINLINK-014505.chunk.processor.retry"), state.context, this.processor.getRef(), e.getClass().getCanonicalName());
-                for (final ListenerImpl listener : state.retryProcessListeners) {
-                    try {
-                        log.debugf(Messages.get("CHAINLINK-014507.chunk.processor.retry.listener"), state.context);
-                        listener.onRetryProcessException(state.configuration, state.context, read, e);
-                    } catch (final Exception s) {
-                        if (exception == null) {
-                            exception = s;
-                            exception.addSuppressed(e);
-                        } else {
-                            exception.addSuppressed(s);
-                        }
+                    if (exception != null) {
+                        throw exception;
                     }
-                }
-                if (exception != null) {
-                    throw exception;
-                }
-                if (getNoRollbackExceptionClasses().matches(e)) {
-                    log.debugf(Messages.get("CHAINLINK-014509.chunk.processor.no.rollback"), state.context, this.processor.getRef(), e.getClass().getCanonicalName());
-                    state.next(PROCESS);
+                    state.next(READ);
                     return;
-                }
-                _rollbackTransaction(state);
-                return;
+                case RETRY:
+                case NO_ROLLBACK:
+                    ++state.retried;
+                    log.debugf(Messages.get("CHAINLINK-014505.chunk.processor.retry"), state.context, this.processor.getRef(), e.getClass().getCanonicalName());
+                    for (final ListenerImpl listener : state.retryProcessListeners) {
+                        try {
+                            log.debugf(Messages.get("CHAINLINK-014507.chunk.processor.retry.listener"), state.context);
+                            listener.onRetryProcessException(state.configuration, state.context, read, e);
+                        } catch (final Exception s) {
+                            if (exception == null) {
+                                exception = s;
+                                exception.addSuppressed(e);
+                            } else {
+                                exception.addSuppressed(s);
+                            }
+                        }
+                    }
+                    if (exception != null) {
+                        throw exception;
+                    }
+                    if (match == Match.NO_ROLLBACK) {
+                        log.debugf(Messages.get("CHAINLINK-014509.chunk.processor.no.rollback"), state.context, this.processor.getRef(), e.getClass().getCanonicalName());
+                        state.next(PROCESS);
+                        return;
+                    }
+                    _rollbackTransaction(state, e);
+                    state.next(BEGIN);
+                    return;
+                default:
+                    throw e;
             }
-            throw e;
         }
     }
 
@@ -789,142 +838,170 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             if (exception != null) {
                 throw exception;
             }
-            if (getSkippableExceptionClasses().matches(e) && state.isSkipAllowed()) {
-                ++state.skipped;
-                state.stepContext.getMetric(WRITE_SKIP_COUNT).increment();
-                log.debugf(Messages.get("CHAINLINK-014606.chunk.writer.skip"), state.context, this.writer.getRef(), e.getClass().getCanonicalName());
-                for (final ListenerImpl listener : state.skipWriteListeners) {
-                    try {
-                        log.debugf(Messages.get("CHAINLINK-014608.chunk.writer.skip.listener"), state.context);
-                        listener.onSkipWriteItem(state.configuration, state.context, state.objects, e);
-                    } catch (final Exception s) {
-                        if (exception == null) {
-                            exception = s;
-                            exception.addSuppressed(e);
-                        } else {
-                            exception.addSuppressed(s);
+            final Match match = _tryMatchException(state, e);
+            switch (match) {
+                case SKIP:
+                    ++state.skipped;
+                    state.stepContext.getMetric(WRITE_SKIP_COUNT).increment();
+                    log.debugf(Messages.get("CHAINLINK-014606.chunk.writer.skip"), state.context, this.writer.getRef(), e.getClass().getCanonicalName());
+                    for (final ListenerImpl listener : state.skipWriteListeners) {
+                        try {
+                            log.debugf(Messages.get("CHAINLINK-014608.chunk.writer.skip.listener"), state.context);
+                            listener.onSkipWriteItem(state.configuration, state.context, state.objects, e);
+                        } catch (final Exception s) {
+                            if (exception == null) {
+                                exception = s;
+                                exception.addSuppressed(e);
+                            } else {
+                                exception.addSuppressed(s);
+                            }
                         }
                     }
-                }
-                if (exception != null) {
-                    throw exception;
-                }
-                state.next(AFTER);
-                return;
-            }
-            if (getRetryableExceptionClasses().matches(e) && state.isRetryAllowed()) {
-                ++state.retried;
-                log.debugf(Messages.get("CHAINLINK-014607.chunk.writer.retry"), state.context, this.writer.getRef(), e.getClass().getCanonicalName());
-                for (final ListenerImpl listener : state.retryWriteListeners) {
-                    try {
-                        log.debugf(Messages.get("CHAINLINK-014609.chunk.writer.retry.listener"), state.context);
-                        listener.onRetryWriteException(state.configuration, state.context, state.objects, e);
-                    } catch (final Exception s) {
-                        if (exception == null) {
-                            exception = s;
-                            exception.addSuppressed(e);
-                        } else {
-                            exception.addSuppressed(s);
-                        }
+                    if (exception != null) {
+                        throw exception;
                     }
-                }
-                if (exception != null) {
-                    throw exception;
-                }
-                if (getNoRollbackExceptionClasses().matches(e)) {
-                    log.debugf(Messages.get("CHAINLINK-014611.chunk.writer.no.rollback"), state.context, this.writer.getRef(), e.getClass().getCanonicalName());
-                    state.next(WRITE);
+                    state.next(AFTER);
                     return;
-                }
-                _rollbackTransaction(state);
-                return;
+                case RETRY:
+                case NO_ROLLBACK:
+                    ++state.retried;
+                    log.debugf(Messages.get("CHAINLINK-014607.chunk.writer.retry"), state.context, this.writer.getRef(), e.getClass().getCanonicalName());
+                    for (final ListenerImpl listener : state.retryWriteListeners) {
+                        try {
+                            log.debugf(Messages.get("CHAINLINK-014609.chunk.writer.retry.listener"), state.context);
+                            listener.onRetryWriteException(state.configuration, state.context, state.objects, e);
+                        } catch (final Exception s) {
+                            if (exception == null) {
+                                exception = s;
+                                exception.addSuppressed(e);
+                            } else {
+                                exception.addSuppressed(s);
+                            }
+                        }
+                    }
+                    if (exception != null) {
+                        throw exception;
+                    }
+                    if (match == Match.NO_ROLLBACK) {
+                        log.debugf(Messages.get("CHAINLINK-014611.chunk.writer.no.rollback"), state.context, this.writer.getRef(), e.getClass().getCanonicalName());
+                        state.next(WRITE);
+                        return;
+                    }
+                    _rollbackTransaction(state, e);
+                    state.next(BEGIN);
+                    return;
+                default:
+                    throw e;
             }
-            throw e;
         }
     }
 
-    private Exception _checkpoint(final State state) throws Exception {
+    private Match _tryMatchException(final State state, final Exception e) throws Exception {
+        if (state.retrying) {
+            if (state.isSkipAllowed() && getSkippableExceptionClasses().matches(e)) {
+                return Match.SKIP;
+            }
+            if (state.isRetryAllowed() && getRetryableExceptionClasses().matches(e)) {
+                if (getNoRollbackExceptionClasses().matches(e)) {
+                    return Match.NO_ROLLBACK;
+                }
+                return Match.RETRY;
+            }
+            return Match.NONE;
+        } else {
+            if (state.isRetryAllowed() && getRetryableExceptionClasses().matches(e)) {
+                if (getNoRollbackExceptionClasses().matches(e)) {
+                    return Match.NO_ROLLBACK;
+                }
+                return Match.RETRY;
+            }
+            if (state.isSkipAllowed() && getSkippableExceptionClasses().matches(e)) {
+                return Match.SKIP;
+            }
+            return Match.NONE;
+        }
+    }
+
+    private int _readerCheckpoint(final State state) throws Exception {
         try {
             log.debugf(Messages.get("CHAINLINK-014900.chunk.reader.checkpoint"), state.context, this.reader.getRef());
             state.readInfo = this.reader.checkpointInfo(state.configuration, state.context);
+        } catch (final Exception e) {
+            final Match match = _tryMatchException(state, e);
+            switch (match) {
+                case SKIP:
+                    ++state.skipped;
+                    state.stepContext.getMetric(READ_SKIP_COUNT).increment();
+                    log.debugf(Messages.get("CHAINLINK-014902.chunk.checkpoint.skip"), state.context, e.getClass().getCanonicalName());
+                    break;
+                case RETRY:
+                case NO_ROLLBACK:
+                    ++state.retried;
+                    log.debugf(Messages.get("CHAINLINK-014903.chunk.checkpoint.retry"), state.context, e.getClass().getCanonicalName());
+                    if (match == Match.NO_ROLLBACK) {
+                        log.debugf(Messages.get("CHAINLINK-014904.chunk.checkpoint.no.rollback"), state.context, e.getClass().getCanonicalName());
+                        return READER_CHECKPOINT;
+                    }
+                    _rollbackTransaction(state, e);
+                    return BEGIN;
+                default:
+                    throw e;
+            }
+        }
+        return WRITER_CHECKPOINT;
+    }
+
+    private int _writerCheckpoint(final State state) throws Exception {
+        try {
             log.debugf(Messages.get("CHAINLINK-014901.chunk.writer.checkpoint"), state.context, this.writer.getRef());
             state.writeInfo = this.writer.checkpointInfo(state.configuration, state.context);
-            if (state.partitionExecutionId == null) {
-                Repository.updateStep(
-                        state.repository,
-                        state.jobExecutionId,
-                        state.stepExecutionId,
-                        state.stepContext.getMetrics(),
-                        state.stepContext.getPersistentUserData(),
-                        state.readInfo,
-                        state.writeInfo
-                );
-            } else {
-                state.repository.updatePartitionExecution(
-                        state.partitionExecutionId,
-                        state.stepContext.getMetrics(),
-                        state.stepContext.getPersistentUserData(),
-                        state.readInfo,
-                        state.writeInfo,
-                        new Date()
-                );
-            }
-            _collect(state, state.context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
-            return null;
         } catch (final Exception e) {
-            return e;
+            final Match match = _tryMatchException(state, e);
+            switch (match) {
+                case SKIP:
+                    ++state.skipped;
+                    state.stepContext.getMetric(WRITE_SKIP_COUNT).increment();
+                    log.debugf(Messages.get("CHAINLINK-014902.chunk.checkpoint.skip"), state.context, e.getClass().getCanonicalName());
+                    break;
+                case RETRY:
+                case NO_ROLLBACK:
+                    ++state.retried;
+                    log.debugf(Messages.get("CHAINLINK-014903.chunk.checkpoint.retry"), state.context, e.getClass().getCanonicalName());
+                    if (match == Match.NO_ROLLBACK) {
+                        log.debugf(Messages.get("CHAINLINK-014904.chunk.checkpoint.no.rollback"), state.context, e.getClass().getCanonicalName());
+                        return WRITER_CHECKPOINT;
+                    }
+                    _rollbackTransaction(state, e);
+                    return BEGIN;
+                default:
+                    throw e;
+            }
         }
+        return COLLECT;
     }
 
-    private void _commit(final State state, final Exception exception) throws Exception {
-        if (exception != null) {
-            if (getRetryableExceptionClasses().matches(exception) && state.isRetryAllowed()) {
-                ++state.retried;
-                log.debugf(Messages.get("CHAINLINK-014902.chunk.checkpoint.retry"), state.context, exception.getClass().getCanonicalName());
-                if (getNoRollbackExceptionClasses().matches(exception)) {
-                    log.debugf(Messages.get("CHAINLINK-014903.chunk.checkpoint.no.rollback"), state.context, exception.getClass().getCanonicalName());
-                    state.next(AFTER);
-                    return;
-                }
-                _rollbackTransaction(state);
-                return;
-            }
-            throw exception;
-        }
-        try {
-            log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
-            state.transactionManager.commit();
-            state.stepContext.getMetric(COMMIT_COUNT).increment();
-            state.checkpointAlgorithm.endCheckpoint(state.configuration, state.context);
-        } catch (final Exception e) {
-            if (getRetryableExceptionClasses().matches(e) && state.isRetryAllowed()) {
-                ++state.retried;
-                log.debugf(Messages.get("CHAINLINK-014902.chunk.checkpoint.retry"), state.context, e.getClass().getCanonicalName());
-                if (getNoRollbackExceptionClasses().matches(e)) {
-                    log.debugf(Messages.get("CHAINLINK-014903.chunk.checkpoint.no.rollback"), state.context, e.getClass().getCanonicalName());
-                    state.next(AFTER);
-                    return;
-                }
-                _rollbackTransaction(state);
-                return;
-            }
-            throw e;
-        }
+    private void _commit(final State state) throws Exception {
+        log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
+        state.transactionManager.commit();
+        state.stepContext.getMetric(COMMIT_COUNT).increment();
+        state.endCheckpoint();
+        state.commit();
     }
 
-    private void _rollbackTransaction(final State state) throws Exception {
+    private void _rollbackTransaction(final State state, final Exception exception) throws Exception {
         state.stepContext.getMetric(ROLLBACK_COUNT).increment();
         try {
             _closeWriter(state);
             _closeReader(state);
         } finally {
             log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-            _runErrorListeners(state);
+            _runErrorListeners(state, exception);
             state.transactionManager.rollback();
+            state.endCheckpoint();
         }
         log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
-        final Exception e = state._takeException();
-        final Throwable f = state._takeFailure();
+        final Exception e = state.takeException();
+        final Throwable f = state.takeFailure();
         try {
             state.transactionManager.begin();
             _openReader(state);
@@ -934,21 +1011,21 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 state.transactionManager.commit();
             } else {
                 log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-                _runErrorListeners(state);
+                _runErrorListeners(state, state._exception);
                 state.transactionManager.rollback();
             }
         } finally {
-            state._give(e, f);
+            state.give(e, f);
         }
         state.objects.clear();
-        state.next(BEGIN);
+        state.rollback();
     }
 
     private void _cleanupTx(final State state) {
         try {
             if (state.isFailed() && state.transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION) {
                 log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-                _runErrorListeners(state);
+                _runErrorListeners(state, state._exception);
                 state.transactionManager.rollback();
             }
         } catch (final Exception e) {
@@ -980,31 +1057,14 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         }
     }
 
-    /*
-    @Override
-    protected String getResolveLogMessage() {
-        return Messages.format("CHAINLINK-014800.chunk.resolve", state.context, this);
-    }
+    private enum Match { NONE, SKIP, RETRY, NO_ROLLBACK }
 
-    @Override
-    protected String getRejectLogMessage() {
-        return Messages.format("CHAINLINK-014801.chunk.reject", state.context, this);
-    }
-
-    @Override
-    protected String getCancelLogMessage() {
-        return Messages.format("CHAINLINK-014802.chunk.cancel", state.context, this);
-    }
-
-    @Override
-    protected String getTimeoutExceptionMessage() {
-        return Messages.format("CHAINLINK-014004.chunk.timeout", state.context, this);
-    }
-    */
-
-    private class State {
+    private class State implements CheckpointAlgorithm {
         int next = BEGIN;
         boolean finished = false;
+        boolean retrying = false;
+        boolean _firstRetry = false;
+        boolean _lastRetry = true;
         Object value;
         Serializable readInfo;
         Serializable writeInfo;
@@ -1036,7 +1096,8 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
 
         long checkpointStartTime;
 
-        final CheckpointAlgorithmImpl checkpointAlgorithm;
+        final CheckpointAlgorithmImpl _checkpointAlgorithm;
+        final CheckpointAlgorithmImpl _retryCheckpointAlgorithm;
 
         final List<ListenerImpl> chunkListeners;
         final List<ListenerImpl> itemReadListeners;
@@ -1090,10 +1151,11 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 throw new IllegalStateException(Messages.format("CHAINLINK-014003.chunk.writer.null", context, ChunkImpl.this.writer.getRef()));
             }
             if (CheckpointPolicy.ITEM.equalsIgnoreCase(ChunkImpl.this.checkpointPolicy) || ChunkImpl.this.checkpointAlgorithm == null) {
-                this.checkpointAlgorithm = new ItemCheckpointAlgorithm(timeout, this.itemCount);
+                this._checkpointAlgorithm = new ItemCheckpointAlgorithm(timeout, this.itemCount);
             } else {
-                this.checkpointAlgorithm = ChunkImpl.this.checkpointAlgorithm;
+                this._checkpointAlgorithm = ChunkImpl.this.checkpointAlgorithm;
             }
+            this._retryCheckpointAlgorithm = new ItemCheckpointAlgorithm(timeout, 1);
             this.chunkListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, ChunkListener.class);
             this.itemReadListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, ItemReadListener.class);
             this.retryReadListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, RetryReadListener.class);
@@ -1106,10 +1168,64 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             this.skipWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, SkipWriteListener.class);
         }
 
+        public void rollback() {
+            this.retrying = true;
+            this._firstRetry = true;
+        }
+
+        public void commit() {
+            this.retrying = !this._lastRetry;
+            this._firstRetry = false;
+        }
+
+        @Override
+        public int checkpointTimeout() throws Exception {
+            if (this.retrying) {
+                if (this._firstRetry) {
+                    return this._checkpointAlgorithm.checkpointTimeout(this.configuration, this.context);
+                }
+                return this._retryCheckpointAlgorithm.checkpointTimeout(this.configuration, this.context);
+            } else {
+                return this._checkpointAlgorithm.checkpointTimeout(this.configuration, this.context);
+            }
+        }
+
+        @Override
+        public void beginCheckpoint() throws Exception {
+            if (this.retrying) {
+                if (this._firstRetry) {
+                    this._checkpointAlgorithm.beginCheckpoint(this.configuration, this.context);
+                }
+                this._retryCheckpointAlgorithm.beginCheckpoint(this.configuration, this.context);
+            } else {
+                this._checkpointAlgorithm.beginCheckpoint(this.configuration, this.context);
+            }
+        }
+
+        @Override
         public boolean isReadyToCheckpoint() throws Exception {
-            return this.checkpointAlgorithm.isReadyToCheckpoint(this.configuration, this.context)
+            final boolean ret;
+            if (this.retrying) {
+                this._lastRetry = this._checkpointAlgorithm.isReadyToCheckpoint(this.configuration, this.context);
+                ret = this._retryCheckpointAlgorithm.isReadyToCheckpoint(this.configuration, this.context);
+            } else {
+                ret = this._checkpointAlgorithm.isReadyToCheckpoint(this.configuration, this.context);
+            }
+            return ret
                     || (0 != this.timeLimit && this.checkpointStartTime + this.timeLimit < System.currentTimeMillis())
                     || promise.isCancelled();
+        }
+
+        @Override
+        public void endCheckpoint() throws Exception {
+            if (this.retrying) {
+                if (this._lastRetry) {
+                    this._checkpointAlgorithm.endCheckpoint(this.configuration, this.context);
+                }
+                this._retryCheckpointAlgorithm.endCheckpoint(this.configuration, this.context);
+            } else {
+                this._checkpointAlgorithm.endCheckpoint(this.configuration, this.context);
+            }
         }
 
         public void next(final int status) {
@@ -1142,19 +1258,19 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             }
         }
 
-        Exception _takeException() {
+        Exception takeException() {
             final Exception that = this._exception;
             this._exception = null;
             return that;
         }
 
-        Throwable _takeFailure() {
+        Throwable takeFailure() {
             final Throwable that = this._failure;
             this._failure = null;
             return that;
         }
 
-        void _give(final Exception e, final Throwable f) {
+        void give(final Exception e, final Throwable f) {
             if (e != null) {
                 final Exception oldE = this._exception;
                 this._exception = e;

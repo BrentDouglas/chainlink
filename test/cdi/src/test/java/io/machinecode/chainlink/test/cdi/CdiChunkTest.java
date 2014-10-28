@@ -6,14 +6,15 @@ import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.ChunkTest;
+import io.machinecode.chainlink.test.core.execution.chunk.ChunkTest;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @since 1.0
  */
 public class CdiChunkTest extends ChunkTest {
 

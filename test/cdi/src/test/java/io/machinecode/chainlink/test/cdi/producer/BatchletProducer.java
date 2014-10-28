@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.test.cdi.producer;
 
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.FailBatchlet;
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.RunBatchlet;
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.StopBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.FailBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.InjectedBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.RunBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.StopBatchlet;
 
 import javax.enterprise.inject.New;
 import javax.enterprise.inject.Produces;

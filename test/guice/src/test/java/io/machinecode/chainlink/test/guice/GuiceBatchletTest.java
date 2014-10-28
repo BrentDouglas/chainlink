@@ -7,11 +7,11 @@ import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
 import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.BatchletTest;
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.FailBatchlet;
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.InjectedBatchlet;
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.RunBatchlet;
-import io.machinecode.chainlink.test.core.execution.artifact.batchlet.StopBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.BatchletTest;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.FailBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.InjectedBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.RunBatchlet;
+import io.machinecode.chainlink.test.core.execution.batchlet.artifact.StopBatchlet;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
