@@ -48,7 +48,7 @@ public class ConfigurationImpl implements Configuration {
     protected final Properties properties;
 
     public ConfigurationImpl(final JobOperatorModelImpl model, final ArtifactLoader loader) throws Exception {
-        this.properties = model.getProperties();
+        this.properties = model.getRawProperties();
         this.classLoader = nn(model.classLoader, loader);
         this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, _array(ArtifactLoader.class, model.artifactLoaders.values(), loader));
         this.transactionManager = nn(model.transactionManager, loader);

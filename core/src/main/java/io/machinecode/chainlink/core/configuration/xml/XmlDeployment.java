@@ -5,6 +5,8 @@ import io.machinecode.chainlink.spi.configuration.DeploymentConfiguration;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
 
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
@@ -14,6 +16,18 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlAccessorType(NONE)
 public class XmlDeployment extends XmlScope {
+
+    @XmlID
+    @XmlAttribute(name = "name", required = false)
+    protected String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
 
     public void configureDeployment(final DeploymentModelImpl model, final ClassLoader classLoader) throws Exception {
         configureScope(model, classLoader);

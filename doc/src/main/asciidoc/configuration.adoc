@@ -1,0 +1,198 @@
+== Configuration
+:chainlinkd: {chainlinkdDir}
+:resource: {resourceDir}
+:example: {javaDir}/example
+
+A JobOperator (or ExtendedJobOperator, which I will just refer to
+as a JobOperator or operator) in Chainlink is essentially a wrapper
+around a group of individual components that can be easily replaced.
+
+Through the JSR-352 api, only a single operator is available however
+Chainlink allows many to be used. For example you could have one that
+executed job's locally and stored the results in redis and a second
+that executes jobs on all nodes of a hazelcast cluster and stores the
+results in a relational database. Many permutations are available
+through the available extensions.
+
+=== chainlink.xml
+
+Configuration in chainlink is primarily done using the file
+`chainlink.xml`. Every implementation will honour a `chainlink.xml`
+file found in the root of an application's classpath (i.e. / for a
+jar or /WEB-INF/classes for a war) in combination with it's provided
+configuration methods. Containers also have additional configuration
+options to allow sharing a JobOperator between deployments. Due to
+differences in each container they are not always identical but they
+are designed to work with the file `chainlink-subsystem.xml`.
+
+Configuration is hierarchical with an JobOperator defined in container
+configuration able to be overridden by properties in a deployments
+`chainlink.xml`.
+
+Here are two example `chainlink.xml` files. The first is a minimal
+example that will allow calling `BatchRuntime.getJobOperator()` on
+all containers. The `job-operator` element is only required in
+wildfly and may be omitted in all containers.
+
+[source,xml]
+----
+include::{resource}/chainlink-min.xml[]
+----
+
+This is a more complete example of a configured job operator and is
+the default configuration for operators in SE mode. By default the ref
+attribute of each element specifies the fully qualified class name
+(FQCN) of either a factory that produces one of the extension points
+used by the job operator or the FQCN. In both cases the specified class
+must have a no-args constructor.
+
+[source,xml]
+----
+include::{chainlinkd}/cnf/chainlink.xml[]
+----
+
+The utility of the ref attribute may be increased by specifying
+additional ArtifactLoaders from which to load the ref. The ref
+attribute of the `artifact-loader` elements (outside the `job-operator`
+element) must abide by the same rules as before (FQCN of ArtifactLoader
+or ArtifactLoaderFactory with no-arg constructor) but now the
+`job-operator` elements and their children will attempt to use the
+specified loader as well. Hereafter a reference able to be loaded by
+either the default rules or a provided loader will be referred to as an
+injectable reference. Here is an example loading an Injector (that
+doesn't do anything) using CDI.
+
+[source,xml]
+----
+include::{resource}/chainlink-loader.xml[]
+----
+
+[source,java]
+----
+include::{example}/TheInjector.java[]
+----
+
+Sometimes this may not be sufficiently flexible and it may be desirable
+to configure a JobOperator programmatically. Chainlink facilitates this
+through the DeploymentConfiguration and JobOperatorConfiguration
+interfaces. Setting the `ref` attribute on a `job-operator` element to
+an injectable reference of a class implementing the
+JobOperatorConfiguration interface allows directly manipulating the
+JobOperator model. These operations are applied after the `ref`
+attributes specified in xml are added to the model. Setting the `ref`
+attribute on the `chainlink` element allows accessing the model for
+the entire deployment so you can add new operators as in this example.
+
+The JobOperatorConfiguration `ref` attribute MUST be accessible through
+one of the artifact loaders defined in xml. It cannot be loaded through
+an artifact loader added in the DeploymentConfiguration. Artifacts
+within the JobOperator however MAY be accessible through an artifact
+loader added programmatically.
+
+[source,xml]
+----
+include::{resource}/chainlink-factory.xml[]
+----
+
+[source,java]
+----
+include::{example}/TheJobOperatorConfiguration.java[]
+----
+
+[source,java]
+----
+include::{example}/TheDeploymentConfiguration.java[]
+----
+
+Each extension in configured using the Declaration interface using a
+number of options. Only one, the most specific, of the provided options
+is actually used in the JobOperator. The most specific operator is
+determined by looking for parameters passed in using these methods.
+
+1. setValue
+2. setValueClass
+3. setFactory
+4. setFactoryClass
+5. setRef
+6. setDefaultFactory
+
+The first one found is used. Note that in general you should not use
+setDefaultFactory. It is provided to allow each container to specify
+default values.
+
+All the values not specified by name in the JobOperatorConfiguration
+interface are required other than the MBeanServer. Those specified by
+name indicates a collection which is provided to the operator in the
+order they are added. In the example we saw the injector defined in
+xml moved after a second injector. In this case 'otherInjector' would
+be called first and 'theInjector' second. The ordering may or may not
+be important and you should check the javadoc to determine how they
+are called. For example, specified Injector's are called one at a time
+until on returns true, the ArtifactLoader's are called one at a time
+until one return an artifact or throws an exception, while different
+parts of the Security interface are either called one at a time (the
+filter* methods) or until one throws (the can* methods). Note that the
+javadoc is the source of truth on how these methods are called, not the
+passage above, so always check them.
+
+=== chainlink-subsystem.xml
+
+The `chainlink-subsystem.xml` file is used to configure a container
+with multiple deployments. In it you can specify operators that are
+shared between deployments and the operators to be used for each
+deployment. These configuration settings can then be extended by each
+deployment's `chainlink.xml`.
+
+Here's a pretty complete example that shows most of the options
+available. It is idealised to show how Chainlink's configuration works,
+and does not represent a configuration that will work in a container.
+The caveat's with it are discussed generally below, and in more detail
+within the section for each container.
+
+[source,xml]
+----
+include::{resource}/chainlink-subsystem.xml[]
+----
+
+[source,java]
+----
+include::{example}/TheSubSystemConfiguration.java[]
+----
+
+As we can see, configuration follows a pretty similar model to that of
+`chainlink.xml`. The `deployment` element has a different meaning for
+the `name` attribute than a `job-operator`. When configuring a
+deployment, the container will try and find a `deployment` element that
+matches the deployment name. If it can't it will use the definition with
+the name default.
+
+Injectable references in the deployment sections can use artifact
+loaders defined within the `subsystem` element in addition to those they
+declare. Note that in this example the artifact loader `jndi` is only
+available to the deployment `default`.
+
+The SubSystemConfiguration interface allows programmatic manipulation
+of the entire subsystem model, though as before, references to
+DeploymentConfiguration and JobOperatorConfiguration's are not available
+through artifact loaders added in this manner.
+
+This example however ignores some of the realities present when configuring
+your deployments. If this example were to attempt to be used to configure a
+container the *Configuration classes would have to be available to the
+classloader of the Chainlink module, rather than in a deployment. A
+BeanManager would have to be available to the module, a
+TransactionManager would have to be available under
+"java:comp/TransactionManager" and moreover the "java:comp" context
+would also have to be available. Whether these conditions hold is
+dependent on the container integration and should be carefully
+considered when configuring Chainlink.
+
+include::configuration-embedded.adoc[]
+
+include::configuration-se.adoc[]
+
+include::configuration-glassfish.adoc[]
+
+include::configuration-tomee.adoc[]
+
+include::configuration-wildfly.adoc[]

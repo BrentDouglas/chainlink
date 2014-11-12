@@ -20,8 +20,8 @@ public class XmlChainlink extends XmlDeployment {
 
     public static final String ELEMENT = "chainlink";
 
-    public static final String SCHEMA_URL = "http://io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd";
-    public static final String NAMESPACE = "http://io.machinecode/xml/ns/chainlink";
+    public static final String SCHEMA_URL = "http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd";
+    public static final String NAMESPACE = "http://machinecode.io/xml/ns/chainlink";
 
     public static void configureDeploymentFromStream(final DeploymentModelImpl model, final ClassLoader loader, final InputStream stream) throws Exception {
         try {

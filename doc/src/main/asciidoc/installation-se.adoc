@@ -1,0 +1,52 @@
+=== SE
+
+==== Installation
+
+To install the standalone Chainlink service requires one of
+the provided distribution zip files.
+
+1. Unzip the distribution and `cd` into destination directory which
+   hereafter will be referred to using the environment variable
+   `CHAINLINK_DIR`. The unzipped directory will be used as the service
+   home. The installation script does not create any files outside of
+   this directory.
+
+2. Run the script `./install -h` to see available extensions.
+
+3. Run the script with `./install -c se -m <comma separated list of
+   modules to install>`.
+
+4. Add Chainlink to your path with `export PATH="${PATH}:${CHAINLINK_DIR}/bin"`.
+
+5. Symlink the chainlinkd service to /etc/init.d/chainlinkd with
+   `ln -s ${CHAINLINK_DIR}/bin/chainlinkd /etc/init.d/chainlinkd`
+
+6. Chainlink is installed! You can start chainlink directly
+   with the command `chainlink <args>`. Run `chainlink -h` for help.
+
+===== Using chkconfig
+
+1. Add it with `sudo chkconfig --add chainlinkd`
+
+2. Enable it with `sudo chkconfig chainlinkd on`
+
+3. Start it with `sudo service chainlinkd start`.
+
+===== Using systemd
+
+1. Add it with `sudo systemctl daemon-reload`
+
+2. Enable it with `sudo systemctl enable chainlinkd`
+
+3. Start it with `sudo systemctl start chainlinkd`
+
+==== Uninstallation
+
+1. Run the script with `./install -u -c se -m <comma separated list of
+   modules to uninstall>`. Alternatively the installation may be
+   removed by running `rm -rf "${CHAINLINK_DIR}"`.
+
+2. If you created a symlink to chainlinkd, remove it with
+   `rm /etc/init.d/chainlinkd`.
+
+3. Chainlink is uninstalled!

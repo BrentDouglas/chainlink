@@ -49,7 +49,7 @@ public class LazyJobOperator implements ExtendedJobOperator {
     }
 
     synchronized void lazyOpen() {
-        if (delegate != null) {
+        if (delegate == null) {
             try {
                 delegate = loader == null
                         ? model.createJobOperator()
@@ -65,7 +65,7 @@ public class LazyJobOperator implements ExtendedJobOperator {
 
     @Override
     public void open(final Configuration configuration) throws Exception {
-        throw new IllegalStateException(); //TODO Message
+        // no op
     }
 
     @Override

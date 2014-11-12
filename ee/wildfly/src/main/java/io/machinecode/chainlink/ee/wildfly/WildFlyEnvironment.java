@@ -41,7 +41,7 @@ public class WildFlyEnvironment implements Environment {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
-                return app.ops;
+                return Collections.unmodifiableMap(app.ops);
             }
         }
         return Collections.emptyMap();

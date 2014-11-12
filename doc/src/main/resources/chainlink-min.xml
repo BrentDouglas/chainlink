@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chainlink xmlns="http://machinecode.io/xml/ns/chainlink"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd">
+    <job-operator name="default"/>
+</chainlink>

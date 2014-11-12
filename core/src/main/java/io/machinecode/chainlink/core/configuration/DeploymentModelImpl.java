@@ -1,8 +1,11 @@
 package io.machinecode.chainlink.core.configuration;
 
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.DeploymentModel;
 
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
@@ -25,5 +28,23 @@ public class DeploymentModelImpl extends ScopeModelImpl implements DeploymentMod
 
     public DeploymentModelImpl copy(final ClassLoader loader) {
         return new DeploymentModelImpl(this, loader);
+    }
+
+    public DeploymentModel loadChainlinkXml() throws Exception {
+        final ClassLoader loader = this.loader.get();
+        if (loader == null) {
+            throw new IllegalStateException(); //TODO Message
+        }
+        final String chainlinkXml = System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
+        final InputStream stream = loader.getResourceAsStream(chainlinkXml);
+        if (stream != null) {
+            XmlChainlink.configureDeploymentFromStream(this, loader, stream);
+        }
+        return this;
+    }
+
+    public DeploymentModel loadChainlinkXml(final InputStream stream) throws Exception {
+        XmlChainlink.configureDeploymentFromStream(this, loader.get(), stream);
+        return this;
     }
 }

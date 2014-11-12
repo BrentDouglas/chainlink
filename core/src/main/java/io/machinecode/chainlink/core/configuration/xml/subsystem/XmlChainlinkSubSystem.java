@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
@@ -25,24 +27,24 @@ public class XmlChainlinkSubSystem extends XmlScope {
 
     public static final String ELEMENT = "subsystem";
 
-    public static final String SCHEMA_URL = "http://io.machinecode/xml/ns/chainlink/subsystem/chainlink-subsystem_1_0.xsd";
-    public static final String NAMESPACE = "http://io.machinecode/xml/ns/chainlink/subsystem";
+    public static final String SCHEMA_URL = "http://machinecode.io/xml/ns/chainlink/subsystem/chainlink-subsystem_1_0.xsd";
+    public static final String NAMESPACE = "http://machinecode.io/xml/ns/chainlink/subsystem";
 
     @XmlElement(name = "deployment", namespace = XmlChainlinkSubSystem.NAMESPACE, required = false)
-    private XmlDeployment deployment;
+    private List<XmlDeployment> deployments = new ArrayList<>(0);
 
-    public XmlDeployment getDeployment() {
-        return deployment;
+    public List<XmlDeployment> getDeployment() {
+        return deployments;
     }
 
-    public void setDeployment(final XmlDeployment deployment) {
-        this.deployment = deployment;
+    public void setDeployment(final List<XmlDeployment> deployment) {
+        this.deployments = deployment;
     }
 
     public void configureSubSystem(final SubSystemModelImpl model, final ClassLoader classLoader) throws Exception {
         configureScope(model, classLoader);
-        if (this.deployment != null) {
-            deployment.configureDeployment(model.getDeployment(), classLoader);
+        for (final XmlDeployment deployment : this.deployments) {
+            deployment.configureDeployment(model.getDeployment(deployment.getName()), classLoader);
         }
         if (this.ref != null) {
             final SubSystemConfiguration configuration;

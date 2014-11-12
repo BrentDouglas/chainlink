@@ -12,7 +12,6 @@ import io.machinecode.chainlink.spi.transport.Transport;
 
 import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -44,5 +43,5 @@ public interface JobOperatorModel {
 
     Declaration<MBeanServer> getMBeanServer();
 
-    Properties getProperties();
+    PropertyModel getProperties();
 }

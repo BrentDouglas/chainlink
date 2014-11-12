@@ -8,7 +8,7 @@ public interface Constants {
 
     String NAMESPACE                        = "io.machinecode.chainlink";
 
-    String DEFAULT_CONFIGURATION            = "default";
+    String DEFAULT = "default";
 
     String GLOBAL_TRANSACTION_TIMEOUT       = "javax.transaction.global.timeout";
 

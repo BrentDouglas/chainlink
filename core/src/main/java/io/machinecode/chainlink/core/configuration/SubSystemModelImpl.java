@@ -1,9 +1,14 @@
 package io.machinecode.chainlink.core.configuration;
 
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.SubSystemModel;
 
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -11,15 +16,34 @@ import java.lang.ref.WeakReference;
  */
 public class SubSystemModelImpl extends ScopeModelImpl implements SubSystemModel {
 
-    final DeploymentModelImpl deployment;
+    final Map<String, DeploymentModelImpl> deployments;
+    final DeploymentModelImpl defaultDeployment;
 
     public SubSystemModelImpl(final ClassLoader loader) {
         super(new WeakReference<>(loader), new THashSet<String>());
-        this.deployment = new DeploymentModelImpl(this);
+        this.deployments = new THashMap<>();
+        this.deployments.put(Constants.DEFAULT, defaultDeployment = new DeploymentModelImpl(this));
     }
 
     @Override
-    public DeploymentModelImpl getDeployment() {
-        return deployment;
+    public DeploymentModelImpl getDeployment(final String name) {
+        DeploymentModelImpl scope = deployments.get(name);
+        if (scope == null) {
+            deployments.put(name, scope = new DeploymentModelImpl(this));
+        }
+        return scope;
+    }
+
+    public DeploymentModelImpl findDeployment(final String name) {
+        DeploymentModelImpl scope = deployments.get(name);
+        if (scope == null) {
+            return defaultDeployment;
+        }
+        return scope;
+    }
+
+    public SubSystemModel loadChainlinkSubsystemXml(final InputStream stream) throws Exception {
+        XmlChainlinkSubSystem.configureSubSystemFromStream(this, loader.get(), stream);
+        return this;
     }
 }

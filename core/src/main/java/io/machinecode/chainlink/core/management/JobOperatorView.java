@@ -37,7 +37,7 @@ public class JobOperatorView implements ExtendedJobOperator {
     private final ExtendedJobOperator delegate;
 
     public JobOperatorView() {
-        this(Constants.DEFAULT_CONFIGURATION);
+        this(Constants.DEFAULT);
     }
 
     public JobOperatorView(final String id) {

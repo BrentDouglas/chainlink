@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>chainlink-parent</artifactId>
+        <groupId>io.machinecode.chainlink</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>chainlink-doc</artifactId>
+
+    <properties>
+        <version.org.asciidoctor>1.5.2</version.org.asciidoctor>
+        <version.org.asciidoctor.asciidoctor-maven-plugin>${version.org.asciidoctor}</version.org.asciidoctor.asciidoctor-maven-plugin>
+        <version.org.asciidoctor.asciidoctorj-pdf>1.5.0-alpha.6</version.org.asciidoctor.asciidoctorj-pdf>
+
+        <asciidoc.dir>${project.basedir}/src/main/asciidoc</asciidoc.dir>
+        <java.dir>${project.basedir}/src/main/java</java.dir>
+        <resource.dir>${project.basedir}/src/main/resources</resource.dir>
+        <chainlinkd.dir>${root.dir}/server/chainlinkd</chainlinkd.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-inject-cdi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-se</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <version>${version.org.asciidoctor.asciidoctor-maven-plugin}</version>
+                    <configuration>
+                        <sourceDirectory>${asciidoc.dir}</sourceDirectory>
+                        <headerFooter>true</headerFooter>
+                        <imagesDir>${project.basedir}/src/main/resources/img</imagesDir>
+                        <attributes>
+                            <version>${project.version}</version>
+                            <javaDir>${java.dir}</javaDir>
+                            <resourceDir>${resource.dir}</resourceDir>
+                            <chainlinkdDir>${chainlinkd.dir}</chainlinkdDir>
+                        </attributes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>output-html</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <!-- coderay, highlightjs, prettify, pygments -->
+                            <sourceHighlighter>prettify</sourceHighlighter>
+                            <backend>html</backend>
+                            <attributes>
+                                <toc/>
+                                <linkcss>false</linkcss>
+                                <stylesheet>chainlink.css</stylesheet>
+                            </attributes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>output-pdf</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <sourceHighlighter>coderay</sourceHighlighter>
+                            <backend>pdf</backend>
+                            <attributes>
+                                <toc/>
+                            </attributes>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctorj-pdf</artifactId>
+                        <version>${version.org.asciidoctor.asciidoctorj-pdf}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

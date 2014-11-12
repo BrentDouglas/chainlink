@@ -5,7 +5,6 @@ import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
-import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.ee.wildfly.WildFlyConstants;
 import io.machinecode.chainlink.ee.wildfly.WildFlyEnvironment;
@@ -24,7 +23,6 @@ import org.jboss.msc.value.InjectedValue;
 
 import javax.enterprise.inject.spi.BeanManager;
 import javax.transaction.TransactionManager;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -68,7 +66,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
             final DeploymentModelImpl deployment;
             final ScopeModelImpl scope;
             if (!global) {
-                scope = deployment = this.scope.getValue().getDeployment();
+                scope = deployment = this.scope.getValue().findDeployment(Constants.DEFAULT); //TODO This needs to be the module name
             } else {
                 scope = this.scope.getValue();
                 deployment = null;
@@ -121,11 +119,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
             if (!global) {
                 final DeploymentModelImpl dep = deployment.copy(classLoader);
                 final JobOperatorModelImpl op = dep.getJobOperator(name);
-                final String chainlinkXml = System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
-                final InputStream stream = classLoader.getResourceAsStream(chainlinkXml);
-                if (stream != null) {
-                    XmlChainlink.configureDeploymentFromStream(dep, classLoader, stream);
-                }
+                dep.loadChainlinkXml();
                 model = op;
             } else {
                 model = operator;
@@ -231,7 +225,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
             if (!name.isDefined()) {
                 throw new IllegalStateException(); //TODO Message
             }
-            operator.getProperties().setProperty(name.asString(), node.get(WildFlyConstants.VALUE).asString());
+            operator.getRawProperties().setProperty(name.asString(), node.get(WildFlyConstants.VALUE).asString());
         }
     }
 

@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.core.configuration;
 
-import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
@@ -34,7 +34,7 @@ public class ConfigurationTest extends Assert {
                 return tccl;
             }
         });
-        model.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory(180, TimeUnit.SECONDS));
+        model.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
         model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
         model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
         model.getTransport().setDefaultFactory(new LocalTransportFactory());
@@ -45,8 +45,8 @@ public class ConfigurationTest extends Assert {
     private JobOperatorModelImpl op() throws Exception {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         final SubSystemModelImpl model = new SubSystemModelImpl(tccl);
-        final DeploymentModelImpl deployment = model.getDeployment();
-        XmlChainlink.configureDeploymentFromStream(deployment, tccl, tccl.getResourceAsStream("test-chainlink.xml"));
+        final DeploymentModelImpl deployment = model.getDeployment(Constants.DEFAULT);
+        deployment.loadChainlinkXml(tccl.getResourceAsStream("test-chainlink.xml"));
         final JobOperatorModelImpl op = deployment.getJobOperator("default");
         defaults(tccl, op);
         return op;

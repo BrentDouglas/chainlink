@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:cl="http://io.machinecode/xml/ns/chainlink"
-           targetNamespace="http://io.machinecode/xml/ns/chainlink"
+           xmlns:cl="http://machinecode.io/xml/ns/chainlink"
+           targetNamespace="http://machinecode.io/xml/ns/chainlink"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
            version="1.0">
@@ -80,7 +80,7 @@
     </xs:complexType>
 
     <xs:complexType name="NamedType">
-        <xs:attribute name="name" use="required" type="xs:ID">
+        <xs:attribute name="name" use="required" type="xs:string">
             <xs:annotation>
                 <xs:documentation>
                     The name this element may referred to by other elements using this attribute.

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:cl="http://io.machinecode/xml/ns/chainlink"
-           xmlns:cls="http://io.machinecode/xml/ns/chainlink/subsystem"
-           targetNamespace="http://io.machinecode/xml/ns/chainlink/subsystem"
+           xmlns:cl="http://machinecode.io/xml/ns/chainlink"
+           xmlns:cls="http://machinecode.io/xml/ns/chainlink/subsystem"
+           targetNamespace="http://machinecode.io/xml/ns/chainlink/subsystem"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
            version="1.0">
@@ -24,12 +24,26 @@
         <xs:complexContent>
             <xs:extension base="cl:ScopeType">
                 <xs:sequence>
-                    <xs:element name="deployment" type="cl:DeploymentType" minOccurs="0" maxOccurs="1" nillable="false"/>
+                    <xs:element name="deployment" type="cls:ContainerDeploymentType" minOccurs="0" maxOccurs="unbounded" nillable="false"/>
                 </xs:sequence>
                 <xs:attribute name="ref" use="optional" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
                             An injectable reference for the SubSystemConfiguration to use to configure this subsystem.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ContainerDeploymentType">
+        <xs:complexContent>
+            <xs:extension base="cl:DeploymentType">
+                <xs:attribute name="name" use="required" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The name of the deployment this configuration applies to.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>

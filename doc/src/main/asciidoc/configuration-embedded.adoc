@@ -1,0 +1,78 @@
+=== Embedded
+:example: {javaDir}/example
+
+Embedded usage of chainlink requires manually configuring chainlink.
+We will cover configuring chainlink both with the `chainlink-se` jar
+and without it.
+
+With the `chainlink-se` jar configuration is fairly straightforward as
+can be seen in the following snipped.
+
+
+[source,java]
+----
+include::{example}/SeConfiguration.java[]
+----
+
+So what's going on? We're constructing an environment and providing it
+to the BatchRuntime. We then load the configuration files specified
+(in this case it will look for the default `chainlink.xml` in both the
+root of the classpath and in the current directory. The SeEnvironment
+provides sufficient defaults that a JobOperator only need be specified
+by its identifier in the configuration file to be instantiated. It will
+also always provide a JobOperator with the identifier "default".
+BatchRuntime then loads a JobOperator using the ServiceLoader mechanism
+which calls `Chainlink.getEnvironment().getJobOperator("default");` to
+access the underlying operator we have configured and we start a job
+with it.
+
+It's important to note that calling `Chainlink.getEnvironment()` blocks
+until `Chainlink.setEnvironment()` has been called so calling
+`BatchRuntime.getJobOperator()` before `Chainlink.setEnvironment()`
+will result in a blocked thread.
+
+Because that was so straightforward we'll now give it a go without the
+benefit of the `chainlink-se` jar. Essentially the same steps will need
+to be done.
+
+1. We must call `Chainlink.setEnvironment()` with an environment before
+looking up a JobOperator.
+2. The environment must be able to provide a JobOperator for the identifier
+"default" to use `BatchRuntime.getJobOperator()`.
+
+
+[source,java]
+----
+include::{example}/ManualConfiguration.java[]
+----
+
+Essentially we go through the same steps as before. Configure the default
+JobOperator, provide Chainlink with a way to get it, run our code. It's
+split into setting the defaults and then loading and installing the operator
+so that we can more easily customise our config. For example we might want
+to run in a CDI environment. Configuring that requires adding a some
+dependencies:
+
+[source,xml]
+----
+    <dependencies>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-inject-cdi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se</artifactId>
+        </dependency>
+    </dependencies>
+----
+
+And then adding it to the model:
+
+[source,java]
+----
+include::{example}/WeldConfiguration.java[]
+----
+
+Chainlink includes a wide range of extensions that can be installed in
+this manner and you can easily write your own.

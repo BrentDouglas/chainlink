@@ -3,7 +3,9 @@ package io.machinecode.chainlink.core.configuration;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
+import io.machinecode.chainlink.core.management.LazyJobOperator;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.configuration.PropertyModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
@@ -231,7 +233,11 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     }
 
     @Override
-    public Properties getProperties() {
+    public PropertyModel getProperties() {
+        return new PropertyModelImpl(this.getRawProperties());
+    }
+
+    public Properties getRawProperties() {
         return this.properties == null
                 ? this.properties = new Properties()
                 : this.properties;
@@ -239,16 +245,24 @@ public class JobOperatorModelImpl implements JobOperatorModel {
 
     public JobOperatorImpl createJobOperator(final ArtifactLoader loader) throws Exception {
         final ConfigurationImpl configuration = scope.getConfiguration(name, loader);
-        final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
+        final JobOperatorImpl op = new JobOperatorImpl(configuration, getRawProperties());
         op.open(configuration);
         return op;
     }
 
     public JobOperatorImpl createJobOperator() throws Exception {
         final ConfigurationImpl configuration = scope.getConfiguration(name);
-        final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
+        final JobOperatorImpl op = new JobOperatorImpl(configuration, getRawProperties());
         op.open(configuration);
         return op;
+    }
+
+    public LazyJobOperator createLazyJobOperator(final ArtifactLoader loader) throws Exception {
+        return new LazyJobOperator(this, loader);
+    }
+
+    public LazyJobOperator createLazyJobOperator() throws Exception {
+        return new LazyJobOperator(this);
     }
 
     public ConfigurationImpl getConfiguration() throws Exception {

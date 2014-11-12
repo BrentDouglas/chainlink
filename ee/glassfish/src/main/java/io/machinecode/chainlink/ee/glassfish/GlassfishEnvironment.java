@@ -3,7 +3,6 @@ package io.machinecode.chainlink.ee.glassfish;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
-import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
 import io.machinecode.chainlink.core.management.LazyJobOperator;
@@ -54,7 +53,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
-                return app.ops;
+                return Collections.unmodifiableMap(app.ops);
             }
         }
         return Collections.emptyMap();
@@ -80,35 +79,30 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
             app = new App(loader);
             this.operators.put(info.getName(), app);
         }
-        final DeploymentModelImpl deployment = this.model.getDeployment().copy(loader);
+        final DeploymentModelImpl deployment = this.model.findDeployment(info.getName()).copy(loader);
 
-        final String chainlinkXml = System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
-        final InputStream stream = loader.getResourceAsStream(chainlinkXml);
-        if (stream != null) {
-            XmlChainlink.configureDeploymentFromStream(deployment, loader, stream);
-        }
+        deployment.loadChainlinkXml();
+
         final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, threadFactory);
         boolean haveDefault = false;
         for (final Map.Entry<String, JobOperatorModelImpl> entry : deployment.getJobOperators().entrySet()) {
             final JobOperatorModelImpl jobOperatorModel = entry.getValue();
             defaults.configureJobOperator(jobOperatorModel);
-            if (Constants.DEFAULT_CONFIGURATION.equals(entry.getKey())) {
+            if (Constants.DEFAULT.equals(entry.getKey())) {
                 haveDefault = true;
             }
-            final LazyJobOperator op = new LazyJobOperator(jobOperatorModel);
-            op.open(jobOperatorModel.getConfiguration());
+            final LazyJobOperator op = jobOperatorModel.createLazyJobOperator();
             app.ops.put(
                     entry.getKey(),
                     op
             );
         }
         if (!haveDefault) {
-            final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+            final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT);
             defaults.configureJobOperator(defaultModel);
-            final LazyJobOperator op = new LazyJobOperator(defaultModel);
-            op.open(defaultModel.getConfiguration());
+            final LazyJobOperator op = defaultModel.createLazyJobOperator();
             app.ops.put(
-                    Constants.DEFAULT_CONFIGURATION,
+                    Constants.DEFAULT,
                     op
             );
         }

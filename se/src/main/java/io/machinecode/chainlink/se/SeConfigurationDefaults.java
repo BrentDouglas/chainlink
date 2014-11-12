@@ -12,7 +12,6 @@ import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -30,7 +29,7 @@ public class SeConfigurationDefaults implements JobOperatorConfiguration {
                 return tccl;
             }
         });
-        model.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory(180, TimeUnit.SECONDS));
+        model.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
         model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
         model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
         model.getTransport().setDefaultFactory(new LocalTransportFactory());

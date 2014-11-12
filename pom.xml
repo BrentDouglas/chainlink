@@ -49,6 +49,7 @@
         <module>se</module>
         <module>ee</module>
         <module>server</module>
+        <module>doc</module>
         <module>bom</module>
         <module>dist</module>
     </modules>

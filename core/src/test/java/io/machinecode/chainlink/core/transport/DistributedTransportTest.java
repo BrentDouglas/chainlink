@@ -37,8 +37,8 @@ public class DistributedTransportTest extends TransportTest {
         if (this._secondConfiguration == null) {
             final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
             final DeploymentModelImpl deployment = _configure(tccl);
-            visitSecondJobOperatorModel(deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION));
-            this._secondConfiguration = deployment.getConfiguration(Constants.DEFAULT_CONFIGURATION);
+            visitSecondJobOperatorModel(deployment.getJobOperator(Constants.DEFAULT));
+            this._secondConfiguration = deployment.getConfiguration(Constants.DEFAULT);
         }
         return this._secondConfiguration;
     }
@@ -47,8 +47,8 @@ public class DistributedTransportTest extends TransportTest {
         if (this._thirdConfiguration == null) {
             final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
             final DeploymentModelImpl deployment = _configure(tccl);
-            visitThirdJobOperatorModel(deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION));
-            this._thirdConfiguration = deployment.getConfiguration(Constants.DEFAULT_CONFIGURATION);
+            visitThirdJobOperatorModel(deployment.getJobOperator(Constants.DEFAULT));
+            this._thirdConfiguration = deployment.getConfiguration(Constants.DEFAULT);
         }
         return this._thirdConfiguration;
     }

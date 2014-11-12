@@ -15,6 +15,10 @@ public class LocalTransactionManagerFactory implements TransactionManagerFactory
     final long timeout;
     final TimeUnit unit;
 
+    public LocalTransactionManagerFactory() {
+        this(180, TimeUnit.SECONDS);
+    }
+
     public LocalTransactionManagerFactory(final long timeout, final TimeUnit unit) {
         this.timeout = timeout;
         this.unit = unit;

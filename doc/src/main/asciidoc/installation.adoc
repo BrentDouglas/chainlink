@@ -1,0 +1,18 @@
+== Installation
+
+The Chainlink distribution can be downloaded from the Maven Central
+repository. Two versions are available, one contains the installation
+script and every jar required for a full install of Chainlink. The
+second only contains the installation script and relies on Maven to
+fetch the required jars. One of them is required for all but embedded
+usage.
+
+include::installation-embedded.adoc[]
+
+include::installation-se.adoc[]
+
+include::installation-glassfish.adoc[]
+
+include::installation-tomee.adoc[]
+
+include::installation-wildfly.adoc[]

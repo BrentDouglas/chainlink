@@ -28,7 +28,6 @@ import org.junit.Before;
 
 import javax.transaction.TransactionManager;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -55,16 +54,16 @@ public abstract class BaseTest extends Assert {
         if (this._configuration == null) {
             final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
             final DeploymentModelImpl deployment = _configure(tccl);
-            final JobOperatorModelImpl op = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+            final JobOperatorModelImpl op = deployment.getJobOperator(Constants.DEFAULT);
             this.visitJobOperatorModel(op);
-            this._configuration = deployment.getConfiguration(Constants.DEFAULT_CONFIGURATION);
+            this._configuration = deployment.getConfiguration(Constants.DEFAULT);
 
             final ArtifactLoader loader = new ConfigurationArtifactLoader();
-            this._transactionManager = op.getTransactionManager().get(_configuration, op.getProperties(), loader);
-            this._registry = op.getRegistry().get(_configuration, op.getProperties(), loader);
-            this._repository = op.getExecutionRepository().get(_configuration, op.getProperties(), loader);
-            this._marshalling = op.getMarshalling().get(_configuration, op.getProperties(), loader);
-            this._executor = op.getExecutor().get(_configuration, op.getProperties(), loader);
+            this._transactionManager = op.getTransactionManager().get(_configuration, op.getRawProperties(), loader);
+            this._registry = op.getRegistry().get(_configuration, op.getRawProperties(), loader);
+            this._repository = op.getExecutionRepository().get(_configuration, op.getRawProperties(), loader);
+            this._marshalling = op.getMarshalling().get(_configuration, op.getRawProperties(), loader);
+            this._executor = op.getExecutor().get(_configuration, op.getRawProperties(), loader);
             // Make sure any factories get called
             op.getConfiguration();
         }
@@ -73,15 +72,15 @@ public abstract class BaseTest extends Assert {
 
     protected DeploymentModelImpl _configure(final ClassLoader tccl) {
         final SubSystemModelImpl subSystem = new SubSystemModelImpl(tccl);
-        final DeploymentModelImpl deployment = subSystem.getDeployment();
-        final JobOperatorModelImpl jobOperator = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+        final DeploymentModelImpl deployment = subSystem.getDeployment(Constants.DEFAULT);
+        final JobOperatorModelImpl jobOperator = deployment.getJobOperator(Constants.DEFAULT);
         jobOperator.getClassLoader().setDefaultFactory(new ClassLoaderFactory() {
             @Override
             public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
                 return tccl;
             }
         });
-        jobOperator.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory(180, TimeUnit.SECONDS));
+        jobOperator.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
         jobOperator.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
         jobOperator.getMarshalling().setDefaultFactory(new MarshallingFactory() {
             @Override

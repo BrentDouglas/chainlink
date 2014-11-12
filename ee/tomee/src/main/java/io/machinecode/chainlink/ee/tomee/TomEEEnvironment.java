@@ -4,7 +4,6 @@ import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
-import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.spi.Constants;
@@ -65,7 +64,7 @@ public class TomEEEnvironment implements Environment {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
-                return app.ops;
+                return Collections.unmodifiableMap(app.ops);
             }
         }
         return Collections.emptyMap();
@@ -103,7 +102,7 @@ public class TomEEEnvironment implements Environment {
         final AppInfo info = event.getApp();
         final AppContext context = event.getContext();
         final ClassLoader loader = context.getClassLoader();
-        final DeploymentModelImpl deployment = model.getDeployment().copy(loader);
+        final DeploymentModelImpl deployment = model.findDeployment(info.appId).copy(loader);
         App app = this.operators.get(info.appId);
         if (app == null) {
             app = new App(loader);
@@ -112,14 +111,14 @@ public class TomEEEnvironment implements Environment {
         final String chainlinkXml = system.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
         final InputStream stream = loader.getResourceAsStream(chainlinkXml);
         if (stream != null) {
-            XmlChainlink.configureDeploymentFromStream(deployment, loader, stream);
+            deployment.loadChainlinkXml(stream);
         }
         final TomEEConfigurationDefaults defaults = new TomEEConfigurationDefaults(loader);
         boolean haveDefault = false;
         for (final Map.Entry<String, JobOperatorModelImpl> entry : deployment.getJobOperators().entrySet()) {
             final JobOperatorModelImpl jobOperatorModel = entry.getValue();
             defaults.configureJobOperator(jobOperatorModel);
-            if (Constants.DEFAULT_CONFIGURATION.equals(entry.getKey())) {
+            if (Constants.DEFAULT.equals(entry.getKey())) {
                 haveDefault = true;
             }
             app.ops.put(
@@ -128,10 +127,10 @@ public class TomEEEnvironment implements Environment {
             );
         }
         if (!haveDefault) {
-            final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+            final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT);
             defaults.configureJobOperator(defaultModel);
             app.ops.put(
-                    Constants.DEFAULT_CONFIGURATION,
+                    Constants.DEFAULT,
                     defaultModel.createJobOperator()
             );
         }

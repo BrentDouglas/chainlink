@@ -83,7 +83,7 @@
 
     <profile>
         <subsystem xmlns="urn:jboss:domain:chainlink:1.0">
-            <deployment>
+            <deployment name="default">
                 <job-operator name="default">
                     <property name="io.machinecode.chainlink.infinispan.cache_manager.jndi_name" value="@cache.manager.jndi.name@"/>
                 </job-operator>

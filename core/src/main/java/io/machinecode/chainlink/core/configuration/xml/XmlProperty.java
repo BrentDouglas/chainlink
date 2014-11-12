@@ -1,9 +1,10 @@
 package io.machinecode.chainlink.core.configuration.xml;
 
+import io.machinecode.chainlink.spi.configuration.PropertyModel;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import java.util.List;
-import java.util.Properties;
 
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
@@ -38,13 +39,7 @@ public class XmlProperty {
         this.value = value;
     }
 
-    public static Properties convert(final List<XmlProperty> properties) {
-        final Properties ret = new Properties();
-        convert(properties, ret);
-        return ret;
-    }
-
-    public static void convert(final List<XmlProperty> properties, final Properties target) {
+    public static void convert(final List<XmlProperty> properties, final PropertyModel target) {
         for (final XmlProperty property : properties) {
             target.setProperty(property.getName(), property.getValue());
         }

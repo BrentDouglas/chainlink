@@ -68,19 +68,6 @@ public class DeclarationImpl<T> implements Declaration<T> {
     }
 
     @Override
-    public DeclarationImpl<T> setValue(final T that) {
-        this.cache = null;
-        this.value = that;
-        return this;
-    }
-
-    @Override
-    public Declaration<T> setValueClass(final Class<? extends T> that) {
-        this.cache = null;
-        this.valueClass = that;
-        return this;
-    }
-
     public DeclarationImpl<T> setName(final String name) {
         if (name == null) {
             throw new IllegalStateException(); //TODO Message, should only really be called from xml for XmlJobOperator
@@ -99,6 +86,20 @@ public class DeclarationImpl<T> implements Declaration<T> {
             return this;
         }
         owner.put(name, this);
+        return this;
+    }
+
+    @Override
+    public DeclarationImpl<T> setValue(final T that) {
+        this.cache = null;
+        this.value = that;
+        return this;
+    }
+
+    @Override
+    public Declaration<T> setValueClass(final Class<? extends T> that) {
+        this.cache = null;
+        this.valueClass = that;
         return this;
     }
 

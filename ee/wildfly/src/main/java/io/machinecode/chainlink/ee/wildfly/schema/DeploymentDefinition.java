@@ -22,7 +22,7 @@ public class DeploymentDefinition extends PersistentResourceDefinition {
 
     public DeploymentDefinition() {
         super(
-                PathElement.pathElement(WildFlyConstants.DEPLOYMENT, WildFlyConstants.DEPLOYMENT),
+                PathElement.pathElement(WildFlyConstants.DEPLOYMENT),
                 ChainlinkExtension.getResourceDescriptionResolver(WildFlyConstants.DEPLOYMENT),
                 NoopAddHandler.INSTANCE,
                 ReloadRequiredRemoveStepHandler.INSTANCE

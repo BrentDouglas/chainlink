@@ -1,0 +1,6 @@
+== Introduction
+
+Chainlink is an implementation of JSR-352 with the primary goals of
+allowing jobs to be executed across a cluster utilizing existing
+clustering frameworks. It targets the EE 7 specification and
+requires a minimum of JDK7 To run. It is written in Java 7.

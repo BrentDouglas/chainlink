@@ -1,0 +1,92 @@
+=== Embedded
+:version: {version}
+
+Installing Chainlink for embedded usage only means that is must be
+available in the applications classpath. The jars are available in
+the Maven Central repository.
+
+There are three components that are essential to using Chainlink. A jar
+containing the JSR-352 API, a jar containing the Chainlink API and the
+jar containing the main Chainlink implementation. It is recommended
+that a fourth jar, containing the SE configuration also be imported as
+this will make configuration much simpler, though both options will be
+covered in the configuration section.
+
+There are several extensions available in Maven under the groupId
+io.machinecode.chainlink. They may also be 'installed' by making them
+available on the applications classpath.
+
+==== Maven
+
+[source,xml,subs="verbatim,attributes"]
+----
+<properties>
+    <version.io.machinecode.chainlink>{version}</version.io.machinecode.chainlink>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-api</artifactId>
+            <version>${version.io.machinecode.chainlink}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-spi</artifactId>
+            <version>${version.io.machinecode.chainlink}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-core</artifactId>
+            <version>${version.io.machinecode.chainlink}</version>
+        </dependency>
+        <!-- Optional but recommended -->
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-se</artifactId>
+            <version>${version.io.machinecode.chainlink}</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <dependency>
+        <groupId>io.machinecode.chainlink</groupId>
+        <artifactId>chainlink-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>io.machinecode.chainlink</groupId>
+        <artifactId>chainlink-spi</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>io.machinecode.chainlink</groupId>
+        <artifactId>chainlink-core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>io.machinecode.chainlink</groupId>
+        <artifactId>chainlink-se</artifactId>
+        <optional>true</optional>
+    </dependency>
+</dependencies>
+----
+
+==== Gradle
+
+TODO
+
+==== Ant
+
+TODO
+
+==== Embedded Usage and EE7 Containers
+
+When embedding Chainlink into an app run in an EE7 container it is
+important that JobOperator's are obtained by calling `Chainlink.getEnvironment().getJobOperator(String)`
+rather than using `BatchRuntime.getJobOperator()` as this will return
+a JobOperator from the container supplied implementation.
+
+You will also have to ensure that the Chainlink API jar is not
+embedded in the application. If it is included it will cause
+classloading issues as the container will already include a copy
+of the JSR-352 API.

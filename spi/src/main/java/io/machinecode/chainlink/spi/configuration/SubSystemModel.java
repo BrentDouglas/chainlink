@@ -6,5 +6,5 @@ package io.machinecode.chainlink.spi.configuration;
  */
 public interface SubSystemModel extends ScopeModel {
 
-    DeploymentModel getDeployment();
+    DeploymentModel getDeployment(final String name);
 }

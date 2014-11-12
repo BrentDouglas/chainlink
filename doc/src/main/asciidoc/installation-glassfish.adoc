@@ -1,0 +1,30 @@
+=== GlassFish
+
+==== Installation
+
+To install Chainlink on a GlassFish application server requires one of
+the provided distribution zip files. Installing Chainlink on GlassFish
+will uninstall the included JBatch implementation. See the uninstall
+instructions to reinstall it.
+
+1. Unzip the distribution and `cd` into destination directory which
+   hereafter will be referred to using the environment variable
+   `CHAINLINK_DIR`. The location it is unzipped to will be used to
+   store the JBatch jars however once installation is complete this
+   directory may be safely moved with no effect on GlassFish.
+
+2. Run the script `./install -h` to see available extensions.
+
+3. Run the script with `./install -c glassfish -d "${GLASSFISH_HOME}"
+   -m <comma separated list of modules to install>`. This process will
+   remove the existing JBatch jars.
+
+4. Chainlink is installed! Start GlassFish as you would normally.
+
+==== Uninstallation
+
+1. Run the script with `./install -u -c glassfish -d "${GLASSFISH_HOME}"
+   -m <comma separated list of modules to uninstall>`. This process
+   will replace the JBatch jars that were removed earlier.
+
+2. Chainlink is uninstalled! Start GlassFish as you would normally.

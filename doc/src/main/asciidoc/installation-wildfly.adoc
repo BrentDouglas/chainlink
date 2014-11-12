@@ -1,0 +1,31 @@
+=== Wildfly
+
+==== Installation
+
+To install Chainlink on a Wildfly application server requires one of
+the provided distribution zip files.
+
+1. Unzip the distribution and `cd` into destination directory which
+   hereafter will be referred to using the environment variable
+   `CHAINLINK_DIR`. Once the installation is complete the unzipped
+   directory may be safely moved with no effect on Wildfly.
+
+2. Run the script `./install -h` to see available extensions.
+
+3. Run the script with `./install -c wildfly -d "${WILDFLY_HOME}" -m
+   <comma separated list of modules to install>`.
+
+4. Chainlink is installed! Before you are able to use Chainlink you
+   must enable it in standalone.xml or domain.xml and disable
+   the provided JBeret implementation. See the configuration
+   section for details.
+
+==== Uninstallation
+
+1. Run the script with `./install -u -c wildfly -d "${WILDFLY_HOME}"
+   -m <comma separated list of modules to uninstall>`.
+
+2. Chainlink is uninstalled! Before your are able to use the provided
+   JBeret implementation you will have to disable Chainlink in
+   standalone.xml or domain.xml and enable JBeret. See the configuration
+   section for details.

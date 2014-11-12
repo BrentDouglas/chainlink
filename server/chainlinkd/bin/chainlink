@@ -29,8 +29,8 @@ RETVAL=0
 usage() {
 cat <<EOF
 Usage: chainlink [-c configuration_file_name] [-p properties_file_name] [-d] [-k] [-h]
-    -c  Set the configuration file to use
-    -p  Set the properties file to use
+    -c  Set the configuration file to use. Must be found in ${CHAINLINK_HOME}/cnf
+    -p  Set the properties file to use. Must be found in ${CHAINLINK_HOME}/cnf
     -d  Start Chainlink in daemon mode
     -k  Kill a running Chainlink daemon
     -h  Print usage

@@ -1,0 +1,25 @@
+=== TomEE
+
+==== Installation
+
+To install Chainlink on a TomEE application server requires one of
+the provided distribution zip files.
+
+1. Unzip the distribution and `cd` into destination directory which
+   hereafter will be referred to using the environment variable
+   `CHAINLINK_DIR`. Once the installation is complete the unzipped
+   directory may be safely moved with no effect on TomEE.
+
+2. Run the script `./install -h` to see available extensions.
+
+3. Run the script with `./install -c tomee -d "${TOMEE_HOME}" -m
+   <comma separated list of modules to install>`.
+
+4. Chainlink is installed! Start TomEE as you would normally.
+
+==== Uninstallation
+
+1. Run the script with `./install -u -c tomee -d "${TOMEE_HOME}"
+   -m <comma separated list of modules to uninstall>`.
+
+2. Chainlink is uninstalled! Start TomEE as you would normally.

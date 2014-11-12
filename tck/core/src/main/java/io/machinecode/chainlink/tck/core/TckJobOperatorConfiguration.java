@@ -64,7 +64,7 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
         List<RegistryFactory> registries = new ResolvableService<>(RegistryFactory.class).resolve(tccl);
         List<TransportFactory> transports = new ResolvableService<>(TransportFactory.class).resolve(tccl);
 
-        model.getProperties().put(Constants.THREAD_POOL_SIZE, "8");
+        model.getProperties().setProperty(Constants.THREAD_POOL_SIZE, "8");
         model.getTransactionManager().setFactory(transactionManagers == null || transactionManagers.isEmpty() ? null : transactionManagers.get(0));
         if (artifactLoaders != null) {
             for (final ArtifactLoaderFactory factory : artifactLoaders) {

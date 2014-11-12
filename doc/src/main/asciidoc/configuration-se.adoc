@@ -1,0 +1,31 @@
+=== SE
+
+The SE version of Chainlink (Chainlinkd) runs wih only a single
+deployment. It is not a container and is configured either by
+specifying the classpath, the location of a `chainlink.xml` file and
+a properties file that can will be added to the system properties. An
+example invocation from the root of the installation directory might
+look like:
+
+[source,shell]
+----
+java -server \
+     -cp <colon separated jars in lib dir>:<colon separated jars in app dir> \
+     io.machinecode.chainlink.server.chainlinkd.Chainlinkd \
+     --configuration cnf/chainlink.xml \
+     --properties cnf/chainlink.properties
+----
+
+The `chainlink.xml` file behaves exactly as described earlier.
+
+==== Bash
+
+Two bash scripts are provided to simplify startup in the `bin`
+directory. The first, `chainlink` should be used when starting
+Chainlinkd from the command line. An example invocation executed
+from the bin directory of the installation might look like
+`./chainlink`. Run `./chainlink -h` for more information.
+
+The second, `chainlinkd` should be used with `chkconfig` or
+`systemctl`. It is configured by setting environment properties
+in `/etc/sysconfig/chainlinkd`.

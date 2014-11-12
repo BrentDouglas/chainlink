@@ -4,7 +4,6 @@ import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
-import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
@@ -52,7 +51,7 @@ public class SeEnvironment implements Environment, AutoCloseable {
     @Override
     public Map<String, JobOperatorImpl> getJobOperators() {
         loadConfiguration();
-        return operators;
+        return Collections.unmodifiableMap(operators);
     }
 
     public synchronized void loadConfiguration() {
@@ -64,8 +63,8 @@ public class SeEnvironment implements Environment, AutoCloseable {
 
     private void _loadConfiguration() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        final DeploymentModelImpl model = new SubSystemModelImpl(tccl).getDeployment();
-        model.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+        final DeploymentModelImpl model = new SubSystemModelImpl(tccl).findDeployment(Constants.DEFAULT);
+        model.getJobOperator(Constants.DEFAULT);
         try {
             final String config = this.config != null
                     ? this.config
@@ -83,7 +82,11 @@ public class SeEnvironment implements Environment, AutoCloseable {
                 stream = null;
             }
             if (stream != null) {
-                XmlChainlink.configureDeploymentFromStream(model, tccl, stream);
+                try {
+                    model.loadChainlinkXml(stream);
+                } finally {
+                    stream.close();
+                }
             }
             final SeConfigurationDefaults defaults = new SeConfigurationDefaults();
             for (final Map.Entry<String, JobOperatorModelImpl> entry : model.getJobOperators().entrySet()) {
