@@ -12,10 +12,6 @@
     <artifactId>chainlink-ee-test</artifactId>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>glassfish</module>
-    </modules>
-
     <dependencies>
         <!-- Has to be run after the dist module -->
         <dependency>
@@ -73,4 +69,27 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>glassfish</id>
+            <activation>
+                <property><name>glassfish</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>glassfish</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tomee</id>
+            <activation>
+                <property><name>tomee</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>tomee</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

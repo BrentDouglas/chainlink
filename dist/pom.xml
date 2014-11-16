@@ -305,6 +305,7 @@
                             <descriptors>
                                 <descriptor>chainlinkd.xml</descriptor>
                                 <descriptor>glassfish.xml</descriptor>
+                                <descriptor>tomee.xml</descriptor>
                                 <descriptor>src.xml</descriptor>
                             </descriptors>
                             <finalName>chainlink-${project.version}</finalName>

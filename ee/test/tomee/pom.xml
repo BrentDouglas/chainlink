@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>chainlink-ee-test</artifactId>
+        <groupId>io.machinecode.chainlink</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>chainlink-ee-test-tomee</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <properties>
+        <tomee.dir>${project.build.directory}/apache-tomee-plume-${version.org.apache.openejb.tomee}</tomee.dir>
+        <tests.dir>${project.build.directory}/arquillian-tests</tests.dir>
+        <chainlink.dir>${tomee.dir}/chainlink-${project.version}</chainlink.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.core</groupId>
+            <artifactId>arquillian-core-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.openejb</groupId>
+            <artifactId>arquillian-tomee-remote</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>install-chainlink-jars</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <mkdir dir="${tests.dir}"/>
+                                    <unzip src="${project.build.directory}/../../../../dist/target/chainlink-${project.version}-tomee.zip"
+                                           dest="${tomee.dir}"/>
+                                    <chmod file="${chainlink.dir}/install" perm="754"/>
+                                    <exec executable="${chainlink.dir}/install"
+                                          dir="${chainlink.dir}"/>
+                                </target>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>uninstall-chainlink-jars</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <exec executable="${chainlink.dir}/install"
+                                          dir="${chainlink.dir}">
+                                        <arg value="-u"/>
+                                    </exec>
+                                </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>unpack-tomee</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>unpack</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>org.apache.openejb</groupId>
+                                        <artifactId>apache-tomee</artifactId>
+                                        <classifier>plume</classifier>
+                                        <version>${version.org.apache.openejb.tomee}</version>
+                                        <type>zip</type>
+                                        <outputDirectory>${project.build.directory}</outputDirectory>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-tomee</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>install-chainlink-jars</id>
+                        <phase>pre-integration-test</phase>
+                    </execution>
+                    <execution>
+                        <id>uninstall-chainlink-jars</id>
+                        <phase>post-integration-test</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <skipExec>false</skipExec>
+                    <systemPropertyVariables>
+                        <tomee.dir>${tomee.dir}</tomee.dir>
+                        <tests.dir>${tests.dir}</tests.dir>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

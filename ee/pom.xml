@@ -14,6 +14,7 @@
 
     <modules>
         <module>glassfish</module>
+        <module>tomee</module>
     </modules>
 
     <properties>
@@ -21,6 +22,9 @@
         <version.org.glassfish>${version.org.glassfish.major}.1</version.org.glassfish>
         <version.org.glassfish.main.common.glassfish-api>${version.org.glassfish}</version.org.glassfish.main.common.glassfish-api>
         <version.org.glassfish.main.common.internal-api>${version.org.glassfish}</version.org.glassfish.main.common.internal-api>
+        <version.org.apache.openejb.openejb-core>5.0.0-SNAPSHOT</version.org.apache.openejb.openejb-core>
+        <version.org.apache.openejb.tomee>1.7.1</version.org.apache.openejb.tomee>
+        <version.org.apache.openejb.arquillian-tomee-remote>${version.org.apache.openejb.tomee}</version.org.apache.openejb.arquillian-tomee-remote>
         <version.org.jboss.arquillian.arquillian-bom>1.1.0.Final</version.org.jboss.arquillian.arquillian-bom>
         <version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1>1.0.0.CR4</version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1>
     </properties>
@@ -49,14 +53,24 @@
                 <artifactId>arquillian-glassfish-managed-3.1</artifactId>
                 <version>${version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.openejb</groupId>
+                <artifactId>arquillian-tomee-remote</artifactId>
+                <version>${version.org.apache.openejb.arquillian-tomee-remote}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.openejb</groupId>
+                <artifactId>openejb-core</artifactId>
+                <version>${version.org.apache.openejb.openejb-core}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <profiles>
         <profile>
-            <id>ee-test</id>
+            <id>test</id>
             <activation>
-                <property><name>ee-test</name></property>
+                <property><name>test</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
