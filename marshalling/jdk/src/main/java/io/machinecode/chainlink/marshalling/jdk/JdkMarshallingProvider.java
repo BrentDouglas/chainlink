@@ -1,18 +1,27 @@
 package io.machinecode.chainlink.marshalling.jdk;
 
+import io.machinecode.chainlink.spi.marshalling.Cloner;
 import io.machinecode.chainlink.spi.marshalling.Marshaller;
+import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
+import io.machinecode.chainlink.spi.marshalling.Unmarshaller;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
  */
-public class JdkMarshaller implements Marshaller {
+public class JdkMarshallingProvider implements Marshaller, Unmarshaller, Cloner, MarshallingProvider {
 
     @Override
     public byte[] marshall(final Serializable that) throws IOException {
@@ -63,7 +72,7 @@ public class JdkMarshaller implements Marshaller {
     }
 
     @Override
-    public <T> T unmarshall(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException {
+    public <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
@@ -80,10 +89,49 @@ public class JdkMarshaller implements Marshaller {
     }
 
     @Override
-    public <T extends Serializable> T clone(final T that) throws ClassNotFoundException, IOException {
+    @SuppressWarnings("unchecked")
+    public <T> T clone(final T that) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
-        return (T) unmarshall(marshall(that));
+        if (that instanceof Serializable) {
+            return (T) unmarshall(marshall((Serializable)that));
+        } else if (that instanceof Cloneable) {
+            final Method method = AccessController.doPrivileged(new PrivilegedAction<Method>() {
+                public Method run() {
+                    final Method method;
+                    try {
+                        method = Object.class.getDeclaredMethod("clone");
+                    } catch (final NoSuchMethodException e) {
+                        throw new IllegalStateException(e);
+                    }
+                    method.setAccessible(true);
+                    return method;
+                }
+            });
+            try {
+                return (T)method.invoke(that);
+            } catch (final IllegalAccessException e) {
+                throw new InvalidClassException("Can't access #clone() on " + that.getClass().getName());
+            } catch (final InvocationTargetException e) {
+                throw new InvalidObjectException("Failed calling #clone() on " + that);
+            }
+        }
+        throw new IllegalStateException(); //TODO Message
+    }
+
+    @Override
+    public Cloner getCloner() {
+        return this;
+    }
+
+    @Override
+    public Marshaller getMarshaller() {
+        return this;
+    }
+
+    @Override
+    public Unmarshaller getUnmarshaller() {
+        return this;
     }
 }

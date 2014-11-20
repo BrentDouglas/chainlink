@@ -5,8 +5,8 @@ import io.machinecode.chainlink.core.inject.InjectionContextImpl;
 import io.machinecode.chainlink.core.inject.InjectorImpl;
 import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.core.security.SecurityCheckImpl;
-import io.machinecode.chainlink.spi.configuration.BaseConfiguration;
 import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.FinalConfiguration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationBuilder;
 import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
@@ -17,7 +17,7 @@ import io.machinecode.chainlink.spi.configuration.factory.Factory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
-import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
@@ -41,10 +41,10 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
  * @since 1.0
  */
-public abstract class ConfigurationImpl implements Configuration, RuntimeConfiguration {
+public abstract class ConfigurationImpl implements FinalConfiguration, RuntimeConfiguration {
 
     protected final ClassLoader classLoader;
-    protected final MarshallerFactory marshallerFactory;
+    protected final MarshallingProviderFactory marshallingProviderFactory;
     protected final Registry registry;
     protected final ExecutionRepository repository;
     protected final TransactionManager transactionManager;
@@ -72,7 +72,7 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
         final ArrayList<SecurityCheck> securityChecks = _arrayGet(this.classLoader, builder.securityChecks, builder.securityCheckFactories, builder.securityCheckFactoriesClass, builder.securityCheckFactoriesFqcns, this);
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
-        this.marshallerFactory = (MarshallerFactory) _getFactory(this.classLoader, builder.marshallerFactory, builder.marshallerFactoryClass, builder.marshallerFactoryFqcn, defaults.getMarshallerFactory(this));
+        this.marshallingProviderFactory = (MarshallingProviderFactory) _getFactory(this.classLoader, builder.marshallingProviderFactory, builder.marshallingProviderFactoryClass, builder.marshallingProviderFactoryFqcn, defaults.getMarshallerFactory(this));
         this.repository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, defaults.getRepository(this), this);
         this.mBeanServer = _get(this.classLoader, builder.mBeanServer, builder.mBeanServerFactory, builder.mBeanServerFactoryClass, builder.mBeanServerFactoryFqcn, defaults.getMBeanServer(this), this);
         this.registry = _get(this.classLoader, builder.registry, builder.registryFactory, builder.registryFactoryClass, builder.registryFactoryFqcn, defaults.getRegistry(this), this);
@@ -151,8 +151,8 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
     }
 
     @Override
-    public MarshallerFactory getMarshallerFactory() {
-        return this.marshallerFactory;
+    public MarshallingProviderFactory getMarshallingProviderFactory() {
+        return this.marshallingProviderFactory;
     }
 
     // Runtime only
@@ -167,7 +167,7 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
         return this.injectionContext;
     }
 
-    private <T, U extends BaseConfiguration> T _get(final ClassLoader classLoader, final T that, final Factory<? extends T, U> factory,
+    private <T, U extends Configuration> T _get(final ClassLoader classLoader, final T that, final Factory<? extends T, U> factory,
                        final Class<? extends Factory<? extends T, U>> clazz, final String fqcn, final T defaultValue, final U configuration) {
         if (that != null) {
             return that;
@@ -206,7 +206,7 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
         return defaultValue;
     }
 
-    private <T, U extends BaseConfiguration> Factory<? extends T, U> _getFactory(final ClassLoader classLoader, final Factory<? extends T, U> factory,
+    private <T, U extends Configuration> Factory<? extends T, U> _getFactory(final ClassLoader classLoader, final Factory<? extends T, U> factory,
                                                     final Class<? extends Factory<? extends T, U>> clazz, final String fqcn, Factory<? extends T, U> def) {
         if (factory != null) {
             try {
@@ -264,7 +264,7 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
         throw new RuntimeException(); //TODO Message
     }
 
-    private <T, U extends BaseConfiguration> ArrayList<T> _arrayGet(final ClassLoader classLoader, final T[] that, final Factory<? extends T, U>[] factories,
+    private <T, U extends Configuration> ArrayList<T> _arrayGet(final ClassLoader classLoader, final T[] that, final Factory<? extends T, U>[] factories,
                                                                     final Class<? extends Factory<? extends T, U>>[] clazzes, final String[] fqcns, final U configuration) {
         final ArrayList<T> ret = new ArrayList<T>();
         if (that != null) {
@@ -338,7 +338,7 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
         private MBeanServerFactory mBeanServerFactory;
         private WorkerFactory workerFactory;
         private ClassLoaderFactory classLoaderFactory;
-        private MarshallerFactory marshallerFactory;
+        private MarshallingProviderFactory marshallingProviderFactory;
         private ExecutionRepositoryFactory executionRepositoryFactory;
         private TransactionManagerFactory transactionManagerFactory;
         private JobLoaderFactory[] jobLoaderFactories;
@@ -351,7 +351,7 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
         private Class<? extends MBeanServerFactory> mBeanServerFactoryClass;
         private Class<? extends WorkerFactory> workerFactoryClass;
         private Class<? extends ClassLoaderFactory> classLoaderFactoryClass;
-        private Class<? extends MarshallerFactory> marshallerFactoryClass;
+        private Class<? extends MarshallingProviderFactory> marshallingProviderFactoryClass;
         private Class<? extends ExecutionRepositoryFactory> executionRepositoryFactoryClass;
         private Class<? extends TransactionManagerFactory> transactionManagerFactoryClass;
         private Class<? extends JobLoaderFactory>[] jobLoaderFactoriesClass;
@@ -364,7 +364,7 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
         private String mBeanServerFactoryFqcn;
         private String workerFactoryFqcn;
         private String classLoaderFactoryFqcn;
-        private String marshallerFactoryFqcn;
+        private String marshallingProviderFactoryFqcn;
         private String executionRepositoryFactoryFqcn;
         private String transactionManagerFactoryFqcn;
         private String[] jobLoaderFactoriesFqcns;
@@ -571,20 +571,20 @@ public abstract class ConfigurationImpl implements Configuration, RuntimeConfigu
         }
 
         @Override
-        public T setMarshallerFactory(final MarshallerFactory marshallerFactory) {
-            this.marshallerFactory = marshallerFactory;
+        public T setMarshallingProviderFactory(final MarshallingProviderFactory marshallingProviderFactory) {
+            this.marshallingProviderFactory = marshallingProviderFactory;
             return (T)this;
         }
 
         @Override
-        public T setMarshallerFactoryClass(final Class<? extends MarshallerFactory> clazz) {
-            this.marshallerFactoryClass = clazz;
+        public T setMarshallingProviderFactoryClass(final Class<? extends MarshallingProviderFactory> clazz) {
+            this.marshallingProviderFactoryClass = clazz;
             return (T)this;
         }
 
         @Override
-        public T setMarshallerFactoryFqcn(final String fqcn) {
-            this.marshallerFactoryFqcn = fqcn;
+        public T setMarshallingProviderFactoryFqcn(final String fqcn) {
+            this.marshallingProviderFactoryFqcn = fqcn;
             return (T)this;
         }
 

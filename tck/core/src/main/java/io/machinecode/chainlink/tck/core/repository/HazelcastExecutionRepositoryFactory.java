@@ -21,7 +21,7 @@ public class HazelcastExecutionRepositoryFactory implements ExecutionRepositoryF
             }
         });
         return new HazelcastExecutonRepository(
-                configuration.getMarshallerFactory().produce(configuration),
+                configuration.getMarshallingProviderFactory().produce(configuration),
                 hazelcast
         );
     }

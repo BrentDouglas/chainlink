@@ -23,7 +23,7 @@
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
-        <marshaller.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory</marshaller.factory.class>
+        <marshaller.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshaller.factory.class>
 
         <class.loader.factory.class></class.loader.factory.class>
         <transaction.manager.factory.class></transaction.manager.factory.class>
@@ -496,7 +496,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallerFactory</marshaller.factory.class>
+                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallingProviderFactory</marshaller.factory.class>
             </properties>
         </profile>
     </profiles>
@@ -656,8 +656,8 @@
                                             <filter token="worker.factory.class" value="${worker.factory.class}" />
                                         </filterset>
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory"
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory"
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>

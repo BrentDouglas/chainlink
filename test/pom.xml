@@ -27,7 +27,7 @@
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
-        <marshaller.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory</marshaller.factory.class>
+        <marshaller.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshaller.factory.class>
     </properties>
 
     <dependencies>
@@ -128,7 +128,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallerFactory</marshaller.factory.class>
+                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallingProviderFactory</marshaller.factory.class>
             </properties>
         </profile>
     </profiles>

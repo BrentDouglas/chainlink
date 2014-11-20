@@ -11,10 +11,10 @@
 
     <artifactId>chainlink-marshalling</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>jdk</module>
         <module>jboss</module>
     </modules>
-
 
 </project>

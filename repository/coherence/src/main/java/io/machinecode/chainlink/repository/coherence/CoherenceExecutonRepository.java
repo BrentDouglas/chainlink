@@ -4,7 +4,7 @@ import com.tangosol.net.CacheFactory;
 import com.tangosol.net.NamedCache;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.repository.core.BaseMapExecutionRepository;
-import io.machinecode.chainlink.spi.marshalling.Marshaller;
+import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
@@ -49,8 +49,8 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
     protected final NamedCache stepExecutionPartitionExecutions;
     protected final NamedCache jobExecutionHistory;
 
-    public CoherenceExecutonRepository(final Marshaller marshaller) {
-        super(marshaller);
+    public CoherenceExecutonRepository(final MarshallingProvider provider) {
+        super(provider);
 
         CacheFactory.ensureCluster();
         this.ids = CacheFactory.getCache(IDS);

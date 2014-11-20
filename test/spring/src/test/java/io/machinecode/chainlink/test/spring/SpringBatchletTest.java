@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.test.spring;
 
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider;
 import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.batchlet.BatchletTest;
@@ -24,7 +24,7 @@ public class SpringBatchletTest extends BatchletTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkMarshaller());
+        return new MemoryExecutionRepository(new JdkMarshallingProvider());
     }
 
     @BeforeClass

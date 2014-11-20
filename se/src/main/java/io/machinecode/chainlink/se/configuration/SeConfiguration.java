@@ -32,7 +32,7 @@ public class SeConfiguration extends ConfigurationImpl {
                 .setArtifactLoaderFactoriesFqcns(_fqcns(xml.getArtifactLoaderFactories()))
                 .setInjectorFactoriesFqcns(_fqcns(xml.getInjectorFactories()))
                 .setSecurityCheckFactoriesFqcns(_fqcns(xml.getSecurityCheckFactories()))
-                .setMarshallerFactoryFqcn(xml.getMarshallerFactory().getClazz())
+                .setMarshallingProviderFactoryFqcn(xml.getMarshallerFactory().getClazz())
                 .setExecutionRepositoryFactoryFqcn(xml.getMarshallerFactory().getClazz())
                 .setMBeanServerFactoryFqcn(xml.getmBeanServerFactory().getClazz())
                 .setRegistryFactoryFqcn(xml.getRegistryFactory().getClazz())

@@ -8,7 +8,10 @@ import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
 import io.machinecode.chainlink.spi.execution.Worker;
+import io.machinecode.chainlink.spi.marshalling.Cloner;
 import io.machinecode.chainlink.spi.marshalling.Marshaller;
+import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
+import io.machinecode.chainlink.spi.marshalling.Unmarshaller;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableAndContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -51,6 +54,8 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
     private static final Logger log = Logger.getLogger(BaseDistributedRegistry.class);
 
     protected final Marshaller marshaller;
+    protected final Unmarshaller unmarshaller;
+    protected final Cloner cloner;
     protected final Executor network;
     protected final Executor reaper;
 
@@ -61,7 +66,11 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
     protected final TimeUnit unit;
 
     public BaseDistributedRegistry(final RegistryConfiguration configuration) throws Exception {
-        this.marshaller = configuration.getMarshallerFactory().produce(configuration);
+        final MarshallingProvider provider = configuration.getMarshallingProviderFactory().produce(configuration);
+        this.marshaller = provider.getMarshaller();
+        this.unmarshaller = provider.getUnmarshaller();
+        this.cloner = provider.getCloner();
+
         this.network= Executors.newSingleThreadExecutor();
         this.reaper = Executors.newSingleThreadExecutor();
 

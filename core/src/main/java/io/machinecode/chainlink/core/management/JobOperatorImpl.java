@@ -12,7 +12,7 @@ import io.machinecode.chainlink.core.work.JobExecutable;
 import io.machinecode.chainlink.repository.core.DelegateJobExecution;
 import io.machinecode.chainlink.repository.core.DelegateStepExecution;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.FinalConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Job;
@@ -58,14 +58,14 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     private static final Logger log = Logger.getLogger(JobOperatorImpl.class);
 
-    private final Configuration configuration;
+    private final FinalConfiguration configuration;
     private final Executor executor;
     private final Registry registry;
     private final SecurityCheck securityCheck;
     private final ExecutionRepositoryId executionRepositoryId;
     private ObjectName jmxName;
 
-    public JobOperatorImpl(final Configuration configuration) {
+    public JobOperatorImpl(final FinalConfiguration configuration) {
         this.configuration = configuration;
         this.executor = configuration.getExecutor();
         this.registry = configuration.getRegistry();

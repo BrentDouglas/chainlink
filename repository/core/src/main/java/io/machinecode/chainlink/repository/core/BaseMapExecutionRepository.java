@@ -3,7 +3,10 @@ package io.machinecode.chainlink.repository.core;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
+import io.machinecode.chainlink.spi.marshalling.Cloner;
 import io.machinecode.chainlink.spi.marshalling.Marshaller;
+import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
+import io.machinecode.chainlink.spi.marshalling.Unmarshaller;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecutionBuilder;
@@ -49,9 +52,13 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
     protected static final String PARTITION_EXECUTION_ID = "partition_execution_id";
 
     protected final Marshaller marshaller;
+    protected final Unmarshaller unmarshaller;
+    protected final Cloner cloner;
 
-    public BaseMapExecutionRepository(final Marshaller marshaller) {
-        this.marshaller = marshaller;
+    public BaseMapExecutionRepository(final MarshallingProvider provider) {
+        this.marshaller = provider.getMarshaller();
+        this.unmarshaller = provider.getUnmarshaller();
+        this.cloner = provider.getCloner();
     }
 
     protected abstract Map<String, Long> ids();
@@ -139,9 +146,9 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = marshaller.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = marshaller.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
         final CopyOnWriteArrayList<Long> partitions = stepExecutionPartitionExecutions().get(stepExecutionId);
         if (partitions == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
@@ -240,7 +247,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
+        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
         final ExtendedStepExecution execution = stepExecutions().get(stepExecutionId);
         if (execution == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
@@ -255,9 +262,9 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = marshaller.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = marshaller.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
         final ExtendedStepExecution execution = stepExecutions().get(stepExecutionId);
         if (execution == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
@@ -304,9 +311,9 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
 
     @Override
     public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = marshaller.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = marshaller.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
         final PartitionExecution partition = partitionExecutions().get(partitionExecutionId);
         if (partition == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
@@ -323,7 +330,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
 
     @Override
     public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = marshaller.clone(persistentUserData);
+        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
         final PartitionExecution partition = partitionExecutions().get(partitionExecutionId);
         if (partition == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));

@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.test.cdi;
 
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider;
 import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
@@ -7,7 +8,6 @@ import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
 import io.machinecode.chainlink.inject.cdi.CdiInjector;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.batchlet.BatchletTest;
@@ -38,7 +38,7 @@ public class CdiBatchletTest extends BatchletTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkMarshaller());
+        return new MemoryExecutionRepository(new JdkMarshallingProvider());
     }
 
     @BeforeClass

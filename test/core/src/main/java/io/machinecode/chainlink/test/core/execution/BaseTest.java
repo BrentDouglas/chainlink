@@ -8,7 +8,7 @@ import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
-import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -32,7 +32,7 @@ public abstract class BaseTest extends Assert {
     private ExecutionRepository _repository;
     private SeConfiguration _configuration;
     private TransactionManager _transactionManager;
-    private MarshallerFactory _marshallerFactory;
+    private MarshallingProviderFactory _marshallingProviderFactory;
     private RegistryFactory _registryFactory;
 
     protected final SeConfiguration configuration() throws Exception {
@@ -63,11 +63,11 @@ public abstract class BaseTest extends Assert {
         return _transactionManager;
     }
 
-    protected final MarshallerFactory marshallerFactory() throws Exception {
-        if (this._marshallerFactory == null) {
-            this._marshallerFactory = _marshallerFactory();
+    protected final MarshallingProviderFactory marshallerFactory() throws Exception {
+        if (this._marshallingProviderFactory == null) {
+            this._marshallingProviderFactory = _marshallerFactory();
         }
-        return _marshallerFactory;
+        return _marshallingProviderFactory;
     }
 
     protected final RegistryFactory registryFactory() throws Exception {
@@ -87,7 +87,7 @@ public abstract class BaseTest extends Assert {
                 .setExecutionRepository(repository())
                 .setExecutorFactory(executor())
                 .setWorkerFactory(_workerFactory())
-                .setMarshallerFactory(marshallerFactory())
+                .setMarshallingProviderFactory(marshallerFactory())
                 .setRegistryFactory(registryFactory())
                 .setProperty(Constants.THREAD_POOL_SIZE, "8");
     }
@@ -98,8 +98,8 @@ public abstract class BaseTest extends Assert {
         return new LocalTransactionManager(180, TimeUnit.SECONDS);
     }
 
-    protected MarshallerFactory _marshallerFactory() throws Exception {
-        return (MarshallerFactory) Class.forName(System.getProperty("marshaller.factory.class")).newInstance();
+    protected MarshallingProviderFactory _marshallerFactory() throws Exception {
+        return (MarshallingProviderFactory) Class.forName(System.getProperty("marshaller.factory.class")).newInstance();
     }
 
     protected ExecutorFactory _executor() throws Exception {

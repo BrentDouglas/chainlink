@@ -12,7 +12,7 @@ public class CoherenceExecutionRepositoryFactory implements ExecutionRepositoryF
     @Override
     public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
         return new CoherenceExecutonRepository(
-                configuration.getMarshallerFactory().produce(configuration)
+                configuration.getMarshallingProviderFactory().produce(configuration)
         );
     }
 }

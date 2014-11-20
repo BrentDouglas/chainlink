@@ -68,7 +68,7 @@ public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFa
     @Override
     public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
         return new GridGainExecutionRepository(
-                configuration.getMarshallerFactory().produce(configuration),
+                configuration.getMarshallingProviderFactory().produce(configuration),
                 GridGain.grid(CHAINLINK_TCK_GRID)
         );
     }

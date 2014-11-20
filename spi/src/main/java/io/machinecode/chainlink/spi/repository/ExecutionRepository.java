@@ -425,7 +425,7 @@ public interface ExecutionRepository {
 
     /**
      * @see {@link javax.batch.operations.JobOperator#getJobNames()}
-     * 
+     *
      * @return A set of distinct job names that would be obtainable by calling either {@link JobInstance#getJobName()}
      * or {@link JobExecution#getJobName()} from any of the {@link JobInstance}'s or {@link JobExecution}'s stored in this
      * repository.
@@ -436,7 +436,7 @@ public interface ExecutionRepository {
 
     /**
      * @see {@link javax.batch.operations.JobOperator#getJobInstanceCount(String)}
-     * 
+     *
      * @param jobName The search term.
      * @return The number of {@link JobInstance}'s that would return {@param jobName}
      * from {@link JobInstance#getJobName()}.
@@ -450,7 +450,7 @@ public interface ExecutionRepository {
 
     /**
      * @see {@link javax.batch.operations.JobOperator#getJobInstances(String, int, int)}
-     * 
+     *
      * @param jobName The search term.
      * @param start The index of the first {@link JobInstance} to be included in the results.
      * @param count The maximum number of {@link JobInstance}'s to return.
@@ -501,7 +501,7 @@ public interface ExecutionRepository {
     /**
      * @see {@link javax.batch.operations.JobOperator#getJobInstance(long)}
      *
-     * @param jobInstanceId
+     * @param jobInstanceIdMER
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
@@ -520,7 +520,7 @@ public interface ExecutionRepository {
     ExtendedJobInstance getJobInstanceForExecution(final long jobExecutionId) throws Exception;
 
     /**
-     * @see {@link javax.batch.operations.JobOperator#getJobExecutions(javax.batch.runtime.JobInstance)} 
+     * @see {@link javax.batch.operations.JobOperator#getJobExecutions(javax.batch.runtime.JobInstance)}
      *
      * @param jobInstanceId
      * @return

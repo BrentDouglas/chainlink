@@ -10,7 +10,7 @@ import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
-import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
@@ -39,7 +39,7 @@ public class TckConfigurationFactory implements ConfigurationFactory {
         List<JobLoaderFactory> jobLoaders = null;
         List<SecurityCheckFactory> securityChecks = null;
         List<MBeanServerFactory> mBeanServer = null;
-        List<MarshallerFactory> marshallerFactory = null;
+        List<MarshallingProviderFactory> marshallingProviderFactory = null;
 
         //These will throw if the properties aren't set but they aren't all required
         try {
@@ -61,7 +61,7 @@ public class TckConfigurationFactory implements ConfigurationFactory {
             mBeanServer = new ResolvableService<MBeanServerFactory>(MBeanServerFactory.class).resolve(tccl);
         } catch (final ServiceConfigurationError e) {}
         try {
-            marshallerFactory = new ResolvableService<MarshallerFactory>(MarshallerFactory.class).resolve(tccl);
+            marshallingProviderFactory = new ResolvableService<MarshallingProviderFactory>(MarshallingProviderFactory.class).resolve(tccl);
         } catch (final ServiceConfigurationError e) {}
         List<ExecutionRepositoryFactory> executionRepositories = new ResolvableService<ExecutionRepositoryFactory>(ExecutionRepositoryFactory.class).resolve(tccl);
         List<ExecutorFactory> executors = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
@@ -76,7 +76,7 @@ public class TckConfigurationFactory implements ConfigurationFactory {
                 .setSecurityCheckFactories(securityChecks == null || securityChecks.isEmpty() ? null : securityChecks.toArray(new SecurityCheckFactory[securityChecks.size()]))
                 .setJobLoaderFactories(jobLoaders == null || jobLoaders.isEmpty() ? null : jobLoaders.toArray(new JobLoaderFactory[jobLoaders.size()]))
                 .setMBeanServerFactory(mBeanServer == null || mBeanServer.isEmpty() ? null : mBeanServer.get(0))
-                .setMarshallerFactory(marshallerFactory == null || marshallerFactory.isEmpty() ? null : marshallerFactory.get(0))
+                .setMarshallingProviderFactory(marshallingProviderFactory == null || marshallingProviderFactory.isEmpty() ? null : marshallingProviderFactory.get(0))
                 .setExecutionRepositoryFactory(executionRepositories.get(0))
                 .setExecutorFactory(executors.get(0))
                 .setWorkerFactory(workers.get(0))

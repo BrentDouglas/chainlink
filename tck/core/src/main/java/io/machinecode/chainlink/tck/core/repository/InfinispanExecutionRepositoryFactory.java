@@ -23,7 +23,7 @@ public class InfinispanExecutionRepositoryFactory implements ExecutionRepository
     @Override
     public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
         return new InfinispanExecutionRepository(
-                configuration.getMarshallerFactory().produce(configuration),
+                configuration.getMarshallingProviderFactory().produce(configuration),
                 new DefaultCacheManager(
                         new GlobalConfigurationBuilder()
                                 .clusteredDefault()

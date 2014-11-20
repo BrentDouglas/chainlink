@@ -2,7 +2,7 @@ package io.machinecode.chainlink.repository.infinispan;
 
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.repository.core.BaseMapExecutionRepository;
-import io.machinecode.chainlink.spi.marshalling.Marshaller;
+import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
@@ -62,8 +62,8 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
     protected final EmbeddedCacheManager cacheManager;
     protected final TransactionManager transactionManager;
 
-    public InfinispanExecutionRepository(final Marshaller marshaller, final EmbeddedCacheManager cacheManager, final TransactionManager transactionManager) {
-        super(marshaller);
+    public InfinispanExecutionRepository(final MarshallingProvider provider, final EmbeddedCacheManager cacheManager, final TransactionManager transactionManager) {
+        super(provider);
         this.cacheManager = cacheManager;
         this.transactionManager = transactionManager;
 

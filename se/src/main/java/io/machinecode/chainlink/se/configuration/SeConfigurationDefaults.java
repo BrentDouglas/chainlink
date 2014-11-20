@@ -5,15 +5,15 @@ import io.machinecode.chainlink.core.execution.EventedExecutor;
 import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory;
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.BaseConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
 import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.WorkerConfiguration;
-import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.registry.Registry;
@@ -32,7 +32,7 @@ class SeConfigurationDefaults implements ConfigurationDefaults {
     final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
     @Override
-    public ClassLoader getClassLoader(final BaseConfiguration configuration) {
+    public ClassLoader getClassLoader(final Configuration configuration) {
         return tccl;
     }
 
@@ -43,12 +43,12 @@ class SeConfigurationDefaults implements ConfigurationDefaults {
 
     @Override
     public ExecutionRepository getRepository(final RepositoryConfiguration configuration) throws Exception {
-        return new MemoryExecutionRepository(configuration.getMarshallerFactory().produce(configuration));
+        return new MemoryExecutionRepository(configuration.getMarshallingProviderFactory().produce(configuration));
     }
 
     @Override
-    public MarshallerFactory getMarshallerFactory(final BaseConfiguration configuration) {
-        return new JdkMarshallerFactory();
+    public MarshallingProviderFactory getMarshallerFactory(final Configuration configuration) {
+        return new JdkMarshallingProviderFactory();
     }
 
     @Override

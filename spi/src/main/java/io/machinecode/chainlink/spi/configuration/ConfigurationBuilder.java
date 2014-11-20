@@ -7,7 +7,7 @@ import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
-import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
@@ -38,11 +38,11 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
 
     T setClassLoaderFactoryFqcn(final String fqcn);
 
-    T setMarshallerFactory(final MarshallerFactory marshallerFactory);
+    T setMarshallingProviderFactory(final MarshallingProviderFactory marshallingProviderFactory);
 
-    T setMarshallerFactoryClass(final Class<? extends MarshallerFactory> clazz);
+    T setMarshallingProviderFactoryClass(final Class<? extends MarshallingProviderFactory> clazz);
 
-    T setMarshallerFactoryFqcn(final String fqcn);
+    T setMarshallingProviderFactoryFqcn(final String fqcn);
 
     T setRegistry(final Registry registry);
 
@@ -122,5 +122,5 @@ public interface ConfigurationBuilder<T extends ConfigurationBuilder> {
 
     T setSecurityCheckFactoriesFqcns(final String... fqcns);
 
-    Configuration build() throws Exception;
+    FinalConfiguration build() throws Exception;
 }

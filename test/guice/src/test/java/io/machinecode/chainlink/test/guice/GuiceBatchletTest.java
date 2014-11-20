@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.test.guice;
 
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider;
 import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.batchlet.BatchletTest;
@@ -43,7 +43,7 @@ public class GuiceBatchletTest extends BatchletTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkMarshaller());
+        return new MemoryExecutionRepository(new JdkMarshallingProvider());
     }
 
     @BeforeClass

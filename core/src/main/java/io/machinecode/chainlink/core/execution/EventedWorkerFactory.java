@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.FinalConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Worker;
 
@@ -9,7 +9,7 @@ import io.machinecode.chainlink.spi.execution.Worker;
  */
 public class EventedWorkerFactory implements WorkerFactory {
     @Override
-    public Worker produce(final Configuration configuration) throws Exception {
+    public Worker produce(final FinalConfiguration configuration) throws Exception {
         return new EventedWorker(configuration.getRuntimeConfiguration());
     }
 }

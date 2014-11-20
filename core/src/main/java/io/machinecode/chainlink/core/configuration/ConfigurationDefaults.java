@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.core.configuration;
 
-import io.machinecode.chainlink.spi.configuration.BaseConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
 import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.WorkerConfiguration;
-import io.machinecode.chainlink.spi.configuration.factory.MarshallerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.registry.Registry;
@@ -21,13 +21,13 @@ import javax.transaction.TransactionManager;
 */
 public interface ConfigurationDefaults {
 
-    ClassLoader getClassLoader(final BaseConfiguration configuration);
+    ClassLoader getClassLoader(final Configuration configuration);
 
     TransactionManager getTransactionManager(final LoaderConfiguration configuration);
 
     ExecutionRepository getRepository(final RepositoryConfiguration configuration) throws Exception;
 
-    MarshallerFactory getMarshallerFactory(final BaseConfiguration configuration);
+    MarshallingProviderFactory getMarshallerFactory(final Configuration configuration);
 
     MBeanServer getMBeanServer(final LoaderConfiguration configuration);
 

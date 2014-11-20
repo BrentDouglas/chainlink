@@ -135,7 +135,7 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
     public Object handle(final Message msg) throws Exception {
         try {
             @SuppressWarnings("unchecked")
-            final DistributedCommand<?,Address,JGroupsRegistry> command = marshaller.unmarshall(msg.getBuffer(), DistributedCommand.class);
+            final DistributedCommand<?,Address,JGroupsRegistry> command = unmarshaller.unmarshall(msg.getBuffer(), DistributedCommand.class);
             log.tracef("Handling %s from %s.", command, msg.src());
             return command.perform(this, msg.src());
         } catch (final Exception e) {

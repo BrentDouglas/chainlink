@@ -7,7 +7,7 @@
         <executor-factory class="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
         <registry-factory class="io.machinecode.chainlink.core.registry.LocalRegistryFactory"/>
         <worker-factory class="io.machinecode.chainlink.core.execution.EventedWorkerFactory"/>
-        <marshaller-factory class="io.machinecode.chainlink.marshalling.jdk.JdkMarshallerFactory"/>
+        <marshaller-factory class="io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory"/>
         <mbean-server-factory class="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
         <execution-repository-factory class="io.machinecode.chainlink.repository.memory.MemoryExecutionRepositoryFactory"/>
     </configuration>

@@ -13,7 +13,7 @@ public class EhCacheExecutionRepositoryFactory implements ExecutionRepositoryFac
     @Override
     public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
         return new EhCacheExecutionRepository(
-                configuration.getMarshallerFactory().produce(configuration),
+                configuration.getMarshallingProviderFactory().produce(configuration),
                 new CacheManager()
         );
     }

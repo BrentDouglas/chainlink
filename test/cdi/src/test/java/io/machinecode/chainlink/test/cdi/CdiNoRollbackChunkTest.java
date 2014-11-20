@@ -2,11 +2,10 @@ package io.machinecode.chainlink.test.cdi;
 
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
 import io.machinecode.chainlink.inject.cdi.CdiInjector;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshaller;
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider;
 import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
 import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.chunk.FailChunkTest;
 import io.machinecode.chainlink.test.core.execution.chunk.NoRollbackChunkTest;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
@@ -30,7 +29,7 @@ public class CdiNoRollbackChunkTest extends NoRollbackChunkTest {
     }
     @Override
     protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkMarshaller());
+        return new MemoryExecutionRepository(new JdkMarshallingProvider());
     }
 
     @BeforeClass
