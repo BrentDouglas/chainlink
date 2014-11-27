@@ -1,7 +1,4 @@
-package io.machinecode.chainlink.se.configuration.xml;
-
-import io.machinecode.chainlink.se.configuration.SeConfiguration;
-import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
+package io.machinecode.chainlink.core.configuration.xml;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -16,7 +13,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author Brent Douglas <brent.n.douglas@gmail.com>
  */
 @XmlAccessorType(NONE)
-public class XmlConfiguration implements ConfigurationFactory {
+public class XmlConfiguration {
 
     @XmlID
     @XmlAttribute(name = "id", required = true)
@@ -61,7 +58,6 @@ public class XmlConfiguration implements ConfigurationFactory {
     @XmlElement(name = "property", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlProperty> properties = new ArrayList<XmlProperty>(0);
 
-    @Override
     public String getId() {
         return id;
     }
@@ -172,10 +168,5 @@ public class XmlConfiguration implements ConfigurationFactory {
 
     public void setProperties(final List<XmlProperty> properties) {
         this.properties = properties;
-    }
-
-    @Override
-    public SeConfiguration.Builder produce() throws Exception {
-        return SeConfiguration.toBuilder(this);
     }
 }

@@ -14,7 +14,6 @@
 
     <modules>
         <module>core</module>
-        <module>repository</module>
         <module>batch</module>
         <module>cdi</module>
         <module>guice</module>
@@ -99,6 +98,16 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>repository</id>
+            <activation>
+                <property><name>repository</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>repository</module>
+            </modules>
+        </profile>
         <profile>
             <id>db-mariadb</id>
             <activation>

@@ -1,5 +1,8 @@
 package io.machinecode.chainlink.core.configuration;
 
+import io.machinecode.chainlink.core.configuration.xml.XmlClassRef;
+import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
+import io.machinecode.chainlink.core.configuration.xml.XmlProperty;
 import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.core.inject.InjectionContextImpl;
 import io.machinecode.chainlink.core.inject.InjectorImpl;
@@ -35,6 +38,7 @@ import io.machinecode.chainlink.spi.security.SecurityCheck;
 import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -317,6 +321,35 @@ public abstract class ConfigurationImpl implements FinalConfiguration, RuntimeCo
     @Override
     public Registry getRegistry() {
         return registry;
+    }
+
+    public static <T extends _Builder<T>> T _configureBuilder(final T builder, final XmlConfiguration xml) {
+        for (final XmlProperty property : xml.getProperties()) {
+            builder.setProperty(property.getKey(), property.getValue());
+        }
+        return builder.setClassLoaderFactoryFqcn(xml.getClassLoaderFactory().getClazz())
+                .setTransactionManagerFactoryFqcn(xml.getTransactionManagerFactory().getClazz())
+                .setJobLoaderFactoriesFqcns(_fqcns(xml.getJobLoaderFactories()))
+                .setArtifactLoaderFactoriesFqcns(_fqcns(xml.getArtifactLoaderFactories()))
+                .setInjectorFactoriesFqcns(_fqcns(xml.getInjectorFactories()))
+                .setSecurityCheckFactoriesFqcns(_fqcns(xml.getSecurityCheckFactories()))
+                .setMarshallingProviderFactoryFqcn(xml.getMarshallerFactory().getClazz())
+                .setExecutionRepositoryFactoryFqcn(xml.getMarshallerFactory().getClazz())
+                .setMBeanServerFactoryFqcn(xml.getmBeanServerFactory().getClazz())
+                .setRegistryFactoryFqcn(xml.getRegistryFactory().getClazz())
+                .setExecutorFactoryFqcn(xml.getExecutorFactory().getClazz())
+                .setWorkerFactoryFqcn(xml.getWorkerFactory().getClazz());
+    }
+
+    protected static String[] _fqcns(final List<XmlClassRef> refs) {
+        if (refs == null) {
+            return null;
+        }
+        final String[] ret = new String[refs.size()];
+        for (int i = 0; i < refs.size(); ++i) {
+            ret[i] = refs.get(i).getClazz();
+        }
+        return ret;
     }
 
     @SuppressWarnings("unchecked")

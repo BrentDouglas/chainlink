@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.se.configuration.xml;
+package io.machinecode.chainlink.core.configuration.xml;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;

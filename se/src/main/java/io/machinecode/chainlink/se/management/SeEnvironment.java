@@ -3,8 +3,9 @@ package io.machinecode.chainlink.se.management;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.util.ResolvableService;
-import io.machinecode.chainlink.se.configuration.xml.XmlChainlink;
-import io.machinecode.chainlink.se.configuration.xml.XmlConfiguration;
+import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
+import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
+import io.machinecode.chainlink.se.configuration.SeConfiguration;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
@@ -80,8 +81,7 @@ public class SeEnvironment implements Environment {
                 for (final XmlConfiguration configuration : xml.getConfigurations()) {
                     operators.put(
                             configuration.getId(),
-                            new JobOperatorImpl(configuration
-                                    .produce()
+                            new JobOperatorImpl(SeConfiguration.xmlToBuilder(configuration)
                                     .build()
                             )
                     );

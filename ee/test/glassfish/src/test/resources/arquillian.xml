@@ -8,6 +8,7 @@
             <property name="glassFishHome">target/glassfish${version.org.glassfish.major}</property>
             <property name="adminHost">localhost</property>
             <property name="adminPort">4848</property>
+            <property name="debug">true</property>
         </configuration>
     </container>
 </arquillian>

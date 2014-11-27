@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.ee.tomee;
 
+import io.machinecode.chainlink.core.management.JobOperatorView;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -29,5 +30,6 @@ public class TomeeTest extends Assert {
     public void testGlassfish() throws Exception {
         final JobOperator operator = BatchRuntime.getJobOperator();
         assertNotNull(operator);
+        assertEquals(JobOperatorView.class, operator.getClass());
     }
 }

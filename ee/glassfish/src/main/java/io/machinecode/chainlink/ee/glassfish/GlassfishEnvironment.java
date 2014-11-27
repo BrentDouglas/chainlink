@@ -1,5 +1,7 @@
 package io.machinecode.chainlink.ee.glassfish;
 
+import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
+import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.Constants;
@@ -12,6 +14,9 @@ import org.glassfish.internal.data.ApplicationInfo;
 
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +29,14 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class GlassfishEnvironment implements Environment {
 
-    private final ConcurrentMap<String, V> operators = new ConcurrentHashMap<String, V>();
+    private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<String, App>();
 
     @Override
     public ExtendedJobOperator getJobOperator(final String id) throws NoConfigurationWithIdException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        for (final Map.Entry<String, V> entry : operators.entrySet()) {
-            final V v = entry.getValue();
-            if (tccl.equals(v.info.getAppClassLoader())) {
-                return v.ops.get(id);
+        for (final App app : operators.values()) {
+            if (tccl.equals(app.info.getAppClassLoader())) {
+                return app.ops.get(id);
             }
         }
         throw new NoConfigurationWithIdException("No configuration for id: " + id); //TODO Message
@@ -41,19 +45,19 @@ public class GlassfishEnvironment implements Environment {
     @Override
     public Map<String, ? extends ExtendedJobOperator> getJobOperators() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        for (final Map.Entry<String, V> entry : operators.entrySet()) {
-            final V v = entry.getValue();
-            if (tccl.equals(v.info.getAppClassLoader())) {
-                return v.ops;
+        for (final App app : operators.values()) {
+            if (tccl.equals(app.info.getAppClassLoader())) {
+                return app.ops;
             }
         }
         return Collections.emptyMap();
     }
 
     public void addApplication(final ApplicationInfo info) throws Exception {
-        V v = this.operators.get(info.getName());
-        if (v == null) {
-            v = new V(info);
+        App app = this.operators.get(info.getName());
+        if (app == null) {
+            app = new App(info);
+            this.operators.put(info.getName(), app);
         }
         final List<ConfigurationFactory> factories;
         try {
@@ -63,13 +67,46 @@ public class GlassfishEnvironment implements Environment {
             throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
         }
         try {
-            final TransactionManager transactionManager = InitialContext.doLookup("java:comp/UserTransaction");
-            for (final ConfigurationFactory factory : factories) {
-                v.ops.put(
-                        factory.getId(),
-                        new JobOperatorImpl(factory.produce()
-                                .setClassLoader(info.getAppClassLoader())
-                                .setTransactionManager(transactionManager)
+            final TransactionManager transactionManager = InitialContext.doLookup("java:appserver/TransactionManager");
+            GlassfishConfigutation.defaults = new GlassfishConfigurationDefaults(info.getAppClassLoader(), transactionManager);
+
+            boolean haveDefault = false;
+            if (factories.isEmpty()) {
+                final InputStream stream = info.getAppClassLoader().getResourceAsStream("chainlink.xml");
+                if (stream != null) {
+                    final JAXBContext context = JAXBContext.newInstance(XmlChainlink.class);
+                    final Unmarshaller unmarshaller = context.createUnmarshaller();
+                    final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
+
+                    for (final XmlConfiguration configuration : xml.getConfigurations()) {
+                        app.ops.put(
+                                configuration.getId(),
+                                new JobOperatorImpl(GlassfishConfigutation.xmlToBuilder(configuration)
+                                        .build()
+                                )
+                        );
+                        if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getId())) {
+                            haveDefault = true;
+                        }
+                    }
+                }
+            } else {
+                for (final ConfigurationFactory configuration : factories) {
+                    app.ops.put(
+                            configuration.getId(),
+                            new JobOperatorImpl(configuration.produce()
+                                    .build()
+                            )
+                    );
+                    if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getId())) {
+                        haveDefault = true;
+                    }
+                }
+            }
+            if (!haveDefault) {
+                app.ops.put(
+                        Constants.DEFAULT_CONFIGURATION,
+                        new JobOperatorImpl(new GlassfishConfigutation.Builder()
                                 .build()
                         )
                 );
@@ -85,11 +122,11 @@ public class GlassfishEnvironment implements Environment {
         );
     }
 
-    private static class V {
+    private static class App {
         final ApplicationInfo info;
         final ConcurrentMap<String, JobOperatorImpl> ops;
 
-        private V(final ApplicationInfo info) {
+        private App(final ApplicationInfo info) {
             this.info = info;
             this.ops = new ConcurrentHashMap<String, JobOperatorImpl>();
         }

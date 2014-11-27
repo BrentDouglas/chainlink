@@ -1,9 +1,11 @@
 package io.machinecode.chainlink.ee.glassfish;
 
 import io.machinecode.chainlink.core.Chainlink;
+import org.glassfish.api.StartupRunLevel;
 import org.glassfish.api.event.EventListener;
 import org.glassfish.api.event.Events;
 import org.glassfish.hk2.api.PostConstruct;
+import org.glassfish.hk2.runlevel.RunLevel;
 import org.glassfish.internal.data.ApplicationInfo;
 import org.glassfish.internal.deployment.Deployment;
 import org.jvnet.hk2.annotations.Service;
@@ -15,6 +17,7 @@ import javax.inject.Inject;
  * @since 1.0
  */
 @Service
+@RunLevel(StartupRunLevel.VAL)
 public class GlassfishService implements PostConstruct, EventListener {
 
     @Inject
