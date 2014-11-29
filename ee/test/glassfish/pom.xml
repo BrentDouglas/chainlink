@@ -145,6 +145,7 @@
                     <skipExec>false</skipExec>
                     <systemPropertyVariables>
                         <version.org.glassfish.major>${version.org.glassfish.major}</version.org.glassfish.major>
+                        <container.debug>${container.debug}</container.debug>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

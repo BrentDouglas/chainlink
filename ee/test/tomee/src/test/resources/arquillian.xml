@@ -14,6 +14,8 @@
                 openejb.classloader.forced-load=org.apache.openejb
                 org.apache.openejb.batchee.BatchObserverProducer=io.machinecode.chainlink.ee.tomee.TomeeObserverProducer
             </property>
+            <property name="debug">${container.debug}</property>
+            <property name="debugPort">9009</property>
         </configuration>
     </container>
 </arquillian>

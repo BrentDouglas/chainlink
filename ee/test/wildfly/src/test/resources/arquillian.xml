@@ -6,7 +6,7 @@
     <container qualifier="wildfly" default="true">
         <configuration>
             <property name="jbossHome">target/wildfly-${version.org.wildfly}</property>
-            <property name="javaVmArguments">-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9009</property>
+            <property name="javaVmArguments">${wildfly.jvm.arguments}</property>
             <property name="allowConnectingToRunningServer">false</property>
         </configuration>
     </container>

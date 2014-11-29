@@ -150,6 +150,7 @@
                     <systemPropertyVariables>
                         <tomee.dir>${tomee.dir}</tomee.dir>
                         <tests.dir>${tests.dir}</tests.dir>
+                        <container.debug>${container.debug}</container.debug>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
