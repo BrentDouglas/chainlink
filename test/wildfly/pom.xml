@@ -16,7 +16,7 @@
 
         <wildfly.dir>${project.build.directory}/wildfly-${version.org.wildfly}</wildfly.dir>
         <chainlink.dir>${wildfly.dir}/chainlink-${project.version}</chainlink.dir>
-        <wildfly.jvm.arguments> </wildfly.jvm.arguments>
+        <wildfly.jvm.arguments>-server</wildfly.jvm.arguments> <!-- Need to have something here for arquillian to handle it properly -->
     </properties>
 
     <dependencies>
@@ -48,6 +48,7 @@
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
                                           dir="${chainlink.dir}"/>
+                                    <copy file="standalone.xml" tofile="${wildfly.dir}/standalone/configuration/standalone.xml" />
                                 </target>
                             </configuration>
                         </execution>
@@ -143,7 +144,7 @@
             </activation>
             <properties>
                 <container.debug>true</container.debug>
-                <wildfly.jvm.arguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
+                <wildfly.jvm.arguments>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
             </properties>
         </profile>
     </profiles>
