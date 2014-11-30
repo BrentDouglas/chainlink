@@ -12,10 +12,6 @@
     <artifactId>chainlink-tck-core</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <properties>
-        <test.properties>../../test.properties</test.properties>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
@@ -270,43 +266,18 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>create-persistence-xml-and-services</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>copy-test-artifact</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>start-background-server</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>stop-background-server</id>
-                        <phase>none</phase>
+                        <id>validate-tck-source</id>
+                        <phase>generate-test-sources</phase>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <skipExec>true</skipExec>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
+                <artifactId>properties-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>none</phase>
+                        <id>read-properties</id>
+                        <phase>generate-sources</phase>
                     </execution>
                 </executions>
             </plugin>

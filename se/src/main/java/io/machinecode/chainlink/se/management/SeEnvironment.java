@@ -99,6 +99,7 @@ public class SeEnvironment implements Environment {
                             factory.getId(),
                             new JobOperatorImpl(factory
                                     .produce()
+                                    .setConfigurationDefaults(defaults)
                                     .build()
                             )
                     );

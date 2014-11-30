@@ -102,7 +102,7 @@ public abstract class BaseTest extends Assert {
     }
 
     protected MarshallingProviderFactory _marshallerFactory() throws Exception {
-        return (MarshallingProviderFactory) Class.forName(System.getProperty("marshaller.factory.class")).newInstance();
+        return (MarshallingProviderFactory) Class.forName(System.getProperty("marshalling.provider.factory.class")).newInstance();
     }
 
     protected ExecutorFactory _executor() throws Exception {

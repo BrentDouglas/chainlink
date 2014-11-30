@@ -13,25 +13,21 @@
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
+        <module>se</module>
     </modules>
 
     <properties>
-        <test.properties>../test.properties</test.properties>
+        <!-- This property is for the child projects, not this one -->
+        <test.properties>../../test.properties</test.properties>
 
         <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
-        <marshaller.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshaller.factory.class>
+        <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshalling.provider.factory.class>
 
-        <class.loader.factory.class></class.loader.factory.class>
-        <transaction.manager.factory.class></transaction.manager.factory.class>
-
-        <job.loader.factory.class></job.loader.factory.class>
-        <artifact.loader.factory.class></artifact.loader.factory.class>
-        <injector.factory.class></injector.factory.class>
-        <security.check.factory.class></security.check.factory.class>
+        <injector.configuration.destination.file>${injector.configuration.source.file}</injector.configuration.destination.file>
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
@@ -253,6 +249,53 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>se</id>
+            <activation>
+                <property><name>se</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>se</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>glassfish</id>
+            <activation>
+                <property><name>glassfish</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+        <!--
+            <modules>
+                <module>glassfish</module>
+            </modules>
+        -->
+        </profile>
+        <profile>
+            <id>tomee</id>
+            <activation>
+                <property><name>tomee</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+        <!--
+            <modules>
+                <module>tomee</module>
+            </modules>
+        -->
+        </profile>
+        <profile>
+            <id>wildfly</id>
+            <activation>
+                <property><name>wildfly</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+        <!--
+            <modules>
+                <module>wildfly</module>
+            </modules>
+        -->
+        </profile>
+
         <!-- Transport -->
         <profile>
             <id>tr-coherence</id>
@@ -404,9 +447,16 @@
                 <property><name>in-batch</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
-            <modules>
-                <module>batch</module>
-            </modules>
+            <properties>
+                <injector.configuration.source.file>batch.xml</injector.configuration.source.file>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>in-cdi</id>
@@ -417,10 +467,20 @@
             <properties>
                 <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.CdiArtifactLoaderFactory</artifact.loader.factory.class>
                 <injector.factory.class>io.machinecode.chainlink.tck.core.inject.CdiInjectorFactory</injector.factory.class>
+                <injector.configuration.source.file>beans.xml</injector.configuration.source.file>
             </properties>
-            <modules>
-                <module>cdi</module>
-            </modules>
+            <dependencies>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-inject-cdi</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.weld.se</groupId>
+                    <artifactId>weld-se</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>in-guice</id>
@@ -432,9 +492,37 @@
                 <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.GuiceArtifactLoaderFactory</artifact.loader.factory.class>
                 <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
             </properties>
-            <modules>
-                <module>guice</module>
-            </modules>
+            <dependencies>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-inject-guice</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.google.inject</groupId>
+                    <artifactId>guice</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch-tck</artifactId>
+                    <scope>test</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.ibm.jbatch</groupId>
+                            <artifactId>com.ibm.jbatch-model</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.ibm.jbatch</groupId>
+                            <artifactId>com.ibm.jbatch-ri-spi</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.ibm.jbatch</groupId>
+                            <artifactId>com.ibm.jbatch-runtime</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>in-seam</id>
@@ -445,10 +533,67 @@
             <properties>
                 <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.SeamArtifactLoaderFactory</artifact.loader.factory.class>
                 <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
+                <injector.configuration.source.file>components.xml</injector.configuration.source.file>
             </properties>
-            <modules>
-                <module>seam</module>
-            </modules>
+            <dependencies>
+                <dependency>
+                    <groupId>dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-inject-seam</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.seam</groupId>
+                    <artifactId>jboss-seam</artifactId>
+                    <type>ejb</type>
+                    <scope>test</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.testng</groupId>
+                            <artifactId>testng</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.ejb</groupId>
+                    <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.faces</groupId>
+                    <artifactId>jboss-jsf-api_2.1_spec</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>in-spring</id>
@@ -458,10 +603,36 @@
             </activation>
             <properties>
                 <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.SpringArtifactLoaderFactory</artifact.loader.factory.class>
+                <injector.configuration.source.file>spring-beans.xml</injector.configuration.source.file>
+                <injector.configuration.destination.file>beans.xml</injector.configuration.destination.file>
             </properties>
-            <modules>
-                <module>spring</module>
-            </modules>
+            <dependencies>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-inject-spring</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
 
         <!-- Database -->
@@ -496,7 +667,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallingProviderFactory</marshaller.factory.class>
+                <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallingProviderFactory</marshalling.provider.factory.class>
             </properties>
         </profile>
     </profiles>
@@ -531,11 +702,11 @@
                             </configuration>
                         </execution>
                         <execution>
-                            <id>create-persistence-xml-and-services</id>
+                            <id>create-test-resources</id>
                             <goals>
                                 <goal>run</goal>
                             </goals>
-                            <phase>generate-test-resources</phase>
+                            <phase>none</phase>
                             <configuration>
                                 <target>
                                     <copy file="${project.basedir}/../core/src/test/resources/coherence-cache-config.xml"
@@ -567,6 +738,10 @@
                                             <filter token="database.user" value="${database.prefix}.database.user" />
                                             <filter token="database.password" value="${database.prefix}.database.password" />
                                         </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../src/test/resources/META-INF/${injector.configuration.source.file}"
+                                          tofile="${project.basedir}/src/test/resources/META-INF/${injector.configuration.destination.file}"
+                                          overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/com.ibm.jbatch.tck.spi.JobExecutionWaiterFactory"
                                           tofile="${project.build.testOutputDirectory}/META-INF/services/com.ibm.jbatch.tck.spi.JobExecutionWaiterFactory"
@@ -661,93 +836,9 @@
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>
-                                            <filter token="marshaller.factory.class" value="${marshaller.factory.class}" />
+                                            <filter token="marshalling.provider.factory.class" value="${marshalling.provider.factory.class}" />
                                         </filterset>
                                     </copy>
-                                </target>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>copy-test-artifact</id>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <phase>process-test-classes</phase>
-                            <configuration>
-                                <target>
-                                    <jar destfile="${project.build.directory}/chainlink-tck-${tck.test.module.name}-${project.version}.jar" basedir="${project.build.directory}/test-classes"/>
-                                    <copy file="${project.build.directory}/chainlink-tck-${tck.test.module.name}-${project.version}.jar"
-                                          tofile="${tck.work.dir}/chainlink-${project.version}/app/chainlink-tck-${tck.test.module.name}-${project.version}.jar"
-                                          overwrite="true"/>
-                                </target>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>start-background-server</id>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <phase>pre-integration-test</phase>
-                            <configuration>
-                                <target>
-                                    <!-- Setup other instance in case we are testing a clustering registry. Executed from tck-core pom -->
-                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-chainlinkd.zip"
-                                           dest="${tck.work.dir}"/>
-                                    <chmod file="${tck.work.dir}/chainlink-${project.version}/install" perm="754"/>
-                                    <exec executable="${tck.work.dir}/chainlink-${project.version}/install"
-                                          dir="${tck.work.dir}/chainlink-${project.version}"/>
-
-                                    <copy file="${project.basedir}/../chainlink-tck.xml"
-                                          tofile="${tck.work.dir}/chainlink-${project.version}/cnf/chainlink-tck.xml"
-                                          filtering="true"
-                                          overwrite="true">
-                                        <filterset>
-                                            <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
-                                            <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
-                                            <filter token="executor.factory.class" value="${executor.factory.class}" />
-                                            <filter token="registry.factory.class" value="${registry.factory.class}" />
-                                            <filter token="injector.factory.class" value="${injector.factory.class}" />
-                                            <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
-                                            <filter token="security.check.factory.class" value="${security.check.factory.class}" />
-                                            <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
-                                            <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
-                                            <filter token="worker.factory.class" value="${worker.factory.class}" />
-                                            <filter token="marshaller.factory.class" value="${marshaller.factory.class}" />
-                                        </filterset>
-                                    </copy>
-                                    <copy file="${project.basedir}/../chainlink-tck.properties"
-                                          tofile="${tck.work.dir}/chainlink-${project.version}/cnf/chainlink-tck.properties"
-                                          overwrite="true">
-                                    </copy>
-
-                                    <chmod file="${tck.work.dir}/chainlink-${project.version}/bin/*" perm="754"/>
-
-                                    <exec executable="${tck.work.dir}/chainlink-${project.version}/bin/chainlink"
-                                          dir="${tck.work.dir}/chainlink-${project.version}/bin">
-                                        <arg value="-p"/>
-                                        <arg value="chainlink-tck.properties"/>
-                                        <arg value="-d"/>
-                                    </exec>
-                                </target>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>stop-background-server</id>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <phase>post-integration-test</phase>
-                            <configuration>
-                                <target>
-                                    <!-- Kill instance. Executed from test modules pom -->
-                                    <exec executable="${tck.work.dir}/chainlink-${project.version}/bin/chainlink"
-                                          dir="${tck.work.dir}/chainlink-${project.version}/bin">
-                                        <arg value="-k"/>
-                                    </exec>
-                                    <exec executable="${tck.work.dir}/chainlink-${project.version}/install"
-                                          dir="${tck.work.dir}/chainlink-${project.version}">
-                                        <arg value="-u"/>
-                                    </exec>
                                 </target>
                             </configuration>
                         </execution>
@@ -759,7 +850,7 @@
                     <executions>
                         <execution>
                             <id>copy</id>
-                            <phase>process-test-classes</phase>
+                            <phase>none</phase>
                             <goals>
                                 <goal>copy</goal>
                             </goals>
@@ -773,7 +864,7 @@
                                 <version>${version.com.ibm.batch.com.ibm.batch-tck-spi}</version>
                                 <type>jar</type>
                                 <overWrite>true</overWrite>
-                                <outputDirectory>${tck.work.dir}/chainlink-${project.version}/app/</outputDirectory>
+                                <outputDirectory>${deployment.dir}</outputDirectory>
                                 <destFileName>com.ibm.jbatch-tck-spi-${version.com.ibm.batch.com.ibm.batch-tck-spi}.jar</destFileName>
                             </artifactItem>
                             <artifactItem>
@@ -782,7 +873,7 @@
                                 <version>${project.version}</version>
                                 <type>jar</type>
                                 <overWrite>true</overWrite>
-                                <outputDirectory>${tck.work.dir}/chainlink-${project.version}/app/</outputDirectory>
+                                <outputDirectory>${deployment.dir}</outputDirectory>
                                 <destFileName>chainlink-tck-core-${project.version}.jar</destFileName>
                             </artifactItem>
                         </artifactItems>
@@ -792,6 +883,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
+                    <configuration>
+                        <skipExec>true</skipExec>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>integration-test</id>
@@ -801,7 +895,6 @@
                             <configuration>
                                 <includes>
                                     <include>**/**Test*.java</include>
-                                    <include>**/**TestCase*.java</include>
                                 </includes>
                                 <systemPropertiesFile>${test.properties}</systemPropertiesFile>
                                 <systemPropertyVariables>
@@ -818,95 +911,60 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>add-test-sources</id>
+                            <phase>none</phase>
+                            <goals><goal>add-test-source</goal></goals>
+                            <configuration>
+                                <sources>
+                                    <source>${tck.source}/com.ibm.jbatch.tck/src/main/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-test-resources</id>
+                            <phase>none</phase>
+                            <goals><goal>add-test-resource</goal></goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>${tck.source}/com.ibm.jbatch.tck/src/main/resources/testJobXml/META-INF/batch-jobs</directory>
+                                        <targetPath>META-INF/batch-jobs</targetPath>
+                                    </resource>
+                                    <resource>
+                                        <directory>${project.basedir}/src/test/resources</directory>
+                                    </resource>
+                                    <resource>
+                                        <directory>${project.basedir}/../../spi/src/main/resources</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>read-properties</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>read-project-properties</goal>
+                            </goals>
+                            <configuration>
+                                <files>
+                                    <file>${test.properties}</file>
+                                </files>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>validate-tck-source</id>
-                        <phase>generate-test-sources</phase>
-                    </execution>
-                    <execution>
-                        <id>create-persistence-xml-and-services</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>copy-test-artifact</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>start-background-server</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>stop-background-server</id>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>read-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>${test.properties}</file>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <goals><goal>add-test-source</goal></goals>
-                        <configuration>
-                            <sources>
-                                <source>${tck.source}/com.ibm.jbatch.tck/src/main/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-test-resources</id>
-                        <phase>generate-test-resources</phase>
-                        <goals><goal>add-test-resource</goal></goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${tck.source}/com.ibm.jbatch.tck/src/main/resources/testJobXml/META-INF/batch-jobs</directory>
-                                    <targetPath>META-INF/batch-jobs</targetPath>
-                                </resource>
-                                <resource>
-                                    <directory>${project.basedir}/src/test/resources</directory>
-                                </resource>
-                                <resource>
-                                    <directory>${project.basedir}/../../spi/src/main/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <skipExec>true</skipExec>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 </project>

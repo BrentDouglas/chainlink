@@ -26,7 +26,7 @@
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
-        <marshaller.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshaller.factory.class>
+        <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshalling.provider.factory.class>
 
         <container.debug>false</container.debug>
     </properties>
@@ -159,7 +159,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <marshaller.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallingProviderFactory</marshaller.factory.class>
+                <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallingProviderFactory</marshalling.provider.factory.class>
             </properties>
         </profile>
 
@@ -276,7 +276,7 @@
                     <systemPropertyVariables>
                         <database.driver>${database.driver}</database.driver>
                         <database.prefix>${database.prefix}</database.prefix>
-                        <marshaller.factory.class>${marshaller.factory.class}</marshaller.factory.class>
+                        <marshalling.provider.factory.class>${marshalling.provider.factory.class}</marshalling.provider.factory.class>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
