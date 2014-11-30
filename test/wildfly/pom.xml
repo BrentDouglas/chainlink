@@ -3,23 +3,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>chainlink-ee-test</artifactId>
+        <artifactId>chainlink-test</artifactId>
         <groupId>io.machinecode.chainlink</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>chainlink-ee-test-glassfish</artifactId>
+    <artifactId>chainlink-test-wildfly</artifactId>
 
     <properties>
-        <glassfish.dir>${project.build.directory}/glassfish${version.org.glassfish.major}</glassfish.dir>
-        <chainlink.dir>${glassfish.dir}/chainlink-${project.version}</chainlink.dir>
+        <test.properties>../../test.properties</test.properties>
+
+        <wildfly.dir>${project.build.directory}/wildfly-${version.org.wildfly}</wildfly.dir>
+        <chainlink.dir>${wildfly.dir}/chainlink-${project.version}</chainlink.dir>
+        <wildfly.jvm.arguments> </wildfly.jvm.arguments>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-glassfish-managed-3.1</artifactId>
+            <groupId>org.wildfly.arquillian</groupId>
+            <artifactId>wildfly-arquillian-container-managed</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -40,8 +43,8 @@
                             </goals>
                             <configuration>
                                 <target>
-                                    <unzip src="${project.build.directory}/../../../../dist/target/chainlink-${project.version}-glassfish.zip"
-                                           dest="${glassfish.dir}"/>
+                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-wildfly.zip"
+                                           dest="${wildfly.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
                                           dir="${chainlink.dir}"/>
@@ -70,7 +73,7 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>unpack-glassfish</id>
+                            <id>unpack-wildfly</id>
                             <phase>none</phase>
                             <goals>
                                 <goal>unpack</goal>
@@ -78,9 +81,9 @@
                             <configuration>
                                 <artifactItems>
                                     <artifactItem>
-                                        <groupId>org.glassfish.main.distributions</groupId>
-                                        <artifactId>glassfish</artifactId>
-                                        <version>${version.org.glassfish}</version>
+                                        <groupId>org.wildfly</groupId>
+                                        <artifactId>wildfly-dist</artifactId>
+                                        <version>${version.org.wildfly}</version>
                                         <type>zip</type>
                                         <outputDirectory>${project.build.directory}</outputDirectory>
                                     </artifactItem>
@@ -98,7 +101,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-glassfish</id>
+                        <id>unpack-wildfly</id>
                         <phase>generate-test-resources</phase>
                     </execution>
                 </executions>
@@ -123,12 +126,26 @@
                 <configuration>
                     <skipExec>false</skipExec>
                     <systemPropertyVariables>
-                        <version.org.glassfish.major>${version.org.glassfish.major}</version.org.glassfish.major>
-                        <container.debug>${container.debug}</container.debug>
+                        <version.org.wildfly>${version.org.wildfly}</version.org.wildfly>
+                        <wildfly.jvm.arguments>${wildfly.jvm.arguments}</wildfly.jvm.arguments>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>debug</id>
+            <activation>
+                <property><name>debug</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <container.debug>true</container.debug>
+                <wildfly.jvm.arguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

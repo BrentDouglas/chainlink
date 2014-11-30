@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
-import java.io.File;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>

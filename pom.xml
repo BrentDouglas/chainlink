@@ -106,6 +106,23 @@
         <version.org.codehaus.mojo.build-helper-maven-plugin>1.8</version.org.codehaus.mojo.build-helper-maven-plugin>
         <version.org.codehaus.mojo.exec-maven-plugin>1.2.1</version.org.codehaus.mojo.exec-maven-plugin>
         <version.org.codehaus.mojo.properties-maven-plugin>1.0-alpha-2</version.org.codehaus.mojo.properties-maven-plugin>
+
+        <!-- EE -->
+        <version.org.glassfish.major>4</version.org.glassfish.major>
+        <version.org.glassfish>${version.org.glassfish.major}.1</version.org.glassfish>
+        <version.org.glassfish.main.common.glassfish-api>${version.org.glassfish}</version.org.glassfish.main.common.glassfish-api>
+        <version.org.glassfish.main.common.internal-api>${version.org.glassfish}</version.org.glassfish.main.common.internal-api>
+        <version.org.apache.openejb.openejb-core>5.0.0-SNAPSHOT</version.org.apache.openejb.openejb-core>
+        <version.org.apache.openejb.tomee>2.0.0-SNAPSHOT</version.org.apache.openejb.tomee>
+        <version.org.apache.openejb.arquillian-tomee-remote>${version.org.apache.openejb.tomee}</version.org.apache.openejb.arquillian-tomee-remote>
+        <version.org.jboss.arquillian.arquillian-bom>1.1.0.Final</version.org.jboss.arquillian.arquillian-bom>
+        <version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1>1.0.0.CR4</version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1>
+        <version.org.wildfly>9.0.0.Alpha1</version.org.wildfly>
+        <version.org.wildfly.wildfly-transactions>${version.org.wildfly}</version.org.wildfly.wildfly-transactions>
+        <version.org.wildfly.arquillian.wildfly-arquillian-container-managed>1.0.0.Alpha2</version.org.wildfly.arquillian.wildfly-arquillian-container-managed>
+
+        <!-- EE Plugins -->
+        <version.org.glassfish.hk2.hk2-inhabitant-generator>2.3.0</version.org.glassfish.hk2.hk2-inhabitant-generator>
     </properties>
 
     <dependencyManagement>
@@ -526,6 +543,50 @@
                 <artifactId>jedis</artifactId>
                 <version>${version.redis.clients.jedis}</version>
             </dependency>
+
+            <!-- EE -->
+            <dependency>
+                <groupId>org.glassfish.main.common</groupId>
+                <artifactId>glassfish-api</artifactId>
+                <version>${version.org.glassfish.main.common.glassfish-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.main.common</groupId>
+                <artifactId>internal-api</artifactId>
+                <version>${version.org.glassfish.main.common.internal-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>${version.org.jboss.arquillian.arquillian-bom}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.container</groupId>
+                <artifactId>arquillian-glassfish-managed-3.1</artifactId>
+                <version>${version.org.jboss.arquillian.container.arquillian-glassfish-managed-3.1}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.openejb</groupId>
+                <artifactId>arquillian-tomee-remote</artifactId>
+                <version>${version.org.apache.openejb.arquillian-tomee-remote}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.openejb</groupId>
+                <artifactId>openejb-core</artifactId>
+                <version>${version.org.apache.openejb.openejb-core}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-transactions</artifactId>
+                <version>${version.org.wildfly.wildfly-transactions}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.arquillian</groupId>
+                <artifactId>wildfly-arquillian-container-managed</artifactId>
+                <version>${version.org.wildfly.arquillian.wildfly-arquillian-container-managed}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -592,6 +653,13 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>properties-maven-plugin</artifactId>
                     <version>${version.org.codehaus.mojo.properties-maven-plugin}</version>
+                </plugin>
+
+                <!-- EE -->
+                <plugin>
+                    <groupId>org.glassfish.hk2</groupId>
+                    <artifactId>hk2-inhabitant-generator</artifactId>
+                    <version>${version.org.glassfish.hk2.hk2-inhabitant-generator}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

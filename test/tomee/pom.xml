@@ -3,16 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>chainlink-ee-test</artifactId>
+        <artifactId>chainlink-test</artifactId>
         <groupId>io.machinecode.chainlink</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>chainlink-ee-test-tomee</artifactId>
+    <artifactId>chainlink-test-tomee</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
+        <test.properties>../../test.properties</test.properties>
+
         <tomee.dir>${project.build.directory}/apache-tomee-plume-${version.org.apache.openejb.tomee}</tomee.dir>
         <tests.dir>${project.build.directory}/arquillian-tests</tests.dir>
         <chainlink.dir>${tomee.dir}/chainlink-${project.version}</chainlink.dir>
@@ -43,7 +45,7 @@
                             <configuration>
                                 <target>
                                     <mkdir dir="${tests.dir}"/>
-                                    <unzip src="${project.build.directory}/../../../../dist/target/chainlink-${project.version}-tomee.zip"
+                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-tomee.zip"
                                            dest="${tomee.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
