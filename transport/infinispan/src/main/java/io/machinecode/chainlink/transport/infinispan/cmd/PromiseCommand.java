@@ -3,7 +3,7 @@ package io.machinecode.chainlink.transport.infinispan.cmd;
 import io.machinecode.chainlink.spi.registry.ChainId;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class PromiseCommand extends BaseChainlinkCommand {
 

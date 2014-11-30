@@ -16,7 +16,7 @@ import org.jboss.seam.contexts.Lifecycle;
 import javax.batch.operations.BatchRuntimeException;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 @Name("seamArtifactLoader")
 @Scope(ScopeType.APPLICATION)

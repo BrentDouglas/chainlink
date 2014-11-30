@@ -3,7 +3,7 @@ package io.machinecode.chainlink.transport.core;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class DistributedWorkerId<A> implements WorkerId {
     final long id;

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegistry> implements AsyncRequestHandler, MembershipListener, DistributedRegistry<Address,JGroupsRegistry> {
 

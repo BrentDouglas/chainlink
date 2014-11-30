@@ -5,7 +5,7 @@ import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import org.infinispan.remoting.transport.Address;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FindWorkerCallable extends BaseCallable<Object, Object, Address> {
 

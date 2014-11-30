@@ -7,7 +7,7 @@ import io.machinecode.chainlink.spi.element.Properties;
 import io.machinecode.chainlink.spi.element.partition.Plan;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class PlanValidator extends ValidatingVisitor<Plan> {
 

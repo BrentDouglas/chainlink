@@ -5,7 +5,7 @@ import io.machinecode.then.api.OnComplete;
 import org.jboss.logging.Logger;
 
 /**
-* @author Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class Notify implements OnComplete { //TODO Why is this serializable?
 

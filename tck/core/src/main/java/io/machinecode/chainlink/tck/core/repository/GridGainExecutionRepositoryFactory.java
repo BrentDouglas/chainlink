@@ -14,7 +14,7 @@ import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMulticastIpFinder;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFactory {
 

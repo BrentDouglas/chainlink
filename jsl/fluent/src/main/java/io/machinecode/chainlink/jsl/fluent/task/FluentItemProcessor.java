@@ -4,7 +4,7 @@ import io.machinecode.chainlink.spi.element.task.ItemProcessor;
 import io.machinecode.chainlink.jsl.fluent.FluentPropertyReference;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FluentItemProcessor extends FluentPropertyReference<FluentItemProcessor> implements ItemProcessor {
     @Override

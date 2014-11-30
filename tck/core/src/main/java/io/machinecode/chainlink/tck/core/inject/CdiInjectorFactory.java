@@ -8,7 +8,7 @@ import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.tck.core.loader.CdiArtifactLoaderFactory;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CdiInjectorFactory implements InjectorFactory {
     @Override

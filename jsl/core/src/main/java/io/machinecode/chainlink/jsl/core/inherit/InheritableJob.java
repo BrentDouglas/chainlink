@@ -11,7 +11,7 @@ import io.machinecode.chainlink.spi.element.execution.Execution;
 import java.util.List;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface InheritableJob<T extends InheritableJob<T, P, L, E>,
         P extends Mergeable<P> & Properties,

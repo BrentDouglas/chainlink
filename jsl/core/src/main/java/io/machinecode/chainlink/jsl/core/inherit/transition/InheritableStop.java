@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.core.inherit.transition;
 import io.machinecode.chainlink.spi.element.transition.Stop;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface InheritableStop<T extends InheritableStop<T>>
         extends InheritableTerminatingTransition<T>, Stop {

@@ -7,7 +7,7 @@ import io.machinecode.chainlink.spi.element.partition.Plan;
 import java.util.List;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface InheritablePlan<T extends InheritablePlan<T, P>,
         P extends MergeableList<P> & Properties>

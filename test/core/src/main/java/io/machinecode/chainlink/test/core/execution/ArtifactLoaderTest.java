@@ -10,7 +10,7 @@ import javax.batch.api.Batchlet;
 import javax.batch.api.Decider;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public abstract class ArtifactLoaderTest extends BaseTest {

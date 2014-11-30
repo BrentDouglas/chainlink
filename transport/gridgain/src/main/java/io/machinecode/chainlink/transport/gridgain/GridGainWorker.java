@@ -10,7 +10,7 @@ import io.machinecode.chainlink.transport.gridgain.cmd.GridGainPushChainCommand;
 import java.util.UUID;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GridGainWorker extends DistributedWorker<UUID, GridGainRegistry> {
 

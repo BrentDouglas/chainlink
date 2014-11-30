@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.fluent.task;
 import io.machinecode.chainlink.jsl.core.inherit.task.InheritableChunk;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FluentChunk implements FluentTask<FluentChunk>, InheritableChunk<FluentChunk, FluentItemReader, FluentItemProcessor, FluentItemWriter, FluentCheckpointAlgorithm, FluentExceptionClassFilter> {
 

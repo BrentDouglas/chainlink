@@ -7,7 +7,7 @@ import io.machinecode.chainlink.test.core.execution.chunk.artifact.exception.Fai
 import javax.batch.api.chunk.ItemProcessor;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class OnceFailEventOrderProcessor implements ItemProcessor {

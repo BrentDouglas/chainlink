@@ -3,7 +3,7 @@ package io.machinecode.chainlink.transport.core.cmd;
 import io.machinecode.chainlink.transport.core.DistributedRegistry;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CleanupCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<Void,A,R> {
 

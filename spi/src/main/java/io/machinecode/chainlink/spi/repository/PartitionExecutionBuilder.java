@@ -3,7 +3,7 @@ package io.machinecode.chainlink.spi.repository;
 import java.util.Properties;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface PartitionExecutionBuilder<T extends PartitionExecutionBuilder<T>> extends BaseExecutionBuilder<T> {
 

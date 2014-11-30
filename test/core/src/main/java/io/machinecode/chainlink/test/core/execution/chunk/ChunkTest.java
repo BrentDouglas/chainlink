@@ -40,7 +40,7 @@ import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkE
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_JOB;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public abstract class ChunkTest extends OperatorTest {

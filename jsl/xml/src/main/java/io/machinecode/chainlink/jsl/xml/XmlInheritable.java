@@ -11,7 +11,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * An elementName that can inherit from other elements from
  * the JSL Inheritance v1 spec.
  *
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 @XmlAccessorType(NONE)
 public abstract class XmlInheritable<T extends XmlInheritable<T>> implements InheritableBase<T> {

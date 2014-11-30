@@ -19,7 +19,7 @@ import java.util.List;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.EventOrderAccumulator._order;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class EventOrderListener implements JobListener, StepListener, ChunkListener, ItemReadListener, ItemWriteListener,

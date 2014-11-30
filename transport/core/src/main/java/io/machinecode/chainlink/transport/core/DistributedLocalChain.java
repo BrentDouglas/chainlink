@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class DistributedLocalChain<A, R extends DistributedRegistry<A, R>> extends ChainImpl<Void> {
     protected final R registry;

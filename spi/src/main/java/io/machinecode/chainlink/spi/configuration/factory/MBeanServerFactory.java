@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
 import javax.management.MBeanServer;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface MBeanServerFactory extends Factory<MBeanServer, LoaderConfiguration> {
 

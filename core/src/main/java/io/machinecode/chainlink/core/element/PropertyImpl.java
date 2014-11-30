@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.element.Property;
 import java.io.Serializable;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class PropertyImpl implements Property, Serializable {
 

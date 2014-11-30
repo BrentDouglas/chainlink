@@ -17,7 +17,7 @@ import java.util.Properties;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 @JsonAutoDetect(
         getterVisibility = NONE,

@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.core.inherit;
 import io.machinecode.chainlink.spi.InheritableElement;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface InheritableBase<T extends InheritableBase<T>>
         extends InheritableElement<T> {
@@ -15,7 +15,7 @@ public interface InheritableBase<T extends InheritableBase<T>>
     T setJslName(String jslName);
 
     /**
-     * @author Brent Douglas <brent.n.douglas@gmail.com>
+     * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
      */
     class BaseTool {
 

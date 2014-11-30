@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.expression;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface PropertyResolver {
 

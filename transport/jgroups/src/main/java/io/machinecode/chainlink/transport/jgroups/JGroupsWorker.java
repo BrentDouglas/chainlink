@@ -9,7 +9,7 @@ import io.machinecode.chainlink.transport.jgroups.cmd.JGroupsPushChainCommand;
 import org.jgroups.Address;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class JGroupsWorker extends DistributedWorker<Address, JGroupsRegistry> {
 

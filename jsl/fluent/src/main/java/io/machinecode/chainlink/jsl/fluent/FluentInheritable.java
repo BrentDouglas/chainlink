@@ -6,7 +6,7 @@ import io.machinecode.chainlink.jsl.core.inherit.InheritableBase;
  * An elementName that can inherit from other elements from
  * the JSL Inheritance v1 spec.
  *
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class FluentInheritable<T extends FluentInheritable<T>> implements InheritableBase<T> {
 

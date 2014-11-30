@@ -13,7 +13,7 @@ import java.util.List;
 import static org.jboss.as.controller.PersistentResourceXMLDescription.builder;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class ChainlinkParser_1_0 implements XMLElementReader<List<ModelNode>>, XMLStreamConstants {

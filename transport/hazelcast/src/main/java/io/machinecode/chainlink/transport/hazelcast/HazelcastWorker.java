@@ -9,7 +9,7 @@ import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.chainlink.transport.hazelcast.cmd.HazelcastPushChainCommand;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class HazelcastWorker extends DistributedWorker<Member, HazelcastRegistry> {
 

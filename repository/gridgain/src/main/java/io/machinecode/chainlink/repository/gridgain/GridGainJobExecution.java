@@ -7,7 +7,7 @@ import org.gridgain.grid.cache.query.GridCacheQuerySqlField;
 import javax.batch.runtime.BatchStatus;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GridGainJobExecution extends JobExecutionImpl {
 

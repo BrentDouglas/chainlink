@@ -4,7 +4,7 @@ import io.machinecode.chainlink.test.core.execution.chunk.artifact.exception.Fai
 import org.junit.Assert;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class ExpectFailReadOpenExceptionEventOrderListener extends EventOrderListener {

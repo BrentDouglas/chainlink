@@ -10,7 +10,7 @@ import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.api.chunk.CheckpointAlgorithm> implements CheckpointAlgorithm {
 

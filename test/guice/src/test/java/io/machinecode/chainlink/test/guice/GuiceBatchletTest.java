@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 //@Ignore("Guice injector doesn't work properties deferring to the field name.")
 public class GuiceBatchletTest extends BatchletTest {

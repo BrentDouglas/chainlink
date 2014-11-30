@@ -6,7 +6,7 @@ import com.ibm.jbatch.tck.spi.JobExecutionWaiterFactory;
 import javax.batch.operations.JobOperator;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class JobExecutionWaiterFactoryImpl implements JobExecutionWaiterFactory {
 

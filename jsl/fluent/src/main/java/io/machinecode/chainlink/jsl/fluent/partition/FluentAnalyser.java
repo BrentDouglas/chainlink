@@ -4,7 +4,7 @@ import io.machinecode.chainlink.spi.element.partition.Analyser;
 import io.machinecode.chainlink.jsl.fluent.FluentPropertyReference;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FluentAnalyser extends FluentPropertyReference<FluentAnalyser> implements Analyser {
     @Override

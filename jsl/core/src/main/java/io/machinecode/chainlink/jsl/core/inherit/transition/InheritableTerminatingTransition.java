@@ -4,7 +4,7 @@ import io.machinecode.chainlink.spi.Copyable;
 import io.machinecode.chainlink.spi.element.transition.TerminatingTransition;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface InheritableTerminatingTransition<T extends InheritableTerminatingTransition<T>>
         extends Copyable<T>, TerminatingTransition {

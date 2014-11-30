@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.inject.Injector;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class VetoInjectorFactory implements InjectorFactory {
     @Override

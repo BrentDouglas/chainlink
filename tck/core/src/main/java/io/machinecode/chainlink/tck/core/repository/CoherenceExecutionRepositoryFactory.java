@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFac
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CoherenceExecutionRepositoryFactory implements ExecutionRepositoryFactory {
     @Override

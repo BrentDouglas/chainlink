@@ -14,7 +14,7 @@ import io.machinecode.then.core.DeferredImpl;
 import org.infinispan.remoting.transport.Address;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class InfinispanWorker implements Worker {
 

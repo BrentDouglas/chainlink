@@ -8,7 +8,7 @@ import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class EndFactory implements ElementFactory<End, EndImpl> {
 

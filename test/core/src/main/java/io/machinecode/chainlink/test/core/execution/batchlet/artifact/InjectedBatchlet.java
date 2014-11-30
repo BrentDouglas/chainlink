@@ -10,7 +10,7 @@ import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
 /**
-* @author Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class InjectedBatchlet extends javax.batch.api.AbstractBatchlet {
     public static Reference<Boolean> hasRun = new Reference<Boolean>(false);

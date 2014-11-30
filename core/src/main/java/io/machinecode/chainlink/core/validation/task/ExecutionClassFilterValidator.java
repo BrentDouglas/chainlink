@@ -7,7 +7,7 @@ import io.machinecode.chainlink.spi.element.task.ExceptionClassFilter;
 import io.machinecode.chainlink.spi.util.Messages;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ExecutionClassFilterValidator extends ValidatingVisitor<ExceptionClassFilter> {
 

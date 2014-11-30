@@ -19,7 +19,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class JdkMarshallingProvider implements Marshaller, Unmarshaller, Cloner, MarshallingProvider {
 

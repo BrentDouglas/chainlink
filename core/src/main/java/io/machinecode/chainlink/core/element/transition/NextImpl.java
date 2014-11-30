@@ -6,7 +6,7 @@ import org.jboss.logging.Logger;
 import javax.batch.runtime.BatchStatus;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class NextImpl extends TransitionImpl implements Next {
 

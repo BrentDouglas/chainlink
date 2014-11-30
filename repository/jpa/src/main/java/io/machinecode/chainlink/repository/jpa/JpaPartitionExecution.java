@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 @Entity
 @Table(name = "partition_execution")

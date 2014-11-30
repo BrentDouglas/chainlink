@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
 import io.machinecode.chainlink.spi.element.partition.Partition;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class PartitionValidator extends ValidatingVisitor<Partition> {
 

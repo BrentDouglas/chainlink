@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class VisitorNode {
     public static final String ERROR = "FAILURE -";

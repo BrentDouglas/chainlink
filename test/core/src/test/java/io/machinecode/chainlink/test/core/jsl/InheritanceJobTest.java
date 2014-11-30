@@ -28,7 +28,7 @@ import javax.xml.bind.JAXBException;
 import java.util.List;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class InheritanceJobTest {
 

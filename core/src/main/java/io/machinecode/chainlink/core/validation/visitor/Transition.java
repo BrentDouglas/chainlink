@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.validation.visitor;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 final class Transition {
     Transition(final Type type, final String fromElement, final String from, final String toElement, final String to) {

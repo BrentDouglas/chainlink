@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class PartitionExecutionImpl extends BaseExecutionImpl implements PartitionExecution, Serializable {
     private final long partitionExecutionId;

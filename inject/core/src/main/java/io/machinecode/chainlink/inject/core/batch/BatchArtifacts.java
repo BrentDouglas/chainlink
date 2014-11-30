@@ -10,7 +10,7 @@ import static io.machinecode.chainlink.inject.core.batch.BatchArtifacts.NAMESPAC
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 @XmlRootElement(namespace = NAMESPACE, name = BatchArtifacts.ELEMENT)
 @XmlAccessorType(NONE)

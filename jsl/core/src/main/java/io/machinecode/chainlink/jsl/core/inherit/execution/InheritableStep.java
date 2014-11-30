@@ -19,7 +19,7 @@ import javax.batch.operations.JobStartException;
 import java.util.List;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface InheritableStep<T extends InheritableStep<T, P, L, M, X, Y>,
         P extends Mergeable<P> & Properties,

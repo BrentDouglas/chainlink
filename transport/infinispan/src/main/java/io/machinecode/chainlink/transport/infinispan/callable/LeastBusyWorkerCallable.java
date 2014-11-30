@@ -4,7 +4,7 @@ import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import io.machinecode.chainlink.transport.infinispan.InfinispanWorkerId;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class LeastBusyWorkerCallable extends BaseCallable<Object, Object, InfinispanWorkerId> {
 

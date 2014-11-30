@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface Worker extends Runnable, AutoCloseable {
 

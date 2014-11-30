@@ -7,7 +7,7 @@ import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.security.SecurityCheck;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface RepositoryConfiguration extends SecurityConfiguration {
 

@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
 import io.machinecode.chainlink.transport.coherence.CoherenceRegistry;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CoherenceRegistryFactory implements RegistryFactory {
 

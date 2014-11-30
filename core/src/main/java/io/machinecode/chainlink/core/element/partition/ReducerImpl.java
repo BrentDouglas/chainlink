@@ -12,7 +12,7 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
 import javax.batch.api.partition.PartitionReducer;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> implements Reducer {
 

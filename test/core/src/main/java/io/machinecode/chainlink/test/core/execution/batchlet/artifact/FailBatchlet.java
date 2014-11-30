@@ -3,7 +3,7 @@ package io.machinecode.chainlink.test.core.execution.batchlet.artifact;
 import io.machinecode.chainlink.test.core.execution.Reference;
 
 /**
-* @author Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class FailBatchlet extends javax.batch.api.AbstractBatchlet {
     public static Reference<Boolean> hasRun = new Reference<Boolean>(false);

@@ -4,7 +4,7 @@ import io.machinecode.chainlink.jsl.fluent.FluentProperties
 import io.machinecode.chainlink.jsl.fluent.FluentProperty;
 
 /**
- * @author Brent Douglas (brent.n.douglas@gmail.com)
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class GroovyProperties {

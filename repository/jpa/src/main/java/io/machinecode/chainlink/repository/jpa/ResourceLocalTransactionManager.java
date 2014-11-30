@@ -11,7 +11,7 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ResourceLocalTransactionManager implements ExtendedTransactionManager {
 

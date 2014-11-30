@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.Mergeable;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 @XmlType
 public interface XmlTask<T extends XmlTask<T>> extends Mergeable<T>, Task {

@@ -4,7 +4,7 @@ import io.machinecode.chainlink.jsl.fluent.partition.FluentCollector
 import io.machinecode.chainlink.jsl.groovy.GroovyProperties;
 
 /**
- * @author Brent Douglas (brent.n.douglas@gmail.com)
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class GroovyCollector {

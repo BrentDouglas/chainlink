@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.validation;
 import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class InvalidJobException extends RuntimeException {
 

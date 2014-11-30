@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.fluent.partition;
 import io.machinecode.chainlink.jsl.core.inherit.InheritablePartition;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FluentPartition
         implements InheritablePartition<FluentPartition, FluentStrategy, FluentCollector, FluentAnalyser, FluentReducer> {

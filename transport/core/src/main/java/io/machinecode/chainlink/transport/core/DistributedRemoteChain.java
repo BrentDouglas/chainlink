@@ -10,7 +10,7 @@ import io.machinecode.then.core.DeferredImpl;
 import java.io.Serializable;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class DistributedRemoteChain<A, R extends DistributedRegistry<A, R>> extends ChainImpl<Void> {
 

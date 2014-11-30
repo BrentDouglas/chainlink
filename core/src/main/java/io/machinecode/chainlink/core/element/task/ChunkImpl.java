@@ -54,7 +54,7 @@ import static javax.batch.runtime.Metric.MetricType.WRITE_COUNT;
 import static javax.batch.runtime.Metric.MetricType.WRITE_SKIP_COUNT;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ChunkImpl implements Chunk, TaskWork, Serializable {
 

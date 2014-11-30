@@ -4,7 +4,7 @@ import com.mongodb.DBObject;
 import org.jongo.ResultHandler;
 
 /**
-* @author Brent Douglas <brent.n.douglas@gmail.com>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 class Handler<T> implements ResultHandler<T> {
 

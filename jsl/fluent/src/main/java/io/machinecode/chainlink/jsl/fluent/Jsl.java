@@ -24,7 +24,7 @@ import io.machinecode.chainlink.jsl.fluent.transition.FluentNext;
 import io.machinecode.chainlink.jsl.fluent.transition.FluentStop;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class Jsl {
 

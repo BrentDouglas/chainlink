@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import static javax.xml.bind.annotation.XmlAccessType.FIELD;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 @XmlAccessorType(FIELD)
 //@XmlType(name = "Next")

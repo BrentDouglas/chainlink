@@ -4,7 +4,7 @@ import io.machinecode.chainlink.core.validation.PropertyReferenceValidator;
 import io.machinecode.chainlink.spi.element.partition.Reducer;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ReducerValidator extends PropertyReferenceValidator<Reducer> {
 

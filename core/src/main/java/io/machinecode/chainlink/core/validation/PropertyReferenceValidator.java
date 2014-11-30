@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.element.PropertyReference;
 import io.machinecode.chainlink.spi.util.Messages;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class PropertyReferenceValidator<T extends PropertyReference> extends ValidatingVisitor<T> {
 

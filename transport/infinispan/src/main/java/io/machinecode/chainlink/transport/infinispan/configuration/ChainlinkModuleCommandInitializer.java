@@ -5,7 +5,7 @@ import org.infinispan.commands.ReplicableCommand;
 import org.infinispan.commands.module.ModuleCommandInitializer;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ChainlinkModuleCommandInitializer implements ModuleCommandInitializer {
 

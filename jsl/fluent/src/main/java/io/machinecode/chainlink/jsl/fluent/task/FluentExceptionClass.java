@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.fluent.task;
 import io.machinecode.chainlink.jsl.core.inherit.task.InheritableExceptionClass;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FluentExceptionClass implements InheritableExceptionClass<FluentExceptionClass> {
 

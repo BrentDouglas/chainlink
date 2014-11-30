@@ -9,7 +9,7 @@ import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.chainlink.transport.core.cmd.PushChainCommand;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CoherencePushChainCommand extends PushChainCommand<Member,CoherenceRegistry> implements DistributedCommand<ChainId,Member,CoherenceRegistry> {
 

@@ -8,7 +8,7 @@ import io.machinecode.chainlink.spi.registry.WorkerId;
 import java.util.UUID;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class DistributedUUIDId<A> implements ExecutionRepositoryId, ExecutableId, ChainId, WorkerId {
 

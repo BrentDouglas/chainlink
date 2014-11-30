@@ -11,7 +11,7 @@ import org.jboss.seam.mock.MockServletContext;
 import javax.servlet.ServletContext;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class SeamArtifactLoaderFactory implements ArtifactLoaderFactory {
 

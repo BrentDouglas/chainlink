@@ -13,7 +13,7 @@ import io.machinecode.chainlink.spi.expression.PropertyContext;
 import java.util.List;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FlowFactory implements ElementFactory<Flow, FlowImpl> {
 

@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.validation.visitor;
 import io.machinecode.chainlink.spi.element.Element;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class Visitor<T extends Element> {
 

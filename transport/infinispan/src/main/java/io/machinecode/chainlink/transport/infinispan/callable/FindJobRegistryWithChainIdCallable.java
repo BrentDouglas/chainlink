@@ -7,7 +7,7 @@ import org.infinispan.remoting.transport.Address;
 import javax.batch.operations.JobExecutionNotRunningException;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FindJobRegistryWithChainIdCallable extends BaseCallable<Object, Object, Address> {
 

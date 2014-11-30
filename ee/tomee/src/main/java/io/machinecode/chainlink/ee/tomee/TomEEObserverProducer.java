@@ -3,7 +3,7 @@ package io.machinecode.chainlink.ee.tomee;
 import org.apache.openejb.batchee.BatchObserverProducer;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class TomEEObserverProducer implements BatchObserverProducer {

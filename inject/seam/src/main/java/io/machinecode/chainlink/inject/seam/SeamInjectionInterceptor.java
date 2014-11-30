@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 @Name("seamInjectionInterceptor")
 @Scope(ScopeType.STATELESS)

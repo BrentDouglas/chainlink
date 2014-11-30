@@ -12,7 +12,7 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
 import java.io.Serializable;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.ItemReader> implements ItemReader {
 

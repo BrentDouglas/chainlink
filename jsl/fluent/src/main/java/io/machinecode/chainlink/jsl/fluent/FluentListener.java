@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.fluent;
 import io.machinecode.chainlink.spi.element.Listener;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FluentListener extends FluentPropertyReference<FluentListener> implements Listener {
     @Override

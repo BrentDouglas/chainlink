@@ -8,7 +8,7 @@ import org.jboss.marshalling.cloner.ClonerConfiguration;
 import org.jboss.marshalling.river.RiverMarshallerFactory;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class JbossMarshallingProviderFactory implements MarshallingProviderFactory {
     @Override

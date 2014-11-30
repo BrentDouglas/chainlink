@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.security.SecurityCheck;
 import javax.batch.operations.JobSecurityException;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class SecurityCheckImpl implements SecurityCheck {
 

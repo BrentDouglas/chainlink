@@ -5,7 +5,7 @@ import io.machinecode.chainlink.transport.infinispan.configuration.ChainlinkComm
 import org.infinispan.commands.remote.BaseRpcCommand;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class BaseChainlinkCommand extends BaseRpcCommand implements ChainlinkCommand {
 

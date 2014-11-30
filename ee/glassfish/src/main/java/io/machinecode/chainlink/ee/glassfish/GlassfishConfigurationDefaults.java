@@ -23,7 +23,7 @@ import javax.transaction.TransactionManager;
 import java.lang.management.ManagementFactory;
 
 /**
-* @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+* @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 * @since 1.0
 */
 public class GlassfishConfigurationDefaults implements ConfigurationDefaults {

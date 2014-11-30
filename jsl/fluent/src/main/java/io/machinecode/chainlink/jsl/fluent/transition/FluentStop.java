@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.fluent.transition;
 import io.machinecode.chainlink.jsl.core.inherit.transition.InheritableStop;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FluentStop extends FluentTerminatingTransition<FluentStop> implements InheritableStop<FluentStop> {
 

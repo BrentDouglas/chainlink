@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @see https://java.net/bugzilla/show_bug.cgi?id=4834
  */
 public class DelegateStepExecution implements StepExecution {

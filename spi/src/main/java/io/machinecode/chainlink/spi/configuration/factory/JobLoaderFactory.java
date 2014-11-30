@@ -4,7 +4,7 @@ import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public interface JobLoaderFactory extends Factory<JobLoader, LoaderConfiguration> {
 

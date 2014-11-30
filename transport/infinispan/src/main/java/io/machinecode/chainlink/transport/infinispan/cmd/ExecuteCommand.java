@@ -6,7 +6,7 @@ import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 import org.infinispan.context.InvocationContext;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ExecuteCommand extends BaseChainlinkCommand {
 

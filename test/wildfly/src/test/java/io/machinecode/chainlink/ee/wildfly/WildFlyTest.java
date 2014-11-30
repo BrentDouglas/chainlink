@@ -15,7 +15,7 @@ import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 @RunWith(Arquillian.class)

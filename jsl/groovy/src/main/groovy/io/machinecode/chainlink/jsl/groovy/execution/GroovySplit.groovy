@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.groovy.execution
 import io.machinecode.chainlink.jsl.fluent.execution.FluentSplit
 
 /**
- * @author Brent Douglas (brent.n.douglas@gmail.com)
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class GroovySplit {

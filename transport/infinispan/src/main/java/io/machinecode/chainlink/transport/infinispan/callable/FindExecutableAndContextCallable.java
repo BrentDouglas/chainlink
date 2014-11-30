@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FindExecutableAndContextCallable extends BaseCallable<Object, Object, ExecutableAndContext> {
 

@@ -13,7 +13,7 @@ import org.jvnet.hk2.annotations.Service;
 import javax.inject.Inject;
 
 /**
- * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 @Service

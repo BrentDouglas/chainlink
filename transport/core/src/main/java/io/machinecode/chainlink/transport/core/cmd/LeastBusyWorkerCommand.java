@@ -4,7 +4,7 @@ import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorkerId;
 
 /**
- * @author Brent Douglas <brent.n.douglas@gmail.com>
+ * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class LeastBusyWorkerCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<DistributedWorkerId<A>,A,R> {
 
