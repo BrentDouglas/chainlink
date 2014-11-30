@@ -19,29 +19,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.arquillian.core</groupId>
-            <artifactId>arquillian-core-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -162,7 +141,7 @@
             </activation>
             <properties>
                 <container.debug>true</container.debug>
-                <wildfly.jvm.arguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9009</wildfly.jvm.arguments>
+                <wildfly.jvm.arguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
             </properties>
         </profile>
     </profiles>

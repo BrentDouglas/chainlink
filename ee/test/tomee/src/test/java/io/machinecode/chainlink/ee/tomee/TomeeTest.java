@@ -5,7 +5,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,12 +22,12 @@ public class TomeeTest extends Assert {
 
     @Deployment
     public static Archive<?> deploy() {
-        return ShrinkWrap.create(JavaArchive.class, TomeeTest.class.getSimpleName() + ".jar")
+        return ShrinkWrap.create(WebArchive.class, TomeeTest.class.getSimpleName() + ".war")
                 .addClass(TomeeTest.class);
     }
 
     @Test
-    public void testGlassfish() throws Exception {
+    public void testTomee() throws Exception {
         final JobOperator operator = BatchRuntime.getJobOperator();
         assertNotNull(operator);
         assertEquals(JobOperatorView.class, operator.getClass());

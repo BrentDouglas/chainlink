@@ -27,6 +27,10 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-ee-tomee</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-ee-wildfly</artifactId>
         </dependency>
         <dependency>

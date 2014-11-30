@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns="http://jboss.org/schema/arquillian"
             xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
@@ -10,10 +10,7 @@
             <property name="ajpPort">-1</property>
             <property name="dir">${tomee.dir}</property>
             <property name="appWorkingDir">${tests.dir}</property>
-            <property name="properties">
-                openejb.classloader.forced-load=org.apache.openejb
-                org.apache.openejb.batchee.BatchObserverProducer=io.machinecode.chainlink.ee.tomee.TomeeObserverProducer
-            </property>
+            <property name="properties">org.apache.openejb.batchee.BatchObserverProducer=io.machinecode.chainlink.ee.tomee.TomEEObserverProducer</property>
             <property name="debug">${container.debug}</property>
             <property name="debugPort">9009</property>
         </configuration>

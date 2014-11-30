@@ -116,6 +116,9 @@ public class EventedWorker extends Thread implements Worker {
     @Override
     public void close() {
         running = false;
+        synchronized (lock) {
+            lock.notifyAll();
+        }
     }
 
     @Override

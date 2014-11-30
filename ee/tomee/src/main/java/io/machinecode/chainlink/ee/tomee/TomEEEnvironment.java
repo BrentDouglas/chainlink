@@ -1,5 +1,6 @@
-package io.machinecode.chainlink.ee.glassfish;
+package io.machinecode.chainlink.ee.tomee;
 
+import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
@@ -10,9 +11,13 @@ import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.util.Messages;
-import org.glassfish.internal.data.ApplicationInfo;
+import org.apache.openejb.AppContext;
+import org.apache.openejb.assembler.classic.AppInfo;
+import org.apache.openejb.assembler.classic.event.AssemblerAfterApplicationCreated;
+import org.apache.openejb.assembler.classic.event.AssemblerBeforeApplicationDestroyed;
+import org.apache.openejb.observer.Observes;
+import org.apache.openejb.observer.event.ObserverAdded;
 
-import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -28,9 +33,15 @@ import java.util.concurrent.ConcurrentMap;
  * @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
  * @since 1.0
  */
-public class GlassfishEnvironment implements Environment {
+public class TomEEEnvironment implements Environment {
 
     private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<String, App>();
+
+    public void init(@Observes final ObserverAdded event) {
+        if (event.getObserver() == this) {
+            Chainlink.setEnvironment(this);
+        }
+    }
 
     @Override
     public ExtendedJobOperator getJobOperator(final String id) throws NoConfigurationWithIdException {
@@ -54,12 +65,14 @@ public class GlassfishEnvironment implements Environment {
         return Collections.emptyMap();
     }
 
-    public void addApplication(final ApplicationInfo info) throws Exception {
-        App app = this.operators.get(info.getName());
-        final ClassLoader loader = info.getAppClassLoader();
+    public void postCreateApp(@Observes final AssemblerAfterApplicationCreated event) {
+        final AppInfo info = event.getApp();
+        final AppContext context = event.getContext();
+        final ClassLoader loader = context.getClassLoader();
+        App app = this.operators.get(info.appId);
         if (app == null) {
             app = new App(loader);
-            this.operators.put(info.getName(), app);
+            this.operators.put(info.appId, app);
         }
         final List<ConfigurationFactory> factories;
         try {
@@ -69,8 +82,8 @@ public class GlassfishEnvironment implements Environment {
             throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
         }
         try {
-            final TransactionManager transactionManager = InitialContext.doLookup("java:appserver/TransactionManager");
-            final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, transactionManager);
+            final TransactionManager transactionManager = context.getSystemInstance().getComponent(TransactionManager.class);
+            final TomEEConfigurationDefaults defaults = new TomEEConfigurationDefaults(loader, transactionManager);
 
             boolean haveDefault = false;
             if (factories.isEmpty()) {
@@ -83,7 +96,7 @@ public class GlassfishEnvironment implements Environment {
                     for (final XmlConfiguration configuration : xml.getConfigurations()) {
                         app.ops.put(
                                 configuration.getId(),
-                                new JobOperatorImpl(GlassfishConfigutation.xmlToBuilder(configuration)
+                                new JobOperatorImpl(TomEEConfigutation.xmlToBuilder(configuration)
                                         .setConfigurationDefaults(defaults)
                                         .build()
                                 )
@@ -110,7 +123,7 @@ public class GlassfishEnvironment implements Environment {
             if (!haveDefault) {
                 app.ops.put(
                         Constants.DEFAULT_CONFIGURATION,
-                        new JobOperatorImpl(new GlassfishConfigutation.Builder()
+                        new JobOperatorImpl(new TomEEConfigutation.Builder()
                                 .setConfigurationDefaults(defaults)
                                 .build()
                         )
@@ -121,9 +134,9 @@ public class GlassfishEnvironment implements Environment {
         }
     }
 
-    public void removeApplication(final ApplicationInfo info) throws Exception {
+    public void preDestroyApp(@Observes final AssemblerBeforeApplicationDestroyed event) throws Exception {
         final App app = this.operators.remove(
-                info.getName()
+                event.getApp().appId
         );
         Exception exception = null;
         for (final JobOperatorImpl x : app.ops.values()) {
