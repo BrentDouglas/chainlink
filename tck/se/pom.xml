@@ -13,10 +13,16 @@
 
     <properties>
         <container.dir>${project.basedir}/target/chainlinkd</container.dir>
-        <deployment.dir>${container.dir}/chainlink-${project.version}/app/</deployment.dir>
+        <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
+        <deployment.dir>${chainlink.dir}/app/</deployment.dir>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-se</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-tck-core</artifactId>
@@ -47,12 +53,20 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>ensure-test-properties</id>
+                        <phase>initialize</phase>
+                    </execution>
+                    <execution>
                         <id>create-test-resources</id>
                         <phase>generate-test-resources</phase>
                     </execution>
                     <execution>
+                        <id>destroy-test-resources</id>
+                        <phase>post-integration-test</phase>
+                    </execution>
+                    <execution>
                         <id>copy-test-artifact</id>
-                        <phase>process-test-classes</phase>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
@@ -73,15 +87,14 @@
                         <phase>pre-integration-test</phase>
                         <configuration>
                             <target>
-                                <!-- Setup other instance in case we are testing a clustering registry. -->
                                 <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-chainlinkd.zip"
                                        dest="${container.dir}"/>
-                                <chmod file="${container.dir}/chainlink-${project.version}/install" perm="754"/>
-                                <exec executable="${container.dir}/chainlink-${project.version}/install"
-                                      dir="${container.dir}/chainlink-${project.version}"/>
+                                <chmod file="${chainlink.dir}/install" perm="754"/>
+                                <exec executable="${chainlink.dir}/install"
+                                      dir="${chainlink.dir}"/>
 
                                 <copy file="${project.basedir}/../chainlink-tck.xml"
-                                      tofile="${container.dir}/chainlink-${project.version}/cnf/chainlink-tck.xml"
+                                      tofile="${chainlink.dir}/cnf/chainlink-tck.xml"
                                       filtering="true"
                                       overwrite="true">
                                     <filterset>
@@ -99,14 +112,14 @@
                                     </filterset>
                                 </copy>
                                 <copy file="${project.basedir}/../chainlink-tck.properties"
-                                      tofile="${container.dir}/chainlink-${project.version}/cnf/chainlink-tck.properties"
+                                      tofile="${chainlink.dir}/cnf/chainlink-tck.properties"
                                       overwrite="true">
                                 </copy>
 
-                                <chmod file="${container.dir}/chainlink-${project.version}/bin/*" perm="754"/>
+                                <chmod file="${chainlink.dir}/bin/*" perm="754"/>
 
-                                <exec executable="${container.dir}/chainlink-${project.version}/bin/chainlink"
-                                      dir="${container.dir}/chainlink-${project.version}/bin">
+                                <exec executable="${chainlink.dir}/bin/chainlink"
+                                      dir="${chainlink.dir}/bin">
                                     <arg value="-p"/>
                                     <arg value="chainlink-tck.properties"/>
                                     <arg value="-d"/>
@@ -122,13 +135,12 @@
                         <phase>post-integration-test</phase>
                         <configuration>
                             <target>
-                                <!-- Kill instance. Executed from test modules pom -->
-                                <exec executable="${container.dir}/chainlink-${project.version}/bin/chainlink"
-                                      dir="${container.dir}/chainlink-${project.version}/bin">
+                                <exec executable="${chainlink.dir}/bin/chainlink"
+                                      dir="${chainlink.dir}/bin">
                                     <arg value="-k"/>
                                 </exec>
-                                <exec executable="${container.dir}/chainlink-${project.version}/install"
-                                      dir="${container.dir}/chainlink-${project.version}">
+                                <exec executable="${chainlink.dir}/install"
+                                      dir="${chainlink.dir}">
                                     <arg value="-u"/>
                                 </exec>
                             </target>
@@ -140,10 +152,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
-                    <execution>
-                        <id>add-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                    </execution>
                     <execution>
                         <id>add-test-resources</id>
                         <phase>generate-test-resources</phase>
@@ -157,6 +165,10 @@
                     <execution>
                         <id>copy</id>
                         <phase>process-test-classes</phase>
+                    </execution>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>process-test-sources</phase>
                     </execution>
                 </executions>
             </plugin>

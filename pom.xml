@@ -56,11 +56,10 @@
     <properties>
         <version.java>1.6</version.java>
 
-        <version.com.boundary.high-scale-lib>1.0.6</version.com.boundary.high-scale-lib>
         <version.com.google.inject.guice>3.0</version.com.google.inject.guice>
         <version.com.hazelcast.hazelcast>3.3</version.com.hazelcast.hazelcast>
-        <version.com.ibm.batch.com.ibm.batch-tck>1.0</version.com.ibm.batch.com.ibm.batch-tck>
-        <version.com.ibm.batch.com.ibm.batch-tck-spi>${version.com.ibm.batch.com.ibm.batch-tck}</version.com.ibm.batch.com.ibm.batch-tck-spi>
+        <version.com.ibm.jbatch.com.ibm.jbatch.tck>1.0.1-b01</version.com.ibm.jbatch.com.ibm.jbatch.tck>
+        <version.com.ibm.jbatch.com.ibm.jbatch.tck.spi>${version.com.ibm.jbatch.com.ibm.jbatch.tck}</version.com.ibm.jbatch.com.ibm.jbatch.tck.spi>
         <version.com.oracle.coherence.coherence>12.1.2-0-0</version.com.oracle.coherence.coherence>
         <version.dom4j>1.6.1</version.dom4j>
         <version.gnu-getopt.getopt>1.0.13</version.gnu-getopt.getopt>
@@ -81,7 +80,7 @@
         <version.org.hibernate>4.2.5.Final</version.org.hibernate>
         <version.org.hibernate.hibernate-validator>3.1.0.GA</version.org.hibernate.hibernate-validator>
         <version.org.infinispan.infinispan-bom>6.0.2.Final</version.org.infinispan.infinispan-bom>
-        <version.org.javassist.javassist>3.13.0-GA</version.org.javassist.javassist>
+        <version.org.javassist.javassist>3.18.2-GA</version.org.javassist.javassist>
         <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.marshalling.jboss-marshalling>1.4.10.Final</version.org.jboss.marshalling.jboss-marshalling>
         <version.org.jboss.seam.jboss-seam>2.2.2.Final</version.org.jboss.seam.jboss-seam>
@@ -108,8 +107,7 @@
         <version.org.codehaus.mojo.properties-maven-plugin>1.0-alpha-2</version.org.codehaus.mojo.properties-maven-plugin>
 
         <!-- EE -->
-        <version.org.glassfish.major>4</version.org.glassfish.major>
-        <version.org.glassfish>${version.org.glassfish.major}.1</version.org.glassfish>
+        <version.org.glassfish>4.1</version.org.glassfish>
         <version.org.glassfish.main.common.glassfish-api>${version.org.glassfish}</version.org.glassfish.main.common.glassfish-api>
         <version.org.glassfish.main.common.internal-api>${version.org.glassfish}</version.org.glassfish.main.common.internal-api>
         <version.org.apache.openejb.openejb-core>5.0.0-SNAPSHOT</version.org.apache.openejb.openejb-core>
@@ -128,24 +126,19 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.boundary</groupId>
-                <artifactId>high-scale-lib</artifactId>
-                <version>${version.com.boundary.high-scale-lib}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>${version.com.google.inject.guice}</version>
             </dependency>
             <dependency>
                 <groupId>com.ibm.jbatch</groupId>
-                <artifactId>com.ibm.jbatch-tck-spi</artifactId>
-                <version>${version.com.ibm.batch.com.ibm.batch-tck-spi}</version>
+                <artifactId>com.ibm.jbatch.tck.spi</artifactId>
+                <version>${version.com.ibm.jbatch.com.ibm.jbatch.tck.spi}</version>
             </dependency>
             <dependency>
                 <groupId>com.ibm.jbatch</groupId>
-                <artifactId>com.ibm.jbatch-tck</artifactId>
-                <version>${version.com.ibm.batch.com.ibm.batch-tck}</version>
+                <artifactId>com.ibm.jbatch.tck</artifactId>
+                <version>${version.com.ibm.jbatch.com.ibm.jbatch.tck}</version>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>

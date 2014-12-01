@@ -71,7 +71,7 @@
                     <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Embed-Dependency>trove4j;inline=true</Embed-Dependency>
-                        <_exportcontents>gnu.trove,gnu.trove.*</_exportcontents>
+                        <_exportcontents>io.machinecode.chainlink.ee.glassfish,io.machinecode.chainlink.ee.glassfish.console,gnu.trove,gnu.trove.*</_exportcontents>
                     </instructions>
                 </configuration>
             </plugin>

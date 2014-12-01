@@ -1,10 +1,9 @@
 package io.machinecode.chainlink.tck.core;
 
-import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.spi.configuration.ConfigurationBuilder;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
-import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
@@ -22,15 +21,9 @@ import java.util.ServiceConfigurationError;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class TckConfigurationFactory implements ConfigurationFactory {
+public class TckConfigurator {
 
-    @Override
-    public String getId() {
-        return Constants.DEFAULT_CONFIGURATION;
-    }
-
-    @Override
-    public Builder produce() throws Exception {
+    public static <T extends ConfigurationBuilder<T>> T produce(final T builder) throws Exception {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
         List<TransactionManagerFactory> transactionManagers = null;
@@ -67,9 +60,8 @@ public class TckConfigurationFactory implements ConfigurationFactory {
         List<ExecutorFactory> executors = new ResolvableService<ExecutorFactory>(ExecutorFactory.class).resolve(tccl);
         List<RegistryFactory> registries = new ResolvableService<RegistryFactory>(RegistryFactory.class).resolve(tccl);
         List<WorkerFactory> workers = new ResolvableService<WorkerFactory>(WorkerFactory.class).resolve(tccl);
-        return new Builder()
+        return builder
                 .setProperty(Constants.THREAD_POOL_SIZE, "8")
-                .setClassLoader(tccl)
                 .setTransactionManagerFactory(transactionManagers == null || transactionManagers.isEmpty() ? null : transactionManagers.get(0))
                 .setArtifactLoaderFactories(artifactLoaders == null || artifactLoaders.isEmpty() ? null : artifactLoaders.toArray(new ArtifactLoaderFactory[artifactLoaders.size()]))
                 .setInjectorFactories(injectors == null || injectors.isEmpty() ? null : injectors.toArray(new InjectorFactory[injectors.size()]))

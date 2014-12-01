@@ -6,7 +6,7 @@ An implementation of JSR-352.
 
 Chainlink aims to implement JSR-352 in a modular and easily extensible
 fashion. Each of the major components of the system should be user
-replacable without requiring an in depth knowledge of the specification
+replaceable without requiring an in depth knowledge of the specification
 if possible. It also aims to provide reasonable default implementations
 of these components for a wide range of external libraries.
 
@@ -99,11 +99,9 @@ git clone git://java.net/jbatch~jsr-352-git-repository <target>
 ```
 
 Copy [test.template.properties](test.template.properties)
-to `test.properties` and set `tck.source` to the directory you checked
-the sources out at (`<target>` in the above command). This file is used
-to configure maven to run the tests. All properties in this file will
-be passed to Failsafe and available from `System.getProperty(...)` in
-the test JVM.
+to `test.properties`. This file is used to configure maven to run the
+tests. All properties in this file will be passed to Failsafe and
+available from `System.getProperty(...)` in the test JVM.
 
 Copy [chainlink-tck.template.properties](tck/chainlink-tck.template.properties)
 to `chainlink-tck.properties` though it is only used for transports
@@ -111,26 +109,27 @@ running on two JVM's. All properties in this file will be passed to
 Failsafe and available from `System.getProperty(...)` in the secondary
 JVM.
 
+The test process will create these files from the templates when
+running the tests if they are not found.
+
 Create the directories `/var/run/chainlink` and `/var/log/chainlink`
 and make sure the user running the tests has write permissions to them.
 
-Maven will copy the chainlink daemon and relevant test jars into a
-directory specified by the property `tck.work.dir` in `test.properties`
-(/tmp by default), start it before running the tests and stop it afterwards.
-
-If the maven process is killed before shutting down the second process
-you might need to shut it down manually, which you can do by running
-`<tck.work.dir>/chainlink-<version>/bin/chainlink -k`.
+Maven will start a chainlink daemon before running the tests and stop
+it afterwards. If the maven process is killed before shutting down the
+second process you might need to shut it down manually, which you can
+do by running `./tck/se/target/chainlink-<version>/bin/chainlink -k`.
 
 To run the TCK you must select an injector via a maven profile (there is
 no default) and you may select an alternate  repository (an in memory
 repository will be used by default) and/or an alternate transport.
 
-Run `mvn clean install -Ptck -Pin-x -Pre-x -Ptr-x` where the in-x, re-x
-and tr-x are the profiles of injector, repository and transport you
-wish to use. You can see the available tck profiles in [the tck modules pom](tck/pom.xml).
+Run `mvn clean install -Ptck,se,in-x,re-x,tr-x,ma-x` where the
+in-x, re-x and tr-x are the profiles of injector, repository, transport
+and marshaller you wish to use. You can see the available tck profiles
+in [the tck modules pom](tck/pom.xml).
 
-An example minimum command to run the TCK is `mvn clean install -Ptck -Pin-cdi`.
+An example minimum command to run the TCK is `mvn clean install -Ptck,se`.
 
 ## Remote transports
 
@@ -146,7 +145,7 @@ use:
 ```shell
 CHAINLINK_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006" \
     mvn clean install \
-        -Ptck -Pin-cdi -Ptr-<x> \
+        -Ptck,se,tr-<x> \
         -Dmaven.failsafe.debug
 ```
 
@@ -167,8 +166,6 @@ And allow traffic through iptables:
 
 ## Infinispan and JGroups Tests
 
-Make sure `tck.source` and `tck.work.dir` are set in `test.properties`.
-
 The background process should have the following properties passed to
 it, either through the `CHAINLINK_OPTS` environment variable or
 `chainlink-tck.properties`:
@@ -182,7 +179,7 @@ Failsafe should also be provided the same properties. To execute the
 tests you can run something like this (though any injector and
 repository profile can be used):
 
-`mvn clean install -Ptck -Pin-cdi -Ptr-infinispan`
+`mvn clean install -Ptck,se,tr-infinispan`
 
 ## Known issues
 
@@ -192,13 +189,6 @@ _MariaDB_
   due to the `create_time` field only having second resolution. This may
   or may not be a problem depending on the workload (i.e. if your steps
   run for over 1 second it will be fine).
-
-_Infinispan Transport_
-
-- Doesn't pass the TCK yet as one of the TCK classes `ExternalizableString`
-  is not actually `Externalizable`. When a no-args constructor is added to
-  `ExternalizableString` as per the `Externalizable` requirements it passes
-  all the TCK tests. See [TCK bug #6155](https://java.net/bugzilla/show_bug.cgi?id=6155).
 
 # Work in progress components
 

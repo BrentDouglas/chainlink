@@ -33,6 +33,7 @@ import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,6 +67,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     protected final byte[] JOB_NAMES;
 
+    protected final WeakReference<ClassLoader> loader;
     protected final JedisShardInfo info;
     protected final Marshaller marshaller;
     protected final Unmarshaller unmarshaller;
@@ -75,7 +77,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
         return info.createResource();
     }
 
-    public RedisExecutionRepository(final JedisShardInfo info, final MarshallingProvider provider) throws IOException {
+    public RedisExecutionRepository(final JedisShardInfo info, final ClassLoader loader, final MarshallingProvider provider) throws Exception {
+        this.loader = new WeakReference<ClassLoader>(loader);
         this.info = info;
         this.marshaller = provider.getMarshaller();
         this.unmarshaller = provider.getUnmarshaller();
@@ -519,7 +522,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             final Set<byte[]> names = jedis.smembers(JOB_NAMES);
             final Set<String> ret = new THashSet<String>();
             for (final byte[] name : names) {
-                ret.add((String) unmarshaller.unmarshall(name));
+                ret.add((String) unmarshaller.unmarshall(name, this.loader.get()));
             }
             return ret;
         } finally {
@@ -698,7 +701,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if (jobExecution == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            final Long latest = (Long) unmarshaller.unmarshall(jedis.get(marshaller.marshall(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, jobExecution.getJobInstanceId())));
+            final Long latest = (Long) unmarshaller.unmarshall(jedis.get(marshaller.marshall(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, jobExecution.getJobInstanceId())), this.loader.get());
             if (latest == null) {
                 throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobExecutionId));
             }
@@ -984,38 +987,38 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     private ExtendedJobInstance _ji(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(JOB_INSTANCE_PREFIX, id));
-        return response == null ? null : (ExtendedJobInstance) unmarshaller.unmarshall(response);
+        return response == null ? null : (ExtendedJobInstance) unmarshaller.unmarshall(response, this.loader.get());
     }
 
     private ExtendedJobInstance _ji(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
-        return _ji(jedis, unmarshaller.unmarshall(id, Long.class));
+        return _ji(jedis, unmarshaller.unmarshall(id, Long.class, this.loader.get()));
     }
 
     private ExtendedJobExecution _je(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(JOB_EXECUTION_PREFIX, id));
-        return response == null ? null : (ExtendedJobExecution) unmarshaller.unmarshall(response);
+        return response == null ? null : (ExtendedJobExecution) unmarshaller.unmarshall(response, this.loader.get());
     }
 
     private ExtendedJobExecution _je(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
-        return _je(jedis, unmarshaller.unmarshall(id, Long.class));
+        return _je(jedis, unmarshaller.unmarshall(id, Long.class, this.loader.get()));
     }
 
     private ExtendedStepExecution _se(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(STEP_EXECUTION_PREFIX, id));
-        return response == null ? null : (ExtendedStepExecution) unmarshaller.unmarshall(response);
+        return response == null ? null : (ExtendedStepExecution) unmarshaller.unmarshall(response, this.loader.get());
     }
 
     private ExtendedStepExecution _se(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
-        return _se(jedis, unmarshaller.unmarshall(id, Long.class));
+        return _se(jedis, unmarshaller.unmarshall(id, Long.class, this.loader.get()));
     }
 
     private PartitionExecution _pe(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(PARTITION_EXECUTION_PREFIX, id));
-        return (PartitionExecution) unmarshaller.unmarshall(response);
+        return (PartitionExecution) unmarshaller.unmarshall(response, this.loader.get());
     }
 
     private PartitionExecution _pe(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
-        return _pe(jedis, unmarshaller.unmarshall(id, Long.class));
+        return _pe(jedis, unmarshaller.unmarshall(id, Long.class, this.loader.get()));
     }
 
     private List<byte[]> _list(final BinaryJedisCommands jedis, final byte[] prefix, final long id) throws IOException {
@@ -1029,7 +1032,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
     }
 
     private List<byte[]> _list(final BinaryJedisCommands jedis, final byte[] prefix, final byte[] id) throws IOException, ClassNotFoundException {
-        final byte[] key = marshaller.marshall(prefix, unmarshaller.unmarshall(id));
+        final byte[] key = marshaller.marshall(prefix, unmarshaller.unmarshall(id, this.loader.get()));
         return jedis.lrange(key, 0, jedis.llen(key));
     }
 }

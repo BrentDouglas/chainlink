@@ -37,10 +37,14 @@ public class GlassfishEnvironment implements Environment {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
-                return app.ops.get(id);
+                final JobOperatorImpl op = app.ops.get(id);
+                if (op == null) {
+                    throw new NoConfigurationWithIdException("No configuration for id: " + id); //TODO Message
+                }
+                return op;
             }
         }
-        throw new NoConfigurationWithIdException("No configuration for id: " + id); //TODO Message
+        throw new NoConfigurationWithIdException("Chainlink not configured for TCCL: " + tccl); //TODO Message
     }
 
     @Override
@@ -72,18 +76,36 @@ public class GlassfishEnvironment implements Environment {
             final TransactionManager transactionManager = InitialContext.doLookup("java:appserver/TransactionManager");
             final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, transactionManager);
 
-            boolean haveDefault = false;
-            if (factories.isEmpty()) {
-                final InputStream stream = loader.getResourceAsStream("chainlink.xml");
-                if (stream != null) {
-                    final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
-                    final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
-                    final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
+            final Thread thread = Thread.currentThread();
+            final ClassLoader tccl = thread.getContextClassLoader();
+            thread.setContextClassLoader(loader);
+            try {
+                boolean haveDefault = false;
+                if (factories.isEmpty()) {
+                    final InputStream stream = loader.getResourceAsStream("chainlink.xml");
+                    if (stream != null) {
+                        final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
+                        final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+                        final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
 
-                    for (final XmlConfiguration configuration : xml.getConfigurations()) {
+                        for (final XmlConfiguration configuration : xml.getConfigurations()) {
+                            app.ops.put(
+                                    configuration.getId(),
+                                    new JobOperatorImpl(GlassfishConfigutation.xmlToBuilder(configuration)
+                                            .setConfigurationDefaults(defaults)
+                                            .build()
+                                    )
+                            );
+                            if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getId())) {
+                                haveDefault = true;
+                            }
+                        }
+                    }
+                } else {
+                    for (final ConfigurationFactory configuration : factories) {
                         app.ops.put(
                                 configuration.getId(),
-                                new JobOperatorImpl(GlassfishConfigutation.xmlToBuilder(configuration)
+                                new JobOperatorImpl(configuration.produce()
                                         .setConfigurationDefaults(defaults)
                                         .build()
                                 )
@@ -93,28 +115,17 @@ public class GlassfishEnvironment implements Environment {
                         }
                     }
                 }
-            } else {
-                for (final ConfigurationFactory configuration : factories) {
+                if (!haveDefault) {
                     app.ops.put(
-                            configuration.getId(),
-                            new JobOperatorImpl(configuration.produce()
+                            Constants.DEFAULT_CONFIGURATION,
+                            new JobOperatorImpl(new GlassfishConfigutation.Builder()
                                     .setConfigurationDefaults(defaults)
                                     .build()
                             )
                     );
-                    if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getId())) {
-                        haveDefault = true;
-                    }
                 }
-            }
-            if (!haveDefault) {
-                app.ops.put(
-                        Constants.DEFAULT_CONFIGURATION,
-                        new JobOperatorImpl(new GlassfishConfigutation.Builder()
-                                .setConfigurationDefaults(defaults)
-                                .build()
-                        )
-                );
+            } finally {
+                thread.setContextClassLoader(tccl);
             }
         } catch (final Exception e) {
             throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);

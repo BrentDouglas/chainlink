@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public interface Unmarshaller {
 
-    Serializable unmarshall(final byte[] that) throws ClassNotFoundException, IOException;
+    Serializable unmarshall(final byte[] that, final ClassLoader loader) throws ClassNotFoundException, IOException;
 
-    <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException;
+    <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz, final ClassLoader loader) throws ClassNotFoundException, IOException;
 }

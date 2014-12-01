@@ -12,6 +12,7 @@ import java.io.InvalidClassException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -64,21 +65,26 @@ public class JdkMarshallingProvider implements Marshaller, Unmarshaller, Cloner,
     }
 
     @Override
-    public Serializable unmarshall(final byte[] that) throws ClassNotFoundException, IOException {
+    public Serializable unmarshall(final byte[] that, final ClassLoader loader) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
-        return unmarshall(that, Serializable.class);
+        return unmarshall(that, Serializable.class, loader);
     }
 
     @Override
-    public <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException {
+    public <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz, final ClassLoader loader) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
         ObjectInputStream unmarshaller = null;
         try {
-            unmarshaller = new ObjectInputStream(new ByteArrayInputStream(that));
+            unmarshaller = new ObjectInputStream(new ByteArrayInputStream(that)) {
+                @Override
+                protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                    return loader.loadClass(desc.getName());
+                }
+            };
             final Object ret = unmarshaller.readObject();
             return clazz.cast(ret);
         } finally {
@@ -95,7 +101,7 @@ public class JdkMarshallingProvider implements Marshaller, Unmarshaller, Cloner,
             return null;
         }
         if (that instanceof Serializable) {
-            return (T) unmarshall(marshall((Serializable)that));
+            return (T) unmarshall(marshall((Serializable)that), that.getClass().getClassLoader());
         } else if (that instanceof Cloneable) {
             final Method method = AccessController.doPrivileged(new PrivilegedAction<Method>() {
                 public Method run() {

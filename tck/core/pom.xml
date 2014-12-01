@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
-            <artifactId>com.ibm.jbatch-tck</artifactId>
+            <artifactId>com.ibm.jbatch.tck</artifactId>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -24,15 +24,11 @@
                 </exclusion>
                 <exclusion>
                     <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-model</artifactId>
+                    <artifactId>com.ibm.jbatch.spi</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-ri-spi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-runtime</artifactId>
+                    <artifactId>com.ibm.jbatch.container</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -124,11 +120,6 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-redis</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-se</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -257,30 +248,27 @@
             <artifactId>jedis</artifactId>
             <scope>provided</scope>
         </dependency>
-    </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>validate-tck-source</id>
-                        <phase>generate-test-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>read-properties</id>
-                        <phase>generate-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+        <!-- For instrument-->
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap</groupId>
+            <artifactId>shrinkwrap-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

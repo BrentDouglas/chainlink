@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.test;
 
 import io.machinecode.chainlink.repository.redis.RedisExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import redis.clients.jedis.JedisShardInfo;
@@ -17,6 +18,7 @@ public class RedisRepositoryTest extends RepositoryTest {
                         System.getProperty("redis.host"),
                         Integer.parseInt(System.getProperty("redis.port"))
                 ),
+                Thread.currentThread().getContextClassLoader(),
                 marshallerFactory().produce(null)
         );
     }

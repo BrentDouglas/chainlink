@@ -17,6 +17,7 @@ public class RedisExecutionRepositoryFactory implements ExecutionRepositoryFacto
                         System.getProperty("redis.host"),
                         Integer.parseInt(System.getProperty("redis.port"))
                 ),
+                configuration.getClassLoader(),
                 configuration.getMarshallingProviderFactory().produce(configuration)
         );
     }

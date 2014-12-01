@@ -65,18 +65,19 @@ public class JbossMarshallingProvider implements Marshaller, Unmarshaller, Clone
     }
 
     @Override
-    public Serializable unmarshall(final byte[] that) throws ClassNotFoundException, IOException {
+    public Serializable unmarshall(final byte[] that, final ClassLoader loader) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
-        return unmarshall(that, Serializable.class);
+        return unmarshall(that, Serializable.class, loader);
     }
 
     @Override
-    public <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz) throws ClassNotFoundException, IOException {
+    public <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz, final ClassLoader loader) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
+        //TODO Read out of loader
         final org.jboss.marshalling.Unmarshaller unmarshaller = marshallerFactory.createUnmarshaller(marshallingConfiguration);
         unmarshaller.start(new ByteBufferInput(ByteBuffer.wrap(that)));
         final Object ret = unmarshaller.readObject();

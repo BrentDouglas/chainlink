@@ -13,12 +13,15 @@
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
-        <module>se</module>
     </modules>
 
     <properties>
-        <!-- This property is for the child projects, not this one -->
-        <test.properties>../../test.properties</test.properties>
+        <!-- These properties are for the child projects, not this one -->
+        <test.properties.dir>../..</test.properties.dir>
+        <test.properties>${test.properties.dir}/test.properties</test.properties>
+        <tck.source>${project.build.directory}/tck-source</tck.source>
+
+        <container.debug>false</container.debug>
 
         <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
@@ -27,12 +30,13 @@
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
         <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshalling.provider.factory.class>
 
+        <injector.configuration.source.file>batch.xml</injector.configuration.source.file>
         <injector.configuration.destination.file>${injector.configuration.source.file}</injector.configuration.destination.file>
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
 
-        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.17</version.org.apache.maven.plugins.maven-failsafe-plugin>
+        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.18</version.org.apache.maven.plugins.maven-failsafe-plugin>
     </properties>
 
     <dependencies>
@@ -48,23 +52,12 @@
         </dependency>
         <dependency>
             <groupId>com.ibm.jbatch</groupId>
-            <artifactId>com.ibm.jbatch-tck-spi</artifactId>
+            <artifactId>com.ibm.jbatch.tck.spi</artifactId>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>javax.batch</groupId>
                     <artifactId>javax.batch-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-model</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-ri-spi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-runtime</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -143,11 +136,6 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-se</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-core</artifactId>
             <scope>test</scope>
         </dependency>
@@ -174,6 +162,11 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-jgroups</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -265,11 +258,9 @@
                 <property><name>glassfish</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
-        <!--
             <modules>
                 <module>glassfish</module>
             </modules>
-        -->
         </profile>
         <profile>
             <id>tomee</id>
@@ -294,6 +285,16 @@
                 <module>wildfly</module>
             </modules>
         -->
+        </profile>
+        <profile>
+            <id>debug</id>
+            <activation>
+                <property><name>debug</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <container.debug>true</container.debug>
+            </properties>
         </profile>
 
         <!-- Transport -->
@@ -442,23 +443,6 @@
 
         <!-- Injector -->
         <profile>
-            <id>in-batch</id>
-            <activation>
-                <property><name>in-batch</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <injector.configuration.source.file>batch.xml</injector.configuration.source.file>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.inject</groupId>
-                    <artifactId>javax.inject</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>in-cdi</id>
             <activation>
                 <property><name>in-cdi</name></property>
@@ -505,20 +489,16 @@
                 </dependency>
                 <dependency>
                     <groupId>com.ibm.jbatch</groupId>
-                    <artifactId>com.ibm.jbatch-tck</artifactId>
+                    <artifactId>com.ibm.jbatch.tck</artifactId>
                     <scope>test</scope>
                     <exclusions>
                         <exclusion>
                             <groupId>com.ibm.jbatch</groupId>
-                            <artifactId>com.ibm.jbatch-model</artifactId>
+                            <artifactId>com.ibm.jbatch.spi</artifactId>
                         </exclusion>
                         <exclusion>
                             <groupId>com.ibm.jbatch</groupId>
-                            <artifactId>com.ibm.jbatch-ri-spi</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>com.ibm.jbatch</groupId>
-                            <artifactId>com.ibm.jbatch-runtime</artifactId>
+                            <artifactId>com.ibm.jbatch.container</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -681,23 +661,21 @@
                     <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
                     <executions>
                         <execution>
-                            <id>validate-tck-source</id>
+                            <id>ensure-test-properties</id>
                             <goals>
                                 <goal>run</goal>
                             </goals>
                             <phase>none</phase>
                             <configuration>
                                 <target>
-                                    <condition property="invalid.tck.source">
-                                        <not>
-                                            <and>
-                                                <resourcecontains resource="${tck.source}/pom.xml" substring="groupId>javax.batch"/>
-                                                <resourcecontains resource="${tck.source}/pom.xml" substring="artifactId>jbatch"/>
-                                                <resourcecontains resource="${tck.source}/pom.xml" substring="name>com.ibm.jbatch"/>
-                                            </and>
-                                        </not>
-                                    </condition>
-                                    <fail if="invalid.tck.source" message="Make sure the 'tck.source' property is test in 'test.properties' to point to a copy of the RI's git repo. Found 'tck.source'='${tck.source}'" />
+                                    <copy file="${test.properties.dir}/test.template.properties"
+                                          tofile="${test.properties}"
+                                          overwrite="false">
+                                    </copy>
+                                    <copy file="${project.basedir}/../chainlink-tck.template.properties"
+                                          tofile="${project.basedir}/../chainlink-tck.properties"
+                                          overwrite="false">
+                                    </copy>
                                 </target>
                             </configuration>
                         </execution>
@@ -725,10 +703,6 @@
                                           tofile="${project.build.testOutputDirectory}/tck-udp.xml"
                                           overwrite="true">
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/testng.xml"
-                                          tofile="${project.build.testOutputDirectory}/testng.xml"
-                                          overwrite="true">
-                                    </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.template.xml"
                                           tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
                                           filtering="true"
@@ -754,10 +728,6 @@
                                         <filterset>
                                             <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
                                         </filterset>
-                                    </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory"
-                                          overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory"
                                           tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory"
@@ -842,6 +812,18 @@
                                 </target>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>destroy-test-resources</id>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <phase>none</phase>
+                            <configuration>
+                                <target>
+                                    <delete file="${project.basedir}/src/test/resources/META-INF/${injector.configuration.destination.file}"/>
+                                </target>
+                            </configuration>
+                        </execution>
                     </executions>
                 </plugin>
                 <plugin>
@@ -854,30 +836,50 @@
                             <goals>
                                 <goal>copy</goal>
                             </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>com.ibm.jbatch</groupId>
+                                        <artifactId>com.ibm.jbatch.tck.spi</artifactId>
+                                        <version>${version.com.ibm.jbatch.com.ibm.jbatch.tck.spi}</version>
+                                        <type>jar</type>
+                                        <overWrite>true</overWrite>
+                                        <outputDirectory>${deployment.dir}</outputDirectory>
+                                        <destFileName>com.ibm.jbatch.tck.spi-${version.com.ibm.jbatch.com.ibm.jbatch.tck.spi}.jar</destFileName>
+                                    </artifactItem>
+                                    <artifactItem>
+                                        <groupId>io.machinecode.chainlink</groupId>
+                                        <artifactId>chainlink-tck-core</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>jar</type>
+                                        <overWrite>true</overWrite>
+                                        <outputDirectory>${deployment.dir}</outputDirectory>
+                                        <destFileName>chainlink-tck-core-${project.version}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>unpack</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>unpack</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>com.ibm.jbatch</groupId>
+                                        <artifactId>com.ibm.jbatch.tck</artifactId>
+                                        <version>${version.com.ibm.jbatch.com.ibm.jbatch.tck}</version>
+                                        <type>jar</type>
+                                        <overWrite>true</overWrite>
+                                        <outputDirectory>${tck.source}</outputDirectory>
+                                        <destFileName>com.ibm.jbatch.tck-${version.com.ibm.jbatch.com.ibm.jbatch.tck}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
                         </execution>
                     </executions>
-                    <configuration>
-                        <artifactItems>
-                            <artifactItem>
-                                <groupId>com.ibm.jbatch</groupId>
-                                <artifactId>com.ibm.jbatch-tck-spi</artifactId>
-                                <version>${version.com.ibm.batch.com.ibm.batch-tck-spi}</version>
-                                <type>jar</type>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${deployment.dir}</outputDirectory>
-                                <destFileName>com.ibm.jbatch-tck-spi-${version.com.ibm.batch.com.ibm.batch-tck-spi}.jar</destFileName>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>io.machinecode.chainlink</groupId>
-                                <artifactId>chainlink-tck-core</artifactId>
-                                <version>${project.version}</version>
-                                <type>jar</type>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${deployment.dir}</outputDirectory>
-                                <destFileName>chainlink-tck-core-${project.version}.jar</destFileName>
-                            </artifactItem>
-                        </artifactItems>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -886,6 +888,13 @@
                     <configuration>
                         <skipExec>true</skipExec>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.surefire</groupId>
+                            <artifactId>surefire-junit47</artifactId>
+                            <version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
+                        </dependency>
+                    </dependencies>
                     <executions>
                         <execution>
                             <id>integration-test</id>
@@ -894,7 +903,7 @@
                             </goals>
                             <configuration>
                                 <includes>
-                                    <include>**/**Test*.java</include>
+                                    <include>**/**Tests.java</include>
                                 </includes>
                                 <systemPropertiesFile>${test.properties}</systemPropertiesFile>
                                 <systemPropertyVariables>
@@ -916,23 +925,17 @@
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>add-test-sources</id>
-                            <phase>none</phase>
-                            <goals><goal>add-test-source</goal></goals>
-                            <configuration>
-                                <sources>
-                                    <source>${tck.source}/com.ibm.jbatch.tck/src/main/java</source>
-                                </sources>
-                            </configuration>
-                        </execution>
-                        <execution>
                             <id>add-test-resources</id>
                             <phase>none</phase>
                             <goals><goal>add-test-resource</goal></goals>
                             <configuration>
                                 <resources>
                                     <resource>
-                                        <directory>${tck.source}/com.ibm.jbatch.tck/src/main/resources/testJobXml/META-INF/batch-jobs</directory>
+                                        <directory>${tck.source}/com</directory>
+                                        <targetPath>com</targetPath>
+                                    </resource>
+                                    <resource>
+                                        <directory>${tck.source}/testJobXml/META-INF/batch-jobs</directory>
                                         <targetPath>META-INF/batch-jobs</targetPath>
                                     </resource>
                                     <resource>
@@ -963,6 +966,13 @@
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <skipExec>true</skipExec>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

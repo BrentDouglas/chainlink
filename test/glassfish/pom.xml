@@ -14,7 +14,7 @@
     <properties>
         <test.properties>../../test.properties</test.properties>
 
-        <glassfish.dir>${project.build.directory}/glassfish${version.org.glassfish.major}</glassfish.dir>
+        <glassfish.dir>${project.build.directory}/glassfish4</glassfish.dir>
         <chainlink.dir>${glassfish.dir}/chainlink-${project.version}</chainlink.dir>
     </properties>
 
@@ -125,7 +125,6 @@
                 <configuration>
                     <skipExec>false</skipExec>
                     <systemPropertyVariables>
-                        <version.org.glassfish.major>${version.org.glassfish.major}</version.org.glassfish.major>
                         <container.debug>${container.debug}</container.debug>
                     </systemPropertyVariables>
                 </configuration>

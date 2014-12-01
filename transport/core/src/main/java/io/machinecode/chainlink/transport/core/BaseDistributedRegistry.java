@@ -35,6 +35,7 @@ import io.machinecode.then.core.FutureDeferred;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.JobExecutionNotRunningException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,6 +54,7 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
 
     private static final Logger log = Logger.getLogger(BaseDistributedRegistry.class);
 
+    protected final WeakReference<ClassLoader> loader;
     protected final Marshaller marshaller;
     protected final Unmarshaller unmarshaller;
     protected final Cloner cloner;
@@ -66,6 +68,7 @@ public abstract class BaseDistributedRegistry<A, R extends DistributedRegistry<A
     protected final TimeUnit unit;
 
     public BaseDistributedRegistry(final RegistryConfiguration configuration) throws Exception {
+        this.loader = new WeakReference<ClassLoader>(configuration.getClassLoader());
         final MarshallingProvider provider = configuration.getMarshallingProviderFactory().produce(configuration);
         this.marshaller = provider.getMarshaller();
         this.unmarshaller = provider.getUnmarshaller();
