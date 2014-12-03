@@ -149,10 +149,13 @@ public class TomEEEnvironment implements Environment {
         final App app = this.operators.remove(
                 event.getApp().appId
         );
+        if (app == null) {
+            return;
+        }
         Exception exception = null;
-        for (final JobOperatorImpl x : app.ops.values()) {
+        for (final JobOperatorImpl op : app.ops.values()) {
             try {
-                x.close();
+                op.close();
             } catch (Exception e) {
                 if (exception == null) {
                     exception = e;

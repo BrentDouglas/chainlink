@@ -14,8 +14,8 @@
     <properties>
         <test.properties>../../test.properties</test.properties>
 
-        <wildfly.dir>${project.build.directory}/wildfly-${version.org.wildfly}</wildfly.dir>
-        <chainlink.dir>${wildfly.dir}/chainlink-${project.version}</chainlink.dir>
+        <container.dir>${project.build.directory}/wildfly-${version.org.wildfly}</container.dir>
+        <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <wildfly.jvm.arguments>-server</wildfly.jvm.arguments> <!-- Need to have something here for arquillian to handle it properly -->
     </properties>
 
@@ -44,11 +44,11 @@
                             <configuration>
                                 <target>
                                     <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-wildfly.zip"
-                                           dest="${wildfly.dir}"/>
+                                           dest="${container.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
                                           dir="${chainlink.dir}"/>
-                                    <copy file="standalone.xml" tofile="${wildfly.dir}/standalone/configuration/standalone.xml" />
+                                    <copy file="standalone.xml" tofile="${container.dir}/standalone/configuration/standalone.xml" />
                                 </target>
                             </configuration>
                         </execution>
@@ -74,7 +74,7 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>unpack-wildfly</id>
+                            <id>unpack-container</id>
                             <phase>none</phase>
                             <goals>
                                 <goal>unpack</goal>
@@ -102,7 +102,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-wildfly</id>
+                        <id>unpack-container</id>
                         <phase>generate-test-resources</phase>
                     </execution>
                 </executions>

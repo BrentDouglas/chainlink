@@ -9,12 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>chainlink-tck-glassfish</artifactId>
+    <artifactId>chainlink-tck-tomee</artifactId>
 
     <properties>
-        <container.dir>${project.build.directory}/glassfish4</container.dir>
+        <container.dir>${project.build.directory}/apache-tomee-plume-${version.org.apache.openejb.tomee}</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <deployment.dir>${project.build.directory}/deps</deployment.dir>
+        <tests.dir>${project.build.directory}/arquillian-tests</tests.dir>
     </properties>
 
     <dependencies>
@@ -25,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-ee-glassfish</artifactId>
+            <artifactId>chainlink-ee-tomee</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -65,8 +66,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-glassfish-managed-3.1</artifactId>
+            <groupId>org.apache.openejb</groupId>
+            <artifactId>arquillian-tomee-remote</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -130,7 +131,7 @@
                         <phase>pre-integration-test</phase>
                         <configuration>
                             <target>
-                                <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-glassfish.zip"
+                                <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-tomee.zip"
                                        dest="${container.dir}"/>
                                 <chmod file="${chainlink.dir}/install" perm="754"/>
                                 <exec executable="${chainlink.dir}/install"
@@ -167,7 +168,7 @@
                                     <arg value="-cp"/>
                                     <arg value="${test_classpath}"/>
                                     <arg value="io.machinecode.chainlink.tck.core.ArquillianInstrument"/>
-                                    <arg value="io.machinecode.chainlink.tck.glassfish.GlassfishTckConfigurationFactory"/>
+                                    <arg value="io.machinecode.chainlink.tck.tomee.TomEETckConfigurationFactory"/>
                                     <arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/ee/TransactionTests.class"/>
                                     <arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/BatchletRestartStateMachineTests.class"/>
                                     <arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ChunkTests.class"/>
@@ -263,9 +264,10 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.glassfish.main.distributions</groupId>
-                                    <artifactId>glassfish</artifactId>
-                                    <version>${version.org.glassfish}</version>
+                                    <groupId>org.apache.openejb</groupId>
+                                    <artifactId>apache-tomee</artifactId>
+                                    <classifier>plume</classifier>
+                                    <version>${version.org.apache.openejb.tomee}</version>
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
@@ -281,6 +283,8 @@
                     <skipExec>false</skipExec>
                     <systemPropertyVariables>
                         <container.debug>${container.debug}</container.debug>
+                        <container.dir>${container.dir}</container.dir>
+                        <tests.dir>${tests.dir}</tests.dir>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

@@ -268,11 +268,9 @@
                 <property><name>tomee</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
-        <!--
             <modules>
                 <module>tomee</module>
             </modules>
-        -->
         </profile>
         <profile>
             <id>wildfly</id>
@@ -703,16 +701,6 @@
                                           tofile="${project.build.testOutputDirectory}/tck-udp.xml"
                                           overwrite="true">
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.template.xml"
-                                          tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
-                                          filtering="true"
-                                          overwrite="true">
-                                        <filterset>
-                                            <filter token="database.url" value="${database.prefix}.database.url" />
-                                            <filter token="database.user" value="${database.prefix}.database.user" />
-                                            <filter token="database.password" value="${database.prefix}.database.password" />
-                                        </filterset>
-                                    </copy>
                                     <copy file="${project.basedir}/../src/test/resources/META-INF/${injector.configuration.source.file}"
                                           tofile="${project.basedir}/src/test/resources/META-INF/${injector.configuration.destination.file}"
                                           overwrite="true">
@@ -813,6 +801,27 @@
                             </configuration>
                         </execution>
                         <execution>
+                            <id>create-persistence-xml</id>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <phase>none</phase>
+                            <configuration>
+                                <target>
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.template.xml"
+                                          tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="database.url" value="${database.prefix}.database.url" />
+                                            <filter token="database.user" value="${database.prefix}.database.user" />
+                                            <filter token="database.password" value="${database.prefix}.database.password" />
+                                        </filterset>
+                                    </copy>
+                                </target>
+                            </configuration>
+                        </execution>
+                        <execution>
                             <id>destroy-test-resources</id>
                             <goals>
                                 <goal>run</goal>
@@ -820,7 +829,8 @@
                             <phase>none</phase>
                             <configuration>
                                 <target>
-                                    <delete file="${project.basedir}/src/test/resources/META-INF/${injector.configuration.destination.file}"/>
+                                    <delete file="${project.basedir}/src/test/resources/META-INF/${injector.configuration.destination.file}" quiet="true"/>
+                                    <delete file="${project.basedir}/src/test/resources/META-INF/persistence.xml" quiet="true"/>
                                 </target>
                             </configuration>
                         </execution>

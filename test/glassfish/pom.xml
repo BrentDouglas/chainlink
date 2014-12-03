@@ -14,8 +14,8 @@
     <properties>
         <test.properties>../../test.properties</test.properties>
 
-        <glassfish.dir>${project.build.directory}/glassfish4</glassfish.dir>
-        <chainlink.dir>${glassfish.dir}/chainlink-${project.version}</chainlink.dir>
+        <container.dir>${project.build.directory}/glassfish4</container.dir>
+        <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
     </properties>
 
     <dependencies>
@@ -43,7 +43,7 @@
                             <configuration>
                                 <target>
                                     <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-glassfish.zip"
-                                           dest="${glassfish.dir}"/>
+                                           dest="${container.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
                                           dir="${chainlink.dir}"/>
@@ -72,7 +72,7 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>unpack-glassfish</id>
+                            <id>unpack-container</id>
                             <phase>none</phase>
                             <goals>
                                 <goal>unpack</goal>
@@ -100,7 +100,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-glassfish</id>
+                        <id>unpack-container</id>
                         <phase>generate-test-resources</phase>
                     </execution>
                 </executions>

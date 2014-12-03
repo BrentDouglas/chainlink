@@ -35,13 +35,45 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>re-jpa</id>
+            <activation>
+                <property><name>re-jpa</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                        <includes>
+                            <include>**/persistence.xml</include>
+                        </includes>
+                    </testResource>
+                </testResources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-persistence-xml</id>
+                                <phase>generate-test-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/persistence.xml</include>
                     <include>**/${injector.configuration.destination.file}</include>
                 </includes>
             </testResource>

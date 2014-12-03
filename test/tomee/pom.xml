@@ -15,9 +15,9 @@
     <properties>
         <test.properties>../../test.properties</test.properties>
 
-        <tomee.dir>${project.build.directory}/apache-tomee-plume-${version.org.apache.openejb.tomee}</tomee.dir>
+        <container.dir>${project.build.directory}/apache-tomee-plume-${version.org.apache.openejb.tomee}</container.dir>
+        <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <tests.dir>${project.build.directory}/arquillian-tests</tests.dir>
-        <chainlink.dir>${tomee.dir}/chainlink-${project.version}</chainlink.dir>
     </properties>
 
     <dependencies>
@@ -46,7 +46,7 @@
                                 <target>
                                     <mkdir dir="${tests.dir}"/>
                                     <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-tomee.zip"
-                                           dest="${tomee.dir}"/>
+                                           dest="${container.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
                                           dir="${chainlink.dir}"/>
@@ -75,7 +75,7 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>unpack-tomee</id>
+                            <id>unpack-container</id>
                             <phase>none</phase>
                             <goals>
                                 <goal>unpack</goal>
@@ -104,7 +104,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-tomee</id>
+                        <id>unpack-container</id>
                         <phase>generate-test-resources</phase>
                     </execution>
                 </executions>
@@ -129,9 +129,9 @@
                 <configuration>
                     <skipExec>false</skipExec>
                     <systemPropertyVariables>
-                        <tomee.dir>${tomee.dir}</tomee.dir>
-                        <tests.dir>${tests.dir}</tests.dir>
                         <container.debug>${container.debug}</container.debug>
+                        <container.dir>${container.dir}</container.dir>
+                        <tests.dir>${tests.dir}</tests.dir>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
