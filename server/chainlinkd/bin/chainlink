@@ -21,7 +21,7 @@ STOP_WAIT=${STOP_WAIT-10}
 
 RETVAL=0
 
-CLASSPATH="$(find ${CHAINLINK_HOME}/lib -regex '.*\.jar$' -type f -printf ${CHAINLINK_HOME}/lib/%f:)$(find ${CHAINLINK_HOME}/app -regex '.*\.jar$' -type f -printf ${CHAINLINK_HOME}/app/%f:)"
+CLASSPATH="$(find ${CHAINLINK_HOME}/modules -regex '.*\.jar$' -type f -printf ${CHAINLINK_HOME}/modules/%f:)$(find ${CHAINLINK_HOME}/app -regex '.*\.jar$' -type f -printf ${CHAINLINK_HOME}/app/%f:)"
 
 usage() {
   echo "Usage: chainlink [-c configuration_file_name] [-p properties_file_name] [-d] [-h] [-k]"

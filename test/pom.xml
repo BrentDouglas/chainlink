@@ -121,6 +121,16 @@
 
     <profiles>
         <profile>
+            <id>coherence</id>
+            <activation>
+                <property><name>coherence</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>coherence</module>
+            </modules>
+        </profile>
+        <profile>
             <id>repository</id>
             <activation>
                 <property><name>repository</name></property>

@@ -69,10 +69,15 @@ Where `ORACLE_HOME` is where you set it in the installer and `<version>`
 is the version of coherence you are installing (which should match the
 version in [pom.xml](pom.xml).
 
+Using the build profile `coherence` or the test profiles `tr-coherence`
+and `re-coherence` will not work if coherence is not installed.
+
 ## Building
 
 To build without coherence run `mvn clean install`, if you do want it
-use `mvn clean install -Pcoherence`
+use `mvn clean install -Pcoherence`. 
+`tr-coherence` and `re-coherence` will not work dependencies if
+coherence is not installed.
 
 ## Run the tests
 

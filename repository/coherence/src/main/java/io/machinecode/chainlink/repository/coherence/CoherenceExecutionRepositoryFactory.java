@@ -1,6 +1,5 @@
-package io.machinecode.chainlink.tck.core.repository;
+package io.machinecode.chainlink.repository.coherence;
 
-import io.machinecode.chainlink.repository.coherence.CoherenceExecutonRepository;
 import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;

@@ -38,8 +38,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.oracle.coherence</groupId>
-            <artifactId>coherence</artifactId>
+            <groupId>gnu-getopt</groupId>
+            <artifactId>getopt</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -70,11 +70,6 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-coherence</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -130,11 +125,6 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-coherence</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

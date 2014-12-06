@@ -1,0 +1,713 @@
+#!/bin/bash
+#
+# @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+#
+# Script to install Chainlink from either
+#
+
+GREEN="${GREEN-\033[32m}"
+YELLOW="${YELLOW-\033[33m}"
+RED="${RED-\033[31m}"
+RESET="${RESET-\033[00m}"
+
+green() {
+    echo -e "${GREEN}${@}${RESET}"
+}
+yellow() {
+    echo -e "${YELLOW}${@}${RESET}"
+}
+red() {
+    echo -e "${RED}${@}${RESET}"
+}
+
+source ./vars
+
+if [ ! -z ${M2+x} ]; then
+    MVN="${M2}/mvn"
+elif [ ! -z ${M2_HOME+x} ]; then
+    MVN="${M2_HOME}/bin/mvn"
+fi
+
+# These should not be mutated
+AVAILABLE_MODULES=( all core seam spring guice h2 postgresql mariadb jboss-logging jboss-marshalling jdbc jpa infinispan jgroups hazelcast coherence gridgain ehcache redis mongo )
+AVAILABLE_CONTAINERS=( se glassfish tomee wildfly )
+
+# These should be read from getopts
+UNINSTALL="false"
+MODULES=()
+
+#
+# Modules
+#
+
+core() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.then" "then-api" "${version_io_machinecode_then_then_api}"
+    "${apply}" "io.machinecode.then" "then-core" "${version_io_machinecode_then_then_core}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-api" "${version_io_machinecode_chainlink_chainlink_api}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-core" "${version_io_machinecode_chainlink_chainlink_core}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-inject-core" "${version_io_machinecode_chainlink_chainlink_inject_core}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-inject-cdi" "${version_io_machinecode_chainlink_chainlink_inject_cdi}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-core" "${version_io_machinecode_chainlink_chainlink_jsl_core}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-fluent" "${version_io_machinecode_chainlink_chainlink_jsl_fluent}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-groovy" "${version_io_machinecode_chainlink_chainlink_jsl_groovy}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-xml" "${version_io_machinecode_chainlink_chainlink_jsl_xml}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-marshalling-jdk" "${version_io_machinecode_chainlink_chainlink_marshalling_jdk}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-core" "${version_io_machinecode_chainlink_chainlink_repository_core}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-memory" "${version_io_machinecode_chainlink_chainlink_repository_memory}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-spi" "${version_io_machinecode_chainlink_chainlink_spi}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-core" "${version_io_machinecode_chainlink_chainlink_transport_core}"
+    "${apply}" "net.sf.trove4j" "trove4j" "${version_net_sf_trove4j_trove4j}"
+}
+
+seam() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-inject-seam" "${version_io_machinecode_chainlink_chainlink_inject_seam}"
+    "${apply}" "org.jboss.seam" "jboss-seam" "${version_org_jboss_seam_jboss_seam}" "ejb"
+    [ "${CONTAINER}" == "se" ] && {
+        "${apply}" "javax.servlet" "servlet-api" "${version_javax_servlet_servlet_api}"
+    }
+}
+
+spring() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-inject-spring" "${version_io_machinecode_chainlink_chainlink_inject_spring}"
+    "${apply}" "org.springframework" "spring-beans" "${version_org_springframework_spring_beans}"
+    "${apply}" "org.springframework" "spring-context" "${version_org_springframework_spring_context}"
+    "${apply}" "org.springframework" "spring-core" "${version_org_springframework_spring_core}"
+}
+
+guice() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-inject-guice" "${version_io_machinecode_chainlink_chainlink_inject_guice}"
+    "${apply}" "com.google.inject" "guice" "${version_com_google_inject_guice}"
+}
+
+h2() {
+    local apply="${1}"
+    "${apply}" "com.h2database" "h2" "${version_com_h2database_h2}"
+}
+
+postgresql() {
+    local apply="${1}"
+    "${apply}" "postgresql" "postgresql" "${version_postgresql_postgresql}"
+}
+
+mariadb() {
+    local apply="${1}"
+    "${apply}" "org.mariadb.jdbc" "mariadb-java-client" "${version_org_mariadb_jdbc_mariadb_java_client}"
+}
+
+jboss-logging() {
+    local apply="${1}"
+    [ "${CONTAINER}" != "wildfly" ] && {
+        "${apply}" "org.jboss.logging" "jboss-logging" "${version_org_jboss_logging_jboss_logging}"
+    }
+}
+
+jboss-marshalling() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-marshalling-jboss" "${version_io_machinecode_chainlink_chainlink_marshalling_jboss}"
+    [ "${CONTAINER}" != "wildfly" ] && {
+        "${apply}" "org.jboss.marshalling" "jboss-marshalling" "${version_org_jboss_marshalling_jboss_marshalling}"
+        "${apply}" "org.jboss.marshalling" "jboss-marshalling-river" "${version_org_jboss_marshalling_jboss_marshalling_river}"
+    }
+}
+
+jdbc() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-jdbc" "${version_io_machinecode_chainlink_chainlink_repository_jdbc}"
+}
+
+jpa() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-jpa" "${version_io_machinecode_chainlink_chainlink_repository_jpa}"
+    [ "${CONTAINER}" == "se" ] && {
+        "${apply}" "org.hibernate" "hibernate-core" "${version_org_hibernate_hibernate_core}"
+        "${apply}" "org.hibernate" "hibernate-entitymanager" "${version_org_hibernate_hibernate_entitymanager}"
+    }
+}
+
+infinispan() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-infinispan" "${version_io_machinecode_chainlink_chainlink_repository_infinispan}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-infinispan" "${version_io_machinecode_chainlink_chainlink_transport_infinispan}"
+    [ "${CONTAINER}" != "wildfly" ] && {
+        "${apply}" "org.infinispan" "infinispan-commons" "${version_org_infinispan_infinispan_commons}"
+        "${apply}" "org.infinispan" "infinispan-core" "${version_org_infinispan_infinispan_core}"
+    }
+}
+
+jgroups() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-jgroups" "${version_io_machinecode_chainlink_chainlink_transport_jgroups}"
+    [ "${CONTAINER}" != "wildfly" ] && {
+        "${apply}" "org.jgroups" "jgroups" "${version_org_jgroups_jgroups}"
+    }
+}
+
+hazelcast() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-hazelcast" "${version_io_machinecode_chainlink_chainlink_repository_hazelcast}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-hazelcast" "${version_io_machinecode_chainlink_chainlink_transport_hazelcast}"
+    "${apply}" "com.hazelcast" "hazelcast" "${version_com_hazelcast_hazelcast}"
+}
+
+coherence() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-coherence" "${version_io_machinecode_chainlink_chainlink_repository_coherence}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-coherence" "${version_io_machinecode_chainlink_chainlink_transport_coherence}"
+    "${apply}" "com.oracle.coherence" "coherence" "${version_com_oracle_coherence_coherence}"
+}
+
+gridgain() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-gridgain" "${version_io_machinecode_chainlink_chainlink_repository_gridgain}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-gridgain" "${version_io_machinecode_chainlink_chainlink_transport_gridgain}"
+    "${apply}" "org.gridgain" "gridgain-core" "${version_org_gridgain_gridgain_core}"
+    "${apply}" "org.gridgain" "gridgain-indexing" "${version_org_gridgain_gridgain_indexing}"
+}
+
+ehcache() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-ehcache" "${version_io_machinecode_chainlink_chainlink_repository_ehcache}"
+    "${apply}" "net.sf.ehcache" "ehcache-core" "${version_net_sf_ehcache_ehcache_core}"
+}
+
+redis() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-redis" "${version_io_machinecode_chainlink_chainlink_repository_redis}"
+    "${apply}" "redis.clients" "jedis" "${version_redis_clients_jedis}"
+}
+
+mongo() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-mongo" "${version_io_machinecode_chainlink_chainlink_repository_mongo}"
+    "${apply}" "org.jongo" "jongo" "${version_org_jongo_jongo}"
+    "${apply}" "org.mongodb" "mongo-java-driver" "${version_org_mongodb_mongo_java_driver}"
+}
+
+all() {
+    local apply="${1}"
+
+    core "${apply}"
+    seam "${apply}"
+    spring "${apply}"
+    guice "${apply}"
+    h2 "${apply}"
+    postgresql "${apply}"
+    mariadb "${apply}"
+    jboss-logging "${apply}"
+    jboss-marshalling "${apply}"
+    jdbc "${apply}"
+    jpa "${apply}"
+    infinispan "${apply}"
+    jgroups "${apply}"
+    hazelcast "${apply}"
+    coherence "${apply}"
+    gridgain "${apply}"
+    ehcache "${apply}"
+    redis "${apply}"
+    mongo "${apply}"
+}
+
+#
+# Containers
+#
+
+# SE
+
+CHAINLINK_REPOSITORY_DIR="repository"
+
+SE_APP_DIR="app"
+SE_MODULES_DIR="modules"
+
+se() {
+    local uninstall="${1}"
+    local apply="se"
+    if [ "${uninstall}" == "false" ]; then
+        apply="${apply}-install"
+        add-module "core"
+        print-modules "Installing"
+    else
+        apply="${apply}-uninstall"
+        print-modules "Uninstalling"
+    fi
+
+    "${apply}" "io.machinecode.chainlink" "chainlink-se" "${version_io_machinecode_chainlink_chainlink_se}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-server-chainlinkd" "${version_io_machinecode_chainlink_chainlink_server_chainlinkd}"
+    "${apply}" "gnu-getopt" "getopt" "${version_gnu_getopt_getopt}"
+    "${apply}" "javax.enterprise" "cdi-api" "${version_javax_enterprise_cdi_api}"
+    "${apply}" "javax.inject" "javax.inject" "${version_javax_inject_javax_inject}"
+    "${apply}" "log4j" "log4j" "${version_log4j_log4j}"
+    "${apply}" "org.jboss.weld.se" "weld-se" "${version_org_jboss_weld_se_weld_se}"
+
+    for module in "${MODULES[@]}"; do
+        "${module}" "${apply}"
+    done
+}
+
+se-before() {
+    [ -d "${SE_APP_DIR}" ] || {
+        mkdir "${SE_APP_DIR}"
+    }
+    [ -d "${SE_MODULES_DIR}" ] || {
+        mkdir "${SE_MODULES_DIR}"
+    }
+}
+
+se-after() {
+    rmdir -p --ignore-fail-on-non-empty "${SE_MODULES_DIR}"
+}
+
+se-install() {
+    local group_id="${1}"
+    local artifact_id="${2}"
+    local version="${3}"
+    local classifier="${4}"
+
+    install-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+}
+
+se-uninstall() {
+    local group_id="${1}"
+    local artifact_id="${2}"
+    local version="${3}"
+
+    uninstall-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+}
+
+# Glassfish
+
+GLASSFISH_MODULES_DIR="../glassfish/modules"
+GLASSFISH_BACKUP_DIR="backup"
+
+glassfish() {
+    local uninstall="${1}"
+    local apply="glassfish"
+    if [ "${uninstall}" == "false" ]; then
+        apply="${apply}-install"
+        add-module "core"
+        print-modules "Installing"
+    else
+        apply="${apply}-uninstall"
+        print-modules "Uninstalling"
+    fi
+
+    "${apply}" "io.machinecode.chainlink" "chainlink-ee-glassfish" "${version_io_machinecode_chainlink_chainlink_ee_glassfish}"
+
+    for module in "${MODULES[@]}"; do
+        "${module}" "${apply}"
+    done
+}
+
+glassfish-before() {
+    [ -e "${CONTAINER_DIR}/glassfish/bin/asadmin" ] || {
+        red "Invalid Glassfish home: ${CONTAINER_DIR}"
+        usage
+        exit 1
+    }
+    [ -d "${GLASSFISH_BACKUP_DIR}" ] || {
+        mkdir "${GLASSFISH_BACKUP_DIR}"
+    }
+    mv ${GLASSFISH_MODULES_DIR}/{glassfish-batch-connector.jar,glassfish-batch-commands.jar,com.ibm.jbatch-ri-spi.jar,com.ibm.jbatch-runtime-all.jar} ${GLASSFISH_BACKUP_DIR}
+}
+
+glassfish-after() {
+    mv ${GLASSFISH_BACKUP_DIR}/{glassfish-batch-connector.jar,glassfish-batch-commands.jar,com.ibm.jbatch-ri-spi.jar,com.ibm.jbatch-runtime-all.jar} ${GLASSFISH_MODULES_DIR}
+}
+
+glassfish-install() {
+    local group_id="${1}"
+    local artifact_id="${2}"
+    local version="${3}"
+    local classifier="${4}"
+
+    install-jar "${GLASSFISH_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+}
+
+glassfish-uninstall() {
+    local group_id="${1}"
+    local artifact_id="${2}"
+    local version="${3}"
+
+    uninstall-jar "${GLASSFISH_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+}
+
+# TomEE
+
+TOMEE_MODULES_DIR="../lib"
+
+tomee() {
+    local uninstall="${1}"
+    local apply="tomee"
+    if [ "${uninstall}" == "false" ]; then
+        apply="${apply}-install"
+        add-module "core"
+        print-modules "Installing"
+    else
+        apply="${apply}-uninstall"
+        print-modules "Uninstalling"
+    fi
+
+    "${apply}" "io.machinecode.chainlink" "chainlink-ee-tomee" "${version_io_machinecode_chainlink_chainlink_ee_tomee}"
+
+    for module in "${MODULES[@]}"; do
+        "${module}" "${apply}"
+    done
+}
+
+tomee-before() {
+    [ -e "${CONTAINER_DIR}/bin/tomee.sh" ] || {
+        red "Invalid TomEE home: ${CONTAINER_DIR}"
+        usage
+        exit 1
+    }
+}
+
+tomee-after() {
+    return 0
+}
+
+tomee-install() {
+    local group_id="${1}"
+    local artifact_id="${2}"
+    local version="${3}"
+    local classifier="${4}"
+
+    install-jar "${TOMEE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+}
+
+tomee-uninstall() {
+    local group_id="${1}"
+    local artifact_id="${2}"
+    local version="${3}"
+
+    uninstall-jar "${TOMEE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+}
+
+# Wildfly
+
+WILDFLY_MODULES_DIR="../modules/system/layers/base"
+WILDFLY_XML_DIR="modules"
+
+wildfly() {
+    local uninstall="${1}"
+    local apply="wildfly"
+    add-module "jboss-marshalling"
+    if [ "${uninstall}" == "false" ]; then
+        apply="${apply}-install"
+        add-module "core"
+        print-modules "Installing"
+    else
+        apply="${apply}-uninstall"
+        print-modules "Uninstalling"
+    fi
+
+    "${apply}" "io.machinecode.chainlink" "chainlink-ee-wildfly" "${version_io_machinecode_chainlink_chainlink_ee_wildfly}"
+
+    for module in "${MODULES[@]}"; do
+        "${module}" "${apply}"
+    done
+}
+
+wildfly-before() {
+    [ -e "${CONTAINER_DIR}/jboss-modules.jar" ] || {
+        red "Invalid Wildfly home: ${CONTAINER_DIR}"
+        usage
+        exit 1
+    }
+}
+
+wildfly-after() {
+    return 0
+}
+
+wildfly-install() {
+    local group_id="${1}"
+    local artifact_id="${2}"
+    local version="${3}"
+    local classifier="${4}"
+
+    local module_dir="${group_id//.//}/main"
+    mkdir -p "${WILDFLY_MODULES_DIR}/${module_dir}"
+    cp "${WILDFLY_XML_DIR}/${module_dir}/module.xml" "${WILDFLY_MODULES_DIR}/${module_dir}/module.xml"
+    install-jar "${WILDFLY_MODULES_DIR}/${module_dir}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+}
+
+wildfly-uninstall() {
+    local group_id="${1}"
+    local artifact_id="${2}"
+    local version="${3}"
+
+    local module_dir="${group_id//.//}/main"
+
+    uninstall-jar "${WILDFLY_MODULES_DIR}/${module_dir}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+    rm "${WILDFLY_MODULES_DIR}/${module_dir}/module.xml"
+    rmdir -p --ignore-fail-on-non-empty "${WILDFLY_MODULES_DIR}/${module_dir}"
+}
+
+# Copy a jar from the distribution or pull it from maven
+install-jar() {
+    local dest="${1}"
+    local group_id="${2}"
+    local artifact_id="${3}"
+    local version="${4}"
+    local classifier="${5}"
+
+    local name="${artifact_id}-${version}"
+    local descriptor="${group_id}:${artifact_id}:${version}:jar"
+
+    local from="${CHAINLINK_REPOSITORY_DIR}/${name}.jar"
+    local to="${dest}/${name}.jar"
+
+    [ -e "${to}" ] && {
+        echo "Found existing jar at ${to}"
+        return 0
+    }
+
+    local retval=0
+    local method=""
+    if [ -e "${from}" ]; then
+        cp "${from}" "${to}"
+        retval=${?}
+        method="distribution"
+    else
+        [ -z ${MVN+x} ] && {
+            red "Cannot find file ${from} in distribution and cannot find environment variables M2 or M2_HOME"
+            return 1
+        }
+        ${MVN} dependency:copy -Dartifact=${descriptor} -DoutputDirectory=${dest}
+        retval=${?}
+        method="Maven"
+    fi
+
+    if [ ${retval} -eq 0 ]; then
+        green "Installed ${descriptor} from ${method} to ${to}"
+    else
+        red "Failed installing ${descriptor} from ${method}"
+    fi
+
+    return ${retval}
+}
+
+uninstall-jar() {
+    local dir="${1}"
+    local group_id="${2}"
+    local artifact_id="${3}"
+    local version="${4}"
+    local classifier="${5}"
+
+    local descriptor="${artifact_id}-${version}"
+
+    local full="${dir}/${descriptor}.jar"
+
+    [ ! -e "${full}" ] && {
+        yellow "No module installed at ${full}"
+        return 0
+    }
+
+    rm "${full}" > /dev/null 2>&1 # Output from rm appears randomly rather than here
+    local retval=${?}
+
+    if [ ${retval} -eq 0 ]; then
+        green "Removed ${full}"
+    else
+        red "Failed removing ${full}"
+    fi
+
+    return ${retval}
+}
+
+add-module() {
+    local target="${1}"
+    [ -z "${target-}" ] && {
+        return 1
+    }
+    for module in "${MODULES[@]}"; do
+        [ "${module}" == "all" ] && {
+            return 0
+        }
+        [ "${module}" == "${target}" ] && {
+            return 0
+        }
+    done
+    MODULES+=("${target}")
+    return 0
+}
+
+print-modules() {
+    local action="${1}"
+
+    local modules=""
+    for module in "${MODULES[@]}"; do
+        if [ -z "${modules}" ]; then
+            modules="${module}"
+        else
+            modules="${modules}, ${module}"
+        fi
+    done
+    echo "${action} modules: ${modules}"
+}
+
+print-available-modules() {
+    local action="${1}"
+
+    local modules=""
+    for module in "${AVAILABLE_MODULES[@]}"; do
+        if [ -z "${modules}" ]; then
+            modules="${module}"
+        else
+            modules="${modules}, ${module}"
+        fi
+    done
+    echo "Available modules: ${modules}"
+}
+
+print-available-containers() {
+    local containers=""
+    for container in "${AVAILABLE_CONTAINERS[@]}"; do
+        if [ -z "${containers}" ]; then
+            containers="${container}"
+        else
+            containers="${containers}, ${container}"
+        fi
+    done
+    echo "Available containers: ${containers}"
+}
+
+usage() {
+    cat <<EOF
+        Usage: install -c container [-d dir] [-m modules] [-u] [-h]
+
+            -h  Print usage.
+            -u  Uninstall selected modules.
+            -c  The container to install to. Valid values are:
+EOF
+
+    for container in "${AVAILABLE_CONTAINERS[@]}"; do
+      echo "                    - ${container}"
+    done
+
+    cat <<EOF
+            -d  The root directory of the container to install too.
+                This is required for all containers other than "se" which is installed
+                in place.
+            -m  Comma separated list of modules. Valid values are:
+EOF
+
+    for module in "${AVAILABLE_MODULES[@]}"; do
+      echo "                    - ${module}"
+    done
+
+    cat <<EOF
+            There are two special modules, "core" and "all". The "core" module contains
+            the main jars required to run Chainlink and is implied whenever running an
+            install. If the -u option is provided it must be specified individually.
+            e.g. This script will install and then uninstall the Chainlink core:
+
+                install -c se
+                install -c se -u -m core
+
+            The "all" option is a convenience every available module (including the core).
+            Providing the options "-u -m all" is the recommended way to completely uninstall
+            Chainlink from a container.
+
+        Examples:
+
+            Install an SE instance with every available module:
+
+                install -c se -e all
+
+            Install to a Wildfly instance with the Infinispan, jGroups and Redis modules.
+
+                install -c wildfly -d /usr/local/wildfly -m infinispan,jgroups,redis
+
+            Install to a Glassfish instance with only the core functionality.
+
+                install -c glassfish -d /usr/local/glassfish
+
+            Uninstall two modules from a TomEE instance. The Chainlink core and any other
+            installed modules will remain installed.
+
+                install -u -c tomee -d /usr/local/tomee -m mongo,ehcache
+
+            Uninstall Chainlink completely from a Glassfish instance.
+
+                install -u -c glassfish -d /usr/local/glassfish -m all
+EOF
+}
+
+while getopts "huc:d:m:" opt; do
+    case ${opt} in
+        h)
+            usage
+            exit 0
+            ;;
+
+        u)
+            UNINSTALL="true"
+            ;;
+
+        d)
+            CONTAINER_DIR="${OPTARG}"
+            ;;
+
+        c)
+            for container in "${AVAILABLE_CONTAINERS[@]}"; do
+                [ "${container}" == "${OPTARG}" ] && {
+                    CONTAINER="${OPTARG}"
+                    continue 2 #getopts loop
+                }
+            done
+            [ -z ${CONTAINER+x} ] && {
+                red "Invalid container: ${OPTARG}"
+                print-available-containers
+                exit 1
+            }
+            ;;
+
+        m)
+            IFS=',' read -ra TMP <<< "${OPTARG}"
+            for module in "${TMP[@]}"; do
+                [ "${module}" == "all" ] && {
+                    MODULES=("all")
+                    continue 2 #getopt loop
+                }
+                for available in "${AVAILABLE_MODULES[@]}"; do
+                    [ "${available}" == "${module}" ] && {
+                        add-module "${module}"
+                        continue 2 #TMP loop
+                    }
+                done
+                red "Invalid module: ${module}"
+                print-available-modules
+                exit 1
+            done
+            ;;
+
+        \?)
+            red "Invalid option: -${OPTARG}"
+            usage
+            exit 1
+            ;;
+
+        :)
+            red "Option -${OPTARG} requires an argument"
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+[ -z ${CONTAINER+x} ] && {
+    red "Option -c is required"
+    print-available-containers
+    exit 1
+}
+
+${CONTAINER}-before
+${CONTAINER} "${UNINSTALL}"
+${CONTAINER}-after
+
+exit 0

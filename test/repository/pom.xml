@@ -27,18 +27,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.oracle.coherence</groupId>
-            <artifactId>coherence</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-coherence</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

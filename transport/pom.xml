@@ -14,11 +14,24 @@
 
     <modules>
         <module>core</module>
-        <module>coherence</module>
         <module>hazelcast</module>
         <module>infinispan</module>
         <module>jgroups</module>
         <module>gridgain</module>
     </modules>
+
+
+    <profiles>
+        <profile>
+            <id>coherence</id>
+            <activation>
+                <property><name>coherence</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>coherence</module>
+            </modules>
+        </profile>
+    </profiles>
 
 </project>

@@ -2,7 +2,7 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-    <id>chainlinkd</id>
+    <id>all</id>
     <formats>
         <format>zip</format>
         <format>tar.gz</format>
@@ -17,8 +17,13 @@
             <includes>
                 <include>io.machinecode.chainlink:chainlink-api</include>
                 <include>io.machinecode.chainlink:chainlink-core</include>
+                <include>io.machinecode.chainlink:chainlink-ee-glassfish</include>
+                <include>io.machinecode.chainlink:chainlink-ee-tomee</include>
+                <include>io.machinecode.chainlink:chainlink-ee-wildfly</include>
                 <include>io.machinecode.chainlink:chainlink-inject-core</include>
                 <include>io.machinecode.chainlink:chainlink-inject-cdi</include>
+                <include>io.machinecode.chainlink:chainlink-inject-guice</include>
+                <include>io.machinecode.chainlink:chainlink-inject-jndi</include>
                 <include>io.machinecode.chainlink:chainlink-inject-seam</include>
                 <include>io.machinecode.chainlink:chainlink-inject-spring</include>
                 <include>io.machinecode.chainlink:chainlink-jsl-core</include>
@@ -51,7 +56,7 @@
                 <include>com.google.inject:guice</include>
                 <include>com.h2database:h2</include>
                 <include>com.hazelcast:hazelcast</include>
-                <include>com.oracle.coherence:coherence</include>
+                <!-- <include>com.oracle.coherence:coherence</include> -->
                 <include>gnu-getopt:getopt</include>
                 <include>io.machinecode.then:then-api</include>
                 <include>io.machinecode.then:then-core</include>
@@ -84,9 +89,19 @@
                 <include>postgresql:postgresql</include>
                 <include>redis.clients:jedis</include>
             </includes>
-            <outputDirectory>lib</outputDirectory>
+            <outputDirectory>repository</outputDirectory>
         </dependencySet>
     </dependencySets>
+
+    <fileSets>
+        <fileSet>
+            <outputDirectory>modules</outputDirectory>
+            <directory>../ee/wildfly/modules</directory>
+            <directoryMode>755</directoryMode>
+            <fileMode>644</fileMode>
+            <filtered>true</filtered>
+        </fileSet>
+    </fileSets>
 
     <files>
         <file>
@@ -114,7 +129,13 @@
             <fileMode>664</fileMode>
         </file>
         <file>
-            <source>../server/chainlinkd/install</source>
+            <source>target/vars</source>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>644</fileMode>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>install</source>
             <outputDirectory>/</outputDirectory>
             <fileMode>754</fileMode>
         </file>

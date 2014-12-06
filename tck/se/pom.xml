@@ -97,33 +97,26 @@
                         <phase>post-integration-test</phase>
                     </execution>
                     <execution>
-                        <id>copy-test-artifact</id>
-                        <phase>pre-integration-test</phase>
+                        <id>install-background-server</id>
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <target>
+                                <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
+                                       dest="${container.dir}"/>
+                                <chmod file="${chainlink.dir}/install" perm="754"/>
+                                <exec executable="${chainlink.dir}/install"
+                                      dir="${chainlink.dir}">
+                                    <arg value="-c"/><arg value="se"/>
+                                    <arg value="-m"/><arg value="all"/>
+                                </exec>
+
                                 <jar destfile="${project.build.directory}/chainlink-tck-se-${project.version}.jar" basedir="${project.build.directory}/test-classes"/>
                                 <copy file="${project.build.directory}/chainlink-tck-se-${project.version}.jar"
                                       tofile="${deployment.dir}/chainlink-tck-se-${project.version}.jar"
                                       overwrite="true"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>start-background-server</id>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <phase>pre-integration-test</phase>
-                        <configuration>
-                            <target>
-                                <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-chainlinkd.zip"
-                                       dest="${container.dir}"/>
-                                <chmod file="${chainlink.dir}/install" perm="754"/>
-                                <exec executable="${chainlink.dir}/install"
-                                      dir="${chainlink.dir}"/>
 
                                 <copy file="${project.basedir}/../chainlink-tck.xml"
                                       tofile="${chainlink.dir}/cnf/chainlink-tck.xml"
@@ -149,7 +142,17 @@
                                 </copy>
 
                                 <chmod file="${chainlink.dir}/bin/*" perm="754"/>
-
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>start-background-server</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
                                 <exec executable="${chainlink.dir}/bin/chainlink"
                                       dir="${chainlink.dir}/bin">
                                     <arg value="-p"/>
@@ -160,11 +163,11 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>stop-background-server</id>
+                        <id>uninstall-background-server</id>
+                        <phase>post-integration-test</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
-                        <phase>post-integration-test</phase>
                         <configuration>
                             <target>
                                 <exec executable="${chainlink.dir}/bin/chainlink"
@@ -174,6 +177,8 @@
                                 <exec executable="${chainlink.dir}/install"
                                       dir="${chainlink.dir}">
                                     <arg value="-u"/>
+                                    <arg value="-c"/><arg value="se"/>
+                                    <arg value="-m"/><arg value="all"/>
                                 </exec>
                             </target>
                         </configuration>
@@ -195,11 +200,11 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy</id>
+                        <id>copy-tck</id>
                         <phase>process-test-classes</phase>
                     </execution>
                     <execution>
-                        <id>unpack</id>
+                        <id>unpack-tck</id>
                         <phase>process-test-sources</phase>
                     </execution>
                 </executions>

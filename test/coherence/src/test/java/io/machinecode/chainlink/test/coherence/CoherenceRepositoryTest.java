@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.test;
+package io.machinecode.chainlink.test.coherence;
 
 import com.tangosol.net.CacheFactory;
 import io.machinecode.chainlink.repository.coherence.CoherenceExecutonRepository;

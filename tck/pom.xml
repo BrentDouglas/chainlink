@@ -34,6 +34,7 @@
         <injector.configuration.destination.file>${injector.configuration.source.file}</injector.configuration.destination.file>
 
         <database.driver>org.h2.Driver</database.driver>
+        <database.datasource>org.h2.jdbcx.JdbcDataSource</database.datasource>
         <database.prefix>h2</database.prefix>
 
         <version.org.apache.maven.plugins.maven-failsafe-plugin>2.18</version.org.apache.maven.plugins.maven-failsafe-plugin>
@@ -62,11 +63,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.oracle.coherence</groupId>
-            <artifactId>coherence</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-api</artifactId>
         </dependency>
@@ -82,11 +78,6 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-coherence</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -137,11 +128,6 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-transport-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-coherence</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -243,6 +229,18 @@
 
     <profiles>
         <profile>
+            <id>coherence</id>
+            <activation>
+                <property><name>debug</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>coherence</module>
+            </modules>
+        </profile>
+
+        <!-- Containers -->
+        <profile>
             <id>se</id>
             <activation>
                 <property><name>se</name></property>
@@ -303,8 +301,28 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <registry.factory.class>io.machinecode.chainlink.tck.core.transport.CoherenceRegistryFactory</registry.factory.class>
+                <registry.factory.class>io.machinecode.chainlink.tck.coherence.CoherenceRegistryFactory</registry.factory.class>
             </properties>
+            <modules>
+                <module>coherence</module>
+            </modules>
+            <dependencies>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-tck-coherence</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-transport-coherence</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.oracle.coherence</groupId>
+                    <artifactId>coherence</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>tr-gridgain</id>
@@ -355,8 +373,23 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.CoherenceExecutionRepositoryFactory</execution.repository.factory.class>
+                <execution.repository.factory.class>io.machinecode.chainlink.repository.coherence.CoherenceExecutionRepositoryFactory</execution.repository.factory.class>
             </properties>
+            <modules>
+                <module>coherence</module>
+            </modules>
+            <dependencies>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-repository-coherence</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.oracle.coherence</groupId>
+                    <artifactId>coherence</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>re-ehcache</id>
@@ -622,6 +655,7 @@
             </activation>
             <properties>
                 <database.driver>org.mariadb.jdbc.Driver</database.driver>
+                <database.datasource>org.mariadb.jdbc.MySQLDataSource</database.datasource>
                 <database.prefix>mariadb</database.prefix>
             </properties>
         </profile>
@@ -633,9 +667,24 @@
             </activation>
             <properties>
                 <database.driver>org.postgresql.Driver</database.driver>
+                <database.datasource>org.postgresql.ds.PGPoolingDataSource</database.datasource>
                 <database.prefix>postgresql</database.prefix>
             </properties>
         </profile>
+        <!--
+        <profile>
+            <id>db-derby</id>
+            <activation>
+                <property><name>db-derby</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <database.driver>org.apache.derby.jdbc.EmbeddedDriver</database.driver>
+                <database.datasource>org.apache.derby.jdbc.EmbeddedDataSource</database.datasource>
+                <database.prefix>derby</database.prefix>
+            </properties>
+        </profile>
+        -->
 
         <!-- Marshaller -->
         <profile>
@@ -841,7 +890,7 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>copy</id>
+                            <id>copy-tck</id>
                             <phase>none</phase>
                             <goals>
                                 <goal>copy</goal>
@@ -870,7 +919,27 @@
                             </configuration>
                         </execution>
                         <execution>
-                            <id>unpack</id>
+                            <id>copy-testng</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>org.testng</groupId>
+                                        <artifactId>testng</artifactId>
+                                        <version>${version.org.testng.testng}</version>
+                                        <type>jar</type>
+                                        <overWrite>true</overWrite>
+                                        <outputDirectory>${deployment.dir}</outputDirectory>
+                                        <destFileName>testng-${version.org.testng.testng}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>unpack-tck</id>
                             <phase>none</phase>
                             <goals>
                                 <goal>unpack</goal>

@@ -43,11 +43,15 @@
                             </goals>
                             <configuration>
                                 <target>
-                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-wildfly.zip"
+                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
                                            dest="${container.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
-                                          dir="${chainlink.dir}"/>
+                                          dir="${chainlink.dir}">
+                                        <arg value="-c"/><arg value="wildfly"/>
+                                        <arg value="-d"/><arg value="${container.dir}"/>
+                                        <arg value="-m"/><arg value="all"/>
+                                    </exec>
                                     <copy file="standalone.xml" tofile="${container.dir}/standalone/configuration/standalone.xml" />
                                 </target>
                             </configuration>
@@ -63,6 +67,9 @@
                                     <exec executable="${chainlink.dir}/install"
                                           dir="${chainlink.dir}">
                                         <arg value="-u"/>
+                                        <arg value="-c"/><arg value="wildfly"/>
+                                        <arg value="-d"/><arg value="${container.dir}"/>
+                                        <arg value="-m"/><arg value="all"/>
                                     </exec>
                                 </target>
                             </configuration>

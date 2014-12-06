@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.tck.core.transport;
+package io.machinecode.chainlink.tck.coherence;
 
 import com.tangosol.net.CacheFactory;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;

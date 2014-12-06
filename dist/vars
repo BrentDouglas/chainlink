@@ -1,0 +1,95 @@
+#!/bin/bash
+#
+# @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+#
+
+export version_io_machinecode_then_then_api="@version.io.machinecode.then.then-api@"
+export version_io_machinecode_then_then_core="@version.io.machinecode.then.then-core@"
+
+export version_io_machinecode_chainlink_chainlink_api="@version.io.machinecode.chainlink.chainlink-api@"
+export version_io_machinecode_chainlink_chainlink_core="@version.io.machinecode.chainlink.chainlink-core@"
+export version_io_machinecode_chainlink_chainlink_inject_core="@version.io.machinecode.chainlink.chainlink-inject-core@"
+export version_io_machinecode_chainlink_chainlink_inject_cdi="@version.io.machinecode.chainlink.chainlink-inject-cdi@"
+export version_io_machinecode_chainlink_chainlink_jsl_core="@version.io.machinecode.chainlink.chainlink-jsl-core@"
+export version_io_machinecode_chainlink_chainlink_jsl_fluent="@version.io.machinecode.chainlink.chainlink-jsl-fluent@"
+export version_io_machinecode_chainlink_chainlink_jsl_groovy="@version.io.machinecode.chainlink.chainlink-jsl-groovy@"
+export version_io_machinecode_chainlink_chainlink_jsl_xml="@version.io.machinecode.chainlink.chainlink-jsl-xml@"
+export version_io_machinecode_chainlink_chainlink_marshalling_jdk="@version.io.machinecode.chainlink.chainlink-marshalling-jdk@"
+export version_io_machinecode_chainlink_chainlink_repository_core="@version.io.machinecode.chainlink.chainlink-repository-core@"
+export version_io_machinecode_chainlink_chainlink_repository_memory="@version.io.machinecode.chainlink.chainlink-repository-memory@"
+export version_io_machinecode_chainlink_chainlink_spi="@version.io.machinecode.chainlink.chainlink-spi@"
+export version_io_machinecode_chainlink_chainlink_transport_core="@version.io.machinecode.chainlink.chainlink-transport-core@"
+export version_net_sf_trove4j_trove4j="@version.net.sf.trove4j.trove4j@"
+
+export version_io_machinecode_chainlink_chainlink_inject_seam="@version.io.machinecode.chainlink.chainlink-inject-seam@"
+export version_org_jboss_seam_jboss_seam="@version.org.jboss.seam.jboss-seam@"
+export version_javax_servlet_servlet_api="@version.javax.servlet.servlet-api@"
+
+export version_io_machinecode_chainlink_chainlink_inject_spring="@version.io.machinecode.chainlink.chainlink-inject-spring@"
+export version_org_springframework_spring_beans="@version.org.springframework.spring-beans@"
+export version_org_springframework_spring_context="@version.org.springframework.spring-context@"
+export version_org_springframework_spring_core="@version.org.springframework.spring-core@"
+
+export version_io_machinecode_chainlink_chainlink_inject_guice="@version.io.machinecode.chainlink.chainlink-inject-guice@"
+export version_com_google_inject_guice="@version.com.google.inject.guice@"
+
+export version_com_h2database_h2="@version.com.h2database.h2@"
+
+export version_postgresql_postgresql="@version.postgresql.postgresql@"
+
+export version_org_mariadb_jdbc_mariadb_java_client="@version.org.mariadb.jdbc.mariadb-java-client@"
+
+export version_org_jboss_logging_jboss_logging="@version.org.jboss.logging.jboss-logging@"
+
+export version_io_machinecode_chainlink_chainlink_marshalling_jboss="@version.io.machinecode.chainlink.chainlink-marshalling-jboss@"
+export version_org_jboss_marshalling_jboss_marshalling="@version.org.jboss.marshalling.jboss-marshalling@"
+export version_org_jboss_marshalling_jboss_marshalling_river="@version.org.jboss.marshalling.jboss-marshalling-river@"
+
+export version_io_machinecode_chainlink_chainlink_repository_jdbc="@version.io.machinecode.chainlink.chainlink-repository-jdbc@"
+
+export version_io_machinecode_chainlink_chainlink_repository_jpa="@version.io.machinecode.chainlink.chainlink-repository-jpa@"
+export version_org_hibernate_hibernate_core="@version.org.hibernate.hibernate-core@"
+export version_org_hibernate_hibernate_entitymanager="@version.org.hibernate.hibernate-entitymanager@"
+
+export version_io_machinecode_chainlink_chainlink_repository_infinispan="@version.io.machinecode.chainlink.chainlink-repository-infinispan@"
+export version_io_machinecode_chainlink_chainlink_transport_infinispan="@version.io.machinecode.chainlink.chainlink-transport-infinispan@"
+export version_org_infinispan_infinispan_commons="@version.org.infinispan.infinispan-commons@"
+export version_org_infinispan_infinispan_core="@version.org.infinispan.infinispan-core@"
+
+export version_io_machinecode_chainlink_chainlink_transport_jgroups="@version.io.machinecode.chainlink.chainlink-transport-jgroups@"
+export version_org_jgroups_jgroups="@version.org.jgroups.jgroups@"
+
+export version_io_machinecode_chainlink_chainlink_repository_hazelcast="@version.io.machinecode.chainlink.chainlink-repository-hazelcast@"
+export version_io_machinecode_chainlink_chainlink_transport_hazelcast="@version.io.machinecode.chainlink.chainlink-transport-hazelcast@"
+export version_com_hazelcast_hazelcast="@version.com.hazelcast.hazelcast@"
+
+export version_io_machinecode_chainlink_chainlink_repository_coherence="@version.io.machinecode.chainlink.chainlink-repository-coherence@"
+export version_io_machinecode_chainlink_chainlink_transport_coherence="@version.io.machinecode.chainlink.chainlink-transport-coherence@"
+export version_com_oracle_coherence_coherence="@version.com.oracle.coherence.coherence@"
+
+export version_io_machinecode_chainlink_chainlink_repository_gridgain="@version.io.machinecode.chainlink.chainlink-repository-gridgain@"
+export version_io_machinecode_chainlink_chainlink_transport_gridgain="@version.io.machinecode.chainlink.chainlink-transport-gridgain@"
+export version_org_gridgain_gridgain_core="@version.org.gridgain.gridgain-core@"
+export version_org_gridgain_gridgain_indexing="@version.org.gridgain.gridgain-indexing@"
+
+export version_io_machinecode_chainlink_chainlink_repository_ehcache="@version.io.machinecode.chainlink.chainlink-repository-ehcache@"
+export version_net_sf_ehcache_ehcache_core="@version.net.sf.ehcache.ehcache-core@"
+
+export version_io_machinecode_chainlink_chainlink_repository_redis="@version.io.machinecode.chainlink.chainlink-repository-redis@"
+export version_redis_clients_jedis="@version.redis.clients.jedis@"
+
+export version_io_machinecode_chainlink_chainlink_repository_mongo="@version.io.machinecode.chainlink.chainlink-repository-mongo@"
+export version_org_jongo_jongo="@version.org.jongo.jongo@"
+export version_org_mongodb_mongo_java_driver="@version.org.mongodb.mongo-java-driver@"
+
+export version_io_machinecode_chainlink_chainlink_se="@version.io.machinecode.chainlink.chainlink-se@"
+export version_io_machinecode_chainlink_chainlink_server_chainlinkd="@version.io.machinecode.chainlink.chainlink-server-chainlinkd@"
+export version_gnu_getopt_getopt="@version.gnu-getopt.getopt@"
+export version_javax_enterprise_cdi_api="@version.javax.enterprise.cdi-api@"
+export version_javax_inject_javax_inject="@version.javax.inject.javax.inject@"
+export version_log4j_log4j="@version.log4j.log4j@"
+export version_org_jboss_weld_se_weld_se="@version.org.jboss.weld.se.weld-se@"
+
+export version_io_machinecode_chainlink_chainlink_ee_glassfish="@version.io.machinecode.chainlink.chainlink-ee-glassfish@"
+export version_io_machinecode_chainlink_chainlink_ee_tomee="@version.io.machinecode.chainlink.chainlink-ee-tomee@"
+export version_io_machinecode_chainlink_chainlink_ee_wildfly="@version.io.machinecode.chainlink.chainlink-ee-wildfly@"

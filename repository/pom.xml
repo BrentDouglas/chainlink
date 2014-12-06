@@ -14,7 +14,6 @@
 
     <modules>
         <module>core</module>
-        <module>coherence</module>
         <module>ehcache</module>
         <module>gridgain</module>
         <module>hazelcast</module>
@@ -25,5 +24,18 @@
         <module>mongo</module>
         <module>redis</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>coherence</id>
+            <activation>
+                <property><name>coherence</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>coherence</module>
+            </modules>
+        </profile>
+    </profiles>
 
 </project>
