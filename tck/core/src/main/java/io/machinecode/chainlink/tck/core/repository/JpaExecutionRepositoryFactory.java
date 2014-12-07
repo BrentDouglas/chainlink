@@ -3,7 +3,7 @@ package io.machinecode.chainlink.tck.core.repository;
 import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
-import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 
@@ -43,7 +43,7 @@ public class JpaExecutionRepositoryFactory implements ExecutionRepositoryFactory
     }
 
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) {
+    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) {
         return new JpaExecutionRepository(new EntityManagerLookup() {
             @Override
             public EntityManagerFactory getEntityManagerFactory() {

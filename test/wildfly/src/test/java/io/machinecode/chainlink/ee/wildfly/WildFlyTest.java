@@ -5,7 +5,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,12 +24,11 @@ public class WildFlyTest extends Assert {
     @Deployment
     public static Archive<?> deploy() {
         return ShrinkWrap.create(JavaArchive.class, WildFlyTest.class.getSimpleName() + ".jar")
-                .addClass(WildFlyTest.class)
-                .addAsResource(EmptyAsset.INSTANCE, "META-INF/beans.xml");
+                .addClass(WildFlyTest.class);
     }
 
     @Test
-    public void testWildfly() throws Exception {
+    public void testWildFly() throws Exception {
         final JobOperator operator = BatchRuntime.getJobOperator();
         assertNotNull(operator);
         assertEquals(JobOperatorView.class, operator.getClass());

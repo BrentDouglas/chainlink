@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>chainlink-tck</artifactId>
+        <groupId>io.machinecode.chainlink</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>chainlink-tck-wildfly</artifactId>
+
+    <properties>
+        <container.dir>${project.build.directory}/wildfly-${version.org.wildfly}</container.dir>
+        <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
+        <deployment.dir>${project.build.directory}/deps</deployment.dir>
+
+        <wildfly.jvm.arguments>-server</wildfly.jvm.arguments> <!-- Need to have something here for arquillian to handle it properly -->
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-ee-wildfly</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-tck-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ibm.jbatch</groupId>
+            <artifactId>com.ibm.jbatch.tck</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.batch</groupId>
+                    <artifactId>javax.batch-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch.spi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ibm.jbatch</groupId>
+                    <artifactId>com.ibm.jbatch.container</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>gnu-getopt</groupId>
+            <artifactId>getopt</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.core</groupId>
+            <artifactId>arquillian-core-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.arquillian</groupId>
+            <artifactId>wildfly-arquillian-container-managed</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>re-jpa</id>
+            <activation>
+                <property><name>re-jpa</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>first-pass-persistence-xml</id>
+                                <phase>generate-test-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>second-pass-persistence-xml</id>
+                                <phase>process-test-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>debug</id>
+            <activation>
+                <property><name>debug</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <container.debug>true</container.debug>
+                <wildfly.jvm.arguments>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>ensure-test-properties</id>
+                        <phase>initialize</phase>
+                    </execution>
+                    <execution>
+                        <id>create-test-resources</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>destroy-test-resources</id>
+                        <phase>post-integration-test</phase>
+                    </execution>
+                    <execution>
+                        <id>install-background-server</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
+                                       dest="${container.dir}"/>
+                                <chmod file="${chainlink.dir}/install" perm="754"/>
+                                <exec executable="${chainlink.dir}/install"
+                                      dir="${chainlink.dir}">
+                                    <arg value="-c"/><arg value="wildfly"/>
+                                    <arg value="-d"/><arg value="${container.dir}"/>
+                                    <arg value="-m"/><arg value="all"/>
+                                </exec>
+                                <copy file="${project.basedir}/standalone.xml"
+                                      tofile="${container.dir}/standalone/configuration/standalone.xml"
+                                      filtering="true"
+                                      overwrite="true">
+                                    <filterset>
+                                        <filter token="tck.database.url" value="${tck.database.url}" />
+                                        <filter token="tck.database.driver" value="${tck.database.driver}" />
+                                        <filter token="tck.database.datasource" value="${tck.database.datasource}" />
+                                        <filter token="tck.database.user" value="${tck.database.user}" />
+                                        <filter token="tck.database.password" value="${tck.database.password}" />
+
+                                        <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
+                                        <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
+                                        <filter token="executor.factory.class" value="${executor.factory.class}" />
+                                        <filter token="injector.factory.class" value="${injector.factory.class}" />
+                                        <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
+                                        <filter token="security.check.factory.class" value="${security.check.factory.class}" />
+                                        <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
+                                        <filter token="registry.factory.class" value="${registry.factory.class}" />
+                                        <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
+                                        <filter token="worker.factory.class" value="${worker.factory.class}" />
+                                        <filter token="marshalling.provider.factory.class" value="${marshalling.provider.factory.class}" />
+                                    </filterset>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>uninstall-background-server</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec executable="${chainlink.dir}/install"
+                                      dir="${chainlink.dir}">
+                                    <arg value="-u"/>
+                                    <arg value="-c"/><arg value="wildfly"/>
+                                    <arg value="-d"/><arg value="${container.dir}"/>
+                                    <arg value="-m"/><arg value="all"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>instrument-classes</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="test_classpath" refid="maven.test.classpath"/>
+                                <exec executable="java"
+                                      dir="${project.build.directory}">
+                                    <arg value="-cp"/>
+                                    <arg value="${test_classpath}"/>
+                                    <arg value="io.machinecode.chainlink.tck.core.TestInstrument"/>
+                                    <arg value="-c"/><arg value="io.machinecode.chainlink.tck.wildfly.WildFlyTckConfigurationFactory"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/ee/TransactionTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/BatchletRestartStateMachineTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ChunkTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ContextAndListenerTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ContextsGetIdTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/DeciderTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ExecuteTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ExecutionTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/FlowTransitioningTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/JobAttributeRestartTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/JobExecutableSequenceTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/JobLevelPropertiesTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/JobOperatorTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/MetricsTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ParallelExecutionTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/PropertySubstitutionTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/RestartNotMostRecentTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/RetryListenerTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/SplitFlowTransitionLoopTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/SplitTransitioningTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/StartLimitTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/StepExecutionTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/StepLevelPropertiesTests.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/StopOrFailOnExitStatusWithRestartTests.class"/>
+                                    <arg value="-l"/><arg value="${project.build.directory}/deps/com.ibm.jbatch.tck.spi-${version.com.ibm.jbatch.com.ibm.jbatch.tck.spi}.jar"/>
+                                    <arg value="-l"/><arg value="${project.build.directory}/deps/chainlink-tck-core-${project.version}.jar"/>
+                                    <arg value="-l"/><arg value="${project.build.directory}/deps/testng-${version.org.testng.testng}.jar"/>
+                                    <arg value="-r"/><arg value="${project.build.testOutputDirectory}/coherence-cache-config.xml"/>
+                                    <arg value="-r"/><arg value="${project.build.testOutputDirectory}/ehcache.xml"/>
+                                    <arg value="-r"/><arg value="${project.build.testOutputDirectory}/hazelcast.xml"/>
+                                    <arg value="-r"/><arg value="${project.build.testOutputDirectory}/tck-udp.xml"/>
+                                    <arg value="-r"/><arg value="${project.build.testOutputDirectory}/ChainlinkMessages_en.properties"/>
+                                    <arg value="-r"/><arg value="${project.build.testOutputDirectory}/META-INF"/>
+                                    <arg value="-w"/><arg value="${project.basedir}/src/test/resources/WEB-INF/web.xml"/>
+                                    <arg value="-e"/><arg value="${project.build.directory}/exported-tests"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>instrument-helpers</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="test_classpath" refid="maven.test.classpath"/>
+                                <exec executable="java"
+                                      dir="${project.build.directory}">
+                                    <arg value="-cp"/>
+                                    <arg value="${test_classpath}"/>
+                                    <arg value="io.machinecode.chainlink.tck.core.FieldInstrument"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/ConnectionHelper.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryConnectionHelper.class"/>
+                                    <arg value="-f"/><arg value="jndiName"/>
+                                    <arg value="-v"/><arg value="java:jboss/datasources/ExampleDS"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>instrument-artifacts</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="test_classpath" refid="maven.test.classpath"/>
+                                <exec executable="java"
+                                      dir="${project.build.directory}">
+                                    <arg value="-cp"/>
+                                    <arg value="${test_classpath}"/>
+                                    <arg value="io.machinecode.chainlink.tck.core.FieldInstrument"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryInitReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryInitWriter.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryWriter.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryStepListener.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/NumbersReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryInitReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryInitWriter.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryWriter.class"/>
+                                    <arg value="-c"/><arg value="jdbc/orderDB"/>
+                                    <arg value="-v"/><arg value="java:jboss/datasources/ExampleDS"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-test-resources</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-tck</id>
+                        <phase>process-test-classes</phase>
+                    </execution>
+                    <execution>
+                        <id>copy-testng</id>
+                        <phase>process-test-classes</phase>
+                    </execution>
+                    <execution>
+                        <id>unpack-tck</id>
+                        <phase>process-test-sources</phase>
+                    </execution>
+                    <execution>
+                        <id>unpack-container</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${version.org.wildfly}</version>
+                                    <type>zip</type>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <skipExec>false</skipExec>
+                    <systemPropertyVariables>
+                        <container.dir>${container.dir}</container.dir>
+                        <wildfly.jvm.arguments>${wildfly.jvm.arguments}</wildfly.jvm.arguments>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>log4j-properties</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>read-properties</id>
+                        <phase>generate-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

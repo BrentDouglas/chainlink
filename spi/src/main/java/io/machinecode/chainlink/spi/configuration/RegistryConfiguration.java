@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public interface RegistryConfiguration extends RepositoryConfiguration {
+public interface RegistryConfiguration extends ExecutionRepositoryConfiguration {
 
-    ExecutionRepository getRepository();
+    ExecutionRepository getExecutionRepository();
 }

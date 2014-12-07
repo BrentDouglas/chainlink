@@ -203,6 +203,14 @@
             <artifactId>trove4j</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.gridgain</groupId>
             <artifactId>gridgain-core</artifactId>
         </dependency>
@@ -330,67 +338,33 @@
                         <phase>process-resources</phase>
                         <configuration>
                             <target>
-                                <copy file="${project.basedir}/vars"
-                                      tofile="${project.build.directory}/vars"
+                                <copy file="${project.basedir}/filter.properties"
+                                      tofile="${project.build.directory}/filter.properties"
                                       filtering="true"
                                       overwrite="true">
                                     <filterset>
-                                        <filter token="version.io.machinecode.chainlink.chainlink-api" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-core" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-ee-glassfish" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-ee-tomee" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-ee-wildfly" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-inject-core" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-inject-cdi" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-inject-guice" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-inject-seam" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-inject-spring" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-jsl-core" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-jsl-fluent" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-jsl-groovy" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-jsl-xml" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-marshalling-jboss" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-marshalling-jdk" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-core" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-coherence" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-ehcache" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-gridgain" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-hazelcast" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-infinispan" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-jdbc" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-jpa" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-memory" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-mongo" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-repository-redis" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-se" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-server-chainlinkd" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-spi" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-transport-core" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-transport-coherence" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-transport-gridgain" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-transport-hazelcast" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-transport-infinispan" value="${project.version}" />
-                                        <filter token="version.io.machinecode.chainlink.chainlink-transport-jgroups" value="${project.version}" />
+                                        <filter token="project.version" value="${project.version}" />
 
                                         <filter token="version.com.google.inject.guice" value="${version.com.google.inject.guice}" />
                                         <filter token="version.com.h2database.h2" value="${version.com.h2database.h2}" />
                                         <filter token="version.com.hazelcast.hazelcast" value="${version.com.hazelcast.hazelcast}" />
                                         <filter token="version.com.oracle.coherence.coherence" value="${version.com.oracle.coherence.coherence}" />
                                         <filter token="version.gnu-getopt.getopt" value="${version.gnu-getopt.getopt}" />
-                                        <filter token="version.io.machinecode.then.then-api" value="${version.io.machinecode.then}" />
-                                        <filter token="version.io.machinecode.then.then-core" value="${version.io.machinecode.then}" />
+                                        <filter token="version.io.machinecode.then.then-api" value="${version.io.machinecode.then.then-api}" />
+                                        <filter token="version.io.machinecode.then.then-core" value="${version.io.machinecode.then.then-core}" />
                                         <filter token="version.javax.enterprise.cdi-api" value="${version.javax.enterprise.cdi-api}" />
                                         <filter token="version.javax.inject.javax.inject" value="${version.javax.inject}" />
                                         <filter token="version.javax.servlet.servlet-api" value="${version.javax.servlet.servlet-api}" />
                                         <filter token="version.log4j.log4j" value="${version.log4j.log4j}" />
                                         <filter token="version.net.sf.ehcache.ehcache-core" value="${version.net.sf.ehcache.ehcache-core}" />
                                         <filter token="version.net.sf.trove4j.trove4j" value="${version.net.sf.trove4j.trove4j}" />
+                                        <filter token="version.org.apache.derby.derby" value="${version.org.apache.derby.derby}" />
+                                        <filter token="version.org.codehaus.groovy.groovy-all" value="${version.org.codehaus.groovy.groovy-all}" />
                                         <filter token="version.org.gridgain.gridgain-core" value="${version.org.gridgain.gridgain-core}" />
                                         <filter token="version.org.gridgain.gridgain-indexing" value="${version.org.gridgain.gridgain-indexing}" />
-                                        <filter token="version.org.hibernate.hibernate-core" value="${version.org.hibernate}" />
-                                        <filter token="version.org.hibernate.hibernate-entitymanager" value="${version.org.hibernate}" />
-                                        <filter token="version.org.infinispan.infinispan-commons" value="${version.org.infinispan.infinispan-bom}" />
-                                        <filter token="version.org.infinispan.infinispan-core" value="${version.org.infinispan.infinispan-bom}" />
+                                        <filter token="version.org.hibernate.hibernate-core" value="${version.org.hibernate.hibernate-core}" />
+                                        <filter token="version.org.hibernate.hibernate-entitymanager" value="${version.org.hibernate.hibernate-entitymanager}" />
+                                        <filter token="version.org.infinispan.infinispan-bom" value="${version.org.infinispan.infinispan-bom}" />
                                         <filter token="version.org.jboss.logging.jboss-logging" value="${version.org.jboss.logging.jboss-logging}" />
                                         <filter token="version.org.jboss.marshalling.jboss-marshalling" value="${version.org.jboss.marshalling.jboss-marshalling}" />
                                         <filter token="version.org.jboss.marshalling.jboss-marshalling-river" value="${version.org.jboss.marshalling.jboss-marshalling}" />
@@ -423,6 +397,9 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
+                            <filters>
+                                <filter>${project.build.directory}/filter.properties</filter>
+                            </filters>
                             <descriptors>
                                 <descriptor>all.xml</descriptor>
                                 <descriptor>min.xml</descriptor>

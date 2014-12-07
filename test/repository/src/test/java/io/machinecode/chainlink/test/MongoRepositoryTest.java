@@ -21,6 +21,6 @@ public class MongoRepositoryTest extends RepositoryTest {
         final String database = System.getProperty("mongo.database");
         log.infof("Connection: {\n\turl: '%s'\n}", host);
         final Jongo jongo = new Jongo(new MongoClient(host, port).getDB(database));
-        return new MongoExecutionRepository(jongo, marshallerFactory().produce(null), true);
+        return new MongoExecutionRepository(jongo, marshallingProviderFactory().produce(null), true);
     }
 }

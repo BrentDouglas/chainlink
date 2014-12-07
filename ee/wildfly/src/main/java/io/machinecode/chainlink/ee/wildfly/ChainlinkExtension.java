@@ -20,7 +20,7 @@ public class ChainlinkExtension implements Extension, WildFlyConstants {
         for (final String prefix : keyPrefix) {
             builder.append('.').append(prefix);
         }
-        return new StandardResourceDescriptionResolver(builder.toString(), RESOURCE_NAME, ChainlinkExtension.class.getClassLoader(), true, true);
+        return new StandardResourceDescriptionResolver(builder.toString(), RESOURCE_NAME, ChainlinkExtension.class.getClassLoader(), true, false);
     }
 
     @Override

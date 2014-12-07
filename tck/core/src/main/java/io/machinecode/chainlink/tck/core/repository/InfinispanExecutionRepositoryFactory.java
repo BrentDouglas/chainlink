@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.infinispan.configuration.cache.CacheMode;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class InfinispanExecutionRepositoryFactory implements ExecutionRepositoryFactory {
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
+    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) throws Exception {
         return new InfinispanExecutionRepository(
                 configuration.getMarshallingProviderFactory().produce(configuration),
                 new DefaultCacheManager(

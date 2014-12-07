@@ -40,17 +40,17 @@ public class SeEnvironment implements Environment {
     }
 
     @Override
-    public JobOperatorImpl getJobOperator(final String id) throws NoConfigurationWithIdException {
+    public JobOperatorImpl getJobOperator(final String name) throws NoConfigurationWithIdException {
         synchronized (this) {
             if (!loaded) {
                 loadConfiguration();
             }
         }
-        final JobOperatorImpl operator = operators.get(id);
+        final JobOperatorImpl operator = operators.get(name);
         if (operator != null) {
             return operator;
         } else {
-            throw new NoConfigurationWithIdException(Messages.format("CHAINLINK-031004.no.configuration.with.id", id));
+            throw new NoConfigurationWithIdException(Messages.format("CHAINLINK-031004.no.configuration.with.id", name));
         }
     }
 
@@ -82,7 +82,7 @@ public class SeEnvironment implements Environment {
 
                 for (final XmlConfiguration configuration : xml.getConfigurations()) {
                     operators.put(
-                            configuration.getId(),
+                            configuration.getName(),
                             new JobOperatorImpl(SeConfiguration.xmlToBuilder(configuration)
                                     .setConfigurationDefaults(defaults)
                                     .build()

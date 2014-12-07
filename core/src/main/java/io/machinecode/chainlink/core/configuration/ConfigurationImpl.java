@@ -50,7 +50,7 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
     protected final ClassLoader classLoader;
     protected final MarshallingProviderFactory marshallingProviderFactory;
     protected final Registry registry;
-    protected final ExecutionRepository repository;
+    protected final ExecutionRepository executionRepository;
     protected final TransactionManager transactionManager;
     protected final JobLoader jobLoader;
     protected final ArtifactLoader artifactLoader;
@@ -76,8 +76,8 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
         final ArrayList<SecurityCheck> securityChecks = _arrayGet(this.classLoader, builder.securityChecks, builder.securityCheckFactories, builder.securityCheckFactoriesClass, builder.securityCheckFactoriesFqcns, this);
         this.securityCheck = new SecurityCheckImpl(securityChecks.toArray(new SecurityCheck[securityChecks.size()]));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
-        this.marshallingProviderFactory = (MarshallingProviderFactory) _getFactory(this.classLoader, builder.marshallingProviderFactory, builder.marshallingProviderFactoryClass, builder.marshallingProviderFactoryFqcn, builder.defaults.getMarshallerFactory(this));
-        this.repository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, builder.defaults.getRepository(this), this);
+        this.marshallingProviderFactory = (MarshallingProviderFactory) _getFactory(this.classLoader, builder.marshallingProviderFactory, builder.marshallingProviderFactoryClass, builder.marshallingProviderFactoryFqcn, builder.defaults.getMarshallingProviderFactory(this));
+        this.executionRepository = _get(this.classLoader, builder.executionRepository, builder.executionRepositoryFactory, builder.executionRepositoryFactoryClass, builder.executionRepositoryFactoryFqcn, builder.defaults.getExecutionRepository(this), this);
         this.mBeanServer = _get(this.classLoader, builder.mBeanServer, builder.mBeanServerFactory, builder.mBeanServerFactoryClass, builder.mBeanServerFactoryFqcn, builder.defaults.getMBeanServer(this), this);
         this.registry = _get(this.classLoader, builder.registry, builder.registryFactory, builder.registryFactoryClass, builder.registryFactoryFqcn, builder.defaults.getRegistry(this), this);
         this.executor = _get(this.classLoader, builder.executor, builder.executorFactory, builder.executorFactoryClass, builder.executorFactoryFqcn, builder.defaults.getExecutor(this), this);
@@ -90,8 +90,8 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
     }
 
     @Override
-    public ExecutionRepository getRepository() {
-        return this.repository;
+    public ExecutionRepository getExecutionRepository() {
+        return this.executionRepository;
     }
 
     @Override
@@ -333,8 +333,8 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
                 .setArtifactLoaderFactoriesFqcns(_fqcns(xml.getArtifactLoaderFactories()))
                 .setInjectorFactoriesFqcns(_fqcns(xml.getInjectorFactories()))
                 .setSecurityCheckFactoriesFqcns(_fqcns(xml.getSecurityCheckFactories()))
-                .setMarshallingProviderFactoryFqcn(xml.getMarshallerFactory().getClazz())
-                .setExecutionRepositoryFactoryFqcn(xml.getMarshallerFactory().getClazz())
+                .setMarshallingProviderFactoryFqcn(xml.getMarshallingProviderFactory().getClazz())
+                .setExecutionRepositoryFactoryFqcn(xml.getMarshallingProviderFactory().getClazz())
                 .setMBeanServerFactoryFqcn(xml.getmBeanServerFactory().getClazz())
                 .setRegistryFactoryFqcn(xml.getRegistryFactory().getClazz())
                 .setExecutorFactoryFqcn(xml.getExecutorFactory().getClazz())
@@ -356,7 +356,7 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
     public abstract static class _Builder<T extends _Builder<T>> implements ConfigurationBuilder<T> {
         private ConfigurationDefaults defaults;
 
-        private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        private ClassLoader classLoader;
         private Executor executor;
         private Registry registry;
         private MBeanServer mBeanServer;

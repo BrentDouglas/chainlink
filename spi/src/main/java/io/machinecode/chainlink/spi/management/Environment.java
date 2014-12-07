@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public interface Environment {
 
-    ExtendedJobOperator getJobOperator(final String id) throws NoConfigurationWithIdException;
+    ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException;
 
     Map<String, ? extends ExtendedJobOperator> getJobOperators();
 }

@@ -66,9 +66,9 @@ public abstract class BaseTest extends Assert {
         return _transactionManager;
     }
 
-    protected final MarshallingProviderFactory marshallerFactory() throws Exception {
+    protected final MarshallingProviderFactory marshallingProviderFactory() throws Exception {
         if (this._marshallingProviderFactory == null) {
-            this._marshallingProviderFactory = _marshallerFactory();
+            this._marshallingProviderFactory = _marshallingProviderFactory();
         }
         return _marshallingProviderFactory;
     }
@@ -90,7 +90,7 @@ public abstract class BaseTest extends Assert {
                 .setExecutionRepository(repository())
                 .setExecutorFactory(executor())
                 .setWorkerFactory(_workerFactory())
-                .setMarshallingProviderFactory(marshallerFactory())
+                .setMarshallingProviderFactory(marshallingProviderFactory())
                 .setRegistryFactory(registryFactory())
                 .setProperty(Constants.THREAD_POOL_SIZE, "8");
     }
@@ -101,7 +101,7 @@ public abstract class BaseTest extends Assert {
         return new LocalTransactionManager(180, TimeUnit.SECONDS);
     }
 
-    protected MarshallingProviderFactory _marshallerFactory() throws Exception {
+    protected MarshallingProviderFactory _marshallingProviderFactory() throws Exception {
         return (MarshallingProviderFactory) Class.forName(System.getProperty("marshalling.provider.factory.class")).newInstance();
     }
 

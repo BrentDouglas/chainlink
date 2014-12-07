@@ -987,7 +987,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     private ExtendedJobInstance _ji(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(JOB_INSTANCE_PREFIX, id));
-        return response == null ? null : (ExtendedJobInstance) unmarshaller.unmarshall(response, this.loader.get());
+        return response == null ? null : unmarshaller.unmarshall(response, JobInstanceImpl.class, this.loader.get());
     }
 
     private ExtendedJobInstance _ji(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
@@ -996,7 +996,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     private ExtendedJobExecution _je(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(JOB_EXECUTION_PREFIX, id));
-        return response == null ? null : (ExtendedJobExecution) unmarshaller.unmarshall(response, this.loader.get());
+        return response == null ? null : unmarshaller.unmarshall(response, JobExecutionImpl.class, this.loader.get());
     }
 
     private ExtendedJobExecution _je(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
@@ -1005,7 +1005,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     private ExtendedStepExecution _se(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(STEP_EXECUTION_PREFIX, id));
-        return response == null ? null : (ExtendedStepExecution) unmarshaller.unmarshall(response, this.loader.get());
+        return response == null ? null : unmarshaller.unmarshall(response, StepExecutionImpl.class, this.loader.get());
     }
 
     private ExtendedStepExecution _se(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
@@ -1014,7 +1014,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     private PartitionExecution _pe(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
         final byte[] response = jedis.get(marshaller.marshall(PARTITION_EXECUTION_PREFIX, id));
-        return (PartitionExecution) unmarshaller.unmarshall(response, this.loader.get());
+        return unmarshaller.unmarshall(response, PartitionExecutionImpl.class, this.loader.get());
     }
 
     private PartitionExecution _pe(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {

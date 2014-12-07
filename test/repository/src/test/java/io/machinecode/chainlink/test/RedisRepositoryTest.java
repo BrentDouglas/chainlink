@@ -4,6 +4,8 @@ import io.machinecode.chainlink.repository.core.MutableMetricImpl;
 import io.machinecode.chainlink.repository.redis.RedisExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
+import org.junit.After;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisShardInfo;
 
 /**
@@ -11,15 +13,34 @@ import redis.clients.jedis.JedisShardInfo;
  */
 public class RedisRepositoryTest extends RepositoryTest {
 
+    protected JedisShardInfo info;
+
+    private JedisShardInfo _info() {
+        if (info == null) {
+            info = new JedisShardInfo(
+                    System.getProperty("redis.host"),
+                    Integer.parseInt(System.getProperty("redis.port"))
+            );
+        }
+        return info;
+    }
+
     @Override
     protected ExecutionRepository _repository() throws Exception {
         return new RedisExecutionRepository(
-                new JedisShardInfo(
-                        System.getProperty("redis.host"),
-                        Integer.parseInt(System.getProperty("redis.port"))
-                ),
+                _info(),
                 MutableMetricImpl.class.getClassLoader(),
-                marshallerFactory().produce(null)
+                marshallingProviderFactory().produce(null)
         );
+    }
+
+    @After
+    public void after() throws Exception {
+        final Jedis jedis = _info().createResource();
+        try {
+            jedis.flushDB();
+        } finally {
+            jedis.disconnect();
+        }
     }
 }

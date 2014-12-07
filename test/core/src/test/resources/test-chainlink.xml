@@ -3,15 +3,15 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://xmlns.io.machinecode/xml/ns/chainlink http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
 
-    <configuration id="Default">
+    <job-operator name="Default">
         <executor-factory class=""/>
         <registry-factory class=""/>
         <worker-factory class=""/>
-        <marshaller-factory class=""/>
+        <marshalling-provider-factory class=""/>
         <mbean-server-factory class="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
         <execution-repository-factory class=""/>
         <artifact-loader-factory class="io.machinecode.chainlink.inject.cdi.CdiArtifactLoader"/>
         <injector-factory class="io.machinecode.chainlink.inject.cdi.CdiInjector"/>
-    </configuration>
+    </job-operator>
 
 </chainlink>

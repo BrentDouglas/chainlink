@@ -11,6 +11,8 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class PartitionExecutionImpl extends BaseExecutionImpl implements PartitionExecution, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final long partitionExecutionId;
     private final long stepExecutionId;
     private final int partitionId;

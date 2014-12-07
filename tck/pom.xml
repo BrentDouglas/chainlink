@@ -34,7 +34,6 @@
         <injector.configuration.destination.file>${injector.configuration.source.file}</injector.configuration.destination.file>
 
         <database.driver>org.h2.Driver</database.driver>
-        <database.datasource>org.h2.jdbcx.JdbcDataSource</database.datasource>
         <database.prefix>h2</database.prefix>
 
         <version.org.apache.maven.plugins.maven-failsafe-plugin>2.18</version.org.apache.maven.plugins.maven-failsafe-plugin>
@@ -201,11 +200,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <scope>test</scope>
@@ -213,11 +207,6 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -276,11 +265,9 @@
                 <property><name>wildfly</name></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
-        <!--
             <modules>
                 <module>wildfly</module>
             </modules>
-        -->
         </profile>
         <profile>
             <id>debug</id>
@@ -655,9 +642,15 @@
             </activation>
             <properties>
                 <database.driver>org.mariadb.jdbc.Driver</database.driver>
-                <database.datasource>org.mariadb.jdbc.MySQLDataSource</database.datasource>
                 <database.prefix>mariadb</database.prefix>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mariadb.jdbc</groupId>
+                    <artifactId>mariadb-java-client</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>db-postgresql</id>
@@ -667,11 +660,16 @@
             </activation>
             <properties>
                 <database.driver>org.postgresql.Driver</database.driver>
-                <database.datasource>org.postgresql.ds.PGPoolingDataSource</database.datasource>
                 <database.prefix>postgresql</database.prefix>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
-        <!--
         <profile>
             <id>db-derby</id>
             <activation>
@@ -680,11 +678,16 @@
             </activation>
             <properties>
                 <database.driver>org.apache.derby.jdbc.EmbeddedDriver</database.driver>
-                <database.datasource>org.apache.derby.jdbc.EmbeddedDataSource</database.datasource>
                 <database.prefix>derby</database.prefix>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derby</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
-        -->
 
         <!-- Marshaller -->
         <profile>
@@ -751,7 +754,7 @@
                                           overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../src/test/resources/META-INF/${injector.configuration.source.file}"
-                                          tofile="${project.basedir}/src/test/resources/META-INF/${injector.configuration.destination.file}"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/${injector.configuration.destination.file}"
                                           overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/com.ibm.jbatch.tck.spi.JobExecutionWaiterFactory"
@@ -850,15 +853,15 @@
                             </configuration>
                         </execution>
                         <execution>
-                            <id>create-persistence-xml</id>
+                            <id>first-pass-persistence-xml</id>
+                            <phase>none</phase>
                             <goals>
                                 <goal>run</goal>
                             </goals>
-                            <phase>none</phase>
                             <configuration>
                                 <target>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.template.xml"
-                                          tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/persistence.xml"
+                                          tofile="${project.build.directory}/persistence-xml/persistence.xml"
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>
@@ -870,17 +873,44 @@
                                 </target>
                             </configuration>
                         </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <executions>
                         <execution>
-                            <id>destroy-test-resources</id>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
+                            <id>second-pass-persistence-xml</id>
                             <phase>none</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
                             <configuration>
-                                <target>
-                                    <delete file="${project.basedir}/src/test/resources/META-INF/${injector.configuration.destination.file}" quiet="true"/>
-                                    <delete file="${project.basedir}/src/test/resources/META-INF/persistence.xml" quiet="true"/>
-                                </target>
+                                <outputDirectory>${project.build.testOutputDirectory}/META-INF</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.build.directory}/persistence-xml</directory>
+                                        <filtering>true</filtering>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>log4j-properties</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.basedir}/..</directory>
+                                        <includes>
+                                            <include>log4j.properties</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
                             </configuration>
                         </execution>
                     </executions>

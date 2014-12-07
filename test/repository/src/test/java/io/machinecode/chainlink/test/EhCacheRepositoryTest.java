@@ -15,7 +15,7 @@ public class EhCacheRepositoryTest extends RepositoryTest {
     @Override
     protected ExecutionRepository _repository() throws Exception {
         return new EhCacheExecutionRepository(
-                marshallerFactory().produce(null),
+                marshallingProviderFactory().produce(null),
                 manager
         );
     }

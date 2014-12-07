@@ -16,8 +16,8 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 public class XmlConfiguration {
 
     @XmlID
-    @XmlAttribute(name = "id", required = true)
-    private String id;
+    @XmlAttribute(name = "name", required = true)
+    private String name;
 
     @XmlElement(name = "executor-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef executorFactory;
@@ -28,8 +28,8 @@ public class XmlConfiguration {
     @XmlElement(name = "worker-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef workerFactory;
 
-    @XmlElement(name = "marshaller-factory", namespace = XmlChainlink.NAMESPACE, required = true)
-    private XmlClassRef marshallerFactory;
+    @XmlElement(name = "marshalling-provider-factory", namespace = XmlChainlink.NAMESPACE, required = true)
+    private XmlClassRef marshallingProviderFactory;
 
     @XmlElement(name = "mbean-server-factory", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlClassRef mBeanServerFactory;
@@ -58,12 +58,12 @@ public class XmlConfiguration {
     @XmlElement(name = "property", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlProperty> properties = new ArrayList<XmlProperty>(0);
 
-    public String getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
-    public void setId(final String id) {
-        this.id = id;
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public XmlClassRef getExecutorFactory() {
@@ -106,12 +106,12 @@ public class XmlConfiguration {
         this.executionRepositoryFactory = executionRepositoryFactory;
     }
 
-    public XmlClassRef getMarshallerFactory() {
-        return marshallerFactory;
+    public XmlClassRef getMarshallingProviderFactory() {
+        return marshallingProviderFactory;
     }
 
-    public void setMarshallerFactory(final XmlClassRef marshallerFactory) {
-        this.marshallerFactory = marshallerFactory;
+    public void setMarshallingProviderFactory(final XmlClassRef marshallingProviderFactory) {
+        this.marshallingProviderFactory = marshallingProviderFactory;
     }
 
     public XmlClassRef getClassLoaderFactory() {

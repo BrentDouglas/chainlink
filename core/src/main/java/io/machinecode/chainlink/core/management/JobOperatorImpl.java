@@ -72,7 +72,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         this.securityCheck = this.configuration.getSecurityCheck();
         this.executionRepositoryId = this.registry.registerExecutionRepository(
                 registry.generateExecutionRepositoryId(),
-                configuration.getRepository()
+                configuration.getExecutionRepository()
         );
         final int numThreads;
         try {

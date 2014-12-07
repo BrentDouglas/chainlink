@@ -1,0 +1,3 @@
+delete-jdbc-resource  jdbc/orderDB
+delete-jdbc-connection-pool  OrderPool
+stop-database  --dbhost  localhost  --dbport  1527

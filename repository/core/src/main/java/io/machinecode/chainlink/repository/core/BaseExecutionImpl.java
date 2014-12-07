@@ -13,6 +13,8 @@ import java.util.Date;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class BaseExecutionImpl implements BaseExecution, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final BatchStatus batchStatus;
     private final Date createTime;
     private final Date startTime;

@@ -44,13 +44,13 @@ public class TomEEEnvironment implements Environment {
     }
 
     @Override
-    public ExtendedJobOperator getJobOperator(final String id) throws NoConfigurationWithIdException {
+    public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
-                final JobOperatorImpl op = app.ops.get(id);
+                final JobOperatorImpl op = app.ops.get(name);
                 if (op == null) {
-                    throw new NoConfigurationWithIdException("No configuration for id: " + id); //TODO Message
+                    throw new NoConfigurationWithIdException("No configuration for id: " + name); //TODO Message
                 }
                 return op;
             }
@@ -59,7 +59,7 @@ public class TomEEEnvironment implements Environment {
     }
 
     @Override
-    public Map<String, ? extends ExtendedJobOperator> getJobOperators() {
+    public Map<String, JobOperatorImpl> getJobOperators() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
@@ -103,13 +103,13 @@ public class TomEEEnvironment implements Environment {
 
                         for (final XmlConfiguration configuration : xml.getConfigurations()) {
                             app.ops.put(
-                                    configuration.getId(),
-                                    new JobOperatorImpl(TomEEConfigutation.xmlToBuilder(configuration)
+                                    configuration.getName(),
+                                    new JobOperatorImpl(TomEEConfiguration.xmlToBuilder(configuration)
                                             .setConfigurationDefaults(defaults)
                                             .build()
                                     )
                             );
-                            if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getId())) {
+                            if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getName())) {
                                 haveDefault = true;
                             }
                         }
@@ -131,7 +131,7 @@ public class TomEEEnvironment implements Environment {
                 if (!haveDefault) {
                     app.ops.put(
                             Constants.DEFAULT_CONFIGURATION,
-                            new JobOperatorImpl(new TomEEConfigutation.Builder()
+                            new JobOperatorImpl(new TomEEConfiguration.Builder()
                                     .setConfigurationDefaults(defaults)
                                     .build()
                             )

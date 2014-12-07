@@ -3,13 +3,13 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://xmlns.io.machinecode/xml/ns/chainlink http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
 
-    <configuration id="default">
+    <job-operator name="default">
         <executor-factory class="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
         <registry-factory class="io.machinecode.chainlink.core.registry.LocalRegistryFactory"/>
         <worker-factory class="io.machinecode.chainlink.core.execution.EventedWorkerFactory"/>
-        <marshaller-factory class="io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory"/>
+        <marshalling-provider-factory class="io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory"/>
         <mbean-server-factory class="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
         <execution-repository-factory class="io.machinecode.chainlink.repository.memory.MemoryExecutionRepositoryFactory"/>
-    </configuration>
+    </job-operator>
 
 </chainlink>

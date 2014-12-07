@@ -88,6 +88,12 @@
             <testResource>
                 <directory>${project.basedir}/src/test/resources</directory>
             </testResource>
+            <testResource>
+                <directory>${project.basedir}/..</directory>
+                <includes>
+                    <include>log4j.properties</include>
+                </includes>
+            </testResource>
         </testResources>
         <plugins>
             <plugin>

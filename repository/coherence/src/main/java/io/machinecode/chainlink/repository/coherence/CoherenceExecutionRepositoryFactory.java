@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.coherence;
 
-import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 
@@ -9,7 +9,7 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
  */
 public class CoherenceExecutionRepositoryFactory implements ExecutionRepositoryFactory {
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
+    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) throws Exception {
         return new CoherenceExecutonRepository(
                 configuration.getMarshallingProviderFactory().produce(configuration)
         );

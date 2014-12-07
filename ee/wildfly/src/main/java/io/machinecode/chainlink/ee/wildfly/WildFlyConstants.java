@@ -20,16 +20,23 @@ public interface WildFlyConstants {
     String JOB_OPERATOR = "job-operator";
     String PROPERTY = "property";
 
-    String ID = "id";
+    String CLASS_LOADER_FACTORY = "class-loader-factory";
     String WORKER_FACTORY = "worker-factory";
-    String MARSHALLER_FACTORY = "marshaller-factory";
+    String EXECUTOR_FACTORY = "executor-factory";
+    String REGISTRY_FACTORY = "registry-factory";
+    String MARSHALLING_PROVIDER_FACTORY = "marshalling-provider-factory";
     String EXECUTION_REPOSITORY_FACTORY = "execution-repository-factory";
+    String TRANSACTION_MANAGER_FACTORY = "transaction-manager-factory";
+    String MBEAN_SERVER_FACTORY = "mbean-server-factory";
     String JOB_LOADER_FACTORY = "job-loader-factory";
     String ARTIFACT_LOADER_FACTORY = "artifact-loader-factory";
     String INJECTOR_FACTORY = "injector-factory";
     String SECURITY_CHECK_FACTORY = "security-check-factory";
 
     String CLASS = "class";
+    String REF = "ref";
+    String FACTORY = "factory";
+    String JNDI_NAME = "jndi-name";
 
     String NAME = "name";
     String VALUE = "value";

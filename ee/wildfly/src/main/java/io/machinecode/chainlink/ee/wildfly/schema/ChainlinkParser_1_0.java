@@ -23,37 +23,49 @@ public class ChainlinkParser_1_0 implements XMLElementReader<List<ModelNode>>, X
     private static final PersistentResourceXMLDescription xmlDescription;
 
     static {
-        xmlDescription = builder(ChainlinkDefinition.INSTANCE)
-                .addChild(
-                        builder(JobOperatorDefinition.INSTANCE)
-                                .addAttribute(JobOperatorDefinition.ID)
-                                .addChild(
-                                        builder(JobOperatorDefinition.WORKER_FACTORY)
-                                                .addAttribute(JobOperatorDefinition.WORKER_FACTORY.clazz)
-                                ).addChild(
-                                        builder(JobOperatorDefinition.MARSHALLER_FACTORY)
-                                                .addAttribute(JobOperatorDefinition.MARSHALLER_FACTORY.clazz)
-                                ).addChild(
-                                        builder(JobOperatorDefinition.EXECUTION_REPOSITORY_FACTORY)
-                                                .addAttribute(JobOperatorDefinition.EXECUTION_REPOSITORY_FACTORY.clazz)
-                                ).addChild(
-                                        builder(JobOperatorDefinition.JOB_LOADER_FACTORY)
-                                                .addAttribute(JobOperatorDefinition.JOB_LOADER_FACTORY.clazz)
-                                ).addChild(
-                                        builder(JobOperatorDefinition.ARTIFACT_LOADER_FACTORY)
-                                                .addAttribute(JobOperatorDefinition.ARTIFACT_LOADER_FACTORY.clazz)
-                                ).addChild(
-                                        builder(JobOperatorDefinition.INJECTOR_FACTORY)
-                                                .addAttribute(JobOperatorDefinition.INJECTOR_FACTORY.clazz)
-                                ).addChild(
-                                        builder(JobOperatorDefinition.SECURITY_CHECK_FACTORY)
-                                                .addAttribute(JobOperatorDefinition.SECURITY_CHECK_FACTORY.clazz)
-                                ).addChild(
-                                        builder(PropertyDefinition.INSTANCE)
-                                                .addAttribute(PropertyDefinition.NAME)
-                                                .addAttribute(PropertyDefinition.VALUE)
-                                )
-
+        xmlDescription = builder(ChainlinkDefinition.INSTANCE).addChild(
+                builder(JobOperatorDefinition.INSTANCE)
+                        .addChild(
+                                builder(JobOperatorDefinition.EXECUTOR_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.EXECUTOR_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.REGISTRY_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.REGISTRY_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.WORKER_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.WORKER_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.MARSHALLING_PROVIDER_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.MARSHALLING_PROVIDER_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.MBEAN_SERVER_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.MBEAN_SERVER_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.EXECUTION_REPOSITORY_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.EXECUTION_REPOSITORY_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.CLASS_LOADER_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.CLASS_LOADER_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.TRANSACTION_MANAGER_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.TRANSACTION_MANAGER_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.JOB_LOADER_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.JOB_LOADER_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.ARTIFACT_LOADER_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.ARTIFACT_LOADER_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.INJECTOR_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.INJECTOR_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(JobOperatorDefinition.SECURITY_CHECK_FACTORY)
+                                        .addAttributes(JobOperatorDefinition.SECURITY_CHECK_FACTORY.getRawAttributes())
+                        ).addChild(
+                                builder(PropertyDefinition.INSTANCE)
+                                        .addAttribute(PropertyDefinition.NAME)
+                                        .addAttribute(PropertyDefinition.VALUE)
+                        )
                 ).build();
     }
     @Override

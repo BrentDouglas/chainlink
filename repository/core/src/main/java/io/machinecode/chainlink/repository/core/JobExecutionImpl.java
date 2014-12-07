@@ -14,6 +14,8 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class JobExecutionImpl implements ExtendedJobExecution, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final long jobInstanceId;
     private final long jobExecutionId;
     private final String jobName;

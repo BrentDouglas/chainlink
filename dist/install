@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+# @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 #
 # Script to install Chainlink from either
 #
@@ -22,14 +22,16 @@ red() {
 
 source ./vars
 
-if [ ! -z ${M2+x} ]; then
+if [ $(which mvn) ]; then
+    MVN="mvn"
+elif [ ! -z ${M2+x} ]; then
     MVN="${M2}/mvn"
 elif [ ! -z ${M2_HOME+x} ]; then
     MVN="${M2_HOME}/bin/mvn"
 fi
 
 # These should not be mutated
-AVAILABLE_MODULES=( all core seam spring guice h2 postgresql mariadb jboss-logging jboss-marshalling jdbc jpa infinispan jgroups hazelcast coherence gridgain ehcache redis mongo )
+AVAILABLE_MODULES=( all core groovy seam spring guice h2 derby postgresql mariadb jboss-logging jboss-marshalling jdbc jpa infinispan jgroups hazelcast coherence gridgain ehcache redis mongo )
 AVAILABLE_CONTAINERS=( se glassfish tomee wildfly )
 
 # These should be read from getopts
@@ -42,28 +44,33 @@ MODULES=()
 
 core() {
     local apply="${1}"
-    "${apply}" "io.machinecode.then" "then-api" "${version_io_machinecode_then_then_api}"
-    "${apply}" "io.machinecode.then" "then-core" "${version_io_machinecode_then_then_core}"
+    "${apply}" "io.machinecode.then" "then-api" "${version_io_machinecode_then_then_api}" "io/machinecode/then"
+    "${apply}" "io.machinecode.then" "then-core" "${version_io_machinecode_then_then_core}" "io/machinecode/then"
     "${apply}" "io.machinecode.chainlink" "chainlink-api" "${version_io_machinecode_chainlink_chainlink_api}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-core" "${version_io_machinecode_chainlink_chainlink_core}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-inject-core" "${version_io_machinecode_chainlink_chainlink_inject_core}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-inject-cdi" "${version_io_machinecode_chainlink_chainlink_inject_cdi}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-core" "${version_io_machinecode_chainlink_chainlink_jsl_core}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-fluent" "${version_io_machinecode_chainlink_chainlink_jsl_fluent}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-groovy" "${version_io_machinecode_chainlink_chainlink_jsl_groovy}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-xml" "${version_io_machinecode_chainlink_chainlink_jsl_xml}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-marshalling-jdk" "${version_io_machinecode_chainlink_chainlink_marshalling_jdk}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-core" "${version_io_machinecode_chainlink_chainlink_repository_core}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-memory" "${version_io_machinecode_chainlink_chainlink_repository_memory}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-spi" "${version_io_machinecode_chainlink_chainlink_spi}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-core" "${version_io_machinecode_chainlink_chainlink_transport_core}"
-    "${apply}" "net.sf.trove4j" "trove4j" "${version_net_sf_trove4j_trove4j}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-core" "${version_io_machinecode_chainlink_chainlink_core}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-inject-core" "${version_io_machinecode_chainlink_chainlink_inject_core}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-inject-cdi" "${version_io_machinecode_chainlink_chainlink_inject_cdi}" "io/machinecode/chainlink/inject/cdi"
+    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-core" "${version_io_machinecode_chainlink_chainlink_jsl_core}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-fluent" "${version_io_machinecode_chainlink_chainlink_jsl_fluent}" "io/machinecode/chainlink/jsl/fluent"
+    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-xml" "${version_io_machinecode_chainlink_chainlink_jsl_xml}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-marshalling-jdk" "${version_io_machinecode_chainlink_chainlink_marshalling_jdk}" "io/machinecode/chainlink/marshalling/jdk"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-core" "${version_io_machinecode_chainlink_chainlink_repository_core}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-memory" "${version_io_machinecode_chainlink_chainlink_repository_memory}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-spi" "${version_io_machinecode_chainlink_chainlink_spi}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-core" "${version_io_machinecode_chainlink_chainlink_transport_core}" "io/machinecode/chainlink"
+    "${apply}" "net.sf.trove4j" "trove4j" "${version_net_sf_trove4j_trove4j}" "gnu/trove"
+}
+
+groovy() {
+    local apply="${1}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-groovy" "${version_io_machinecode_chainlink_chainlink_jsl_groovy}" "io/machinecode/chainlink/jsl/groovy"
+    "${apply}" "org.codehaus.groovy" "groovy-all" "${version_org_codehaus_groovy_groovy_all}" "org/codehaus/groovy"
 }
 
 seam() {
     local apply="${1}"
     "${apply}" "io.machinecode.chainlink" "chainlink-inject-seam" "${version_io_machinecode_chainlink_chainlink_inject_seam}"
-    "${apply}" "org.jboss.seam" "jboss-seam" "${version_org_jboss_seam_jboss_seam}" "ejb"
+    "${apply}" "org.jboss.seam" "jboss-seam" "${version_org_jboss_seam_jboss_seam}"
     [ "${CONTAINER}" == "se" ] && {
         "${apply}" "javax.servlet" "servlet-api" "${version_javax_servlet_servlet_api}"
     }
@@ -71,7 +78,7 @@ seam() {
 
 spring() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-inject-spring" "${version_io_machinecode_chainlink_chainlink_inject_spring}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-inject-spring" "${version_io_machinecode_chainlink_chainlink_inject_spring}" "io/machinecode/chainlink/inject/spring"
     "${apply}" "org.springframework" "spring-beans" "${version_org_springframework_spring_beans}"
     "${apply}" "org.springframework" "spring-context" "${version_org_springframework_spring_context}"
     "${apply}" "org.springframework" "spring-core" "${version_org_springframework_spring_core}"
@@ -81,6 +88,13 @@ guice() {
     local apply="${1}"
     "${apply}" "io.machinecode.chainlink" "chainlink-inject-guice" "${version_io_machinecode_chainlink_chainlink_inject_guice}"
     "${apply}" "com.google.inject" "guice" "${version_com_google_inject_guice}"
+}
+
+derby() {
+    local apply="${1}"
+    [ "${CONTAINER}" != "glassfish" ] && {
+        "${apply}" "org.apache.derby" "derby" "${version_org_apache_derby_derby}"
+    }
 }
 
 h2() {
@@ -107,7 +121,7 @@ jboss-logging() {
 
 jboss-marshalling() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-marshalling-jboss" "${version_io_machinecode_chainlink_chainlink_marshalling_jboss}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-marshalling-jboss" "${version_io_machinecode_chainlink_chainlink_marshalling_jboss}" "io/machinecode/chainlink"
     [ "${CONTAINER}" != "wildfly" ] && {
         "${apply}" "org.jboss.marshalling" "jboss-marshalling" "${version_org_jboss_marshalling_jboss_marshalling}"
         "${apply}" "org.jboss.marshalling" "jboss-marshalling-river" "${version_org_jboss_marshalling_jboss_marshalling_river}"
@@ -116,12 +130,12 @@ jboss-marshalling() {
 
 jdbc() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-jdbc" "${version_io_machinecode_chainlink_chainlink_repository_jdbc}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-jdbc" "${version_io_machinecode_chainlink_chainlink_repository_jdbc}" "io/machinecode/chainlink/repository/jdbc"
 }
 
 jpa() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-jpa" "${version_io_machinecode_chainlink_chainlink_repository_jpa}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-jpa" "${version_io_machinecode_chainlink_chainlink_repository_jpa}" "io/machinecode/chainlink/repository/jpa"
     [ "${CONTAINER}" == "se" ] && {
         "${apply}" "org.hibernate" "hibernate-core" "${version_org_hibernate_hibernate_core}"
         "${apply}" "org.hibernate" "hibernate-entitymanager" "${version_org_hibernate_hibernate_entitymanager}"
@@ -130,8 +144,8 @@ jpa() {
 
 infinispan() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-infinispan" "${version_io_machinecode_chainlink_chainlink_repository_infinispan}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-infinispan" "${version_io_machinecode_chainlink_chainlink_transport_infinispan}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-infinispan" "${version_io_machinecode_chainlink_chainlink_repository_infinispan}" "io/machinecode/chainlink/repository/infinispan"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-infinispan" "${version_io_machinecode_chainlink_chainlink_transport_infinispan}" "io/machinecode/chainlink/transport/infinispan"
     [ "${CONTAINER}" != "wildfly" ] && {
         "${apply}" "org.infinispan" "infinispan-commons" "${version_org_infinispan_infinispan_commons}"
         "${apply}" "org.infinispan" "infinispan-core" "${version_org_infinispan_infinispan_core}"
@@ -140,7 +154,7 @@ infinispan() {
 
 jgroups() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-jgroups" "${version_io_machinecode_chainlink_chainlink_transport_jgroups}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-jgroups" "${version_io_machinecode_chainlink_chainlink_transport_jgroups}" "io/machinecode/chainlink/transport/jgroups"
     [ "${CONTAINER}" != "wildfly" ] && {
         "${apply}" "org.jgroups" "jgroups" "${version_org_jgroups_jgroups}"
     }
@@ -148,67 +162,53 @@ jgroups() {
 
 hazelcast() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-hazelcast" "${version_io_machinecode_chainlink_chainlink_repository_hazelcast}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-hazelcast" "${version_io_machinecode_chainlink_chainlink_transport_hazelcast}"
-    "${apply}" "com.hazelcast" "hazelcast" "${version_com_hazelcast_hazelcast}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-hazelcast" "${version_io_machinecode_chainlink_chainlink_repository_hazelcast}" "io/machinecode/chainlink/repository/hazelcast"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-hazelcast" "${version_io_machinecode_chainlink_chainlink_transport_hazelcast}" "io/machinecode/chainlink/transport/hazelcast"
+    "${apply}" "com.hazelcast" "hazelcast" "${version_com_hazelcast_hazelcast}" "com/hazelcast"
 }
 
 coherence() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-coherence" "${version_io_machinecode_chainlink_chainlink_repository_coherence}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-coherence" "${version_io_machinecode_chainlink_chainlink_transport_coherence}"
-    "${apply}" "com.oracle.coherence" "coherence" "${version_com_oracle_coherence_coherence}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-coherence" "${version_io_machinecode_chainlink_chainlink_repository_coherence}" "io/machinecode/chainlink/repository/coherence"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-coherence" "${version_io_machinecode_chainlink_chainlink_transport_coherence}" "io/machinecode/chainlink/transport/coherence"
+    "${apply}" "com.oracle.coherence" "coherence" "${version_com_oracle_coherence_coherence}" "com/oracle/coherence"
 }
 
 gridgain() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-gridgain" "${version_io_machinecode_chainlink_chainlink_repository_gridgain}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-gridgain" "${version_io_machinecode_chainlink_chainlink_transport_gridgain}"
-    "${apply}" "org.gridgain" "gridgain-core" "${version_org_gridgain_gridgain_core}"
-    "${apply}" "org.gridgain" "gridgain-indexing" "${version_org_gridgain_gridgain_indexing}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-gridgain" "${version_io_machinecode_chainlink_chainlink_repository_gridgain}" "io/machinecode/chainlink/repository/gridgain"
+    "${apply}" "io.machinecode.chainlink" "chainlink-transport-gridgain" "${version_io_machinecode_chainlink_chainlink_transport_gridgain}" "io/machinecode/chainlink/transport/gridgain"
+    "${apply}" "org.gridgain" "gridgain-core" "${version_org_gridgain_gridgain_core}" "org/gridgain"
+    "${apply}" "org.gridgain" "gridgain-indexing" "${version_org_gridgain_gridgain_indexing}" "org/gridgain"
 }
 
 ehcache() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-ehcache" "${version_io_machinecode_chainlink_chainlink_repository_ehcache}"
-    "${apply}" "net.sf.ehcache" "ehcache-core" "${version_net_sf_ehcache_ehcache_core}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-ehcache" "${version_io_machinecode_chainlink_chainlink_repository_ehcache}" "io/machinecode/chainlink/repository/ehcache"
+    "${apply}" "net.sf.ehcache" "ehcache-core" "${version_net_sf_ehcache_ehcache_core}" "net/sf/ehcache"
 }
 
 redis() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-redis" "${version_io_machinecode_chainlink_chainlink_repository_redis}"
-    "${apply}" "redis.clients" "jedis" "${version_redis_clients_jedis}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-redis" "${version_io_machinecode_chainlink_chainlink_repository_redis}" "io/machinecode/chainlink/repository/redis"
+    "${apply}" "redis.clients" "jedis" "${version_redis_clients_jedis}" "jedis"
 }
 
 mongo() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-mongo" "${version_io_machinecode_chainlink_chainlink_repository_mongo}"
-    "${apply}" "org.jongo" "jongo" "${version_org_jongo_jongo}"
-    "${apply}" "org.mongodb" "mongo-java-driver" "${version_org_mongodb_mongo_java_driver}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-repository-mongo" "${version_io_machinecode_chainlink_chainlink_repository_mongo}" "io/machinecode/chainlink/repository/mongo"
+    "${apply}" "org.jongo" "jongo" "${version_org_jongo_jongo}" "org/jongo"
+    "${apply}" "org.mongodb" "mongo-java-driver" "${version_org_mongodb_mongo_java_driver}" "org/jongo"
 }
 
 all() {
     local apply="${1}"
 
-    core "${apply}"
-    seam "${apply}"
-    spring "${apply}"
-    guice "${apply}"
-    h2 "${apply}"
-    postgresql "${apply}"
-    mariadb "${apply}"
-    jboss-logging "${apply}"
-    jboss-marshalling "${apply}"
-    jdbc "${apply}"
-    jpa "${apply}"
-    infinispan "${apply}"
-    jgroups "${apply}"
-    hazelcast "${apply}"
-    coherence "${apply}"
-    gridgain "${apply}"
-    ehcache "${apply}"
-    redis "${apply}"
-    mongo "${apply}"
+    for module in "${AVAILABLE_MODULES[@]}"; do
+        [ "${module}" != "all" ] && {
+            "${module}" "${apply}"
+        }
+    done
 }
 
 #
@@ -264,9 +264,9 @@ se-install() {
     local group_id="${1}"
     local artifact_id="${2}"
     local version="${3}"
-    local classifier="${4}"
+    local module="${4}"
 
-    install-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+    install-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 se-uninstall() {
@@ -274,7 +274,7 @@ se-uninstall() {
     local artifact_id="${2}"
     local version="${3}"
 
-    uninstall-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+    uninstall-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 # Glassfish
@@ -321,9 +321,9 @@ glassfish-install() {
     local group_id="${1}"
     local artifact_id="${2}"
     local version="${3}"
-    local classifier="${4}"
+    local module="${4}"
 
-    install-jar "${GLASSFISH_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+    install-jar "${GLASSFISH_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 glassfish-uninstall() {
@@ -331,7 +331,7 @@ glassfish-uninstall() {
     local artifact_id="${2}"
     local version="${3}"
 
-    uninstall-jar "${GLASSFISH_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+    uninstall-jar "${GLASSFISH_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 # TomEE
@@ -373,9 +373,9 @@ tomee-install() {
     local group_id="${1}"
     local artifact_id="${2}"
     local version="${3}"
-    local classifier="${4}"
+    local module="${4}"
 
-    install-jar "${TOMEE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+    install-jar "${TOMEE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 tomee-uninstall() {
@@ -383,7 +383,7 @@ tomee-uninstall() {
     local artifact_id="${2}"
     local version="${3}"
 
-    uninstall-jar "${TOMEE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+    uninstall-jar "${TOMEE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 # Wildfly
@@ -404,7 +404,7 @@ wildfly() {
         print-modules "Uninstalling"
     fi
 
-    "${apply}" "io.machinecode.chainlink" "chainlink-ee-wildfly" "${version_io_machinecode_chainlink_chainlink_ee_wildfly}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ee-wildfly" "${version_io_machinecode_chainlink_chainlink_ee_wildfly}" "io/machinecode/chainlink"
 
     for module in "${MODULES[@]}"; do
         "${module}" "${apply}"
@@ -427,23 +427,35 @@ wildfly-install() {
     local group_id="${1}"
     local artifact_id="${2}"
     local version="${3}"
-    local classifier="${4}"
+    local module="${4}"
 
-    local module_dir="${group_id//.//}/main"
+    [ -z "${module-}" ] && {
+        yellow "Skipping ${group_id}:${artifact_id}:${version} as it has no module.xml"
+        return 1
+    }
+
+    local module_dir="${module}/main"
     mkdir -p "${WILDFLY_MODULES_DIR}/${module_dir}"
     cp "${WILDFLY_XML_DIR}/${module_dir}/module.xml" "${WILDFLY_MODULES_DIR}/${module_dir}/module.xml"
-    install-jar "${WILDFLY_MODULES_DIR}/${module_dir}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
+    install-jar "${WILDFLY_MODULES_DIR}/${module_dir}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 wildfly-uninstall() {
     local group_id="${1}"
     local artifact_id="${2}"
     local version="${3}"
+    local module="${4}"
 
-    local module_dir="${group_id//.//}/main"
+    [ -z "${module-}" ] && {
+        yellow "Skipping ${group_id}:${artifact_id}:${version} as it has no module.xml"
+        return 1
+    }
 
-    uninstall-jar "${WILDFLY_MODULES_DIR}/${module_dir}" "${group_id}" "${artifact_id}" "${version}" "${classifier}"
-    rm "${WILDFLY_MODULES_DIR}/${module_dir}/module.xml"
+    local module_dir="${module}/main"
+    uninstall-jar "${WILDFLY_MODULES_DIR}/${module_dir}" "${group_id}" "${artifact_id}" "${version}"
+    [ -e "${WILDFLY_MODULES_DIR}/${module_dir}/module.xml" ] && {
+      rm "${WILDFLY_MODULES_DIR}/${module_dir}/module.xml"
+    }
     rmdir -p --ignore-fail-on-non-empty "${WILDFLY_MODULES_DIR}/${module_dir}"
 }
 
@@ -453,7 +465,6 @@ install-jar() {
     local group_id="${2}"
     local artifact_id="${3}"
     local version="${4}"
-    local classifier="${5}"
 
     local name="${artifact_id}-${version}"
     local descriptor="${group_id}:${artifact_id}:${version}:jar"
@@ -496,7 +507,6 @@ uninstall-jar() {
     local group_id="${2}"
     local artifact_id="${3}"
     local version="${4}"
-    local classifier="${5}"
 
     local descriptor="${artifact_id}-${version}"
 

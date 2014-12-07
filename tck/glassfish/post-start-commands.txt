@@ -1,0 +1,2 @@
+create-jdbc-connection-pool  --restype  javax.sql.DataSource  --datasourceclassname  org.apache.derby.jdbc.ClientDataSource  --property  User=APP:Password=APP:PortNumber=1527:ServerName=localhost:DatabaseName=orderDB"  OrderPool
+create-jdbc-resource  --connectionpoolid  OrderPool  jdbc/orderDB

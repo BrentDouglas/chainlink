@@ -17,7 +17,6 @@ public class GlassfishConfigutation extends ConfigurationImpl {
         return configureBuilder(new Builder(), xml);
     }
 
-
     public static class Builder extends _Builder<Builder> {
         @Override
         public GlassfishConfigutation build() throws Exception {

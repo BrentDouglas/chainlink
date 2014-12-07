@@ -16,7 +16,7 @@ public class HazelcastRepositoryTest extends RepositoryTest {
     @Override
     protected ExecutionRepository _repository() throws Exception {
         return new HazelcastExecutonRepository(
-                marshallerFactory().produce(null),
+                marshallingProviderFactory().produce(null),
                 hazelcast
         );
     }

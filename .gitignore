@@ -24,9 +24,4 @@ idea
 
 # Build
 test.properties
-persistence.xml
 chainlink-tck.properties
-tck/se/src/test/resources/META-INF/*
-
-# Logging
-log4j.properties

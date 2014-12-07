@@ -43,23 +43,24 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <build>
-                <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                        <filtering>true</filtering>
-                        <includes>
-                            <include>**/persistence.xml</include>
-                        </includes>
-                    </testResource>
-                </testResources>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>create-persistence-xml</id>
+                                <id>first-pass-persistence-xml</id>
                                 <phase>generate-test-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>second-pass-persistence-xml</id>
+                                <phase>process-test-resources</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -69,16 +70,6 @@
     </profiles>
 
     <build>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/${injector.configuration.destination.file}</include>
-                </includes>
-            </testResource>
-        </testResources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -215,6 +206,16 @@
                 <configuration>
                     <skipExec>false</skipExec>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>log4j-properties</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

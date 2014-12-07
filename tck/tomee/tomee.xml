@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tomee>
+    <Resource id="jdbc/orderDB"
+              type="javax.sql.DataSource">
+        JdbcDriver = @tck.database.driver@
+        JdbcUrl = @tck.database.url@
+        UserName = @tck.database.user@
+        Password = @tck.database.password@
+    </Resource>
+</tomee>
+
+

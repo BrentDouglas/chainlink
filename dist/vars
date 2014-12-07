@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @author <a href="mailto:brent.n.douglas@gmail.com>Brent Douglas</a>
+# @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 #
 
 export version_io_machinecode_then_then_api="@version.io.machinecode.then.then-api@"
@@ -12,7 +12,6 @@ export version_io_machinecode_chainlink_chainlink_inject_core="@version.io.machi
 export version_io_machinecode_chainlink_chainlink_inject_cdi="@version.io.machinecode.chainlink.chainlink-inject-cdi@"
 export version_io_machinecode_chainlink_chainlink_jsl_core="@version.io.machinecode.chainlink.chainlink-jsl-core@"
 export version_io_machinecode_chainlink_chainlink_jsl_fluent="@version.io.machinecode.chainlink.chainlink-jsl-fluent@"
-export version_io_machinecode_chainlink_chainlink_jsl_groovy="@version.io.machinecode.chainlink.chainlink-jsl-groovy@"
 export version_io_machinecode_chainlink_chainlink_jsl_xml="@version.io.machinecode.chainlink.chainlink-jsl-xml@"
 export version_io_machinecode_chainlink_chainlink_marshalling_jdk="@version.io.machinecode.chainlink.chainlink-marshalling-jdk@"
 export version_io_machinecode_chainlink_chainlink_repository_core="@version.io.machinecode.chainlink.chainlink-repository-core@"
@@ -20,6 +19,9 @@ export version_io_machinecode_chainlink_chainlink_repository_memory="@version.io
 export version_io_machinecode_chainlink_chainlink_spi="@version.io.machinecode.chainlink.chainlink-spi@"
 export version_io_machinecode_chainlink_chainlink_transport_core="@version.io.machinecode.chainlink.chainlink-transport-core@"
 export version_net_sf_trove4j_trove4j="@version.net.sf.trove4j.trove4j@"
+
+export version_io_machinecode_chainlink_chainlink_jsl_groovy="@version.io.machinecode.chainlink.chainlink-jsl-groovy@"
+export version_org_codehaus_groovy_groovy_all="@version.org.codehaus.groovy.groovy-all@"
 
 export version_io_machinecode_chainlink_chainlink_inject_seam="@version.io.machinecode.chainlink.chainlink-inject-seam@"
 export version_org_jboss_seam_jboss_seam="@version.org.jboss.seam.jboss-seam@"
@@ -32,6 +34,8 @@ export version_org_springframework_spring_core="@version.org.springframework.spr
 
 export version_io_machinecode_chainlink_chainlink_inject_guice="@version.io.machinecode.chainlink.chainlink-inject-guice@"
 export version_com_google_inject_guice="@version.com.google.inject.guice@"
+
+export version_org_apache_derby_derby="@version.org.apache.derby.derby@"
 
 export version_com_h2database_h2="@version.com.h2database.h2@"
 

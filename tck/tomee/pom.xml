@@ -15,6 +15,7 @@
         <container.dir>${project.build.directory}/apache-tomee-plume-${version.org.apache.openejb.tomee}</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <deployment.dir>${project.build.directory}/deps</deployment.dir>
+
         <tests.dir>${project.build.directory}/arquillian-tests</tests.dir>
     </properties>
 
@@ -75,6 +76,11 @@
             <artifactId>arquillian-tomee-remote</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -85,23 +91,24 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <build>
-                <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                        <filtering>true</filtering>
-                        <includes>
-                            <include>**/persistence.xml</include>
-                        </includes>
-                    </testResource>
-                </testResources>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>create-persistence-xml</id>
+                                <id>first-pass-persistence-xml</id>
                                 <phase>generate-test-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>second-pass-persistence-xml</id>
+                                <phase>process-test-resources</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -145,6 +152,18 @@
                                     <arg value="-d"/><arg value="${container.dir}"/>
                                     <arg value="-m"/><arg value="all"/>
                                 </exec>
+                                <copy file="${project.basedir}/tomee.xml"
+                                      tofile="${container.dir}/conf/tomee.xml"
+                                      filtering="true"
+                                      overwrite="true">
+                                    <filterset>
+                                        <filter token="tck.database.url" value="${tck.database.url}" />
+                                        <filter token="tck.database.driver" value="${tck.database.driver}" />
+                                        <filter token="tck.database.datasource" value="${tck.database.datasource}" />
+                                        <filter token="tck.database.user" value="${tck.database.user}" />
+                                        <filter token="tck.database.password" value="${tck.database.password}" />
+                                    </filterset>
+                                </copy>
                             </target>
                         </configuration>
                     </execution>
@@ -179,7 +198,7 @@
                                       dir="${project.build.directory}">
                                     <arg value="-cp"/>
                                     <arg value="${test_classpath}"/>
-                                    <arg value="io.machinecode.chainlink.tck.core.ArquillianInstrument"/>
+                                    <arg value="io.machinecode.chainlink.tck.core.TestInstrument"/>
                                     <arg value="-c"/><arg value="io.machinecode.chainlink.tck.tomee.TomEETckConfigurationFactory"/>
                                     <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/ee/TransactionTests.class"/>
                                     <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/BatchletRestartStateMachineTests.class"/>
@@ -214,7 +233,6 @@
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/tck-udp.xml"/>
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/ChainlinkMessages_en.properties"/>
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/META-INF"/>
-                                    <arg value="-m"/><arg value="${project.build.testOutputDirectory}/context.xml"/>
                                     <arg value="-w"/><arg value="${project.basedir}/src/test/resources/WEB-INF/web.xml"/>
                                     <arg value="-e"/><arg value="${project.build.directory}/exported-tests"/>
                                 </exec>
@@ -222,46 +240,55 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>first-pass-context-xml</id>
-                        <phase>generate-test-resources</phase>
+                        <id>instrument-helpers</id>
+                        <phase>process-test-classes</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="${project.basedir}/src/test/resources/META-INF/context.xml"
-                                      tofile="${project.build.directory}/context-xml/context.xml"
-                                      filtering="true"
-                                      overwrite="true">
-                                    <filterset>
-                                        <filter token="database.url" value="${database.prefix}.database.url" />
-                                        <filter token="database.user" value="${database.prefix}.database.user" />
-                                        <filter token="database.password" value="${database.prefix}.database.password" />
-                                    </filterset>
-                                </copy>
+                                <property name="test_classpath" refid="maven.test.classpath"/>
+                                <exec executable="java"
+                                      dir="${project.build.directory}">
+                                    <arg value="-cp"/>
+                                    <arg value="${test_classpath}"/>
+                                    <arg value="io.machinecode.chainlink.tck.core.FieldInstrument"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/ConnectionHelper.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryConnectionHelper.class"/>
+                                    <arg value="-f"/><arg value="jndiName"/>
+                                    <arg value="-v"/><arg value="java:comp/env/jdbc/orderDB"/>
+                                </exec>
                             </target>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
                     <execution>
-                        <id>second-pass-context-xml</id>
-                        <phase>pre-integration-test</phase>
+                        <id>instrument-artifacts</id>
+                        <phase>process-test-classes</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}/context-xml</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
+                            <target>
+                                <property name="test_classpath" refid="maven.test.classpath"/>
+                                <exec executable="java"
+                                      dir="${project.build.directory}">
+                                    <arg value="-cp"/>
+                                    <arg value="${test_classpath}"/>
+                                    <arg value="io.machinecode.chainlink.tck.core.FieldInstrument"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryInitReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryInitWriter.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryWriter.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/InventoryStepListener.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/NumbersReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryInitReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryInitWriter.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryReader.class"/>
+                                    <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/artifacts/chunkartifacts/RetryWriter.class"/>
+                                    <arg value="-c"/><arg value="jdbc/orderDB"/>
+                                    <arg value="-v"/><arg value="java:comp/env/jdbc/orderDB"/>
+                                </exec>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
@@ -324,6 +351,16 @@
                         <tests.dir>${tests.dir}</tests.dir>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>log4j-properties</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

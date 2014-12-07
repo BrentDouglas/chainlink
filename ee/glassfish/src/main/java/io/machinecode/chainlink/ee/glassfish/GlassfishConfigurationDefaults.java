@@ -10,7 +10,7 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
 import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
 import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
-import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.WorkerConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
@@ -47,12 +47,12 @@ public class GlassfishConfigurationDefaults implements ConfigurationDefaults {
     }
 
     @Override
-    public ExecutionRepository getRepository(final RepositoryConfiguration configuration) throws Exception {
+    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryConfiguration configuration) throws Exception {
         return new MemoryExecutionRepository(configuration.getMarshallingProviderFactory().produce(configuration));
     }
 
     @Override
-    public MarshallingProviderFactory getMarshallerFactory(final Configuration configuration) {
+    public MarshallingProviderFactory getMarshallingProviderFactory(final Configuration configuration) {
         return new JdkMarshallingProviderFactory();
     }
 

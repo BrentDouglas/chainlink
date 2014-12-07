@@ -14,7 +14,7 @@ public class CoherenceRepositoryTest extends RepositoryTest {
     protected ExecutionRepository _repository() throws Exception {
         CacheFactory.ensureCluster();
         return new CoherenceExecutonRepository(
-                marshallerFactory().produce(null)
+                marshallingProviderFactory().produce(null)
         );
     }
 }

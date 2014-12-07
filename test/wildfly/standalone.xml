@@ -83,6 +83,7 @@
 
     <profile>
         <subsystem xmlns="urn:machinecode:chainlink:1.0">
+            <job-operator name="default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:logging:3.0">
             <console-handler name="CONSOLE">

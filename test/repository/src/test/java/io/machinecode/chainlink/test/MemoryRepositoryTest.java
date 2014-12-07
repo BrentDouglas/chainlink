@@ -11,6 +11,6 @@ public class MemoryRepositoryTest extends RepositoryTest {
 
     @Override
     protected ExecutionRepository _repository() throws Exception {
-        return new MemoryExecutionRepository(marshallerFactory().produce(null));
+        return new MemoryExecutionRepository(marshallingProviderFactory().produce(null));
     }
 }

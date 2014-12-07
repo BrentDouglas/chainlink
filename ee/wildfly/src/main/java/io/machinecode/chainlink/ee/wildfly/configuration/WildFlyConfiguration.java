@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.ee.wildfly.configuration;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
+import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -10,6 +11,10 @@ public class WildFlyConfiguration extends ConfigurationImpl {
 
     protected WildFlyConfiguration(final _Builder<?> builder) throws Exception {
         super(builder);
+    }
+
+    public static Builder xmlToBuilder(final XmlConfiguration xml) {
+        return configureBuilder(new Builder(), xml);
     }
 
     public static class Builder extends _Builder<Builder> {

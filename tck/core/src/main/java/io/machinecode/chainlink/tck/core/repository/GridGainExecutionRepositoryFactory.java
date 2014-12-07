@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.gridgain.grid.GridConfiguration;
@@ -66,7 +66,7 @@ public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFa
     }
 
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) throws Exception {
+    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) throws Exception {
         return new GridGainExecutionRepository(
                 configuration.getMarshallingProviderFactory().produce(configuration),
                 GridGain.grid(CHAINLINK_TCK_GRID)

@@ -2,7 +2,7 @@ package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
 import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.RepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.tck.core.DummyDataSource;
@@ -58,7 +58,7 @@ public class JdbcExecutionRepositoryFactory implements ExecutionRepositoryFactor
     }
 
     @Override
-    public ExecutionRepository produce(final RepositoryConfiguration configuration) {
+    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) {
         return JdbcExecutionRepository.create(new DataSourceLookup() {
             @Override
             public DataSource getDataSource() {

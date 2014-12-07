@@ -33,13 +33,13 @@ public class GlassfishEnvironment implements Environment {
     private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<String, App>();
 
     @Override
-    public ExtendedJobOperator getJobOperator(final String id) throws NoConfigurationWithIdException {
+    public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
-                final JobOperatorImpl op = app.ops.get(id);
+                final JobOperatorImpl op = app.ops.get(name);
                 if (op == null) {
-                    throw new NoConfigurationWithIdException("No configuration for id: " + id); //TODO Message
+                    throw new NoConfigurationWithIdException("No configuration for id: " + name); //TODO Message
                 }
                 return op;
             }
@@ -48,7 +48,7 @@ public class GlassfishEnvironment implements Environment {
     }
 
     @Override
-    public Map<String, ? extends ExtendedJobOperator> getJobOperators() {
+    public Map<String, JobOperatorImpl> getJobOperators() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
@@ -90,13 +90,13 @@ public class GlassfishEnvironment implements Environment {
 
                         for (final XmlConfiguration configuration : xml.getConfigurations()) {
                             app.ops.put(
-                                    configuration.getId(),
+                                    configuration.getName(),
                                     new JobOperatorImpl(GlassfishConfigutation.xmlToBuilder(configuration)
                                             .setConfigurationDefaults(defaults)
                                             .build()
                                     )
                             );
-                            if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getId())) {
+                            if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getName())) {
                                 haveDefault = true;
                             }
                         }
@@ -137,9 +137,9 @@ public class GlassfishEnvironment implements Environment {
                 info.getName()
         );
         Exception exception = null;
-        for (final JobOperatorImpl x : app.ops.values()) {
+        for (final JobOperatorImpl op : app.ops.values()) {
             try {
-                x.close();
+                op.close();
             } catch (Exception e) {
                 if (exception == null) {
                     exception = e;

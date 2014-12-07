@@ -106,16 +106,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-container</id>
-                        <phase>generate-test-resources</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -130,14 +120,34 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-container</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <skipExec>false</skipExec>
                     <systemPropertyVariables>
-                        <version.org.wildfly>${version.org.wildfly}</version.org.wildfly>
+                        <container.dir>${container.dir}</container.dir>
                         <wildfly.jvm.arguments>${wildfly.jvm.arguments}</wildfly.jvm.arguments>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>log4j-properties</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -150,7 +160,6 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <container.debug>true</container.debug>
                 <wildfly.jvm.arguments>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
             </properties>
         </profile>

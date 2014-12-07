@@ -64,7 +64,7 @@ public class GridGainRepositoryTest extends RepositoryTest {
     @Override
     protected ExecutionRepository _repository() throws Exception {
         return new GridGainExecutionRepository(
-                marshallerFactory().produce(null),
+                marshallingProviderFactory().produce(null),
                 GridGain.grid("test-grid")
         );
     }

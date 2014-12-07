@@ -19,9 +19,9 @@ public interface ConfigurationDefaults {
 
     TransactionManager getTransactionManager(final LoaderConfiguration configuration);
 
-    ExecutionRepository getRepository(final RepositoryConfiguration configuration) throws Exception;
+    ExecutionRepository getExecutionRepository(final ExecutionRepositoryConfiguration configuration) throws Exception;
 
-    MarshallingProviderFactory getMarshallerFactory(final Configuration configuration);
+    MarshallingProviderFactory getMarshallingProviderFactory(final Configuration configuration);
 
     MBeanServer getMBeanServer(final LoaderConfiguration configuration);
 

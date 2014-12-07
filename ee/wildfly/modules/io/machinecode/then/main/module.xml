@@ -4,4 +4,8 @@
         <resource-root path="then-api-${version.io.machinecode.then.then-api}.jar"/>
         <resource-root path="then-core-${version.io.machinecode.then.then-core}.jar"/>
     </resources>
+
+    <dependencies>
+        <module name="org.jboss.logging"/>
+    </dependencies>
 </module>

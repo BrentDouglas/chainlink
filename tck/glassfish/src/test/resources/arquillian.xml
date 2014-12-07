@@ -10,6 +10,11 @@
             <property name="adminPort">4848</property>
             <property name="outputToConsole">true</property>
             <property name="debug">${container.debug}</property>
+            <!--
+            <property name="commandFileDelimiter"> {2}</property>
+            <property name="postStartCommandFile">target/commands/post-start-commands.txt</property>
+            <property name="preStopCommandFile">target/commands/pre-stop-commands.txt</property>
+            -->
         </configuration>
     </container>
 </arquillian>

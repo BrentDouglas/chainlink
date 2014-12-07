@@ -23,7 +23,7 @@ public class InfinispanRepositoryTest extends RepositoryTest {
     @Override
     protected ExecutionRepository _repository() throws Exception {
         return new InfinispanExecutionRepository(
-                marshallerFactory().produce(null),
+                marshallingProviderFactory().produce(null),
                 new DefaultCacheManager(
                         new GlobalConfigurationBuilder()
                                 .clusteredDefault()

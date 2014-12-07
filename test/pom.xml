@@ -231,15 +231,15 @@
                     <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
                     <executions>
                         <execution>
-                            <id>create-persistence-xml</id>
+                            <id>first-pass-persistence-xml</id>
+                            <phase>none</phase>
                             <goals>
                                 <goal>run</goal>
                             </goals>
-                            <phase>none</phase>
                             <configuration>
                                 <target>
-                                    <copy file="${project.basedir}/src/test/resources/META-INF/persistence.template.xml"
-                                          tofile="${project.basedir}/src/test/resources/META-INF/persistence.xml"
+                                    <copy file="${project.basedir}/src/test/resources/META-INF/persistence.xml"
+                                          tofile="${project.build.directory}/persistence-xml/persistence.xml"
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>
@@ -249,6 +249,46 @@
                                         </filterset>
                                     </copy>
                                 </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>second-pass-persistence-xml</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.testOutputDirectory}/META-INF</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.build.directory}/persistence-xml</directory>
+                                        <filtering>true</filtering>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>log4j-properties</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.basedir}/..</directory>
+                                        <includes>
+                                            <include>log4j.properties</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
                             </configuration>
                         </execution>
                     </executions>

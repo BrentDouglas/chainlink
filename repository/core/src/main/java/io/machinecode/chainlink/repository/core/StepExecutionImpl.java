@@ -11,6 +11,8 @@ import java.util.List;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStepExecution, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final long jobExecutionId;
     private final long stepExecutionId;
     private final String stepName;
