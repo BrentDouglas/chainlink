@@ -37,6 +37,11 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>../functions</source>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
             <source>install</source>
             <outputDirectory>/</outputDirectory>
             <fileMode>754</fileMode>

@@ -1,0 +1,266 @@
+#!/bin/bash
+#
+# @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+#
+
+source ./functions
+
+RETVAL=0
+FAILED=""
+
+
+AVAILABLE_DATABASES=( db-h2 db-postgresql db-mariadb db-derby )
+AVAILABLE_CONTAINERS=( se glassfish tomee wildfly )
+AVAILABLE_INJECTORS=( in-batch in-cdi in-spring in-guice in-seam )
+
+DATABASES=( db-h2 db-postgresql db-mariadb )
+CONTAINERS=( se glassfish tomee wildfly )
+INJECTORS=( in-batch in-cdi in-spring )
+
+TEST_COHERENCE="false"
+TEST_REPOSITORIES="false"
+FAIL_FAST="false"
+
+run() {
+    local dir="${1}"
+    local msg="${2}"
+    local command="${3}"
+    local ret=0
+
+    echo "Running ${msg} with profiles ${command}"
+    (
+        cd "${dir}"
+        maven test "-P${command}"
+        ret=${?}
+    )
+    [ ${ret} -eq 0 ] || {
+        [ "${FAIL_FAST}" == "true" ] && {
+            terminate ${ret} "Failed ${msg} with profiles ${command}"
+        }
+        red "Failed ${msg} with profiles  ${command}"
+        FAILED+="\n${command}"
+        RETVAL=${ret}
+    }
+
+    return ${ret}
+}
+
+tests() {
+    local command="test"
+    [ "${TEST_REPOSITORIES}" == "true" ] && {
+        command+=",repository"
+    }
+    [ "${TEST_COHERENCE}" == "true" ] && {
+        command+=",coherence"
+    }
+    run "test" "tests" "${command}"
+    return ${?}
+}
+
+tck() {
+    local profiles="${@}"
+    local command="tck"
+    for container in "${CONTAINERS[@]}"; do
+        command+="${container:+,$container}"
+    done
+    command="${command}${profiles:+,$profiles}"
+
+    run "tck" "TCK" "${command}"
+    return ${?}
+}
+
+injectors() {
+    local profiles="${@}"
+    for injector in "${INJECTORS[@]}"; do
+        if [ "in-batch" == "${injector}" ]; then
+            tck "${profiles}" #in-batch
+        else
+            tck "${profiles:+$profiles,}${injector}"
+        fi
+    done
+}
+
+databases() {
+    local profiles="${@}"
+    [ "${TEST_REPOSITORIES}" == "true" ] && {
+        for database in "${DATABASES[@]}"; do
+            if [ "db-h2" == "${database}" ]; then
+                injectors "${profiles}"
+            else
+                injectors "${profiles:+$profiles,}${database}"
+            fi
+        done
+    }
+}
+
+testsuite() {
+    tests
+
+    injectors #re-memory
+    databases "re-jpa"
+    databases "re-jdbc"
+    [ "${TEST_REPOSITORIES}" == "true" ] && {
+        injectors "re-redis"
+        injectors "re-mongo"
+    }
+    injectors "re-infinispan"
+    injectors "re-ehcache"
+    injectors "re-gridgain"
+    injectors "re-hazelcast"
+
+    injectors "tr-infinispan"
+    injectors "tr-jgroups"
+    injectors "tr-hazelcast"
+    injectors "tr-gridgain"
+    [ "${TEST_COHERENCE}" == "true" ] && {
+        injectors "coherence,re-coherence"
+        injectors "coherence,tr-coherence"
+    }
+}
+
+print-available-injectors() {
+    local values=""
+    for injector in "${AVAILABLE_INJECTORS[@]}"; do
+        values+="${values:+$values, }${injector}"
+    done
+    echo "Available injectors are: ${values}"
+}
+
+print-available-containers() {
+    local values=""
+    for container in "${AVAILABLE_CONTAINERS[@]}"; do
+        values+="${values:+$values, }${container}"
+    done
+    echo "Available containers are: ${values}"
+}
+
+print-available-databases() {
+    local values=""
+    for database in "${AVAILABLE_DATABASES[@]}"; do
+        values+="${values:+$values, }${database}"
+    done
+    echo "Available databases are: ${values}"
+}
+
+usage() {
+cat <<EOF
+Usage: testsuite [-i injector] [-c container] [-d database] [-r] [-o]
+                 [-f] [-h]
+
+    -i  Comma separated list of injectors to run the tests for.
+        Selecting the value in-batch will use the default injector and
+        will not show up in the profile list. Available injectors are:
+EOF
+    for injector in "${AVAILABLE_INJECTORS[@]}"; do
+      echo "                    - ${injector}"
+    done
+cat <<EOF
+    -c  Comma separated list of containers to run the tests for.
+        Available containers are:
+EOF
+    for container in "${AVAILABLE_CONTAINERS[@]}"; do
+      echo "                    - ${container}"
+    done
+cat <<EOF
+    -d  Comma separated list of databases to run the tests for.
+        Selecting the value db-h2 will use the default database and
+        will not show up in the profile list. Available databases are:
+EOF
+    for database in "${AVAILABLE_DATABASES[@]}"; do
+      echo "                    - ${database}"
+    done
+cat <<EOF
+    -r  Include repository tests (requires PostgreSQL, MariaDB, Redis
+        and MongoDB).
+    -o  Include Oracle Coherence tests (requires Oracle Coherence).
+    -f  Fail fast. By default every test will be executed regardless of
+        failures. This option will terminate execution at the first
+        test failure.
+    -h  Print usage.
+EOF
+}
+
+while getopts "i:c:d:rofh" opt; do
+    case ${opt} in
+        h)
+            usage
+            exit 0
+            ;;
+
+        i)
+            INJECTORS=()
+            IFS=',' read -ra TMP <<< "${OPTARG}"
+            for injector in "${TMP[@]}"; do
+                for available in "${AVAILABLE_INJECTORS[@]}"; do
+                    [ "${available}" == "${injector}" ] && {
+                        INJECTORS+=("${injector}")
+                        continue 2 #TMP loop
+                    }
+                done
+                red "Invalid injector: ${injector}"
+                print-available-injectors
+                exit 1
+            done
+            ;;
+
+        c)
+            CONTAINERS=()
+            IFS=',' read -ra TMP <<< "${OPTARG}"
+            for container in "${TMP[@]}"; do
+                for available in "${AVAILABLE_CONTAINERS[@]}"; do
+                    [ "${available}" == "${container}" ] && {
+                        CONTAINERS+=("${container}")
+                        continue 2 #TMP loop
+                    }
+                done
+                red "Invalid container: ${container}"
+                print-available-containers
+                exit 1
+            done
+            ;;
+
+        d)
+            DATABASES=()
+            IFS=',' read -ra TMP <<< "${OPTARG}"
+            for database in "${TMP[@]}"; do
+                for available in "${AVAILABLE_DATABASES[@]}"; do
+                    [ "${available}" == "${database}" ] && {
+                        DATABASES+=("${database}")
+                        continue 2 #TMP loop
+                    }
+                done
+                red "Invalid database: ${database}"
+                print-available-database
+                exit 1
+            done
+            ;;
+
+        r)
+            TEST_REPOSITORIES="true"
+            ;;
+
+        o)
+            TEST_COHERENCE="true"
+            ;;
+
+        f)
+            FAIL_FAST="true"
+            ;;
+
+        \?)
+            red "Invalid option: -${OPTARG}"
+            usage
+            exit 1
+            ;;
+
+        :)
+            red "Option -${OPTARG} requires an argument"
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+testsuite
+
+terminate ${RETVAL} "Failed profiles were: ${FAILED}"

@@ -12,7 +12,7 @@
     <artifactId>chainlink-test-guice</artifactId>
 
     <properties>
-        <test.properties>../../test.properties</test.properties>
+        <test.properties.dir>../..</test.properties.dir>
     </properties>
 
     <dependencies>

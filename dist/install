@@ -5,30 +5,8 @@
 # Script to install Chainlink from either
 #
 
-GREEN="${GREEN-\033[32m}"
-YELLOW="${YELLOW-\033[33m}"
-RED="${RED-\033[31m}"
-RESET="${RESET-\033[00m}"
-
-green() {
-    echo -e "${GREEN}${@}${RESET}"
-}
-yellow() {
-    echo -e "${YELLOW}${@}${RESET}"
-}
-red() {
-    echo -e "${RED}${@}${RESET}"
-}
-
+source ./functions
 source ./vars
-
-if [ $(which mvn) ]; then
-    MVN="mvn"
-elif [ ! -z ${M2+x} ]; then
-    MVN="${M2}/mvn"
-elif [ ! -z ${M2_HOME+x} ]; then
-    MVN="${M2_HOME}/bin/mvn"
-fi
 
 # These should not be mutated
 AVAILABLE_MODULES=( all core groovy seam spring guice h2 derby postgresql mariadb jboss-logging jboss-marshalling jdbc jpa infinispan jgroups hazelcast coherence gridgain ehcache redis mongo )
@@ -37,6 +15,20 @@ AVAILABLE_CONTAINERS=( se glassfish tomee wildfly )
 # These should be read from getopts
 UNINSTALL="false"
 MODULES=()
+
+
+CHAINLINK_REPOSITORY_DIR="repository"
+
+SE_APP_DIR="app"
+SE_MODULES_DIR="modules"
+
+GLASSFISH_MODULES_DIR="../glassfish/modules"
+GLASSFISH_BACKUP_DIR="backup"
+
+TOMEE_MODULES_DIR="../lib"
+
+WILDFLY_MODULES_DIR="../modules/system/layers/base"
+WILDFLY_XML_DIR="modules"
 
 #
 # Modules
@@ -215,13 +207,6 @@ all() {
 # Containers
 #
 
-# SE
-
-CHAINLINK_REPOSITORY_DIR="repository"
-
-SE_APP_DIR="app"
-SE_MODULES_DIR="modules"
-
 se() {
     local uninstall="${1}"
     local apply="se"
@@ -247,7 +232,11 @@ se() {
     done
 }
 
-se-before() {
+se-validate() {
+    return 0
+}
+
+se-pre-install() {
     [ -d "${SE_APP_DIR}" ] || {
         mkdir "${SE_APP_DIR}"
     }
@@ -256,7 +245,7 @@ se-before() {
     }
 }
 
-se-after() {
+se-post-uninstall() {
     rmdir -p --ignore-fail-on-non-empty "${SE_MODULES_DIR}"
 }
 
@@ -277,11 +266,6 @@ se-uninstall() {
     uninstall-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
-# Glassfish
-
-GLASSFISH_MODULES_DIR="../glassfish/modules"
-GLASSFISH_BACKUP_DIR="backup"
-
 glassfish() {
     local uninstall="${1}"
     local apply="glassfish"
@@ -301,20 +285,23 @@ glassfish() {
     done
 }
 
-glassfish-before() {
+glassfish-validate() {
     [ -e "${CONTAINER_DIR}/glassfish/bin/asadmin" ] || {
         red "Invalid Glassfish home: ${CONTAINER_DIR}"
         usage
         exit 1
     }
+}
+
+glassfish-pre-install() {
     [ -d "${GLASSFISH_BACKUP_DIR}" ] || {
         mkdir "${GLASSFISH_BACKUP_DIR}"
     }
-    mv ${GLASSFISH_MODULES_DIR}/{glassfish-batch-connector.jar,glassfish-batch-commands.jar,com.ibm.jbatch-ri-spi.jar,com.ibm.jbatch-runtime-all.jar} ${GLASSFISH_BACKUP_DIR}
+    mv ${GLASSFISH_MODULES_DIR}/{glassfish-batch-connector,glassfish-batch-commands,com.ibm.jbatch-ri-spi,com.ibm.jbatch-runtime-all}.jar ${GLASSFISH_BACKUP_DIR}
 }
 
-glassfish-after() {
-    mv ${GLASSFISH_BACKUP_DIR}/{glassfish-batch-connector.jar,glassfish-batch-commands.jar,com.ibm.jbatch-ri-spi.jar,com.ibm.jbatch-runtime-all.jar} ${GLASSFISH_MODULES_DIR}
+glassfish-post-uninstall() {
+    mv ${GLASSFISH_BACKUP_DIR}/{glassfish-batch-connector,glassfish-batch-commands,com.ibm.jbatch-ri-spi,com.ibm.jbatch-runtime-all}.jar ${GLASSFISH_MODULES_DIR}
 }
 
 glassfish-install() {
@@ -333,10 +320,6 @@ glassfish-uninstall() {
 
     uninstall-jar "${GLASSFISH_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
-
-# TomEE
-
-TOMEE_MODULES_DIR="../lib"
 
 tomee() {
     local uninstall="${1}"
@@ -357,7 +340,7 @@ tomee() {
     done
 }
 
-tomee-before() {
+tomee-validate() {
     [ -e "${CONTAINER_DIR}/bin/tomee.sh" ] || {
         red "Invalid TomEE home: ${CONTAINER_DIR}"
         usage
@@ -365,7 +348,11 @@ tomee-before() {
     }
 }
 
-tomee-after() {
+tomee-pre-install() {
+    return 0
+}
+
+tomee-post-uninstall() {
     return 0
 }
 
@@ -385,11 +372,6 @@ tomee-uninstall() {
 
     uninstall-jar "${TOMEE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
-
-# Wildfly
-
-WILDFLY_MODULES_DIR="../modules/system/layers/base"
-WILDFLY_XML_DIR="modules"
 
 wildfly() {
     local uninstall="${1}"
@@ -411,7 +393,7 @@ wildfly() {
     done
 }
 
-wildfly-before() {
+wildfly-validate() {
     [ -e "${CONTAINER_DIR}/jboss-modules.jar" ] || {
         red "Invalid Wildfly home: ${CONTAINER_DIR}"
         usage
@@ -419,7 +401,11 @@ wildfly-before() {
     }
 }
 
-wildfly-after() {
+wildfly-pre-install() {
+    return 0
+}
+
+wildfly-post-uninstall() {
     return 0
 }
 
@@ -459,7 +445,6 @@ wildfly-uninstall() {
     rmdir -p --ignore-fail-on-non-empty "${WILDFLY_MODULES_DIR}/${module_dir}"
 }
 
-# Copy a jar from the distribution or pull it from maven
 install-jar() {
     local dest="${1}"
     local group_id="${2}"
@@ -484,11 +469,7 @@ install-jar() {
         retval=${?}
         method="distribution"
     else
-        [ -z ${MVN+x} ] && {
-            red "Cannot find file ${from} in distribution and cannot find environment variables M2 or M2_HOME"
-            return 1
-        }
-        ${MVN} dependency:copy -Dartifact=${descriptor} -DoutputDirectory=${dest}
+        maven dependency:copy -Dartifact=${descriptor} -DoutputDirectory=${dest}
         retval=${?}
         method="Maven"
     fi
@@ -587,64 +568,62 @@ print-available-containers() {
 }
 
 usage() {
-    cat <<EOF
-        Usage: install -c container [-d dir] [-m modules] [-u] [-h]
+cat <<EOF
+Usage: install -c container [-d dir] [-m modules] [-u] [-h]
 
-            -h  Print usage.
-            -u  Uninstall selected modules.
-            -c  The container to install to. Valid values are:
+    -h  Print usage.
+    -u  Uninstall selected modules.
+    -c  The container to install to. Valid values are:
 EOF
-
     for container in "${AVAILABLE_CONTAINERS[@]}"; do
       echo "                    - ${container}"
     done
-
-    cat <<EOF
-            -d  The root directory of the container to install too.
-                This is required for all containers other than "se" which is installed
-                in place.
-            -m  Comma separated list of modules. Valid values are:
+cat <<EOF
+    -d  The root directory of the container to install too. This is
+        required for all containers other than "se" which is installed
+        in place.
+    -m  Comma separated list of modules. Valid values are:
 EOF
-
     for module in "${AVAILABLE_MODULES[@]}"; do
       echo "                    - ${module}"
     done
+cat <<EOF
+    There are two special modules, "core" and "all". The "core" module
+    contains the main jars required to run Chainlink and is implied
+    whenever running an install. If the -u option is provided it must
+    be specified individually. e.g. This script will install and then
+    uninstall the Chainlink core:
 
-    cat <<EOF
-            There are two special modules, "core" and "all". The "core" module contains
-            the main jars required to run Chainlink and is implied whenever running an
-            install. If the -u option is provided it must be specified individually.
-            e.g. This script will install and then uninstall the Chainlink core:
+        install -c se
+        install -c se -u -m core
 
-                install -c se
-                install -c se -u -m core
+    The "all" option is a convenience every available module (including
+    the core). Providing the options "-u -m all" is the recommended way
+    to completely uninstall Chainlink from a container.
 
-            The "all" option is a convenience every available module (including the core).
-            Providing the options "-u -m all" is the recommended way to completely uninstall
-            Chainlink from a container.
+Examples:
 
-        Examples:
+    Install an SE instance with every available module:
 
-            Install an SE instance with every available module:
+        install -c se -e all
 
-                install -c se -e all
+    Install to a Wildfly instance with the Infinispan and jGroups
+    modules.
 
-            Install to a Wildfly instance with the Infinispan, jGroups and Redis modules.
+        install -c wildfly -d /usr/local/wildfly -m infinispan,jgroups
 
-                install -c wildfly -d /usr/local/wildfly -m infinispan,jgroups,redis
+    Install to a Glassfish instance with only the core functionality.
 
-            Install to a Glassfish instance with only the core functionality.
+        install -c glassfish -d /usr/local/glassfish
 
-                install -c glassfish -d /usr/local/glassfish
+    Uninstall two modules from a TomEE instance. The Chainlink core and
+    any other installed modules will remain installed.
 
-            Uninstall two modules from a TomEE instance. The Chainlink core and any other
-            installed modules will remain installed.
+        install -u -c tomee -d /usr/local/tomee -m mongo,ehcache
 
-                install -u -c tomee -d /usr/local/tomee -m mongo,ehcache
+    Uninstall Chainlink completely from a Glassfish instance.
 
-            Uninstall Chainlink completely from a Glassfish instance.
-
-                install -u -c glassfish -d /usr/local/glassfish -m all
+        install -u -c glassfish -d /usr/local/glassfish -m all
 EOF
 }
 
@@ -670,7 +649,7 @@ while getopts "huc:d:m:" opt; do
                     continue 2 #getopts loop
                 }
             done
-            [ -z ${CONTAINER+x} ] && {
+            [ -z "${CONTAINER-}" ] && {
                 red "Invalid container: ${OPTARG}"
                 print-available-containers
                 exit 1
@@ -710,14 +689,23 @@ while getopts "huc:d:m:" opt; do
     esac
 done
 
-[ -z ${CONTAINER+x} ] && {
+[ -z "${CONTAINER-}" ] && {
     red "Option -c is required"
     print-available-containers
     exit 1
 }
 
-${CONTAINER}-before
+
+${CONTAINER}-validate
+
+[ "${UNINSTALL}" == "false" ] && {
+    ${CONTAINER}-pre-install
+}
+
 ${CONTAINER} "${UNINSTALL}"
-${CONTAINER}-after
+
+[ "${UNINSTALL}" == "true" ] && {
+    ${CONTAINER}-post-uninstall "${UNINSTALL}"
+}
 
 exit 0

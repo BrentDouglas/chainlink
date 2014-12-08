@@ -16,9 +16,9 @@
     </modules>
 
     <properties>
-        <!-- These properties are for the child projects, not this one -->
-        <test.properties.dir>../..</test.properties.dir>
+        <test.properties.dir>..</test.properties.dir>
         <test.properties>${test.properties.dir}/test.properties</test.properties>
+        <tck.properties.dir>${project.basedir}</tck.properties.dir>
         <tck.source>${project.build.directory}/tck-source</tck.source>
 
         <container.debug>false</container.debug>
@@ -712,18 +712,18 @@
                     <executions>
                         <execution>
                             <id>ensure-test-properties</id>
+                            <phase>none</phase>
                             <goals>
                                 <goal>run</goal>
                             </goals>
-                            <phase>none</phase>
                             <configuration>
                                 <target>
                                     <copy file="${test.properties.dir}/test.template.properties"
                                           tofile="${test.properties}"
                                           overwrite="false">
                                     </copy>
-                                    <copy file="${project.basedir}/../chainlink-tck.template.properties"
-                                          tofile="${project.basedir}/../chainlink-tck.properties"
+                                    <copy file="${tck.properties.dir}/chainlink-tck.template.properties"
+                                          tofile="${tck.properties.dir}/chainlink-tck.properties"
                                           overwrite="false">
                                     </copy>
                                 </target>
@@ -731,10 +731,10 @@
                         </execution>
                         <execution>
                             <id>create-test-resources</id>
+                            <phase>none</phase>
                             <goals>
                                 <goal>run</goal>
                             </goals>
-                            <phase>none</phase>
                             <configuration>
                                 <target>
                                     <copy file="${project.basedir}/../core/src/test/resources/coherence-cache-config.xml"
@@ -1085,5 +1085,18 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>ensure-test-properties</id>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

@@ -12,6 +12,9 @@
     <artifactId>chainlink-tck-wildfly</artifactId>
 
     <properties>
+        <test.properties.dir>../..</test.properties.dir>
+        <tck.properties.dir>..</tck.properties.dir>
+
         <container.dir>${project.build.directory}/wildfly-${version.org.wildfly}</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <deployment.dir>${project.build.directory}/deps</deployment.dir>
@@ -134,10 +137,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
-                    <execution>
-                        <id>ensure-test-properties</id>
-                        <phase>initialize</phase>
-                    </execution>
                     <execution>
                         <id>create-test-resources</id>
                         <phase>generate-test-resources</phase>

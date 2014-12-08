@@ -12,6 +12,9 @@
     <artifactId>chainlink-tck-glassfish</artifactId>
 
     <properties>
+        <test.properties.dir>../..</test.properties.dir>
+        <tck.properties.dir>..</tck.properties.dir>
+
         <container.dir>${project.build.directory}/glassfish4</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <deployment.dir>${project.build.directory}/deps</deployment.dir>
@@ -127,10 +130,6 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>ensure-test-properties</id>
-                        <phase>initialize</phase>
-                    </execution>
-                    <execution>
                         <id>create-test-resources</id>
                         <phase>generate-test-resources</phase>
                     </execution>
@@ -195,9 +194,13 @@
                                     <arg value="--dbhome"/>
                                     <arg value="${container.dir}/databases"/>
                                 </exec>
+                                <concat destfile="${project.build.directory}/tck-schema.sql" binary="yes">
+                                    <fileset file="${project.basedir}/../orderdb-schema-derby.sql" />
+                                    <fileset file="${tck.source}/ddls/derby.ddl.jbatch-tck.sql" />
+                                </concat>
                                 <exec executable="${container.dir}/javadb/bin/ij"
                                       dir="${container.dir}">
-                                    <arg value="${project.basedir}/../transaction-test-derby.sql"/>
+                                    <arg value="${project.build.directory}/tck-schema.sql"/>
                                 </exec>
                             </target>
                         </configuration>

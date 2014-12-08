@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+#
+
+GREEN="${GREEN-\033[32m}"
+YELLOW="${YELLOW-\033[33m}"
+RED="${RED-\033[31m}"
+RESET="${RESET-\033[00m}"
+
+green() {
+    echo -e "${GREEN}${@}${RESET}"
+}
+yellow() {
+    echo -e "${YELLOW}${@}${RESET}"
+}
+red() {
+    echo -e "${RED}${@}${RESET}"
+}
+ok() {
+    echo -e "[${GREEN}OK${RESET}] ${@}"
+}
+failed() {
+    echo -e "[${RED}FAILED${RESET}] ${@}"
+}
+
+terminate() {
+    local ret=${1}
+    local msg="${2}"
+    if [ ${ret} -eq 0 ]; then
+        ok
+    else
+        failed "${msg}"
+    fi
+    exit ${ret}
+}
+
+maven() {
+    [ -z "${MVN-}" ] && {
+        if [ $(which mvn) ]; then
+            MVN="mvn"
+        elif [ ! -z "${M2-}" ]; then
+            MVN="${M2}/mvn"
+        elif [ ! -z "${M2_HOME-}" ]; then
+            MVN="${M2_HOME}/bin/mvn"
+        else
+            red "Cannot find file mvn in PATH or find environment variables M2 and M2_HOME"
+            return 1
+        fi
+    }
+    "${MVN}" "${@}"
+    return ${?}
+}
