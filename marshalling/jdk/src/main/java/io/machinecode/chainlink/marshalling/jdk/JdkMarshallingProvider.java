@@ -15,10 +15,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -187,7 +189,14 @@ public class JdkMarshallingProvider implements Marshaller, Unmarshaller, Cloner,
                         if (len < 3) {
                             throw new ClassNotFoundException("Malformed class name: " + desc.getName());
                         }
-                        return loader.loadClass(name.substring(pos + 1, name.length()-1));
+                        final Class<?> clazz = loader.loadClass(name.substring(pos + 1, name.length()-1));
+                        if (pos == 1) {
+                            return Array.newInstance(clazz, pos).getClass();
+                        } else {
+                            final int[] dims = new int[pos];
+                            Arrays.fill(dims, 0);
+                            return Array.newInstance(clazz, dims).getClass();
+                        }
                 }
             } else {
                 final Class<?> ret = primitives.get(name);
