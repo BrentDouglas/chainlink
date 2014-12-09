@@ -3,7 +3,6 @@ package io.machinecode.chainlink.server.chainlinkd;
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 import io.machinecode.chainlink.core.Chainlink;
-import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.se.management.SeEnvironment;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
@@ -61,39 +60,21 @@ public class Chainlinkd {
                     System.setProperties(properties);
                 }
             }
-            final SeEnvironment environment = new SeEnvironment(config);
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Exception exception = null;
-                    for (final JobOperatorImpl operator : environment.getJobOperators().values()) {
-                        try {
-                            operator.close();
-                        } catch (final Exception e) {
-                            if (exception == null) {
-                                exception = e;
-                            } else {
-                                exception.addSuppressed(e);
-                            }
-                        }
+            try (final SeEnvironment environment = new SeEnvironment(config)) {
+                //TODO Should be able to configure eager or lazy start
+                environment.loadConfiguration();
+                Chainlink.setEnvironment(environment);
+                log.info(Messages.get("CHAINLINK-032000.chainlinkd.started"));
+                final Object lock = new Object();
+                while (true) {
+                    synchronized (lock) {
+                        lock.wait();
                     }
-                    if (exception != null) {
-                        throw new RuntimeException(exception);
-                    }
-                }
-            }));
-            //TODO Should be able to configure eager or lazy start
-            environment.loadConfiguration();
-            Chainlink.setEnvironment(environment);
-            log.info(Messages.get("CHAINLINK-032000.chainlinkd.started"));
-            final Object lock = new Object();
-            while (true) {
-                synchronized (lock) {
-                    lock.wait();
                 }
             }
         } catch (final Throwable e) {
             log.fatalf(e, Messages.get("CHAINLINK-032001.chainlinkd.exception"));
+            System.exit(1);
         }
     }
 

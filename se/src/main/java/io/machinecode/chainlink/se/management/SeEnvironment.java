@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class SeEnvironment implements Environment {
+public class SeEnvironment implements Environment, AutoCloseable {
 
     private final Map<String, JobOperatorImpl> operators = Collections.synchronizedMap(new THashMap<String, JobOperatorImpl>());
     private final String config;
@@ -77,8 +77,8 @@ public class SeEnvironment implements Environment {
             throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
         }
         final SeConfigurationDefaults defaults = new SeConfigurationDefaults();
-        if (factories.isEmpty()) {
-            try {
+        try {
+            if (factories.isEmpty()) {
                 final JAXBContext context = JAXBContext.newInstance(XmlChainlink.class);
                 final Unmarshaller unmarshaller = context.createUnmarshaller();
                 final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(new File(config));
@@ -92,11 +92,7 @@ public class SeEnvironment implements Environment {
                             )
                     );
                 }
-            } catch (Exception e) {
-                throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
-            }
-        } else {
-            try {
+            } else {
                 for (final ConfigurationFactory factory : factories) {
                     operators.put(
                             factory.getId(),
@@ -107,10 +103,40 @@ public class SeEnvironment implements Environment {
                             )
                     );
                 }
-            } catch (final Exception e) {
-                throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
             }
+        } catch (Throwable e) {
+            _close(e);
+            throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
         }
         loaded = true;
+    }
+
+    @Override
+    public void close() throws Exception {
+        Throwable throwable = _close(null);
+        if (throwable == null) {
+            return;
+        }
+        if (throwable instanceof Exception) {
+            throw (Exception)throwable;
+        } else {
+            throw new RuntimeException(throwable);
+        }
+    }
+
+    private Throwable _close(Throwable throwable) {
+        for (final JobOperatorImpl op : operators.values()) {
+            try {
+                op.close();
+            } catch(final Throwable t) {
+                if (throwable == null) {
+                    throwable.addSuppressed(t);
+                } else {
+                    throwable = t;
+                }
+            }
+        }
+        operators.clear();
+        return throwable;
     }
 }

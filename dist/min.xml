@@ -31,6 +31,21 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
+            <source>../server/chainlinkd/bin/chainlink</source>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>754</fileMode>
+        </file>
+        <file>
+            <source>../server/chainlinkd/bin/chainlinkd</source>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>754</fileMode>
+        </file>
+        <file>
+            <source>../server/chainlinkd/cnf/chainlink.xml</source>
+            <outputDirectory>cnf</outputDirectory>
+            <fileMode>664</fileMode>
+        </file>
+        <file>
             <source>vars</source>
             <outputDirectory>/</outputDirectory>
             <fileMode>644</fileMode>

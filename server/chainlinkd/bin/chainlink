@@ -23,8 +23,6 @@ STOP_WAIT=${STOP_WAIT-10}
 
 RETVAL=0
 
-CLASSPATH="$(find ${CHAINLINK_LIB_DIR} -regex '.*\.jar$' -type f -printf ${CHAINLINK_LIB_DIR}/%f:)$(find ${CHAINLINK_APP_DIR} -regex '.*\.jar$' -type f -printf ${CHAINLINK_APP_DIR}/%f:)"
-
 usage() {
 cat <<EOF
 Usage: chainlink [-c configuration_file_name] [-p properties_file_name] [-d] [-k] [-h]
@@ -125,6 +123,8 @@ CHAINLINK_ARGS=""
     CHAINLINK_ARGS="${CHAINLINK_ARGS} --properties ${CHAINLINK_HOME}/cnf/${CHAINLINK_PROPERTIES}"
 }
 
+CLASSPATH="$(find ${CHAINLINK_LIB_DIR} -regex '.*\.jar$' -type f -printf ${CHAINLINK_LIB_DIR}/%f:)$(find ${CHAINLINK_APP_DIR} -regex '.*\.jar$' -type f -printf ${CHAINLINK_APP_DIR}/%f:)"
+
 if [ ${DAEMON} -eq 0 ]; then
     eval "java" "${CHAINLINK_OPTS}" "-cp" "${CLASSPATH}" "io.machinecode.chainlink.server.chainlinkd.Chainlinkd" "${CHAINLINK_ARGS}" "| tee ${CHAINLINK_LOG_DIR}/console_${DATE}.log" 2>&1
     RETVAL=${?}
@@ -145,8 +145,24 @@ else
 
         until [ ${count} -gt ${START_WAIT} ]
         do
-            ( test -e ${LOG_FILE} && grep 'CHAINLINK-032000' ${LOG_FILE} ) 2>&1 > /dev/null && {
+            (
+                [ -e ${LOG_FILE} ] && {
+                    grep 'CHAINLINK-032000' ${LOG_FILE} && {
+                        exit 3
+                    }
+                    grep 'CHAINLINK-032001' ${LOG_FILE} && {
+                        exit 4
+                    }
+                }
+            ) 2>&1 > /dev/null
+            LAST=${?}
+
+            [ ${LAST} -eq 3 ] && {
                 RETVAL=0
+                break
+            }
+            [ ${LAST} -eq 4 ] && {
+                RETVAL=1
                 break
             }
             sleep 1
