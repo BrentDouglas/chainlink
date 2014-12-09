@@ -20,7 +20,7 @@ MODULES=()
 CHAINLINK_REPOSITORY_DIR="repository"
 
 SE_APP_DIR="app"
-SE_MODULES_DIR="modules"
+SE_LIB_DIR="lib"
 
 GLASSFISH_MODULES_DIR="../glassfish/modules"
 GLASSFISH_BACKUP_DIR="backup"
@@ -241,13 +241,13 @@ se-pre-install() {
     [ -d "${SE_APP_DIR}" ] || {
         mkdir "${SE_APP_DIR}"
     }
-    [ -d "${SE_MODULES_DIR}" ] || {
-        mkdir "${SE_MODULES_DIR}"
+    [ -d "${SE_LIB_DIR}" ] || {
+        mkdir "${SE_LIB_DIR}"
     }
 }
 
 se-post-uninstall() {
-    rmdir -p --ignore-fail-on-non-empty "${SE_MODULES_DIR}"
+    rmdir -p --ignore-fail-on-non-empty "${SE_LIB_DIR}"
 }
 
 se-install() {
@@ -256,7 +256,7 @@ se-install() {
     local version="${3}"
     local module="${4}"
 
-    install-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
+    install-jar "${SE_LIB_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 se-uninstall() {
@@ -264,7 +264,7 @@ se-uninstall() {
     local artifact_id="${2}"
     local version="${3}"
 
-    uninstall-jar "${SE_MODULES_DIR}" "${group_id}" "${artifact_id}" "${version}"
+    uninstall-jar "${SE_LIB_DIR}" "${group_id}" "${artifact_id}" "${version}"
 }
 
 glassfish() {

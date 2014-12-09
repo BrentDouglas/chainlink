@@ -9,10 +9,10 @@
 #
 
 [ -e /etc/sysconfig/chainlinkd ] && {
-  source /etc/sysconfig/chainlinkd
+    source /etc/sysconfig/chainlinkd
 }
 [ -e /etc/rc.d/init.d/functions ] && {
-  source /etc/rc.d/init.d/functions
+    source /etc/rc.d/init.d/functions
 }
 
 export CHAINLINK_USER="${CHAINLINK_USER-chainlink}"
@@ -31,72 +31,72 @@ RETVAL=0
 DATE=`date +%F_%H-%M-%S`
 
 if [ ! -d ${CHAINLINK_LOG_DIR} ]; then
-  mkdir -p ${CHAINLINK_LOG_DIR}
+    mkdir -p ${CHAINLINK_LOG_DIR}
 fi
 chown -R ${CHAINLINK_USER}:${CHAINLINK_USER} ${CHAINLINK_LOG_DIR}
 
 
 if [ ! -d $(dirname ${CHAINLINK_PIDFILE}) ]; then
-  mkdir -p $(dirname ${CHAINLINK_PIDFILE})
+    mkdir -p $(dirname ${CHAINLINK_PIDFILE})
 fi
 chown -R ${CHAINLINK_USER}:${CHAINLINK_USER} $(dirname ${CHAINLINK_PIDFILE})
 
 # Starts a new Chainlink instance
 start() {
-  # If there is a server running do nothing
-  [ -e ${CHAINLINK_PIDFILE} ] && {
-    echo "Chainlink instance already running: `cat ${CHAINLINK_PIDFILE}`"
-    RETVAL=2
+    # If there is a server running do nothing
+    [ -e ${CHAINLINK_PIDFILE} ] && {
+        echo "Chainlink instance already running: `cat ${CHAINLINK_PIDFILE}`"
+        RETVAL=2
+        return ${RETVAL}
+    }
+
+    local chainlink_args=""
+    [ -n "${CHAINLINK_CONFIG}" ] && {
+        chainlink_args="${chainlink_args} -c ${CHAINLINK_CONFIG}"
+    }
+    [ -n "${CHAINLINK_PROPERTIES}" ] && {
+        chainlink_args="${chainlink_args} -p ${CHAINLINK_PROPERTIES}"
+    }
+
+    runuser -c "CHAINLINK_PIDFILE=${CHAINLINK_PIDFILE} \
+                CHAINLINK_LOG_DIR=${CHAINLINK_LOG_DIR} \
+                CHAINLINK_OPTS=${CHAINLINK_OPTS} \
+                ${chainlink} ${chainlink_args} -d" \
+                ${CHAINLINK_USER} 2>&1 > ${CHAINLINK_LOG_DIR}/console.log
+
+    RETVAL=1
+    count=0
+
+    if [ ${RETVAL} -eq 0 ]; then
+        success
+    else
+        failure
+    fi
     return ${RETVAL}
-  }
-
-  local chainlink_args=""
-  [ -n "${CHAINLINK_CONFIG}" ] && {
-    chainlink_args="${chainlink_args} -c ${CHAINLINK_CONFIG}"
-  }
-  [ -n "${CHAINLINK_PROPERTIES}" ] && {
-    chainlink_args="${chainlink_args} -p ${CHAINLINK_PROPERTIES}"
-  }
-
-  runuser -c "CHAINLINK_PIDFILE=${CHAINLINK_PIDFILE} \
-        CHAINLINK_LOG_DIR=${CHAINLINK_LOG_DIR} \
-        CHAINLINK_OPTS=${CHAINLINK_OPTS} \
-        ${chainlink} ${chainlink_args} -d" \
-        ${CHAINLINK_USER} 2>&1 > ${CHAINLINK_LOG_DIR}/console.log
-
-  RETVAL=1
-  count=0
-
-  if [ ${RETVAL} -eq 0 ]; then
-    success
-  else
-    failure
-  fi
-  return ${RETVAL}
 }
 
 # Shuts down a running Chainlink server
 stop() {
-  CHAINLINK_PIDFILE=${CHAINLINK_PIDFILE} STOP_WAIT=${STOP_WAIT} ${chainlink} -k
+    CHAINLINK_PIDFILE=${CHAINLINK_PIDFILE} STOP_WAIT=${STOP_WAIT} ${chainlink} -k
 }
 
 # Gets the status of a running chainlink instance
 status() {
-  if [ -f ${CHAINLINK_PIDFILE} ]; then
-    local pid=$(cat ${CHAINLINK_PIDFILE})
-    ( ps -p ${pid} ) 2>&1 > /dev/null
-    if [ $? -eq 0 ]; then
-      echo "Running (pid ${pid})"
-      RETVAL=0
+    if [ -f ${CHAINLINK_PIDFILE} ]; then
+        local pid=$(cat ${CHAINLINK_PIDFILE})
+        ( ps -p ${pid} ) 2>&1 > /dev/null
+        if [ $? -eq 0 ]; then
+            echo "Running (pid ${pid})"
+            RETVAL=0
+        else
+            echo "Dead but pid file exists"
+            RETVAL=1
+        fi
     else
-      echo "Dead but pid file exists"
-      RETVAL=1
+        echo "stopped"
+        RETVAL=3
     fi
-  else
-    echo "stopped"
-    RETVAL=3
-  fi
-  return ${RETVAL}
+    return ${RETVAL}
 }
 
 case "$1" in
