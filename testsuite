@@ -261,6 +261,8 @@ while getopts "i:c:d:rofh" opt; do
     esac
 done
 
+trap 'terminate 130' INT
+
 testsuite
 
 terminate ${RETVAL} "Failed profiles were: ${FAILED}"

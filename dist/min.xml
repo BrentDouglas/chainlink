@@ -46,6 +46,12 @@
             <fileMode>664</fileMode>
         </file>
         <file>
+            <source>install-pom.xml</source>
+            <destName>pom.xml</destName>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>644</fileMode>
+        </file>
+        <file>
             <source>vars</source>
             <outputDirectory>/</outputDirectory>
             <fileMode>644</fileMode>

@@ -20,6 +20,9 @@ red() {
 ok() {
     echo -e "[${GREEN}OK${RESET}] ${@}"
 }
+aborted() {
+    echo -e "[${YELLOW}ABORTED${RESET}] ${@}"
+}
 failed() {
     echo -e "[${RED}FAILED${RESET}] ${@}"
 }
@@ -29,6 +32,8 @@ terminate() {
     local msg="${2}"
     if [ ${ret} -eq 0 ]; then
         ok
+    elif [ ${ret} -eq 130 ]; then
+        aborted
     else
         failed "${msg}"
     fi

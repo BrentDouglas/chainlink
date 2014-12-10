@@ -13,9 +13,11 @@ AVAILABLE_MODULES=( all core groovy seam spring guice h2 derby postgresql mariad
 AVAILABLE_CONTAINERS=( se glassfish tomee wildfly )
 
 # These should be read from getopts
-UNINSTALL="false"
+ACTION="install"
 MODULES=()
 
+SIGUNINSTALL=5
+ROLLING_BACK="false"
 
 CHAINLINK_REPOSITORY_DIR="repository"
 
@@ -208,16 +210,7 @@ all() {
 #
 
 se() {
-    local uninstall="${1}"
-    local apply="se"
-    if [ "${uninstall}" == "false" ]; then
-        apply="${apply}-install"
-        add-module "core"
-        print-modules "Installing" "se"
-    else
-        apply="${apply}-uninstall"
-        print-modules "Uninstalling" "se"
-    fi
+    local apply="${1}"
 
     "${apply}" "io.machinecode.chainlink" "chainlink-se" "${version_io_machinecode_chainlink_chainlink_se}"
     "${apply}" "io.machinecode.chainlink" "chainlink-server-chainlinkd" "${version_io_machinecode_chainlink_chainlink_server_chainlinkd}"
@@ -268,16 +261,7 @@ se-uninstall() {
 }
 
 glassfish() {
-    local uninstall="${1}"
-    local apply="glassfish"
-    if [ "${uninstall}" == "false" ]; then
-        apply="${apply}-install"
-        add-module "core"
-        print-modules "Installing" "glassfish"
-    else
-        apply="${apply}-uninstall"
-        print-modules "Uninstalling" "glassfish"
-    fi
+    local apply="${1}"
 
     "${apply}" "io.machinecode.chainlink" "chainlink-ee-glassfish" "${version_io_machinecode_chainlink_chainlink_ee_glassfish}"
 
@@ -323,16 +307,7 @@ glassfish-uninstall() {
 }
 
 tomee() {
-    local uninstall="${1}"
-    local apply="tomee"
-    if [ "${uninstall}" == "false" ]; then
-        apply="${apply}-install"
-        add-module "core"
-        print-modules "Installing" "tomee"
-    else
-        apply="${apply}-uninstall"
-        print-modules "Uninstalling" "tomee"
-    fi
+    local apply="${1}"
 
     "${apply}" "io.machinecode.chainlink" "chainlink-ee-tomee" "${version_io_machinecode_chainlink_chainlink_ee_tomee}"
 
@@ -375,17 +350,7 @@ tomee-uninstall() {
 }
 
 wildfly() {
-    local uninstall="${1}"
-    local apply="wildfly"
-    add-module "jboss-marshalling"
-    if [ "${uninstall}" == "false" ]; then
-        apply="${apply}-install"
-        add-module "core"
-        print-modules "Installing" "wildlfly"
-    else
-        apply="${apply}-uninstall"
-        print-modules "Uninstalling" "wildlfly"
-    fi
+    local apply="${1}"
 
     "${apply}" "io.machinecode.chainlink" "chainlink-ee-wildfly" "${version_io_machinecode_chainlink_chainlink_ee_wildfly}" "io/machinecode/chainlink"
 
@@ -569,6 +534,51 @@ print-available-containers() {
     echo "Available containers: ${containers}"
 }
 
+#
+# Runner
+#
+
+
+run() {
+    [ "${ACTION}" == "install" ] && {
+        ${CONTAINER}-pre-install
+    }
+
+    "${ACTION}"
+
+    [ "${ACTION}" == "uninstall" ] && {
+        ${CONTAINER}-post-uninstall
+    }
+}
+
+rollback() {
+    [ "${ACTION}" == "uninstall" ] && {
+       terminate 130
+    }
+    ROLLING_BACK="true"
+    ACTION="uninstall"
+    trap 'run' ${SIGUNINSTALL}
+    yellow "Rolling back install. Interrupt again to abort."
+}
+
+install() {
+    add-module "core"
+    print-modules "Installing" "${CONTAINER}"
+    "${CONTAINER}" install-unless-rolling-back
+}
+
+uninstall() {
+    print-modules "Installing" "${CONTAINER}"
+    "${CONTAINER}" "${CONTAINER}-uninstall"
+}
+
+install-unless-rolling-back() {
+    [ "${ROLLING_BACK}" == "true" ] && {
+        return 1
+    }
+    "${CONTAINER}-install" ${@}
+}
+
 usage() {
 cat <<EOF
 Usage: install -c container [-d dir] [-m modules] [-u] [-h]
@@ -637,7 +647,7 @@ while getopts "huc:d:m:" opt; do
             ;;
 
         u)
-            UNINSTALL="true"
+            ACTION="uninstall"
             ;;
 
         d)
@@ -697,17 +707,14 @@ done
     exit 1
 }
 
+trap 'rollback' INT
 
 ${CONTAINER}-validate
 
-[ "${UNINSTALL}" == "false" ] && {
-    ${CONTAINER}-pre-install
-}
+run
 
-${CONTAINER} "${UNINSTALL}"
-
-[ "${UNINSTALL}" == "true" ] && {
-    ${CONTAINER}-post-uninstall "${UNINSTALL}"
+[ "${ROLLING_BACK}" == "true" ] && {
+    kill -s ${SIGUNINSTALL} $$
 }
 
 exit 0
