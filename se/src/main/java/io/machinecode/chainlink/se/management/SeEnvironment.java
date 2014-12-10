@@ -41,11 +41,7 @@ public class SeEnvironment implements Environment {
 
     @Override
     public JobOperatorImpl getJobOperator(final String name) throws NoConfigurationWithIdException {
-        synchronized (this) {
-            if (!loaded) {
-                loadConfiguration();
-            }
-        }
+        loadConfiguration();
         final JobOperatorImpl operator = operators.get(name);
         if (operator != null) {
             return operator;
@@ -56,15 +52,22 @@ public class SeEnvironment implements Environment {
 
     @Override
     public Map<String, JobOperatorImpl> getJobOperators() {
-        synchronized (this) {
-            if (!loaded) {
-                loadConfiguration();
-            }
-        }
+        loadConfiguration();
         return operators;
     }
 
-    private void loadConfiguration() throws NoConfigurationWithIdException {
+    public void loadConfiguration() {
+        if (loaded) {
+            return;
+        }
+        synchronized (this) {
+            if (!loaded) {
+                _loadConfiguration();
+            }
+        }
+    }
+
+    private void _loadConfiguration() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         final List<ConfigurationFactory> factories;
         try {

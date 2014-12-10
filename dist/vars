@@ -92,6 +92,7 @@ export version_gnu_getopt_getopt="@version.gnu-getopt.getopt@"
 export version_javax_enterprise_cdi_api="@version.javax.enterprise.cdi-api@"
 export version_javax_inject_javax_inject="@version.javax.inject.javax.inject@"
 export version_log4j_log4j="@version.log4j.log4j@"
+export version_org_jboss_spec_javax_transaction_jboss_transaction_api_1_1_spec="@version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec@"
 export version_org_jboss_weld_se_weld_se="@version.org.jboss.weld.se.weld-se@"
 
 export version_io_machinecode_chainlink_chainlink_ee_glassfish="@version.io.machinecode.chainlink.chainlink-ee-glassfish@"

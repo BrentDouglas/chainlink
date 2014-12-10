@@ -213,10 +213,10 @@ se() {
     if [ "${uninstall}" == "false" ]; then
         apply="${apply}-install"
         add-module "core"
-        print-modules "Installing"
+        print-modules "Installing" "se"
     else
         apply="${apply}-uninstall"
-        print-modules "Uninstalling"
+        print-modules "Uninstalling" "se"
     fi
 
     "${apply}" "io.machinecode.chainlink" "chainlink-se" "${version_io_machinecode_chainlink_chainlink_se}"
@@ -225,6 +225,7 @@ se() {
     "${apply}" "javax.enterprise" "cdi-api" "${version_javax_enterprise_cdi_api}"
     "${apply}" "javax.inject" "javax.inject" "${version_javax_inject_javax_inject}"
     "${apply}" "log4j" "log4j" "${version_log4j_log4j}"
+    "${apply}" "org.jboss.spec.javax.transaction" "jboss-transaction-api_1.1_spec" "${version_org_jboss_spec_javax_transaction_jboss_transaction_api_1_1_spec}"
     "${apply}" "org.jboss.weld.se" "weld-se" "${version_org_jboss_weld_se_weld_se}"
 
     for module in "${MODULES[@]}"; do
@@ -272,10 +273,10 @@ glassfish() {
     if [ "${uninstall}" == "false" ]; then
         apply="${apply}-install"
         add-module "core"
-        print-modules "Installing"
+        print-modules "Installing" "glassfish"
     else
         apply="${apply}-uninstall"
-        print-modules "Uninstalling"
+        print-modules "Uninstalling" "glassfish"
     fi
 
     "${apply}" "io.machinecode.chainlink" "chainlink-ee-glassfish" "${version_io_machinecode_chainlink_chainlink_ee_glassfish}"
@@ -327,10 +328,10 @@ tomee() {
     if [ "${uninstall}" == "false" ]; then
         apply="${apply}-install"
         add-module "core"
-        print-modules "Installing"
+        print-modules "Installing" "tomee"
     else
         apply="${apply}-uninstall"
-        print-modules "Uninstalling"
+        print-modules "Uninstalling" "tomee"
     fi
 
     "${apply}" "io.machinecode.chainlink" "chainlink-ee-tomee" "${version_io_machinecode_chainlink_chainlink_ee_tomee}"
@@ -380,10 +381,10 @@ wildfly() {
     if [ "${uninstall}" == "false" ]; then
         apply="${apply}-install"
         add-module "core"
-        print-modules "Installing"
+        print-modules "Installing" "wildlfly"
     else
         apply="${apply}-uninstall"
-        print-modules "Uninstalling"
+        print-modules "Uninstalling" "wildlfly"
     fi
 
     "${apply}" "io.machinecode.chainlink" "chainlink-ee-wildfly" "${version_io_machinecode_chainlink_chainlink_ee_wildfly}" "io/machinecode/chainlink"
@@ -529,6 +530,7 @@ add-module() {
 
 print-modules() {
     local action="${1}"
+    local container="${2}"
 
     local modules=""
     for module in "${MODULES[@]}"; do
@@ -538,7 +540,7 @@ print-modules() {
             modules="${modules}, ${module}"
         fi
     done
-    echo "${action} modules: ${modules}"
+    echo "${action} modules for container ${container}: ${modules}"
 }
 
 print-available-modules() {

@@ -363,6 +363,7 @@
                                         <filter token="version.org.jboss.marshalling.jboss-marshalling" value="${version.org.jboss.marshalling.jboss-marshalling}" />
                                         <filter token="version.org.jboss.marshalling.jboss-marshalling-river" value="${version.org.jboss.marshalling.jboss-marshalling}" />
                                         <filter token="version.org.jboss.seam.jboss-seam" value="${version.org.jboss.seam.jboss-seam}" />
+                                        <filter token="version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec" value="${version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec}"/>
                                         <filter token="version.org.jboss.weld.se.weld-se" value="${version.org.jboss.weld.se.weld-se}" />
                                         <filter token="version.org.jgroups.jgroups" value="${version.org.jgroups.jgroups}" />
                                         <filter token="version.org.jongo.jongo" value="${version.org.jongo.jongo}" />

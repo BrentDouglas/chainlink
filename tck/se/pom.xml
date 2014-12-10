@@ -103,11 +103,6 @@
                                     <arg value="-m"/><arg value="all"/>
                                 </exec>
 
-                                <jar destfile="${project.build.directory}/chainlink-tck-se-${project.version}.jar" basedir="${project.build.directory}/test-classes"/>
-                                <copy file="${project.build.directory}/chainlink-tck-se-${project.version}.jar"
-                                      tofile="${deployment.dir}/chainlink-tck-se-${project.version}.jar"
-                                      overwrite="true"/>
-
                                 <copy file="${project.basedir}/../chainlink-tck.xml"
                                       tofile="${chainlink.dir}/cnf/chainlink-tck.xml"
                                       filtering="true"
@@ -132,6 +127,27 @@
                                 </copy>
 
                                 <chmod file="${chainlink.dir}/bin/*" perm="754"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-se-tck</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- This is for the background server-->
+                                <jar destfile="${project.build.directory}/chainlink-tck-se-${project.version}.jar" basedir="${project.build.directory}/test-classes"/>
+                                <copy file="${project.build.directory}/chainlink-tck-se-${project.version}.jar"
+                                      tofile="${deployment.dir}/chainlink-tck-se-${project.version}.jar"
+                                      overwrite="true"/>
+
+                                <!-- Now replace the JobOperator for failsafe with one that sets the Environment in a static initializer -->
+                                <copy file="${project.basedir}/javax.batch.operations.JobOperator"
+                                      tofile="${project.build.testOutputDirectory}/META-INF/services/javax.batch.operations.JobOperator"
+                                      overwrite="true"/>
                             </target>
                         </configuration>
                     </execution>

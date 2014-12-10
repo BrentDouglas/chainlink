@@ -82,6 +82,8 @@ public class Chainlinkd {
                     }
                 }
             }));
+            //TODO Should be able to configure eager or lazy start
+            environment.loadConfiguration();
             Chainlink.setEnvironment(environment);
             log.info(Messages.get("CHAINLINK-032000.chainlinkd.started"));
             final Object lock = new Object();
