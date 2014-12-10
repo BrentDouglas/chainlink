@@ -1,6 +1,9 @@
 package io.machinecode.chainlink.test;
 
 import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.gridgain.grid.GridConfiguration;
@@ -12,8 +15,11 @@ import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMulticastIpFinder;
 import org.junit.BeforeClass;
 
+import java.util.Properties;
+
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class GridGainRepositoryTest extends RepositoryTest {
 
@@ -62,10 +68,15 @@ public class GridGainRepositoryTest extends RepositoryTest {
     }
 
     @Override
-    protected ExecutionRepository _repository() throws Exception {
-        return new GridGainExecutionRepository(
-                marshallingProviderFactory().produce(null),
-                GridGain.grid("test-grid")
-        );
+    protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
+        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+            @Override
+            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new GridGainExecutionRepository(
+                        dependencies.getMarshalling(),
+                        GridGain.grid("test-grid")
+                );
+            }
+        });
     }
 }

@@ -10,6 +10,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.util.List;
 
+import static org.jboss.as.controller.PersistentResourceXMLDescription.PersistentResourceXMLBuilder;
 import static org.jboss.as.controller.PersistentResourceXMLDescription.builder;
 
 /**
@@ -23,51 +24,45 @@ public class ChainlinkParser_1_0 implements XMLElementReader<List<ModelNode>>, X
     private static final PersistentResourceXMLDescription xmlDescription;
 
     static {
-        xmlDescription = builder(ChainlinkDefinition.INSTANCE).addChild(
-                builder(JobOperatorDefinition.INSTANCE)
-                        .addChild(
-                                builder(JobOperatorDefinition.EXECUTOR_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.EXECUTOR_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.REGISTRY_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.REGISTRY_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.WORKER_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.WORKER_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.MARSHALLING_PROVIDER_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.MARSHALLING_PROVIDER_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.MBEAN_SERVER_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.MBEAN_SERVER_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.EXECUTION_REPOSITORY_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.EXECUTION_REPOSITORY_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.CLASS_LOADER_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.CLASS_LOADER_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.TRANSACTION_MANAGER_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.TRANSACTION_MANAGER_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.JOB_LOADER_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.JOB_LOADER_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.ARTIFACT_LOADER_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.ARTIFACT_LOADER_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.INJECTOR_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.INJECTOR_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(JobOperatorDefinition.SECURITY_CHECK_FACTORY)
-                                        .addAttributes(JobOperatorDefinition.SECURITY_CHECK_FACTORY.getRawAttributes())
-                        ).addChild(
-                                builder(PropertyDefinition.INSTANCE)
-                                        .addAttribute(PropertyDefinition.NAME)
-                                        .addAttribute(PropertyDefinition.VALUE)
-                        )
+        xmlDescription = builder(ChainlinkDefinition.INSTANCE)
+                .addChild(jobOperator(JobOperatorDefinition.GLOBAL_INSTANCE))
+                .addChild(builder(DeploymentDefinition.INSTANCE)
+                        .addChild(jobOperator(JobOperatorDefinition.DEPLOYMENT_INSTANCE))
                 ).build();
     }
+
+    private static PersistentResourceXMLBuilder jobOperator(final JobOperatorDefinition definition) {
+        return builder(definition)
+                .addChild(builder(JobOperatorDefinition.EXECUTOR)
+                        .addAttributes(JobOperatorDefinition.EXECUTOR.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.TRANSPORT)
+                        .addAttributes(JobOperatorDefinition.TRANSPORT.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.REGISTRY)
+                        .addAttributes(JobOperatorDefinition.REGISTRY.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.MARSHALLING)
+                        .addAttributes(JobOperatorDefinition.MARSHALLING.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.MBEAN_SERVER)
+                        .addAttributes(JobOperatorDefinition.MBEAN_SERVER.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.EXECUTION_REPOSITORY)
+                        .addAttributes(JobOperatorDefinition.EXECUTION_REPOSITORY.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.CLASS_LOADER)
+                        .addAttributes(JobOperatorDefinition.CLASS_LOADER.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.TRANSACTION_MANAGER)
+                        .addAttributes(JobOperatorDefinition.TRANSACTION_MANAGER.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.JOB_LOADER)
+                        .addAttributes(JobOperatorDefinition.JOB_LOADER.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.ARTIFACT_LOADER)
+                        .addAttributes(JobOperatorDefinition.ARTIFACT_LOADER.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.INJECTOR)
+                        .addAttributes(JobOperatorDefinition.INJECTOR.getRawAttributes())
+                ).addChild(builder(JobOperatorDefinition.SECURITY)
+                        .addAttributes(JobOperatorDefinition.SECURITY.getRawAttributes())
+                ).addChild(builder(PropertyDefinition.INSTANCE)
+                        .addAttribute(PropertyDefinition.NAME)
+                        .addAttribute(PropertyDefinition.VALUE)
+                );
+    }
+
     @Override
     public void readElement(final XMLExtendedStreamReader reader, final List<ModelNode> operations) throws XMLStreamException {
         xmlDescription.parse(reader, PathAddress.EMPTY_ADDRESS, operations);

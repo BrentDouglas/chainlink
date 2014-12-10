@@ -11,6 +11,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 @XmlRootElement(namespace = NAMESPACE, name = BatchArtifacts.ELEMENT)
 @XmlAccessorType(NONE)

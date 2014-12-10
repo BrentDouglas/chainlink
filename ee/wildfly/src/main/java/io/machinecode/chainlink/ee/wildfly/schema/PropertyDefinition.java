@@ -5,6 +5,7 @@ import io.machinecode.chainlink.ee.wildfly.WildFlyConstants;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.PersistentResourceDefinition;
+import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.dmr.ModelType;
@@ -23,7 +24,9 @@ public class PropertyDefinition extends PersistentResourceDefinition {
     public PropertyDefinition() {
         super(
                 PathElement.pathElement(WildFlyConstants.PROPERTY),
-                ChainlinkExtension.getResourceDescriptionResolver(WildFlyConstants.JOB_OPERATOR, WildFlyConstants.PROPERTY)
+                ChainlinkExtension.getResourceDescriptionResolver(WildFlyConstants.JOB_OPERATOR, WildFlyConstants.PROPERTY),
+                NoopAddHandler.INSTANCE,
+                ReloadRequiredRemoveStepHandler.INSTANCE
         );
     }
 

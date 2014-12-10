@@ -1,11 +1,8 @@
 package io.machinecode.chainlink.test.seam;
 
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider;
-import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.inject.core.VetoInjector;
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
-import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.test.core.execution.batchlet.BatchletTest;
 import org.jboss.seam.contexts.Lifecycle;
 import org.jboss.seam.contexts.ServletLifecycle;
@@ -18,18 +15,14 @@ import javax.servlet.ServletContext;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class SeamBatchletTest extends BatchletTest {
 
     @Override
-    protected Builder _configuration() throws Exception {
-        return super._configuration()
-                .setArtifactLoaders(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class))
-                .setInjectors(new VetoInjector());
-    }
-    @Override
-    protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkMarshallingProvider());
+    protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
+        model.getArtifactLoader("artifactFactory").set(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class));
+        model.getInjector("injector").set(new VetoInjector());
     }
 
     @BeforeClass

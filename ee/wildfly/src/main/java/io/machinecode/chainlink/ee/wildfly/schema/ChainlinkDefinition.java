@@ -32,7 +32,10 @@ public class ChainlinkDefinition extends PersistentResourceDefinition {
 
     @Override
     protected List<? extends PersistentResourceDefinition> getChildren() {
-        return Arrays.asList(JobOperatorDefinition.INSTANCE);
+        return Arrays.asList(
+                JobOperatorDefinition.GLOBAL_INSTANCE,
+                DeploymentDefinition.INSTANCE
+        );
     }
 
     @Override

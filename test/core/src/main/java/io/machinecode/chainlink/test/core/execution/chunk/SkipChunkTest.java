@@ -3,10 +3,8 @@ package io.machinecode.chainlink.test.core.execution.chunk;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.test.core.execution.OperatorTest;
 import io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent;
 import io.machinecode.chainlink.test.core.execution.chunk.artifact.EventOrderAccumulator;
-import io.machinecode.chainlink.test.core.execution.chunk.artifact.EventOrderTransactionManager;
 import io.machinecode.chainlink.test.core.execution.chunk.artifact.exception.FailProcessException;
 import io.machinecode.chainlink.test.core.execution.chunk.artifact.exception.FailReadCheckpointException;
 import io.machinecode.chainlink.test.core.execution.chunk.artifact.exception.FailReadException;
@@ -16,8 +14,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import javax.batch.runtime.BatchStatus;
-import javax.transaction.TransactionManager;
-import java.util.concurrent.TimeUnit;
 
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_CHUNK;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_JOB;
@@ -55,11 +51,7 @@ import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkE
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public abstract class SkipChunkTest extends OperatorTest {
-
-    protected TransactionManager _transactionManager() throws Exception {
-        return new EventOrderTransactionManager(180, TimeUnit.SECONDS);
-    }
+public abstract class SkipChunkTest extends EventOrderTest {
 
     @Test
     public void skipSupertypeChunkTest() throws Exception {

@@ -2,7 +2,7 @@ package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
 import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.tck.core.DummyDataSource;
@@ -12,9 +12,11 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class JdbcExecutionRepositoryFactory implements ExecutionRepositoryFactory {
 
@@ -60,7 +62,7 @@ public class JdbcExecutionRepositoryFactory implements ExecutionRepositoryFactor
     }
 
     @Override
-    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) {
+    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) {
         return JdbcExecutionRepository.create(new DataSourceLookup() {
             @Override
             public DataSource getDataSource() {

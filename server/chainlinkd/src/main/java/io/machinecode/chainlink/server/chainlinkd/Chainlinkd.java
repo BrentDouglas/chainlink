@@ -3,7 +3,7 @@ package io.machinecode.chainlink.server.chainlinkd;
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 import io.machinecode.chainlink.core.Chainlink;
-import io.machinecode.chainlink.se.management.SeEnvironment;
+import io.machinecode.chainlink.se.SeEnvironment;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
@@ -15,6 +15,7 @@ import static java.lang.System.out;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class Chainlinkd {
 

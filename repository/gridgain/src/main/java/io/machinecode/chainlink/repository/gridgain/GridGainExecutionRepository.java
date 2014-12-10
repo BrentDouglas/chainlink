@@ -2,7 +2,7 @@ package io.machinecode.chainlink.repository.gridgain;
 
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.repository.core.BaseMapExecutionRepository;
-import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
+import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
@@ -25,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class GridGainExecutionRepository extends BaseMapExecutionRepository {
 
@@ -55,8 +56,8 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
     protected final Grid grid;
     protected final boolean transactional;
 
-    public GridGainExecutionRepository(final MarshallingProvider provider, final Grid grid) {
-        super(provider);
+    public GridGainExecutionRepository(final Marshalling marshalling, final Grid grid) {
+        super(marshalling);
         this.grid = grid;
 
         this.ids = GridGainMap.with(grid.<String, Long>cache(IDS));

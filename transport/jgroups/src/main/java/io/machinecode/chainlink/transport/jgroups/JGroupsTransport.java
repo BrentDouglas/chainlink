@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.jgroups;
 
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
@@ -22,10 +22,12 @@ import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.Response;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class JGroupsTransport extends DistributedTransport<Address> implements AsyncRequestHandler, MembershipListener {
 
@@ -36,8 +38,8 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     final Address local;
     protected volatile List<Address> remotes;
 
-    public JGroupsTransport(final TransportConfiguration configuration, final JChannel channel, final String clusterName) throws Exception {
-        super(configuration);
+    public JGroupsTransport(final Dependencies dependencies, final Properties properties, final JChannel channel, final String clusterName) throws Exception {
+        super(dependencies, properties);
         this.channel = channel;
         try {
             channel.connect(clusterName);
@@ -106,7 +108,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     public <T> void invokeRemote(final Address address, final Command<T, Address> command,
                                  final Deferred<T, Throwable,?> promise) {
         try {
-            final byte[] bytes = marshaller.marshall(command);
+            final byte[] bytes = marshalling.marshall(command);
             log.tracef("Invoking %s on %s. Bytes = %s", command, address, bytes.length);
             this.dispatcher.sendMessageWithFuture(
                     new Message(address, bytes),
@@ -125,7 +127,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.dispatcher.sendMessageWithFuture(
-                    new Message(address, marshaller.marshall(command)),
+                    new Message(address, marshalling.marshall(command)),
                     RequestOptions.SYNC()
                             .setExclusionList(this.local)
                             .setTimeout(unit.toMillis(timeout)),
@@ -140,7 +142,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     public Object handle(final Message msg) throws Exception {
         try {
             @SuppressWarnings("unchecked")
-            final Command<?,Address> command = unmarshaller.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
+            final Command<?,Address> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
             log.tracef("Handling %s from %s.", command, msg.src());
             return command.perform(this, msg.src());
         } catch (final Exception e) {

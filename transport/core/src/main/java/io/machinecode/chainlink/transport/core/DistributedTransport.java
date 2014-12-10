@@ -6,13 +6,10 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import io.machinecode.chainlink.core.transport.BaseTransport;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
 import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.marshalling.Cloner;
-import io.machinecode.chainlink.spi.marshalling.Marshaller;
-import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
-import io.machinecode.chainlink.spi.marshalling.Unmarshaller;
+import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
@@ -41,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -50,15 +48,14 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
     private static final Logger log = Logger.getLogger(DistributedTransport.class);
 
     protected final WeakReference<ClassLoader> loader;
-    protected final Marshaller marshaller;
-    protected final Unmarshaller unmarshaller;
-    protected final Cloner cloner;
+    protected final Marshalling marshalling;
     protected final Executor network;
     protected final Executor reaper;
 
@@ -68,19 +65,16 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
     protected final long timeout;
     protected final TimeUnit unit;
 
-    public DistributedTransport(final TransportConfiguration configuration) throws Exception {
-        super(configuration);
-        this.loader = new WeakReference<>(configuration.getClassLoader());
-        final MarshallingProvider provider = configuration.getMarshallingProviderFactory().produce(configuration);
-        this.marshaller = provider.getMarshaller();
-        this.unmarshaller = provider.getUnmarshaller();
-        this.cloner = provider.getCloner();
+    public DistributedTransport(final Dependencies dependencies, final Properties properties) throws Exception {
+        super(dependencies, properties);
+        this.loader = new WeakReference<>(dependencies.getClassLoader());
+        this.marshalling = dependencies.getMarshalling();
 
         this.network= Executors.newSingleThreadExecutor();
         this.reaper = Executors.newSingleThreadExecutor();
 
-        this.timeout = Long.parseLong(configuration.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
-        this.unit = TimeUnit.valueOf(configuration.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
+        this.timeout = Long.parseLong(properties.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
+        this.unit = TimeUnit.valueOf(properties.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
 
         getRegistry().registerJobEventListener("cleanup-remote-jobs", new JobEventListener() {
             @Override
@@ -172,7 +166,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
                     remoteWorkers.put(workerId, rpcWorker);
                 }
                 return rpcWorker;
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            } catch (final InterruptedException | ExecutionException | TimeoutException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -271,7 +265,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
                     throw new IllegalStateException(); //TODO Message
                 }
                 return createDistributedExecutionRepository(id, address);
-            } catch (TimeoutException | InterruptedException | ExecutionException e) {
+            } catch (final TimeoutException | InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -300,7 +294,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
                     continue;
                 }
                 return executable;
-            } catch (TimeoutException | InterruptedException | ExecutionException e) {
+            } catch (final TimeoutException | InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -351,7 +345,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
     }
 
     protected List<A> _remoteMembers(final Collection<A> all) {
-        final List<A> that = new ArrayList<A>(all);
+        final List<A> that = new ArrayList<>(all);
         that.remove(this.getLocal());
         return Collections.unmodifiableList(that);
     }

@@ -2,7 +2,7 @@ package io.machinecode.chainlink.repository.ehcache;
 
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.repository.core.BaseMapExecutionRepository;
-import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
+import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class EhCacheExecutionRepository extends BaseMapExecutionRepository {
 
@@ -56,8 +57,8 @@ public class EhCacheExecutionRepository extends BaseMapExecutionRepository {
     protected final EhCacheMap<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions;
     protected final EhCacheMap<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory;
 
-    public EhCacheExecutionRepository(final MarshallingProvider provider, final CacheManager manager) {
-        super(provider);
+    public EhCacheExecutionRepository(final Marshalling marshalling, final CacheManager manager) {
+        super(marshalling);
 
         this.ids = EhCacheMap.with(manager.addCacheIfAbsent(IDS));
         this.jobInstances = EhCacheMap.with(manager.addCacheIfAbsent(JOB_INSTANCES));

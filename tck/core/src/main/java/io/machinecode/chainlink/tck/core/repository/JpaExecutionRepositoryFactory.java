@@ -3,7 +3,7 @@ package io.machinecode.chainlink.tck.core.repository;
 import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
-import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 
@@ -11,9 +11,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class JpaExecutionRepositoryFactory implements ExecutionRepositoryFactory {
 
@@ -43,7 +45,7 @@ public class JpaExecutionRepositoryFactory implements ExecutionRepositoryFactory
     }
 
     @Override
-    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) {
+    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) {
         return new JpaExecutionRepository(new EntityManagerLookup() {
             @Override
             public EntityManagerFactory getEntityManagerFactory() {

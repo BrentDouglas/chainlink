@@ -23,8 +23,8 @@ public class ElementBuilder {
     private OperationStepHandler removeHandler;
     private Flag addRestartLevel = Flag.RESTART_NONE;
     private Flag removeRestartLevel = Flag.RESTART_RESOURCE_SERVICES;
-    private List<AttributeDefinition> attributes = new LinkedList<AttributeDefinition>();
-    private List<PersistentResourceDefinition> children = new LinkedList<PersistentResourceDefinition>();
+    private List<AttributeDefinition> attributes = new LinkedList<>();
+    private List<PersistentResourceDefinition> children = new LinkedList<>();
 
     public ElementBuilder(final PathElement path, final ResourceDescriptionResolver descriptionResolver) {
         this.path = path;

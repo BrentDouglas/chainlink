@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class WildFlyEnvironment implements Environment {
 
-    private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<String, App>();
+    private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
 
     @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
@@ -84,8 +84,8 @@ public class WildFlyEnvironment implements Environment {
         final ConcurrentMap<String, JobOperatorImpl> ops;
 
         private App(final ClassLoader loader) {
-            this.loader = new WeakReference<ClassLoader>(loader);
-            this.ops = new ConcurrentHashMap<String, JobOperatorImpl>();
+            this.loader = new WeakReference<>(loader);
+            this.ops = new ConcurrentHashMap<>();
         }
     }
 }

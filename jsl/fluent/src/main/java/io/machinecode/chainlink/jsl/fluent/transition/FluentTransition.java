@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.element.transition.Transition;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public abstract class FluentTransition<T extends FluentTransition<T>> implements Copyable<T>, Transition {
 

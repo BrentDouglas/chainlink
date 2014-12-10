@@ -1,10 +1,7 @@
 package io.machinecode.chainlink.test.spring;
 
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider;
-import io.machinecode.chainlink.se.configuration.SeConfiguration.Builder;
 import io.machinecode.chainlink.inject.spring.SpringArtifactLoader;
-import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.test.core.execution.batchlet.BatchletTest;
 import org.junit.BeforeClass;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -12,19 +9,15 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class SpringBatchletTest extends BatchletTest {
 
     private static AbstractApplicationContext context;
 
     @Override
-    protected Builder _configuration() throws Exception {
-        return super._configuration()
-                .setArtifactLoaders(context.getBean(SpringArtifactLoader.class));
-    }
-    @Override
-    protected ExecutionRepository _repository() {
-        return new MemoryExecutionRepository(new JdkMarshallingProvider());
+    protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
+        model.getArtifactLoader("artifactFactory").set(context.getBean(SpringArtifactLoader.class));
     }
 
     @BeforeClass

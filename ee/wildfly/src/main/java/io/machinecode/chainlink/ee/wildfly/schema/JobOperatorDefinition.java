@@ -2,6 +2,7 @@ package io.machinecode.chainlink.ee.wildfly.schema;
 
 import io.machinecode.chainlink.ee.wildfly.ChainlinkExtension;
 import io.machinecode.chainlink.ee.wildfly.WildFlyConstants;
+import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.PersistentResourceDefinition;
@@ -21,43 +22,27 @@ import java.util.List;
  */
 public class JobOperatorDefinition extends PersistentResourceDefinition {
 
-    public static final JobOperatorDefinition INSTANCE = new JobOperatorDefinition();
+    public static final JobOperatorDefinition GLOBAL_INSTANCE = new JobOperatorDefinition(JobOperatorAdd.GLOBAL_INSTANCE);
+    public static final JobOperatorDefinition DEPLOYMENT_INSTANCE = new JobOperatorDefinition(JobOperatorAdd.DEPLOYMENT_INSTANCE);
 
-    public JobOperatorDefinition() {
+    public JobOperatorDefinition(final AbstractAddStepHandler add) {
         super(
                 PathElement.pathElement(WildFlyConstants.JOB_OPERATOR),
                 ChainlinkExtension.getResourceDescriptionResolver(WildFlyConstants.JOB_OPERATOR),
-                JobOperatorAdd.INSTANCE,
+                add,
                 ReloadRequiredRemoveStepHandler.INSTANCE
         );
     }
 
-    private static Element owned(final String name) {
+    private static Element declaration(final String name) {
         return new ElementBuilder(
                 PathElement.pathElement(name),
                 ChainlinkExtension.getResourceDescriptionResolver(WildFlyConstants.JOB_OPERATOR, name)
-        ).addAttribute(new SimpleAttributeDefinitionBuilder(WildFlyConstants.CLASS, ModelType.STRING)
-                .setAllowNull(false)
-                .setAllowExpression(true)
-                .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)
-                .build()
-        /*
         ).addAttribute(new SimpleAttributeDefinitionBuilder(WildFlyConstants.FACTORY, ModelType.STRING)
                 .setAllowNull(true)
                 .setAllowExpression(true)
                 .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)
                 .build()
-        ).addAttribute(new SimpleAttributeDefinitionBuilder(WildFlyConstants.REF, ModelType.STRING)
-                .setAllowNull(true)
-                .setAllowExpression(true)
-                .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)
-                .build()
-        ).addAttribute(new SimpleAttributeDefinitionBuilder(WildFlyConstants.JNDI_NAME, ModelType.STRING)
-                .setAllowNull(true)
-                .setAllowExpression(true)
-                .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)
-                .build()
-        */
         ).setAddHandler(
                 NoopAddHandler.INSTANCE
         ).setRemoveHandler(
@@ -65,18 +50,18 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
         ).build();
     }
 
-    protected static final Element CLASS_LOADER_FACTORY = owned(WildFlyConstants.CLASS_LOADER_FACTORY);
-    protected static final Element WORKER_FACTORY = owned(WildFlyConstants.WORKER_FACTORY);
-    protected static final Element EXECUTOR_FACTORY = owned(WildFlyConstants.EXECUTOR_FACTORY);
-    protected static final Element REGISTRY_FACTORY = owned(WildFlyConstants.REGISTRY_FACTORY);
-    protected static final Element MARSHALLING_PROVIDER_FACTORY = owned(WildFlyConstants.MARSHALLING_PROVIDER_FACTORY);
-    protected static final Element EXECUTION_REPOSITORY_FACTORY = owned(WildFlyConstants.EXECUTION_REPOSITORY_FACTORY);
-    protected static final Element TRANSACTION_MANAGER_FACTORY = owned(WildFlyConstants.TRANSACTION_MANAGER_FACTORY);
-    protected static final Element MBEAN_SERVER_FACTORY = owned(WildFlyConstants.MBEAN_SERVER_FACTORY);
-    protected static final Element JOB_LOADER_FACTORY = owned(WildFlyConstants.JOB_LOADER_FACTORY);
-    protected static final Element ARTIFACT_LOADER_FACTORY = owned(WildFlyConstants.ARTIFACT_LOADER_FACTORY);
-    protected static final Element INJECTOR_FACTORY = owned(WildFlyConstants.INJECTOR_FACTORY);
-    protected static final Element SECURITY_CHECK_FACTORY = owned(WildFlyConstants.SECURITY_CHECK_FACTORY);
+    protected static final Element CLASS_LOADER = declaration(WildFlyConstants.CLASS_LOADER);
+    protected static final Element EXECUTOR = declaration(WildFlyConstants.EXECUTOR);
+    protected static final Element TRANSPORT = declaration(WildFlyConstants.TRANSPORT);
+    protected static final Element REGISTRY = declaration(WildFlyConstants.REGISTRY);
+    protected static final Element MARSHALLING = declaration(WildFlyConstants.MARSHALLING);
+    protected static final Element EXECUTION_REPOSITORY = declaration(WildFlyConstants.EXECUTION_REPOSITORY);
+    protected static final Element TRANSACTION_MANAGER = declaration(WildFlyConstants.TRANSACTION_MANAGER);
+    protected static final Element MBEAN_SERVER = declaration(WildFlyConstants.MBEAN_SERVER);
+    protected static final Element JOB_LOADER = declaration(WildFlyConstants.JOB_LOADER);
+    protected static final Element ARTIFACT_LOADER = declaration(WildFlyConstants.ARTIFACT_LOADER);
+    protected static final Element INJECTOR = declaration(WildFlyConstants.INJECTOR);
+    protected static final Element SECURITY = declaration(WildFlyConstants.SECURITY);
 
     @Override
     public Collection<AttributeDefinition> getAttributes() {
@@ -86,18 +71,18 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
     @Override
     protected List<? extends PersistentResourceDefinition> getChildren() {
         return Arrays.asList(
-                CLASS_LOADER_FACTORY,
-                WORKER_FACTORY,
-                EXECUTOR_FACTORY,
-                REGISTRY_FACTORY,
-                MARSHALLING_PROVIDER_FACTORY,
-                EXECUTION_REPOSITORY_FACTORY,
-                TRANSACTION_MANAGER_FACTORY,
-                MBEAN_SERVER_FACTORY,
-                JOB_LOADER_FACTORY,
-                ARTIFACT_LOADER_FACTORY,
-                INJECTOR_FACTORY,
-                SECURITY_CHECK_FACTORY,
+                CLASS_LOADER,
+                EXECUTOR,
+                TRANSPORT,
+                REGISTRY,
+                MARSHALLING,
+                EXECUTION_REPOSITORY,
+                TRANSACTION_MANAGER,
+                MBEAN_SERVER,
+                JOB_LOADER,
+                ARTIFACT_LOADER,
+                INJECTOR,
+                SECURITY,
                 PropertyDefinition.INSTANCE
         );
     }

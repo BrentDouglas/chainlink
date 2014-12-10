@@ -3,6 +3,7 @@ package io.machinecode.chainlink.ee.glassfish;
 import io.machinecode.chainlink.core.Chainlink;
 import org.glassfish.api.StartupRunLevel;
 import org.glassfish.api.event.EventListener;
+import org.glassfish.api.event.EventTypes;
 import org.glassfish.api.event.Events;
 import org.glassfish.hk2.api.PostConstruct;
 import org.glassfish.hk2.runlevel.RunLevel;
@@ -34,7 +35,10 @@ public class GlassfishService implements PostConstruct, EventListener {
     @Override
     public void event(final Event event) {
         try {
-            if (event.is(Deployment.APPLICATION_LOADED)) {
+            if (event.is(EventTypes.SERVER_READY)) {
+                //TODO
+                environment.addSubsystem(Thread.currentThread().getContextClassLoader());
+            } else if (event.is(Deployment.APPLICATION_LOADED)) {
                 if (event.hook() != null) {
                     environment.addApplication((ApplicationInfo)event.hook());
                 }
@@ -42,6 +46,8 @@ public class GlassfishService implements PostConstruct, EventListener {
                 if (event.hook() != null) {
                     environment.removeApplication((ApplicationInfo)event.hook());
                 }
+            } else if (event.is(EventTypes.PREPARE_SHUTDOWN)) {
+                environment.close();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

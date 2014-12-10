@@ -1,9 +1,12 @@
 package io.machinecode.chainlink.core.execution;
 
+import io.machinecode.chainlink.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.chainlink.core.then.AllChain;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.RejectedChain;
-import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
+import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.ChainAndIds;
 import io.machinecode.chainlink.spi.execution.Executable;
@@ -22,24 +25,49 @@ import org.jboss.logging.Logger;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class EventedExecutor implements Executor {
 
     private static final Logger log = Logger.getLogger(EventedExecutor.class);
 
-    protected final Transport<?> transport;
+    protected final RuntimeConfiguration configuration;
     protected final Registry registry;
+    protected final Transport<?> transport;
     private final ExecutorService cancellation = Executors.newSingleThreadExecutor();
 
-    public EventedExecutor(final ExecutorConfiguration configuration) {
+    public EventedExecutor(final Dependencies dependencies, final Properties properties) {
+        this.configuration = new RuntimeConfigurationImpl(this,
+                dependencies.getRegistry(),
+                dependencies.getTransport(),
+                dependencies.getTransactionManager(),
+                dependencies.getInjectionContext()
+        );
+        this.registry = dependencies.getRegistry();
         this.transport = configuration.getTransport();
-        this.registry = configuration.getRegistry();
+        final int numThreads;
+        try {
+            numThreads = Integer.parseInt(properties.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));
+        } catch (final NumberFormatException e) {
+            throw new RuntimeException(e); //TODO Message
+        }
+        for (int i = 0; i < numThreads; ++i) {
+            final Worker worker;
+            try {
+                worker = new EventedWorker(this.configuration);
+            } catch (final Exception e) {
+                throw new RuntimeException(e); //TODO Message
+            }
+            worker.start();
+            this.transport.registerWorker(worker.id(), worker);
+        }
     }
 
     @Override

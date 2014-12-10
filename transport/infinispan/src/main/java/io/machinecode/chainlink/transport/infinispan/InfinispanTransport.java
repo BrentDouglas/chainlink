@@ -6,7 +6,7 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import io.machinecode.chainlink.core.transport.BaseTransport;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
@@ -46,6 +46,7 @@ import org.jboss.logging.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -55,6 +56,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class InfinispanTransport extends BaseTransport<Address> {
 
@@ -76,9 +78,9 @@ public class InfinispanTransport extends BaseTransport<Address> {
     final TMap<WorkerId, Worker> remoteWorkers = new THashMap<>();
     final TLongObjectMap<List<Pair<ChainId,Address>>> remoteExecutions = new TLongObjectHashMap<>();
 
-    public InfinispanTransport(final TransportConfiguration configuration, final EmbeddedCacheManager manager,
+    public InfinispanTransport(final Dependencies configuration, final Properties properties, final EmbeddedCacheManager manager,
                                final long timeout, final TimeUnit unit) throws Exception {
-        super(configuration);
+        super(configuration, properties);
         final GlobalComponentRegistry gcr = manager.getGlobalComponentRegistry();
         gcr.registerComponent(this, InfinispanTransport.class); //TODO One Registry per config, this will be an issue
         if (manager.getStatus() == ComponentStatus.INSTANTIATED) {
@@ -96,7 +98,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
         this.network = Executors.newSingleThreadExecutor();
         this.reaper = Executors.newSingleThreadExecutor();
         this.local = manager.getAddress();
-        this.cacheName = configuration.getProperty(InfinispanConstants.CACHE, InfinispanConstants.CACHE);
+        this.cacheName = properties.getProperty(InfinispanConstants.CACHE, InfinispanConstants.CACHE);
         this.cache = manager.<Object, Object>getCache(this.cacheName, true).getAdvancedCache();
         this.rpc = cache.getRpcManager();
         this.options = new RpcOptions(
@@ -109,8 +111,8 @@ public class InfinispanTransport extends BaseTransport<Address> {
                 false
         );
         this.distributor = new DefaultExecutorService(cache);
-        this.timeout = Long.parseLong(configuration.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
-        this.unit = TimeUnit.valueOf(configuration.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
+        this.timeout = Long.parseLong(properties.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
+        this.unit = TimeUnit.valueOf(properties.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
 
         if (!manager.isRunning(this.cacheName)) {
             manager.startCaches(this.cacheName);

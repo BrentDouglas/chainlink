@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.gridgain;
 
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
@@ -21,11 +21,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class GridGainTransport extends DistributedTransport<UUID> {
 
@@ -34,8 +36,8 @@ public class GridGainTransport extends DistributedTransport<UUID> {
     final Grid grid;
     final UUID local;
 
-    public GridGainTransport(final TransportConfiguration configuration, final Grid grid) throws Exception {
-        super(configuration);
+    public GridGainTransport(final Dependencies dependencies, final Properties properties, final Grid grid) throws Exception {
+        super(dependencies, properties);
         this.grid = grid;
         this.local = grid.localNode().id();
         grid.nodeLocalMap().addIfAbsent(GridGainTransport.class.getName(), this);

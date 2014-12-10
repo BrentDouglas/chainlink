@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chainlink xmlns="http://xmlns.io.machinecode/xml/ns/chainlink"
+<chainlink xmlns="http://io.machinecode/xml/ns/chainlink"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://xmlns.io.machinecode/xml/ns/chainlink http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
+                 xsi:schemaLocation="http://io.machinecode/xml/ns/chainlink http://io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
 
     <job-operator name="default">
-        <executor-factory class="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
-        <registry-factory class="io.machinecode.chainlink.core.registry.LocalRegistryFactory"/>
-        <worker-factory class="io.machinecode.chainlink.core.execution.EventedWorkerFactory"/>
-        <marshalling-provider-factory class="io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory"/>
-        <mbean-server-factory class="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
-        <execution-repository-factory class="io.machinecode.chainlink.repository.memory.MemoryExecutionRepositoryFactory"/>
+        <marshalling name="marshalling" factory="io.machinecode.chainlink.marshalling.jdk.JdkMarshallingFactory"/>
+        <mbean-server name="mbean-server" factory="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
+        <execution-repository name="execution-repository" factory="io.machinecode.chainlink.repository.memory.MemoryExecutionRepositoryFactory"/>
+        <registry name="registry" factory="io.machinecode.chainlink.core.registry.LocalRegistryFactory"/>
+        <transport name="transport" factory="io.machinecode.chainlink.core.transport.LocalTransportFactory"/>
+        <executor name="executor" factory="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
     </job-operator>
 
 </chainlink>

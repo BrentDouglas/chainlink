@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.infinispan.configuration.cache.CacheMode;
@@ -14,16 +14,18 @@ import org.infinispan.transaction.lookup.TransactionManagerLookup;
 import org.infinispan.util.concurrent.IsolationLevel;
 
 import javax.transaction.TransactionManager;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class InfinispanExecutionRepositoryFactory implements ExecutionRepositoryFactory {
     @Override
-    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) throws Exception {
+    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
         return new InfinispanExecutionRepository(
-                configuration.getMarshallingProviderFactory().produce(configuration),
+                dependencies.getMarshalling(),
                 new DefaultCacheManager(
                         new GlobalConfigurationBuilder()
                                 .clusteredDefault()
@@ -44,7 +46,7 @@ public class InfinispanExecutionRepositoryFactory implements ExecutionRepository
                                 .transactionManagerLookup(new TransactionManagerLookup() {
                                     @Override
                                     public TransactionManager getTransactionManager() throws Exception {
-                                        return configuration.getTransactionManager();
+                                        return dependencies.getTransactionManager();
                                     }
                                 })
                                 .locking()
@@ -55,7 +57,7 @@ public class InfinispanExecutionRepositoryFactory implements ExecutionRepository
                                 .sync()
                                 .build()
                 ),
-                configuration.getTransactionManager()
+                dependencies.getTransactionManager()
         );
     }
 }

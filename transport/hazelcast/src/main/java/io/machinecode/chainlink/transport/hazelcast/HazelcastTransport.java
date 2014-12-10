@@ -8,7 +8,7 @@ import com.hazelcast.core.Member;
 import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
@@ -23,11 +23,13 @@ import org.jboss.logging.Logger;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class HazelcastTransport extends DistributedTransport<Member> {
 
@@ -39,8 +41,8 @@ public class HazelcastTransport extends DistributedTransport<Member> {
     final Member local;
     protected volatile List<Member> remotes;
 
-    public HazelcastTransport(final TransportConfiguration configuration, final HazelcastInstance hazelcast, final IExecutorService executor) throws Exception {
-        super(configuration);
+    public HazelcastTransport(final Dependencies dependencies, final Properties properties, final HazelcastInstance hazelcast, final IExecutorService executor) throws Exception {
+        super(dependencies, properties);
         this.hazelcast = hazelcast;
         this.executor = executor;
 

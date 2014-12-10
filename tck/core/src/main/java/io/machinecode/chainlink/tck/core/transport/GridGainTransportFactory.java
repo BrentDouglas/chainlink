@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.tck.core.transport;
 
 import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.gridgain.GridGainTransport;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import org.gridgain.grid.GridConfiguration;
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridGain;
@@ -13,8 +13,11 @@ import org.gridgain.grid.cache.GridCacheConfiguration;
 import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMulticastIpFinder;
 
+import java.util.Properties;
+
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class GridGainTransportFactory implements TransportFactory {
 
@@ -66,9 +69,10 @@ public class GridGainTransportFactory implements TransportFactory {
     }
 
     @Override
-    public GridGainTransport produce(final TransportConfiguration configuration) throws Exception {
+    public GridGainTransport produce(final Dependencies dependencies, final Properties properties) throws Exception {
         return new GridGainTransport(
-                configuration,
+                dependencies,
+                properties,
                 GridGain.grid(CHAINLINK_TCK_GRID)
         );
     }

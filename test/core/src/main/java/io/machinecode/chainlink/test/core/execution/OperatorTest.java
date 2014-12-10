@@ -6,6 +6,7 @@ import org.junit.Before;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -18,7 +19,7 @@ public abstract class OperatorTest extends BaseTest {
     @Before
     public void before() throws Exception {
         if (operator == null) {
-            operator = new JobOperatorImpl(configuration());
+            operator = new JobOperatorImpl(configuration(), new Properties());
         }
     }
 

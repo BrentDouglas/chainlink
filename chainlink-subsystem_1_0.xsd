@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:cl="http://io.machinecode/xml/ns/chainlink"
+           xmlns:cls="http://io.machinecode/xml/ns/chainlink/subsystem"
+           targetNamespace="http://io.machinecode/xml/ns/chainlink/subsystem"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0">
+    <xs:annotation>
+        <xs:documentation>
+            Configuration for a Chainlink Subsystem.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="subsystem" type="cls:SubSystemType"/>
+
+    <xs:complexType name="SubSystemType">
+        <xs:annotation>
+            <xs:documentation>
+                A Chainlink subsystem. Resources declared here will be created when the subsystem starts and will be
+                shared by operators in every deployment.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="cl:ScopeType">
+                <xs:sequence>
+                    <xs:element name="deployment" type="cl:DeploymentType" minOccurs="0" maxOccurs="1" nillable="false"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

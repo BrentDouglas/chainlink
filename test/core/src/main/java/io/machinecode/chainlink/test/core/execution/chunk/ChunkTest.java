@@ -3,53 +3,42 @@ package io.machinecode.chainlink.test.core.execution.chunk;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.test.core.execution.OperatorTest;
-import io.machinecode.chainlink.test.core.execution.chunk.artifact.EventOrderAccumulator;
 import io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent;
-import io.machinecode.chainlink.test.core.execution.chunk.artifact.EventOrderTransactionManager;
+import io.machinecode.chainlink.test.core.execution.chunk.artifact.EventOrderAccumulator;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.batch.runtime.BatchStatus;
-import javax.transaction.TransactionManager;
 
-import java.util.concurrent.TimeUnit;
-
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_CHUNK;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_JOB;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_PROCESS;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_READ;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_STEP;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_WRITE;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_CHUNK;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_JOB;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_PROCESS;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_READ;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_STEP;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_WRITE;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEGIN_TRANSACTION;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.COMMIT_TRANSACTION;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.READER_OPEN;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.WRITER_OPEN;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_CHUNK;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_READ;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.READ;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_READ;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_PROCESS;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.PROCESS;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_PROCESS;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.BEFORE_WRITE;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.WRITE;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_WRITE;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_CHUNK;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.READ;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.READER_CHECKPOINT;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.READER_CLOSE;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.READER_OPEN;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.WRITE;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.WRITER_CHECKPOINT;
 import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.WRITER_CLOSE;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.READER_CLOSE;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_STEP;
-import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.AFTER_JOB;
+import static io.machinecode.chainlink.test.core.execution.chunk.artifact.ChunkEvent.WRITER_OPEN;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public abstract class ChunkTest extends OperatorTest {
-
-
-    protected TransactionManager _transactionManager() throws Exception {
-        return new EventOrderTransactionManager(180, TimeUnit.SECONDS);
-    }
-
+public abstract class ChunkTest extends EventOrderTest {
 
     @Test
     public void noItemChunkTest() throws Exception {

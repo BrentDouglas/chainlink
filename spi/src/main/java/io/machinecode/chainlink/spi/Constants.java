@@ -2,24 +2,30 @@ package io.machinecode.chainlink.spi;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public interface Constants {
 
-    String GLOBAL_TRANSACTION_TIMEOUT   = "javax.transaction.global.timeout";
-
-    String CHAINLINK_XML                = "io.machinecode.chainlink.chainlink_xml";
-    String ENVIRONMENT                  = "io.machinecode.chainlink.environment";
-    String CONFIGURATION_FACTORY_CLASS  = "io.machinecode.chainlink.configuration_factory";
-
-    String THREAD_POOL_SIZE             = "io.machinecode.chainlink.spi.management.thread_pool_size";
-    String JMX_DOMAIN                   = "io.machinecode.chainlink.spi.management.jmx_domain";
+    String NAMESPACE                    = "io.machinecode.chainlink";
 
     String DEFAULT_CONFIGURATION        = "default";
 
-    String TIMEOUT                      = "io.machinecode.chainlink.transport.timeout";
-    String TIMEOUT_UNIT                 = "io.machinecode.chainlink.transport.timeout_unit";
+    String GLOBAL_TRANSACTION_TIMEOUT   = "javax.transaction.global.timeout";
+
+    String CHAINLINK_XML                = NAMESPACE + ".chainlink_xml";
+    String CHAINLINK_SUBSYSTEM_XML      = NAMESPACE + ".chainlink_subsystem_xml";
+    String ENVIRONMENT                  = NAMESPACE + ".environment";
+
+    String THREAD_POOL_SIZE             = NAMESPACE + ".spi.management.thread_pool_size";
+    String JMX_DOMAIN                   = NAMESPACE + ".spi.management.jmx_domain";
+
+    String TIMEOUT                      = NAMESPACE + ".transport.timeout";
+    String TIMEOUT_UNIT                 = NAMESPACE + ".transport.timeout_unit";
 
     interface Defaults {
+        String CHAINLINK_XML            = "chainlink.xml";
+        String CHAINLINK_SUBSYSTEM_XML  = "chainlink-subsystem.xml";
+
         String JMX_DOMAIN               = "io.machinecode.chainlink";
         String THREAD_POOL_SIZE         = "4";
 

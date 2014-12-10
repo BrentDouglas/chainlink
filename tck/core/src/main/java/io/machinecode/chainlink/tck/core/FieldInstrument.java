@@ -88,24 +88,18 @@ public class FieldInstrument {
                 final InputStream in = new FileInputStream(file);
                 final CtClass clazz = pool.makeClass(in);
                 instrumentField(field, value, clazz);
-                final DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
-                try {
+                try (final DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
                     out.write(clazz.toBytecode());
                     System.out.println("Instrumented " + clazz.getName());
-                } finally {
-                    out.close();
                 }
             } else {
                 final InputStream in = new FileInputStream(file);
                 final ClassWriter writer = new ClassWriter(0);
                 final ClassReader reader = new ClassReader(in);
                 reader.accept(instrumentConstant(constant, value, writer), 0);
-                final FileOutputStream out = new FileOutputStream(file);
-                try {
+                try (final FileOutputStream out = new FileOutputStream(file)) {
                     out.write(writer.toByteArray());
                     System.out.println("Instrumented " + reader.getClassName());
-                } finally {
-                    out.close();
                 }
             }
         }

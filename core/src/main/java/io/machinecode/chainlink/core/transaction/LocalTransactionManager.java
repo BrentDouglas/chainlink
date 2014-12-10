@@ -22,8 +22,8 @@ public class LocalTransactionManager implements TransactionManager, UserTransact
 
     private static final Logger log = Logger.getLogger(LocalTransactionManager.class);
 
-    final ThreadLocal<Transaction> transaction = new ThreadLocal<Transaction>();
-    private final ThreadLocal<Long> timeout = new ThreadLocal<Long>();
+    final ThreadLocal<Transaction> transaction = new ThreadLocal<>();
+    private final ThreadLocal<Long> timeout = new ThreadLocal<>();
     private final long defaultTimeout;
 
     public LocalTransactionManager(final long duration, final TimeUnit unit) {

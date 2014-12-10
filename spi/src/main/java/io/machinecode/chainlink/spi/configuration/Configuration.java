@@ -1,15 +1,16 @@
 package io.machinecode.chainlink.spi.configuration;
 
-import java.util.Properties;
+import io.machinecode.chainlink.spi.execution.Executor;
+import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
-public interface Configuration {
+public interface Configuration extends Dependencies {
 
-    String getProperty(final String key);
+    Executor getExecutor();
 
-    String getProperty(final String key, final String defaultValue);
-
-    Properties getProperties();
+    ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id);
 }

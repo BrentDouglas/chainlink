@@ -6,6 +6,7 @@ import io.machinecode.chainlink.spi.element.PropertyReference;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public interface InheritablePropertyReference<T extends InheritablePropertyReference<T, P>,
         P extends Mergeable<P> & Properties>

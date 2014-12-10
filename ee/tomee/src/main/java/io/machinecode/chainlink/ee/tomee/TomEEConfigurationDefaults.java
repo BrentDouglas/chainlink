@@ -1,35 +1,25 @@
 package io.machinecode.chainlink.ee.tomee;
 
-import io.machinecode.chainlink.core.execution.EventedExecutor;
-import io.machinecode.chainlink.core.execution.EventedWorkerFactory;
-import io.machinecode.chainlink.core.registry.LocalRegistry;
-import io.machinecode.chainlink.core.transport.LocalTransport;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory;
-import io.machinecode.chainlink.repository.memory.MemoryExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.configuration.ConfigurationDefaults;
-import io.machinecode.chainlink.spi.configuration.ExecutorConfiguration;
-import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
-import io.machinecode.chainlink.spi.configuration.RegistryConfiguration;
-import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
-import io.machinecode.chainlink.spi.configuration.WorkerConfiguration;
-import io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory;
-import io.machinecode.chainlink.spi.configuration.factory.WorkerFactory;
-import io.machinecode.chainlink.spi.execution.Executor;
-import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.transport.Transport;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
+import io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory;
+import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
+import io.machinecode.chainlink.core.transport.LocalTransportFactory;
+import io.machinecode.chainlink.marshalling.jdk.JdkMarshallingFactory;
+import io.machinecode.chainlink.repository.memory.MemoryExecutionRepositoryFactory;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 
-import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
-import java.lang.management.ManagementFactory;
+import java.util.Properties;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 * @since 1.0
 */
-public class TomEEConfigurationDefaults implements ConfigurationDefaults {
+public class TomEEConfigurationDefaults implements JobOperatorConfiguration {
 
     final ClassLoader loader;
     final TransactionManager transactionManager;
@@ -40,47 +30,24 @@ public class TomEEConfigurationDefaults implements ConfigurationDefaults {
     }
 
     @Override
-    public ClassLoader getClassLoader(final Configuration configuration) {
-        return loader;
-    }
-
-    @Override
-    public TransactionManager getTransactionManager(final LoaderConfiguration configuration) {
-        return transactionManager;
-    }
-
-    @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryConfiguration configuration) throws Exception {
-        return new MemoryExecutionRepository(configuration.getMarshallingProviderFactory().produce(configuration));
-    }
-
-    @Override
-    public MarshallingProviderFactory getMarshallingProviderFactory(final Configuration configuration) {
-        return new JdkMarshallingProviderFactory();
-    }
-
-    @Override
-    public MBeanServer getMBeanServer(final LoaderConfiguration configuration) {
-        return ManagementFactory.getPlatformMBeanServer();
-    }
-
-    @Override
-    public Registry getRegistry(final RegistryConfiguration configuration) {
-        return new LocalRegistry();
-    }
-
-    @Override
-    public Transport<?> getTransport(final TransportConfiguration configuration) {
-        return new LocalTransport(configuration);
-    }
-
-    @Override
-    public Executor getExecutor(final ExecutorConfiguration configuration) {
-        return new EventedExecutor(configuration);
-    }
-
-    @Override
-    public WorkerFactory getWorkerFactory(final WorkerConfiguration configuration) {
-        return new EventedWorkerFactory();
+    public void configureJobOperator(final JobOperatorModel model) throws Exception {
+        model.getClassLoader().setDefaultValueFactory(new ClassLoaderFactory() {
+            @Override
+            public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return loader;
+            }
+        });
+        model.getTransactionManager().setDefaultValueFactory(new TransactionManagerFactory() {
+            @Override
+            public TransactionManager produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return transactionManager;
+            }
+        });
+        model.getExecutionRepository().setDefaultValueFactory(new MemoryExecutionRepositoryFactory());
+        model.getMarshalling().setDefaultValueFactory(new JdkMarshallingFactory());
+        model.getMBeanServer().setDefaultValueFactory(new PlatformMBeanServerFactory());
+        model.getTransport().setDefaultValueFactory(new LocalTransportFactory());
+        model.getRegistry().setDefaultValueFactory(new LocalRegistryFactory());
+        model.getExecutor().setDefaultValueFactory(new EventedExecutorFactory());
     }
 }

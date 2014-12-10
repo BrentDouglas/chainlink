@@ -175,12 +175,11 @@
                                         <filter token="executor.factory.class" value="${executor.factory.class}" />
                                         <filter token="injector.factory.class" value="${injector.factory.class}" />
                                         <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
-                                        <filter token="security.check.factory.class" value="${security.check.factory.class}" />
+                                        <filter token="security.factory.class" value="${security.factory.class}" />
                                         <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
                                         <filter token="registry.factory.class" value="${registry.factory.class}" />
                                         <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
-                                        <filter token="worker.factory.class" value="${worker.factory.class}" />
-                                        <filter token="marshalling.provider.factory.class" value="${marshalling.provider.factory.class}" />
+                                        <filter token="marshalling.factory.class" value="${marshalling.factory.class}" />
                                     </filterset>
                                 </copy>
                             </target>
@@ -218,7 +217,7 @@
                                     <arg value="-cp"/>
                                     <arg value="${test_classpath}"/>
                                     <arg value="io.machinecode.chainlink.tck.core.TestInstrument"/>
-                                    <arg value="-c"/><arg value="io.machinecode.chainlink.tck.wildfly.WildFlyTckConfigurationFactory"/>
+                                    <arg value="-c"/><arg value="io.machinecode.chainlink.tck.core.TckJobOperatorConfiguration"/>
                                     <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/ee/TransactionTests.class"/>
                                     <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/BatchletRestartStateMachineTests.class"/>
                                     <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ChunkTests.class"/>

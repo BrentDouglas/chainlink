@@ -4,7 +4,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.repository.core.BaseMapExecutionRepository;
-import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
+import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class HazelcastExecutonRepository extends BaseMapExecutionRepository {
 
@@ -51,8 +52,8 @@ public class HazelcastExecutonRepository extends BaseMapExecutionRepository {
 
     final HazelcastInstance hazelcast;
 
-    public HazelcastExecutonRepository(final MarshallingProvider provider, final HazelcastInstance hazelcast) {
-        super(provider);
+    public HazelcastExecutonRepository(final Marshalling marshalling, final HazelcastInstance hazelcast) {
+        super(marshalling);
         this.hazelcast = hazelcast;
 
         this.ids = this.hazelcast.getMap(IDS);

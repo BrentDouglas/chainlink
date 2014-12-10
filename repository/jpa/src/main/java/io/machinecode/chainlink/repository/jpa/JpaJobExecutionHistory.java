@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 @Entity
 @Table(name = "job_execution_history")

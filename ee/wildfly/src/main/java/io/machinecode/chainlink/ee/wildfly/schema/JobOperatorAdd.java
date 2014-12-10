@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.ee.wildfly.schema;
 
 import io.machinecode.chainlink.ee.wildfly.WildFlyConstants;
-import io.machinecode.chainlink.ee.wildfly.configuration.Config;
 import io.machinecode.chainlink.ee.wildfly.processor.JobOperatorProcessor;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -24,52 +23,37 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_
 */
 public class JobOperatorAdd extends AbstractAddStepHandler {
 
-    public static final JobOperatorAdd INSTANCE = new JobOperatorAdd();
+    public static final JobOperatorAdd GLOBAL_INSTANCE = new JobOperatorAdd(true);
+    public static final JobOperatorAdd DEPLOYMENT_INSTANCE = new JobOperatorAdd(false);
+
+    private final boolean global;
+
+    public JobOperatorAdd(final boolean global) {
+        this.global = global;
+    }
 
     @Override
     protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model, final ServiceVerificationHandler verificationHandler, final List<ServiceController<?>> newControllers) throws OperationFailedException {
         final PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
         final String name = address.getLastElement().getValue();
-        context.addStep(new AbstractDeploymentChainStep() {
-            public void execute(final DeploymentProcessorTarget processorTarget) {
-                final Config config = new Config(
-                        nodeToString(model.get(WildFlyConstants.CLASS_LOADER_FACTORY)),
-                        nodeToString(model.get(WildFlyConstants.WORKER_FACTORY)),
-                        nodeToString(model.get(WildFlyConstants.EXECUTOR_FACTORY)),
-                        nodeToString(model.get(WildFlyConstants.REGISTRY_FACTORY)),
-                        nodeToString(model.get(WildFlyConstants.MARSHALLING_PROVIDER_FACTORY)),
-                        nodeToString(model.get(WildFlyConstants.EXECUTION_REPOSITORY_FACTORY)),
-                        nodeToString(model.get(WildFlyConstants.TRANSACTION_MANAGER_FACTORY)),
-                        nodeToString(model.get(WildFlyConstants.MBEAN_SERVER_FACTORY)),
-                        nodeToArray(model.get(WildFlyConstants.JOB_LOADER_FACTORY)),
-                        nodeToArray(model.get(WildFlyConstants.ARTIFACT_LOADER_FACTORY)),
-                        nodeToArray(model.get(WildFlyConstants.INJECTOR_FACTORY)),
-                        nodeToArray(model.get(WildFlyConstants.SECURITY_CHECK_FACTORY))
-                );
-                //TODO Properties
-                processorTarget.addDeploymentProcessor(WildFlyConstants.SUBSYSTEM_NAME, Phase.POST_MODULE, Phase.POST_MODULE_BATCH_ENVIRONMENT, new JobOperatorProcessor(name, config));
-            }
-        }, OperationContext.Stage.RUNTIME);
+        context.addStep(new DeployJobOperator(global, name, model), OperationContext.Stage.RUNTIME);
     }
 
-    String nodeToString(final ModelNode node) {
-        return node.isDefined()
-                ? node.asString()
-                : null;
-    }
+    public static class DeployJobOperator extends AbstractDeploymentChainStep {
 
-    String[] nodeToArray(final ModelNode root) {
-        if (!root.isDefined()) {
-            return null;
+        private final boolean global;
+        final String name;
+        final ModelNode model;
+
+        public DeployJobOperator(final boolean global, final String name, final ModelNode model) {
+            this.global = global;
+            this.name = name;
+            this.model = model;
         }
-        final List<ModelNode> nodes = root.asList();
-        if (nodes == null || nodes.isEmpty()) {
-            return null;
+
+        @Override
+        public void execute(final DeploymentProcessorTarget processorTarget) {
+            processorTarget.addDeploymentProcessor(WildFlyConstants.SUBSYSTEM_NAME, Phase.POST_MODULE, Phase.POST_MODULE_BATCH_ENVIRONMENT, new JobOperatorProcessor(global, name, model));
         }
-        final String[] ret = new String[nodes.size()];
-        for (int i = 0; i < nodes.size(); ++i) {
-            ret[i] = nodeToString(nodes.get(i));
-        }
-        return ret;
     }
 }

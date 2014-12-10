@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.tck.core.transport;
 
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
@@ -13,15 +13,17 @@ import org.infinispan.transaction.lookup.TransactionManagerLookup;
 import org.infinispan.util.concurrent.IsolationLevel;
 
 import javax.transaction.TransactionManager;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class InfinispanTransportFactory implements TransportFactory {
 
     @Override
-    public InfinispanTransport produce(final TransportConfiguration configuration) throws Exception {
+    public InfinispanTransport produce(final Dependencies dependencies, final Properties properties) throws Exception {
         final DefaultCacheManager manager = new DefaultCacheManager(
                 new GlobalConfigurationBuilder()
                         .clusteredDefault()
@@ -42,7 +44,7 @@ public class InfinispanTransportFactory implements TransportFactory {
                         .transactionManagerLookup(new TransactionManagerLookup() {
                             @Override
                             public TransactionManager getTransactionManager() throws Exception {
-                                return configuration.getTransactionManager();
+                                return dependencies.getTransactionManager();
                             }
                         })
                         .locking()
@@ -60,7 +62,8 @@ public class InfinispanTransportFactory implements TransportFactory {
             }
         });
         return new InfinispanTransport(
-                configuration,
+                dependencies,
+                properties,
                 manager,
                 30,
                 TimeUnit.SECONDS

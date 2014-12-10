@@ -2,8 +2,7 @@ package io.machinecode.chainlink.repository.mongo;
 
 import com.mongodb.DBObject;
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.spi.marshalling.Cloner;
-import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
+import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -41,6 +40,7 @@ import static javax.batch.runtime.BatchStatus.STOPPING;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class MongoExecutionRepository implements ExecutionRepository {
 
@@ -63,11 +63,13 @@ public class MongoExecutionRepository implements ExecutionRepository {
     };
 
     protected final Jongo jongo;
-    protected final Cloner cloner;
+    protected final Marshalling marshalling;
+    //protected final boolean camel;
 
-    public MongoExecutionRepository(final Jongo jongo, final MarshallingProvider provider) {
+    public MongoExecutionRepository(final Jongo jongo, final Marshalling marshalling, final boolean camel) {
         this.jongo = jongo;
-        this.cloner = provider.getCloner();
+        this.marshalling = marshalling;
+        //this.camel = camel;
     }
 
     protected long _id(final String key) {
@@ -136,9 +138,9 @@ public class MongoExecutionRepository implements ExecutionRepository {
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws IOException, ClassNotFoundException {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
         final long partitionExecutionId = _id(PARTITION_EXECUTION_ID);
         final MongoPartitionExecution execution = new MongoPartitionExecution.Builder()
                 .setPartitionExecutionId(partitionExecutionId)
@@ -257,7 +259,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws NoSuchJobExecutionException, IOException, ClassNotFoundException {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         final MongoCollection stepExecutions = jongo.getCollection(STEP_EXECUTIONS);
         final String query = "{" + Fields.STEP_EXECUTION_ID + ":#}";
         final MongoCursor<MongoStepExecution> cursor = stepExecutions.find(query, stepExecutionId).as(MongoStepExecution.class);
@@ -279,9 +281,9 @@ public class MongoExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, IOException, ClassNotFoundException {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
         final MongoCollection stepExecutions = jongo.getCollection(STEP_EXECUTIONS);
         final String query = "{" + Fields.STEP_EXECUTION_ID + ":#}";
         final MongoCursor<MongoStepExecution> cursor = stepExecutions.find(query, stepExecutionId).as(MongoStepExecution.class);
@@ -349,9 +351,9 @@ public class MongoExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, ClassNotFoundException, IOException {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
         final MongoCollection partitionExecutions = jongo.getCollection(PARTITION_EXECUTIONS);
         final String query = "{" + Fields.PARTITION_EXECUTION_ID + ":#}";
         final MongoCursor<MongoPartitionExecution> cursor = partitionExecutions.find(query, partitionExecutionId).as(MongoPartitionExecution.class);
@@ -375,7 +377,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
 
     @Override
     public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, ClassNotFoundException, IOException {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         final MongoCollection partitionExecutions = jongo.getCollection(PARTITION_EXECUTIONS);
         final String query = "{" + Fields.PARTITION_EXECUTION_ID + ":#}";
         final MongoCursor<MongoPartitionExecution> cursor = partitionExecutions.find(query, partitionExecutionId).as(MongoPartitionExecution.class);

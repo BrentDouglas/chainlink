@@ -4,6 +4,7 @@ import io.machinecode.chainlink.spi.element.transition.Stop;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public interface InheritableStop<T extends InheritableStop<T>>
         extends InheritableTerminatingTransition<T>, Stop {

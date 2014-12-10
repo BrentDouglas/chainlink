@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class MutableMetricImpl implements MutableMetric, Serializable {
     private static final long serialVersionUID = 1L;

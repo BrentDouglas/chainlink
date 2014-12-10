@@ -7,7 +7,7 @@ import com.tangosol.net.InvocationObserver;
 import com.tangosol.net.InvocationService;
 import com.tangosol.net.Member;
 import com.tangosol.util.UID;
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
@@ -21,10 +21,12 @@ import org.jboss.logging.Logger;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class CoherenceTransport extends DistributedTransport<Member> {
 
@@ -36,8 +38,8 @@ public class CoherenceTransport extends DistributedTransport<Member> {
     final Member local;
     protected volatile List<Member> remotes;
 
-    public CoherenceTransport(final TransportConfiguration configuration, final String invocationServiceName) throws Exception {
-        super(configuration);
+    public CoherenceTransport(final Dependencies dependencies, final Properties properties, final String invocationServiceName) throws Exception {
+        super(dependencies, properties);
         this.invocationServiceName = invocationServiceName;
         final Cluster cluster = CacheFactory.ensureCluster();
         this.executor = (InvocationService) CacheFactory.getService(invocationServiceName);

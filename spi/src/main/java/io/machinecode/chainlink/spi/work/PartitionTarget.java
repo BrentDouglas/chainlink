@@ -4,6 +4,7 @@ import io.machinecode.chainlink.spi.execution.Executable;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class PartitionTarget {
     private final Executable[] executables;

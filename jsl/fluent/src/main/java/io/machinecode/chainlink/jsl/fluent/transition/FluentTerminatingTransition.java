@@ -4,6 +4,7 @@ import io.machinecode.chainlink.jsl.core.inherit.transition.InheritableTerminati
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public abstract class FluentTerminatingTransition<T extends FluentTerminatingTransition<T>> extends FluentTransition<T> implements InheritableTerminatingTransition<T> {
 

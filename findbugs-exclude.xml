@@ -12,6 +12,11 @@
     <Match>
         <Or>
             <Class name="io.machinecode.chainlink.core.execution.EventedExecutor$3" />
+            <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$1" />
+            <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$2" />
+            <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$3" />
+            <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$4" />
+            <Class name="~io\.machinecode\.chainlink\.test\.core\.execution\.BaseTest.*" />
             <Package name="io.machinecode.chainlink.tck.core.loader"/>
             <Package name="io.machinecode.chainlink.tck.core.transport"/>
             <Package name="io.machinecode.chainlink.tck.core.repository"/>
@@ -65,13 +70,13 @@
     <Match>
         <Or>
             <Class name="io.machinecode.chainlink.core.configuration.ConfigurationImpl" />
-            <Class name="io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider" />
-            <Class name="io.machinecode.chainlink.marshalling.jboss.JbossMarshallingProvider" />
+            <Class name="io.machinecode.chainlink.marshalling.jdk.JdkMarshalling" />
+            <Class name="io.machinecode.chainlink.marshalling.jboss.JbossMarshalling" />
             <Class name="io.machinecode.chainlink.repository.core.MetricImpl" />
             <Class name="io.machinecode.chainlink.repository.jpa.JpaMetric" />
             <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository" />
             <Class name="io.machinecode.chainlink.repository.mongo.MongoMetric" />
-            <Class name="io.machinecode.chainlink.ee.wildfly.schema.JobOperatorAdd" />
+            <Class name="io.machinecode.chainlink.ee.wildfly.schema.JobOperatorDeploymentAdd" />
         </Or>
        <Bug code="PZLA" />
     </Match>

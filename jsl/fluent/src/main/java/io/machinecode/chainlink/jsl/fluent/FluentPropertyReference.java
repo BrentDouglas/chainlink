@@ -4,6 +4,7 @@ import io.machinecode.chainlink.jsl.core.inherit.InheritablePropertyReference;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public abstract class FluentPropertyReference<T extends FluentPropertyReference<T>> implements InheritablePropertyReference<T, FluentProperties> {
 

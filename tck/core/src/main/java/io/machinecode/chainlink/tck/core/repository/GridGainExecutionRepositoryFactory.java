@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
-import io.machinecode.chainlink.spi.configuration.ExecutionRepositoryConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.gridgain.grid.GridConfiguration;
@@ -13,8 +13,11 @@ import org.gridgain.grid.cache.GridCacheConfiguration;
 import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMulticastIpFinder;
 
+import java.util.Properties;
+
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFactory {
 
@@ -66,9 +69,9 @@ public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFa
     }
 
     @Override
-    public ExecutionRepository produce(final ExecutionRepositoryConfiguration configuration) throws Exception {
+    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
         return new GridGainExecutionRepository(
-                configuration.getMarshallingProviderFactory().produce(configuration),
+                dependencies.getMarshalling(),
                 GridGain.grid(CHAINLINK_TCK_GRID)
         );
     }

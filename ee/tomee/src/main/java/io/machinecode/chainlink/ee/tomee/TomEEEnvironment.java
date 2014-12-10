@@ -1,30 +1,34 @@
 package io.machinecode.chainlink.ee.tomee;
 
 import io.machinecode.chainlink.core.Chainlink;
+import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
+import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
+import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
-import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
+import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
-import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
-import io.machinecode.chainlink.spi.util.Messages;
 import org.apache.openejb.AppContext;
 import org.apache.openejb.assembler.classic.AppInfo;
 import org.apache.openejb.assembler.classic.event.AssemblerAfterApplicationCreated;
 import org.apache.openejb.assembler.classic.event.AssemblerBeforeApplicationDestroyed;
+import org.apache.openejb.assembler.classic.event.ContainerSystemPostCreate;
+import org.apache.openejb.assembler.classic.event.ContainerSystemPreDestroy;
+import org.apache.openejb.loader.SystemInstance;
 import org.apache.openejb.observer.Observes;
 import org.apache.openejb.observer.event.ObserverAdded;
 
 import javax.transaction.TransactionManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -35,7 +39,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class TomEEEnvironment implements Environment {
 
-    private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<String, App>();
+    private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
+    private SubSystemModelImpl model;
 
     public void init(@Observes final ObserverAdded event) {
         if (event.getObserver() == this) {
@@ -69,79 +74,75 @@ public class TomEEEnvironment implements Environment {
         return Collections.emptyMap();
     }
 
-    public void postCreateApp(@Observes final AssemblerAfterApplicationCreated event) {
+    public void postCreateSubsystem(@Observes final ContainerSystemPostCreate event) throws Exception {
+        final SystemInstance system = SystemInstance.get();
+        final ClassLoader loader = system.getClassLoader();
+        this.model = new SubSystemModelImpl(loader);
+        final String subsystemXml = system.getProperty(Constants.CHAINLINK_SUBSYSTEM_XML, Constants.Defaults.CHAINLINK_SUBSYSTEM_XML);
+        final File conf = system.getConf(subsystemXml);
+        if (conf != null && conf.isFile()) {
+            try (final InputStream stream = new FileInputStream(conf)) {
+                final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlinkSubSystem.class);
+                final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+                final XmlChainlinkSubSystem xml = (XmlChainlinkSubSystem) unmarshaller.unmarshal(stream);
+
+                xml.configureSubSystem(model, loader);
+            }
+        }
+    }
+
+    public void preDestroySubsystem(@Observes final ContainerSystemPreDestroy event) {
+        //TODO
+    }
+
+    public void postCreateApp(@Observes final AssemblerAfterApplicationCreated event) throws Exception {
+        if (model == null) {
+            throw new IllegalStateException(); //TODO Message
+        }
+        final SystemInstance system = SystemInstance.get();
         final AppInfo info = event.getApp();
         final AppContext context = event.getContext();
         final ClassLoader loader = context.getClassLoader();
+        final DeploymentModelImpl deployment = model.getDeployment().copy();
         App app = this.operators.get(info.appId);
         if (app == null) {
             app = new App(loader);
             this.operators.put(info.appId, app);
         }
-        final List<ConfigurationFactory> factories;
-        try {
-            factories = new ResolvableService<ConfigurationFactory>(Constants.CONFIGURATION_FACTORY_CLASS, ConfigurationFactory.class)
-                    .resolve(loader);
-        } catch (final Exception e) {
-            throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
-        }
-        try {
-            final TransactionManager transactionManager = context.getSystemInstance().getComponent(TransactionManager.class);
-            final TomEEConfigurationDefaults defaults = new TomEEConfigurationDefaults(loader, transactionManager);
-
-            final Thread thread = Thread.currentThread();
-            final ClassLoader tccl = thread.getContextClassLoader();
-            thread.setContextClassLoader(loader);
+        final String chainlinkXml = system.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
+        final InputStream stream = loader.getResourceAsStream(chainlinkXml);
+        if (stream != null) {
             try {
-                boolean haveDefault = false;
-                if (factories.isEmpty()) {
-                    final InputStream stream = loader.getResourceAsStream("chainlink.xml");
-                    if (stream != null) {
-                        final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
-                        final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
-                        final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
+                final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
+                final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+                final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
 
-                        for (final XmlConfiguration configuration : xml.getConfigurations()) {
-                            app.ops.put(
-                                    configuration.getName(),
-                                    new JobOperatorImpl(TomEEConfiguration.xmlToBuilder(configuration)
-                                            .setConfigurationDefaults(defaults)
-                                            .build()
-                                    )
-                            );
-                            if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getName())) {
-                                haveDefault = true;
-                            }
-                        }
-                    }
-                } else {
-                    for (final ConfigurationFactory configuration : factories) {
-                        app.ops.put(
-                                configuration.getId(),
-                                new JobOperatorImpl(configuration.produce(loader)
-                                        .setConfigurationDefaults(defaults)
-                                        .build()
-                                )
-                        );
-                        if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getId())) {
-                            haveDefault = true;
-                        }
-                    }
-                }
-                if (!haveDefault) {
-                    app.ops.put(
-                            Constants.DEFAULT_CONFIGURATION,
-                            new JobOperatorImpl(new TomEEConfiguration.Builder()
-                                    .setConfigurationDefaults(defaults)
-                                    .build()
-                            )
-                    );
-                }
+                xml.configureDeployment(deployment, loader);
             } finally {
-                thread.setContextClassLoader(tccl);
+                stream.close();
             }
-        } catch (final Exception e) {
-            throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
+        }
+        final TransactionManager transactionManager = context.getSystemInstance().getComponent(TransactionManager.class);
+        final TomEEConfigurationDefaults defaults = new TomEEConfigurationDefaults(loader, transactionManager);
+        boolean haveDefault = false;
+        for (final Map.Entry<String, JobOperatorModelImpl> entry : deployment.getJobOperators().entrySet()) {
+            final JobOperatorModelImpl jobOperatorModel = entry.getValue();
+            defaults.configureJobOperator(jobOperatorModel);
+            if (Constants.DEFAULT_CONFIGURATION.equals(entry.getKey())) {
+                haveDefault = true;
+            }
+            app.ops.put(
+                    entry.getKey(),
+                    jobOperatorModel.createJobOperator()
+            );
+        }
+        if (!haveDefault) {
+            final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+            defaults.configureJobOperator(defaultModel);
+            app.ops.put(
+                    Constants.DEFAULT_CONFIGURATION,
+                    defaultModel.createJobOperator()
+            );
         }
     }
 
@@ -174,8 +175,8 @@ public class TomEEEnvironment implements Environment {
         final ConcurrentMap<String, JobOperatorImpl> ops;
 
         private App(final ClassLoader loader) {
-            this.loader = new WeakReference<ClassLoader>(loader);
-            this.ops = new ConcurrentHashMap<String, JobOperatorImpl>();
+            this.loader = new WeakReference<>(loader);
+            this.ops = new ConcurrentHashMap<>();
         }
     }
 }

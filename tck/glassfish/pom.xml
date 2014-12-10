@@ -242,7 +242,7 @@
                                     <arg value="-cp"/>
                                     <arg value="${test_classpath}"/>
                                     <arg value="io.machinecode.chainlink.tck.core.TestInstrument"/>
-                                    <arg value="-c"/><arg value="io.machinecode.chainlink.tck.glassfish.GlassfishTckConfigurationFactory"/>
+                                    <arg value="-c"/><arg value="io.machinecode.chainlink.tck.core.TckJobOperatorConfiguration"/>
                                     <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/ee/TransactionTests.class"/>
                                     <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/BatchletRestartStateMachineTests.class"/>
                                     <arg value="-i"/><arg value="${project.build.testOutputDirectory}/com/ibm/jbatch/tck/tests/jslxml/ChunkTests.class"/>

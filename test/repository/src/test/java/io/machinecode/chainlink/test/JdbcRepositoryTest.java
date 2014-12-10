@@ -2,6 +2,9 @@ package io.machinecode.chainlink.test;
 
 import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
 import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.DummyDataSource;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
@@ -10,9 +13,11 @@ import org.junit.After;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class JdbcRepositoryTest extends RepositoryTest {
 
@@ -27,17 +32,22 @@ public class JdbcRepositoryTest extends RepositoryTest {
     final String password = System.getProperty(prefix + "database.password", "");
 
     @Override
-    protected ExecutionRepository _repository() {
+    protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         log.infof("Connection: {\n\turl: '%s'\n\tdriver: '%s'\n\tuser: '%s'\n\tpassword: '%s'\n}", this.url, this.driverName, this.user, this.password);
         if (dataSource == null) {
             dataSource = new DummyDataSource(this.url, this.driverName);
         }
-        return JdbcExecutionRepository.create(new DataSourceLookup() {
+        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
             @Override
-            public DataSource getDataSource() {
-                return dataSource;
+            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = JdbcExecutionRepository.create(new DataSourceLookup() {
+                    @Override
+                    public DataSource getDataSource() {
+                        return dataSource;
+                    }
+                }, user, password);
             }
-        }, this.user, this.password);
+        });
     }
 
     @After

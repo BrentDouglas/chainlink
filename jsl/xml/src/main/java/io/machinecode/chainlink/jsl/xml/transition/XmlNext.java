@@ -9,6 +9,7 @@ import static javax.xml.bind.annotation.XmlAccessType.FIELD;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 @XmlAccessorType(FIELD)
 //@XmlType(name = "Next")

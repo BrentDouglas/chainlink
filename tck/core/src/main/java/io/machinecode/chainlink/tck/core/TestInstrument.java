@@ -42,7 +42,7 @@ public class TestInstrument {
 
     public static void main(final String[] args) throws Exception {
 
-        final Getopt opt = new Getopt("test-instrument", args, "c:i:d:e:l:r:m:w:h", new LongOpt[]{
+        final Getopt opt = new Getopt("test-instrument", args, "c:i:e:l:r:m:w:h", new LongOpt[]{
                 new LongOpt("instrument", LongOpt.REQUIRED_ARGUMENT, null, 'i'),
                 new LongOpt("class", LongOpt.REQUIRED_ARGUMENT, null, 'c'),
                 new LongOpt("export", LongOpt.REQUIRED_ARGUMENT, null, 'e'),
@@ -134,12 +134,9 @@ public class TestInstrument {
 
             instrument(test, classes, export, libraries, resources, metaResources, webResources);
 
-            final DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
-            try {
+            try (final DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
                 out.write(test.toBytecode());
                 System.out.println("Instrumented " + test.getName());
-            } finally {
-                out.close();
             }
         }
     }

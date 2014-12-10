@@ -1,14 +1,14 @@
 package io.machinecode.chainlink.test.core.jsl.groovy
 
-import io.machinecode.chainlink.core.element.JobImpl;
+import io.machinecode.chainlink.core.element.JobImpl
 import io.machinecode.chainlink.core.factory.JobFactory
 import io.machinecode.chainlink.jsl.groovy.Dsl
-import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.task.Chunk.CheckpointPolicy;
+import io.machinecode.chainlink.spi.element.Job
+import io.machinecode.chainlink.spi.element.task.Chunk.CheckpointPolicy
 import io.machinecode.chainlink.test.core.ExpressionTest
-import io.machinecode.chainlink.test.core.jsl.InheritanceJobTest;
-import junit.framework.Assert;
-import org.junit.Test;
+import io.machinecode.chainlink.test.core.jsl.InheritanceJobTest
+import junit.framework.Assert
+import org.junit.Test
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.element.task.Batchlet;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class BatchletValidator extends PropertyReferenceValidator<Batchlet> {
 

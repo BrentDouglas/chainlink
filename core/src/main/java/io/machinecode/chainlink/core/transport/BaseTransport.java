@@ -4,7 +4,7 @@ import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.registry.ThreadId;
 import io.machinecode.chainlink.core.registry.UUIDId;
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
@@ -20,6 +20,7 @@ import io.machinecode.then.api.Deferred;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,8 +44,8 @@ public abstract class BaseTransport<A> implements Transport<A> {
 
     final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public BaseTransport(final TransportConfiguration configuration) {
-        this.registry = configuration.getRegistry();
+    public BaseTransport(final Dependencies dependencies, final Properties properties) {
+        this.registry = dependencies.getRegistry();
         this.workerOrder = new ArrayList<>();
         this.workers = new THashMap<>();
     }

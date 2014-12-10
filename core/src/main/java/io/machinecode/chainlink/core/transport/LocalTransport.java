@@ -1,7 +1,8 @@
 package io.machinecode.chainlink.core.transport;
 
-import io.machinecode.chainlink.spi.configuration.TransportConfiguration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -9,8 +10,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class LocalTransport extends BaseTransport<Void> {
 
-    public LocalTransport(final TransportConfiguration configuration) {
-        super(configuration);
+    public LocalTransport(final Dependencies dependencies, final Properties properties) {
+        super(dependencies, properties);
     }
 
     @Override

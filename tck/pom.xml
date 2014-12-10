@@ -20,13 +20,12 @@
 
         <container.debug>false</container.debug>
 
-        <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
+        <execution.repository.factory.class>io.machinecode.chainlink.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
-        <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
-        <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshalling.provider.factory.class>
+        <marshalling.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingFactory</marshalling.factory.class>
 
         <injector.configuration.source.file>META-INF/batch.xml</injector.configuration.source.file>
         <injector.configuration.destination.file>${injector.configuration.source.file}</injector.configuration.destination.file>
@@ -704,7 +703,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallingProviderFactory</marshalling.provider.factory.class>
+                <marshalling.factory.class>io.machinecode.chainlink.marshalling.jboss.JBossMarshallingFactory</marshalling.factory.class>
             </properties>
         </profile>
     </profiles>
@@ -816,12 +815,12 @@
                                             <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
                                         </filterset>
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SecurityCheckFactory"
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SecurityFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.SecurityFactory"
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>
-                                            <filter token="security.check.factory.class" value="${security.check.factory.class}" />
+                                            <filter token="security.factory.class" value="${security.factory.class}" />
                                         </filterset>
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory"
@@ -856,20 +855,12 @@
                                             <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
                                         </filterset>
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.WorkerFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.WorkerFactory"
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory"
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>
-                                            <filter token="worker.factory.class" value="${worker.factory.class}" />
-                                        </filterset>
-                                    </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.MarshallingProviderFactory"
-                                          filtering="true"
-                                          overwrite="true">
-                                        <filterset>
-                                            <filter token="marshalling.provider.factory.class" value="${marshalling.provider.factory.class}" />
+                                            <filter token="marshalling.factory.class" value="${marshalling.factory.class}" />
                                         </filterset>
                                     </copy>
                                 </target>

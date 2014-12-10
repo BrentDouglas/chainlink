@@ -82,24 +82,24 @@
     </management>
 
     <profile>
-        <subsystem xmlns="urn:machinecode:chainlink:1.0">
+        <subsystem xmlns="urn:jboss:domain:chainlink:1.0">
             <job-operator name="default">
-                <executor-factory name="a" class="@executor.factory.class@"/>
-                <registry-factory name="b" class="@registry.factory.class@"/>
-                <worker-factory name="c" class="@worker.factory.class@"/>
-                <marshalling-provider-factory name="d" class="@marshalling.provider.factory.class@"/>
-                <mbean-server-factory name="e" class="@mbean.server.factory.class@"/>
-                <execution-repository-factory name="f" class="@execution.repository.factory.class@"/>
+                <executor name="a" factory="@executor.factory.class@"/>
+                <registry name="b" factory="@registry.factory.class@"/>
+                <marshalling name="d" factory="@marshalling.factory.class@"/>
+                <mbean-server name="e" factory="@mbean.server.factory.class@"/>
+                <execution-repository name="f" factory="@execution.repository.factory.class@"/>
 
                 <!--
-                <class-loader-factory class="@class.loader.factory.class@"/>
-                <transaction-manager-factory class="@transaction.manager.factory.class@"/>
+                <class-loader factory="@class.loader.factory.class@"/>
+                <transaction-manager factory="@transaction.manager.factory.class@"/>
 
-                <job-loader-factory class="@job.loader.factory.class@"/>
-                <artifact-loader-factory class="@artifact.loader.factory.class@"/>
-                <injector-factory class="@injector.factory.class@"/>
-                <security-check-factory class="@security.check.factory.class@"/>
+                <job-loader factory="@job.loader.factory.class@"/>
+                <artifact-loader factory="@artifact.loader.factory.class@"/>
+                <injector factory="@injector.factory.class@"/>
+                <security factory="@security.factory.class@"/>
                 -->
+                <property name="test" value="test-value"/>
             </job-operator>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:logging:3.0">

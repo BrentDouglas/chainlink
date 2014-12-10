@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chainlink xmlns="http://xmlns.io.machinecode/xml/ns/chainlink"
+<chainlink xmlns="http://io.machinecode/xml/ns/chainlink"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://xmlns.io.machinecode/xml/ns/chainlink http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
+                 xsi:schemaLocation="http://io.machinecode/xml/ns/chainlink http://io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
 
     <job-operator name="default">
-        <executor-factory class="@executor.factory.class@"/>
-        <registry-factory class="@registry.factory.class@"/>
-        <transport-factory class="@transport.factory.class@"/>
-        <worker-factory class="@worker.factory.class@"/>
-        <marshalling-provider-factory class="@marshalling.provider.factory.class@"/>
-        <mbean-server-factory class="@mbean.server.factory.class@"/>
-        <execution-repository-factory class="@execution.repository.factory.class@"/>
+        <marshalling name="marshalling" factory="@marshalling.factory.class@"/>
+        <mbean-server name="mbean-server" factory="@mbean.server.factory.class@"/>
+        <execution-repository name="execution-repository" factory="@execution.repository.factory.class@"/>
+        <registry name="registry" factory="@registry.factory.class@"/>
+        <transport name="transport" factory="@transport.factory.class@"/>
+        <executor name="executor" factory="@executor.factory.class@"/>
 
         <!--
-        <class-loader-factory class="@class.loader.factory.class@"/>
-        <transaction-manager-factory class="@transaction.manager.factory.class@"/>
+        <class-loader name="class-loader" factory="@class.loader.factory.class@"/>
+        <transaction-manager name="transaction-manager" factory="@transaction.manager.factory.class@"/>
 
-        <job-loader-factory class="@job.loader.factory.class@"/>
-        <artifact-loader-factory class="@artifact.loader.factory.class@"/>
-        <injector-factory class="@injector.factory.class@"/>
-        <security-check-factory class="@security.check.factory.class@"/>
+        <job-loader name="job-loader" factory="@job.loader.factory.class@"/>
+        <artifact-loader name="artifact-loader" factory="@artifact.loader.factory.class@"/>
+        <injector name="injector" factory="@injector.factory.class@"/>
+        <security name="security" factory="@security.factory.class@"/>
         -->
     </job-operator>
 

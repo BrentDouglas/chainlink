@@ -6,6 +6,7 @@ import org.infinispan.commands.module.ModuleCommandInitializer;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class ChainlinkModuleCommandInitializer implements ModuleCommandInitializer {
 

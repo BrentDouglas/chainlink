@@ -1,6 +1,9 @@
 package io.machinecode.chainlink.test;
 
 import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.infinispan.configuration.cache.CacheMode;
@@ -13,49 +16,56 @@ import org.infinispan.transaction.lookup.TransactionManagerLookup;
 import org.infinispan.util.concurrent.IsolationLevel;
 
 import javax.transaction.TransactionManager;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class InfinispanRepositoryTest extends RepositoryTest {
 
     @Override
-    protected ExecutionRepository _repository() throws Exception {
-        return new InfinispanExecutionRepository(
-                marshallingProviderFactory().produce(null),
-                new DefaultCacheManager(
-                        new GlobalConfigurationBuilder()
-                                .clusteredDefault()
-                                    .globalJmxStatistics()
-                                    .jmxDomain("io.machinecode.chainlink.test")
-                                .allowDuplicateDomains(true)
-                                .asyncListenerExecutor()
-                                .addProperty("maxThreads", "1")
-                                .build(),
-                        new ConfigurationBuilder()
-                                .deadlockDetection()
-                                    .enable()
-                                .invocationBatching()
-                                    .disable()
-                                .transaction()
-                                    .lockingMode(LockingMode.PESSIMISTIC)
-                                    .transactionMode(TransactionMode.TRANSACTIONAL)
-                                .transactionManagerLookup(new TransactionManagerLookup() {
-                                    @Override
-                                    public TransactionManager getTransactionManager() throws Exception {
-                                        return transactionManager();
-                                    }
-                                })
-                                .locking()
-                                    .isolationLevel(IsolationLevel.READ_COMMITTED)
-                                    .lockAcquisitionTimeout(TimeUnit.SECONDS.toMillis(30))
-                                .clustering()
-                                    .cacheMode(CacheMode.LOCAL)
-                                .sync()
-                                .build()
-                ),
-                transactionManager()
-        );
+    protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
+        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+            @Override
+            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new InfinispanExecutionRepository(
+                        dependencies.getMarshalling(),
+                        new DefaultCacheManager(
+                                new GlobalConfigurationBuilder()
+                                        .clusteredDefault()
+                                        .globalJmxStatistics()
+                                        .jmxDomain("io.machinecode.chainlink.test")
+                                        .allowDuplicateDomains(true)
+                                        .asyncListenerExecutor()
+                                        .addProperty("maxThreads", "1")
+                                        .build(),
+                                new ConfigurationBuilder()
+                                        .deadlockDetection()
+                                        .enable()
+                                        .invocationBatching()
+                                        .disable()
+                                        .transaction()
+                                        .lockingMode(LockingMode.PESSIMISTIC)
+                                        .transactionMode(TransactionMode.TRANSACTIONAL)
+                                        .transactionManagerLookup(new TransactionManagerLookup() {
+                                            @Override
+                                            public TransactionManager getTransactionManager() throws Exception {
+                                                return dependencies.getTransactionManager();
+                                            }
+                                        })
+                                        .locking()
+                                        .isolationLevel(IsolationLevel.READ_COMMITTED)
+                                        .lockAcquisitionTimeout(TimeUnit.SECONDS.toMillis(30))
+                                        .clustering()
+                                        .cacheMode(CacheMode.LOCAL)
+                                        .sync()
+                                        .build()
+                        ),
+                        dependencies.getTransactionManager()
+                );
+            }
+        });
     }
 }

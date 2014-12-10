@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chainlink xmlns="http://xmlns.io.machinecode/xml/ns/chainlink"
+<chainlink xmlns="http://io.machinecode/xml/ns/chainlink"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://xmlns.io.machinecode/xml/ns/chainlink http://xmlns.io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
+                 xsi:schemaLocation="http://io.machinecode/xml/ns/chainlink http://io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
 
     <job-operator name="Default">
-        <executor-factory class=""/>
-        <registry-factory class=""/>
-        <worker-factory class=""/>
-        <marshalling-provider-factory class=""/>
-        <mbean-server-factory class="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
-        <execution-repository-factory class=""/>
-        <artifact-loader-factory class="io.machinecode.chainlink.inject.cdi.CdiArtifactLoader"/>
-        <injector-factory class="io.machinecode.chainlink.inject.cdi.CdiInjector"/>
+        <marshalling name="marshalling" factory=""/>
+        <mbean-server name="mbean-server" factory="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
+        <artifact-loader name="artifact-loader" factory="io.machinecode.chainlink.inject.cdi.CdiArtifactLoader"/>
+        <injector name="injector" factory="io.machinecode.chainlink.inject.cdi.CdiInjector"/>
+        <execution-repository name="execution-repository" factory=""/>
+        <registry name="registry" factory=""/>
+        <transport name="transport" factory=""/>
+        <executor name="executor" factory=""/>
     </job-operator>
 
 </chainlink>

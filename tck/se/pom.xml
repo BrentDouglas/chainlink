@@ -112,11 +112,10 @@
                                         <filter token="registry.factory.class" value="${registry.factory.class}" />
                                         <filter token="injector.factory.class" value="${injector.factory.class}" />
                                         <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
-                                        <filter token="security.check.factory.class" value="${security.check.factory.class}" />
+                                        <filter token="security.factory.class" value="${security.factory.class}" />
                                         <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
                                         <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
-                                        <filter token="worker.factory.class" value="${worker.factory.class}" />
-                                        <filter token="marshalling.provider.factory.class" value="${marshalling.provider.factory.class}" />
+                                        <filter token="marshalling.factory.class" value="${marshalling.factory.class}" />
                                     </filterset>
                                 </copy>
                                 <copy file="${project.basedir}/../chainlink-tck.properties"

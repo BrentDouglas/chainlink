@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:cl="http://io.machinecode/xml/ns/chainlink"
+           targetNamespace="http://io.machinecode/xml/ns/chainlink"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0">
+    <xs:annotation>
+        <xs:documentation>
+            Configuration for a Chainlink deployment.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="chainlink" type="cl:DeploymentType"/>
+
+    <xs:complexType name="ScopeType" abstract="true">
+        <xs:annotation>
+            <xs:documentation>
+                A Chainlink scope.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="job-operator" type="cl:JobOperatorType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="factory" use="optional" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    The fully qualified class name (fqcn) of the factory to use to configure this scope.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="DeploymentType">
+        <xs:annotation>
+            <xs:documentation>
+                A Chainlink deployment. Resources declared here will be created for each deployment and will be shared
+                by any operators in that deployment.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="cl:ScopeType"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="JobOperatorType">
+        <xs:annotation>
+            <xs:documentation>
+                A JobOperator.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="cl:NamedType">
+                <xs:sequence>
+                    <xs:element name="class-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="transaction-manager" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="marshalling" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="mbean-server" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="job-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="artifact-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="injector" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="security" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="execution-repository" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="registry" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="transport" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="executor" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="property" type="cl:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="factory" use="optional" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The fully qualified class name (fqcn) of the factory to use to configure this job operator.
+                            Must implement JobOperatorConfiguration.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="NamedType">
+        <xs:attribute name="name" use="required" type="xs:ID">
+            <xs:annotation>
+                <xs:documentation>
+                    The name this element may referred to by other elements using this attribute.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="DeclarationType">
+        <xs:annotation>
+            <xs:documentation>
+                A resource that may be used by a JobOperator.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="cl:NamedType">
+                <xs:attribute name="factory" use="required" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The fully qualified class name (fqcn) of the factory to use.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="PropertyType">
+        <xs:attribute name="name" use="required" type="xs:string" />
+        <xs:attribute name="value" use="required" type="xs:string" />
+    </xs:complexType>
+</xs:schema>

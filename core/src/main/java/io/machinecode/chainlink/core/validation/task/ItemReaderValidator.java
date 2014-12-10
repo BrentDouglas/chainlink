@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.element.task.ItemReader;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class ItemReaderValidator extends PropertyReferenceValidator<ItemReader> {
 

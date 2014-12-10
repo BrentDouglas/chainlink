@@ -17,6 +17,7 @@ import javax.batch.api.partition.PartitionPlan;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implements Mapper, StrategyWork {
     private static final long serialVersionUID = 1L;

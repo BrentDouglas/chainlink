@@ -1,15 +1,15 @@
 package io.machinecode.chainlink.ee.glassfish;
 
+import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
+import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
+import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
-import io.machinecode.chainlink.core.configuration.xml.XmlConfiguration;
+import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
-import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.factory.ConfigurationFactory;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
-import io.machinecode.chainlink.spi.util.Messages;
 import org.glassfish.internal.data.ApplicationInfo;
 
 import javax.naming.InitialContext;
@@ -19,7 +19,6 @@ import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -28,9 +27,10 @@ import java.util.concurrent.ConcurrentMap;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class GlassfishEnvironment implements Environment {
+public class GlassfishEnvironment implements Environment, AutoCloseable {
 
     private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
+    private SubSystemModelImpl model;
 
     @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
@@ -58,77 +58,70 @@ public class GlassfishEnvironment implements Environment {
         return Collections.emptyMap();
     }
 
+    public void addSubsystem(final ClassLoader loader) throws Exception {
+        this.model = new SubSystemModelImpl(loader);
+        final String subsystemXml = System.getProperty(Constants.CHAINLINK_SUBSYSTEM_XML, Constants.Defaults.CHAINLINK_SUBSYSTEM_XML);
+        //TODO This should come out of the config dir
+        final InputStream stream = loader.getResourceAsStream(subsystemXml);
+        if (stream != null) {
+            try {
+                final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlinkSubSystem.class);
+                final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+                final XmlChainlinkSubSystem xml = (XmlChainlinkSubSystem) unmarshaller.unmarshal(stream);
+
+                xml.configureSubSystem(model, loader);
+            } finally {
+                stream.close();
+            }
+        }
+    }
+
     public void addApplication(final ApplicationInfo info) throws Exception {
+        if (model == null) {
+            throw new IllegalStateException(); //TODO Message
+        }
         App app = this.operators.get(info.getName());
         final ClassLoader loader = info.getAppClassLoader();
         if (app == null) {
             app = new App(loader);
             this.operators.put(info.getName(), app);
         }
-        final List<ConfigurationFactory> factories;
-        try {
-            factories = new ResolvableService<>(Constants.CONFIGURATION_FACTORY_CLASS, ConfigurationFactory.class)
-                    .resolve(loader);
-        } catch (final Exception e) {
-            throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
-        }
-        try {
-            final TransactionManager transactionManager = InitialContext.doLookup("java:appserver/TransactionManager");
-            final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, transactionManager);
+        final DeploymentModelImpl deployment = this.model.getDeployment().copy();
 
-            final Thread thread = Thread.currentThread();
-            final ClassLoader tccl = thread.getContextClassLoader();
-            thread.setContextClassLoader(loader);
+        final String chainlinkXml = System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
+        final InputStream stream = loader.getResourceAsStream(chainlinkXml);
+        if (stream != null) {
             try {
-                boolean haveDefault = false;
-                if (factories.isEmpty()) {
-                    final InputStream stream = loader.getResourceAsStream("chainlink.xml");
-                    if (stream != null) {
-                        final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
-                        final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
-                        final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
+                final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
+                final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+                final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
 
-                        for (final XmlConfiguration configuration : xml.getConfigurations()) {
-                            app.ops.put(
-                                    configuration.getName(),
-                                    new JobOperatorImpl(GlassfishConfigutation.xmlToBuilder(configuration)
-                                            .setConfigurationDefaults(defaults)
-                                            .build()
-                                    )
-                            );
-                            if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getName())) {
-                                haveDefault = true;
-                            }
-                        }
-                    }
-                } else {
-                    for (final ConfigurationFactory configuration : factories) {
-                        app.ops.put(
-                                configuration.getId(),
-                                new JobOperatorImpl(configuration.produce(loader)
-                                        .setConfigurationDefaults(defaults)
-                                        .build()
-                                )
-                        );
-                        if (Constants.DEFAULT_CONFIGURATION.equals(configuration.getId())) {
-                            haveDefault = true;
-                        }
-                    }
-                }
-                if (!haveDefault) {
-                    app.ops.put(
-                            Constants.DEFAULT_CONFIGURATION,
-                            new JobOperatorImpl(new GlassfishConfigutation.Builder()
-                                    .setConfigurationDefaults(defaults)
-                                    .build()
-                            )
-                    );
-                }
+                xml.configureDeployment(deployment, loader);
             } finally {
-                thread.setContextClassLoader(tccl);
+                stream.close();
             }
-        } catch (final Exception e) {
-            throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
+        }
+        final TransactionManager transactionManager = InitialContext.doLookup("java:appserver/TransactionManager");
+        final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, transactionManager);
+        boolean haveDefault = false;
+        for (final Map.Entry<String, JobOperatorModelImpl> entry : deployment.getJobOperators().entrySet()) {
+            final JobOperatorModelImpl jobOperatorModel = entry.getValue();
+            defaults.configureJobOperator(jobOperatorModel);
+            if (Constants.DEFAULT_CONFIGURATION.equals(entry.getKey())) {
+                haveDefault = true;
+            }
+            app.ops.put(
+                    entry.getKey(),
+                    jobOperatorModel.createJobOperator()
+            );
+        }
+        if (!haveDefault) {
+            final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+            defaults.configureJobOperator(defaultModel);
+            app.ops.put(
+                    Constants.DEFAULT_CONFIGURATION,
+                    defaultModel.createJobOperator()
+            );
         }
     }
 
@@ -151,6 +144,11 @@ public class GlassfishEnvironment implements Environment {
         if (exception != null) {
             throw exception;
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        // TODO
     }
 
     private static class App {

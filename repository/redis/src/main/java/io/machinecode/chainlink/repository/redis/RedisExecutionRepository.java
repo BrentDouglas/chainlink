@@ -6,10 +6,7 @@ import io.machinecode.chainlink.repository.core.JobInstanceImpl;
 import io.machinecode.chainlink.repository.core.MutableMetricImpl;
 import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
 import io.machinecode.chainlink.repository.core.StepExecutionImpl;
-import io.machinecode.chainlink.spi.marshalling.Cloner;
-import io.machinecode.chainlink.spi.marshalling.Marshaller;
-import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
-import io.machinecode.chainlink.spi.marshalling.Unmarshaller;
+import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -44,6 +41,7 @@ import java.util.Set;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class RedisExecutionRepository implements ExecutionRepository {
 
@@ -69,40 +67,36 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     protected final WeakReference<ClassLoader> loader;
     protected final JedisShardInfo info;
-    protected final Marshaller marshaller;
-    protected final Unmarshaller unmarshaller;
-    protected final Cloner cloner;
+    protected final Marshalling marshalling;
 
     protected final Jedis _open() {
         return info.createResource();
     }
 
-    public RedisExecutionRepository(final JedisShardInfo info, final ClassLoader loader, final MarshallingProvider provider) throws Exception {
+    public RedisExecutionRepository(final JedisShardInfo info, final ClassLoader loader, final Marshalling marshalling) throws Exception {
         this.loader = new WeakReference<ClassLoader>(loader);
         this.info = info;
-        this.marshaller = provider.getMarshaller();
-        this.unmarshaller = provider.getUnmarshaller();
-        this.cloner = provider.getCloner();
+        this.marshalling = marshalling;
 
-        JOB_INSTANCE_ID = marshaller.marshall("ji_id");
-        JOB_EXECUTION_ID = marshaller.marshall("je_id");
-        STEP_EXECUTION_ID = marshaller.marshall("se_id");
-        PARTITION_EXECUTION_ID = marshaller.marshall("pe_id");
+        JOB_INSTANCE_ID = this.marshalling.marshall("ji_id");
+        JOB_EXECUTION_ID = this.marshalling.marshall("je_id");
+        STEP_EXECUTION_ID = this.marshalling.marshall("se_id");
+        PARTITION_EXECUTION_ID = this.marshalling.marshall("pe_id");
 
-        JOB_INSTANCE_PREFIX = marshaller.marshall("ji_");
-        JOB_EXECUTION_PREFIX = marshaller.marshall("je_");
-        STEP_EXECUTION_PREFIX = marshaller.marshall("se_");
-        PARTITION_EXECUTION_PREFIX = marshaller.marshall("pe_");
+        JOB_INSTANCE_PREFIX = this.marshalling.marshall("ji_");
+        JOB_EXECUTION_PREFIX = this.marshalling.marshall("je_");
+        STEP_EXECUTION_PREFIX = this.marshalling.marshall("se_");
+        PARTITION_EXECUTION_PREFIX = this.marshalling.marshall("pe_");
 
-        JOB_EXECUTION_HISTORY_PREFIX = marshaller.marshall("jeh_");
-        STEP_EXECUTION_PARTITION_EXECUTIONS_PREFIX = marshaller.marshall("sepe_");
-        JOB_INSTANCE_EXECUTIONS_PREFIX = marshaller.marshall("jie_");
-        JOB_NAME_JOB_INSTANCES_PREFIX = marshaller.marshall("jnji_");
-        JOB_NAME_JOB_EXECUTIONS_PREFIX = marshaller.marshall("jnje_");
-        LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX = marshaller.marshall("lje_");
-        JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX = marshaller.marshall("jese_");
+        JOB_EXECUTION_HISTORY_PREFIX = this.marshalling.marshall("jeh_");
+        STEP_EXECUTION_PARTITION_EXECUTIONS_PREFIX = this.marshalling.marshall("sepe_");
+        JOB_INSTANCE_EXECUTIONS_PREFIX = this.marshalling.marshall("jie_");
+        JOB_NAME_JOB_INSTANCES_PREFIX = this.marshalling.marshall("jnji_");
+        JOB_NAME_JOB_EXECUTIONS_PREFIX = this.marshalling.marshall("jnje_");
+        LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX = this.marshalling.marshall("lje_");
+        JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX = this.marshalling.marshall("jese_");
 
-        JOB_NAMES = marshaller.marshall("jn");
+        JOB_NAMES = this.marshalling.marshall("jn");
     }
 
     @Override
@@ -117,9 +111,9 @@ public class RedisExecutionRepository implements ExecutionRepository {
                     .setJslName(jslName)
                     .setCreateTime(timestamp)
                     .build();
-            jedis.set(marshaller.marshall(JOB_INSTANCE_PREFIX, id), marshaller.marshall(instance));
-            jedis.sadd(JOB_NAMES, marshaller.marshall(jobId));
-            jedis.rpush(marshaller.marshall(JOB_NAME_JOB_INSTANCES_PREFIX, jobId), marshaller.marshall(id));
+            jedis.set(marshalling.marshall(JOB_INSTANCE_PREFIX, id), marshalling.marshall(instance));
+            jedis.sadd(JOB_NAMES, marshalling.marshall(jobId));
+            jedis.rpush(marshalling.marshall(JOB_NAME_JOB_INSTANCES_PREFIX, jobId), marshalling.marshall(id));
             return instance;
         } finally {
             if(jedis != null) {
@@ -152,18 +146,18 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 .setCreateTime(timestamp)
                 .setLastUpdatedTime(timestamp)
                 .build();
-        jedis.set(marshaller.marshall(JOB_EXECUTION_PREFIX, jobExecutionId), marshaller.marshall(execution));
+        jedis.set(marshalling.marshall(JOB_EXECUTION_PREFIX, jobExecutionId), marshalling.marshall(execution));
         jedis.set(
-                marshaller.marshall(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, instance.getInstanceId()),
-                marshaller.marshall(jobExecutionId)
+                marshalling.marshall(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, instance.getInstanceId()),
+                marshalling.marshall(jobExecutionId)
         );
         jedis.rpush(
-                marshaller.marshall(JOB_INSTANCE_EXECUTIONS_PREFIX, instance.getInstanceId()),
-                marshaller.marshall(jobExecutionId)
+                marshalling.marshall(JOB_INSTANCE_EXECUTIONS_PREFIX, instance.getInstanceId()),
+                marshalling.marshall(jobExecutionId)
         );
         jedis.rpush(
-                marshaller.marshall(JOB_NAME_JOB_EXECUTIONS_PREFIX, instance.getJobName()),
-                marshaller.marshall(jobExecutionId)
+                marshalling.marshall(JOB_NAME_JOB_EXECUTIONS_PREFIX, instance.getJobName()),
+                marshalling.marshall(jobExecutionId)
         );
         return execution;
     }
@@ -184,11 +178,11 @@ public class RedisExecutionRepository implements ExecutionRepository {
                     .setMetrics(MutableMetricImpl.empty())
                     .build();
             jedis.set(
-                    marshaller.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
-                    marshaller.marshall(execution));
+                    marshalling.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
+                    marshalling.marshall(execution));
             jedis.rpush(
-                    marshaller.marshall(JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, jobExecution.getExecutionId()),
-                    marshaller.marshall(stepExecutionId)
+                    marshalling.marshall(JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, jobExecution.getExecutionId()),
+                    marshalling.marshall(stepExecutionId)
             );
             return execution;
         } finally {
@@ -200,9 +194,9 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
         Jedis jedis = null;
         try {
             jedis = _open();
@@ -220,8 +214,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                     .setMetrics(MutableMetricImpl.empty())
                     .setBatchStatus(BatchStatus.STARTING)
                     .build();
-            jedis.set(marshaller.marshall(PARTITION_EXECUTION_PREFIX, id), marshaller.marshall(execution));
-            jedis.rpush(marshaller.marshall(STEP_EXECUTION_PARTITION_EXECUTIONS_PREFIX, stepExecutionId), marshaller.marshall(id));
+            jedis.set(marshalling.marshall(PARTITION_EXECUTION_PREFIX, id), marshalling.marshall(execution));
+            jedis.rpush(marshalling.marshall(STEP_EXECUTION_PARTITION_EXECUTIONS_PREFIX, stepExecutionId), marshalling.marshall(id));
             return execution;
         } finally {
             if(jedis != null) {
@@ -240,8 +234,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(JOB_EXECUTION_PREFIX, jobExecutionId),
-                    marshaller.marshall(JobExecutionImpl.from(execution)
+                    marshalling.marshall(JOB_EXECUTION_PREFIX, jobExecutionId),
+                    marshalling.marshall(JobExecutionImpl.from(execution)
                             .setLastUpdatedTime(timestamp)
                             .setStartTime(timestamp)
                             .setBatchStatus(BatchStatus.STARTED)
@@ -264,8 +258,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(JOB_EXECUTION_PREFIX, jobExecutionId),
-                    marshaller.marshall(JobExecutionImpl.from(execution)
+                    marshalling.marshall(JOB_EXECUTION_PREFIX, jobExecutionId),
+                    marshalling.marshall(JobExecutionImpl.from(execution)
                             .setLastUpdatedTime(timestamp)
                             .setBatchStatus(batchStatus)
                             .build())
@@ -287,8 +281,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(JOB_EXECUTION_PREFIX, jobExecutionId),
-                    marshaller.marshall(JobExecutionImpl.from(execution)
+                    marshalling.marshall(JOB_EXECUTION_PREFIX, jobExecutionId),
+                    marshalling.marshall(JobExecutionImpl.from(execution)
                             .setBatchStatus(batchStatus)
                             .setExitStatus(exitStatus)
                             .setRestartElementId(restartElementId)
@@ -316,10 +310,10 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if (jobExecutionIds == null) {
                 jobExecutionIds = new ArrayList<byte[]>();
             }
-            jobExecutionIds.add(marshaller.marshall(restartJobExecutionId));
+            jobExecutionIds.add(marshalling.marshall(restartJobExecutionId));
             jobExecutionIds.addAll(oldJobExecutionIds);
             jedis.rpush(
-                    marshaller.marshall(JOB_EXECUTION_HISTORY_PREFIX, jobExecutionId),
+                    marshalling.marshall(JOB_EXECUTION_HISTORY_PREFIX, jobExecutionId),
                     jobExecutionIds.toArray(new byte[jobExecutionIds.size()][])
             );
         } finally {
@@ -339,8 +333,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
-                    marshaller.marshall(StepExecutionImpl.from(execution)
+                    marshalling.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
+                    marshalling.marshall(StepExecutionImpl.from(execution)
                             .setStartTime(timestamp)
                             .setUpdatedTime(timestamp)
                             .setBatchStatus(BatchStatus.STARTED)
@@ -358,14 +352,14 @@ public class RedisExecutionRepository implements ExecutionRepository {
         Jedis jedis = null;
         try {
             jedis = _open();
-            final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
+            final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
             final ExtendedStepExecution execution = _se(jedis, stepExecutionId);
             if (execution == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
-                    marshaller.marshall(StepExecutionImpl.from(execution)
+                    marshalling.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
+                    marshalling.marshall(StepExecutionImpl.from(execution)
                             .setUpdatedTime(timestamp)
                             .setPersistentUserData(clonedPersistentUserData)
                             .setMetrics(MutableMetricImpl.copy(metrics))
@@ -380,9 +374,9 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
         Jedis jedis = null;
         try {
             jedis = _open();
@@ -391,8 +385,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
-                    marshaller.marshall(StepExecutionImpl.from(execution)
+                    marshalling.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
+                    marshalling.marshall(StepExecutionImpl.from(execution)
                             .setUpdatedTime(timestamp)
                             .setPersistentUserData(clonedPersistentUserData)
                             .setMetrics(MutableMetricImpl.copy(metrics))
@@ -417,8 +411,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
-                    marshaller.marshall(StepExecutionImpl.from(execution)
+                    marshalling.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
+                    marshalling.marshall(StepExecutionImpl.from(execution)
                             .setBatchStatus(batchStatus)
                             .setExitStatus(exitStatus)
                             .setUpdatedTime(timestamp)
@@ -443,8 +437,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(PARTITION_EXECUTION_PREFIX, partitionExecutionId),
-                    marshaller.marshall(PartitionExecutionImpl.from(partition)
+                    marshalling.marshall(PARTITION_EXECUTION_PREFIX, partitionExecutionId),
+                    marshalling.marshall(PartitionExecutionImpl.from(partition)
                             .setUpdatedTime(timestamp)
                             .setStartTime(timestamp)
                             .setBatchStatus(BatchStatus.STARTED)
@@ -459,9 +453,9 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     @Override
     public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
-        final Serializable clonedReaderCheckpoint = cloner.clone(readerCheckpoint);
-        final Serializable clonedWriterCheckpoint = cloner.clone(writerCheckpoint);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
+        final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
+        final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
         Jedis jedis = null;
         try {
             jedis = _open();
@@ -470,8 +464,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(PARTITION_EXECUTION_PREFIX, partitionExecutionId),
-                    marshaller.marshall(PartitionExecutionImpl.from(partition)
+                    marshalling.marshall(PARTITION_EXECUTION_PREFIX, partitionExecutionId),
+                    marshalling.marshall(PartitionExecutionImpl.from(partition)
                             .setUpdatedTime(timestamp)
                             .setReaderCheckpoint(clonedReaderCheckpoint)
                             .setWriterCheckpoint(clonedWriterCheckpoint)
@@ -488,7 +482,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     @Override
     public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
-        final Serializable clonedPersistentUserData = cloner.clone(persistentUserData);
+        final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         Jedis jedis = null;
         try {
             jedis = _open();
@@ -497,8 +491,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
             }
             jedis.set(
-                    marshaller.marshall(PARTITION_EXECUTION_PREFIX, partitionExecutionId),
-                    marshaller.marshall(PartitionExecutionImpl.from(partition)
+                    marshalling.marshall(PARTITION_EXECUTION_PREFIX, partitionExecutionId),
+                    marshalling.marshall(PartitionExecutionImpl.from(partition)
                             .setEndTime(timestamp)
                             .setUpdatedTime(timestamp)
                             .setBatchStatus(batchStatus)
@@ -522,7 +516,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             final Set<byte[]> names = jedis.smembers(JOB_NAMES);
             final Set<String> ret = new THashSet<String>();
             for (final byte[] name : names) {
-                ret.add((String) unmarshaller.unmarshall(name, this.loader.get()));
+                ret.add((String) marshalling.unmarshall(name, this.loader.get()));
             }
             return ret;
         } finally {
@@ -537,7 +531,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
         Jedis jedis = null;
         try {
             jedis = _open();
-            long count = jedis.llen(marshaller.marshall(JOB_NAME_JOB_INSTANCES_PREFIX, jobName));
+            long count = jedis.llen(marshalling.marshall(JOB_NAME_JOB_INSTANCES_PREFIX, jobName));
             if (count == 0) {
                 throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
             }
@@ -556,7 +550,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
         final int end = start + count - 1;
         try {
             jedis = _open();
-            List<byte[]> ids = jedis.lrange(marshaller.marshall(JOB_NAME_JOB_INSTANCES_PREFIX, jobName), start, end < 0 ? 0 : end);
+            List<byte[]> ids = jedis.lrange(marshalling.marshall(JOB_NAME_JOB_INSTANCES_PREFIX, jobName), start, end < 0 ? 0 : end);
             for (final byte[] id : ids) {
                 ret.add(_ji(jedis, id));
             }
@@ -701,7 +695,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if (jobExecution == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            final Long latest = (Long) unmarshaller.unmarshall(jedis.get(marshaller.marshall(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, jobExecution.getJobInstanceId())), this.loader.get());
+            final Long latest = (Long) marshalling.unmarshall(jedis.get(marshalling.marshall(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, jobExecution.getJobInstanceId())), this.loader.get());
             if (latest == null) {
                 throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobExecutionId));
             }
@@ -762,7 +756,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if (historicJobExecutionIds == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            final byte[] stepExecutionIdBytes = marshaller.marshall(stepExecutionId);
+            final byte[] stepExecutionIdBytes = marshalling.marshall(stepExecutionId);
             final List<byte[]> stepExecutionIds = new ArrayList<byte[]>();
 
             List<byte[]> executionIds = _list(jedis, JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, jobExecutionId);
@@ -986,53 +980,53 @@ public class RedisExecutionRepository implements ExecutionRepository {
     }
 
     private ExtendedJobInstance _ji(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
-        final byte[] response = jedis.get(marshaller.marshall(JOB_INSTANCE_PREFIX, id));
-        return response == null ? null : unmarshaller.unmarshall(response, JobInstanceImpl.class, this.loader.get());
+        final byte[] response = jedis.get(marshalling.marshall(JOB_INSTANCE_PREFIX, id));
+        return response == null ? null : marshalling.unmarshall(response, JobInstanceImpl.class, this.loader.get());
     }
 
     private ExtendedJobInstance _ji(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
-        return _ji(jedis, unmarshaller.unmarshall(id, Long.class, this.loader.get()));
+        return _ji(jedis, marshalling.unmarshall(id, Long.class, this.loader.get()));
     }
 
     private ExtendedJobExecution _je(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
-        final byte[] response = jedis.get(marshaller.marshall(JOB_EXECUTION_PREFIX, id));
-        return response == null ? null : unmarshaller.unmarshall(response, JobExecutionImpl.class, this.loader.get());
+        final byte[] response = jedis.get(marshalling.marshall(JOB_EXECUTION_PREFIX, id));
+        return response == null ? null : marshalling.unmarshall(response, JobExecutionImpl.class, this.loader.get());
     }
 
     private ExtendedJobExecution _je(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
-        return _je(jedis, unmarshaller.unmarshall(id, Long.class, this.loader.get()));
+        return _je(jedis, marshalling.unmarshall(id, Long.class, this.loader.get()));
     }
 
     private ExtendedStepExecution _se(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
-        final byte[] response = jedis.get(marshaller.marshall(STEP_EXECUTION_PREFIX, id));
-        return response == null ? null : unmarshaller.unmarshall(response, StepExecutionImpl.class, this.loader.get());
+        final byte[] response = jedis.get(marshalling.marshall(STEP_EXECUTION_PREFIX, id));
+        return response == null ? null : marshalling.unmarshall(response, StepExecutionImpl.class, this.loader.get());
     }
 
     private ExtendedStepExecution _se(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
-        return _se(jedis, unmarshaller.unmarshall(id, Long.class, this.loader.get()));
+        return _se(jedis, marshalling.unmarshall(id, Long.class, this.loader.get()));
     }
 
     private PartitionExecution _pe(final BinaryJedisCommands jedis, final long id) throws ClassNotFoundException, IOException {
-        final byte[] response = jedis.get(marshaller.marshall(PARTITION_EXECUTION_PREFIX, id));
-        return unmarshaller.unmarshall(response, PartitionExecutionImpl.class, this.loader.get());
+        final byte[] response = jedis.get(marshalling.marshall(PARTITION_EXECUTION_PREFIX, id));
+        return marshalling.unmarshall(response, PartitionExecutionImpl.class, this.loader.get());
     }
 
     private PartitionExecution _pe(final BinaryJedisCommands jedis, final byte[] id) throws ClassNotFoundException, IOException {
-        return _pe(jedis, unmarshaller.unmarshall(id, Long.class, this.loader.get()));
+        return _pe(jedis, marshalling.unmarshall(id, Long.class, this.loader.get()));
     }
 
     private List<byte[]> _list(final BinaryJedisCommands jedis, final byte[] prefix, final long id) throws IOException {
-        final byte[] key = marshaller.marshall(prefix, id);
+        final byte[] key = marshalling.marshall(prefix, id);
         return jedis.lrange(key, 0, jedis.llen(key));
     }
 
     private List<byte[]> _list(final BinaryJedisCommands jedis, final byte[] prefix, final String id) throws IOException {
-        final byte[] key = marshaller.marshall(prefix, id);
+        final byte[] key = marshalling.marshall(prefix, id);
         return jedis.lrange(key, 0, jedis.llen(key));
     }
 
     private List<byte[]> _list(final BinaryJedisCommands jedis, final byte[] prefix, final byte[] id) throws IOException, ClassNotFoundException {
-        final byte[] key = marshaller.marshall(prefix, unmarshaller.unmarshall(id, this.loader.get()));
+        final byte[] key = marshalling.marshall(prefix, marshalling.unmarshall(id, this.loader.get()));
         return jedis.lrange(key, 0, jedis.llen(key));
     }
 }

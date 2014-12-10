@@ -3,6 +3,9 @@ package io.machinecode.chainlink.test;
 import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.test.core.execution.RepositoryTest;
 import org.jboss.logging.Logger;
@@ -17,9 +20,11 @@ import javax.persistence.Persistence;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
+ * @since 1.0
  */
 public class JpaRepositoryTest extends RepositoryTest {
 
@@ -28,13 +33,18 @@ public class JpaRepositoryTest extends RepositoryTest {
     private static EntityManagerFactory factory;
 
     @Override
-    protected ExecutionRepository _repository() {
-        return new JpaExecutionRepository(new EntityManagerLookup() {
+    protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
+        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
             @Override
-            public EntityManagerFactory getEntityManagerFactory() {
-                return factory;
+            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new JpaExecutionRepository(new EntityManagerLookup() {
+                    @Override
+                    public EntityManagerFactory getEntityManagerFactory() {
+                        return factory;
+                    }
+                }, new ResourceLocalTransactionManagerLookup());
             }
-        }, new ResourceLocalTransactionManagerLookup());
+        });
     }
 
     @BeforeClass

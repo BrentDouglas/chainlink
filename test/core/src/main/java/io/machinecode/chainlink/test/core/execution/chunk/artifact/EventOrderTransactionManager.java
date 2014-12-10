@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0
  */
 public class EventOrderTransactionManager extends LocalTransactionManager {
+
     public EventOrderTransactionManager(final long duration, final TimeUnit unit) {
         super(duration, unit);
     }
