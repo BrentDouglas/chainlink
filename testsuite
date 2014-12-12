@@ -12,13 +12,19 @@ FAILED=""
 AVAILABLE_DATABASES=( db-h2 db-postgresql db-mariadb db-derby )
 AVAILABLE_CONTAINERS=( se glassfish tomee wildfly )
 AVAILABLE_INJECTORS=( in-batch in-cdi in-spring in-guice in-seam )
+AVAILABLE_TRANSPORTS=( tr-local tr-coherence tr-gridgain tr-hazelcast tr-infinispan tr-jgroups )
+AVAILABLE_REPOSITORIES=( re-memory re-coherence re-ehcache re-gridgain re-hazelcast re-infinispan re-jdbc re-jpa re-mongo re-redis )
 
-DATABASES=( db-h2 db-postgresql db-mariadb )
 CONTAINERS=( se glassfish tomee wildfly )
-INJECTORS=( in-batch in-cdi in-spring )
+
+# Permutations of these are used to run the tests
+DATABASES=( db-h2 )
+INJECTORS=( in-batch in-cdi )
+TRANSPORTS=( tr-local tr-infinispan )
+REPOSITORIES=( re-memory re-ehcache re-gridgain re-hazelcast re-infinispan )
 
 TEST_COHERENCE="false"
-TEST_REPOSITORIES="false"
+TEST_LOCAL_REPOSITORIES="false"
 FAIL_FAST="false"
 
 run() {
@@ -31,8 +37,8 @@ run() {
     (
         cd "${dir}"
         maven test "-P${command}"
-        ret=${?}
     )
+    ret=${?}
     [ ${ret} -eq 0 ] || {
         [ "${FAIL_FAST}" == "true" ] && {
             terminate ${ret} "Failed ${msg} with profiles ${command}"
@@ -47,7 +53,7 @@ run() {
 
 tests() {
     local command="test"
-    [ "${TEST_REPOSITORIES}" == "true" ] && {
+    [ "${TEST_LOCAL_REPOSITORIES}" == "true" ] && {
         command+=",repository"
     }
     [ "${TEST_COHERENCE}" == "true" ] && {
@@ -64,6 +70,10 @@ tck() {
         command+="${container:+,$container}"
     done
     command="${command}${profiles:+,$profiles}"
+
+    [ "${TEST_COHERENCE}" == "true" ] && {
+        command+=",coherence"
+    }
 
     run "tck" "TCK" "${command}"
     return ${?}
@@ -82,46 +92,47 @@ injectors() {
 
 databases() {
     local profiles="${@}"
-    [ "${TEST_REPOSITORIES}" == "true" ] && {
-        for database in "${DATABASES[@]}"; do
-            if [ "db-h2" == "${database}" ]; then
-                injectors "${profiles}"
-            else
-                injectors "${profiles:+$profiles,}${database}"
-            fi
-        done
-    }
+    for database in "${DATABASES[@]}"; do
+        if [ "db-h2" == "${database}" ]; then
+            injectors "${profiles}"
+        else
+            injectors "${profiles:+$profiles,}${database}"
+        fi
+    done
+}
+
+transports() {
+    local profiles="${@}"
+    for transport in "${TRANSPORTS[@]}"; do
+        if [ "tr-local" == "${transport}" ]; then
+            databases "${profiles}"
+        else
+            databases "${profiles:+$profiles,}${transport}"
+        fi
+    done
+}
+
+repositories() {
+    local profiles="${@}"
+    for repository in "${REPOSITORIES[@]}"; do
+        if [ "re-memory" == "${repository}" ]; then
+            transports "${profiles}"
+        else
+            transports "${profiles:+$profiles,}${repository}"
+        fi
+    done
 }
 
 testsuite() {
     tests
 
-    injectors #re-memory
-    databases "re-jpa"
-    databases "re-jdbc"
-    [ "${TEST_REPOSITORIES}" == "true" ] && {
-        injectors "re-redis"
-        injectors "re-mongo"
-    }
-    injectors "re-infinispan"
-    injectors "re-ehcache"
-    injectors "re-gridgain"
-    injectors "re-hazelcast"
-
-    injectors "tr-infinispan"
-    injectors "tr-jgroups"
-    injectors "tr-hazelcast"
-    injectors "tr-gridgain"
-    [ "${TEST_COHERENCE}" == "true" ] && {
-        injectors "coherence,re-coherence"
-        injectors "coherence,tr-coherence"
-    }
+    repositories
 }
 
 print-available-injectors() {
     local values=""
     for injector in "${AVAILABLE_INJECTORS[@]}"; do
-        values+="${values:+$values, }${injector}"
+        values="${values:+$values, }${injector}"
     done
     echo "Available injectors are: ${values}"
 }
@@ -129,7 +140,7 @@ print-available-injectors() {
 print-available-containers() {
     local values=""
     for container in "${AVAILABLE_CONTAINERS[@]}"; do
-        values+="${values:+$values, }${container}"
+        values="${values:+$values, }${container}"
     done
     echo "Available containers are: ${values}"
 }
@@ -137,29 +148,45 @@ print-available-containers() {
 print-available-databases() {
     local values=""
     for database in "${AVAILABLE_DATABASES[@]}"; do
-        values+="${values:+$values, }${database}"
+        values="${values:+$values, }${database}"
     done
     echo "Available databases are: ${values}"
 }
 
+print-available-transports() {
+    local values=""
+    for transport in "${AVAILABLE_TRANSPORTS[@]}"; do
+        values="${values:+$values, }${transport}"
+    done
+    echo "Available transports are: ${values}"
+}
+
+print-available-repositories() {
+    local values=""
+    for repository in "${AVAILABLE_REPOSITORIES[@]}"; do
+        values="${values:+$values, }${repository}"
+    done
+    echo "Available repositories are: ${values}"
+}
+
 usage() {
 cat <<EOF
-Usage: testsuite [-i injector] [-c container] [-d database] [-r] [-o]
-                 [-f] [-h]
+Usage: testsuite [-i injector] [-c container] [-d database]
+                 [-t transport] [-r repository] [-l] [-o] [-f] [-h]
 
     -i  Comma separated list of injectors to run the tests for.
         Selecting the value in-batch will use the default injector and
         will not show up in the profile list. Available injectors are:
 EOF
     for injector in "${AVAILABLE_INJECTORS[@]}"; do
-      echo "                    - ${injector}"
+        echo "            - ${injector}"
     done
 cat <<EOF
     -c  Comma separated list of containers to run the tests for.
         Available containers are:
 EOF
     for container in "${AVAILABLE_CONTAINERS[@]}"; do
-      echo "                    - ${container}"
+        echo "            - ${container}"
     done
 cat <<EOF
     -d  Comma separated list of databases to run the tests for.
@@ -167,11 +194,27 @@ cat <<EOF
         will not show up in the profile list. Available databases are:
 EOF
     for database in "${AVAILABLE_DATABASES[@]}"; do
-      echo "                    - ${database}"
+        echo "            - ${database}"
     done
 cat <<EOF
-    -r  Include repository tests (requires PostgreSQL, MariaDB, Redis
-        and MongoDB).
+    -t  Comma separated list of transports to run the tests for.
+        Selecting the value tr-local will use the default transport and
+        will not show up in the profile list. Available transports are:
+EOF
+    for transport in "${AVAILABLE_TRANSPORTS[@]}"; do
+        echo "            - ${transport}"
+    done
+cat <<EOF
+    -r  Comma separated list of repositories to run the tests for.
+        Selecting the value re-memory will use the default repository and
+        will not show up in the profile list. Available repositories are:
+EOF
+    for repository in "${AVAILABLE_REPOSITORIES[@]}"; do
+        echo "            - ${repository}"
+    done
+cat <<EOF
+    -l  Include repository tests that require a local installation
+        (requires PostgreSQL, MariaDB, Redis and MongoDB).
     -o  Include Oracle Coherence tests (requires Oracle Coherence).
     -f  Fail fast. By default every test will be executed regardless of
         failures. This option will terminate execution at the first
@@ -180,7 +223,7 @@ cat <<EOF
 EOF
 }
 
-while getopts "i:c:d:rofh" opt; do
+while getopts "i:c:d:r:t:lofh" opt; do
     case ${opt} in
         h)
             usage
@@ -230,13 +273,45 @@ while getopts "i:c:d:rofh" opt; do
                     }
                 done
                 red "Invalid database: ${database}"
-                print-available-database
+                print-available-databases
+                exit 1
+            done
+            ;;
+
+        t)
+            TRANSPORTS=()
+            IFS=',' read -ra TMP <<< "${OPTARG}"
+            for transport in "${TMP[@]}"; do
+                for available in "${AVAILABLE_TRANSPORTS[@]}"; do
+                    [ "${available}" == "${transport}" ] && {
+                        TRANSPORTS+=("${transport}")
+                        continue 2 #TMP loop
+                    }
+                done
+                red "Invalid transport: ${transport}"
+                print-available-transports
                 exit 1
             done
             ;;
 
         r)
-            TEST_REPOSITORIES="true"
+            REPOSITORIES=()
+            IFS=',' read -ra TMP <<< "${OPTARG}"
+            for repository in "${TMP[@]}"; do
+                for available in "${AVAILABLE_REPOSITORIES[@]}"; do
+                    [ "${available}" == "${repository}" ] && {
+                        REPOSITORIES+=("${repository}")
+                        continue 2 #TMP loop
+                    }
+                done
+                red "Invalid repository: ${repository}"
+                print-available-repositories
+                exit 1
+            done
+            ;;
+
+        l)
+            TEST_LOCAL_REPOSITORIES="true"
             ;;
 
         o)
