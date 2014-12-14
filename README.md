@@ -75,7 +75,7 @@ and `re-coherence` will not work if coherence is not installed.
 ## Building
 
 To build without coherence run `mvn clean install`, if you do want it
-use `mvn clean install -Pcoherence`. 
+use `mvn clean install -Pcoherence`.
 `tr-coherence` and `re-coherence` will not work dependencies if
 coherence is not installed.
 
@@ -92,16 +92,11 @@ will need to have redis and mongodb running. If using the
 postgresql and mariadb running respectively. Connection settings for
 these are configured in `test.properties`.
 
-Run the tests with `mvn clean install -Ptest`.
+Run the tests with `mvn clean install -Ptest,<profiles>` or better
+`./testsuite` for a more comprehensive run. Several options are
+available, run `./testsuite -h` to see them.
 
-## Running TCK Tests from failsafe
-
-To run the TCK from within the build you will need to get the sources
-of the TCK with:
-
-```shell
-git clone git://java.net/jbatch~jsr-352-git-repository <target>
-```
+## Running the SE TCK Tests
 
 Copy [test.template.properties](test.template.properties)
 to `test.properties`. This file is used to configure maven to run the
@@ -135,6 +130,14 @@ and marshaller you wish to use. You can see the available tck profiles
 in [the tck modules pom](tck/pom.xml).
 
 An example minimum command to run the TCK is `mvn clean install -Ptck,se`.
+
+## Running the EE TCK Tests
+
+No extra setup is required to run the EE TCK tests. You will have to add
+the relevent profile for the container you wish to run them in, e.g.
+`mvn clean install -Ptck,se,glassfish,tomee,wildfly` will run them in all
+the supported containers. Note that currently the `tr-X` profiles won't
+work, and most of the extensions probably won't work in wildfly yet.
 
 ## Remote transports
 
