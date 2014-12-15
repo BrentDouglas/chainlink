@@ -31,14 +31,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
+                <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
                 <executions>
                     <execution>
                         <id>groovy-compile</id>
                         <phase>compile</phase>
-                    </execution>
-                    <execution>
-                        <id>groovy-test-compile</id>
-                        <phase>test-compile</phase>
                     </execution>
                 </executions>
             </plugin>
