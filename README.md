@@ -75,10 +75,17 @@ and `re-coherence` will not work if coherence is not installed.
 
 ## Building
 
-To build without coherence run `mvn clean install`, if you do want it
-use `mvn clean install -Pcoherence`.
-`tr-coherence` and `re-coherence` will not work dependencies if
+To build run `mvn clean install`.
+
+To build with the coherence modules use `mvn clean install -Pcoherence`.
+The test profiles `tr-coherence` and `re-coherence` will not work if
 coherence is not installed.
+
+To build with the seam modules use `mvn clean install -Pseam`. You will
+need to add the JBoss public repository to your setting.xml. See
+[the instructions from JBoss](https://developer.jboss.org/wiki/MavenGettingStarted-Users)
+for more details. The test profile `in-seam` will not work if seam is
+not installed.
 
 ## Run the tests
 

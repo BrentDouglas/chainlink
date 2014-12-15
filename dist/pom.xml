@@ -187,10 +187,6 @@
             <artifactId>javax.inject</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
@@ -245,11 +241,6 @@
         <dependency>
             <groupId>org.jboss.marshalling</groupId>
             <artifactId>jboss-marshalling-river</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.seam</groupId>
-            <artifactId>jboss-seam</artifactId>
-            <type>ejb</type>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -312,6 +303,24 @@
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
                     <artifactId>chainlink-transport-coherence</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>seam</id>
+            <activation>
+                <property><name>seam</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.seam</groupId>
+                    <artifactId>jboss-seam</artifactId>
+                    <type>ejb</type>
                 </dependency>
             </dependencies>
         </profile>

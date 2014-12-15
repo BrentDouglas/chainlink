@@ -227,6 +227,16 @@
                 <module>coherence</module>
             </modules>
         </profile>
+        <profile>
+            <id>seam</id>
+            <activation>
+                <property><name>seam</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>seam</module>
+            </modules>
+        </profile>
 
         <!-- Containers -->
         <profile>
@@ -529,7 +539,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.SeamArtifactLoaderFactory</artifact.loader.factory.class>
+                <artifact.loader.factory.class>io.machinecode.chainlink.tck.seam.SeamArtifactLoaderFactory</artifact.loader.factory.class>
                 <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
                 <injector.configuration.source.file>components.xml</injector.configuration.source.file>
             </properties>

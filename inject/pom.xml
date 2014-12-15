@@ -17,8 +17,20 @@
         <module>cdi</module>
         <module>guice</module>
         <module>jndi</module>
-        <module>seam</module>
         <module>spring</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>seam</id>
+            <activation>
+                <property><name>seam</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>seam</module>
+            </modules>
+        </profile>
+    </profiles>
 
 </project>

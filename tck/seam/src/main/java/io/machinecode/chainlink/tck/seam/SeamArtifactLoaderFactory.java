@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.tck.core.loader;
+package io.machinecode.chainlink.tck.seam;
 
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.LoaderConfiguration;
