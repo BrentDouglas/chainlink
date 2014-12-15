@@ -71,10 +71,6 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-inject-seam</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-marshalling-jboss</artifactId>
         </dependency>
         <dependency>
@@ -313,6 +309,10 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <dependencies>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-inject-seam</artifactId>
+                </dependency>
                 <dependency>
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
