@@ -39,7 +39,7 @@ export version_org_apache_derby_derby="@version.org.apache.derby.derby@"
 
 export version_com_h2database_h2="@version.com.h2database.h2@"
 
-export version_postgresql_postgresql="@version.postgresql.postgresql@"
+export version_org_postgresql_postgresql="@version.org.postgresql.postgresql@"
 
 export version_org_mariadb_jdbc_mariadb_java_client="@version.org.mariadb.jdbc.mariadb-java-client@"
 

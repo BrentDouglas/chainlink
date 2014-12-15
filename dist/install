@@ -98,7 +98,7 @@ h2() {
 
 postgresql() {
     local apply="${1}"
-    "${apply}" "postgresql" "postgresql" "${version_postgresql_postgresql}"
+    "${apply}" "org.postgresql" "postgresql" "${version_org_postgresql_postgresql}"
 }
 
 mariadb() {

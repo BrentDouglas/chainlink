@@ -87,7 +87,7 @@
                 <include>org.springframework:spring-beans</include>
                 <include>org.springframework:spring-context</include>
                 <include>org.springframework:spring-core</include>
-                <include>postgresql:postgresql</include>
+                <include>org.postgresql:postgresql</include>
                 <include>redis.clients:jedis</include>
             </includes>
             <outputDirectory>repository</outputDirectory>

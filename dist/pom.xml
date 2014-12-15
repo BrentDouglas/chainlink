@@ -381,7 +381,7 @@
                                         <filter token="version.org.springframework.spring-beans" value="${version.org.springframework.spring-beans}" />
                                         <filter token="version.org.springframework.spring-context" value="${version.org.springframework.spring-context}" />
                                         <filter token="version.org.springframework.spring-core" value="${version.org.springframework.spring-core}" />
-                                        <filter token="version.postgresql.postgresql" value="${version.postgresql.postgresql}" />
+                                        <filter token="version.org.postgresql.postgresql" value="${version.org.postgresql.postgresql}" />
                                         <filter token="version.redis.clients.jedis" value="${version.redis.clients.jedis}" />
                                     </filterset>
                                 </copy>
