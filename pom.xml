@@ -100,7 +100,7 @@
         <version.org.springframework.spring-context>${version.org.springframework}</version.org.springframework.spring-context>
         <version.org.springframework.spring-core>${version.org.springframework}</version.org.springframework.spring-core>
         <version.org.testng.testng>6.8</version.org.testng.testng>
-        <version.postgresql.postgresql>9.2-1002.jdbc4</version.postgresql.postgresql>
+        <version.postgresql.postgresql>9.2-1004-jdbc4</version.postgresql.postgresql>
         <version.redis.clients.jedis>2.2.1</version.redis.clients.jedis>
 
         <!-- Plugins -->
@@ -557,7 +557,7 @@
                 <version>${version.org.testng.testng}</version>
             </dependency>
             <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${version.postgresql.postgresql}</version>
             </dependency>
