@@ -139,7 +139,7 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
                 .setBatchStatus(BatchStatus.STARTING)
                 .setMetrics(MutableMetricImpl.empty())
                 .build();
-        stepExecutions().putIfAbsent(stepExecutionId, execution);
+        stepExecutions().put(stepExecutionId, execution);
         stepExecutionPartitionExecutions().put(stepExecutionId, new CopyOnWriteArrayList<Long>());
         return execution;
     }
