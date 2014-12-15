@@ -1,0 +1,9 @@
+language: java
+
+jdk:
+  - oraclejdk7
+  - oraclejdk8
+
+before_script: mvn clean install -DskipTests=true
+
+script: ./testsuite -t tr-local
