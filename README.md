@@ -1,4 +1,5 @@
 # Chainlink
+[![Build Status](https://travis-ci.org/machinecode-io/chainlink.svg)](https://travis-ci.org/machinecode-io/chainlink)
 
 An implementation of JSR-352.
 
