@@ -167,8 +167,8 @@
             <artifactId>hazelcast</artifactId>
         </dependency>
         <dependency>
-            <groupId>gnu-getopt</groupId>
-            <artifactId>getopt</artifactId>
+            <groupId>gnu.getopt</groupId>
+            <artifactId>java-getopt</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.then</groupId>
@@ -352,7 +352,7 @@
                                         <filter token="version.com.h2database.h2" value="${version.com.h2database.h2}" />
                                         <filter token="version.com.hazelcast.hazelcast" value="${version.com.hazelcast.hazelcast}" />
                                         <filter token="version.com.oracle.coherence.coherence" value="${version.com.oracle.coherence.coherence}" />
-                                        <filter token="version.gnu-getopt.getopt" value="${version.gnu-getopt.getopt}" />
+                                        <filter token="version.gnu.getopt.java-getopt" value="${version.gnu.getopt.java-getopt}" />
                                         <filter token="version.io.machinecode.then.then-api" value="${version.io.machinecode.then.then-api}" />
                                         <filter token="version.io.machinecode.then.then-core" value="${version.io.machinecode.then.then-core}" />
                                         <filter token="version.javax.enterprise.cdi-api" value="${version.javax.enterprise.cdi-api}" />

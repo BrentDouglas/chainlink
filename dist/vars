@@ -88,7 +88,7 @@ export version_org_mongodb_mongo_java_driver="@version.org.mongodb.mongo-java-dr
 
 export version_io_machinecode_chainlink_chainlink_se="@version.io.machinecode.chainlink.chainlink-se@"
 export version_io_machinecode_chainlink_chainlink_server_chainlinkd="@version.io.machinecode.chainlink.chainlink-server-chainlinkd@"
-export version_gnu_getopt_getopt="@version.gnu-getopt.getopt@"
+export version_gnu_getopt_java_getopt="@version.gnu.getopt.java-getopt@"
 export version_javax_enterprise_cdi_api="@version.javax.enterprise.cdi-api@"
 export version_javax_inject_javax_inject="@version.javax.inject.javax.inject@"
 export version_log4j_log4j="@version.log4j.log4j@"

@@ -214,7 +214,7 @@ se() {
 
     "${apply}" "io.machinecode.chainlink" "chainlink-se" "${version_io_machinecode_chainlink_chainlink_se}"
     "${apply}" "io.machinecode.chainlink" "chainlink-server-chainlinkd" "${version_io_machinecode_chainlink_chainlink_server_chainlinkd}"
-    "${apply}" "gnu-getopt" "getopt" "${version_gnu_getopt_getopt}"
+    "${apply}" "gnu.getopt" "java-getopt" "${version_gnu_getopt_java_getopt}"
     "${apply}" "javax.enterprise" "cdi-api" "${version_javax_enterprise_cdi_api}"
     "${apply}" "javax.inject" "javax.inject" "${version_javax_inject_javax_inject}"
     "${apply}" "log4j" "log4j" "${version_log4j_log4j}"

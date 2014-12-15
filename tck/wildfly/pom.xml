@@ -60,8 +60,8 @@
         </dependency>
 
         <dependency>
-            <groupId>gnu-getopt</groupId>
-            <artifactId>getopt</artifactId>
+            <groupId>gnu.getopt</groupId>
+            <artifactId>java-getopt</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

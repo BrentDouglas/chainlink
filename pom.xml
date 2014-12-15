@@ -61,7 +61,7 @@
         <version.com.ibm.jbatch.com.ibm.jbatch.tck.spi>${version.com.ibm.jbatch.com.ibm.jbatch.tck}</version.com.ibm.jbatch.com.ibm.jbatch.tck.spi>
         <version.com.oracle.coherence.coherence>12.1.2-0-0</version.com.oracle.coherence.coherence>
         <version.dom4j>1.6.1</version.dom4j>
-        <version.gnu-getopt.getopt>1.0.13</version.gnu-getopt.getopt>
+        <version.gnu.getopt.java-getopt>1.0.13</version.gnu.getopt.java-getopt>
         <version.io.machinecode.then>0.2.0-SNAPSHOT</version.io.machinecode.then>
         <version.io.machinecode.then.then-api>${version.io.machinecode.then}</version.io.machinecode.then.then-api>
         <version.io.machinecode.then.then-core>${version.io.machinecode.then}</version.io.machinecode.then.then-core>
@@ -166,9 +166,9 @@
                 <version>${version.dom4j}</version>
             </dependency>
             <dependency>
-                <groupId>gnu-getopt</groupId>
-                <artifactId>getopt</artifactId>
-                <version>${version.gnu-getopt.getopt}</version>
+                <groupId>gnu.getopt</groupId>
+                <artifactId>java-getopt</artifactId>
+                <version>${version.gnu.getopt.java-getopt}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
