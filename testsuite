@@ -126,6 +126,8 @@ repositories() {
 testsuite() {
     tests
 
+    maven clean install -Ptck -pl :chainlink-tck-core -Dmaven.test.skip.exec=true
+
     repositories
 }
 
