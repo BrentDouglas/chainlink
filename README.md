@@ -94,13 +94,17 @@ This file is used to configure maven to run the tests. All properties in
 this file will be passed to Surefire and available from
 `System.getProperty(...)` in the test JVM.
 
+Copy [test/log4j.template.properties](test/log4j.template.properties)
+to `test/log4j.properties`. You will probably want so set the root logger
+to INFO and both the chainlink and then loggers to TRACE.
+
 To run the full suite of tests available under the `-Ptest` profile you
 will need to have redis and mongodb running. If using the
 `-Pdb-postgresql` or `-Pdb-mariadb` profiles you will also require
 postgresql and mariadb running respectively. Connection settings for
 these are configured in `test.properties`.
 
-Run the tests with `mvn clean install -Ptest,<profiles>` or better
+Run the tests with `mvn test -Ptest,<profiles>` or better
 `./testsuite` for a more comprehensive run. Several options are
 available, run `./testsuite -h` to see them.
 
@@ -117,6 +121,10 @@ running on two JVM's. All properties in this file will be passed to
 Failsafe and available from `System.getProperty(...)` in the secondary
 JVM.
 
+Copy [tck/log4j.template.properties](tck/log4j.template.properties)
+to `tck/log4j.properties`. You will probably want so set the root logger
+to INFO and both the chainlink and then loggers to TRACE.
+
 The test process will create these files from the templates when
 running the tests if they are not found.
 
@@ -132,18 +140,18 @@ To run the TCK you must select an injector via a maven profile (there is
 no default) and you may select an alternate  repository (an in memory
 repository will be used by default) and/or an alternate transport.
 
-Run `mvn clean install -Ptck,se,in-x,re-x,tr-x,ma-x` where the
+Run `mvn verify -Ptck,se,in-x,re-x,tr-x,ma-x` where the
 in-x, re-x and tr-x are the profiles of injector, repository, transport
 and marshaller you wish to use. You can see the available tck profiles
 in [the tck modules pom](tck/pom.xml).
 
-An example minimum command to run the TCK is `mvn clean install -Ptck,se`.
+An example minimum command to run the TCK is `mvn verify -Ptck,se`.
 
 ## Running the EE TCK Tests
 
 No extra setup is required to run the EE TCK tests. You will have to add
-the relevent profile for the container you wish to run them in, e.g.
-`mvn clean install -Ptck,se,glassfish,tomee,wildfly` will run them in all
+the relevant profile for the container you wish to run them in, e.g.
+`mvn verify -Ptck,se,glassfish,tomee,wildfly` will run them in all
 the supported containers. Note that currently the `tr-X` profiles won't
 work, and most of the extensions probably won't work in wildfly yet.
 

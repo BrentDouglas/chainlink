@@ -23,6 +23,8 @@
     <properties>
         <test.properties.dir>..</test.properties.dir>
         <test.properties>${test.properties.dir}/test.properties</test.properties>
+        <log4j.properties.dir>${project.basedir}</log4j.properties.dir>
+        <log4j.properties>${log4j.properties.dir}/log4j.properties</log4j.properties>
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
@@ -261,6 +263,21 @@
                                 </target>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>ensure-log4j-properties</id>
+                            <phase>generate-test-resources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <copy file="${log4j.properties.dir}/log4j.template.properties"
+                                          tofile="${log4j.properties}"
+                                          overwrite="false">
+                                    </copy>
+                                </target>
+                            </configuration>
+                        </execution>
                     </executions>
                 </plugin>
                 <plugin>
@@ -293,7 +310,7 @@
                                 <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
                                 <resources>
                                     <resource>
-                                        <directory>${project.basedir}/..</directory>
+                                        <directory>${log4j.properties.dir}</directory>
                                         <includes>
                                             <include>log4j.properties</include>
                                         </includes>

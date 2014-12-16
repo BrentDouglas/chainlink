@@ -313,6 +313,10 @@
                             </target>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>ensure-log4j-properties</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -354,6 +358,7 @@
                                     <artifactId>wildfly-dist</artifactId>
                                     <version>${version.org.wildfly}</version>
                                     <type>zip</type>
+                                    <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
@@ -378,7 +383,7 @@
                 <executions>
                     <execution>
                         <id>log4j-properties</id>
-                        <phase>generate-test-resources</phase>
+                        <phase>process-test-resources</phase>
                     </execution>
                 </executions>
             </plugin>

@@ -13,6 +13,7 @@
 
     <properties>
         <test.properties.dir>../..</test.properties.dir>
+        <log4j.properties.dir>..</log4j.properties.dir>
 
         <container.dir>${project.build.directory}/glassfish4</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
@@ -114,6 +115,10 @@
                         <id>uninstall-chainlink-jars</id>
                         <phase>post-integration-test</phase>
                     </execution>
+                    <execution>
+                        <id>ensure-log4j-properties</id>
+                        <phase>generate-test-resources</phase>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -142,7 +147,7 @@
                 <executions>
                     <execution>
                         <id>log4j-properties</id>
-                        <phase>generate-test-resources</phase>
+                        <phase>process-test-resources</phase>
                     </execution>
                 </executions>
             </plugin>

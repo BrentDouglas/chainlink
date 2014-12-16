@@ -125,6 +125,8 @@
                                       tofile="${chainlink.dir}/cnf/chainlink-tck.properties"
                                       overwrite="true">
                                 </copy>
+                                <mkdir dir="${chainlink.dir}/run" />
+                                <mkdir dir="${chainlink.dir}/log" />
 
                                 <chmod file="${chainlink.dir}/bin/*" perm="754"/>
                             </target>
@@ -164,6 +166,8 @@
                                     <arg value="-p"/>
                                     <arg value="chainlink-tck.properties"/>
                                     <arg value="-d"/>
+                                    <env key="CHAINLINK_PIDFILE" value="${chainlink.dir}/run/chainlink.pid"/>
+                                    <env key="CHAINLINK_LOG_DIR" value="${chainlink.dir}/log"/>
                                 </exec>
                             </target>
                         </configuration>
@@ -179,6 +183,8 @@
                                 <exec executable="${chainlink.dir}/bin/chainlink"
                                       dir="${chainlink.dir}/bin">
                                     <arg value="-k"/>
+                                    <env key="CHAINLINK_PIDFILE" value="${chainlink.dir}/run/chainlink.pid"/>
+                                    <env key="CHAINLINK_LOG_DIR" value="${chainlink.dir}/log"/>
                                 </exec>
                                 <exec executable="${chainlink.dir}/install"
                                       dir="${chainlink.dir}">
@@ -188,6 +194,10 @@
                                 </exec>
                             </target>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>ensure-log4j-properties</id>
+                        <phase>generate-test-resources</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -207,7 +217,7 @@
                 <executions>
                     <execution>
                         <id>copy-tck</id>
-                        <phase>process-test-classes</phase>
+                        <phase>pre-integration-test</phase>
                     </execution>
                     <execution>
                         <id>unpack-tck</id>
@@ -228,7 +238,7 @@
                 <executions>
                     <execution>
                         <id>log4j-properties</id>
-                        <phase>generate-test-resources</phase>
+                        <phase>process-test-resources</phase>
                     </execution>
                 </executions>
             </plugin>

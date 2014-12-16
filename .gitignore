@@ -23,5 +23,6 @@ idea
 .settings
 
 # Build
+log4j.properties
 test.properties
 chainlink-tck.properties

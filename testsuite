@@ -26,40 +26,47 @@ REPOSITORIES=( re-memory re-ehcache re-gridgain re-hazelcast re-infinispan )
 TEST_COHERENCE="false"
 TEST_LOCAL_REPOSITORIES="false"
 FAIL_FAST="false"
+QUIET="false"
 
 run() {
     local dir="${1}"
     local msg="${2}"
-    local command="${3}"
+    local profiles="${3}"
     local ret=0
 
-    echo "Running ${msg} with profiles ${command}"
+    local command="maven"
+    [ "${QUIET}" == "true" ] && {
+        command="${command} -q"
+    }
+
+    echo "Starting ${msg} run with profiles ${profiles}"
     (
         cd "${dir}"
-        maven test "-P${command}"
+        ${command} clean verify "-P${profiles}"
     )
     ret=${?}
     [ ${ret} -eq 0 ] || {
         [ "${FAIL_FAST}" == "true" ] && {
-            terminate ${ret} "Failed ${msg} with profiles ${command}"
+            terminate ${ret} "Failed ${msg} run with profiles ${profiles}"
         }
-        red "Failed ${msg} with profiles  ${command}"
-        FAILED+="\n${command}"
+        FAILED+="\n${profiles}"
         RETVAL=${ret}
+        red "Failed ${msg} run with profiles  ${profiles}"
+        return ${ret}
     }
-
+    green "Passed ${msg} run with profiles ${profiles}"
     return ${ret}
 }
 
 tests() {
-    local command="test"
+    local profiles="test"
     [ "${TEST_LOCAL_REPOSITORIES}" == "true" ] && {
-        command+=",repository"
+        profiles+=",repository"
     }
     [ "${TEST_COHERENCE}" == "true" ] && {
-        command+=",coherence"
+        profiles+=",coherence"
     }
-    run "test" "tests" "${command}"
+    run "test" "tests" "${profiles}"
     return ${?}
 }
 
@@ -125,9 +132,6 @@ repositories() {
 
 testsuite() {
     tests
-
-    maven clean install -Ptck -pl :chainlink-tck-core -Dmaven.test.skip.exec=true
-
     repositories
 }
 
@@ -221,11 +225,12 @@ cat <<EOF
     -f  Fail fast. By default every test will be executed regardless of
         failures. This option will terminate execution at the first
         test failure.
+    -q  Quiet mode.
     -h  Print usage.
 EOF
 }
 
-while getopts "i:c:d:r:t:lofh" opt; do
+while getopts "i:c:d:r:t:lofqh" opt; do
     case ${opt} in
         h)
             usage
@@ -322,6 +327,10 @@ while getopts "i:c:d:r:t:lofh" opt; do
 
         f)
             FAIL_FAST="true"
+            ;;
+
+        q)
+            QUIET="true"
             ;;
 
         \?)

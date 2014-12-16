@@ -20,6 +20,8 @@
         <test.properties>${test.properties.dir}/test.properties</test.properties>
         <tck.properties.dir>${project.basedir}</tck.properties.dir>
         <tck.source>${project.build.directory}/tck-source</tck.source>
+        <log4j.properties.dir>..</log4j.properties.dir>
+        <log4j.properties>${log4j.properties.dir}/log4j.properties</log4j.properties>
 
         <container.debug>false</container.debug>
 
@@ -879,6 +881,21 @@
                                             <filter token="database.user" value="${database.prefix}.database.user" />
                                             <filter token="database.password" value="${database.prefix}.database.password" />
                                         </filterset>
+                                    </copy>
+                                </target>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>ensure-log4j-properties</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <copy file="${log4j.properties.dir}/log4j.template.properties"
+                                          tofile="${log4j.properties}"
+                                          overwrite="false">
                                     </copy>
                                 </target>
                             </configuration>
