@@ -2,7 +2,6 @@ package io.machinecode.chainlink.test.core;
 
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.ResolvedChain;
-import io.machinecode.chainlink.test.core.execution.Reference;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,9 +15,9 @@ public class ChainImplTest {
 
     @Test
     public void resolveTest() throws Exception {
-        final ChainImpl<Void> first = new ChainImpl<Void>();
-        final ChainImpl<Void> second = new ChainImpl<Void>();
-        final ChainImpl<Void> third = new ChainImpl<Void>();
+        final ChainImpl<Void> first = new ChainImpl<>();
+        final ChainImpl<Void> second = new ChainImpl<>();
+        final ChainImpl<Void> third = new ChainImpl<>();
 
         first.link(second);
         second.link(third);
@@ -28,18 +27,17 @@ public class ChainImplTest {
         Assert.assertFalse(third.isDone());
 
         final CountDownLatch latch = new CountDownLatch(1);
-        final Reference<Boolean> done = new Reference<Boolean>(false);
+        final CountDownLatch done = new CountDownLatch(1);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 latch.countDown();
                 try {
                     third.get(1, TimeUnit.SECONDS);
-                    done.set(true);
                 } catch (final Exception e) {
                     // Swallow
                 } finally {
-                    done.set(true);
+                    done.countDown();
                 }
             }
         }).start();
@@ -50,32 +48,32 @@ public class ChainImplTest {
         Assert.assertFalse(first.isDone());
         Assert.assertTrue(second.isDone());
         Assert.assertFalse(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
         first.resolve(null);
 
         Assert.assertTrue(first.isDone());
         Assert.assertTrue(second.isDone());
         Assert.assertFalse(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
         third.resolve(null);
 
         Assert.assertTrue(first.isDone());
         Assert.assertTrue(second.isDone());
         Assert.assertTrue(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
-        third.link(new ResolvedChain<Void>(null));
-        Thread.sleep(100);
-        Assert.assertTrue(done.get());
+        third.link(new ResolvedChain<>(null));
+        done.await(2, TimeUnit.SECONDS);
+        Assert.assertEquals(0, done.getCount());
     }
 
     @Test
     public void rejectTest() throws Exception {
-        final ChainImpl<Void> first = new ChainImpl<Void>();
-        final ChainImpl<Void> second = new ChainImpl<Void>();
-        final ChainImpl<Void> third = new ChainImpl<Void>();
+        final ChainImpl<Void> first = new ChainImpl<>();
+        final ChainImpl<Void> second = new ChainImpl<>();
+        final ChainImpl<Void> third = new ChainImpl<>();
 
         first.link(second);
         second.link(third);
@@ -85,18 +83,17 @@ public class ChainImplTest {
         Assert.assertFalse(third.isDone());
 
         final CountDownLatch latch = new CountDownLatch(1);
-        final Reference<Boolean> done = new Reference<Boolean>(false);
+        final CountDownLatch done = new CountDownLatch(1);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 latch.countDown();
                 try {
                     third.get(1, TimeUnit.SECONDS);
-                    done.set(true);
                 } catch (final Exception e) {
                     // Swallow
                 } finally {
-                    done.set(true);
+                    done.countDown();
                 }
             }
         }).start();
@@ -107,32 +104,32 @@ public class ChainImplTest {
         Assert.assertFalse(first.isDone());
         Assert.assertTrue(second.isDone());
         Assert.assertFalse(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
         first.reject(null);
 
         Assert.assertTrue(first.isDone());
         Assert.assertTrue(second.isDone());
         Assert.assertFalse(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
         third.reject(null);
 
         Assert.assertTrue(first.isDone());
         Assert.assertTrue(second.isDone());
         Assert.assertTrue(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
-        third.link(new ResolvedChain<Void>(null));
-        Thread.sleep(100);
-        Assert.assertTrue(done.get());
+        third.link(new ResolvedChain<>(null));
+        done.await(2, TimeUnit.SECONDS);
+        Assert.assertEquals(0, done.getCount());
     }
 
     @Test
     public void cancelTest() throws Exception {
-        final ChainImpl<Void> first = new ChainImpl<Void>();
-        final ChainImpl<Void> second = new ChainImpl<Void>();
-        final ChainImpl<Void> third = new ChainImpl<Void>();
+        final ChainImpl<Void> first = new ChainImpl<>();
+        final ChainImpl<Void> second = new ChainImpl<>();
+        final ChainImpl<Void> third = new ChainImpl<>();
 
         first.link(second);
         second.link(third);
@@ -142,18 +139,17 @@ public class ChainImplTest {
         Assert.assertFalse(third.isDone());
 
         final CountDownLatch latch = new CountDownLatch(1);
-        final Reference<Boolean> done = new Reference<Boolean>(false);
+        final CountDownLatch done = new CountDownLatch(1);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 latch.countDown();
                 try {
                     third.get(1, TimeUnit.SECONDS);
-                    done.set(true);
                 } catch (final Exception e) {
                     // Swallow
                 } finally {
-                    done.set(true);
+                    done.countDown();
                 }
             }
         }).start();
@@ -164,25 +160,25 @@ public class ChainImplTest {
         Assert.assertFalse(first.isDone());
         Assert.assertFalse(second.isDone());
         Assert.assertTrue(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
         second.cancel(true);
 
         Assert.assertFalse(first.isDone());
         Assert.assertTrue(second.isDone());
         Assert.assertTrue(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
         first.cancel(true);
 
         Assert.assertTrue(first.isDone());
         Assert.assertTrue(second.isDone());
         Assert.assertTrue(third.isDone());
-        Assert.assertFalse(done.get());
+        Assert.assertEquals(1, done.getCount());
 
 
-        third.link(new ResolvedChain<Void>(null));
-        Thread.sleep(100);
-        Assert.assertTrue(done.get());
+        third.link(new ResolvedChain<>(null));
+        done.await(2, TimeUnit.SECONDS);
+        Assert.assertEquals(0, done.getCount());
     }
 }
