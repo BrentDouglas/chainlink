@@ -64,7 +64,7 @@
         <version.com.oracle.coherence.coherence>12.1.2-0-0</version.com.oracle.coherence.coherence>
         <version.dom4j>1.6.1</version.dom4j>
         <version.gnu.getopt.java-getopt>1.0.13</version.gnu.getopt.java-getopt>
-        <version.io.machinecode.then>0.2.0-SNAPSHOT</version.io.machinecode.then>
+        <version.io.machinecode.then>0.2.0</version.io.machinecode.then>
         <version.io.machinecode.then.then-api>${version.io.machinecode.then}</version.io.machinecode.then.then-api>
         <version.io.machinecode.then.then-core>${version.io.machinecode.then}</version.io.machinecode.then.then-core>
         <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
@@ -86,7 +86,7 @@
         <version.org.hibernate.hibernate-validator>3.1.0.GA</version.org.hibernate.hibernate-validator>
         <version.org.infinispan.infinispan-bom>6.0.2.Final</version.org.infinispan.infinispan-bom>
         <version.org.javassist.javassist>3.18.2-GA</version.org.javassist.javassist>
-        <version.org.jboss.logging.jboss-logging>3.1.2.GA</version.org.jboss.logging.jboss-logging>
+        <version.org.jboss.logging.jboss-logging>3.1.4.GA</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.marshalling.jboss-marshalling>1.4.10.Final</version.org.jboss.marshalling.jboss-marshalling>
         <version.org.jboss.seam.jboss-seam>2.2.2.Final</version.org.jboss.seam.jboss-seam>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>1.0.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>
