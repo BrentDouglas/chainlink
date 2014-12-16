@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.ee.wildfly.processor;
 
+import org.jboss.as.ee.weld.WeldDeploymentMarker;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -21,14 +22,20 @@ public class ChainlinkDependencyProcessor implements DeploymentUnitProcessor {
 
     private final ModuleIdentifier javax_batch_api = ModuleIdentifier.create("javax.batch.api");
     private final ModuleIdentifier io_machinecode_chainlink = ModuleIdentifier.create("io.machinecode.chainlink");
+    private final ModuleIdentifier io_machinecode_chainlink_inject_cdi = ModuleIdentifier.create("io.machinecode.chainlink.inject.cdi");
 
     @Override
     public void deploy(final DeploymentPhaseContext deploymentPhaseContext) throws DeploymentUnitProcessingException {
-        final ModuleSpecification moduleSpecification = deploymentPhaseContext.getDeploymentUnit().getAttachment(Attachments.MODULE_SPECIFICATION);
+        final DeploymentUnit deploymentUnit = deploymentPhaseContext.getDeploymentUnit();
+        final ModuleSpecification moduleSpecification = deploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
         final ModuleLoader moduleLoader = Module.getBootModuleLoader();
 
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, javax_batch_api, false, false, false, false));
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, io_machinecode_chainlink, false, false, true, false));
+
+        if (WeldDeploymentMarker.isPartOfWeldDeployment(deploymentUnit)) {
+            moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, io_machinecode_chainlink_inject_cdi, false, false, true, false));
+        }
     }
 
     @Override

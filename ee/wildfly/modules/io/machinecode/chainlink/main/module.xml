@@ -21,13 +21,14 @@
         <module name="javax.enterprise.api"/>
         <module name="javax.transaction.api"/>
         <module name="org.jboss.as.controller"/>
+        <module name="org.jboss.as.ee"/>
         <module name="org.jboss.as.server"/>
         <module name="org.jboss.modules"/>
         <module name="org.jboss.staxmapper"/>
         <module name="org.jboss.as.transactions"/>
         <!--
         <module name="org.jboss.dmr"/>
-        <module name="org.jboss.msc"/>
+        <module name="org.jboss.msc"/>org.jboss.as.ee
         -->
         <module name="org.jboss.jts"/>
         <module name="org.jboss.marshalling"/>
