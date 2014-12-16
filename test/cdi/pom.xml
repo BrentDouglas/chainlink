@@ -11,11 +11,6 @@
 
     <artifactId>chainlink-test-cdi</artifactId>
 
-    <properties>
-        <test.properties.dir>../..</test.properties.dir>
-        <log4j.properties.dir>..</log4j.properties.dir>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>

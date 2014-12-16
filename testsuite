@@ -28,6 +28,8 @@ TEST_LOCAL_REPOSITORIES="false"
 FAIL_FAST="false"
 QUIET="false"
 
+BUILD_BASE_DIR="${TRAVIS_BUILD_DIR-$(pwd)}"
+
 run() {
     local dir="${1}"
     local msg="${2}"
@@ -42,7 +44,7 @@ run() {
     echo "Starting ${msg} run with profiles ${profiles}"
     (
         cd "${dir}"
-        ${command} clean verify "-P${profiles}"
+        ${command} clean verify "-P${profiles}" "-Droot.dir=${BUILD_BASE_DIR}"
     )
     ret=${?}
     [ ${ret} -eq 0 ] || {

@@ -13,9 +13,6 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <test.properties.dir>../..</test.properties.dir>
-        <log4j.properties.dir>..</log4j.properties.dir>
-
         <container.dir>${project.build.directory}/apache-tomee-plume-${version.org.apache.openejb.tomee}</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <tests.dir>${project.build.directory}/arquillian-tests</tests.dir>

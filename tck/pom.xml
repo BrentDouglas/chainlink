@@ -16,12 +16,7 @@
     </modules>
 
     <properties>
-        <test.properties.dir>..</test.properties.dir>
-        <test.properties>${test.properties.dir}/test.properties</test.properties>
-        <tck.properties.dir>${project.basedir}</tck.properties.dir>
         <tck.source>${project.build.directory}/tck-source</tck.source>
-        <log4j.properties.dir>..</log4j.properties.dir>
-        <log4j.properties>${log4j.properties.dir}/log4j.properties</log4j.properties>
 
         <container.debug>false</container.debug>
 
@@ -730,13 +725,21 @@
                             </goals>
                             <configuration>
                                 <target>
-                                    <copy file="${test.properties.dir}/test.template.properties"
-                                          tofile="${test.properties}"
-                                          overwrite="false">
+                                    <copy file="${root.dir}/test.template.properties"
+                                          tofile="${root.dir}/test.properties"
+                                          overwrite="false"
+                                          filtering="true">
+                                        <filterset>
+                                            <filter token="root.dir" value="${root.dir}" />
+                                        </filterset>
                                     </copy>
-                                    <copy file="${tck.properties.dir}/chainlink-tck.template.properties"
-                                          tofile="${tck.properties.dir}/chainlink-tck.properties"
-                                          overwrite="false">
+                                    <copy file="${root.dir}/tck/chainlink-tck.template.properties"
+                                          tofile="${root.dir}/tck/chainlink-tck.properties"
+                                          overwrite="false"
+                                          filtering="true">
+                                        <filterset>
+                                            <filter token="root.dir" value="${root.dir}" />
+                                        </filterset>
                                     </copy>
                                 </target>
                             </configuration>
@@ -893,8 +896,8 @@
                             </goals>
                             <configuration>
                                 <target>
-                                    <copy file="${log4j.properties.dir}/log4j.template.properties"
-                                          tofile="${log4j.properties}"
+                                    <copy file="${root.dir}/tck/log4j.template.properties"
+                                          tofile="${root.dir}/tck/log4j.properties"
                                           overwrite="false">
                                     </copy>
                                 </target>
@@ -1041,7 +1044,7 @@
                                 <includes>
                                     <include>**/**Tests.java</include>
                                 </includes>
-                                <systemPropertiesFile>${test.properties}</systemPropertiesFile>
+                                <systemPropertiesFile>${root.dir}/test.properties</systemPropertiesFile>
                                 <systemPropertyVariables>
                                     <database.driver>${database.driver}</database.driver>
                                     <database.prefix>${database.prefix}</database.prefix>
@@ -1097,7 +1100,7 @@
                             </goals>
                             <configuration>
                                 <files>
-                                    <file>${test.properties}</file>
+                                    <file>${root.dir}/test.properties</file>
                                 </files>
                             </configuration>
                         </execution>

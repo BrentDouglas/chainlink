@@ -54,6 +54,8 @@
     </modules>
 
     <properties>
+        <root.dir>${user.dir}</root.dir>
+
         <version.com.google.inject.guice>3.0</version.com.google.inject.guice>
         <version.com.h2database.h2>1.3.175</version.com.h2database.h2>
         <version.com.hazelcast.hazelcast>3.3</version.com.hazelcast.hazelcast>
@@ -666,9 +668,13 @@
                             </goals>
                             <configuration>
                                 <target>
-                                    <copy file="${test.properties.dir}/test.template.properties"
-                                          tofile="${test.properties}"
-                                          overwrite="false">
+                                    <copy file="${root.dir}/test.template.properties"
+                                          tofile="${root.dir}/test.properties"
+                                          overwrite="false"
+                                          filtering="true">
+                                        <filterset>
+                                            <filter token="root.dir" value="${root.dir}" />
+                                        </filterset>
                                     </copy>
                                 </target>
                             </configuration>

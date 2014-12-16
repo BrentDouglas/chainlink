@@ -12,9 +12,6 @@
     <artifactId>chainlink-test-glassfish</artifactId>
 
     <properties>
-        <test.properties.dir>../..</test.properties.dir>
-        <log4j.properties.dir>..</log4j.properties.dir>
-
         <container.dir>${project.build.directory}/glassfish4</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
     </properties>

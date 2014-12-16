@@ -12,9 +12,6 @@
     <artifactId>chainlink-test-wildfly</artifactId>
 
     <properties>
-        <test.properties.dir>../..</test.properties.dir>
-        <log4j.properties.dir>..</log4j.properties.dir>
-
         <container.dir>${project.build.directory}/wildfly-${version.org.wildfly}</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <wildfly.jvm.arguments>-server</wildfly.jvm.arguments> <!-- Need to have something here for arquillian to handle it properly -->
