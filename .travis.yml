@@ -29,7 +29,7 @@ env:
   - BUILD_ARGS="-I -t local      -i batch  -r memory     -c tomee"
   #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee" # Also needs access to inject-cdi module
   - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
-  - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly"
+  #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly" # Need a factory that doesn't try to start weld
 
 services:
   - mongodb
@@ -40,7 +40,7 @@ addons:
 
 before_script:
   - psql -c 'create database chainlink;' -U postgres
-  - cat "${TRAVIS_BUILD_DIR}/repository/schema-postgresql.sql" | psql -U postgres
+  - cat "${TRAVIS_BUILD_DIR}/repository/schema-postgresql.sql" | psql -U postgres -d chainlink
 
 script: ./testsuite ${BUILD_ARGS}
 

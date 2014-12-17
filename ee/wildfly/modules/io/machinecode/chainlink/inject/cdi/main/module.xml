@@ -6,7 +6,9 @@
 
     <dependencies>
         <module name="io.machinecode.chainlink"/>
-        <module name="javax.inject"/>
+        <module name="javax.batch.api"/>
+        <module name="javax.inject.api"/>
         <module name="javax.enterprise.api"/>
+        <module name="org.jboss.logging"/>
     </dependencies>
 </module>

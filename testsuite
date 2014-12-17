@@ -27,6 +27,7 @@ TEST_COHERENCE="false"
 TEST_LOCAL_REPOSITORIES="false"
 FAIL_FAST="false"
 QUIET="false"
+DEBUG="false"
 INTEGRATION_TESTS="true"
 TCK_TESTS="true"
 
@@ -90,6 +91,9 @@ tck() {
 
     [ "${TEST_COHERENCE}" == "true" ] && {
         command+=",coherence"
+    }
+    [ "${DEBUG}" == "true" ] && {
+        command+=",debug"
     }
 
     run "tck" "TCK" "${command}"
@@ -243,11 +247,13 @@ cat <<EOF
     -I  Don't run the integration tests.
     -T  Don't run the TCK tests.
     -q  Quiet mode.
+    -x  Debug mode for containers. See the 'debug' profile in the tck
+        module.
     -h  Print usage.
 EOF
 }
 
-while getopts "i:c:d:r:t:lofITqh" opt; do
+while getopts "i:c:d:r:t:lofITqxh" opt; do
     case ${opt} in
         i)
             INJECTORS=()
@@ -351,6 +357,10 @@ while getopts "i:c:d:r:t:lofITqh" opt; do
 
         q)
             QUIET="true"
+            ;;
+
+        x)
+            DEBUG="true"
             ;;
 
         h)
