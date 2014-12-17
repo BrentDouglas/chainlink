@@ -150,8 +150,8 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
     protected int fetchJobInstanceCount(final String jobName) {
         int count = 0;
         for (final Object value : jobInstances.invokeAll(new AllEntriesFilter(), new JobInstanceCountProcessor(jobName)).values()) {
-            if (value != null) {
-                count += (Integer)value;
+            if (value != null && (Boolean)value) {
+                ++count;
             }
         }
         return count;

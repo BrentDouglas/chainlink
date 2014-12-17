@@ -27,7 +27,7 @@
         <worker.factory.class>io.machinecode.chainlink.core.execution.EventedWorkerFactory</worker.factory.class>
         <marshalling.provider.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProviderFactory</marshalling.provider.factory.class>
 
-        <injector.configuration.source.file>batch.xml</injector.configuration.source.file>
+        <injector.configuration.source.file>META-INF/batch.xml</injector.configuration.source.file>
         <injector.configuration.destination.file>${injector.configuration.source.file}</injector.configuration.destination.file>
 
         <database.driver>org.h2.Driver</database.driver>
@@ -476,7 +476,7 @@
             <properties>
                 <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.CdiArtifactLoaderFactory</artifact.loader.factory.class>
                 <injector.factory.class>io.machinecode.chainlink.tck.core.inject.CdiInjectorFactory</injector.factory.class>
-                <injector.configuration.source.file>beans.xml</injector.configuration.source.file>
+                <injector.configuration.source.file>META-INF/beans.xml</injector.configuration.source.file>
             </properties>
             <dependencies>
                 <dependency>
@@ -538,7 +538,7 @@
             <properties>
                 <artifact.loader.factory.class>io.machinecode.chainlink.tck.seam.SeamArtifactLoaderFactory</artifact.loader.factory.class>
                 <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
-                <injector.configuration.source.file>components.xml</injector.configuration.source.file>
+                <injector.configuration.source.file>META-INF/components.xml</injector.configuration.source.file>
             </properties>
             <dependencies>
                 <dependency>
@@ -608,8 +608,7 @@
             </activation>
             <properties>
                 <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.SpringArtifactLoaderFactory</artifact.loader.factory.class>
-                <injector.configuration.source.file>spring-beans.xml</injector.configuration.source.file>
-                <injector.configuration.destination.file>beans.xml</injector.configuration.destination.file>
+                <injector.configuration.source.file>beans.xml</injector.configuration.source.file>
             </properties>
             <dependencies>
                 <dependency>
@@ -768,8 +767,8 @@
                                           tofile="${project.build.testOutputDirectory}/tck-udp.xml"
                                           overwrite="true">
                                     </copy>
-                                    <copy file="${project.basedir}/../src/test/resources/META-INF/${injector.configuration.source.file}"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/${injector.configuration.destination.file}"
+                                    <copy file="${project.basedir}/../src/test/resources/${injector.configuration.source.file}"
+                                          tofile="${project.build.testOutputDirectory}/${injector.configuration.destination.file}"
                                           overwrite="true">
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/com.ibm.jbatch.tck.spi.JobExecutionWaiterFactory"

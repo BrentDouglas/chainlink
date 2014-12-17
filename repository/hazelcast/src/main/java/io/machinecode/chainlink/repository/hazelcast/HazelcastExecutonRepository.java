@@ -142,8 +142,8 @@ public class HazelcastExecutonRepository extends BaseMapExecutionRepository {
     protected int fetchJobInstanceCount(final String jobName) {
         int count = 0;
         for (final Object value : jobInstances.executeOnEntries(new JobInstanceCountProcessor(jobName)).values()) {
-            if (value != null) {
-                count += (Integer)value;
+            if (value != null && (Boolean)value) {
+                ++count;
             }
         }
         return count;
@@ -163,7 +163,7 @@ public class HazelcastExecutonRepository extends BaseMapExecutionRepository {
     @Override
     protected Collection<Long> fetchRunningJobExecutionIds(final String jobName) {
         final List<Long> ret = new ArrayList<Long>();
-        for (final Object value : jobInstances.executeOnEntries(new RunningJobExecutionIdProcessor(jobName)).values()) {
+        for (final Object value : jobExecutions.executeOnEntries(new RunningJobExecutionIdProcessor(jobName)).values()) {
             if (value != null) {
                 ret.add((Long)value);
             }
@@ -174,7 +174,7 @@ public class HazelcastExecutonRepository extends BaseMapExecutionRepository {
     @Override
     protected Collection<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
         final List<JobExecution> ret = new ArrayList<JobExecution>();
-        for (final Object value : jobInstances.executeOnEntries(new JobExecutionsForJobInstanceProcessor(jobInstanceId)).values()) {
+        for (final Object value : jobExecutions.executeOnEntries(new JobExecutionsForJobInstanceProcessor(jobInstanceId)).values()) {
             if (value != null) {
                 ret.add((JobExecution)value);
             }

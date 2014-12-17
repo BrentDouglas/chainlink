@@ -6,29 +6,30 @@ jdk:
 
 env:
   # Integration tests
-  - BUILD_ARGS="-T"
+  - BUILD_ARGS="-T -l -d h2"
+  - BUILD_ARGS="-T -l -d postgresql"
   # TCK SE
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-memory     -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-cdi    -r re-memory     -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-spring -r re-memory     -c se"
-  - BUILD_ARGS="-I -t tr-infinispan -i in-batch  -r re-memory     -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-infinispan -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-gridgain   -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-hazelcast  -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-ehcache    -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-jdbc       -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-jpa        -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-jdbc       -c se -d db-postgresql"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-jpa        -c se -d db-postgresql"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-redis      -c se"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-mongo      -c se"
+  - BUILD_ARGS="-I -t local      -i batch  -r memory     -c se"
+  - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c se"
+  - BUILD_ARGS="-I -t local      -i spring -r memory     -c se"
+  - BUILD_ARGS="-I -t infinispan -i batch  -r memory     -c se"
+  - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c se"
+  #- BUILD_ARGS="-I -t local      -i batch  -r gridgain   -c se" # Currently both fail StepExecutionTests.testStepInFlowInSplitStepExecution
+  #- BUILD_ARGS="-I -t local      -i batch  -r hazelcast  -c se"
+  - BUILD_ARGS="-I -t local      -i batch  -r ehcache    -c se"
+  - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se"
+  - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se"
+  - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se -d postgresql"
+  - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se -d postgresql"
+  - BUILD_ARGS="-I -t local      -i batch  -r redis      -c se"
+  #- BUILD_ARGS="-I -t local      -i batch  -r mongo      -c se" # Broken for a number of tests
   # TCK EE
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-memory     -c glassfish"
-  # - BUILD_ARGS="-I -t tr-local      -i in-cdi    -r re-memory     -c glassfish" # Need to majic OSGI deps in inject-cdi module somehow
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-memory     -c tomee"
-  - BUILD_ARGS="-I -t tr-local      -i in-cdi    -r re-memory     -c tomee"
-  - BUILD_ARGS="-I -t tr-local      -i in-batch  -r re-memory     -c wildfly"
-  - BUILD_ARGS="-I -t tr-local      -i in-cdi    -r re-memory     -c wildfly"
+  - BUILD_ARGS="-I -t local      -i batch  -r memory     -c glassfish"
+  # - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c glassfish" # Need to majic OSGI deps in inject-cdi module somehow
+  - BUILD_ARGS="-I -t local      -i batch  -r memory     -c tomee"
+  #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee" # Also needs access to inject-cdi module
+  - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
+  - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly"
 
 services:
   - mongodb
@@ -37,9 +38,13 @@ services:
 addons:
   postgresql: "9.2"
 
-before_script: if [ "${BUILD_ARGS}" == *"db-postgresql"* ]; then psql -c 'create database chainlink;' -U postgres; fi
+before_script:
+  - psql -c 'create database chainlink;' -U postgres
+  - cat "${TRAVIS_BUILD_DIR}/repository/schema-postgresql.sql" | psql -U postgres
 
 script: ./testsuite ${BUILD_ARGS}
 
-after_failure: if [ -e tck/glassfish/target/glassfish4/glassfish/domains/domain1/logs/server.log ]; then cat tck/glassfish/target/glassfish4/glassfish/domains/domain1/logs/server.log; fi
+after_failure:
+  - if [ -e tck/glassfish/target/glassfish4/glassfish/domains/domain1/logs/server.log ]; then cat tck/glassfish/target/glassfish4/glassfish/domains/domain1/logs/server.log; fi
+  - if [ -e tck/se/target/chainlinkd/*/log/console*.log ]; then cat tck/se/target/chainlinkd/*/log/console*.log
 

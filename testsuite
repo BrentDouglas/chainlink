@@ -9,19 +9,19 @@ RETVAL=0
 FAILED=""
 
 
-AVAILABLE_DATABASES=( db-h2 db-postgresql db-mariadb db-derby )
+AVAILABLE_DATABASES=( h2 postgresql mariadb derby )
 AVAILABLE_CONTAINERS=( se glassfish tomee wildfly )
-AVAILABLE_INJECTORS=( in-batch in-cdi in-spring in-guice in-seam )
-AVAILABLE_TRANSPORTS=( tr-local tr-coherence tr-gridgain tr-hazelcast tr-infinispan tr-jgroups )
-AVAILABLE_REPOSITORIES=( re-memory re-coherence re-ehcache re-gridgain re-hazelcast re-infinispan re-jdbc re-jpa re-mongo re-redis )
+AVAILABLE_INJECTORS=( batch cdi spring guice seam )
+AVAILABLE_TRANSPORTS=( local coherence gridgain hazelcast infinispan jgroups )
+AVAILABLE_REPOSITORIES=( memory coherence ehcache gridgain hazelcast infinispan jdbc jpa mongo redis )
 
 CONTAINERS=( se glassfish tomee wildfly )
 
 # Permutations of these are used to run the tests
-DATABASES=( db-h2 )
-INJECTORS=( in-batch in-cdi )
-TRANSPORTS=( tr-local tr-infinispan )
-REPOSITORIES=( re-memory re-ehcache re-gridgain re-hazelcast re-infinispan re-jpa re-jdbc )
+DATABASES=( h2 )
+INJECTORS=( batch cdi )
+TRANSPORTS=( local infinispan )
+REPOSITORIES=( memory ehcache gridgain hazelcast infinispan jpa jdbc )
 
 TEST_COHERENCE="false"
 TEST_LOCAL_REPOSITORIES="false"
@@ -70,7 +70,13 @@ tests() {
     [ "${TEST_COHERENCE}" == "true" ] && {
         profiles+=",coherence"
     }
-    run "test" "tests" "${profiles}"
+    for database in "${DATABASES[@]}"; do
+        if [ "h2" == "${database}" ]; then
+            run "test" "tests" "${profiles}"
+        else
+            run "test" "tests" "${profiles:+$profiles,}db-${database}"
+        fi
+    done
     return ${?}
 }
 
@@ -93,10 +99,10 @@ tck() {
 injectors() {
     local profiles="${@}"
     for injector in "${INJECTORS[@]}"; do
-        if [ "in-batch" == "${injector}" ]; then
+        if [ "batch" == "${injector}" ]; then
             tck "${profiles}" #in-batch
         else
-            tck "${profiles:+$profiles,}${injector}"
+            tck "${profiles:+$profiles,}in-${injector}"
         fi
     done
 }
@@ -104,10 +110,10 @@ injectors() {
 databases() {
     local profiles="${@}"
     for database in "${DATABASES[@]}"; do
-        if [ "db-h2" == "${database}" ]; then
+        if [ "h2" == "${database}" ]; then
             injectors "${profiles}"
         else
-            injectors "${profiles:+$profiles,}${database}"
+            injectors "${profiles:+$profiles,}db-${database}"
         fi
     done
 }
@@ -115,10 +121,10 @@ databases() {
 transports() {
     local profiles="${@}"
     for transport in "${TRANSPORTS[@]}"; do
-        if [ "tr-local" == "${transport}" ]; then
+        if [ "local" == "${transport}" ]; then
             databases "${profiles}"
         else
-            databases "${profiles:+$profiles,}${transport}"
+            databases "${profiles:+$profiles,}tr-${transport}"
         fi
     done
 }
@@ -126,10 +132,10 @@ transports() {
 repositories() {
     local profiles="${@}"
     for repository in "${REPOSITORIES[@]}"; do
-        if [ "re-memory" == "${repository}" ]; then
+        if [ "memory" == "${repository}" ]; then
             transports "${profiles}"
         else
-            transports "${profiles:+$profiles,}${repository}"
+            transports "${profiles:+$profiles,}re-${repository}"
         fi
     done
 }
@@ -205,7 +211,7 @@ EOF
     done
 cat <<EOF
     -d  Comma separated list of databases to run the tests for.
-        Selecting the value db-h2 will use the default database and
+        Selecting the value h2 will use the default database and
         will not show up in the profile list. Available databases are:
 EOF
     for database in "${AVAILABLE_DATABASES[@]}"; do
@@ -213,7 +219,7 @@ EOF
     done
 cat <<EOF
     -t  Comma separated list of transports to run the tests for.
-        Selecting the value tr-local will use the default transport and
+        Selecting the value local will use the default transport and
         will not show up in the profile list. Available transports are:
 EOF
     for transport in "${AVAILABLE_TRANSPORTS[@]}"; do
@@ -221,7 +227,7 @@ EOF
     done
 cat <<EOF
     -r  Comma separated list of repositories to run the tests for.
-        Selecting the value re-memory will use the default repository and
+        Selecting the value memory will use the default repository and
         will not show up in the profile list. Available repositories are:
 EOF
     for repository in "${AVAILABLE_REPOSITORIES[@]}"; do
