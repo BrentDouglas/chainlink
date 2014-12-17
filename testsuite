@@ -21,12 +21,14 @@ CONTAINERS=( se glassfish tomee wildfly )
 DATABASES=( db-h2 )
 INJECTORS=( in-batch in-cdi )
 TRANSPORTS=( tr-local tr-infinispan )
-REPOSITORIES=( re-memory re-ehcache re-gridgain re-hazelcast re-infinispan )
+REPOSITORIES=( re-memory re-ehcache re-gridgain re-hazelcast re-infinispan re-jpa re-jdbc )
 
 TEST_COHERENCE="false"
 TEST_LOCAL_REPOSITORIES="false"
 FAIL_FAST="false"
 QUIET="false"
+INTEGRATION_TESTS="true"
+TCK_TESTS="true"
 
 BUILD_BASE_DIR="${TRAVIS_BUILD_DIR-$(pwd)}"
 
@@ -133,8 +135,12 @@ repositories() {
 }
 
 testsuite() {
-    tests
-    repositories
+    [ "${INTEGRATION_TESTS}" == "true" ] && {
+        tests
+    }
+    [ "${TCK_TESTS}" == "true" ] && {
+        repositories
+    }
 }
 
 print-available-injectors() {
@@ -180,7 +186,8 @@ print-available-repositories() {
 usage() {
 cat <<EOF
 Usage: testsuite [-i injector] [-c container] [-d database]
-                 [-t transport] [-r repository] [-l] [-o] [-f] [-h]
+                 [-t transport] [-r repository] [-l] [-o] [-f] [-I]
+                 [-T] [-q] [-h]
 
     -i  Comma separated list of injectors to run the tests for.
         Selecting the value in-batch will use the default injector and
@@ -227,18 +234,15 @@ cat <<EOF
     -f  Fail fast. By default every test will be executed regardless of
         failures. This option will terminate execution at the first
         test failure.
+    -I  Don't run the integration tests.
+    -T  Don't run the TCK tests.
     -q  Quiet mode.
     -h  Print usage.
 EOF
 }
 
-while getopts "i:c:d:r:t:lofqh" opt; do
+while getopts "i:c:d:r:t:lofITqh" opt; do
     case ${opt} in
-        h)
-            usage
-            exit 0
-            ;;
-
         i)
             INJECTORS=()
             IFS=',' read -ra TMP <<< "${OPTARG}"
@@ -331,8 +335,21 @@ while getopts "i:c:d:r:t:lofqh" opt; do
             FAIL_FAST="true"
             ;;
 
+        I)
+            INTEGRATION_TESTS="false"
+            ;;
+
+        T)
+            TCK_TESTS="false"
+            ;;
+
         q)
             QUIET="true"
+            ;;
+
+        h)
+            usage
+            exit 0
             ;;
 
         \?)
