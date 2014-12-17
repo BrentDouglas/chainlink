@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class GlassfishEnvironment implements Environment {
 
-    private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<String, App>();
+    private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
 
     @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
@@ -67,7 +67,7 @@ public class GlassfishEnvironment implements Environment {
         }
         final List<ConfigurationFactory> factories;
         try {
-            factories = new ResolvableService<ConfigurationFactory>(Constants.CONFIGURATION_FACTORY_CLASS, ConfigurationFactory.class)
+            factories = new ResolvableService<>(Constants.CONFIGURATION_FACTORY_CLASS, ConfigurationFactory.class)
                     .resolve(loader);
         } catch (final Exception e) {
             throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
@@ -158,8 +158,8 @@ public class GlassfishEnvironment implements Environment {
         final ConcurrentMap<String, JobOperatorImpl> ops;
 
         private App(final ClassLoader loader) {
-            this.loader = new WeakReference<ClassLoader>(loader);
-            this.ops = new ConcurrentHashMap<String, JobOperatorImpl>();
+            this.loader = new WeakReference<>(loader);
+            this.ops = new ConcurrentHashMap<>();
         }
     }
 }

@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
+import org.jboss.logging.Logger;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
@@ -29,6 +30,8 @@ import java.util.concurrent.Future;
  */
 public class JobOperatorView implements ExtendedJobOperator {
 
+    private static final Logger log = Logger.getLogger(JobOperatorView.class);
+
     private final ExtendedJobOperator delegate;
 
     public JobOperatorView() {
@@ -36,11 +39,20 @@ public class JobOperatorView implements ExtendedJobOperator {
     }
 
     public JobOperatorView(final String id) {
-        this(Chainlink.getEnvironment().getJobOperator(id));
+        this(lookupOperator(id));
     }
 
     public JobOperatorView(final ExtendedJobOperator delegate) {
         this.delegate = delegate;
+    }
+
+    private static ExtendedJobOperator lookupOperator(final String id) {
+        try {
+            return Chainlink.getEnvironment().getJobOperator(id);
+        } catch (final RuntimeException e) {
+            log.error("Failed to locate the required ExtendedJobOperator", e); //TODO Message
+            throw e;
+        }
     }
 
     @Override
