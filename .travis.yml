@@ -7,12 +7,15 @@ jdk:
 env:
   # Integration tests
   - BUILD_ARGS="-T"
+    NO_GLASSFISH="true"
   # TCK every regular repositories per container
   - BUILD_ARGS="-I -c se"
+    NO_GLASSFISH="true"
   - BUILD_ARGS="-I -t tr-local -i in-batch -c glassfish"
-    IS_GLASSFISH="true"
   - BUILD_ARGS="-I -t tr-local -i in-batch -c tomee"
+    NO_GLASSFISH="true"
   - BUILD_ARGS="-I -t tr-local -i in-batch -c wildfly"
+    NO_GLASSFISH="true"
   # TCK every container per installed repo
   - BUILD_ARGS="-I -t tr-local -i in-batch -r re-jpa,re-jdbc -d db-postgresql"
     IS_POSTGRES="true"
@@ -26,9 +29,9 @@ services:
 addons:
   postgresql: "9.2"
 
-before_script: test "${IS_POSTGRES}" == "true" && psql -c 'create database chainlink;' -U postgres
+before_script: if [ "${IS_POSTGRES}" == "true" ]; then psql -c 'create database chainlink;' -U postgres; fi
 
 script: ./testsuite ${BUILD_ARGS}
 
-after_failure: test "${IS_GLASSFISH}" == "true" && cat tck/glassfish/target/glassfish4/glassfish/domains/domain1/logs/server.log
+after_failure: if [ "${NO_GLASSFISH}" != "true" ]; then cat tck/glassfish/target/glassfish4/glassfish/domains/domain1/logs/server.log; fi
 
