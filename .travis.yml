@@ -1,35 +1,40 @@
 language: java
 
+sudo: false
+
 jdk:
   - oraclejdk7
   - oraclejdk8
 
 env:
-  # Integration tests
-  - BUILD_ARGS="-T -l -d h2"
-  - BUILD_ARGS="-T -l -d postgresql"
-  # TCK SE
-  - BUILD_ARGS="-I -t local      -i batch  -r memory     -c se"
-  - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c se"
-  - BUILD_ARGS="-I -t local      -i spring -r memory     -c se"
-  - BUILD_ARGS="-I -t infinispan -i batch  -r memory     -c se"
-  - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c se"
-  #- BUILD_ARGS="-I -t local      -i batch  -r gridgain   -c se" # Currently both fail StepExecutionTests.testStepInFlowInSplitStepExecution
-  #- BUILD_ARGS="-I -t local      -i batch  -r hazelcast  -c se"
-  - BUILD_ARGS="-I -t local      -i batch  -r ehcache    -c se"
-  - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se"
-  - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se"
-  - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se -d postgresql"
-  - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se -d postgresql"
-  - BUILD_ARGS="-I -t local      -i batch  -r redis      -c se"
-  #- BUILD_ARGS="-I -t local      -i batch  -r mongo      -c se" # Broken for a number of tests
-  # TCK EE
-  - BUILD_ARGS="-I -t local      -i batch  -r memory     -c glassfish"
-  # - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c glassfish" # Need to majic OSGI deps in inject-cdi module somehow
-  - BUILD_ARGS="-I -t local      -i batch  -r memory     -c tomee"
-  #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee" # Also needs access to inject-cdi module
-  - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
-  #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly" # Need a factory that doesn't try to start weld
+  global:
+    - MAVEN_OPTS="-Xms512m -Xmx512m"
+  matrix:
+    # Integration tests
+    - BUILD_ARGS="-T -l -d h2"
+    - BUILD_ARGS="-T -l -d postgresql"
+    # TCK SE
+    - BUILD_ARGS="-I -t local      -i batch  -r memory     -c se"
+    - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c se"
+    - BUILD_ARGS="-I -t local      -i spring -r memory     -c se"
+    - BUILD_ARGS="-I -t infinispan -i batch  -r memory     -c se"
+    - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c se"
+    #- BUILD_ARGS="-I -t local      -i batch  -r gridgain   -c se" # Currently both fail StepExecutionTests.testStepInFlowInSplitStepExecution
+    #- BUILD_ARGS="-I -t local      -i batch  -r hazelcast  -c se"
+    - BUILD_ARGS="-I -t local      -i batch  -r ehcache    -c se"
+    - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se"
+    - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se"
+    - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se -d postgresql"
+    - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se -d postgresql"
+    - BUILD_ARGS="-I -t local      -i batch  -r redis      -c se"
+    #- BUILD_ARGS="-I -t local      -i batch  -r mongo      -c se" # Broken for a number of tests
+    # TCK EE
+    - BUILD_ARGS="-I -t local      -i batch  -r memory     -c glassfish"
+    # - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c glassfish" # Need to majic OSGI deps in inject-cdi module somehow
+    - BUILD_ARGS="-I -t local      -i batch  -r memory     -c tomee"
+    #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee" # Also needs access to inject-cdi module
+    - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
+    #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly" # Need a factory that doesn't try to start weld
 
 services:
   - mongodb
