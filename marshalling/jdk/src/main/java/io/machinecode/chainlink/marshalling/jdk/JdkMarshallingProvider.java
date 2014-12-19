@@ -102,20 +102,9 @@ public class JdkMarshallingProvider implements Marshaller, Unmarshaller, Cloner,
         if (that instanceof Serializable) {
             return (T) unmarshall(marshall((Serializable)that), that.getClass().getClassLoader());
         } else if (that instanceof Cloneable) {
-            final Method method = AccessController.doPrivileged(new PrivilegedAction<Method>() {
-                public Method run() {
-                    final Method method;
-                    try {
-                        method = Object.class.getDeclaredMethod("clone");
-                    } catch (final NoSuchMethodException e) {
-                        throw new IllegalStateException(e);
-                    }
-                    method.setAccessible(true);
-                    return method;
-                }
-            });
+            final Method clone = AccessController.doPrivileged(new GetCloneMethod());
             try {
-                return (T)method.invoke(that);
+                return (T)clone.invoke(that);
             } catch (final IllegalAccessException e) {
                 throw new InvalidClassException("Can't access #clone() on " + that.getClass().getName());
             } catch (final InvocationTargetException e) {
@@ -138,6 +127,21 @@ public class JdkMarshallingProvider implements Marshaller, Unmarshaller, Cloner,
     @Override
     public Unmarshaller getUnmarshaller() {
         return this;
+    }
+
+    private static class GetCloneMethod implements PrivilegedAction<Method> {
+        @Override
+        public Method run() {
+            final Method method;
+            try {
+                method = Object.class.getDeclaredMethod("clone");
+            } catch (final NoSuchMethodException e) {
+                throw new IllegalStateException(e);
+            }
+            //TODO Relook at this
+            method.setAccessible(true);
+            return method;
+        }
     }
 
     protected static class ClassLoaderObjectInputStream extends ObjectInputStream {
