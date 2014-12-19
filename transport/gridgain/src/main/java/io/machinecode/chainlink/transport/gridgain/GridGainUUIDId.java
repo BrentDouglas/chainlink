@@ -8,6 +8,7 @@ import java.util.UUID;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GridGainUUIDId extends DistributedUUIDId<UUID> {
+    private static final long serialVersionUID = 1L;
 
     public GridGainUUIDId(final UUID uuid, final UUID address) {
         super(uuid, address);

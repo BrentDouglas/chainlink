@@ -8,6 +8,7 @@ import io.machinecode.chainlink.transport.core.DistributedRegistry;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FindExecutableAndContextCommand<A,R extends DistributedRegistry<A,R>> implements DistributedCommand<ExecutableAndContext,A,R> {
+    private static final long serialVersionUID = 1L;
 
     final long jobExecutionId;
     final ExecutableId id;

@@ -10,6 +10,7 @@ import javax.batch.operations.JobExecutionNotRunningException;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FindJobRegistryWithChainIdCallable extends BaseCallable<Object, Object, Address> {
+    private static final long serialVersionUID = 1L;
 
     final long jobExecutionId;
     final ChainId id;

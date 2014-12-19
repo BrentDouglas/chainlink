@@ -8,6 +8,7 @@ import org.infinispan.remoting.transport.Address;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FindWorkerCallable extends BaseCallable<Object, Object, Address> {
+    private static final long serialVersionUID = 1L;
 
     final WorkerId id;
 

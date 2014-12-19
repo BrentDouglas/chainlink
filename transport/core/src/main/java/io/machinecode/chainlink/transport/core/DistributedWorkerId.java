@@ -6,6 +6,8 @@ import io.machinecode.chainlink.spi.registry.WorkerId;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class DistributedWorkerId<A> implements WorkerId {
+    private static final long serialVersionUID = 1L;
+
     final long id;
     final A address;
 

@@ -11,6 +11,7 @@ import java.util.Set;
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public abstract class BaseCallable<K,V,T> implements DistributedCallable<K,V,T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     protected AdvancedCache<K,V> cache;
 

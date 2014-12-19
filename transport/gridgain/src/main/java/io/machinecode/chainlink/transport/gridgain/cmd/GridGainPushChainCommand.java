@@ -13,6 +13,7 @@ import java.util.UUID;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GridGainPushChainCommand extends PushChainCommand<UUID,GridGainRegistry> implements DistributedCommand<ChainId,UUID,GridGainRegistry> {
+    private static final long serialVersionUID = 1L;
 
     public GridGainPushChainCommand(final long jobExecutionId, final ChainId chainId) {
         super(jobExecutionId, chainId);

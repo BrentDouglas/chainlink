@@ -150,6 +150,8 @@ public class HazelcastRegistry extends BaseDistributedRegistry<Member, Hazelcast
     }
 
     public static class Invocation<T> implements Callable<T>, Serializable, HazelcastInstanceAware {
+        private static final long serialVersionUID = 1L;
+
         private final DistributedCommand<T, Member, HazelcastRegistry> command;
         private final String uuid;
         private transient HazelcastRegistry registry;

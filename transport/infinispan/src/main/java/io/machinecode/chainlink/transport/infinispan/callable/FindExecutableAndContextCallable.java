@@ -8,6 +8,7 @@ import io.machinecode.chainlink.transport.infinispan.InfinispanRegistry;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class FindExecutableAndContextCallable extends BaseCallable<Object, Object, ExecutableAndContext> {
+    private static final long serialVersionUID = 1L;
 
     final long jobExecutionId;
     final ExecutableId id;

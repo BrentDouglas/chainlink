@@ -9,6 +9,7 @@ import java.util.UUID;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class InfinispanUUIDId extends DistributedUUIDId<Address> {
+    private static final long serialVersionUID = 1L;
 
     public InfinispanUUIDId(final UUID uuid, final Address address) {
         super(uuid, address);

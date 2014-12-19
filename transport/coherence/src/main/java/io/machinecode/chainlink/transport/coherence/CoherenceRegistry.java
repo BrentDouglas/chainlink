@@ -133,6 +133,8 @@ public class CoherenceRegistry extends BaseDistributedRegistry<Member, Coherence
     }
 
     public static class Invocation extends AbstractInvocable implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final DistributedCommand<?, Member, CoherenceRegistry> command;
         private final UID uuid;
         private final String invocationServiceName;

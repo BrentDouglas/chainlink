@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GridGainCallable<T> implements Callable<T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     final DistributedCommand<T,UUID, GridGainRegistry> command;
     final UUID origin;
