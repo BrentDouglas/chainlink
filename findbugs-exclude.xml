@@ -35,6 +35,7 @@
             <Class name="io.machinecode.chainlink.core.element.ListenerImpl" />
             <Class name="io.machinecode.chainlink.core.element.execution.StepImpl" />
             <Class name="io.machinecode.chainlink.core.util.ResolvableClass" />
+            <Class name="io.machinecode.chainlink.inject.seam.SeamInjectionInterceptor" />
         </Or>
         <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED"/>
     </Match>

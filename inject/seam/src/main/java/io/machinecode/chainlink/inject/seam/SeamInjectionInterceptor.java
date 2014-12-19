@@ -23,17 +23,29 @@ import java.util.ServiceLoader;
 @Scope(ScopeType.STATELESS)
 @Interceptor(stateless = true)
 public class SeamInjectionInterceptor extends AbstractInterceptor {
+    private static final long serialVersionUID = 1L;
 
-    private final InjectablesProvider provider;
+    private transient InjectablesProvider provider;
 
     public SeamInjectionInterceptor() {
+        this.provider = loadProvider();
+    }
+
+    private InjectablesProvider loadProvider() {
         final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new LoadProviders());
         final Iterator<InjectablesProvider> iterator = providers.iterator();
         if (iterator.hasNext()) {
-            provider = iterator.next();
+            return iterator.next();
         } else {
             throw new IllegalStateException(Messages.format("CHAINLINK-000000.injector.provider.unavailable"));
         }
+    }
+
+    private InjectablesProvider _provider() {
+        if (this.provider != null) {
+            return this.provider;
+        }
+        return this.provider = loadProvider();
     }
 
     @Override
@@ -44,7 +56,7 @@ public class SeamInjectionInterceptor extends AbstractInterceptor {
     @AroundInvoke
     public Object aroundInvoke(final InvocationContext invocation) throws Exception {
         final Object bean = invocation.getTarget();
-        DefaultInjector.doInject(provider, bean);
+        DefaultInjector.doInject(_provider(), bean);
         return invocation.proceed();
     }
 }
