@@ -14,13 +14,11 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
-import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.api.Deferred;
 import org.jboss.logging.Logger;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class CoherenceRegistry extends BaseDistributedRegistry<Member, CoherenceRegistry> implements DistributedRegistry<Member, CoherenceRegistry> {
+public class CoherenceRegistry extends BaseDistributedRegistry<Member, CoherenceRegistry> {
 
     private static final Logger log = Logger.getLogger(CoherenceRegistry.class);
 
@@ -96,34 +94,16 @@ public class CoherenceRegistry extends BaseDistributedRegistry<Member, Coherence
     }
 
     @Override
-    public <T> void invoke(final Member address, final DistributedCommand<T, Member, CoherenceRegistry> command, final Deferred<T, Throwable,?> promise) {
+    public <T> void invoke(final Member address, final DistributedCommand<T, Member, CoherenceRegistry> command, final Deferred<T, Throwable,?> deferred) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.executor.execute(
                     new Invocation(command, this.local, invocationServiceName),
                     Collections.singleton(address),
-                    new InvocationObserver() {
-                        @Override
-                        public void memberCompleted(final Member member, final Object o) {
-                            promise.resolve((T)o);
-                        }
-
-                        @Override
-                        public void memberFailed(final Member member, final Throwable throwable) {
-                            promise.reject(throwable);
-                        }
-
-                        @Override
-                        public void memberLeft(final Member member) {
-                            promise.reject(new Exception()); //TODO Message
-                        }
-
-                        @Override
-                        public void invocationCompleted() {}
-                    }
+                    new DeferredObserver<>(deferred)
             );
         } catch (Exception e) {
-            promise.reject(e);
+            deferred.reject(e);
         }
     }
 
@@ -132,7 +112,34 @@ public class CoherenceRegistry extends BaseDistributedRegistry<Member, Coherence
         invoke(address, command, promise);
     }
 
-    public static class Invocation extends AbstractInvocable implements Serializable {
+    public static class DeferredObserver<T> implements InvocationObserver {
+        final Deferred<T,Throwable,?> deferred;
+
+        public DeferredObserver(final Deferred<T, Throwable, ?> deferred) {
+            this.deferred = deferred;
+        }
+
+        @Override
+        public void memberCompleted(final Member member, final Object o) {
+            deferred.resolve((T) o);
+        }
+
+        @Override
+        public void memberFailed(final Member member, final Throwable throwable) {
+            deferred.reject(throwable);
+        }
+
+        @Override
+        public void memberLeft(final Member member) {
+            deferred.reject(new Exception()); //TODO Message
+        }
+
+        @Override
+        public void invocationCompleted() {}
+
+    }
+
+    public static class Invocation extends AbstractInvocable {
         private static final long serialVersionUID = 1L;
 
         private final DistributedCommand<?, Member, CoherenceRegistry> command;
