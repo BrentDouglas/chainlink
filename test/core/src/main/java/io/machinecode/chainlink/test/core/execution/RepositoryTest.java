@@ -1680,6 +1680,7 @@ public abstract class RepositoryTest extends BaseTest {
         Assert.assertEquals(98, seen);
     }
 
+    /*
     private void _isCopyMetrics(final Metric[] copy) {
         printMethodName();
 
@@ -1727,6 +1728,7 @@ public abstract class RepositoryTest extends BaseTest {
         }
         Assert.assertEquals(98, seen);
     }
+    */
 
     private void _isSameMetrics(final Metric[] source, final Metric[] target) {
         Assert.assertNotNull(source);

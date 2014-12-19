@@ -13,7 +13,8 @@ import javax.inject.Inject;
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class InjectedBatchlet extends javax.batch.api.AbstractBatchlet {
-    public static Reference<Boolean> hasRun = new Reference<Boolean>(false);
+
+    public static final Reference<Boolean> hasRun = new Reference<>(false);
 
     @Inject
     private JobContext jobContext;

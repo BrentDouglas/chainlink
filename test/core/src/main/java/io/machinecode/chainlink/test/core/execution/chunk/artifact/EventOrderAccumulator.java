@@ -8,7 +8,7 @@ import java.util.LinkedList;
  */
 public class EventOrderAccumulator {
 
-    public static LinkedList<ChunkEvent> _order = new LinkedList<ChunkEvent>();
+    public static final LinkedList<ChunkEvent> _order = new LinkedList<ChunkEvent>();
 
     public static ChunkEvent[] order() {
         return _order.toArray(new ChunkEvent[_order.size()]);

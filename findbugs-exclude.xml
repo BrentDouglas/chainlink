@@ -28,6 +28,12 @@
         <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
     </Match>
     <Match>
+        <Or>
+            <Class name="io.machinecode.chainlink.test.core.execution.RepositoryTest" />
+        </Or>
+        <Bug pattern="SF_SWITCH_FALLTHROUGH"/>
+    </Match>
+    <Match>
         <Class name="io.machinecode.chainlink.inject.cdi.CdiArtifactLoader" />
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
     </Match>
@@ -84,6 +90,12 @@
     <Match>
         <Class name="io.machinecode.chainlink.server.chainlinkd.Chainlinkd"/>
         <Bug pattern="UW_UNCOND_WAIT"/>
+    </Match>
+    <Match>
+        <Or>
+            <Class name="io.machinecode.chainlink.test.core.execution.batchlet.artifact.StopBatchlet" />
+        </Or>
+        <Bug pattern="NN_NAKED_NOTIFY"/>
     </Match>
     <Match>
         <Package name="~gnu\.trove.*"/>
