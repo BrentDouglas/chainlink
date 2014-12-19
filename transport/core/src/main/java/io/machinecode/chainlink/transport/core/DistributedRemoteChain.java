@@ -6,13 +6,18 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.api.Deferred;
 import io.machinecode.then.core.DeferredImpl;
+import org.jboss.logging.Logger;
 
 import java.io.Serializable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class DistributedRemoteChain<A, R extends DistributedRegistry<A, R>> extends ChainImpl<Void> {
+
+    private static final Logger log = Logger.getLogger(DistributedRemoteChain.class);
 
     protected final R registry;
     protected final A address;
@@ -31,10 +36,11 @@ public abstract class DistributedRemoteChain<A, R extends DistributedRegistry<A,
     @Override
     public void resolve(final Void value) {
         try {
-            final Deferred<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
+            final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
             registry.invoke(address, this.<Void>command("resolve", new Serializable[]{null}), promise);
             promise.get();
-        } catch (final Exception e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
+            log.error("", e); // TODO Message
             // Swallow transmission errors
         }
         super.resolve(value);
@@ -43,10 +49,11 @@ public abstract class DistributedRemoteChain<A, R extends DistributedRegistry<A,
     @Override
     public void reject(final Throwable failure) {
         try {
-            final Deferred<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
+            final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
             registry.invoke(address, this.<Void>command("reject", failure), promise);
             promise.get();
-        } catch (final Exception e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
+            log.error("", e); // TODO Message
             // Swallow transmission errors
         }
         super.reject(failure);
@@ -55,10 +62,11 @@ public abstract class DistributedRemoteChain<A, R extends DistributedRegistry<A,
     @Override
     public ChainImpl<Void> link(final Chain<?> that) {
         try {
-            final Deferred<Boolean,Throwable,Void> promise = new DeferredImpl<Boolean,Throwable,Void>();
+            final Deferred<Boolean,Throwable,Void> promise = new DeferredImpl<>();
             registry.invoke(address, this.<Boolean>command("link", new Serializable[]{null}), promise);
             promise.get();
-        } catch (final Exception e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
+            log.error("", e); // TODO Message
             // Swallow transmission errors
         }
         super.link(that);

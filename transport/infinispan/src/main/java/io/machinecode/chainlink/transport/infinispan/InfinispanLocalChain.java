@@ -7,8 +7,10 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
 import io.machinecode.then.core.DeferredImpl;
 import org.infinispan.remoting.transport.Address;
+import org.jboss.logging.Logger;
 
 import java.io.Serializable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -19,6 +21,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class InfinispanLocalChain extends ChainImpl<Void> {
+
+    private static final Logger log = Logger.getLogger(InfinispanLocalChain.class);
 
     protected final InfinispanRegistry registry;
     protected final Address address;
@@ -46,7 +50,8 @@ public class InfinispanLocalChain extends ChainImpl<Void> {
             final DeferredImpl<Boolean, Throwable,Void> promise = new DeferredImpl<Boolean, Throwable,Void>();
             registry.invoke(address, command("cancel", true, mayInterruptIfRunning), promise);
             cancelled = promise.get();
-        } catch (final Exception e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
+            log.error("", e);
             // Swallow transmission errors
         }
         return super.cancel(mayInterruptIfRunning) && cancelled;

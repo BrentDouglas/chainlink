@@ -18,6 +18,6 @@ public class JGroupsProxyExecutionRepository extends DistributedProxyExecutionRe
 
     @Override
     protected <T> InvokeExecutionRepositoryCommand<T,Address,JGroupsRegistry> _cmd(final String name, final Serializable... params) {
-        return new InvokeExecutionRepositoryCommand<T,Address,JGroupsRegistry>(executionRepositoryId, name, params);
+        return new InvokeExecutionRepositoryCommand<>(executionRepositoryId, name, params);
     }
 }

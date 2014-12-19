@@ -27,9 +27,10 @@ public class JGroupsFutureListener<T> implements FutureListener<T> {
 
     @Override
     public void futureDone(final Future<T> future) {
-        final FutureDeferred<T, Void> run = new FutureDeferred<T, Void>(future, timeout, unit);
+        final FutureDeferred<T, Void> run = new FutureDeferred<>(future, timeout, unit);
         run.onResolve(promise)
                 .onReject(promise)
                 .onCancel(promise);
+        network.execute(run.asRunnable());
     }
 }

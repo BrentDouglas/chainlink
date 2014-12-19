@@ -6,8 +6,10 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.core.DeferredImpl;
+import org.jboss.logging.Logger;
 
 import java.io.Serializable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -18,6 +20,9 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class DistributedLocalChain<A, R extends DistributedRegistry<A, R>> extends ChainImpl<Void> {
+
+    private static final Logger log = Logger.getLogger(DistributedLocalChain.class);
+
     protected final R registry;
     protected final A address;
     protected final long jobExecutionId;
@@ -42,7 +47,8 @@ public abstract class DistributedLocalChain<A, R extends DistributedRegistry<A, 
             final DeferredImpl<Boolean, Throwable, Void> promise = new DeferredImpl<Boolean, Throwable, Void>();
             registry.invoke(address, this.<Boolean>command("cancel", mayInterruptIfRunning), promise);
             cancelled = promise.get();
-        } catch (final Exception e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
+            log.error("", e); // TODO Message
             // Swallow transmission errors
         }
         return super.cancel(mayInterruptIfRunning) && cancelled;

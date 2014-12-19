@@ -19,13 +19,13 @@ import org.infinispan.remoting.transport.Address;
 public class InfinispanWorker implements Worker {
 
     final InfinispanRegistry registry;
-    final Address local;
+    //final Address local;
     final Address remote;
     final WorkerId workerId;
 
     public InfinispanWorker(final InfinispanRegistry registry, final Address local, final Address remote, final WorkerId workerId) {
         this.registry = registry;
-        this.local = local;
+        //this.local = local;
         this.remote = remote;
         this.workerId = workerId;
     }
@@ -77,7 +77,7 @@ public class InfinispanWorker implements Worker {
     @Override
     public Promise<ChainAndId,Throwable,?> chain(final Executable executable) {
         final long jobExecutionId = executable.getContext().getJobExecutionId();
-        final Deferred<ChainAndId,Throwable,Void> promise = new DeferredImpl<ChainAndId,Throwable,Void>();
+        final Deferred<ChainAndId,Throwable,Void> promise = new DeferredImpl<>();
         final ChainId localId = registry.generateChainId();
         registry.invoke(
                 remote,

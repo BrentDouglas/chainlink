@@ -18,6 +18,6 @@ public class JGroupsLocalChain extends DistributedLocalChain<Address,JGroupsRegi
 
     @Override
     protected <T> InvokeChainCommand<T,Address,JGroupsRegistry> command(final String name, final Serializable... params) {
-        return new InvokeChainCommand<T,Address,JGroupsRegistry>(jobExecutionId, chainId, name, params);
+        return new InvokeChainCommand<>(jobExecutionId, chainId, name, params);
     }
 }

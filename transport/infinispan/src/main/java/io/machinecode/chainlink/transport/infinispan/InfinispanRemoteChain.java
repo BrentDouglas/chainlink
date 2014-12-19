@@ -6,13 +6,18 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.transport.infinispan.cmd.InvokeChainCommand;
 import io.machinecode.then.core.DeferredImpl;
 import org.infinispan.remoting.transport.Address;
+import org.jboss.logging.Logger;
 
 import java.io.Serializable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class InfinispanRemoteChain extends ChainImpl<Void> {
+
+    private static final Logger log = Logger.getLogger(InfinispanRemoteChain.class);
 
     protected final InfinispanRegistry registry;
     protected final Address address;
@@ -36,7 +41,8 @@ public class InfinispanRemoteChain extends ChainImpl<Void> {
             final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
             registry.invoke(address, command("resolve", false, new Serializable[]{ null }), promise);
             promise.get();
-        } catch (final Exception e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
+            log.error("", e);
             // Swallow transmission errors
         }
         super.resolve(value);
@@ -48,7 +54,8 @@ public class InfinispanRemoteChain extends ChainImpl<Void> {
             final DeferredImpl<Void,Throwable,Void> promise = new DeferredImpl<Void,Throwable,Void>();
             registry.invoke(address, command("reject", false, failure), promise);
             promise.get();
-        } catch (final Exception e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
+            log.error("", e);
             // Swallow transmission errors
         }
         super.reject(failure);
@@ -60,7 +67,8 @@ public class InfinispanRemoteChain extends ChainImpl<Void> {
             final DeferredImpl<Boolean,Throwable,Void> promise = new DeferredImpl<Boolean,Throwable,Void>();
             registry.invoke(address, command("link", false, new Serializable[]{ null }), promise);
             promise.get();
-        } catch (final Exception e) {
+        } catch (final InterruptedException | ExecutionException | CancellationException e) {
+            log.error("", e);
             // Swallow transmission errors
         }
         super.link(that);

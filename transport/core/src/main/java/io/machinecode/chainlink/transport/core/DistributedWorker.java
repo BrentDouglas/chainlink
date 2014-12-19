@@ -19,13 +19,13 @@ import io.machinecode.then.core.DeferredImpl;
 public abstract class DistributedWorker<A, R extends DistributedRegistry<A, R>> implements Worker {
 
     protected final R registry;
-    protected final A local;
+    //protected final A local;
     protected final A remote;
     protected final WorkerId workerId;
 
     public DistributedWorker(final R registry, final A local, final A remote, final WorkerId workerId) {
         this.registry = registry;
-        this.local = local;
+        //this.local = local;
         this.remote = remote;
         this.workerId = workerId;
     }
@@ -37,7 +37,7 @@ public abstract class DistributedWorker<A, R extends DistributedRegistry<A, R>> 
 
     @Override
     public void execute(final ExecutableEvent event) {
-        final DistributedCommand<Object, A, R> command = new ExecuteCommand<A, R>(workerId, event);
+        final DistributedCommand<Object, A, R> command = new ExecuteCommand<>(workerId, event);
         registry.invoke(remote, command, new DeferredImpl<Object, Throwable, Void>());
         /*
         registry.invoke(remote, command, new DeferredImpl<ChainAndId,Throwable,Void>().onReject(new OnReject<Throwable>() {
@@ -77,7 +77,7 @@ public abstract class DistributedWorker<A, R extends DistributedRegistry<A, R>> 
     @Override
     public Promise<Worker.ChainAndId,Throwable,?> chain(final Executable executable) {
         final long jobExecutionId = executable.getContext().getJobExecutionId();
-        final Deferred<ChainAndId,Throwable,Void> promise = new DeferredImpl<ChainAndId, Throwable, Void>();
+        final Deferred<ChainAndId,Throwable,Void> promise = new DeferredImpl<>();
         final ChainId localId = registry.generateChainId();
         registry.invoke(
                 remote,

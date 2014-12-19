@@ -7,7 +7,6 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
-import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.api.Deferred;
@@ -28,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegistry> implements AsyncRequestHandler, MembershipListener, DistributedRegistry<Address,JGroupsRegistry> {
+public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegistry> implements AsyncRequestHandler, MembershipListener {
 
     private static final Logger log = Logger.getLogger(JGroupsRegistry.class);
 
@@ -124,7 +123,7 @@ public class JGroupsRegistry extends BaseDistributedRegistry<Address,JGroupsRegi
                     RequestOptions.SYNC()
                             .setExclusionList(this.local)
                             .setTimeout(unit.toMillis(timeout)),
-                    new JGroupsFutureListener<T>(this.network, promise, timeout, unit)
+                    new JGroupsFutureListener<>(this.network, promise, timeout, unit)
             );
         } catch (Exception e) {
             promise.reject(e);

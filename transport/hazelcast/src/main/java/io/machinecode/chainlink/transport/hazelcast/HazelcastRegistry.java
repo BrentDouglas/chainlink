@@ -15,7 +15,6 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.transport.core.BaseDistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
-import io.machinecode.chainlink.transport.core.DistributedRegistry;
 import io.machinecode.chainlink.transport.core.DistributedWorker;
 import io.machinecode.chainlink.transport.core.cmd.DistributedCommand;
 import io.machinecode.then.api.Deferred;
@@ -30,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class HazelcastRegistry extends BaseDistributedRegistry<Member, HazelcastRegistry> implements DistributedRegistry<Member, HazelcastRegistry> {
+public class HazelcastRegistry extends BaseDistributedRegistry<Member, HazelcastRegistry> {
 
     private static final Logger log = Logger.getLogger(HazelcastRegistry.class);
 
