@@ -56,14 +56,10 @@ public class SeEnvironment implements Environment, AutoCloseable {
         return operators;
     }
 
-    public void loadConfiguration() {
-        if (loaded) {
-            return;
-        }
-        synchronized (this) {
-            if (!loaded) {
-                _loadConfiguration();
-            }
+    public synchronized void loadConfiguration() {
+        if (!loaded) {
+            _loadConfiguration();
+            loaded = true;
         }
     }
 
@@ -71,7 +67,7 @@ public class SeEnvironment implements Environment, AutoCloseable {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         final List<ConfigurationFactory> factories;
         try {
-            factories = new ResolvableService<ConfigurationFactory>(Constants.CONFIGURATION_FACTORY_CLASS, ConfigurationFactory.class)
+            factories = new ResolvableService<>(Constants.CONFIGURATION_FACTORY_CLASS, ConfigurationFactory.class)
                     .resolve(tccl);
         } catch (final Exception e) {
             throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
@@ -104,11 +100,9 @@ public class SeEnvironment implements Environment, AutoCloseable {
                     );
                 }
             }
-        } catch (Throwable e) {
-            _close(e);
-            throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
+        } catch (final Throwable e) {
+            throw new IllegalStateException(Messages.get("CHAINLINK-031001.configuration.exception"), _close(e));
         }
-        loaded = true;
     }
 
     @Override
@@ -129,7 +123,7 @@ public class SeEnvironment implements Environment, AutoCloseable {
             try {
                 op.close();
             } catch(final Throwable t) {
-                if (throwable == null) {
+                if (throwable != null) {
                     throwable.addSuppressed(t);
                 } else {
                     throwable = t;
