@@ -35,7 +35,8 @@ terminate() {
     elif [ ${ret} -eq 130 ]; then
         aborted
     else
-        failed "${msg}"
+        failed
+        echo -e "${msg}"
     fi
     exit ${ret}
 }

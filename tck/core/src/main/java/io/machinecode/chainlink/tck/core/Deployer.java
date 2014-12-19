@@ -57,8 +57,11 @@ public class Deployer {
             }
             if (export != null) {
                 final File exportDir = new File(export);
-                exportDir.mkdirs();
-                archive.as(ZipExporter.class).exportTo(new File(exportDir, archive.getName()), true);
+                if (exportDir.isDirectory() || exportDir.mkdirs()) {
+                    archive.as(ZipExporter.class).exportTo(new File(exportDir, archive.getName()), true);
+                } else {
+                    throw new RuntimeException(export + " is either not a directory or cannot be created as a directory."); // TODO Message
+                }
             }
             return archive;
         } catch (final RuntimeException e) {

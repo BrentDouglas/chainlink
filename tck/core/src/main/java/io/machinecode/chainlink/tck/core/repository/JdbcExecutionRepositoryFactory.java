@@ -10,6 +10,8 @@ import org.jboss.logging.Logger;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -26,26 +28,26 @@ public class JdbcExecutionRepositoryFactory implements ExecutionRepositoryFactor
         try {
             final String prefix = System.getProperty("database.prefix") + ".";
             dataSource = new DummyDataSource(System.getProperty(prefix + "database.url"), System.getProperty(prefix + "database.driver"));
-            Connection connection = null;
-            try {
-                username = System.getProperty(prefix + "database.user");
-                password = System.getProperty(prefix + "database.password", "");
-                connection = username == null
+            username = System.getProperty(prefix + "database.user");
+            password = System.getProperty(prefix + "database.password", "");
+            try (final Connection connection = username == null
                         ? dataSource.getConnection()
-                        : dataSource.getConnection(username, password);
+                        : dataSource.getConnection(username, password)) {
                 connection.setAutoCommit(false);
-                connection.prepareStatement("delete from job_instance;").executeUpdate();
-                connection.prepareStatement("delete from metric;").executeUpdate();
-                connection.prepareStatement("delete from property;").executeUpdate();
-                connection.commit();
-            } catch (final Exception e) {
-                if (connection != null) {
+                try {
+                    try (final PreparedStatement statement = connection.prepareStatement("delete from job_instance;")) {
+                        statement.executeUpdate();
+                    }
+                    try (final PreparedStatement statement = connection.prepareStatement("delete from metric;")) {
+                        statement.executeUpdate();
+                    }
+                    try (final PreparedStatement statement = connection.prepareStatement("delete from property;")) {
+                        statement.executeUpdate();
+                    }
+                    connection.commit();
+                } catch (final SQLException e) {
                     connection.rollback();
-                }
-                throw new RuntimeException(e);
-            } finally {
-                if (connection != null) {
-                    connection.close();
+                    throw e;
                 }
             }
         } catch (RuntimeException e) {
