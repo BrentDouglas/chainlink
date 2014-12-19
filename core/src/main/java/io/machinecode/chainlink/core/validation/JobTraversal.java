@@ -14,6 +14,7 @@ import java.util.Map.Entry;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public final class JobTraversal implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(JobTraversal.class);
 

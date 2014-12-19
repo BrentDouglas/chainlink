@@ -9,6 +9,7 @@ import javax.batch.runtime.BatchStatus;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class EndImpl extends TransitionImpl implements End {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(EndImpl.class);
 

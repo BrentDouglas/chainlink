@@ -28,6 +28,7 @@ import java.util.List;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class DecisionImpl extends ExecutionImpl implements Decision {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(DecisionImpl.class);
 
@@ -127,11 +128,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
                     context.getStepContext(),
                     properties.getProperties()
             ));
-            final Decider decider = load(injectionContext, context);
-            if (decider == null) {
-                throw new IllegalStateException(Messages.format("CHAINLINK-025004.artifact.null", context, this.ref.ref()));
-            }
-            return decider.decide(executions);
+            return load(injectionContext, context).decide(executions);
         } finally {
             provider.setInjectables(null);
         }

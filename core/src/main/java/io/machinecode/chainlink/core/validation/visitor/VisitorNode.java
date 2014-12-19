@@ -9,6 +9,7 @@ import io.machinecode.chainlink.spi.element.execution.TransitionExecution;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -18,15 +19,17 @@ import java.util.Map;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class VisitorNode {
+public class VisitorNode implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public static final String ERROR = "FAILURE -";
     public static final String PLAIN = "         ";
 
     protected final Map<String, VisitorNode> ids;
-    protected final List<String> problems = new ArrayList<String>(0);
-    protected final List<Cycle> cycles = new ArrayList<Cycle>(0);
+    protected final List<String> problems = new ArrayList<>(0);
+    protected final List<Cycle> cycles = new ArrayList<>(0);
     protected final VisitorNode parent;
-    protected final List<VisitorNode> children = new ArrayList<VisitorNode>(0);
+    protected final List<VisitorNode> children = new ArrayList<>(0);
     protected final String elementName;
     protected final Element element;
     protected final Execution value;
@@ -35,17 +38,20 @@ public class VisitorNode {
     protected String id;
     protected String next;
     protected final Map<String, VisitorNode> _executions;
-    protected final List<Transition> transitions = new ArrayList<Transition>(0);
+    protected final List<Transition> transitions = new ArrayList<>(0);
 
 
     public VisitorNode(final String elementName, final Element value) {
+        if (!(value instanceof Job)) {
+            throw new IllegalStateException(); //TODO Message
+        }
         this.elementName = elementName;
         this.element = value;
         this.id = ((Job)value).getId();
         this.value = null;
         this.parent = null;
-        this.ids = new THashMap<String, VisitorNode>(0);
-        this._executions = new THashMap<String, VisitorNode>(0);
+        this.ids = new THashMap<>(0);
+        this._executions = new THashMap<>(0);
     }
 
     public VisitorNode(final String elementName, final Element value, final VisitorNode parent) {
@@ -57,7 +63,7 @@ public class VisitorNode {
         if (value instanceof Flow) {
             this.value = (Execution)value;
             this.id = this.value.getId();
-            this._executions = new THashMap<String, VisitorNode>(0);
+            this._executions = new THashMap<>(0);
         } else if (ex) {
             this.value = (Execution)value;
             this.id = this.value.getId();
@@ -236,6 +242,7 @@ public class VisitorNode {
     }
 
     public static class Cycle extends LinkedList<Pair<Transition, VisitorNode>> {
+        private static final long serialVersionUID = 1L;
 
         public Cycle() {
         }
@@ -279,7 +286,7 @@ public class VisitorNode {
         if (next != null ? !next.equals(that.next) : that.next != null) return false;
         if (parent != null ? !parent.equals(that.parent) : that.parent != null) return false;
         if (!problems.equals(that.problems)) return false;
-        if (transitions != null ? !transitions.equals(that.transitions) : that.transitions != null) return false;
+        if (!transitions.equals(that.transitions)) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;
 
         return true;
@@ -298,7 +305,7 @@ public class VisitorNode {
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (next != null ? next.hashCode() : 0);
         result = 31 * result + _executions.hashCode();
-        result = 31 * result + (transitions != null ? transitions.hashCode() : 0);
+        result = 31 * result + transitions.hashCode();
         return result;
     }
 }

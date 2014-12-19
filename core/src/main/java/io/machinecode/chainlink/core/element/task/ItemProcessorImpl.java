@@ -13,6 +13,7 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ItemProcessorImpl extends PropertyReferenceImpl<javax.batch.api.chunk.ItemProcessor> implements ItemProcessor {
+    private static final long serialVersionUID = 1L;
 
     public ItemProcessorImpl(final ArtifactReferenceImpl ref, final PropertiesImpl properties) {
         super(ref, properties);

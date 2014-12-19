@@ -8,6 +8,7 @@ import io.machinecode.chainlink.spi.util.Messages;
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 final class ItemCheckpointAlgorithm extends CheckpointAlgorithmImpl {
+    private static final long serialVersionUID = 1L;
 
     final int timeout;
     final int target;

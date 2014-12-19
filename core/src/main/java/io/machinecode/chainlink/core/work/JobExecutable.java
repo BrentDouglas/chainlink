@@ -13,12 +13,11 @@ import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.work.JobWork;
 import org.jboss.logging.Logger;
 
-import java.io.Serializable;
-
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class JobExecutable extends ExecutableImpl<JobWork> implements Serializable {
+public class JobExecutable extends ExecutableImpl<JobWork> {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(JobExecutable.class);
 

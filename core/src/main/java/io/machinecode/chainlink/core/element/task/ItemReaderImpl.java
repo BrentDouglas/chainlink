@@ -15,6 +15,7 @@ import java.io.Serializable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.ItemReader> implements ItemReader {
+    private static final long serialVersionUID = 1L;
 
     public ItemReaderImpl(final ArtifactReferenceImpl ref, final PropertiesImpl properties) {
         super(ref, properties);

@@ -7,12 +7,10 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
 
-import java.io.Serializable;
-
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public interface Executable extends Serializable {
+public interface Executable {
 
     /**
      * @return The id of this executable.

@@ -6,7 +6,6 @@ import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContextImpl;
-import io.machinecode.chainlink.core.expression.PropertyContextImpl;
 import io.machinecode.chainlink.core.factory.execution.Executions;
 import io.machinecode.chainlink.core.validation.InvalidJobException;
 import io.machinecode.chainlink.core.validation.JobValidator;
@@ -57,24 +56,5 @@ public class JobFactory {
             throw new InvalidJobException(node);
         }
         return node;
-    }
-
-    private JobImpl producePartition(final JobImpl that) {
-        final PropertyContextImpl context = new PropertyContextImpl();
-        final String id = Expression.resolvePartitionProperty(that.getId(), context);
-        final String version = Expression.resolvePartitionProperty(that.getVersion(), context);
-        final String restartable = Expression.resolvePartitionProperty(that.getRestartable(), context);
-        final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);
-        final ListenersImpl listeners = JobListenersFactory.INSTANCE.producePartitioned(that.getListeners(), context);
-
-        final List<ExecutionImpl> executions = Executions.immutableCopyExecutionsPartition(that.getExecutions(), context);
-        return new JobImpl(
-                id,
-                version,
-                restartable,
-                properties,
-                listeners,
-                executions
-        );
     }
 }

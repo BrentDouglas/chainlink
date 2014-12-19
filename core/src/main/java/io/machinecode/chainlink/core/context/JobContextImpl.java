@@ -15,6 +15,7 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class JobContextImpl implements MutableJobContext, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(JobContextImpl.class);
 

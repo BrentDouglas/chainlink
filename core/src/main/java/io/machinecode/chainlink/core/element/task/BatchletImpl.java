@@ -23,13 +23,13 @@ import org.jboss.logging.Logger;
 
 import javax.batch.operations.BatchRuntimeException;
 import javax.batch.runtime.BatchStatus;
-import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet> implements Batchlet, TaskWork, Serializable {
+public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet> implements Batchlet, TaskWork {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(BatchletImpl.class);
 

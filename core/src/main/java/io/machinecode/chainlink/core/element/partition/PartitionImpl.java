@@ -36,6 +36,7 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class PartitionImpl<T extends StrategyWork> implements Partition<T>, PartitionWork<T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(PartitionImpl.class);
 

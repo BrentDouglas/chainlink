@@ -9,6 +9,8 @@ import java.io.Serializable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ItemImpl implements Item, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Serializable data;
     private final BatchStatus batchStatus;
     private final String exitStatus;

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter xmlns="http://findbugs.sourceforge.net/filter/3.0.0"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://findbugs.sourceforge.net/filter/3.0.0 https://findbugs.googlecode.com/git/findbugs/etc/findbugsfilter.xsd">
+    <Match>
+        <Bug code="EI,EI2"/>
+    </Match>
+    <Match>
+        <Class name="io.machinecode.chainlink.core.execution.EventedWorker" />
+        <Bug pattern="WA_NOT_IN_LOOP"/>
+    </Match>
+    <Match>
+        <Class name="io.machinecode.chainlink.core.execution.EventedExecutor$3" />
+        <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON"/>
+    </Match>
+    <Match>
+        <Or>
+            <Class name="io.machinecode.chainlink.core.element.execution.StepImpl" />
+            <Class name="io.machinecode.chainlink.repository.infinispan.RunningJobExecutionIdCallable" />
+        </Or>
+        <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
+    </Match>
+    <Match>
+        <Class name="io.machinecode.chainlink.inject.cdi.CdiArtifactLoader" />
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    </Match>
+    <Match>
+        <Or>
+            <Class name="io.machinecode.chainlink.core.context.ExecutionContextImpl" />
+            <Class name="io.machinecode.chainlink.core.context.JobContextImpl" />
+            <Class name="io.machinecode.chainlink.core.context.StepContextImpl" />
+            <Class name="io.machinecode.chainlink.core.element.JobImpl" />
+            <Class name="io.machinecode.chainlink.core.element.ListenerImpl" />
+            <Class name="io.machinecode.chainlink.core.element.execution.StepImpl" />
+            <Class name="io.machinecode.chainlink.core.util.ResolvableClass" />
+        </Or>
+        <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED"/>
+    </Match>
+    <Match>
+        <Or>
+            <Class name="io.machinecode.chainlink.core.work.ExecutionCallback" />
+            <Class name="io.machinecode.chainlink.core.work.JobCallback" />
+        </Or>
+        <Bug pattern="SE_NO_SERIALVERSIONID,SE_BAD_FIELD"/>
+    </Match>
+    <Match>
+        <Source name="~.*\.groovy" />
+    </Match>
+    <Match>
+        <Or>
+            <Class name="io.machinecode.chainlink.core.configuration.ConfigurationImpl" />
+            <Class name="io.machinecode.chainlink.repository.core.MetricImpl" />
+            <Class name="io.machinecode.chainlink.repository.jpa.JpaMetric" />
+            <Class name="io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider" />
+            <Class name="io.machinecode.chainlink.marshalling.jboss.JbossMarshallingProvider" />
+        </Or>
+       <Bug code="PZLA" />
+    </Match>
+</FindBugsFilter>

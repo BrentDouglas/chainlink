@@ -80,7 +80,7 @@ public class ChainImpl<T> extends BaseChain<T> {
         try {
             this.link.get();
         } catch (final Exception e) {
-            // Swallow
+            log.warn("", e); //TODO Message
         }
     }
 
@@ -95,7 +95,7 @@ public class ChainImpl<T> extends BaseChain<T> {
         try {
             this.link.get(_tryTimeout(end), MILLISECONDS);
         } catch (final Exception e) {
-            // Swallow
+            log.warn("", e); //TODO Message
         }
     }
 

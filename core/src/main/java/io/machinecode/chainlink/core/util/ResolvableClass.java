@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ResolvableClass<T> implements Resolvable<Class<T>>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final String fqcn;
     private transient Class<T> clazz;

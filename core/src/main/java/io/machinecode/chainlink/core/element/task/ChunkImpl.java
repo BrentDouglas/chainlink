@@ -11,7 +11,6 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.element.task.Chunk;
-import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.BaseExecution;
@@ -57,6 +56,7 @@ import static javax.batch.runtime.Metric.MetricType.WRITE_SKIP_COUNT;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ChunkImpl implements Chunk, TaskWork, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(ChunkImpl.class);
 
@@ -191,6 +191,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final State state;
         try {
             state = new State(
+                    this,
                     configuration,
                     promise,
                     executionRepositoryId,
@@ -369,7 +370,8 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 // 11.8 9 m has this outside the write catch block
                 _runAfterListeners(state);
                 state.objects.clear();
-                // Fall through
+                state.next(READER_CHECKPOINT);
+                break;
             case READER_CHECKPOINT:
                 if (state.isFailed()) {
                     return false;
@@ -387,7 +389,8 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                     return false;
                 }
                 _collect(state, state.context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
-                //Fall through
+                state.next(COMMIT);
+                break;
             case COMMIT:
                 _commit(state);
                 if (state.promise.isCancelled()) {
@@ -1059,7 +1062,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
 
     private enum Match { NONE, SKIP, RETRY, NO_ROLLBACK }
 
-    private class State implements CheckpointAlgorithm {
+    private static class State implements CheckpointAlgorithm {
         int next = BEGIN;
         boolean finished = false;
         boolean retrying = false;
@@ -1080,7 +1083,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final ExecutionRepository repository;
         final MutableStepContext stepContext;
         final ExecutionContext context;
-        final Executor executor;
         final RuntimeConfiguration configuration;
         final Promise<?,Throwable,?> promise;
 
@@ -1110,8 +1112,8 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final List<ListenerImpl> retryWriteListeners;
         final List<ListenerImpl> skipWriteListeners;
 
-        private State(final RuntimeConfiguration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
-                      final ExecutionContext context, final int timeout) throws Exception {
+        private State(final ChunkImpl chunk, final RuntimeConfiguration configuration, final Promise<?,Throwable,?> promise,
+                      final ExecutionRepositoryId executionRepositoryId, final ExecutionContext context, final int timeout) throws Exception {
             this.jobExecutionId = context.getJobExecutionId();
             this.stepExecutionId = context.getStepExecutionId();
             this.partitionExecutionId = context.getPartitionExecutionId();
@@ -1119,15 +1121,14 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             this.repository = configuration.getExecutionRepository(executionRepositoryId);
             this.stepContext = context.getStepContext();
             this.context = context;
-            this.executor = configuration.getExecutor();
             this.configuration = configuration;
             this.promise = promise;
-            this.items = new ArrayList<Item>();
+            this.items = new ArrayList<>();
 
-            this.itemCount = Integer.parseInt(ChunkImpl.this.itemCount);
-            this.timeLimit = TimeUnit.SECONDS.toMillis(Integer.parseInt(ChunkImpl.this.timeLimit));
-            this.skipLimit = ChunkImpl.this.skipLimit == null ? -1 : Integer.parseInt(ChunkImpl.this.skipLimit);
-            this.retryLimit = ChunkImpl.this.retryLimit == null ? -1 : Integer.parseInt(ChunkImpl.this.retryLimit);
+            this.itemCount = Integer.parseInt(chunk.itemCount);
+            this.timeLimit = TimeUnit.SECONDS.toMillis(Integer.parseInt(chunk.timeLimit));
+            this.skipLimit = chunk.skipLimit == null ? -1 : Integer.parseInt(chunk.skipLimit);
+            this.retryLimit = chunk.retryLimit == null ? -1 : Integer.parseInt(chunk.retryLimit);
 
             if (context.isRestarting()) {
                 final BaseExecution execution = this.partitionExecutionId == null
@@ -1140,32 +1141,32 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 this.writeInfo = null;
             }
 
-            this.objects = ChunkImpl.this.checkpointAlgorithm == null
-                    ? new LinkedList<Object>()
-                    : new ArrayList<Object>(this.itemCount);
+            this.objects = chunk.checkpointAlgorithm == null
+                    ? new LinkedList<>()
+                    : new ArrayList<>(this.itemCount);
 
-            if (ChunkImpl.this.reader == null) {
-                throw new IllegalStateException(Messages.format("CHAINLINK-014002.chunk.reader.null", context, ChunkImpl.this.reader.getRef()));
+            if (chunk.reader == null) {
+                throw new IllegalStateException(Messages.format("CHAINLINK-014002.chunk.reader.null", context));
             }
-            if (ChunkImpl.this.writer == null) {
-                throw new IllegalStateException(Messages.format("CHAINLINK-014003.chunk.writer.null", context, ChunkImpl.this.writer.getRef()));
+            if (chunk.writer == null) {
+                throw new IllegalStateException(Messages.format("CHAINLINK-014003.chunk.writer.null", context));
             }
-            if (CheckpointPolicy.ITEM.equalsIgnoreCase(ChunkImpl.this.checkpointPolicy) || ChunkImpl.this.checkpointAlgorithm == null) {
+            if (CheckpointPolicy.ITEM.equalsIgnoreCase(chunk.checkpointPolicy) || chunk.checkpointAlgorithm == null) {
                 this._checkpointAlgorithm = new ItemCheckpointAlgorithm(timeout, this.itemCount);
             } else {
-                this._checkpointAlgorithm = ChunkImpl.this.checkpointAlgorithm;
+                this._checkpointAlgorithm = chunk.checkpointAlgorithm;
             }
             this._retryCheckpointAlgorithm = new ItemCheckpointAlgorithm(timeout, 1);
-            this.chunkListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, ChunkListener.class);
-            this.itemReadListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, ItemReadListener.class);
-            this.retryReadListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, RetryReadListener.class);
-            this.skipReadListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, SkipReadListener.class);
-            this.itemProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, ItemProcessListener.class);
-            this.retryProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, RetryProcessListener.class);
-            this.skipProcessListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, SkipProcessListener.class);
-            this.itemWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, ItemWriteListener.class);
-            this.retryWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, RetryWriteListener.class);
-            this.skipWriteListeners = ChunkImpl.this.listeners.getListenersImplementing(configuration, context, SkipWriteListener.class);
+            this.chunkListeners = chunk.listeners.getListenersImplementing(configuration, context, ChunkListener.class);
+            this.itemReadListeners = chunk.listeners.getListenersImplementing(configuration, context, ItemReadListener.class);
+            this.retryReadListeners = chunk.listeners.getListenersImplementing(configuration, context, RetryReadListener.class);
+            this.skipReadListeners = chunk.listeners.getListenersImplementing(configuration, context, SkipReadListener.class);
+            this.itemProcessListeners = chunk.listeners.getListenersImplementing(configuration, context, ItemProcessListener.class);
+            this.retryProcessListeners = chunk.listeners.getListenersImplementing(configuration, context, RetryProcessListener.class);
+            this.skipProcessListeners = chunk.listeners.getListenersImplementing(configuration, context, SkipProcessListener.class);
+            this.itemWriteListeners = chunk.listeners.getListenersImplementing(configuration, context, ItemWriteListener.class);
+            this.retryWriteListeners = chunk.listeners.getListenersImplementing(configuration, context, RetryWriteListener.class);
+            this.skipWriteListeners = chunk.listeners.getListenersImplementing(configuration, context, SkipWriteListener.class);
         }
 
         public void rollback() {

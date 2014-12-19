@@ -15,12 +15,12 @@ import io.machinecode.then.api.OnCancel;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
-import java.io.Serializable;
 
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class TaskExecutable extends ExecutableImpl<TaskWork> implements Serializable {
+public class TaskExecutable extends ExecutableImpl<TaskWork> {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(TaskExecutable.class);
 

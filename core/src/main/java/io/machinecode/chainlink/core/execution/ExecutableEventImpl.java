@@ -9,6 +9,8 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class ExecutableEventImpl implements ExecutableEvent {
+    private static final long serialVersionUID = 1L;
+
     final ChainId chainId;
     final Executable executable;
     final ExecutionContext context;

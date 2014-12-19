@@ -71,7 +71,7 @@ public class AllChain<T> extends BaseChain<T> {
             try {
                 chain.get();
             } catch (final Exception e) {
-                // Swallow
+                log.warn("", e); //TODO Message
             }
         }
     }
@@ -83,7 +83,7 @@ public class AllChain<T> extends BaseChain<T> {
             try {
                 chain.get(_tryTimeout(end), MILLISECONDS);
             } catch (final Exception e) {
-                // Swallow
+                log.warn("", e); //TODO Message
             }
         }
     }

@@ -44,21 +44,21 @@ public final class Chainlink {
             }
             try {
                 final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-                final List<Environment> environments = new ResolvableService<Environment>(Constants.ENVIRONMENT, Environment.class)
+                final List<Environment> environments = new ResolvableService<>(Constants.ENVIRONMENT, Environment.class)
                         .resolve(tccl);
                 if (!environments.isEmpty()) {
                     Chainlink.environment = environments.get(0);
                     return Chainlink.environment;
                 }
-            } catch (final Exception e) {
+            } catch (final ClassNotFoundException | IllegalAccessException | InstantiationException e) {
                 throw new RuntimeException(Messages.get("CHAINLINK-031001.configuration.exception"), e);
             }
             while (Chainlink.environment == null) {
                 try {
                     log.debugf("Waiting for environment to be set."); // TODO Message
                     condition.await();
-                } catch (InterruptedException e) {
-                    //
+                } catch (final InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
             }
             return Chainlink.environment;

@@ -14,6 +14,7 @@ import java.io.Serializable;
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class ExecutionContextImpl implements ExecutionContext, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(ExecutionContextImpl.class);
 

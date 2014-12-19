@@ -13,6 +13,7 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.api.chunk.CheckpointAlgorithm> implements CheckpointAlgorithm {
+    private static final long serialVersionUID = 1L;
 
     public CheckpointAlgorithmImpl(final ArtifactReferenceImpl ref, final PropertiesImpl properties) {
         super(ref, properties);

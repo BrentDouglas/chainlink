@@ -9,6 +9,7 @@ import java.io.Serializable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class TransitionImpl implements Transition, TransitionWork, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final String on;
 

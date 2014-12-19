@@ -56,6 +56,7 @@ import static javax.batch.runtime.BatchStatus.STOPPING;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class StepImpl<T extends TaskWork, U extends StrategyWork> extends ExecutionImpl implements Step<T, U> {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(StepImpl.class);
 
@@ -198,6 +199,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                         }
                         break;
                     case FAILED:
+                        break;
                     case STOPPED:
                         break;
                     default:
@@ -305,10 +307,12 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     switch (childContext.getStepContext().getBatchStatus()) {
                         case FAILED:
                             stepContext.setBatchStatus(FAILED);
+                            break;
                         case STOPPING:
                             if (stepContext.getBatchStatus() != FAILED) {
                                 stepContext.setBatchStatus(STOPPING);
                             }
+                            break;
                     }
                     final PartitionStatus partitionStatus = this.partition.analyse(configuration, context, childContext.getItems());
                     accumulator.setPartitionStatus(

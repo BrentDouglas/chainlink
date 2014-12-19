@@ -3,15 +3,18 @@ package io.machinecode.chainlink.core.element.task;
 import io.machinecode.chainlink.core.util.ResolvableClass;
 import io.machinecode.chainlink.spi.element.task.ExceptionClass;
 
+import java.io.Serializable;
+
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class ExceptionClassImpl implements ExceptionClass {
+public class ExceptionClassImpl implements ExceptionClass, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final ResolvableClass<? extends Throwable> clazz;
 
     public ExceptionClassImpl(final String fqcn) {
-        this.clazz = new ResolvableClass<Throwable>(fqcn);
+        this.clazz = new ResolvableClass<>(fqcn);
     }
 
     @Override

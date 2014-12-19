@@ -14,12 +14,12 @@ import io.machinecode.chainlink.spi.work.ExecutionWork;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
-import java.io.Serializable;
 
 /**
 * Brent Douglas <brent.n.douglas@gmail.com>
 */
-public class ExecutionExecutable extends ExecutableImpl<ExecutionWork> implements Serializable {
+public class ExecutionExecutable extends ExecutableImpl<ExecutionWork> {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(ExecutionExecutable.class);
 

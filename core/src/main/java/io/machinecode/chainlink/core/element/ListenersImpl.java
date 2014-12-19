@@ -18,6 +18,7 @@ import java.util.List;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ListenersImpl implements Listeners, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(ListenersImpl.class);
 

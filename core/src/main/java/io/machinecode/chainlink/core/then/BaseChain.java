@@ -168,6 +168,8 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
     }
 
     private static final class CancelListener implements OnLink, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private RuntimeException exception = null;
 
         @Override

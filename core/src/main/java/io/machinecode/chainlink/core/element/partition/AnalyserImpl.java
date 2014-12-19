@@ -17,6 +17,7 @@ import java.io.Serializable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class AnalyserImpl extends PropertyReferenceImpl<PartitionAnalyzer> implements Analyser {
+    private static final long serialVersionUID = 1L;
 
     public AnalyserImpl(final ArtifactReferenceImpl ref, final PropertiesImpl properties) {
         super(ref, properties);

@@ -16,6 +16,7 @@ import java.io.Serializable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class PropertyReferenceImpl<T> implements PropertyReference, Serializable {
+    private static final long serialVersionUID = 1L;
 
     protected final PropertiesImpl properties;
     protected final ArtifactReferenceImpl ref;

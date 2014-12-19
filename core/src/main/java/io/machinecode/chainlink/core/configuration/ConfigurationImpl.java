@@ -210,32 +210,22 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
         return defaultValue;
     }
 
+    @SuppressWarnings("unchecked")
     private <T, U extends Configuration> Factory<? extends T, U> _getFactory(final ClassLoader classLoader, final Factory<? extends T, U> factory,
                                                     final Class<? extends Factory<? extends T, U>> clazz, final String fqcn, Factory<? extends T, U> def) {
         if (factory != null) {
-            try {
-                return factory;
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO
-            }
+            return factory;
         }
         if (clazz != null) {
             try {
-                final Factory<? extends T, U> produced = clazz.newInstance();
-                if (produced != null) {
-                    return produced;
-                }
+                return clazz.newInstance();
             } catch (final Exception e) {
                 throw new RuntimeException(e); //TODO
             }
         }
         if (fqcn != null) {
             try {
-                @SuppressWarnings("unchecked")
-                final Factory<? extends T, U> produced = ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn)).newInstance();
-                if (produced != null) {
-                    return produced;
-                }
+                return ((Class<? extends Factory<? extends T, U>>)classLoader.loadClass(fqcn)).newInstance();
             } catch (final Exception e) {
                 throw new RuntimeException(e); //TODO
             }
@@ -246,31 +236,9 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
         throw new RuntimeException(); //TODO Message
     }
 
-    private <T> T _getFactory(final ClassLoader classLoader, final String fqcn, final Class<T> clazz, final Class<? extends T> def) {
-        if (fqcn != null) {
-            try {
-                @SuppressWarnings("unchecked")
-                final T produced = ((Class<? extends T>)classLoader.loadClass(fqcn)).newInstance();
-                if (produced != null) {
-                    return produced;
-                }
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO
-            }
-        }
-        if (def != null) {
-            try {
-                return def.newInstance();
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO
-            }
-        }
-        throw new RuntimeException(); //TODO Message
-    }
-
     private <T, U extends Configuration> ArrayList<T> _arrayGet(final ClassLoader classLoader, final T[] that, final Factory<? extends T, U>[] factories,
                                                                     final Class<? extends Factory<? extends T, U>>[] clazzes, final String[] fqcns, final U configuration) {
-        final ArrayList<T> ret = new ArrayList<T>();
+        final ArrayList<T> ret = new ArrayList<>();
         if (that != null) {
             for (final T t : that) {
                 if (t != null) {
@@ -285,6 +253,8 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
                     if (produced != null) {
                         ret.add(produced);
                     }
+                } catch (final RuntimeException e) {
+                    throw e;
                 } catch (final Exception e) {
                     throw new RuntimeException(e); //TODO
                 }
@@ -297,6 +267,8 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
                     if (produced != null) {
                         ret.add(produced);
                     }
+                } catch (final RuntimeException e) {
+                    throw e;
                 } catch (final Exception e) {
                     throw new RuntimeException(e); //TODO
                 }
@@ -310,6 +282,8 @@ public class ConfigurationImpl implements FinalConfiguration, RuntimeConfigurati
                     if (produced != null) {
                         ret.add(produced);
                     }
+                } catch (final RuntimeException e) {
+                    throw e;
                 } catch (final Exception e) {
                     throw new RuntimeException(e); //TODO
                 }

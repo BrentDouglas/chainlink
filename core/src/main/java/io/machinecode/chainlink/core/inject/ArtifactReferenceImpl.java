@@ -10,6 +10,7 @@ import java.io.Serializable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ArtifactReferenceImpl implements ArtifactReference, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final String ref;
 

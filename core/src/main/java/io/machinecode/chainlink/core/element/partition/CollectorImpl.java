@@ -16,6 +16,7 @@ import java.io.Serializable;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class CollectorImpl extends PropertyReferenceImpl<PartitionCollector> implements Collector {
+    private static final long serialVersionUID = 1L;
 
     public CollectorImpl(final ArtifactReferenceImpl ref, final PropertiesImpl properties) {
         super(ref, properties);

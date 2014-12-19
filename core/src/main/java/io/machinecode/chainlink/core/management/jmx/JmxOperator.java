@@ -57,7 +57,7 @@ public class JmxOperator implements JmxOperatorMBean {
     @Override
     public List<Properties> getJobInstances(final String jobName, final int start, final int count) {
         final List<JobInstance> jobInstances = operator.getJobInstances(jobName, start, count);
-        final List<Properties> ret = new ArrayList<Properties>(jobInstances.size());
+        final List<Properties> ret = new ArrayList<>(jobInstances.size());
         final SimpleDateFormat format = new SimpleDateFormat(); //TODO
         for (final JobInstance jobInstance : jobInstances) {
             final Properties properties = new Properties();
@@ -90,7 +90,7 @@ public class JmxOperator implements JmxOperatorMBean {
     public List<Properties> getJobExecutions(final long jobInstanceId) {
         final JobInstance jobInstance = operator.getJobInstanceById(jobInstanceId);
         final List<JobExecution> jobExecutions = operator.getJobExecutions(jobInstance);
-        final List<Properties> ret = new ArrayList<Properties>(jobExecutions.size());
+        final List<Properties> ret = new ArrayList<>(jobExecutions.size());
         final SimpleDateFormat format = new SimpleDateFormat(); //TODO
         for (final JobExecution jobExecution : jobExecutions) {
             final Properties properties = new Properties();
@@ -112,7 +112,7 @@ public class JmxOperator implements JmxOperatorMBean {
     @Override
     public List<Properties> getStepExecutions(final long jobExecutionId) {
         final List<StepExecution> stepExecutions = operator.getStepExecutions(jobExecutionId);
-        final List<Properties> ret = new ArrayList<Properties>(stepExecutions.size());
+        final List<Properties> ret = new ArrayList<>(stepExecutions.size());
         final SimpleDateFormat format = new SimpleDateFormat(); //TODO
         for (final StepExecution stepExecution : stepExecutions) {
             final Properties properties = new Properties();
@@ -134,7 +134,7 @@ public class JmxOperator implements JmxOperatorMBean {
         if (jobInstance instanceof ExtendedJobInstance) {
             final ExtendedJobInstance extendedJobInstance = (ExtendedJobInstance) jobInstance;
             properties.setProperty("jslName", extendedJobInstance.getJslName());
-            properties.setProperty("createTime", extendedJobInstance.getCreateTime() == null ? null : format.format(extendedJobInstance.getCreateTime()));
+            properties.setProperty("createTime", extendedJobInstance.getCreateTime() == null ? "-" : format.format(extendedJobInstance.getCreateTime()));
         }
     }
 
@@ -142,10 +142,10 @@ public class JmxOperator implements JmxOperatorMBean {
         properties.setProperty("jobExecutionId", Long.toString(jobExecution.getExecutionId()));
         properties.setProperty("jobName", jobExecution.getJobName());
         properties.setProperty("batchStatus", jobExecution.getBatchStatus().toString());
-        properties.setProperty("createTime", jobExecution.getCreateTime() == null ? null : format.format(jobExecution.getCreateTime()));
-        properties.setProperty("startTime", jobExecution.getStartTime() == null ? null : format.format(jobExecution.getStartTime()));
-        properties.setProperty("endTime", jobExecution.getEndTime() == null ? null : format.format(jobExecution.getEndTime()));
-        properties.setProperty("lastUpdatedTime", jobExecution.getLastUpdatedTime() == null ? null : format.format(jobExecution.getLastUpdatedTime()));
+        properties.setProperty("createTime", jobExecution.getCreateTime() == null ? "-" : format.format(jobExecution.getCreateTime()));
+        properties.setProperty("startTime", jobExecution.getStartTime() == null ? "-" : format.format(jobExecution.getStartTime()));
+        properties.setProperty("endTime", jobExecution.getEndTime() == null ? "-" : format.format(jobExecution.getEndTime()));
+        properties.setProperty("lastUpdatedTime", jobExecution.getLastUpdatedTime() == null ? "-" : format.format(jobExecution.getLastUpdatedTime()));
         properties.setProperty("exitStatus", jobExecution.getExitStatus());
         if (jobExecution instanceof ExtendedJobExecution) {
             final ExtendedJobExecution extendedJobExecution = (ExtendedJobExecution) jobExecution;
@@ -159,8 +159,8 @@ public class JmxOperator implements JmxOperatorMBean {
         properties.setProperty("stepExecutionId", Long.toString(stepExecution.getStepExecutionId()));
         properties.setProperty("stepName", stepExecution.getStepName());
         properties.setProperty("batchStatus", stepExecution.getBatchStatus().toString());
-        properties.setProperty("startTime", stepExecution.getStartTime() == null ? null : format.format(stepExecution.getStartTime()));
-        properties.setProperty("endTime", stepExecution.getEndTime() == null ? null : format.format(stepExecution.getEndTime()));
+        properties.setProperty("startTime", stepExecution.getStartTime() == null ? "-" : format.format(stepExecution.getStartTime()));
+        properties.setProperty("endTime", stepExecution.getEndTime() == null ? "-" : format.format(stepExecution.getEndTime()));
         properties.setProperty("exitStatus", stepExecution.getExitStatus());
         if (stepExecution instanceof ExtendedStepExecution) {
             final ExtendedStepExecution extendedStepExecution = (ExtendedStepExecution) stepExecution;
