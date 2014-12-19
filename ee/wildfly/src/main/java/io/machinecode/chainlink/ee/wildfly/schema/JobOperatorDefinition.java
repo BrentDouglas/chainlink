@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class JobOperatorDefinition extends PersistentResourceDefinition {
 
-    public static JobOperatorDefinition INSTANCE = new JobOperatorDefinition();
+    public static final JobOperatorDefinition INSTANCE = new JobOperatorDefinition();
 
     public JobOperatorDefinition() {
         super(

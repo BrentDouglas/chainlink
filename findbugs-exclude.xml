@@ -57,6 +57,7 @@
             <Class name="io.machinecode.chainlink.repository.jpa.JpaMetric" />
             <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository" />
             <Class name="io.machinecode.chainlink.repository.mongo.MongoMetric" />
+            <Class name="io.machinecode.chainlink.ee.wildfly.schema.JobOperatorAdd" />
         </Or>
        <Bug code="PZLA" />
     </Match>
@@ -72,5 +73,12 @@
         <Class name="io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository"/>
         <Field name="executionRepositoryId"/>
         <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+    </Match>
+    <Match>
+        <Class name="io.machinecode.chainlink.server.chainlinkd.Chainlinkd"/>
+        <Bug pattern="UW_UNCOND_WAIT"/>
+    </Match>
+    <Match>
+        <Package name="~gnu\.trove.*"/>
     </Match>
 </FindBugsFilter>

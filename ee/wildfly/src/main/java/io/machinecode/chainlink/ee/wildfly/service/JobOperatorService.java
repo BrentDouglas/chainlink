@@ -37,7 +37,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
 
     public JobOperatorService(final ServiceName module, final ClassLoader loader, final String name, final Config config) {
         this.module = module;
-        this.loader = new WeakReference<ClassLoader>(loader);
+        this.loader = new WeakReference<>(loader);
         this.name = name;
         this.config = config;
     }

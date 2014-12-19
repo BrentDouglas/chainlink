@@ -18,7 +18,7 @@ import org.jboss.modules.ModuleLoader;
  */
 public class ChainlinkDependencyProcessor implements DeploymentUnitProcessor {
 
-    public static ChainlinkDependencyProcessor INSTANCE = new ChainlinkDependencyProcessor();
+    public static final ChainlinkDependencyProcessor INSTANCE = new ChainlinkDependencyProcessor();
 
     private final ModuleIdentifier javax_batch_api = ModuleIdentifier.create("javax.batch.api");
     private final ModuleIdentifier io_machinecode_chainlink = ModuleIdentifier.create("io.machinecode.chainlink");

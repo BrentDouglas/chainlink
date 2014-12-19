@@ -33,10 +33,13 @@ public class ChainlinkAdd extends AbstractBoottimeAddStepHandler {
                 .setInitialMode(ServiceController.Mode.ON_DEMAND)
                 .install();
 
-        context.addStep(new AbstractDeploymentChainStep() {
-            public void execute(DeploymentProcessorTarget processorTarget) {
-                processorTarget.addDeploymentProcessor(WildFlyConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_BATCH, ChainlinkDependencyProcessor.INSTANCE);
-            }
-        }, OperationContext.Stage.RUNTIME);
+        context.addStep(new DependenciesStep(), OperationContext.Stage.RUNTIME);
+    }
+
+    public static class DependenciesStep extends AbstractDeploymentChainStep {
+        @Override
+        public void execute(DeploymentProcessorTarget processorTarget) {
+            processorTarget.addDeploymentProcessor(WildFlyConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_BATCH, ChainlinkDependencyProcessor.INSTANCE);
+        }
     }
 }
