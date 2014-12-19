@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "property")
-public class JpaProperty {
+public class JpaProperty implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private String name;
     private String value;

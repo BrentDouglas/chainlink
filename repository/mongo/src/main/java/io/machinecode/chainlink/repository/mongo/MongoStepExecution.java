@@ -27,6 +27,8 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 )
 @JsonDeserialize(builder = MongoStepExecution.Builder.class)
 public class MongoStepExecution extends StepExecutionImpl {
+    private static final long serialVersionUID = 1L;
+
     private final ObjectId _id;
 
     public MongoStepExecution(final _Builder builder) {

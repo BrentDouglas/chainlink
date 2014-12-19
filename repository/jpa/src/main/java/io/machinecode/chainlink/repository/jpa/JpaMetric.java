@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,9 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "metric")
-public class JpaMetric implements MutableMetric {
+public class JpaMetric implements MutableMetric, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private MetricType type;
     private long value;

@@ -11,6 +11,7 @@ import java.util.Set;
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class RunningJobExecutionIdProcessor implements InvocableMap.EntryProcessor, Serializable {
+    private static final long serialVersionUID = 1L;
 
     final String jobName;
 

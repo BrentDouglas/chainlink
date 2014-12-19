@@ -10,6 +10,7 @@ import java.util.Date;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GridGainJobInstance extends JobInstanceImpl {
+    private static final long serialVersionUID = 1L;
 
     public GridGainJobInstance(final _Builder builder) {
         super(builder);

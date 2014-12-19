@@ -42,7 +42,9 @@ import java.util.Properties;
 @NamedQueries({
         @NamedQuery(name = "JpaPartitionExecution.unfinishedForStepExecutionId", query = "select p from JpaPartitionExecution p where p.stepExecution.id=:stepExecutionId and p.batchStatus in (javax.batch.runtime.BatchStatus.FAILED, javax.batch.runtime.BatchStatus.STOPPED, javax.batch.runtime.BatchStatus.STOPPING, javax.batch.runtime.BatchStatus.STARTED, javax.batch.runtime.BatchStatus.STARTING)")
 })
-public class JpaPartitionExecution implements PartitionExecution {
+public class JpaPartitionExecution implements PartitionExecution, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private JpaStepExecution stepExecution;
     private int partitionId;

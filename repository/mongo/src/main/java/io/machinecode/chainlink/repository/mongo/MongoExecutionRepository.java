@@ -64,12 +64,10 @@ public class MongoExecutionRepository implements ExecutionRepository {
 
     protected final Jongo jongo;
     protected final Cloner cloner;
-    protected final boolean camel;
 
-    public MongoExecutionRepository(final Jongo jongo, final MarshallingProvider provider, final boolean camel) {
+    public MongoExecutionRepository(final Jongo jongo, final MarshallingProvider provider) {
         this.jongo = jongo;
         this.cloner = provider.getCloner();
-        this.camel = camel;
     }
 
     protected long _id(final String key) {

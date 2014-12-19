@@ -10,6 +10,7 @@ import javax.batch.runtime.BatchStatus;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GridGainJobExecution extends JobExecutionImpl {
+    private static final long serialVersionUID = 1L;
 
     public GridGainJobExecution(final _Builder builder) {
         super(builder);

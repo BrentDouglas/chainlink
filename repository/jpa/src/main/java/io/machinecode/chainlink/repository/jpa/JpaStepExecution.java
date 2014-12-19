@@ -45,7 +45,9 @@ import java.util.Map;
         @NamedQuery(name = "JpaStepExecution.previous", query = "select s from JpaStepExecution s join s.jobExecution j where (j.id=:jobExecutionId or j in (select p from JpaJobExecutionHistory h join h.previousJobExecution p where h.jobExecution.id=:jobExecutionId)) and s.id!=:stepExecutionId and s.createTime < (select t.createTime from JpaStepExecution t where t.id = :stepExecutionId) and s.stepName =:stepName order by s.createTime desc"),
         @NamedQuery(name = "JpaStepExecution.latest", query = "select s from JpaStepExecution s join s.jobExecution j where (j.id=:jobExecutionId or j in (select p from JpaJobExecutionHistory h join h.previousJobExecution p where h.jobExecution.id=:jobExecutionId)) and s.stepName=:stepName order by s.createTime desc")
 })
-public class JpaStepExecution implements ExtendedStepExecution {
+public class JpaStepExecution implements ExtendedStepExecution, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private String stepName;
     private JpaJobExecution jobExecution;

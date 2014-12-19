@@ -17,6 +17,8 @@
         <Or>
             <Class name="io.machinecode.chainlink.core.element.execution.StepImpl" />
             <Class name="io.machinecode.chainlink.repository.infinispan.RunningJobExecutionIdCallable" />
+            <Class name="io.machinecode.chainlink.repository.memory.MemoryExecutionRepository" />
+            <Class name="io.machinecode.chainlink.repository.redis.RedisExecutionRepository" />
         </Or>
         <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
     </Match>
@@ -49,11 +51,21 @@
     <Match>
         <Or>
             <Class name="io.machinecode.chainlink.core.configuration.ConfigurationImpl" />
-            <Class name="io.machinecode.chainlink.repository.core.MetricImpl" />
-            <Class name="io.machinecode.chainlink.repository.jpa.JpaMetric" />
             <Class name="io.machinecode.chainlink.marshalling.jdk.JdkMarshallingProvider" />
             <Class name="io.machinecode.chainlink.marshalling.jboss.JbossMarshallingProvider" />
+            <Class name="io.machinecode.chainlink.repository.core.MetricImpl" />
+            <Class name="io.machinecode.chainlink.repository.jpa.JpaMetric" />
+            <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository" />
+            <Class name="io.machinecode.chainlink.repository.mongo.MongoMetric" />
         </Or>
        <Bug code="PZLA" />
+    </Match>
+    <Match>
+        <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository"/>
+        <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
+    </Match>
+    <Match>
+        <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository"/>
+        <Bug pattern="REC_CATCH_EXCEPTION"/>
     </Match>
 </FindBugsFilter>

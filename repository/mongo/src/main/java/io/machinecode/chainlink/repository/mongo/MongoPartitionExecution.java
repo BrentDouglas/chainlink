@@ -29,6 +29,7 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 )
 @JsonDeserialize(builder = MongoPartitionExecution.Builder.class)
 public class MongoPartitionExecution extends PartitionExecutionImpl {
+    private static final long serialVersionUID = 1L;
 
     private final ObjectId _id;
 

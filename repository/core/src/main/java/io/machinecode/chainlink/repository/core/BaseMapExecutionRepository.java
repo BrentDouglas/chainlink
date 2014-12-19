@@ -4,9 +4,7 @@ import gnu.trove.iterator.TLongIterator;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import io.machinecode.chainlink.spi.marshalling.Cloner;
-import io.machinecode.chainlink.spi.marshalling.Marshaller;
 import io.machinecode.chainlink.spi.marshalling.MarshallingProvider;
-import io.machinecode.chainlink.spi.marshalling.Unmarshaller;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecutionBuilder;
@@ -51,13 +49,9 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
     protected static final String STEP_EXECUTION_ID = "step_execution_id";
     protected static final String PARTITION_EXECUTION_ID = "partition_execution_id";
 
-    protected final Marshaller marshaller;
-    protected final Unmarshaller unmarshaller;
     protected final Cloner cloner;
 
     public BaseMapExecutionRepository(final MarshallingProvider provider) {
-        this.marshaller = provider.getMarshaller();
-        this.unmarshaller = provider.getUnmarshaller();
         this.cloner = provider.getCloner();
     }
 

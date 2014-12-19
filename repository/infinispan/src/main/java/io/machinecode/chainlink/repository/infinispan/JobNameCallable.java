@@ -9,6 +9,7 @@ import java.util.Set;
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class JobNameCallable extends BaseCallable<Long, ExtendedJobInstance, Set<String>> {
+    private static final long serialVersionUID = 1L;
 
     @Override
     public Set<String> call() throws Exception {

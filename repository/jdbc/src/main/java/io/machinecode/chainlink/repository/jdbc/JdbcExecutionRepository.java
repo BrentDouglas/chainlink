@@ -64,10 +64,9 @@ public class JdbcExecutionRepository implements ExecutionRepository {
 
     public static JdbcExecutionRepository create(final DataSourceLookup lookup, final String username, final String password) {
         final DataSource dataSource = lookup.getDataSource();
-        try {
-            final Connection connection = username == null || password == null
+        try (final Connection connection = username == null || password == null
                     ? dataSource.getConnection()
-                    : dataSource.getConnection(username, password);
+                    : dataSource.getConnection(username, password)) {
             final String url = connection.getMetaData().getURL();
             if (url.startsWith("jdbc:postgresql")) {
                 return new PostgresJdbcExecutionRepository(dataSource, username, password);
@@ -94,25 +93,26 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(insertJobInstance(), Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, jobId);
-            statement.setString(2, jslName);
-            statement.setTimestamp(3, new Timestamp(timestamp.getTime()));
-            if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+            try (final PreparedStatement statement = connection.prepareStatement(insertJobInstance(), Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, jobId);
+                statement.setString(2, jslName);
+                statement.setTimestamp(3, new Timestamp(timestamp.getTime()));
+                if (statement.executeUpdate() == 0) {
+                    throw new IllegalStateException(); //TODO
+                }
+                try (final ResultSet result = statement.getGeneratedKeys()) {
+                    if (!result.next()) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                    final long jobInstanceId = result.getLong(1);
+                    return new JobInstanceImpl.Builder()
+                            .setJobInstanceId(jobInstanceId)
+                            .setCreateTime(timestamp)
+                            .setJobName(jobId)
+                            .setJslName(jslName)
+                            .build();
+                }
             }
-            final ResultSet result = statement.getGeneratedKeys();
-            if (!result.next()) {
-                throw new IllegalStateException(); //TODO
-            }
-            final long jobInstanceId = result.getLong(1);
-            statement.close();
-            return new JobInstanceImpl.Builder()
-                    .setJobInstanceId(jobInstanceId)
-                    .setCreateTime(timestamp)
-                    .setJobName(jobId)
-                    .setJslName(jslName)
-                    .build();
         } finally {
             if (connection != null) {
                 connection.close();
@@ -126,9 +126,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final JobExecutionImpl jobExecution = _createJobExecution(connection, jobInstance, parameters, timestamp);
-            connection.commit();
-            return jobExecution;
+            return _createJobExecution(connection, jobInstance, parameters, timestamp);
         } catch (final Exception e) {
             if (connection != null) {
                 connection.rollback();
@@ -142,45 +140,47 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     public JobExecutionImpl _createJobExecution(final Connection connection, final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception {
-        final PreparedStatement statement = connection.prepareStatement(insertJobExecution(), Statement.RETURN_GENERATED_KEYS);
-        statement.setLong(1, jobInstance.getInstanceId());
-        statement.setString(2, jobInstance.getJobName());
-        statement.setString(3, BatchStatus.STARTING.name());
-        final Timestamp ts = new Timestamp(timestamp.getTime());
-        statement.setTimestamp(4, ts);
-        statement.setTimestamp(5, ts);
-        if (statement.executeUpdate() == 0) {
-            throw new IllegalStateException(); //TODO
+        final long jobExecutionId;
+        try (final PreparedStatement statement = connection.prepareStatement(insertJobExecution(), Statement.RETURN_GENERATED_KEYS)) {
+            statement.setLong(1, jobInstance.getInstanceId());
+            statement.setString(2, jobInstance.getJobName());
+            statement.setString(3, BatchStatus.STARTING.name());
+            final Timestamp ts = new Timestamp(timestamp.getTime());
+            statement.setTimestamp(4, ts);
+            statement.setTimestamp(5, ts);
+            if (statement.executeUpdate() == 0) {
+                throw new IllegalStateException(); //TODO
+            }
+            try (final ResultSet result = statement.getGeneratedKeys()) {
+                if (!result.next()) {
+                    throw new IllegalStateException(); //TODO
+                }
+                jobExecutionId = result.getLong(1);
+            }
         }
-        final ResultSet result = statement.getGeneratedKeys();
-        if (!result.next()) {
-            throw new IllegalStateException(); //TODO
-        }
-        final long jobExecutionId = result.getLong(1);
-        statement.close();
         if (parameters != null) {
             for (final String key : parameters.stringPropertyNames()) {
-                final PreparedStatement ms = connection.prepareStatement(insertProperty(), Statement.RETURN_GENERATED_KEYS);
-                ms.setString(1, key);
-                ms.setString(2, parameters.getProperty(key));
-                if (ms.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+                final long propertyId;
+                try (final PreparedStatement ms = connection.prepareStatement(insertProperty(), Statement.RETURN_GENERATED_KEYS)) {
+                    ms.setString(1, key);
+                    ms.setString(2, parameters.getProperty(key));
+                    if (ms.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                    try (final ResultSet mr = ms.getGeneratedKeys()) {
+                        if (!mr.next()) {
+                            throw new IllegalStateException(); //TODO
+                        }
+                        propertyId = mr.getLong(1);
+                    }
                 }
-                final ResultSet mr = ms.getGeneratedKeys();
-                if (!mr.next()) {
-                    throw new IllegalStateException(); //TODO
+                try (final PreparedStatement sms = connection.prepareStatement(insertPropertyToJobExecution())) {
+                    sms.setLong(1, jobExecutionId);
+                    sms.setLong(2, propertyId);
+                    if (sms.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
                 }
-                final long propertyId = mr.getLong(1);
-                ms.close();
-
-                final PreparedStatement sms = connection.prepareStatement(insertPropertyToJobExecution());
-                sms.setLong(1, jobExecutionId);
-                sms.setLong(2, propertyId);
-                if (sms.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
-                }
-                sms.close();
-
             }
         }
         connection.commit();
@@ -201,44 +201,47 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(insertStepExecution(), Statement.RETURN_GENERATED_KEYS);
-            statement.setLong(1, jobExecution.getExecutionId());
-            statement.setString(2, stepName);
-            statement.setString(3, BatchStatus.STARTING.name());
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setTimestamp(4, ts);
-            statement.setTimestamp(5, ts);
-            if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+            final long stepExecutionId;
+            try (final PreparedStatement statement = connection.prepareStatement(insertStepExecution(), Statement.RETURN_GENERATED_KEYS)) {
+                statement.setLong(1, jobExecution.getExecutionId());
+                statement.setString(2, stepName);
+                statement.setString(3, BatchStatus.STARTING.name());
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setTimestamp(4, ts);
+                statement.setTimestamp(5, ts);
+                if (statement.executeUpdate() == 0) {
+                    throw new IllegalStateException(); //TODO
+                }
+                try (final ResultSet result = statement.getGeneratedKeys()) {
+                    if (!result.next()) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                    stepExecutionId = result.getLong(1);
+                }
             }
-            final ResultSet result = statement.getGeneratedKeys();
-            if (!result.next()) {
-                throw new IllegalStateException(); //TODO
-            }
-            final long stepExecutionId = result.getLong(1);
-            statement.close();
             for (final Metric.MetricType type : Metric.MetricType.values()) {
-                final PreparedStatement ms = connection.prepareStatement(insertMetric(), Statement.RETURN_GENERATED_KEYS);
-                ms.setString(1, type.name());
-                ms.setLong(2, 0);
-                if (ms.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+                final long metricId;
+                try (final PreparedStatement ms = connection.prepareStatement(insertMetric(), Statement.RETURN_GENERATED_KEYS)) {
+                    ms.setString(1, type.name());
+                    ms.setLong(2, 0);
+                    if (ms.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                    try (final ResultSet mr = ms.getGeneratedKeys()) {
+                        if (!mr.next()) {
+                            throw new IllegalStateException();
+                        }
+                        metricId = mr.getLong(1);
+                    }
                 }
-                final ResultSet mr = ms.getGeneratedKeys();
-                if (!mr.next()) {
-                    throw new IllegalStateException();
+                try (final PreparedStatement sms = connection.prepareStatement(insertMetricToStepExecution())) {
+                    sms.setLong(1, stepExecutionId);
+                    sms.setLong(2, metricId);
+                    sms.setString(3, type.name());
+                    if (sms.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
                 }
-                final long metricId = mr.getLong(1);
-                ms.close();
-
-                final PreparedStatement sms = connection.prepareStatement(insertMetricToStepExecution());
-                sms.setLong(1, stepExecutionId);
-                sms.setLong(2, metricId);
-                sms.setString(3, type.name());
-                if (sms.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
-                }
-                sms.close();
             }
             connection.commit();
             return new StepExecutionImpl.Builder()
@@ -273,71 +276,76 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             final byte[] bytesWriterCheckpoint = _bytes(writerCheckpoint);
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(insertPartitionExecution(), Statement.RETURN_GENERATED_KEYS);
-            statement.setLong(1, stepExecutionId);
-            statement.setInt(2, partitionId);
-            statement.setString(3, BatchStatus.STARTING.name());
-            this.setLargeObject(statement, 4, bytesPersistentUserData);
-            this.setLargeObject(statement, 5, bytesReaderCheckpoint);
-            this.setLargeObject(statement, 6, bytesWriterCheckpoint);
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setTimestamp(7, ts);
-            statement.setTimestamp(8, ts);
-            if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+            final long partitionExecutionId;
+            try (final PreparedStatement statement = connection.prepareStatement(insertPartitionExecution(), Statement.RETURN_GENERATED_KEYS)) {
+                statement.setLong(1, stepExecutionId);
+                statement.setInt(2, partitionId);
+                statement.setString(3, BatchStatus.STARTING.name());
+                this.setLargeObject(statement, 4, bytesPersistentUserData);
+                this.setLargeObject(statement, 5, bytesReaderCheckpoint);
+                this.setLargeObject(statement, 6, bytesWriterCheckpoint);
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setTimestamp(7, ts);
+                statement.setTimestamp(8, ts);
+                if (statement.executeUpdate() == 0) {
+                    throw new IllegalStateException(); //TODO
+                }
+                try (final ResultSet result = statement.getGeneratedKeys()) {
+                    if (!result.next()) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                    partitionExecutionId = result.getLong(1);
+                }
             }
-            final ResultSet result = statement.getGeneratedKeys();
-            if (!result.next()) {
-                throw new IllegalStateException(); //TODO
-            }
-            final long partitionExecutionId = result.getLong(1);
-            statement.close();
             if (properties != null) {
                 for (final String key : properties.stringPropertyNames()) {
-                    final PreparedStatement ms = connection.prepareStatement(insertProperty(), Statement.RETURN_GENERATED_KEYS);
-                    ms.setString(1, key);
-                    ms.setString(2, properties.getProperty(key));
-                    if (ms.executeUpdate() == 0) {
-                        throw new IllegalStateException(); //TODO
+                    final long propertyId;
+                    try (final PreparedStatement ms = connection.prepareStatement(insertProperty(), Statement.RETURN_GENERATED_KEYS)) {
+                        ms.setString(1, key);
+                        ms.setString(2, properties.getProperty(key));
+                        if (ms.executeUpdate() == 0) {
+                            throw new IllegalStateException(); //TODO
+                        }
+                        try (final ResultSet mr = ms.getGeneratedKeys()) {
+                            if (!mr.next()) {
+                                throw new IllegalStateException(); //TODO
+                            }
+                            propertyId = mr.getLong(1);
+                        }
                     }
-                    final ResultSet mr = ms.getGeneratedKeys();
-                    if (!mr.next()) {
-                        throw new IllegalStateException(); //TODO
-                    }
-                    final long propertyId = mr.getLong(1);
-                    ms.close();
 
-                    final PreparedStatement sms = connection.prepareStatement(insertPropertyToPartitionExecution());
-                    sms.setLong(1, partitionExecutionId);
-                    sms.setLong(2, propertyId);
-                    if (sms.executeUpdate() == 0) {
-                        throw new IllegalStateException(); //TODO
+                    try (final PreparedStatement sms = connection.prepareStatement(insertPropertyToPartitionExecution())) {
+                        sms.setLong(1, partitionExecutionId);
+                        sms.setLong(2, propertyId);
+                        if (sms.executeUpdate() == 0) {
+                            throw new IllegalStateException(); //TODO
+                        }
                     }
-                    sms.close();
                 }
             }
             for (final Metric.MetricType type : Metric.MetricType.values()) {
-                final PreparedStatement ms = connection.prepareStatement(insertMetric(), Statement.RETURN_GENERATED_KEYS);
-                ms.setString(1, type.name());
-                ms.setLong(2, 0);
-                if (ms.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+                final long metricId;
+                try (final PreparedStatement ms = connection.prepareStatement(insertMetric(), Statement.RETURN_GENERATED_KEYS)) {
+                    ms.setString(1, type.name());
+                    ms.setLong(2, 0);
+                    if (ms.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                    try (final ResultSet mr = ms.getGeneratedKeys()) {
+                        if (!mr.next()) {
+                            throw new IllegalStateException(); //TODO
+                        }
+                        metricId = mr.getLong(1);
+                    }
                 }
-                final ResultSet mr = ms.getGeneratedKeys();
-                if (!mr.next()) {
-                    throw new IllegalStateException(); //TODO
+                try (final PreparedStatement sms = connection.prepareStatement(insertMetricToPartitionExecution())) {
+                    sms.setLong(1, partitionExecutionId);
+                    sms.setLong(2, metricId);
+                    sms.setString(3, type.name());
+                    if (sms.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
                 }
-                final long metricId = mr.getLong(1);
-                ms.close();
-
-                final PreparedStatement sms = connection.prepareStatement(insertMetricToPartitionExecution());
-                sms.setLong(1, partitionExecutionId);
-                sms.setLong(2, metricId);
-                sms.setString(3, type.name());
-                if (sms.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
-                }
-                sms.close();
             }
             connection.commit();
             return new PartitionExecutionImpl.Builder()
@@ -370,16 +378,16 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(updateStartJobExecution());
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setString(1, BatchStatus.STARTED.name());
-            statement.setTimestamp(2, ts);
-            statement.setTimestamp(3, ts);
-            statement.setLong(4, jobExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+            try (final PreparedStatement statement = connection.prepareStatement(updateStartJobExecution())) {
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setString(1, BatchStatus.STARTED.name());
+                statement.setTimestamp(2, ts);
+                statement.setTimestamp(3, ts);
+                statement.setLong(4, jobExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new IllegalStateException(); //TODO
+                }
             }
-            statement.close();
         } finally {
             if (connection != null) {
                 connection.close();
@@ -392,14 +400,14 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(updateUpdateJobExecution());
-            statement.setString(1, batchStatus.name());
-            statement.setTimestamp(2, new Timestamp(timestamp.getTime()));
-            statement.setLong(3, jobExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            try (final PreparedStatement statement = connection.prepareStatement(updateUpdateJobExecution())) {
+                statement.setString(1, batchStatus.name());
+                statement.setTimestamp(2, new Timestamp(timestamp.getTime()));
+                statement.setLong(3, jobExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                }
             }
-            statement.close();
         } finally {
             if (connection != null) {
                 connection.close();
@@ -412,18 +420,18 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(updateFinishJobExecution());
-            statement.setString(1, batchStatus.name());
-            statement.setString(2, exitStatus);
-            statement.setString(3, restartElementId);
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setTimestamp(4, ts);
-            statement.setTimestamp(5, ts);
-            statement.setLong(6, jobExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            try (final PreparedStatement statement = connection.prepareStatement(updateFinishJobExecution())) {
+                statement.setString(1, batchStatus.name());
+                statement.setString(2, exitStatus);
+                statement.setString(3, restartElementId);
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setTimestamp(4, ts);
+                statement.setTimestamp(5, ts);
+                statement.setLong(6, jobExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                }
             }
-            statement.close();
         } finally {
             if (connection != null) {
                 connection.close();
@@ -437,29 +445,30 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(queryJobExecutionHistory());
-            statement.setLong(1, restartJobExecutionId);
-            final ResultSet result = statement.executeQuery();
             final TLongList ids = new TLongArrayList();
-            while (result.next()) {
-                ids.add(result.getLong(1));
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobExecutionHistory())) {
+                statement.setLong(1, restartJobExecutionId);
+                try (final ResultSet result = statement.executeQuery()) {
+                    while (result.next()) {
+                        ids.add(result.getLong(1));
+                    }
+                }
             }
-            statement.close();
-            final PreparedStatement main = connection.prepareStatement(insertJobExecutionHistory());
-            main.setLong(1, jobExecutionId);
-            main.setLong(2, restartJobExecutionId);
-            if (main.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
-            }
-            main.close();
-            for (final TLongIterator it = ids.iterator(); it.hasNext(); ) {
-                final PreparedStatement ps = connection.prepareStatement(insertJobExecutionHistory());
-                ps.setLong(1, jobExecutionId);
-                ps.setLong(2, it.next());
-                if (ps.executeUpdate() == 0) {
+            try (final PreparedStatement main = connection.prepareStatement(insertJobExecutionHistory())) {
+                main.setLong(1, jobExecutionId);
+                main.setLong(2, restartJobExecutionId);
+                if (main.executeUpdate() == 0) {
                     throw new IllegalStateException(); //TODO
                 }
-                ps.close();
+            }
+            for (final TLongIterator it = ids.iterator(); it.hasNext(); ) {
+                try (final PreparedStatement ps = connection.prepareStatement(insertJobExecutionHistory())) {
+                    ps.setLong(1, jobExecutionId);
+                    ps.setLong(2, it.next());
+                    if (ps.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                }
             }
             connection.commit();
         } catch (final Exception e) {
@@ -479,16 +488,16 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(updateStartStepExecution());
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setString(1, BatchStatus.STARTED.name());
-            statement.setTimestamp(2, ts);
-            statement.setTimestamp(3, ts);
-            statement.setLong(4, stepExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
+            try (final PreparedStatement statement = connection.prepareStatement(updateStartStepExecution())) {
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setString(1, BatchStatus.STARTED.name());
+                statement.setTimestamp(2, ts);
+                statement.setTimestamp(3, ts);
+                statement.setLong(4, stepExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new IllegalStateException(); //TODO
+                }
             }
-            statement.close();
         } finally {
             if (connection != null) {
                 connection.close();
@@ -503,24 +512,24 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             final byte[] bytesPersistentUserDate = _bytes(persistentUserData);
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(updateUpdateStepExecution());
-            this.setLargeObject(statement, 1, bytesPersistentUserDate);
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setTimestamp(2, ts);
-            statement.setLong(3, stepExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
-            }
-            statement.close();
-            for (final Metric metric : metrics) {
-                final PreparedStatement ps = connection.prepareStatement(updateStepMetric());
-                ps.setLong(1, metric.getValue());
-                ps.setLong(2, stepExecutionId);
-                ps.setString(3, metric.getType().name());
-                if (ps.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+            try (final PreparedStatement statement = connection.prepareStatement(updateUpdateStepExecution())) {
+                this.setLargeObject(statement, 1, bytesPersistentUserDate);
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setTimestamp(2, ts);
+                statement.setLong(3, stepExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
                 }
-                ps.close();
+            }
+            for (final Metric metric : metrics) {
+                try (final PreparedStatement ps = connection.prepareStatement(updateStepMetric())) {
+                    ps.setLong(1, metric.getValue());
+                    ps.setLong(2, stepExecutionId);
+                    ps.setString(3, metric.getType().name());
+                    if (ps.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                }
             }
             connection.commit();
         } catch (final Exception e) {
@@ -544,26 +553,26 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             final byte[] bytesWriterCheckpoint = _bytes(writerCheckpoint);
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(updateUpdateStepExecutionWithCheckpoint());
-            this.setLargeObject(statement, 1, bytesPersistentUserDate);
-            this.setLargeObject(statement, 2, bytesReaderCheckpoint);
-            this.setLargeObject(statement, 3, bytesWriterCheckpoint);
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setTimestamp(4, ts);
-            statement.setLong(5, stepExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new IllegalStateException(); //TODO
-            }
-            statement.close();
-            for (final Metric metric : metrics) {
-                final PreparedStatement ps = connection.prepareStatement(updateStepMetric());
-                ps.setLong(1, metric.getValue());
-                ps.setLong(2, stepExecutionId);
-                ps.setString(3, metric.getType().name());
-                if (ps.executeUpdate() == 0) {
+            try (final PreparedStatement statement = connection.prepareStatement(updateUpdateStepExecutionWithCheckpoint())) {
+                this.setLargeObject(statement, 1, bytesPersistentUserDate);
+                this.setLargeObject(statement, 2, bytesReaderCheckpoint);
+                this.setLargeObject(statement, 3, bytesWriterCheckpoint);
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setTimestamp(4, ts);
+                statement.setLong(5, stepExecutionId);
+                if (statement.executeUpdate() == 0) {
                     throw new IllegalStateException(); //TODO
                 }
-                ps.close();
+            }
+            for (final Metric metric : metrics) {
+                try (final PreparedStatement ps = connection.prepareStatement(updateStepMetric())) {
+                    ps.setLong(1, metric.getValue());
+                    ps.setLong(2, stepExecutionId);
+                    ps.setString(3, metric.getType().name());
+                    if (ps.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                }
             }
             connection.commit();
         } catch (final Exception e) {
@@ -584,26 +593,26 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(updateFinishStepExecution());
-            statement.setString(1, batchStatus.name());
-            statement.setString(2, exitStatus);
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setTimestamp(3, ts);
-            statement.setTimestamp(4, ts);
-            statement.setLong(5, stepExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
-            }
-            statement.close();
-            for (final Metric metric : metrics) {
-                final PreparedStatement ps = connection.prepareStatement(updateStepMetric());
-                ps.setLong(1, metric.getValue());
-                ps.setLong(2, stepExecutionId);
-                ps.setString(3, metric.getType().name());
-                if (ps.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+            try (final PreparedStatement statement = connection.prepareStatement(updateFinishStepExecution())) {
+                statement.setString(1, batchStatus.name());
+                statement.setString(2, exitStatus);
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setTimestamp(3, ts);
+                statement.setTimestamp(4, ts);
+                statement.setLong(5, stepExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
                 }
-                ps.close();
+            }
+            for (final Metric metric : metrics) {
+                try (final PreparedStatement ps = connection.prepareStatement(updateStepMetric())) {
+                    ps.setLong(1, metric.getValue());
+                    ps.setLong(2, stepExecutionId);
+                    ps.setString(3, metric.getType().name());
+                    if (ps.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                }
             }
             connection.commit();
         } catch (final Exception e) {
@@ -623,16 +632,16 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(updateStartPartitionExecution());
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setString(1, BatchStatus.STARTED.name());
-            statement.setTimestamp(2, ts);
-            statement.setTimestamp(3, ts);
-            statement.setLong(4, partitionExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+            try (final PreparedStatement statement = connection.prepareStatement(updateStartPartitionExecution())) {
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setString(1, BatchStatus.STARTED.name());
+                statement.setTimestamp(2, ts);
+                statement.setTimestamp(3, ts);
+                statement.setLong(4, partitionExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                }
             }
-            statement.close();
         } finally {
             if (connection != null) {
                 connection.close();
@@ -649,26 +658,26 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             final byte[] bytesWriterCheckpoint = _bytes(writerCheckpoint);
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(updateUpdatePartitionExecution());
-            this.setLargeObject(statement, 1, bytesPersistentUserDate);
-            this.setLargeObject(statement, 2, bytesReaderCheckpoint);
-            this.setLargeObject(statement, 3, bytesWriterCheckpoint);
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setTimestamp(4, ts);
-            statement.setLong(5, partitionExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
-            }
-            statement.close();
-            for (final Metric metric : metrics) {
-                final PreparedStatement ps = connection.prepareStatement(updatePartitionMetric());
-                ps.setLong(1, metric.getValue());
-                ps.setLong(2, partitionExecutionId);
-                ps.setString(3, metric.getType().name());
-                if (ps.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+            try (final PreparedStatement statement = connection.prepareStatement(updateUpdatePartitionExecution())) {
+                this.setLargeObject(statement, 1, bytesPersistentUserDate);
+                this.setLargeObject(statement, 2, bytesReaderCheckpoint);
+                this.setLargeObject(statement, 3, bytesWriterCheckpoint);
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setTimestamp(4, ts);
+                statement.setLong(5, partitionExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
                 }
-                ps.close();
+            }
+            for (final Metric metric : metrics) {
+                try (final PreparedStatement ps = connection.prepareStatement(updatePartitionMetric())) {
+                    ps.setLong(1, metric.getValue());
+                    ps.setLong(2, partitionExecutionId);
+                    ps.setString(3, metric.getType().name());
+                    if (ps.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                }
             }
             connection.commit();
         } catch (final Exception e) {
@@ -690,27 +699,27 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             final byte[] bytesPersistentUserDate = _bytes(persistentUserData);
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(updateFinishPartitionExecution());
-            this.setLargeObject(statement, 1, bytesPersistentUserDate);
-            statement.setString(2, batchStatus.name());
-            statement.setString(3, exitStatus);
-            final Timestamp ts = new Timestamp(timestamp.getTime());
-            statement.setTimestamp(4, ts);
-            statement.setTimestamp(5, ts);
-            statement.setLong(6, partitionExecutionId);
-            if (statement.executeUpdate() == 0) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
-            }
-            statement.close();
-            for (final Metric metric : metrics) {
-                final PreparedStatement ps = connection.prepareStatement(updatePartitionMetric());
-                ps.setLong(1, metric.getValue());
-                ps.setLong(2, partitionExecutionId);
-                ps.setString(3, metric.getType().name());
-                if (ps.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+            try (final PreparedStatement statement = connection.prepareStatement(updateFinishPartitionExecution())) {
+                this.setLargeObject(statement, 1, bytesPersistentUserDate);
+                statement.setString(2, batchStatus.name());
+                statement.setString(3, exitStatus);
+                final Timestamp ts = new Timestamp(timestamp.getTime());
+                statement.setTimestamp(4, ts);
+                statement.setTimestamp(5, ts);
+                statement.setLong(6, partitionExecutionId);
+                if (statement.executeUpdate() == 0) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
                 }
-                ps.close();
+            }
+            for (final Metric metric : metrics) {
+                try (final PreparedStatement ps = connection.prepareStatement(updatePartitionMetric())) {
+                    ps.setLong(1, metric.getValue());
+                    ps.setLong(2, partitionExecutionId);
+                    ps.setString(3, metric.getType().name());
+                    if (ps.executeUpdate() == 0) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                }
             }
             connection.commit();
         } catch (final Exception e) {
@@ -730,13 +739,14 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryJobNames());
-            final ResultSet result = statement.executeQuery();
-            final THashSet<String> names = new THashSet<String>();
-            while (result.next()) {
-                names.add(result.getString(1));
+            final THashSet<String> names = new THashSet<>();
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobNames())) {
+                try (final ResultSet result = statement.executeQuery()) {
+                    while (result.next()) {
+                        names.add(result.getString(1));
+                    }
+                }
             }
-            statement.close();
             return names;
         } finally {
             if (connection != null) {
@@ -750,14 +760,16 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryJobInstanceCount());
-            statement.setString(1, jobName);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                throw new IllegalStateException(); //TODO
+            final int count;
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobInstanceCount())) {
+                statement.setString(1, jobName);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        throw new IllegalStateException(); //TODO
+                    }
+                    count = result.getInt(1);
+                }
             }
-            final int count = result.getInt(1);
-            statement.close();
             if (count == 0) {
                 throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
             }
@@ -774,31 +786,29 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryJobInstances());
-            statement.setString(1, jobName);
-            final ResultSet result = statement.executeQuery();
-            for (int i = 0; i < start; ++i) {
-                if (!result.next()) {
-                    statement.close();
-                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+            final List<JobInstance> ret = new ArrayList<>();
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobInstances())) {
+                statement.setString(1, jobName);
+                try (final ResultSet result = statement.executeQuery()) {
+                    for (int i = 0; i < start; ++i) {
+                        if (!result.next()) {
+                            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                        }
+                    }
+                    if (!result.next()) {
+                        if (!result.next()) {
+                            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                        }
+                        return Collections.emptyList();
+                    }
+                    for (int i = 0; i < count; ++i) {
+                        ret.add(_ji(result));
+                        if (!result.next()) {
+                            break;
+                        }
+                    }
                 }
             }
-            if (!result.next()) {
-                if (!result.next()) {
-                    statement.close();
-                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
-                }
-                statement.close();
-                return Collections.emptyList();
-            }
-            final List<JobInstance> ret = new ArrayList<JobInstance>();
-            for (int i = 0; i < count; ++i) {
-                ret.add(_ji(result));
-                if (!result.next()) {
-                    break;
-                }
-            }
-            statement.close();
             return ret;
         } finally {
             if (connection != null) {
@@ -812,17 +822,18 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryRunningExecutions());
-            statement.setString(1, jobName);
-            final ResultSet result = statement.executeQuery();
-            final List<Long> ids = new ArrayList<Long>();
-            while (result.next()) {
-                ids.add(result.getLong(1));
+            final List<Long> ids = new ArrayList<>();
+            try (final PreparedStatement statement = connection.prepareStatement(queryRunningExecutions())) {
+                statement.setString(1, jobName);
+                try (final ResultSet result = statement.executeQuery()) {
+                    while (result.next()) {
+                        ids.add(result.getLong(1));
+                    }
+                }
+                if (ids.isEmpty()) {
+                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                }
             }
-            if (ids.isEmpty()) {
-                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
-            }
-            statement.close();
             return ids;
         } finally {
             if (connection != null) {
@@ -837,29 +848,29 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(queryJobExecutionParameters());
-            statement.setLong(1, jobExecutionId);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                final PreparedStatement ps = connection.prepareStatement(queryJobExecution());
-                ps.setLong(1, jobExecutionId);
-                final ResultSet rs = ps.executeQuery();
-                if (!rs.next()) {
-                    ps.close();
-                    statement.close();
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            final Properties properties;
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobExecutionParameters())) {
+                statement.setLong(1, jobExecutionId);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        try (final PreparedStatement ps = connection.prepareStatement(queryJobExecution())) {
+                            ps.setLong(1, jobExecutionId);
+                            try (final ResultSet rs = ps.executeQuery()) {
+                                if (!rs.next()) {
+                                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                                }
+                            }
+                        }
+                        connection.commit();
+                        return null;
+                    }
+                    properties = new Properties();
+                    do {
+                        properties.put(result.getString(1), result.getString(2));
+                    } while (result.next());
                 }
-                ps.close();
-                statement.close();
-                connection.commit();
-                return null;
             }
-            final Properties properties = new Properties();
-            do {
-                properties.put(result.getString(1), result.getString(2));
-            } while (result.next());
             connection.commit();
-            statement.close();
             return properties;
         } catch (final Exception e) {
             if (connection != null) {
@@ -878,15 +889,15 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryJobInstance());
-            statement.setLong(1, jobInstanceId);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobInstance())) {
+                statement.setLong(1, jobInstanceId);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
+                    }
+                    return  _ji(result);
+                }
             }
-            final JobInstanceImpl ret = _ji(result);
-            statement.close();
-            return ret;
         } finally {
             if (connection != null) {
                 connection.close();
@@ -899,15 +910,15 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryJobInstanceForJobExecution());
-            statement.setLong(1, jobExecutionId);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobInstanceForJobExecution())) {
+                statement.setLong(1, jobExecutionId);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                    }
+                    return  _ji(result);
+                }
             }
-            final JobInstanceImpl ret = _ji(result);
-            statement.close();
-            return ret;
         } finally {
             if (connection != null) {
                 connection.close();
@@ -920,18 +931,19 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryJobExecutionsForJobInstance());
-            statement.setLong(1, jobInstanceId);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobExecutionsForJobInstance())) {
+                statement.setLong(1, jobInstanceId);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
+                    }
+                    final List<JobExecutionImpl> ret = new ArrayList<>();
+                    do {
+                        ret.add(_je(connection, result));
+                    } while (result.next());
+                    return ret;
+                }
             }
-            final List<JobExecutionImpl> ret = new ArrayList<JobExecutionImpl>();
-            do {
-                ret.add(_je(connection, result));
-            } while (result.next());
-            statement.close();
-            return ret;
         } finally {
             if (connection != null) {
                 connection.close();
@@ -944,15 +956,15 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryJobExecution());
-            statement.setLong(1, jobExecutionId);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobExecution())) {
+                statement.setLong(1, jobExecutionId);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                    }
+                    return  _je(connection, result);
+                }
             }
-            final JobExecutionImpl ret = _je(connection, result);
-            statement.close();
-            return ret;
         } finally {
             if (connection != null) {
                 connection.close();
@@ -966,19 +978,25 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement is = connection.prepareStatement(queryJobInstanceForJobExecution());
-            is.setLong(1, jobExecutionId);
-            final ResultSet ir = is.executeQuery();
-            if (!ir.next()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            final JobInstanceImpl jobInstance;
+            try (final PreparedStatement is = connection.prepareStatement(queryJobInstanceForJobExecution())) {
+                is.setLong(1, jobExecutionId);
+                try (final ResultSet ir = is.executeQuery()) {
+                    if (!ir.next()) {
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                    }
+                    jobInstance = _ji(ir);
+                }
             }
-            final JobInstanceImpl jobInstance = _ji(ir);
-            final PreparedStatement ls = connection.prepareStatement(queryLatestJobExecution());
-            final ResultSet lr = ls.executeQuery();
-            if (!lr.next()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            final JobExecutionImpl latest;
+            try (final PreparedStatement ls = connection.prepareStatement(queryLatestJobExecution())) {
+                try (final ResultSet lr = ls.executeQuery()) {
+                    if (!lr.next()) {
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                    }
+                    latest = _je(connection, lr);
+                }
             }
-            final JobExecutionImpl latest = _je(connection, lr);
             if (jobExecutionId != latest.getExecutionId()) {
                 throw new JobExecutionNotMostRecentException(Messages.format("CHAINLINK-006004.repository.not.most.recent.execution", jobExecutionId, jobInstance.getInstanceId()));
             }
@@ -991,9 +1009,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 default:
                     throw new JobRestartException(Messages.format("CHAINLINK-006007.execution.repository.execution.not.eligible.for.restart", latest.getExecutionId(), BatchStatus.STOPPED, BatchStatus.FAILED, latest.getBatchStatus()));
             }
-            final JobExecutionImpl jobExecution =  _createJobExecution(connection, jobInstance, parameters, new Date());
-            connection.commit();
-            return jobExecution;
+            return _createJobExecution(connection, jobInstance, parameters, new Date());
         } catch (final Exception e) {
             if (connection != null) {
                 connection.rollback();
@@ -1012,30 +1028,30 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(queryStepExecutionsForJobExecution());
-            statement.setLong(1, jobExecutionId);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                final PreparedStatement ps = connection.prepareStatement(queryJobExecution());
-                ps.setLong(1, jobExecutionId);
-                final ResultSet rs = ps.executeQuery();
-                if (!rs.next()) {
-                    ps.close();
-                    statement.close();
-                    connection.commit();
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+            try (final PreparedStatement statement = connection.prepareStatement(queryStepExecutionsForJobExecution())) {
+                statement.setLong(1, jobExecutionId);
+                final ArrayList<StepExecutionImpl> ret = new ArrayList<>();
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        try (final PreparedStatement ps = connection.prepareStatement(queryJobExecution())) {
+                            ps.setLong(1, jobExecutionId);
+                            try (final ResultSet rs = ps.executeQuery()) {
+                                if (!rs.next()) {
+                                    connection.commit();
+                                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                                }
+                            }
+                            connection.commit();
+                            return Collections.emptyList();
+                        }
+                    }
+                    do {
+                        ret.add(_se(connection, result));
+                    } while (result.next());
                 }
-                statement.close();
                 connection.commit();
-                return Collections.emptyList();
+                return ret;
             }
-            final ArrayList<StepExecutionImpl> ret = new ArrayList<StepExecutionImpl>();
-            do {
-                ret.add(_se(connection, result));
-            } while (result.next());
-            statement.close();
-            connection.commit();
-            return ret;
         } catch (final Exception e) {
             if (connection != null) {
                 connection.rollback();
@@ -1070,15 +1086,15 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     private StepExecutionImpl _getStepExecution(final Connection connection, final long stepExecutionId) throws Exception {
-        final PreparedStatement statement = connection.prepareStatement(queryStepExecution());
-        statement.setLong(1, stepExecutionId);
-        final ResultSet result = statement.executeQuery();
-        if(!result.next()) {
-            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+        try (final PreparedStatement statement = connection.prepareStatement(queryStepExecution())) {
+            statement.setLong(1, stepExecutionId);
+            try (final ResultSet result = statement.executeQuery()) {
+                if(!result.next()) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                }
+                return _se(connection, result);
+            }
         }
-        final StepExecutionImpl stepExecution = _se(connection, result);
-        statement.close();
-        return stepExecution;
     }
 
     @Override
@@ -1087,22 +1103,22 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(queryPreviousStepExecution());
-            statement.setLong(1, jobExecutionId);
-            statement.setLong(2, jobExecutionId);
-            statement.setLong(3, stepExecutionId);
-            statement.setLong(4, stepExecutionId);
-            statement.setString(5, stepName);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                statement.close();
-                connection.commit();
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+            try (final PreparedStatement statement = connection.prepareStatement(queryPreviousStepExecution())) {
+                statement.setLong(1, jobExecutionId);
+                statement.setLong(2, jobExecutionId);
+                statement.setLong(3, stepExecutionId);
+                statement.setLong(4, stepExecutionId);
+                statement.setString(5, stepName);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        connection.commit();
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+                    }
+                    final StepExecutionImpl stepExecution = _se(connection, result);
+                    connection.commit();
+                    return stepExecution;
+                }
             }
-            final StepExecutionImpl stepExecution = _se(connection, result);
-            statement.close();
-            connection.commit();
-            return stepExecution;
         } catch (final Exception e) {
             if (connection != null) {
                 connection.rollback();
@@ -1121,20 +1137,20 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(queryLatestStepExecution());
-            statement.setLong(1, jobExecutionId);
-            statement.setLong(2, jobExecutionId);
-            statement.setString(3, stepName);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                statement.close();
-                connection.commit();
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+            try (final PreparedStatement statement = connection.prepareStatement(queryLatestStepExecution())) {
+                statement.setLong(1, jobExecutionId);
+                statement.setLong(2, jobExecutionId);
+                statement.setString(3, stepName);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        connection.commit();
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+                    }
+                    final StepExecutionImpl stepExecution = _se(connection, result);
+                    connection.commit();
+                    return stepExecution;
+                }
             }
-            final StepExecutionImpl stepExecution = _se(connection, result);
-            statement.close();
-            connection.commit();
-            return stepExecution;
         } catch (final Exception e) {
             if (connection != null) {
                 connection.rollback();
@@ -1152,16 +1168,16 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         Connection connection = null;
         try {
             connection = _connection();
-            final PreparedStatement statement = connection.prepareStatement(queryStepExecutionCount());
-            statement.setLong(1, jobExecutionId);
-            statement.setString(2, stepName);
-            final ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                //TODO
+            try (final PreparedStatement statement = connection.prepareStatement(queryStepExecutionCount())) {
+                statement.setLong(1, jobExecutionId);
+                statement.setString(2, stepName);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        throw new IllegalStateException(); //TODO Message
+                    }
+                    return result.getInt(1);
+                }
             }
-            final int count = result.getInt(1);
-            statement.close();
-            return count;
         } finally {
             if (connection != null) {
                 connection.close();
@@ -1199,21 +1215,22 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            final PreparedStatement statement = connection.prepareStatement(queryUnfinishedPartitionExecutions());
-            statement.setLong(1, stepExecutionId);
-            statement.setString(2, BatchStatus.FAILED.name());
-            statement.setString(3, BatchStatus.STOPPED.name());
-            statement.setString(4, BatchStatus.STOPPING.name());
-            statement.setString(5, BatchStatus.STARTED.name());
-            statement.setString(6, BatchStatus.STARTING.name());
-            final ResultSet result = statement.executeQuery();
-            final ArrayList<PartitionExecution> ret = new ArrayList<PartitionExecution>();
-            while (result.next()) {
-                ret.add(_pe(connection, result));
+            try (final PreparedStatement statement = connection.prepareStatement(queryUnfinishedPartitionExecutions())) {
+                statement.setLong(1, stepExecutionId);
+                statement.setString(2, BatchStatus.FAILED.name());
+                statement.setString(3, BatchStatus.STOPPED.name());
+                statement.setString(4, BatchStatus.STOPPING.name());
+                statement.setString(5, BatchStatus.STARTED.name());
+                statement.setString(6, BatchStatus.STARTING.name());
+                try (final ResultSet result = statement.executeQuery()) {
+                    final ArrayList<PartitionExecution> ret = new ArrayList<>();
+                    while (result.next()) {
+                        ret.add(_pe(connection, result));
+                    }
+                    connection.commit();
+                    return ret.toArray(new PartitionExecution[ret.size()]);
+                }
             }
-            statement.close();
-            connection.commit();
-            return ret.toArray(new PartitionExecution[ret.size()]);
         } catch (final Exception e) {
             if (connection != null) {
                 connection.rollback();
@@ -1248,15 +1265,15 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     private PartitionExecutionImpl _getPartitionExecution(final Connection connection, final long partitionExecutionId) throws Exception {
-        final PreparedStatement statement = connection.prepareStatement(queryPartitionExecution());
-        statement.setLong(1, partitionExecutionId);
-        final ResultSet result = statement.executeQuery();
-        if(!result.next()) {
-            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+        try (final PreparedStatement statement = connection.prepareStatement(queryPartitionExecution())) {
+            statement.setLong(1, partitionExecutionId);
+            try (final ResultSet result = statement.executeQuery()) {
+                if(!result.next()) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                }
+                return _pe(connection, result);
+            }
         }
-        final PartitionExecutionImpl partitionExecution = _pe(connection, result);
-        statement.close();
-        return partitionExecution;
     }
 
     protected String insertJobInstance() {
@@ -1468,31 +1485,33 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 .setReaderCheckpoint(getLargeObject(result, 11))
                 .setWriterCheckpoint(getLargeObject(result, 12));
 
-        final PreparedStatement ms = connection.prepareStatement(queryPartitionMetric());
-        ms.setLong(1, partitionExecutionId);
-        final ResultSet mr = ms.executeQuery();
-        final ArrayList<Metric> metrics = new ArrayList<Metric>(Metric.MetricType.values().length);
-        while (mr.next()) {
-            metrics.add(new MetricImpl(
-                    Metric.MetricType.valueOf(mr.getString(1)),
-                    mr.getLong(2)
-            ));
+        try (final PreparedStatement ms = connection.prepareStatement(queryPartitionMetric())) {
+            ms.setLong(1, partitionExecutionId);
+            try (final ResultSet mr = ms.executeQuery()) {
+                final ArrayList<Metric> metrics = new ArrayList<>(Metric.MetricType.values().length);
+                while (mr.next()) {
+                    metrics.add(new MetricImpl(
+                            Metric.MetricType.valueOf(mr.getString(1)),
+                            mr.getLong(2)
+                    ));
+                }
+                builder.setMetrics(metrics.toArray(new Metric[metrics.size()]));
+            }
         }
-        ms.close();
-        builder.setMetrics(metrics.toArray(new Metric[metrics.size()]));
 
-        final PreparedStatement ps = connection.prepareStatement(queryPartitionParameters());
-        ps.setLong(1, partitionExecutionId);
-        final ResultSet pr = ps.executeQuery();
-        final Properties properties = new Properties();
-        while (pr.next()) {
-            properties.put(
-                    pr.getString(1),
-                    pr.getString(2)
-            );
+        try (final PreparedStatement ps = connection.prepareStatement(queryPartitionParameters())) {
+            ps.setLong(1, partitionExecutionId);
+            try (final ResultSet pr = ps.executeQuery()) {
+                final Properties properties = new Properties();
+                while (pr.next()) {
+                    properties.put(
+                            pr.getString(1),
+                            pr.getString(2)
+                    );
+                }
+                builder.setPartitionParameters(properties);
+            }
         }
-        ps.close();
-        builder.setPartitionParameters(properties);
 
         return builder.build();
     }
@@ -1513,19 +1532,20 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 .setReaderCheckpoint(getLargeObject(result, 11))
                 .setWriterCheckpoint(getLargeObject(result, 12));
 
-        final PreparedStatement ms = connection.prepareStatement(queryStepMetric());
-        ms.setLong(1, stepExecutionId);
-        final ResultSet mr = ms.executeQuery();
-        final ArrayList<Metric> metrics = new ArrayList<Metric>(Metric.MetricType.values().length);
-        while (mr.next()) {
-            metrics.add(new MetricImpl(
-                    Metric.MetricType.valueOf(mr.getString(1)),
-                    mr.getLong(2)
-            ));
+        try (final PreparedStatement ms = connection.prepareStatement(queryStepMetric())) {
+            ms.setLong(1, stepExecutionId);
+            try (final ResultSet mr = ms.executeQuery()) {
+                final ArrayList<Metric> metrics = new ArrayList<>(Metric.MetricType.values().length);
+                while (mr.next()) {
+                    metrics.add(new MetricImpl(
+                            Metric.MetricType.valueOf(mr.getString(1)),
+                            mr.getLong(2)
+                    ));
+                }
+                builder.setMetrics(metrics.toArray(new Metric[metrics.size()]));
+            }
+            return builder.build();
         }
-        ms.close();
-        builder.setMetrics(metrics.toArray(new Metric[metrics.size()]));
-        return builder.build();
     }
 
     private JobExecutionImpl _je(final Connection connection, final ResultSet result) throws SQLException {
@@ -1542,18 +1562,19 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             .setEndTime(result.getTimestamp(9))
             .setRestartElementId(result.getString(10));
 
-        final PreparedStatement ps = connection.prepareStatement(queryJobExecutionParameters());
-        ps.setLong(1, jobExecutionId);
-        final ResultSet pr = ps.executeQuery();
-        final Properties properties = new Properties();
-        while (pr.next()) {
-            properties.put(
-                    pr.getString(1),
-                    pr.getString(2)
-            );
+        try (final PreparedStatement ps = connection.prepareStatement(queryJobExecutionParameters())) {
+            ps.setLong(1, jobExecutionId);
+            try (final ResultSet pr = ps.executeQuery()) {
+                final Properties properties = new Properties();
+                while (pr.next()) {
+                    properties.put(
+                            pr.getString(1),
+                            pr.getString(2)
+                    );
+                }
+                builder.setJobParameters(properties);
+            }
         }
-        ps.close();
-        builder.setJobParameters(properties);
 
         return builder.build();
     }

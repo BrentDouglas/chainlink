@@ -41,6 +41,8 @@ import java.util.Properties;
         @NamedQuery(name = "JpaJobExecution.previous", query = "select h.previousJobExecution from JpaJobExecutionHistory h where h.jobExecution.id=:jobExecutionId")
 })
 public class JpaJobExecution implements ExtendedJobExecution {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private JpaJobInstance jobInstance;
     private String jobName;

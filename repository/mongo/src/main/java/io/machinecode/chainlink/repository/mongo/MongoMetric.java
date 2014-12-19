@@ -20,6 +20,7 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
         creatorVisibility = NONE
 )
 public class MongoMetric implements Metric, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final MetricType type;
     private final long value;

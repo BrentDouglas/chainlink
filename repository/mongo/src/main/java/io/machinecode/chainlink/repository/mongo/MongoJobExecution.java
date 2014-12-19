@@ -28,6 +28,7 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 )
 @JsonDeserialize(builder = MongoJobExecution.Builder.class)
 public class MongoJobExecution extends JobExecutionImpl {
+    private static final long serialVersionUID = 1L;
 
     private final ObjectId _id;
     private final List<Long> previousJobExecutionIds;

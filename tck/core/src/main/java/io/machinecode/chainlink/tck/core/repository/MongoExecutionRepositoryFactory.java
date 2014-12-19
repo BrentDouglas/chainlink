@@ -18,6 +18,6 @@ public class MongoExecutionRepositoryFactory implements ExecutionRepositoryFacto
         final String database = System.getProperty("mongo.database");
         final Jongo jongo = new Jongo(new MongoClient(host, port).getDB(database));
         jongo.getDatabase().dropDatabase();
-        return new MongoExecutionRepository(jongo, configuration.getMarshallingProviderFactory().produce(configuration), true);
+        return new MongoExecutionRepository(jongo, configuration.getMarshallingProviderFactory().produce(configuration));
     }
 }

@@ -9,6 +9,7 @@ import java.util.List;
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
 public class RunningJobExecutionIdCallable extends BaseCallable<Long, ExtendedJobExecution, List<Long>> {
+    private static final long serialVersionUID = 1L;
 
     private final String jobName;
 
@@ -18,7 +19,7 @@ public class RunningJobExecutionIdCallable extends BaseCallable<Long, ExtendedJo
 
     @Override
     public List<Long> call() throws Exception {
-        final List<Long> ids = new ArrayList<Long>();
+        final List<Long> ids = new ArrayList<>();
         for (final ExtendedJobExecution jobExecution : cache.values()) {
             if (jobName.equals(jobExecution.getJobName())) {
                 switch (jobExecution.getBatchStatus()) {

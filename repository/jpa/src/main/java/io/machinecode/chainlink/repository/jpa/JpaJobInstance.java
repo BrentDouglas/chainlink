@@ -28,6 +28,8 @@ import java.util.List;
         @NamedQuery(name = "JpaJobInstance.jobNames", query = "select distinct j.jobName from JpaJobInstance j order by j.jobName asc")
 })
 public class JpaJobInstance implements ExtendedJobInstance {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private String jobName;
     private String jslName;

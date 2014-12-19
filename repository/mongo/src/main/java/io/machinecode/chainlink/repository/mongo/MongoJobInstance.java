@@ -23,6 +23,7 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 )
 @JsonDeserialize(builder = MongoJobInstance.Builder.class)
 public class MongoJobInstance extends JobInstanceImpl {
+    private static final long serialVersionUID = 1L;
 
     private final ObjectId _id;
     private final Long latestJobInstanceId;

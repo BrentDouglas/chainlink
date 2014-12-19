@@ -3,14 +3,13 @@ package io.machinecode.chainlink.repository.core;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecutionBuilder;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStepExecution, Serializable {
+public class StepExecutionImpl extends BaseExecutionImpl implements ExtendedStepExecution {
     private static final long serialVersionUID = 1L;
 
     private final long jobExecutionId;

@@ -4,13 +4,13 @@ import com.hazelcast.map.AbstractEntryProcessor;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 
 import javax.batch.runtime.JobInstance;
-import java.io.Serializable;
 import java.util.Map;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public class JobInstanceProcessor extends AbstractEntryProcessor<Long, ExtendedJobInstance> implements Serializable {
+public class JobInstanceProcessor extends AbstractEntryProcessor<Long, ExtendedJobInstance> {
+    private static final long serialVersionUID = 1L;
 
     final String jobName;
 
