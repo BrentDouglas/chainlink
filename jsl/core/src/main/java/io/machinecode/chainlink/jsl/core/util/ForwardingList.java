@@ -10,6 +10,7 @@ import java.util.ListIterator;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class ForwardingList<T> implements List<T>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     protected final List<T> delegate;
 
