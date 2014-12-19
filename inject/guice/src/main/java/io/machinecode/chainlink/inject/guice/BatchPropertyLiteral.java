@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class BatchPropertyLiteral implements BatchProperty, Serializable {
+    private static final long serialVersionUID = 1L;
 
     public static final BatchPropertyLiteral DEFAULT = new BatchPropertyLiteral("");
 

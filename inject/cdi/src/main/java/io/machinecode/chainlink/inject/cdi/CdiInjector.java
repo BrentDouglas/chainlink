@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.inject.cdi;
 
 import io.machinecode.chainlink.inject.core.DefaultInjector;
+import io.machinecode.chainlink.inject.core.LoadProviders;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.util.Messages;
@@ -14,7 +15,6 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import java.lang.reflect.Member;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -26,11 +26,7 @@ public class CdiInjector implements Injector {
     private final InjectablesProvider provider;
 
     public CdiInjector() {
-        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<InjectablesProvider>>() {
-            public ServiceLoader<InjectablesProvider> run() {
-                return ServiceLoader.load(InjectablesProvider.class);
-            }
-        });
+        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new LoadProviders());
         final Iterator<InjectablesProvider> iterator = providers.iterator();
         if (iterator.hasNext()) {
             provider = iterator.next();

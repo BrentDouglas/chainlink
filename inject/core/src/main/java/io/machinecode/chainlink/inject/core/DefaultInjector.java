@@ -27,11 +27,7 @@ public class DefaultInjector implements Injector {
     private final InjectablesProvider provider;
 
     public DefaultInjector() {
-        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<InjectablesProvider>>() {
-            public ServiceLoader<InjectablesProvider> run() {
-                return ServiceLoader.load(InjectablesProvider.class);
-            }
-        });
+        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new LoadProviders());
         final Iterator<InjectablesProvider> iterator = providers.iterator();
         if (iterator.hasNext()) {
             provider = iterator.next();
@@ -101,21 +97,25 @@ public class DefaultInjector implements Injector {
         return null;
     }
 
-    public static void set(final Field field, final Object bean, final Object value) throws IllegalAccessException {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+    public static void set(final Field field, final Object bean, final Object value) throws Exception {
+        final Exception exception = AccessController.doPrivileged(new PrivilegedAction<Exception>() {
             @Override
-            public Object run() {
+            public Exception run() {
                 final boolean accessible = field.isAccessible();
                 try {
                     field.setAccessible(true);
                     field.set(bean, value);
+                    return null;
                 } catch (final Exception e) {
-                    //
+                    return e;
                 } finally {
                     field.setAccessible(accessible);
                 }
-                return null;
             }
         });
+        if (exception != null) {
+            throw exception;
+        }
     }
+
 }

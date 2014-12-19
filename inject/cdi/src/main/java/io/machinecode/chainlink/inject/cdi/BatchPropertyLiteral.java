@@ -7,6 +7,7 @@ import javax.enterprise.util.AnnotationLiteral;
  * Brent Douglas <brent.n.douglas@gmail.com>
  */
 public class BatchPropertyLiteral extends AnnotationLiteral<BatchProperty> implements BatchProperty {
+    private static final long serialVersionUID = 1L;
 
     public static final String DEFAULT_NAME = "";
 

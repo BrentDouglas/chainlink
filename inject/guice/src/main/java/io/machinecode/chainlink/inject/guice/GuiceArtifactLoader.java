@@ -14,6 +14,7 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.inject.core.DefaultInjector;
+import io.machinecode.chainlink.inject.core.LoadProviders;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
@@ -25,7 +26,6 @@ import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import java.lang.reflect.Field;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -42,11 +42,7 @@ public class GuiceArtifactLoader implements ArtifactLoader {
     final Injector injector;
 
     public GuiceArtifactLoader(final BindingProvider binding) {
-        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new PrivilegedAction<ServiceLoader<InjectablesProvider>>() {
-            public ServiceLoader<InjectablesProvider> run() {
-                return ServiceLoader.load(InjectablesProvider.class);
-            }
-        });
+        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new LoadProviders());
         final Iterator<InjectablesProvider> iterator = providers.iterator();
         if (iterator.hasNext()) {
             provider = iterator.next();
@@ -118,8 +114,8 @@ public class GuiceArtifactLoader implements ArtifactLoader {
         @Override
         public String get() {
             //TODO Skip field part as this can be for multiple bindings. Field needs to get set by the type listener
-            final String proprety = DefaultInjector.property(batchProperty.name(), batchProperty.name(), provider.getInjectables().getProperties());
-            return proprety == null ? "" : proprety;
+            final String property = DefaultInjector.property(batchProperty.name(), batchProperty.name(), provider.getInjectables().getProperties());
+            return property == null ? "" : property;
         }
     }
 
@@ -138,7 +134,7 @@ public class GuiceArtifactLoader implements ArtifactLoader {
             final String proprety = DefaultInjector.property(batchProperty.name(), field.getName(), provider.getInjectables().getProperties());
             try {
                 DefaultInjector.set(field, instance, proprety);
-            } catch (final IllegalAccessException e) {
+            } catch (final Exception e) {
                 throw new RuntimeException(e);
             }
         }
