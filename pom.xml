@@ -64,7 +64,7 @@
         <version.com.oracle.coherence.coherence>12.1.2-0-0</version.com.oracle.coherence.coherence>
         <version.dom4j>1.6.1</version.dom4j>
         <version.gnu.getopt.java-getopt>1.0.13</version.gnu.getopt.java-getopt>
-        <version.io.machinecode.then>0.2.0</version.io.machinecode.then>
+        <version.io.machinecode.then>0.2.1</version.io.machinecode.then>
         <version.io.machinecode.then.then-api>${version.io.machinecode.then}</version.io.machinecode.then.then-api>
         <version.io.machinecode.then.then-core>${version.io.machinecode.then}</version.io.machinecode.then.then-core>
         <version.javax.enterprise.cdi-api>1.0-SP4</version.javax.enterprise.cdi-api>
