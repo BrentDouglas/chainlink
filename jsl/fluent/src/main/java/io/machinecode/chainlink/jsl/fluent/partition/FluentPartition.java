@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.fluent.partition;
 
-import io.machinecode.chainlink.jsl.core.inherit.InheritablePartition;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritablePartition;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

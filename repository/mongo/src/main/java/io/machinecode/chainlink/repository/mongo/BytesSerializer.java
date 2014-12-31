@@ -3,7 +3,7 @@ package io.machinecode.chainlink.repository.mongo;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import io.machinecode.chainlink.marshalling.jdk.JdkMarshalling;
+import io.machinecode.chainlink.core.marshalling.JdkMarshalling;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 
 import java.io.IOException;

@@ -14,17 +14,12 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-core</artifactId>
+            <artifactId>chainlink-core</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-spi</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-marshalling-jdk</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

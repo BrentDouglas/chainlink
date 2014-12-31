@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.gridgain;
 
-import io.machinecode.chainlink.repository.core.JobExecutionImpl;
+import io.machinecode.chainlink.core.repository.JobExecutionImpl;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import org.gridgain.grid.cache.query.GridCacheQuerySqlField;
 

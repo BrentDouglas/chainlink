@@ -4,8 +4,8 @@ import com.tangosol.net.Member;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.chainlink.transport.coherence.CoherenceRemoteChain;
-import io.machinecode.chainlink.transport.core.DistributedRemoteChain;
-import io.machinecode.chainlink.transport.core.cmd.PushChainCommand;
+import io.machinecode.chainlink.core.transport.DistributedRemoteChain;
+import io.machinecode.chainlink.core.transport.cmd.PushChainCommand;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

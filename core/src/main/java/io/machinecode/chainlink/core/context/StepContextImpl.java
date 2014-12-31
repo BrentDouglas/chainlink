@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core.context;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
-import io.machinecode.chainlink.repository.core.MetricImpl;
-import io.machinecode.chainlink.repository.core.MutableMetricImpl;
+import io.machinecode.chainlink.core.repository.MetricImpl;
+import io.machinecode.chainlink.core.repository.MutableMetricImpl;
 import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.element.execution.Step;

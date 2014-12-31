@@ -19,19 +19,14 @@
                 <include>io.machinecode.chainlink:chainlink-ee-glassfish</include>
                 <include>io.machinecode.chainlink:chainlink-ee-tomee</include>
                 <include>io.machinecode.chainlink:chainlink-ee-wildfly</include>
-                <include>io.machinecode.chainlink:chainlink-inject-core</include>
                 <include>io.machinecode.chainlink:chainlink-inject-cdi</include>
                 <include>io.machinecode.chainlink:chainlink-inject-guice</include>
                 <include>io.machinecode.chainlink:chainlink-inject-jndi</include>
                 <include>io.machinecode.chainlink:chainlink-inject-seam</include>
                 <include>io.machinecode.chainlink:chainlink-inject-spring</include>
-                <include>io.machinecode.chainlink:chainlink-jsl-core</include>
                 <include>io.machinecode.chainlink:chainlink-jsl-fluent</include>
                 <include>io.machinecode.chainlink:chainlink-jsl-groovy</include>
-                <include>io.machinecode.chainlink:chainlink-jsl-xml</include>
                 <include>io.machinecode.chainlink:chainlink-marshalling-jboss</include>
-                <include>io.machinecode.chainlink:chainlink-marshalling-jdk</include>
-                <include>io.machinecode.chainlink:chainlink-repository-core</include>
                 <include>io.machinecode.chainlink:chainlink-repository-coherence</include>
                 <include>io.machinecode.chainlink:chainlink-repository-ehcache</include>
                 <include>io.machinecode.chainlink:chainlink-repository-gridgain</include>
@@ -39,13 +34,11 @@
                 <include>io.machinecode.chainlink:chainlink-repository-infinispan</include>
                 <include>io.machinecode.chainlink:chainlink-repository-jdbc</include>
                 <include>io.machinecode.chainlink:chainlink-repository-jpa</include>
-                <include>io.machinecode.chainlink:chainlink-repository-memory</include>
                 <include>io.machinecode.chainlink:chainlink-repository-mongo</include>
                 <include>io.machinecode.chainlink:chainlink-repository-redis</include>
                 <include>io.machinecode.chainlink:chainlink-se</include>
                 <include>io.machinecode.chainlink:chainlink-server-chainlinkd</include>
                 <include>io.machinecode.chainlink:chainlink-spi</include>
-                <include>io.machinecode.chainlink:chainlink-transport-core</include>
                 <include>io.machinecode.chainlink:chainlink-transport-coherence</include>
                 <include>io.machinecode.chainlink:chainlink-transport-gridgain</include>
                 <include>io.machinecode.chainlink:chainlink-transport-hazelcast</include>

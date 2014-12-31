@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.marshalling.jboss.JbossMarshallingFactory;
-import io.machinecode.chainlink.repository.memory.MemoryExecutionRepositoryFactory;
+import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;

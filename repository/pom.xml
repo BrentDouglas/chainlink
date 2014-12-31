@@ -13,14 +13,12 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>core</module>
         <module>ehcache</module>
         <module>gridgain</module>
         <module>hazelcast</module>
         <module>infinispan</module>
         <module>jpa</module>
         <module>jdbc</module>
-        <module>memory</module>
         <module>mongo</module>
         <module>redis</module>
     </modules>

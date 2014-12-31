@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.chainlink.transport.core.DistributedWorker;
+import io.machinecode.chainlink.core.transport.DistributedWorker;
 import org.infinispan.remoting.transport.Address;
 
 /**

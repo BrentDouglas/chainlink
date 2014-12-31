@@ -2,8 +2,8 @@ package io.machinecode.chainlink.transport.gridgain;
 
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.chainlink.transport.core.DistributedLocalChain;
-import io.machinecode.chainlink.transport.core.cmd.InvokeChainCommand;
+import io.machinecode.chainlink.core.transport.DistributedLocalChain;
+import io.machinecode.chainlink.core.transport.cmd.InvokeChainCommand;
 
 import java.io.Serializable;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan;
 
-import io.machinecode.chainlink.transport.core.DistributedWorkerId;
+import io.machinecode.chainlink.core.transport.DistributedWorkerId;
 import org.infinispan.remoting.transport.Address;
 
 /**

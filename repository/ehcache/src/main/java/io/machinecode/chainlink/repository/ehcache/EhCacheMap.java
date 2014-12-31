@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.ehcache;
 
-import io.machinecode.chainlink.repository.core.CacheMap;
+import io.machinecode.chainlink.core.repository.CacheMap;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 

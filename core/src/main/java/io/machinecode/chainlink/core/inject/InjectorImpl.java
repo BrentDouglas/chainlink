@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.core.inject;
 
 import gnu.trove.set.hash.TLinkedHashSet;
-import io.machinecode.chainlink.inject.core.DefaultInjector;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
@@ -22,7 +21,7 @@ public class InjectorImpl implements Injector {
 
     public InjectorImpl(final Injector... injectors) {
         this.injector = new DefaultInjector();
-        this.injectors = new TLinkedHashSet<Injector>();
+        this.injectors = new TLinkedHashSet<>();
         Collections.addAll(this.injectors, injectors);
     }
 

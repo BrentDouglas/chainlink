@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.test.core.jsl;
 
 import io.machinecode.chainlink.core.factory.JobFactory;
-import io.machinecode.chainlink.jsl.core.inherit.InheritableJob;
-import io.machinecode.chainlink.jsl.core.inherit.execution.InheritableFlow;
-import io.machinecode.chainlink.jsl.core.inherit.execution.InheritableStep;
-import io.machinecode.chainlink.jsl.core.loader.AbstractJobLoader;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
+import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableFlow;
+import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
+import io.machinecode.chainlink.core.loader.AbstractJobLoader;
 import io.machinecode.chainlink.spi.InheritableElement;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.element.Listener;

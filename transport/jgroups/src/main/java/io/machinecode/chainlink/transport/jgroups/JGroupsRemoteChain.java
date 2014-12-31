@@ -2,8 +2,8 @@ package io.machinecode.chainlink.transport.jgroups;
 
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.chainlink.transport.core.DistributedRemoteChain;
-import io.machinecode.chainlink.transport.core.cmd.InvokeChainCommand;
+import io.machinecode.chainlink.core.transport.DistributedRemoteChain;
+import io.machinecode.chainlink.core.transport.cmd.InvokeChainCommand;
 import org.jgroups.Address;
 
 import java.io.Serializable;

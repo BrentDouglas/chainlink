@@ -24,7 +24,7 @@ public final class JobTraversal implements Serializable {
 
     public JobTraversal(final String id, final VisitorNode root) {
         this.id = id;
-        this.transitions = new THashMap<String, ExecutionWork>(root.getIds().size());
+        this.transitions = new THashMap<>(root.getIds().size());
         for (final Entry<String, VisitorNode> entry : root.getIds().entrySet()) {
             this.transitions.put(entry.getKey(), (ExecutionWork) entry.getValue().getValue());
         }

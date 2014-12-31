@@ -19,7 +19,7 @@ public class InjectionContextImpl implements InjectionContext {
     private final InjectablesProvider provider;
 
     public InjectionContextImpl(final ClassLoader classLoader, final ArtifactLoader artifactLoader, final Injector injector) {
-        this.classLoader = new WeakReference<ClassLoader>(classLoader);
+        this.classLoader = new WeakReference<>(classLoader);
         this.artifactLoader = artifactLoader;
         this.injector = injector;
         this.provider = new InjectablesProviderImpl();

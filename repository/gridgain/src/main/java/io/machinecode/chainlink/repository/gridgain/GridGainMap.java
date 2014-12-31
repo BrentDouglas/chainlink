@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.gridgain;
 
-import io.machinecode.chainlink.repository.core.CacheMap;
+import io.machinecode.chainlink.core.repository.CacheMap;
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.cache.GridCache;
 

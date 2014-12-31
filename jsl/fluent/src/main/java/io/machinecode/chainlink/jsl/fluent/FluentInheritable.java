@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.fluent;
 
-import io.machinecode.chainlink.jsl.core.inherit.InheritableBase;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableBase;
 
 /**
  * An elementName that can inherit from other elements from

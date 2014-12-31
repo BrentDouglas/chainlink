@@ -9,7 +9,6 @@ import io.machinecode.chainlink.spi.element.execution.TransitionExecution;
 import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -20,8 +19,7 @@ import java.util.Map;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class VisitorNode implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class VisitorNode {
 
     public static final String ERROR = "FAILURE -";
     public static final String PLAIN = "         ";

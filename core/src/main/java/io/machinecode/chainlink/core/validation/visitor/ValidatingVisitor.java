@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.validation.visitor;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.jsl.core.util.ImmutablePair;
+import io.machinecode.chainlink.spi.jsl.util.ImmutablePair;
 import io.machinecode.chainlink.spi.element.Element;
 import io.machinecode.chainlink.spi.util.Messages;
 
@@ -22,7 +22,7 @@ public abstract class ValidatingVisitor<T extends Element> extends Visitor<T> {
         //Root node is a job
         for (final VisitorNode execution : node.children) {
             final VisitorNode.Cycle cycle = new VisitorNode.Cycle();
-            final Set<String> trail = new THashSet<String>();
+            final Set<String> trail = new THashSet<>();
             ret = _findProblems(execution, cycle, trail) || ret;
         }
         return ret;

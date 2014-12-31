@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>jdk</module>
         <module>jboss</module>
     </modules>
 

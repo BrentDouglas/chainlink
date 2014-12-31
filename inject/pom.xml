@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>core</module>
         <module>cdi</module>
         <module>guice</module>
         <module>jndi</module>

@@ -3,7 +3,7 @@ package io.machinecode.chainlink.test.core.execution;
 import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.jsl.fluent.Jsl;
-import io.machinecode.chainlink.repository.core.MutableMetricImpl;
+import io.machinecode.chainlink.core.repository.MutableMetricImpl;
 import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;

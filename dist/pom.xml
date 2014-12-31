@@ -35,10 +35,6 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-jsl-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-jsl-fluent</artifactId>
         </dependency>
         <dependency>
@@ -47,15 +43,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-jsl-xml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-inject-cdi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-inject-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -72,14 +60,6 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-marshalling-jboss</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-marshalling-jdk</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -107,10 +87,6 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-memory</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-mongo</artifactId>
         </dependency>
         <dependency>
@@ -128,10 +104,6 @@
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-spi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>

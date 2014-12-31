@@ -7,7 +7,6 @@
     <dependencies>
         <module name="gnu.trove"/>
         <module name="io.machinecode.chainlink"/>
-        <module name="io.machinecode.chainlink.marshalling.jdk"/>
         <module name="org.jongo"/>
     </dependencies>
 </module>

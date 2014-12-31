@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.jsl.fluent;
 
 
-import io.machinecode.chainlink.jsl.core.inherit.InheritableListeners;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableListeners;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 public class FluentListeners extends FluentMergeableList<FluentListeners> implements InheritableListeners<FluentListeners, FluentListener> {
 
     private boolean merge;
-    private List<FluentListener> listeners = new ArrayList<FluentListener>(0);
+    private List<FluentListener> listeners = new ArrayList<>(0);
 
     @Override
     public List<FluentListener> getListeners() {

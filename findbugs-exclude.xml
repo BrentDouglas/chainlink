@@ -28,7 +28,7 @@
         <Or>
             <Class name="io.machinecode.chainlink.core.element.execution.StepImpl" />
             <Class name="io.machinecode.chainlink.repository.infinispan.RunningJobExecutionIdCallable" />
-            <Class name="io.machinecode.chainlink.repository.memory.MemoryExecutionRepository" />
+            <Class name="io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepository" />
             <Class name="io.machinecode.chainlink.repository.redis.RedisExecutionRepository" />
         </Or>
         <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
@@ -70,9 +70,9 @@
     <Match>
         <Or>
             <Class name="io.machinecode.chainlink.core.configuration.ConfigurationImpl" />
-            <Class name="io.machinecode.chainlink.marshalling.jdk.JdkMarshalling" />
+            <Class name="io.machinecode.chainlink.core.marshalling.JdkMarshalling" />
             <Class name="io.machinecode.chainlink.marshalling.jboss.JbossMarshalling" />
-            <Class name="io.machinecode.chainlink.repository.core.MetricImpl" />
+            <Class name="io.machinecode.chainlink.core.repository.MetricImpl" />
             <Class name="io.machinecode.chainlink.repository.jpa.JpaMetric" />
             <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository" />
             <Class name="io.machinecode.chainlink.repository.mongo.MongoMetric" />
@@ -89,7 +89,7 @@
         <Bug pattern="REC_CATCH_EXCEPTION"/>
     </Match>
     <Match>
-        <Class name="io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository"/>
+        <Class name="io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository"/>
         <Field name="executionRepositoryId"/>
         <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
     </Match>

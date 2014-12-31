@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.jsl.fluent.task;
 
 import io.machinecode.chainlink.jsl.fluent.FluentMergeableList;
-import io.machinecode.chainlink.jsl.core.inherit.task.InheritableExceptionClassFilter;
+import io.machinecode.chainlink.spi.jsl.inherit.task.InheritableExceptionClassFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +14,8 @@ public class FluentExceptionClassFilter
         extends FluentMergeableList<FluentExceptionClassFilter>
         implements InheritableExceptionClassFilter<FluentExceptionClassFilter, FluentExceptionClass> {
 
-    private List<FluentExceptionClass> includes = new ArrayList<FluentExceptionClass>(0);
-    private List<FluentExceptionClass> excludes = new ArrayList<FluentExceptionClass>(0);
+    private List<FluentExceptionClass> includes = new ArrayList<>(0);
+    private List<FluentExceptionClass> excludes = new ArrayList<>(0);
 
     @Override
     public List<FluentExceptionClass> getIncludes() {

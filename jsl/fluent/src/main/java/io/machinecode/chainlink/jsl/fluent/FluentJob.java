@@ -2,7 +2,7 @@ package io.machinecode.chainlink.jsl.fluent;
 
 import io.machinecode.chainlink.jsl.fluent.execution.FluentDecision;
 import io.machinecode.chainlink.jsl.fluent.execution.FluentExecution;
-import io.machinecode.chainlink.jsl.core.inherit.InheritableJob;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
 import io.machinecode.chainlink.jsl.fluent.execution.FluentFlow;
 import io.machinecode.chainlink.jsl.fluent.execution.FluentSplit;
 import io.machinecode.chainlink.jsl.fluent.execution.FluentStep;
@@ -23,7 +23,7 @@ public class FluentJob extends FluentInheritable<FluentJob> implements Inheritab
     private String restartable = "true";
     private FluentProperties properties;
     private FluentListeners listeners;
-    private List<FluentExecution> executions = new ArrayList<FluentExecution>(0);
+    private List<FluentExecution> executions = new ArrayList<>(0);
 
     @Override
     public String getId() {

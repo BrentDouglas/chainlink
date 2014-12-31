@@ -14,7 +14,8 @@
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-jsl-core</artifactId>
+            <artifactId>chainlink-core</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

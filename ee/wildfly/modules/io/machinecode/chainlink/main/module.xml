@@ -4,12 +4,6 @@
         <resource-root path="chainlink-spi-${project.version}.jar"/>
         <resource-root path="chainlink-core-${project.version}.jar"/>
         <resource-root path="chainlink-ee-wildfly-${project.version}.jar"/>
-        <resource-root path="chainlink-inject-core-${project.version}.jar"/>
-        <resource-root path="chainlink-jsl-core-${project.version}.jar"/>
-        <resource-root path="chainlink-jsl-xml-${project.version}.jar"/>
-        <resource-root path="chainlink-repository-core-${project.version}.jar"/>
-        <resource-root path="chainlink-repository-memory-${project.version}.jar"/>
-        <resource-root path="chainlink-transport-core-${project.version}.jar"/>
         <resource-root path="chainlink-marshalling-jboss-${project.version}.jar"/>
     </resources>
 
@@ -26,10 +20,6 @@
         <module name="org.jboss.modules"/>
         <module name="org.jboss.staxmapper"/>
         <module name="org.jboss.as.transactions"/>
-        <!--
-        <module name="org.jboss.dmr"/>
-        <module name="org.jboss.msc"/>org.jboss.as.ee
-        -->
         <module name="org.jboss.jts"/>
         <module name="org.jboss.marshalling"/>
         <module name="org.jboss.marshalling.river"/>

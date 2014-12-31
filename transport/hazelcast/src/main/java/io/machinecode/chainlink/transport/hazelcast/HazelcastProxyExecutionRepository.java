@@ -3,8 +3,8 @@ package io.machinecode.chainlink.transport.hazelcast;
 import com.hazelcast.core.Member;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
-import io.machinecode.chainlink.transport.core.cmd.InvokeExecutionRepositoryCommand;
+import io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository;
+import io.machinecode.chainlink.core.transport.cmd.InvokeExecutionRepositoryCommand;
 
 import java.io.Serializable;
 

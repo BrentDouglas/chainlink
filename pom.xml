@@ -211,16 +211,6 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-jsl-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-jsl-xml</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-jsl-fluent</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -232,11 +222,6 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-inject-cdi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-inject-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -262,16 +247,6 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-marshalling-jboss</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-marshalling-jdk</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -311,11 +286,6 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-memory</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-repository-mongo</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -347,11 +317,6 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-test-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-transport-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

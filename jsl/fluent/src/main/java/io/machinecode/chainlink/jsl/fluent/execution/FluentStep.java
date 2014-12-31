@@ -10,7 +10,7 @@ import io.machinecode.chainlink.jsl.fluent.task.FluentBatchlet;
 import io.machinecode.chainlink.jsl.fluent.task.FluentChunk;
 import io.machinecode.chainlink.jsl.fluent.task.FluentTask;
 import io.machinecode.chainlink.jsl.fluent.transition.FluentTransition;
-import io.machinecode.chainlink.jsl.core.inherit.execution.InheritableStep;
+import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class FluentStep
     private String allowStartIfComplete = "false";
     private FluentProperties properties;
     private FluentListeners listeners;
-    private List<FluentTransition> transitions = new ArrayList<FluentTransition>(0);
+    private List<FluentTransition> transitions = new ArrayList<>(0);
     private FluentTask task;
     private FluentPartition partition;
 

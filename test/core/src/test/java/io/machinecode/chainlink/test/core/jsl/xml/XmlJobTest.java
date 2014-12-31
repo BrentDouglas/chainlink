@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.test.core.jsl.xml;
 
-import io.machinecode.chainlink.jsl.xml.loader.JarXmlJobLoader;
+import io.machinecode.chainlink.core.jsl.xml.loader.JarXmlJobLoader;
 import io.machinecode.chainlink.test.core.jsl.InheritanceJobTest;
 
 /**

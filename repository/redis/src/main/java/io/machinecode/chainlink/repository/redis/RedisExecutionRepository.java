@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.repository.redis;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.repository.core.JobExecutionImpl;
-import io.machinecode.chainlink.repository.core.JobInstanceImpl;
-import io.machinecode.chainlink.repository.core.MutableMetricImpl;
-import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
-import io.machinecode.chainlink.repository.core.StepExecutionImpl;
+import io.machinecode.chainlink.core.repository.JobExecutionImpl;
+import io.machinecode.chainlink.core.repository.JobInstanceImpl;
+import io.machinecode.chainlink.core.repository.MutableMetricImpl;
+import io.machinecode.chainlink.core.repository.PartitionExecutionImpl;
+import io.machinecode.chainlink.core.repository.StepExecutionImpl;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;

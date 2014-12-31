@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.tck.core.inject;
 
-import io.machinecode.chainlink.inject.core.VetoInjector;
+import io.machinecode.chainlink.core.inject.VetoInjector;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.inject.Injector;

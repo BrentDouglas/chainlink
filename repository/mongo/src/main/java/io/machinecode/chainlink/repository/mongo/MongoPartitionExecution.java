@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.machinecode.chainlink.repository.core.PartitionExecutionImpl;
+import io.machinecode.chainlink.core.repository.PartitionExecutionImpl;
 import org.bson.types.ObjectId;
 
 import javax.batch.runtime.BatchStatus;

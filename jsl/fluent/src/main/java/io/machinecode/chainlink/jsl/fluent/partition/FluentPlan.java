@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.jsl.fluent.partition;
 
 import io.machinecode.chainlink.jsl.fluent.FluentProperties;
-import io.machinecode.chainlink.jsl.core.inherit.InheritablePlan;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritablePlan;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class FluentPlan implements FluentStrategy<FluentPlan>, InheritablePlan<F
 
     private String partitions = ONE;
     private String threads;
-    private List<FluentProperties> properties = new ArrayList<FluentProperties>(0);
+    private List<FluentProperties> properties = new ArrayList<>(0);
 
 
     @Override

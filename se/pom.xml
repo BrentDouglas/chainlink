@@ -23,16 +23,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-marshalling-jdk</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-memory</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
             <scope>provided</scope>

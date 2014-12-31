@@ -1,8 +1,6 @@
 package io.machinecode.chainlink.core.inject;
 
 import gnu.trove.set.hash.TLinkedHashSet;
-import io.machinecode.chainlink.inject.core.JarBatchArtifactLoader;
-import io.machinecode.chainlink.inject.core.WarBatchArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
@@ -25,7 +23,7 @@ public class ArtifactLoaderImpl implements ArtifactLoader {
         this.warBatchLoader = new WarBatchArtifactLoader(classLoader);
         this.configuredLoader = new ClassLoaderArtifactLoader();
         this.tcclLoader = new TcclArtifactLoader();
-        this.loaders = new TLinkedHashSet<ArtifactLoader>();
+        this.loaders = new TLinkedHashSet<>();
         Collections.addAll(this.loaders, artifactLoaders);
     }
 

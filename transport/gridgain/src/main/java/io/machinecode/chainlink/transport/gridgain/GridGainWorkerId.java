@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.gridgain;
 
-import io.machinecode.chainlink.transport.core.DistributedWorkerId;
+import io.machinecode.chainlink.core.transport.DistributedWorkerId;
 
 import java.util.UUID;
 

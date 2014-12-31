@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.transport.coherence;
 
 import com.tangosol.net.Member;
-import io.machinecode.chainlink.transport.core.DistributedUUIDId;
+import io.machinecode.chainlink.core.transport.DistributedUUIDId;
 
 import java.util.UUID;
 

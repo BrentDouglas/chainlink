@@ -12,7 +12,7 @@ public class InjectablesProviderImpl implements InjectablesProvider {
 
     private static final Logger log = Logger.getLogger(InjectablesProviderImpl.class);
 
-    private static final ThreadLocal<Injectables> injectables = new ThreadLocal<Injectables>();
+    private static final ThreadLocal<Injectables> injectables = new ThreadLocal<>();
 
     @Override
     public void setInjectables(final Injectables injectables) {

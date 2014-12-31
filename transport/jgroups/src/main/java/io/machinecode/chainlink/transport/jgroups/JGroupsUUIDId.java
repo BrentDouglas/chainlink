@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.jgroups;
 
-import io.machinecode.chainlink.transport.core.DistributedUUIDId;
+import io.machinecode.chainlink.core.transport.DistributedUUIDId;
 import org.jgroups.Address;
 
 import java.util.UUID;

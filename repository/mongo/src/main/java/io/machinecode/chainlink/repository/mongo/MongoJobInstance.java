@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import io.machinecode.chainlink.repository.core.JobInstanceImpl;
+import io.machinecode.chainlink.core.repository.JobInstanceImpl;
 import org.bson.types.ObjectId;
 
 import java.util.Date;

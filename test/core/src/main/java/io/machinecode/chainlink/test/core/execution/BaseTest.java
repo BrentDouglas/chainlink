@@ -9,7 +9,7 @@ import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
-import io.machinecode.chainlink.repository.memory.MemoryExecutionRepositoryFactory;
+import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;

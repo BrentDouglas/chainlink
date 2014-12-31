@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan;
 
-import io.machinecode.chainlink.transport.core.DistributedUUIDId;
+import io.machinecode.chainlink.core.transport.DistributedUUIDId;
 import org.infinispan.remoting.transport.Address;
 
 import java.util.UUID;

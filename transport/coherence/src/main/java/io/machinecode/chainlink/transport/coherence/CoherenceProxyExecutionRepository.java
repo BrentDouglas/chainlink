@@ -2,8 +2,8 @@ package io.machinecode.chainlink.transport.coherence;
 
 import com.tangosol.net.Member;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
-import io.machinecode.chainlink.transport.core.cmd.InvokeExecutionRepositoryCommand;
+import io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository;
+import io.machinecode.chainlink.core.transport.cmd.InvokeExecutionRepositoryCommand;
 
 import java.io.Serializable;
 

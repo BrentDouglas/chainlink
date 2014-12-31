@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.fluent.transition;
 
-import io.machinecode.chainlink.jsl.core.inherit.transition.InheritableTerminatingTransition;
+import io.machinecode.chainlink.spi.jsl.inherit.transition.InheritableTerminatingTransition;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

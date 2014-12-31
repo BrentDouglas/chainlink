@@ -4,7 +4,7 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Command;
-import io.machinecode.chainlink.transport.core.DistributedWorker;
+import io.machinecode.chainlink.core.transport.DistributedWorker;
 import io.machinecode.chainlink.transport.jgroups.cmd.JGroupsPushChainCommand;
 import org.jgroups.Address;
 

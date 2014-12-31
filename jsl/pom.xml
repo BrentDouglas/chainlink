@@ -13,10 +13,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>core</module>
         <module>fluent</module>
         <module>groovy</module>
-        <module>xml</module>
     </modules>
 
     <dependencies>

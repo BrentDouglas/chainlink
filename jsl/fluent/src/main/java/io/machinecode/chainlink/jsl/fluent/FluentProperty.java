@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.fluent;
 
-import io.machinecode.chainlink.jsl.core.inherit.InheritableProperty;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableProperty;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

@@ -3,7 +3,7 @@ package io.machinecode.chainlink.jsl.fluent.execution;
 import io.machinecode.chainlink.jsl.fluent.FluentProperties;
 import io.machinecode.chainlink.jsl.fluent.FluentPropertyReference;
 import io.machinecode.chainlink.jsl.fluent.transition.FluentTransition;
-import io.machinecode.chainlink.jsl.core.inherit.execution.InheritableDecision;
+import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableDecision;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 public class FluentDecision extends FluentPropertyReference<FluentDecision> implements FluentExecution<FluentDecision>, InheritableDecision<FluentDecision, FluentProperties, FluentTransition> {
 
     private String id;
-    private List<FluentTransition> transitions = new ArrayList<FluentTransition>(0);
+    private List<FluentTransition> transitions = new ArrayList<>(0);
 
     @Override
     public String getId() {

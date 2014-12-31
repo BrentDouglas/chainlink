@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.inject.cdi;
 
-import io.machinecode.chainlink.inject.core.DefaultInjector;
-import io.machinecode.chainlink.inject.core.LoadProviders;
+import io.machinecode.chainlink.core.inject.DefaultInjector;
+import io.machinecode.chainlink.core.inject.LoadProviders;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.util.Messages;

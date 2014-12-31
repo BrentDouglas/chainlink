@@ -2,7 +2,7 @@ package io.machinecode.chainlink.jsl.fluent.execution;
 
 import io.machinecode.chainlink.jsl.fluent.FluentInheritable;
 import io.machinecode.chainlink.jsl.fluent.transition.FluentTransition;
-import io.machinecode.chainlink.jsl.core.inherit.execution.InheritableFlow;
+import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableFlow;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ public class FluentFlow extends FluentInheritable<FluentFlow> implements FluentE
 
     private String id;
     private String next;
-    private List<FluentExecution> executions = new ArrayList<FluentExecution>(0);
-    private List<FluentTransition> transitions = new ArrayList<FluentTransition>(0);
+    private List<FluentExecution> executions = new ArrayList<>(0);
+    private List<FluentTransition> transitions = new ArrayList<>(0);
 
 
     @Override

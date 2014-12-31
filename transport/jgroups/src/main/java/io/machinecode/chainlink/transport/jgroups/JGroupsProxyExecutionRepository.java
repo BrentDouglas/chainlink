@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.transport.jgroups;
 
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.transport.core.DistributedProxyExecutionRepository;
-import io.machinecode.chainlink.transport.core.cmd.InvokeExecutionRepositoryCommand;
+import io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository;
+import io.machinecode.chainlink.core.transport.cmd.InvokeExecutionRepositoryCommand;
 import org.jgroups.Address;
 
 import java.io.Serializable;

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.fluent.execution;
 
-import io.machinecode.chainlink.jsl.core.inherit.execution.InheritableSplit;
+import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableSplit;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ public class FluentSplit implements FluentExecution<FluentSplit>, InheritableSpl
 
     private String id;
     private String next;
-    private List<FluentFlow> flows = new ArrayList<FluentFlow>(0);
+    private List<FluentFlow> flows = new ArrayList<>(0);
 
 
     @Override

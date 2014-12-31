@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.test.seam;
 
-import io.machinecode.chainlink.inject.core.VetoInjector;
+import io.machinecode.chainlink.core.inject.VetoInjector;
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.test.core.execution.batchlet.BatchletTest;

@@ -8,14 +8,7 @@ import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
  */
 public class InvalidJobException extends RuntimeException {
 
-    private final VisitorNode node;
-
     public InvalidJobException(final VisitorNode node) {
-        this.node = node;
-    }
-
-    @Override
-    public String getMessage() {
-        return node.toTree(new StringBuilder(System.lineSeparator())).toString();
+        super(node.toTree(new StringBuilder(System.lineSeparator())).toString());
     }
 }

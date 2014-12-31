@@ -3,8 +3,8 @@ package io.machinecode.chainlink.transport.hazelcast.cmd;
 import com.hazelcast.core.Member;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.chainlink.transport.core.DistributedRemoteChain;
-import io.machinecode.chainlink.transport.core.cmd.PushChainCommand;
+import io.machinecode.chainlink.core.transport.DistributedRemoteChain;
+import io.machinecode.chainlink.core.transport.cmd.PushChainCommand;
 import io.machinecode.chainlink.transport.hazelcast.HazelcastRemoteChain;
 
 /**

@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.repository.ehcache;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.repository.core.BaseMapExecutionRepository;
+import io.machinecode.chainlink.core.repository.BaseMapExecutionRepository;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;

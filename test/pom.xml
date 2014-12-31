@@ -23,7 +23,7 @@
     <properties>
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
-        <marshalling.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingFactory</marshalling.factory.class>
+        <marshalling.factory.class>io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory</marshalling.factory.class>
 
         <container.debug>false</container.debug>
     </properties>
@@ -36,32 +36,12 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-jsl-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-jsl-fluent</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-jsl-xml</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-marshalling-jdk</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-marshalling-jboss</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-memory</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

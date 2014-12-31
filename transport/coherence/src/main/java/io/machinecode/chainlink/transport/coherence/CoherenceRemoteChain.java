@@ -3,8 +3,8 @@ package io.machinecode.chainlink.transport.coherence;
 import com.tangosol.net.Member;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.chainlink.transport.core.DistributedRemoteChain;
-import io.machinecode.chainlink.transport.core.cmd.InvokeChainCommand;
+import io.machinecode.chainlink.core.transport.DistributedRemoteChain;
+import io.machinecode.chainlink.core.transport.cmd.InvokeChainCommand;
 
 import java.io.Serializable;
 

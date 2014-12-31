@@ -2,8 +2,8 @@ package io.machinecode.chainlink.transport.jgroups.cmd;
 
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.chainlink.transport.core.DistributedRemoteChain;
-import io.machinecode.chainlink.transport.core.cmd.PushChainCommand;
+import io.machinecode.chainlink.core.transport.DistributedRemoteChain;
+import io.machinecode.chainlink.core.transport.cmd.PushChainCommand;
 import io.machinecode.chainlink.transport.jgroups.JGroupsRemoteChain;
 import org.jgroups.Address;
 

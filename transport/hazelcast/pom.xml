@@ -27,11 +27,6 @@
             <artifactId>chainlink-spi</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
 </project>

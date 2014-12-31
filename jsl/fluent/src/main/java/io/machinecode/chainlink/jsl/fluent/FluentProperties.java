@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.fluent;
 
-import io.machinecode.chainlink.jsl.core.inherit.InheritableProperties;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
 public class FluentProperties extends FluentMergeableList<FluentProperties> implements InheritableProperties<FluentProperties, FluentProperty> {
 
     private String partition;
-    private List<FluentProperty> properties = new ArrayList<FluentProperty>(0);
+    private List<FluentProperty> properties = new ArrayList<>(0);
 
 
     @Override

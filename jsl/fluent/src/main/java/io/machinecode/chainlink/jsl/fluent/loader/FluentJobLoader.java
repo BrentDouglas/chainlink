@@ -2,8 +2,8 @@ package io.machinecode.chainlink.jsl.fluent.loader;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
-import io.machinecode.chainlink.jsl.core.inherit.InheritableJob;
-import io.machinecode.chainlink.jsl.core.loader.AbstractJobLoader;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
+import io.machinecode.chainlink.core.loader.AbstractJobLoader;
 import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.NoSuchJobException;
@@ -14,13 +14,12 @@ import javax.batch.operations.NoSuchJobException;
  */
 public class FluentJobLoader extends AbstractJobLoader {
 
-
     public FluentJobLoader add(final String jslName, final InheritableJob<?,?,?,?> job) {
         repos.put(jslName, new Node(jslName, job));
         return this;
     }
 
-    final TMap<String, Node> repos = new THashMap<String, Node>();
+    final TMap<String, Node> repos = new THashMap<>();
 
     @Override
     protected Node doLoad(final String jslName) throws NoSuchJobException {

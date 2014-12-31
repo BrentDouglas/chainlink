@@ -25,7 +25,7 @@
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
-        <marshalling.factory.class>io.machinecode.chainlink.marshalling.jdk.JdkMarshallingFactory</marshalling.factory.class>
+        <marshalling.factory.class>io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory</marshalling.factory.class>
 
         <injector.configuration.source.file>META-INF/batch.xml</injector.configuration.source.file>
         <injector.configuration.destination.file>${injector.configuration.source.file}</injector.configuration.destination.file>
@@ -68,16 +68,6 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-marshalling-jdk</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-ehcache</artifactId>
             <scope>test</scope>
         </dependency>
@@ -108,22 +98,12 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-memory</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-mongo</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-repository-redis</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

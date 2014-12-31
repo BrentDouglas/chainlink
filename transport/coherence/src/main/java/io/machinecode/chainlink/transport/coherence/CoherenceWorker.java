@@ -7,7 +7,7 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.chainlink.transport.coherence.cmd.CoherencePushChainCommand;
-import io.machinecode.chainlink.transport.core.DistributedWorker;
+import io.machinecode.chainlink.core.transport.DistributedWorker;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
