@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.xml.partition;
 
-import io.machinecode.chainlink.spi.jsl.inherit.InheritablePlan;
 import io.machinecode.chainlink.core.jsl.xml.XmlProperties;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritablePlan;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

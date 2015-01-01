@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.RepositoryTest;
+import io.machinecode.chainlink.core.repository.RepositoryTest;
 import net.sf.ehcache.CacheManager;
 
 import java.util.Properties;

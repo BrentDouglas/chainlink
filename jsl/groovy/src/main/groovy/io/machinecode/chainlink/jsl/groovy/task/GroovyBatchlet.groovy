@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.task
 
-import io.machinecode.chainlink.jsl.fluent.task.FluentBatchlet
+import io.machinecode.chainlink.core.jsl.fluent.task.FluentBatchlet
 import io.machinecode.chainlink.jsl.groovy.GroovyProperties;
 
 /**

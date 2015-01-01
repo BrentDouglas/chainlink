@@ -12,14 +12,6 @@
     <artifactId>chainlink-test</artifactId>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>core</module>
-        <module>batch</module>
-        <module>cdi</module>
-        <module>guice</module>
-        <module>spring</module>
-    </modules>
-
     <properties>
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
@@ -36,7 +28,8 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-jsl-fluent</artifactId>
+            <artifactId>chainlink-core</artifactId>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -52,11 +45,6 @@
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -105,16 +93,6 @@
             </activation>
             <modules>
                 <module>coherence</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>seam</id>
-            <activation>
-                <property><name>seam</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>seam</module>
             </modules>
         </profile>
         <profile>
@@ -241,17 +219,6 @@
                         <execution>
                             <id>ensure-log4j-properties</id>
                             <phase>generate-test-resources</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <target>
-                                    <copy file="${root.dir}/test/log4j.template.properties"
-                                          tofile="${root.dir}/test/log4j.properties"
-                                          overwrite="false">
-                                    </copy>
-                                </target>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -285,7 +252,7 @@
                                 <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
                                 <resources>
                                     <resource>
-                                        <directory>${root.dir}/test</directory>
+                                        <directory>${root.dir}</directory>
                                         <includes>
                                             <include>log4j.properties</include>
                                         </includes>

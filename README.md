@@ -87,15 +87,15 @@ need to add the JBoss public repository to your setting.xml. See
 for more details. The test profile `in-seam` will not work if seam is
 not installed.
 
-## Run the tests
+## Run the integration tests
 
 Copy [test.template.properties](test.template.properties) to `test.properties`.
 This file is used to configure maven to run the tests. All properties in
 this file will be passed to Surefire and available from
 `System.getProperty(...)` in the test JVM.
 
-Copy [test/log4j.template.properties](test/log4j.template.properties)
-to `test/log4j.properties`. You will probably want so set the root logger
+Copy [log4j.template.properties](log4j.template.properties)
+to `log4j.properties`. You will probably want so set the root logger
 to INFO and both the chainlink and then loggers to TRACE.
 
 To run the full suite of tests available under the `-Ptest` profile you
@@ -121,8 +121,8 @@ running on two JVM's. All properties in this file will be passed to
 Failsafe and available from `System.getProperty(...)` in the secondary
 JVM.
 
-Copy [tck/log4j.template.properties](tck/log4j.template.properties)
-to `tck/log4j.properties`. You will probably want so set the root logger
+Copy [log4j.template.properties](log4j.template.properties)
+to `log4j.properties`. You will probably want so set the root logger
 to INFO and both the chainlink and then loggers to TRACE.
 
 The test process will create these files from the templates when

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy
 
-import io.machinecode.chainlink.jsl.fluent.FluentListeners;
+import io.machinecode.chainlink.core.jsl.fluent.FluentListeners;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.task
 
-import io.machinecode.chainlink.jsl.fluent.task.FluentExceptionClassFilter
+import io.machinecode.chainlink.core.jsl.fluent.task.FluentExceptionClassFilter
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

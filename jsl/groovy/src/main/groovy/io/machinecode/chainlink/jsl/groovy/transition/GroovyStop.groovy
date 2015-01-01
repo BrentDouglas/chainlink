@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.transition
 
-import io.machinecode.chainlink.jsl.fluent.transition.FluentStop
+import io.machinecode.chainlink.core.jsl.fluent.transition.FluentStop
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

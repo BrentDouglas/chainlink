@@ -24,7 +24,6 @@
                 <include>io.machinecode.chainlink:chainlink-inject-jndi</include>
                 <include>io.machinecode.chainlink:chainlink-inject-seam</include>
                 <include>io.machinecode.chainlink:chainlink-inject-spring</include>
-                <include>io.machinecode.chainlink:chainlink-jsl-fluent</include>
                 <include>io.machinecode.chainlink:chainlink-jsl-groovy</include>
                 <include>io.machinecode.chainlink:chainlink-marshalling-jboss</include>
                 <include>io.machinecode.chainlink:chainlink-repository-coherence</include>

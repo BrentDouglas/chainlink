@@ -46,11 +46,6 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-jsl-fluent</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-jsl-groovy</artifactId>
                 <version>${project.version}</version>
             </dependency>

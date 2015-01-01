@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.jsl.xml.execution;
 
-import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
 import io.machinecode.chainlink.core.jsl.xml.XmlInheritable;
 import io.machinecode.chainlink.core.jsl.xml.XmlListeners;
 import io.machinecode.chainlink.core.jsl.xml.XmlProperties;
@@ -13,6 +12,7 @@ import io.machinecode.chainlink.core.jsl.xml.transition.XmlFail;
 import io.machinecode.chainlink.core.jsl.xml.transition.XmlNext;
 import io.machinecode.chainlink.core.jsl.xml.transition.XmlStop;
 import io.machinecode.chainlink.core.jsl.xml.transition.XmlTransition;
+import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import javax.xml.bind.annotation.XmlAccessorType;

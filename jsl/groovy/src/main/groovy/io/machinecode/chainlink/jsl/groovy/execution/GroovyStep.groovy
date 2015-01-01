@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.execution
 
-import io.machinecode.chainlink.jsl.fluent.execution.FluentStep
+import io.machinecode.chainlink.core.jsl.fluent.execution.FluentStep
 import io.machinecode.chainlink.jsl.groovy.GroovyListeners
 import io.machinecode.chainlink.jsl.groovy.GroovyProperties
 import io.machinecode.chainlink.jsl.groovy.partition.GroovyPartition

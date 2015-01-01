@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.machinecode</groupId>
         <artifactId>machinecode-parent</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7-SNAPSHOT</version>
     </parent>
 
     <groupId>io.machinecode.chainlink</groupId>
@@ -185,6 +185,12 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-core</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-dist</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -207,11 +213,6 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-spi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-jsl-fluent</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -312,11 +313,6 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-tck-coherence</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-test-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -581,6 +577,14 @@
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -623,6 +627,21 @@
                                     <groovyc srcdir="${basedir}/src/test/groovy" destdir="${project.build.testOutputDirectory}" encoding="${project.build.sourceEncoding}">
                                         <classpath refid="maven.test.classpath" />
                                     </groovyc>
+                                </target>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>ensure-log4j-properties</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <copy file="${root.dir}/log4j.template.properties"
+                                          tofile="${root.dir}/log4j.properties"
+                                          overwrite="false">
+                                    </copy>
                                 </target>
                             </configuration>
                         </execution>
@@ -715,6 +734,20 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-unit-tests</id>
+                        <phase>process-test-classes</phase>
+                    </execution>
+                    <execution>
+                        <id>report-unit-tests</id>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

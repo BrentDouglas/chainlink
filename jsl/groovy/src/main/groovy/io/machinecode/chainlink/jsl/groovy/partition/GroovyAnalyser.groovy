@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.partition
 
-import io.machinecode.chainlink.jsl.fluent.partition.FluentAnalyser
+import io.machinecode.chainlink.core.jsl.fluent.partition.FluentAnalyser
 import io.machinecode.chainlink.jsl.groovy.GroovyProperties;
 
 /**

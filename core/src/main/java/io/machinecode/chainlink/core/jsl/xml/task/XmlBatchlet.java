@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.core.jsl.xml.task;
 
-import io.machinecode.chainlink.spi.jsl.inherit.task.InheritableTask;
 import io.machinecode.chainlink.core.jsl.xml.XmlPropertyReference;
 import io.machinecode.chainlink.spi.element.task.Batchlet;
+import io.machinecode.chainlink.spi.jsl.inherit.task.InheritableTask;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 

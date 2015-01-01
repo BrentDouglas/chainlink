@@ -6,8 +6,8 @@ import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.test.core.execution.DummyDataSource;
-import io.machinecode.chainlink.test.core.execution.RepositoryTest;
+import io.machinecode.chainlink.core.base.DummyDataSource;
+import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.jboss.logging.Logger;
 import org.junit.After;
 

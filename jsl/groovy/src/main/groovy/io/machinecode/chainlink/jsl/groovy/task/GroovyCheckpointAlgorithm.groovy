@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.task
 
-import io.machinecode.chainlink.jsl.fluent.task.FluentCheckpointAlgorithm
+import io.machinecode.chainlink.core.jsl.fluent.task.FluentCheckpointAlgorithm
 import io.machinecode.chainlink.jsl.groovy.GroovyProperties;
 
 /**

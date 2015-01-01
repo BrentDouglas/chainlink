@@ -9,7 +9,6 @@ export version_io_machinecode_then_then_core="@version.io.machinecode.then.then-
 export version_io_machinecode_chainlink_chainlink_api="@version.io.machinecode.chainlink.chainlink-api@"
 export version_io_machinecode_chainlink_chainlink_core="@version.io.machinecode.chainlink.chainlink-core@"
 export version_io_machinecode_chainlink_chainlink_inject_cdi="@version.io.machinecode.chainlink.chainlink-inject-cdi@"
-export version_io_machinecode_chainlink_chainlink_jsl_fluent="@version.io.machinecode.chainlink.chainlink-jsl-fluent@"
 export version_io_machinecode_chainlink_chainlink_spi="@version.io.machinecode.chainlink.chainlink-spi@"
 export version_net_sf_trove4j_trove4j="@version.net.sf.trove4j.trove4j@"
 

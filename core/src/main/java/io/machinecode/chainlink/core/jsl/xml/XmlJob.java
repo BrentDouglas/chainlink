@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.core.jsl.xml;
 
-import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
 import io.machinecode.chainlink.core.jsl.xml.execution.XmlDecision;
 import io.machinecode.chainlink.core.jsl.xml.execution.XmlExecution;
 import io.machinecode.chainlink.core.jsl.xml.execution.XmlFlow;
 import io.machinecode.chainlink.core.jsl.xml.execution.XmlSplit;
 import io.machinecode.chainlink.core.jsl.xml.execution.XmlStep;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import javax.xml.bind.annotation.XmlAccessorType;

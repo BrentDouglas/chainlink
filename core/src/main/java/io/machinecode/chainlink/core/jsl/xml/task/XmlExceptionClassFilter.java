@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.xml.task;
 
-import io.machinecode.chainlink.spi.jsl.inherit.task.InheritableExceptionClassFilter;
 import io.machinecode.chainlink.core.jsl.xml.XmlMergeableList;
+import io.machinecode.chainlink.spi.jsl.inherit.task.InheritableExceptionClassFilter;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;

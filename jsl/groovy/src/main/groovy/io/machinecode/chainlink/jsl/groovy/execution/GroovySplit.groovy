@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.execution
 
-import io.machinecode.chainlink.jsl.fluent.execution.FluentSplit
+import io.machinecode.chainlink.core.jsl.fluent.execution.FluentSplit
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

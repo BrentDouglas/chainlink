@@ -35,7 +35,7 @@
     </Match>
     <Match>
         <Or>
-            <Class name="io.machinecode.chainlink.test.core.execution.RepositoryTest" />
+            <Class name="io.machinecode.chainlink.core.repository.RepositoryTest" />
         </Or>
         <Bug pattern="SF_SWITCH_FALLTHROUGH"/>
     </Match>
@@ -99,7 +99,7 @@
     </Match>
     <Match>
         <Or>
-            <Class name="io.machinecode.chainlink.test.core.execution.batchlet.artifact.StopBatchlet" />
+            <Class name="io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet" />
         </Or>
         <Bug pattern="NN_NAKED_NOTIFY"/>
     </Match>

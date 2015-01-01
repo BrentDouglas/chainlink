@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.execution
 
-import io.machinecode.chainlink.jsl.fluent.execution.FluentFlow
+import io.machinecode.chainlink.core.jsl.fluent.execution.FluentFlow
 import io.machinecode.chainlink.jsl.groovy.transition.GroovyEnd
 import io.machinecode.chainlink.jsl.groovy.transition.GroovyFail
 import io.machinecode.chainlink.jsl.groovy.transition.GroovyNext

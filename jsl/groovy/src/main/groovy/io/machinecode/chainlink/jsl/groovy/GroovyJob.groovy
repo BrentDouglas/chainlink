@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy
 
-import io.machinecode.chainlink.jsl.fluent.FluentJob
+import io.machinecode.chainlink.core.jsl.fluent.FluentJob
 import io.machinecode.chainlink.jsl.groovy.execution.GroovyDecision
 import io.machinecode.chainlink.jsl.groovy.execution.GroovyFlow
 import io.machinecode.chainlink.jsl.groovy.execution.GroovySplit

@@ -13,11 +13,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-test-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.oracle.coherence</groupId>
             <artifactId>coherence</artifactId>
             <scope>test</scope>

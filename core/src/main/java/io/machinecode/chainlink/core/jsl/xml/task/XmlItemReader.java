@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.xml.task;
 
-import io.machinecode.chainlink.spi.element.task.ItemReader;
 import io.machinecode.chainlink.core.jsl.xml.XmlPropertyReference;
+import io.machinecode.chainlink.spi.element.task.ItemReader;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 

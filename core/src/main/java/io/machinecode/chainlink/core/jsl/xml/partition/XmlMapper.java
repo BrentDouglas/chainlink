@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.xml.partition;
 
-import io.machinecode.chainlink.spi.element.partition.Mapper;
 import io.machinecode.chainlink.core.jsl.xml.XmlPropertyReference;
+import io.machinecode.chainlink.spi.element.partition.Mapper;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 

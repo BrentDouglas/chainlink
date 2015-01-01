@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.jsl.groovy.partition
 
-import io.machinecode.chainlink.jsl.fluent.partition.FluentPartition
+import io.machinecode.chainlink.core.jsl.fluent.partition.FluentPartition
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

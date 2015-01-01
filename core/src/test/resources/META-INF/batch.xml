@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/batchXML_1_0.xsd">
+    <ref id="runBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.RunBatchlet"/>
+    <ref id="stopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet"/>
+    <ref id="failBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet"/>
+    <ref id="injectedBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet"/>
+
+    <ref id="eventOrderListener" class="io.machinecode.chainlink.core.execution.chunk.artifact.listener.EventOrderListener"/>
+    <ref id="expectFailReadOpenExceptionEventOrderListener" class="io.machinecode.chainlink.core.execution.chunk.artifact.listener.ExpectFailReadOpenExceptionEventOrderListener"/>
+    <ref id="expectFailWriteOpenExceptionEventOrderListener" class="io.machinecode.chainlink.core.execution.chunk.artifact.listener.ExpectFailWriteOpenExceptionEventOrderListener"/>
+    <ref id="alwaysEventOrderProcessor" class="io.machinecode.chainlink.core.execution.chunk.artifact.processor.AlwaysEventOrderProcessor"/>
+    <ref id="failEventOrderProcessor" class="io.machinecode.chainlink.core.execution.chunk.artifact.processor.FailEventOrderProcessor"/>
+    <ref id="neverEventOrderProcessor" class="io.machinecode.chainlink.core.execution.chunk.artifact.processor.NeverEventOrderProcessor"/>
+    <ref id="onceFailEventOrderProcessor" class="io.machinecode.chainlink.core.execution.chunk.artifact.processor.OnceFailEventOrderProcessor"/>
+    <ref id="failCheckpointAndCloseEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailCheckpointAndCloseEventOrderReader"/>
+    <ref id="failCheckpointEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailCheckpointEventOrderReader"/>
+    <ref id="failCloseAlwaysEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailCloseAlwaysEventOrderReader"/>
+    <ref id="failCloseEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailCloseEventOrderReader"/>
+    <ref id="failOpenAndCloseEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailOpenAndCloseEventOrderReader"/>
+    <ref id="failOpenEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailOpenEventOrderReader"/>
+    <ref id="failReadAndCloseEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailReadAndCloseEventOrderReader"/>
+    <ref id="failReadEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailReadEventOrderReader"/>
+    <ref id="failTwiceTwiceReadEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailTwiceTwiceReadEventOrderReader"/>
+    <ref id="neverEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.NeverEventOrderReader"/>
+    <ref id="onceFailCheckpointEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.OnceFailCheckpointEventOrderReader"/>
+    <ref id="onceFailReadEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.OnceFailReadEventOrderReader"/>
+    <ref id="oneEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.OneEventOrderReader"/>
+    <ref id="sixEventOrderReader" class="io.machinecode.chainlink.core.execution.chunk.artifact.reader.SixEventOrderReader"/>
+    <ref id="eventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.EventOrderWriter"/>
+    <ref id="failCheckpointAndCloseEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailCheckpointAndCloseEventOrderWriter"/>
+    <ref id="failCheckpointEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailCheckpointEventOrderWriter"/>
+    <ref id="failCloseEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailCloseEventOrderWriter"/>
+    <ref id="failOpenAndCloseEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailOpenAndCloseEventOrderWriter"/>
+    <ref id="failOpenEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailOpenEventOrderWriter"/>
+    <ref id="failWriteAndCloseEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailWriteAndCloseEventOrderWriter"/>
+    <ref id="failWriteEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailWriteEventOrderWriter"/>
+    <ref id="onceFailCheckpointEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.OnceFailCheckpointEventOrderWriter"/>
+    <ref id="onceFailWriteEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.OnceFailWriteEventOrderWriter"/>
+</batch-artifacts>

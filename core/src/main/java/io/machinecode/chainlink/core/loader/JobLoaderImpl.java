@@ -1,8 +1,6 @@
 package io.machinecode.chainlink.core.loader;
 
 import gnu.trove.set.hash.TLinkedHashSet;
-import io.machinecode.chainlink.core.jsl.xml.loader.JarXmlJobLoader;
-import io.machinecode.chainlink.core.jsl.xml.loader.WarXmlJobLoader;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.util.Messages;

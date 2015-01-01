@@ -867,21 +867,6 @@
                                 </target>
                             </configuration>
                         </execution>
-                        <execution>
-                            <id>ensure-log4j-properties</id>
-                            <phase>none</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <target>
-                                    <copy file="${root.dir}/tck/log4j.template.properties"
-                                          tofile="${root.dir}/tck/log4j.properties"
-                                          overwrite="false">
-                                    </copy>
-                                </target>
-                            </configuration>
-                        </execution>
                     </executions>
                 </plugin>
                 <plugin>

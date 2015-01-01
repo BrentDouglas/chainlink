@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.xml.task;
 
-import io.machinecode.chainlink.spi.jsl.inherit.task.InheritableChunk;
 import io.machinecode.chainlink.spi.element.task.Chunk;
+import io.machinecode.chainlink.spi.jsl.inherit.task.InheritableChunk;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
