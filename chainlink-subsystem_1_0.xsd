@@ -26,6 +26,14 @@
                 <xs:sequence>
                     <xs:element name="deployment" type="cl:DeploymentType" minOccurs="0" maxOccurs="1" nillable="false"/>
                 </xs:sequence>
+                <xs:attribute name="factory" use="optional" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The fully qualified class name (fqcn) of the factory to use to configure this subsystem.
+                            Must implement SubSystemConfiguration.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

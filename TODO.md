@@ -8,6 +8,6 @@
   the Messages bundle.
 - Add a JobLoader than uses ServiceLoader to pick up job's declared in
   code (i.e. should work for both the fluent and groovy jobs).
-- Hazelcast, Gridgaid, Coherence and MongoDB repos are broken
+- Hazelcast, Gridgain, Coherence and MongoDB repos are broken
 - CdiArtifactFactory starts weld so is only usable in SE mode
 - Lots of things need tests written for them
