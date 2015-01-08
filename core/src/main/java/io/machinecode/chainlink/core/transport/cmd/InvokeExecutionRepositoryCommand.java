@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
+import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.transport.Command;
@@ -8,6 +9,7 @@ import io.machinecode.chainlink.spi.transport.Transport;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -31,6 +33,7 @@ public class InvokeExecutionRepositoryCommand<T,A> implements Command<T,A> {
     public T perform(final Transport<A> transport, final A origin) throws Throwable {
         //TODO Ensure local
         final ExecutionRepository repository = transport.getRegistry().getExecutionRepository(executionRepositoryId);
+        LocalRegistry.assertExecutionRepository(repository, executionRepositoryId);
         Method method = null;
         for (final Method that : ExecutionRepository.class.getDeclaredMethods()) {
             if (that.getName().equals(methodName) && that.getParameterTypes().length == parameters.length) {
@@ -50,5 +53,15 @@ public class InvokeExecutionRepositoryCommand<T,A> implements Command<T,A> {
         } catch (final InvocationTargetException e) {
             throw e.getCause();
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("InvokeExecutionRepositoryCommand{");
+        sb.append("executionRepositoryId=").append(executionRepositoryId);
+        sb.append(", methodName='").append(methodName).append('\'');
+        sb.append(", parameters=").append(Arrays.toString(parameters));
+        sb.append('}');
+        return sb.toString();
     }
 }

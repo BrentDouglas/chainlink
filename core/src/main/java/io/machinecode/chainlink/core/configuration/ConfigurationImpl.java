@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.core.inject.InjectionContextImpl;
 import io.machinecode.chainlink.core.inject.InjectorImpl;
 import io.machinecode.chainlink.core.loader.JobLoaderImpl;
+import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.security.SecurityImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -22,6 +23,7 @@ import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -42,6 +44,7 @@ public class ConfigurationImpl implements Configuration {
     protected final Transport<?> transport;
     protected final Registry registry;
     protected final Executor executor;
+    protected final Properties properties;
 
     public ConfigurationImpl(final JobOperatorModelImpl model) throws Exception {
         this.classLoader = nn(model.classLoader);
@@ -57,6 +60,7 @@ public class ConfigurationImpl implements Configuration {
         this.transport = nn(model.transport);
         this.executionRepository = nn(model.executionRepository);
         this.executor = nn(model.executor);
+        this.properties = model.getProperties();
     }
 
     private <T> T n(final DeclarationImpl<T> dec) {
@@ -78,6 +82,16 @@ public class ConfigurationImpl implements Configuration {
             ret[i++] = that.get(this);
         }
         return ret;
+    }
+
+    @Override
+    public String getProperty(final String name) {
+        return this.properties.getProperty(name);
+    }
+
+    @Override
+    public String getProperty(final String name, final String defaultValue) {
+        return this.properties.getProperty(name, defaultValue);
     }
 
     @Override
@@ -107,7 +121,9 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        return registry.getExecutionRepository(id);
+        final ExecutionRepository repository = transport.getExecutionRepository(id);
+        LocalRegistry.assertExecutionRepository(repository, id);
+        return repository;
     }
 
     @Override

@@ -21,4 +21,12 @@ public class CleanupCommand<A> implements Command<Void,A> {
         transport.getRegistry().unregisterJob(jobExecutionId).get();
         return null;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("CleanupCommand{");
+        sb.append("jobExecutionId=").append(jobExecutionId);
+        sb.append('}');
+        return sb.toString();
+    }
 }

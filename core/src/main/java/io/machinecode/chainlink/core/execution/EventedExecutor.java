@@ -1,11 +1,9 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.core.configuration.RuntimeConfigurationImpl;
 import io.machinecode.chainlink.core.then.AllChain;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.RejectedChain;
-import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.ChainAndIds;
@@ -38,36 +36,18 @@ public class EventedExecutor implements Executor {
 
     private static final Logger log = Logger.getLogger(EventedExecutor.class);
 
-    protected final RuntimeConfiguration configuration;
     protected final Registry registry;
     protected final Transport<?> transport;
     private final ExecutorService cancellation = Executors.newSingleThreadExecutor();
 
     public EventedExecutor(final Dependencies dependencies, final Properties properties) {
-        this.configuration = new RuntimeConfigurationImpl(this,
-                dependencies.getRegistry(),
-                dependencies.getTransport(),
-                dependencies.getTransactionManager(),
-                dependencies.getInjectionContext()
-        );
         this.registry = dependencies.getRegistry();
-        this.transport = configuration.getTransport();
-        final int numThreads;
-        try {
-            numThreads = Integer.parseInt(properties.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));
-        } catch (final NumberFormatException e) {
-            throw new RuntimeException(e); //TODO Message
-        }
-        for (int i = 0; i < numThreads; ++i) {
-            final Worker worker;
-            try {
-                worker = new EventedWorker(this.configuration);
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO Message
-            }
-            worker.start();
-            this.transport.registerWorker(worker.id(), worker);
-        }
+        this.transport = dependencies.getTransport();
+    }
+
+    @Override
+    public void open(final Configuration configuration) throws Exception {
+        // no op
     }
 
     @Override

@@ -196,17 +196,9 @@ public class InfinispanTransport extends BaseTransport<Address> {
         return unit;
     }
 
-    private Worker _localWorker(final WorkerId workerId) {
-        return super.getWorker(workerId);
-    }
-
-    private Worker _localWorker(final long jobExecutionId, final ExecutableId executableId) {
-        return super.getWorker(jobExecutionId, executableId);
-    }
-
     @Override
     public Worker getWorker(final WorkerId workerId) {
-        final Worker worker = _localWorker(workerId);
+        final Worker worker = getLocalWorker(workerId);
         if (worker != null) {
             return worker;
         }
@@ -278,7 +270,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
 
     @Override
     public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) {
-        final Worker worker = _localWorker(jobExecutionId, executableId);
+        final Worker worker = getLocalWorker(jobExecutionId, executableId);
         if (worker != null) {
             return worker;
         }
@@ -311,7 +303,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
 
     @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        final ExecutionRepository ours = super.getExecutionRepository(id);
+        final ExecutionRepository ours = registry.getExecutionRepository(id);
         if (ours != null) {
             return ours;
         }
@@ -363,42 +355,13 @@ public class InfinispanTransport extends BaseTransport<Address> {
         throw new IllegalStateException(); //TODO Message
     }
 
-    public ExecutionRepository getLocalExecutionRepository(final ExecutionRepositoryId id) {
-        return  super.getExecutionRepository(id);
-    }
-
     //TODO
     protected List<Address> filterMembers(final List<Address> all, final int required) {
         return all.subList(0, required > all.size() ? all.size() : required);
     }
 
-    public InfinispanWorkerId leastBusyWorker() {
-        return (InfinispanWorkerId)getWorker().id();
-    }
-
     public Address getLocal() {
         return local;
-    }
-
-    public boolean hasWorker(final WorkerId workerId) {
-        return _localWorker(workerId) != null;
-    }
-
-    public boolean hasWorker(final long jobExecutionId, final ExecutableId executableId) {
-        return _localWorker(jobExecutionId, executableId) != null;
-    }
-
-    @Override
-    public <T> void invokeRemote(final Address address, final Command<T, Address> command, final Deferred<T,Throwable,?> promise) {
-        if (address == null) {
-            throw new IllegalArgumentException(); //TODO Message
-        }
-        rpc.invokeRemotelyInFuture(
-                Collections.singleton(address),
-                new CommandAdapter(cacheName, command, getLocal()),
-                options,
-                new InfinispanFuture<>(this, promise, address, System.currentTimeMillis())
-        );
     }
 
     @Override

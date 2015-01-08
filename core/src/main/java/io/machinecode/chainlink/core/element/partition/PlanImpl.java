@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.element.partition;
 
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Plan;
 import io.machinecode.chainlink.spi.util.Messages;
@@ -50,7 +50,7 @@ public class PlanImpl implements Plan, StrategyWork, Serializable {
     }
 
     @Override
-    public PartitionPlan getPartitionPlan(final RuntimeConfiguration configuration, final ExecutionContext context) {
+    public PartitionPlan getPartitionPlan(final Configuration configuration, final ExecutionContext context) {
         int threads;
         try {
             threads = Integer.parseInt(this.threads);

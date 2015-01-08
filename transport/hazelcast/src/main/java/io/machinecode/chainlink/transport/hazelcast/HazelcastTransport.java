@@ -122,23 +122,6 @@ public class HazelcastTransport extends DistributedTransport<Member> {
     }
 
     @Override
-    public <T> void invokeRemote(final Member address, final Command<T, Member> command, final Deferred<T, Throwable,?> promise) {
-        try {
-            log.tracef("Invoking %s on %s.", command, address);
-            final FutureDeferred<T, Void> run = new FutureDeferred<T, Void>(this.executor.<T>submitToMember(
-                    new Invocation<T>(command, this.local),
-                    address
-            ), this.timeout, this.unit);
-            run.onResolve(promise)
-                    .onReject(promise)
-                    .onCancel(promise);
-            network.execute(run);
-        } catch (Exception e) {
-            promise.reject(e);
-        }
-    }
-
-    @Override
     public <T> void invokeRemote(final Member address, final Command<T, Member> command, final Deferred<T, Throwable, ?> promise, final long timeout, final TimeUnit unit) {
         try {
             log.tracef("Invoking %s on %s.", command, address);
@@ -160,7 +143,7 @@ public class HazelcastTransport extends DistributedTransport<Member> {
 
         private final Command<T, Member> command;
         private final String uuid;
-        private transient HazelcastTransport registry;
+        private transient HazelcastTransport transport;
         private transient Member origin;
 
         public Invocation(final Command<T, Member> command, final Member origin) {
@@ -170,7 +153,7 @@ public class HazelcastTransport extends DistributedTransport<Member> {
 
         @Override
         public void setHazelcastInstance(final HazelcastInstance hazelcast) {
-            this.registry = (HazelcastTransport) hazelcast.getUserContext().get(HazelcastTransport.class.getCanonicalName());
+            this.transport = (HazelcastTransport) hazelcast.getUserContext().get(HazelcastTransport.class.getCanonicalName());
             for (final Member member : hazelcast.getCluster().getMembers()) {
                 if (member.getUuid().equals(this.uuid)) {
                     this.origin = member;
@@ -185,7 +168,7 @@ public class HazelcastTransport extends DistributedTransport<Member> {
         @Override
         public T call() throws Exception {
             try {
-                return command.perform(this.registry, this.origin);
+                return command.perform(this.transport, this.origin);
             } catch (final Exception e) {
                 throw e;
             } catch (final Throwable e) {

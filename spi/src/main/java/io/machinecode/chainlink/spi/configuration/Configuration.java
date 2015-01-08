@@ -10,6 +10,10 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
  */
 public interface Configuration extends Dependencies {
 
+    String getProperty(final String name);
+
+    String getProperty(final String name, final String defaultValue);
+
     Executor getExecutor();
 
     ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id);

@@ -19,7 +19,7 @@ public class FindWorkerByIdCallable extends BaseCallable<Object, Object, Address
 
     @Override
     public Address call() throws Exception {
-        final InfinispanTransport registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
-        return registry.hasWorker(id) ? registry.getLocal() : null;
+        final InfinispanTransport transport = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
+        return transport.hasWorker(id) ? transport.getLocal() : null;
     }
 }

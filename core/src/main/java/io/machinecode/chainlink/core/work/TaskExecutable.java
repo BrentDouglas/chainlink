@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.work;
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
@@ -31,7 +31,7 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
     }
 
     @Override
-    public void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
+    public void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
                           final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
         //TODO Check ordering of this and check it is allowed to run in this thread
         chain.onCancel(new OnCancel() {

@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -144,6 +145,11 @@ public class JobOperatorView implements ExtendedJobOperator {
     @Override
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         return delegate.getStepExecutions(jobExecutionId);
+    }
+
+    @Override
+    public void open(final Configuration configuration) throws Exception {
+        delegate.open(configuration);
     }
 
     @Override

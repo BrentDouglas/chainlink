@@ -20,4 +20,12 @@ public class FindWorkerByIdCommand<A> implements Command<A,A> {
     public A perform(final Transport<A> transport, final A origin) throws Throwable {
         return transport.hasWorker(workerId) ? transport.getLocal() : null;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("FindWorkerByIdCommand{");
+        sb.append("workerId=").append(workerId);
+        sb.append('}');
+        return sb.toString();
+    }
 }

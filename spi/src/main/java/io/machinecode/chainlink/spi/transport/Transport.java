@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.spi.transport;
 
+import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
@@ -17,19 +18,15 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public interface Transport<A> extends AutoCloseable {
+public interface Transport<A> extends Lifecycle {
 
-    <T> Future<T> invokeLocal(final Command<T, A> command) throws Exception;
-
-    <T> void invokeRemote(final A address, final Command<T, A> command, final Deferred<T, Throwable,?> promise);
+    <T> Future<T> invokeLocal(final Command<T, A> command, final A origin) throws Exception;
 
     <T> void invokeRemote(final A address, final Command<T, A> command, final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit);
 
     A getLocal();
 
     Registry getRegistry();
-
-    void registerWorker(final WorkerId id, final Worker worker);
 
     Worker getWorker(final WorkerId id);
 
@@ -38,8 +35,6 @@ public interface Transport<A> extends AutoCloseable {
     List<Worker> getWorkers(final int required);
 
     Worker getWorker(final long jobExecutionId, final ExecutableId executableId);
-
-    Worker unregisterWorker(final WorkerId id);
 
     boolean hasWorker(final WorkerId workerId);
 

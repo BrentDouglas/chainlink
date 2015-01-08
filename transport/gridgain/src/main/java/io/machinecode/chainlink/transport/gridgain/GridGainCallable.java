@@ -28,8 +28,8 @@ public class GridGainCallable<T> implements Callable<T>, Serializable {
     @Override
     public T call() throws Exception {
         try {
-            final GridGainTransport registry = GridGain.grid(gridName).<String, GridGainTransport>nodeLocalMap().get(GridGainTransport.class.getName());
-            return command.perform(registry, origin);
+            final GridGainTransport transport = GridGain.grid(gridName).<String, GridGainTransport>nodeLocalMap().get(GridGainTransport.class.getName());
+            return command.perform(transport, origin);
         } catch (final Throwable e) {
             throw new Exception(e);
         }

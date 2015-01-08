@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.spi.registry;
 
+import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -13,7 +14,7 @@ import javax.batch.operations.JobExecutionNotRunningException;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface Registry extends AutoCloseable {
+public interface Registry extends Lifecycle {
 
     ExecutionRepositoryId registerExecutionRepository(final ExecutionRepositoryId repositoryId, final ExecutionRepository repository);
 

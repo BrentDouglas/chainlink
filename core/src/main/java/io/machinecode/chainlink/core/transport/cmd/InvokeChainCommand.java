@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
+import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Command;
@@ -8,6 +9,7 @@ import io.machinecode.chainlink.spi.transport.Transport;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -30,8 +32,10 @@ public class InvokeChainCommand<T,A> implements Command<T,A> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T perform(final Transport<A> transport, final A origin) throws Throwable {
         final Chain<?> chain = transport.getRegistry().getChain(jobExecutionId, chainId);
+        LocalRegistry.assertChain(chain, jobExecutionId, chainId);
         Method method = null;
         for (final Method that : chain.getClass().getMethods()) {
             if (that.getName().equals(methodName) && that.getParameterTypes().length == parameters.length) {
@@ -54,5 +58,16 @@ public class InvokeChainCommand<T,A> implements Command<T,A> {
         } catch (final InvocationTargetException e) {
             throw e.getCause();
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("InvokeChainCommand{");
+        sb.append("jobExecutionId=").append(jobExecutionId);
+        sb.append(", chainId=").append(chainId);
+        sb.append(", methodName='").append(methodName).append('\'');
+        sb.append(", parameters=").append(Arrays.toString(parameters));
+        sb.append('}');
+        return sb.toString();
     }
 }

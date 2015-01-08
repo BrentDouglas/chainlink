@@ -111,12 +111,6 @@ public class GridGainTransport extends DistributedTransport<UUID> {
 
     @Override
     public <T> void invokeRemote(final UUID address, final Command<T, UUID> command,
-                                 final Deferred<T, Throwable,?> promise) {
-        this.invokeRemote(address, command, promise, timeout, unit);
-    }
-
-    @Override
-    public <T> void invokeRemote(final UUID address, final Command<T, UUID> command,
                                  final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
         try {
             log.tracef("Invoking %s on %s.", command, address);

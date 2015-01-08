@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.execution;
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
@@ -29,5 +29,5 @@ public interface Executable {
 
     ExecutionContext getContext();
 
-    void execute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId, final ExecutionContext childContext);
+    void execute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId, final ExecutionContext childContext);
 }

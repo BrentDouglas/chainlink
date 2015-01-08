@@ -20,10 +20,10 @@ public class FindExecutionRepositoryWithIdCallable extends BaseCallable<Object, 
 
     @Override
     public Address call() throws Exception {
-        final InfinispanTransport registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
-        final ExecutionRepository repository = registry.getLocalExecutionRepository(id);
+        final InfinispanTransport transport = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
+        final ExecutionRepository repository = transport.getRegistry().getExecutionRepository(id);
         if (repository != null) {
-            return registry.getLocal();
+            return transport.getLocal();
         }
         return null;
     }

@@ -69,7 +69,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
         this.loader = new WeakReference<>(dependencies.getClassLoader());
         this.marshalling = dependencies.getMarshalling();
 
-        this.network= Executors.newSingleThreadExecutor();
+        this.network= Executors.newCachedThreadPool();
         this.reaper = Executors.newSingleThreadExecutor();
 
         this.timeout = Long.parseLong(properties.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
@@ -84,6 +84,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
             @Override
             public Promise<?,?,?> onUnregister(final long jobExecutionId, final Chain<?> job) {
+                final CleanupCommand<A> command = new CleanupCommand<>(jobExecutionId);
                 final FutureDeferred<Object, Void> promise = new FutureDeferred<>(job, timeout, unit);
                 promise.onComplete(new OnComplete() {
                     @Override
@@ -92,7 +93,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
                             final A address = pair.getValue();
                             if (!address.equals(getLocal())) {
                                 try {
-                                    _invoke(address, new CleanupCommand<A>(jobExecutionId));
+                                    _invoke(address, command);
                                 } catch (Exception e) {
                                     log.errorf(e,""); // TODO Message
                                 }
@@ -123,7 +124,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
     @Override
     public Worker getWorker(final WorkerId workerId) {
-        final Worker worker = _localWorker(workerId);
+        final Worker worker = getLocalWorker(workerId);
         if (worker != null) {
             return worker;
         }
@@ -205,7 +206,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
     @Override
     public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) {
-        final Worker worker = _localWorker(jobExecutionId, executableId);
+        final Worker worker = getLocalWorker(jobExecutionId, executableId);
         if (worker != null) {
             return worker;
         }
@@ -242,7 +243,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
     @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        final ExecutionRepository ours = getRegistry().getExecutionRepository(id);
+        final ExecutionRepository ours = registry.getExecutionRepository(id);
         if (ours != null) {
             return ours;
         }
@@ -301,16 +302,6 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
     }
 
     @Override
-    public WorkerId leastBusyWorker() {
-        return getWorker().id();
-    }
-
-    @Override
-    public boolean hasWorker(final WorkerId workerId) {
-        return _localWorker(workerId) != null;
-    }
-
-    @Override
     public long getTimeout() {
         return timeout;
     }
@@ -320,22 +311,10 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
         return unit;
     }
 
-    public boolean hasWorker(final long jobExecutionId, final ExecutableId executableId) {
-        return _localWorker(jobExecutionId, executableId) != null;
-    }
-
     protected <T> Future<T> _invoke(final A address, final Command<T, A> command) throws Exception {
         final Deferred<T,Throwable,Void> promise = new DeferredImpl<>();
-        invokeRemote(address, command, promise);
+        invokeRemote(address, command, promise, this.timeout, this.unit);
         return promise;
-    }
-
-    private Worker _localWorker(final WorkerId workerId) {
-        return super.getWorker(workerId);
-    }
-
-    private Worker _localWorker(final long jobExecutionId, final ExecutableId executableId) {
-        return super.getWorker(jobExecutionId, executableId);
     }
 
     //TODO

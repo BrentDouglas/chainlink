@@ -9,6 +9,7 @@ import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
+import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.Constants;
@@ -48,51 +49,43 @@ public abstract class BaseTest extends Assert {
     protected final Configuration configuration() throws Exception {
         if (this._configuration == null) {
             final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-            final SubSystemModelImpl subSystem = new SubSystemModelImpl(tccl);
-            final DeploymentModelImpl deployment = subSystem.getDeployment();
-            final JobOperatorModelImpl jobOperator = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
-            jobOperator.getClassLoader().setDefaultValueFactory(new ClassLoaderFactory() {
-                @Override
-                public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                    return tccl;
-                }
-            });
-            jobOperator.getTransactionManager().setDefaultValueFactory(new TransactionManagerFactory() {
-                @Override
-                public TransactionManager produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                    return _transactionManager = new LocalTransactionManager(180, TimeUnit.SECONDS);
-                }
-            });
-            jobOperator.getExecutionRepository().setDefaultValueFactory(new MemoryExecutionRepositoryFactory() {
-                @Override
-                public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                    return _repository = super.produce(dependencies, properties);
-                }
-            });
-            jobOperator.getMarshalling().setDefaultValueFactory(new MarshallingFactory() {
-                @Override
-                public Marshalling produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                    return _marshalling = ((MarshallingFactory) Class.forName(System.getProperty("marshalling.factory.class", JdkMarshallingFactory.class.getName())).newInstance())
-                            .produce(dependencies, properties);
-                }
-            });
-            jobOperator.getTransport().setDefaultValueFactory(new LocalTransportFactory());
-            jobOperator.getRegistry().setDefaultValueFactory(new LocalRegistryFactory() {
-                @Override
-                public LocalRegistry produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                    return (LocalRegistry)(_registry = super.produce(dependencies, properties));
-                }
-            });
-            jobOperator.getExecutor().setDefaultValueFactory(new EventedExecutorFactory() {
-                @Override
-                public Executor produce(final Dependencies dependencies, final Properties properties) {
-                    return _executor = super.produce(dependencies, properties);
-                }
-            });
-            this.visitJobOperatorModel(jobOperator);
+            final DeploymentModelImpl deployment = _configure(tccl);
+            final JobOperatorModelImpl op = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+            this.visitJobOperatorModel(op);
             this._configuration = deployment.getConfiguration(Constants.DEFAULT_CONFIGURATION);
+
+            this._transactionManager = op.getTransactionManager().get(_configuration);
+            this._registry = op.getRegistry().get(_configuration);
+            this._repository = op.getExecutionRepository().get(_configuration);
+            this._marshalling = op.getMarshalling().get(_configuration);
+            this._executor = op.getExecutor().get(_configuration);
         }
         return this._configuration;
+    }
+
+    protected DeploymentModelImpl _configure(final ClassLoader tccl) {
+        final SubSystemModelImpl subSystem = new SubSystemModelImpl(tccl);
+        final DeploymentModelImpl deployment = subSystem.getDeployment();
+        final JobOperatorModelImpl jobOperator = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
+        jobOperator.getClassLoader().setDefaultValueFactory(new ClassLoaderFactory() {
+            @Override
+            public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return tccl;
+            }
+        });
+        jobOperator.getTransactionManager().setDefaultValueFactory(new LocalTransactionManagerFactory(180, TimeUnit.SECONDS));
+        jobOperator.getExecutionRepository().setDefaultValueFactory(new MemoryExecutionRepositoryFactory());
+        jobOperator.getMarshalling().setDefaultValueFactory(new MarshallingFactory() {
+            @Override
+            public Marshalling produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return ((MarshallingFactory) Class.forName(System.getProperty("marshalling.factory.class", JdkMarshallingFactory.class.getName())).newInstance())
+                        .produce(dependencies, properties);
+            }
+        });
+        jobOperator.getTransport().setDefaultValueFactory(new LocalTransportFactory());
+        jobOperator.getRegistry().setDefaultValueFactory(new LocalRegistryFactory());
+        jobOperator.getExecutor().setDefaultValueFactory(new EventedExecutorFactory());
+        return deployment;
     }
 
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {

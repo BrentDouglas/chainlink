@@ -20,7 +20,7 @@
 
         <container.debug>false</container.debug>
 
-        <execution.repository.factory.class>io.machinecode.chainlink.repository.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
+        <execution.repository.factory.class>io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
@@ -264,6 +264,8 @@
             </activation>
             <properties>
                 <container.debug>true</container.debug>
+                <wildfly.jvm.arguments>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
+                <chainlink.opts>-server -Xms256m -Xmx256m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:+ExplicitGCInvokesConcurrent -XX:+UseCompressedOops -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</chainlink.opts>
             </properties>
         </profile>
 
@@ -281,11 +283,6 @@
                 <module>coherence</module>
             </modules>
             <dependencies>
-                <dependency>
-                    <groupId>io.machinecode.chainlink</groupId>
-                    <artifactId>chainlink-tck-coherence</artifactId>
-                    <scope>test</scope>
-                </dependency>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
                     <artifactId>chainlink-transport-coherence</artifactId>
@@ -899,7 +896,7 @@
                                 <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
                                 <resources>
                                     <resource>
-                                        <directory>${project.basedir}/..</directory>
+                                        <directory>${root.dir}</directory>
                                         <includes>
                                             <include>log4j.properties</include>
                                         </includes>
@@ -938,6 +935,46 @@
                                         <overWrite>true</overWrite>
                                         <outputDirectory>${deployment.dir}</outputDirectory>
                                         <destFileName>chainlink-tck-core-${project.version}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>copy-tck-coherence</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>io.machinecode.chainlink</groupId>
+                                        <artifactId>chainlink-tck-coherence</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>jar</type>
+                                        <overWrite>true</overWrite>
+                                        <outputDirectory>${deployment.dir}</outputDirectory>
+                                        <destFileName>chainlink-tck-coherence-${project.version}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>copy-tck-seam</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>io.machinecode.chainlink</groupId>
+                                        <artifactId>chainlink-tck-seam</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>jar</type>
+                                        <overWrite>true</overWrite>
+                                        <outputDirectory>${deployment.dir}</outputDirectory>
+                                        <destFileName>chainlink-tck-seam-${project.version}.jar</destFileName>
                                     </artifactItem>
                                 </artifactItems>
                             </configuration>

@@ -29,6 +29,15 @@ import java.util.Set;
  */
 public class JobOperatorModelImpl implements JobOperatorModel {
 
+    public static final String CLASS_LOADER = "class-loader";
+    public static final String MARSHALLING = "marshalling";
+    public static final String TRANSPORT = "transport";
+    public static final String REGISTRY = "registry";
+    public static final String EXECUTION_REPOSITORY = "execution-repository";
+    public static final String TRANSACTION_MANAGER = "transaction-manager";
+    public static final String EXECUTOR = "executor";
+    public static final String MBEAN_SERVER = "mbean-server";
+
     final String name;
     final ScopeModelImpl scope;
     final Set<String> names = new THashSet<>();
@@ -108,7 +117,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<ClassLoader> getClassLoader() {
         if (classLoader == null) {
-            return classLoader = new DeclarationImpl<>(loader, names, values, ClassLoader.class, "class-loader");
+            return classLoader = new DeclarationImpl<>(loader, names, values, ClassLoader.class, CLASS_LOADER);
         }
         return classLoader;
     }
@@ -116,7 +125,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<Marshalling> getMarshalling() {
         if (marshalling == null) {
-            return marshalling = new DeclarationImpl<>(loader, names, values, Marshalling.class, "marshalling");
+            return marshalling = new DeclarationImpl<>(loader, names, values, Marshalling.class, MARSHALLING);
         }
         return marshalling;
     }
@@ -124,7 +133,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public Declaration<Transport<?>> getTransport() {
         if (transport == null) {
-            return transport = new DeclarationImpl<>(loader, names, values, Transport.class, "transport");
+            return transport = new DeclarationImpl<>(loader, names, values, Transport.class, TRANSPORT);
         }
         return transport;
     }
@@ -132,7 +141,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<Registry> getRegistry() {
         if (registry == null) {
-            return registry = new DeclarationImpl<>(loader, names, values, Registry.class, "registry");
+            return registry = new DeclarationImpl<>(loader, names, values, Registry.class, REGISTRY);
         }
         return registry;
     }
@@ -140,7 +149,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<ExecutionRepository> getExecutionRepository() {
         if (executionRepository == null) {
-            return executionRepository = new DeclarationImpl<>(loader, names, values, ExecutionRepository.class, "execution-repository");
+            return executionRepository = new DeclarationImpl<>(loader, names, values, ExecutionRepository.class, EXECUTION_REPOSITORY);
         }
         return executionRepository;
     }
@@ -148,7 +157,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<TransactionManager> getTransactionManager() {
         if (transactionManager == null) {
-            return transactionManager = new DeclarationImpl<>(loader, names, values, TransactionManager.class, "transaction-manager");
+            return transactionManager = new DeclarationImpl<>(loader, names, values, TransactionManager.class, TRANSACTION_MANAGER);
         }
         return transactionManager;
     }
@@ -156,7 +165,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<Executor> getExecutor() {
         if (executor == null) {
-            return executor = new DeclarationImpl<>(loader, names, values, Executor.class, "executor");
+            return executor = new DeclarationImpl<>(loader, names, values, Executor.class, EXECUTOR);
         }
         return executor;
     }
@@ -164,7 +173,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<MBeanServer> getMBeanServer() {
         if (mBeanServer == null) {
-            return mBeanServer = new DeclarationImpl<>(loader, names, values, MBeanServer.class, "mbean-server");
+            return mBeanServer = new DeclarationImpl<>(loader, names, values, MBeanServer.class, MBEAN_SERVER);
         }
         return mBeanServer;
     }
@@ -217,9 +226,9 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     }
 
     public JobOperatorImpl createJobOperator() throws Exception {
-        return new JobOperatorImpl(
-                scope.getConfiguration(name),
-                getProperties()
-        );
+        final ConfigurationImpl configuration = scope.getConfiguration(name);
+        final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
+        op.open(configuration);
+        return op;
     }
 }

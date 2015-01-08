@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.configuration.xml;
 
+import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
@@ -188,8 +189,8 @@ public class XmlJobOperator {
         this.properties = properties;
     }
 
-    private static String name(final XmlNamed dec) {
-        return dec == null ? null : dec.getName();
+    private static String name(final XmlNamed dec, final String def) {
+        return dec == null ? def : dec.getName();
     }
 
     private static String factory(final XmlDeclaration dec) {
@@ -202,35 +203,35 @@ public class XmlJobOperator {
         final JobOperatorModel model = scope.getJobOperator(this.name);
 
         model.getExecutor()
-                .setName(name(this.executor))
+                .setName(name(this.executor, JobOperatorModelImpl.EXECUTOR))
                 .setProperties(properties)
                 .setFactoryFqcn(factory(this.executor));
         model.getTransport()
-                .setName(name(this.transport))
+                .setName(name(this.transport, JobOperatorModelImpl.TRANSPORT))
                 .setProperties(properties)
                 .setFactoryFqcn(factory(this.transport));
         model.getMarshalling()
-                .setName(name(this.marshalling))
+                .setName(name(this.marshalling, JobOperatorModelImpl.MARSHALLING))
                 .setProperties(properties)
                 .setFactoryFqcn(factory(this.marshalling));
         model.getRegistry()
-                .setName(name(this.registry))
+                .setName(name(this.registry, JobOperatorModelImpl.REGISTRY))
                 .setProperties(properties)
                 .setFactoryFqcn(factory(this.registry));
         model.getMBeanServer()
-                .setName(name(this.mBeanServer))
+                .setName(name(this.mBeanServer, JobOperatorModelImpl.MBEAN_SERVER))
                 .setProperties(properties)
                 .setFactoryFqcn(factory(this.mBeanServer));
         model.getExecutionRepository()
-                .setName(name(this.executionRepository))
+                .setName(name(this.executionRepository, JobOperatorModelImpl.EXECUTION_REPOSITORY))
                 .setProperties(properties)
                 .setFactoryFqcn(factory(this.executionRepository));
         model.getClassLoader()
-                .setName(name(this.classLoader))
+                .setName(name(this.classLoader, JobOperatorModelImpl.CLASS_LOADER))
                 .setProperties(properties)
                 .setFactoryFqcn(factory(this.classLoader));
         model.getTransactionManager()
-                .setName(name(this.transactionManager))
+                .setName(name(this.transactionManager, JobOperatorModelImpl.TRANSACTION_MANAGER))
                 .setProperties(properties)
                 .setFactoryFqcn(factory(this.transactionManager));
         for (final XmlDeclaration resource : this.jobLoader) {

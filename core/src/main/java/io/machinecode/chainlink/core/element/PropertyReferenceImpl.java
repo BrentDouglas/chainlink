@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.element;
 
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.inject.InjectablesImpl;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.PropertyReference;
 import io.machinecode.chainlink.spi.inject.Injectables;
@@ -37,7 +37,7 @@ public class PropertyReferenceImpl<T> implements PropertyReference, Serializable
         return this.properties;
     }
 
-    public synchronized T load(final Class<T> clazz, final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public synchronized T load(final Class<T> clazz, final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final Registry registry = configuration.getRegistry();
         final T artifact = registry.loadArtifact(clazz, this.ref.ref(), context);

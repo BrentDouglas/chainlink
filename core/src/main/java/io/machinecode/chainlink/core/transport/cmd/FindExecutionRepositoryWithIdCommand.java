@@ -12,18 +12,26 @@ import io.machinecode.chainlink.spi.transport.Transport;
 public class FindExecutionRepositoryWithIdCommand<A> implements Command<A,A> {
     private static final long serialVersionUID = 1L;
 
-    final ExecutionRepositoryId id;
+    final ExecutionRepositoryId executionRepositoryId;
 
-    public FindExecutionRepositoryWithIdCommand(final ExecutionRepositoryId id) {
-        this.id = id;
+    public FindExecutionRepositoryWithIdCommand(final ExecutionRepositoryId executionRepositoryId) {
+        this.executionRepositoryId = executionRepositoryId;
     }
 
     @Override
     public A perform(final Transport<A> transport, final A origin) throws Throwable {
-        final ExecutionRepository repository = transport.getRegistry().getExecutionRepository(id);
+        final ExecutionRepository repository = transport.getRegistry().getExecutionRepository(executionRepositoryId);
         if (repository != null) {
             return transport.getLocal();
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("FindExecutionRepositoryWithIdCommand{");
+        sb.append("executionRepositoryId=").append(executionRepositoryId);
+        sb.append('}');
+        return sb.toString();
     }
 }

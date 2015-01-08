@@ -22,10 +22,19 @@ public class FindWorkerForExecutionCommand<A> implements Command<WorkerIdAndAddr
     @Override
     public WorkerIdAndAddress<A> perform(final Transport<A> transport, final A origin) throws Throwable {
         return transport.hasWorker(jobExecutionId, executableId)
-                ? new WorkerIdAndAddress<A>(
+                ? new WorkerIdAndAddress<>(
                         transport.getWorker(jobExecutionId, executableId).id(),
                         transport.getLocal()
                 )
                 : null;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("FindWorkerForExecutionCommand{");
+        sb.append("jobExecutionId=").append(jobExecutionId);
+        sb.append(", executableId=").append(executableId);
+        sb.append('}');
+        return sb.toString();
     }
 }

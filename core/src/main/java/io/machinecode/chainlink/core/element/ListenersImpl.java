@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.element;
 
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Listeners;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
@@ -38,7 +38,7 @@ public class ListenersImpl implements Listeners, Serializable {
         return this.listeners;
     }
 
-    public List<ListenerImpl> getListenersImplementing(final RuntimeConfiguration configuration, final ExecutionContext context, final Class<?> clazz) throws Exception {
+    public List<ListenerImpl> getListenersImplementing(final Configuration configuration, final ExecutionContext context, final Class<?> clazz) throws Exception {
         final List<ListenerImpl> ret = new ArrayList<ListenerImpl>(this.listeners.size());
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();

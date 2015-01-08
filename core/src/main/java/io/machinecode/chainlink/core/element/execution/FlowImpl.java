@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.element.execution;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.core.work.ExecutionExecutable;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.element.execution.Flow;
@@ -56,7 +56,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     }
 
     @Override
-    public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> before(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                            final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020000.flow.before"), context, id);
@@ -71,7 +71,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     }
 
     @Override
-    public Chain<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> after(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                              final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                              final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020001.flow.after"), context, id);

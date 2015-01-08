@@ -10,10 +10,13 @@ import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.util.Messages;
+import org.jboss.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
@@ -23,18 +26,18 @@ import java.util.Map;
  */
 public class SeEnvironment implements Environment, AutoCloseable {
 
+    private static final Logger log = Logger.getLogger(SeEnvironment.class);
+
     private final Map<String, JobOperatorImpl> operators = Collections.synchronizedMap(new THashMap<String, JobOperatorImpl>());
     private final String config;
     private boolean loaded = false;
 
     public SeEnvironment() {
-        this(Constants.CHAINLINK_XML);
+        this(null);
     }
 
     public SeEnvironment(final String config) {
-        this.config = config == null
-                ? Constants.CHAINLINK_XML
-                : config;
+        this.config = config;
     }
 
     @Override
@@ -66,13 +69,31 @@ public class SeEnvironment implements Environment, AutoCloseable {
         final DeploymentModelImpl model = new SubSystemModelImpl(tccl).getDeployment();
         model.getJobOperator(Constants.DEFAULT_CONFIGURATION);
         try {
+            final String config = this.config != null
+                    ? this.config
+                    : System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
             final File configFile = new File(config);
+            final InputStream stream;
             if (configFile.isFile()) {
-                final JAXBContext context = JAXBContext.newInstance(XmlChainlink.class);
-                final Unmarshaller unmarshaller = context.createUnmarshaller();
-                final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(configFile);
+                log.debugf("Found config file in filesystem at %s", config); //TODO Message
+                stream = new FileInputStream(configFile);
+            } else if (tccl.getResource(config) != null) {
+                log.debugf("Found config file in classloader at %s", config); //TODO Message
+                stream = tccl.getResourceAsStream(config);
+            } else {
+                log.debugf("No config found at %s", config); //TODO Message
+                stream = null;
+            }
+            if (stream != null) {
+                try {
+                    final JAXBContext context = JAXBContext.newInstance(XmlChainlink.class);
+                    final Unmarshaller unmarshaller = context.createUnmarshaller();
+                    final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
 
-                xml.configureDeployment(model, tccl);
+                    xml.configureDeployment(model, tccl);
+                } finally {
+                    stream.close();
+                }
             }
             final SeConfigurationDefaults defaults = new SeConfigurationDefaults();
             for (final Map.Entry<String, JobOperatorModelImpl> entry : model.getJobOperators().entrySet()) {

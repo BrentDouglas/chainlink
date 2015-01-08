@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.work;
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.element.partition.Partition;
@@ -19,13 +19,13 @@ import static javax.batch.api.partition.PartitionReducer.PartitionStatus;
  */
 public interface PartitionWork<T extends Strategy> extends Partition<T>, Serializable {
 
-    PartitionTarget map(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    PartitionTarget map(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                         final TaskWork task, final ExecutableId callbackId, final ExecutionContext context, final int timeout,
                         final Long restartStepExecutionId) throws Exception;
 
-    Item collect(final RuntimeConfiguration configuration, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception;
+    Item collect(final Configuration configuration, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception;
 
-    PartitionStatus analyse(final RuntimeConfiguration configuration, final ExecutionContext context, final Item... items) throws Exception;
+    PartitionStatus analyse(final Configuration configuration, final ExecutionContext context, final Item... items) throws Exception;
 
-    void reduce(final RuntimeConfiguration configuration, final PartitionStatus partitionStatus, final ExecutionContext context) throws Exception;
+    void reduce(final Configuration configuration, final PartitionStatus partitionStatus, final ExecutionContext context) throws Exception;
 }

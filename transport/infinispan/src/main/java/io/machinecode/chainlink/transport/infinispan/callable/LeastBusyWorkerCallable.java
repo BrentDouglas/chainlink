@@ -12,7 +12,7 @@ public class LeastBusyWorkerCallable extends BaseCallable<Object, Object, Infini
 
     @Override
     public InfinispanWorkerId call() throws Exception {
-        final InfinispanTransport registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
-        return registry.leastBusyWorker();
+        final InfinispanTransport transport = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
+        return (InfinispanWorkerId)transport.leastBusyWorker();
     }
 }

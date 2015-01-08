@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.element.partition.PartitionImpl;
 import io.machinecode.chainlink.core.factory.task.BatchletFactory;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
@@ -42,7 +42,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
-    public void run(final RuntimeConfiguration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
+    public void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
                     final ExecutionContext context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
@@ -131,7 +131,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
-    public void cancel(final RuntimeConfiguration configuration, final ExecutionContext context) {
+    public void cancel(final Configuration configuration, final ExecutionContext context) {
         try {
             log.debugf(Messages.get("CHAINLINK-013103.batchlet.stop"), context, getRef());
             this.stop(configuration, context);
@@ -144,7 +144,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         }
     }
 
-    public String process(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public String process(final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
@@ -155,7 +155,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         }
     }
 
-    public void stop(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public void stop(final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {

@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.element.task;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.task.ItemWriter;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
@@ -23,7 +23,7 @@ public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         super(ref, properties);
     }
 
-    public void open(final RuntimeConfiguration configuration, final ExecutionContext context, final Serializable checkpoint) throws Exception {
+    public void open(final Configuration configuration, final ExecutionContext context, final Serializable checkpoint) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
@@ -34,7 +34,7 @@ public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         }
     }
 
-    public void close(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public void close(final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
@@ -45,7 +45,7 @@ public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         }
     }
 
-    public void writeItems(final RuntimeConfiguration configuration, final ExecutionContext context, final List<Object> items) throws Exception {
+    public void writeItems(final Configuration configuration, final ExecutionContext context, final List<Object> items) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
@@ -56,7 +56,7 @@ public class ItemWriterImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         }
     }
 
-    public Serializable checkpointInfo(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public Serializable checkpointInfo(final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {

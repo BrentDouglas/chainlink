@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.core.expression.PropertyContextImpl;
 import io.machinecode.chainlink.core.work.TaskExecutable;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
@@ -73,7 +73,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
         return this.strategy;
     }
 
-    public PartitionPlan loadPartitionPlan(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public PartitionPlan loadPartitionPlan(final Configuration configuration, final ExecutionContext context) throws Exception {
         if (strategy == null) {
             return null;
         }
@@ -81,7 +81,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     }
 
     @Override
-    public PartitionTarget map(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId, final TaskWork task, final ExecutableId callbackId, final ExecutionContext context, final int timeout, final Long restartStepExecutionId) throws Exception {
+    public PartitionTarget map(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId, final TaskWork task, final ExecutableId callbackId, final ExecutionContext context, final int timeout, final Long restartStepExecutionId) throws Exception {
         final PartitionPlan plan = loadPartitionPlan(configuration, context);
         final boolean restarting = restartStepExecutionId != null;
         final boolean override = plan.getPartitionsOverride();
@@ -180,7 +180,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     }
 
     @Override
-    public Item collect(final RuntimeConfiguration configuration, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception {
+    public Item collect(final Configuration configuration, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception {
         if (this.collector != null) {
             log.debugf(Messages.get("CHAINLINK-011100.partition.collect.partitioned.data"), context, this.collector.getRef());
             return new ItemImpl(
@@ -193,7 +193,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     }
 
     @Override
-    public PartitionStatus analyse(final RuntimeConfiguration configuration, final ExecutionContext context, final Item... items) throws Exception {
+    public PartitionStatus analyse(final Configuration configuration, final ExecutionContext context, final Item... items) throws Exception {
         PartitionStatus partitionStatus = PartitionStatus.COMMIT;
         final TransactionManager transactionManager = configuration.getTransactionManager();
         if (items != null && this.analyser != null) {
@@ -219,7 +219,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
     }
 
     @Override
-    public void reduce(final RuntimeConfiguration configuration, final PartitionStatus partitionStatus, final ExecutionContext context) throws Exception {
+    public void reduce(final Configuration configuration, final PartitionStatus partitionStatus, final ExecutionContext context) throws Exception {
         final TransactionManager transactionManager = configuration.getTransactionManager();
         try {
             switch (partitionStatus) {

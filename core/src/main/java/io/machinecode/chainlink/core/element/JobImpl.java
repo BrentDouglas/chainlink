@@ -7,7 +7,7 @@ import io.machinecode.chainlink.core.validation.InvalidJobException;
 import io.machinecode.chainlink.core.validation.JobTraversal;
 import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.core.work.ExecutionExecutable;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -90,7 +90,7 @@ public class JobImpl implements Job, JobWork, Serializable {
         return this.executions;
     }
 
-    private List<ListenerImpl> _listeners(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    private List<ListenerImpl> _listeners(final Configuration configuration, final ExecutionContext context) throws Exception {
         if (this._listeners == null) {
             this._listeners = this.listeners.getListenersImplementing(configuration, context, JobListener.class);
         }
@@ -98,7 +98,7 @@ public class JobImpl implements Job, JobWork, Serializable {
     }
 
     @Override
-    public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> before(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
         final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
         long jobExecutionId = context.getJobExecutionId();
@@ -141,7 +141,7 @@ public class JobImpl implements Job, JobWork, Serializable {
     }
 
     @Override
-    public void after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public void after(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                       final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
         Exception exception = null;
         for (final ListenerImpl listener : this._listeners(configuration, context)) {
@@ -166,7 +166,7 @@ public class JobImpl implements Job, JobWork, Serializable {
         return traversal.next(next);
     }
 
-    private static Chain<?> _runNext(final RuntimeConfiguration configuration, final ExecutableId callbackId,
+    private static Chain<?> _runNext(final Configuration configuration, final ExecutableId callbackId,
                                         final ExecutionContext context, final ExecutionRepositoryId executionRepositoryId,
                                         final ExecutionWork next) throws Exception {
         return configuration.getExecutor().execute(new ExecutionExecutable(

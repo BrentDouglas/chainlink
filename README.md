@@ -33,6 +33,7 @@ Execution repositories:
 Transports:
 - Local JVM
 - Infinispan
+- GridGain
 
 Job loaders that support the job inheritance proposal and a simple api
 and utilities to allow user defined loaders to also support job
@@ -221,10 +222,6 @@ _JGroups Transport_
 - Distribution doesn't actually work
 
 _Hazelcast Transport_
-
-- Distribution doesn't actually work
-
-_GridGain Transport_
 
 - Distribution doesn't actually work
 

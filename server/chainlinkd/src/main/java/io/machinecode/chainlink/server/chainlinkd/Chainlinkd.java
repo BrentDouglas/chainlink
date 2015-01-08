@@ -4,6 +4,7 @@ import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.se.SeEnvironment;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
@@ -29,7 +30,7 @@ public class Chainlinkd {
                     new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h')
             });
 
-            String config = null;
+            String config = Constants.Defaults.CHAINLINK_XML;
             String props = null;
 
             int c;

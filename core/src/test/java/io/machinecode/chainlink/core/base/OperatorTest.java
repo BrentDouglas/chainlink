@@ -19,6 +19,7 @@ public abstract class OperatorTest extends BaseTest {
     public void before() throws Exception {
         if (operator == null) {
             operator = new JobOperatorImpl(configuration(), new Properties());
+            operator.open(configuration());
         }
     }
 

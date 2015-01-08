@@ -13,8 +13,8 @@ import java.util.UUID;
  */
 public class GridGainProxyExecutionRepository extends DistributedProxyExecutionRepository<UUID> {
 
-    public GridGainProxyExecutionRepository(final GridGainTransport registry, final ExecutionRepositoryId executionRepositoryId, final UUID address) {
-        super(registry, executionRepositoryId, address);
+    public GridGainProxyExecutionRepository(final GridGainTransport transport, final ExecutionRepositoryId executionRepositoryId, final UUID address) {
+        super(transport, executionRepositoryId, address);
     }
 
     @Override

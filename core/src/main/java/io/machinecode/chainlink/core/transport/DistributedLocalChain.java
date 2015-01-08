@@ -52,7 +52,7 @@ public abstract class DistributedLocalChain<A> extends ChainImpl<Void> {
         try {
             final DeferredImpl<Boolean, Throwable, Void> promise = new DeferredImpl<>();
             try {
-                transport.invokeRemote(address, this.<Boolean>command("cancel", mayInterruptIfRunning), promise);
+                transport.invokeRemote(address, this.<Boolean>command("cancel", mayInterruptIfRunning), promise, this.timeout, this.unit);
             } finally {
                 cancelled = promise.get(timeout, unit);
             }

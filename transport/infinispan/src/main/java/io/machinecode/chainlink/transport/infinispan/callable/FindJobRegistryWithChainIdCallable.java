@@ -23,13 +23,13 @@ public class FindJobRegistryWithChainIdCallable extends BaseCallable<Object, Obj
 
     @Override
     public Address call() throws Exception {
-        final InfinispanTransport registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
+        final InfinispanTransport transport = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
         try {
             if (id == null) {
-                return registry.getLocal(); //If this search is for the root job
+                return transport.getLocal(); //If this search is for the root job
             } else {
                 // TODO Can this throw?
-                return registry.getRegistry().getChain(jobExecutionId, id) == null ? null : registry.getLocal();
+                return transport.getRegistry().getChain(jobExecutionId, id) == null ? null : transport.getLocal();
             }
         } catch (final JobExecutionNotRunningException e) {
             //

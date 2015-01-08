@@ -13,8 +13,8 @@ import java.io.Serializable;
  */
 public class JGroupsProxyExecutionRepository extends DistributedProxyExecutionRepository<Address> {
 
-    public JGroupsProxyExecutionRepository(final JGroupsTransport registry, final ExecutionRepositoryId executionRepositoryId, final Address address) {
-        super(registry, executionRepositoryId, address);
+    public JGroupsProxyExecutionRepository(final JGroupsTransport transport, final ExecutionRepositoryId executionRepositoryId, final Address address) {
+        super(transport, executionRepositoryId, address);
     }
 
     @Override

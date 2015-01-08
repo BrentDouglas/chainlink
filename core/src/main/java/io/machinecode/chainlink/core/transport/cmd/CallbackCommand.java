@@ -24,4 +24,13 @@ public class CallbackCommand<A> implements Command<Object,A> {
         transport.getWorker(workerId).callback(event);
         return null;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("CallbackCommand{");
+        sb.append("workerId=").append(workerId);
+        sb.append(", event=").append(event);
+        sb.append('}');
+        return sb.toString();
+    }
 }

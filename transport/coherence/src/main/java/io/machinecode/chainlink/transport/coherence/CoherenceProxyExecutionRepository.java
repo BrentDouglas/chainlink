@@ -13,8 +13,8 @@ import java.io.Serializable;
  */
 public class CoherenceProxyExecutionRepository extends DistributedProxyExecutionRepository<Member> {
 
-    public CoherenceProxyExecutionRepository(final CoherenceTransport registry, final ExecutionRepositoryId executionRepositoryId, final Member address) {
-        super(registry, executionRepositoryId, address);
+    public CoherenceProxyExecutionRepository(final CoherenceTransport transport, final ExecutionRepositoryId executionRepositoryId, final Member address) {
+        super(transport, executionRepositoryId, address);
     }
 
     @Override

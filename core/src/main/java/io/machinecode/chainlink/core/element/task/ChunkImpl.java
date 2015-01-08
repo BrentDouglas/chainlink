@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.element.ListenersImpl;
 import io.machinecode.chainlink.core.element.partition.PartitionImpl;
 import io.machinecode.chainlink.core.factory.task.ChunkFactory;
 import io.machinecode.chainlink.core.util.Repository;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
@@ -185,7 +185,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     }
 
     @Override
-    public void run(final RuntimeConfiguration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
+    public void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
                     final ExecutionContext context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
@@ -1052,7 +1052,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     }
 
     @Override
-    public synchronized void cancel(final RuntimeConfiguration configuration, final ExecutionContext context) {
+    public synchronized void cancel(final Configuration configuration, final ExecutionContext context) {
         if (context != null) {
             final MutableStepContext stepContext = context.getStepContext();
             if (stepContext != null) {
@@ -1084,7 +1084,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final ExecutionRepository repository;
         final MutableStepContext stepContext;
         final ExecutionContext context;
-        final RuntimeConfiguration configuration;
+        final Configuration configuration;
         final Promise<?,Throwable,?> promise;
 
         final ArrayList<Item> items;
@@ -1113,7 +1113,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final List<ListenerImpl> retryWriteListeners;
         final List<ListenerImpl> skipWriteListeners;
 
-        private State(final ChunkImpl chunk, final RuntimeConfiguration configuration, final Promise<?,Throwable,?> promise,
+        private State(final ChunkImpl chunk, final Configuration configuration, final Promise<?,Throwable,?> promise,
                       final ExecutionRepositoryId executionRepositoryId, final ExecutionContext context, final int timeout) throws Exception {
             this.jobExecutionId = context.getJobExecutionId();
             this.stepExecutionId = context.getStepExecutionId();

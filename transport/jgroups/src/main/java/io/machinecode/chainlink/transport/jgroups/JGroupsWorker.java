@@ -14,8 +14,8 @@ import org.jgroups.Address;
  */
 public class JGroupsWorker extends DistributedWorker<Address> {
 
-    public JGroupsWorker(final JGroupsTransport registry, final Address local, final Address remote, final WorkerId workerId) {
-        super(registry, local, remote, workerId);
+    public JGroupsWorker(final JGroupsTransport transport, final Address local, final Address remote, final WorkerId workerId) {
+        super(transport, local, remote, workerId);
     }
 
     @Override

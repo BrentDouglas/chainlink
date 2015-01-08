@@ -20,7 +20,7 @@ public class FindExecutableCallable extends BaseCallable<Object, Object, Executa
 
     @Override
     public Executable call() throws Exception {
-        final InfinispanTransport registry = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
-        return registry.getExecutable(jobExecutionId, id);
+        final InfinispanTransport transport = cache.getCacheManager().getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
+        return transport.getExecutable(jobExecutionId, id);
     }
 }

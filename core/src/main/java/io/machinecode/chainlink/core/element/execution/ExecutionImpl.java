@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.element.execution;
 
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.core.work.ExecutionExecutable;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -63,7 +63,7 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.elem
         return null;
     }
 
-    public Chain<?> next(final RuntimeConfiguration configuration, final WorkerId workerId, final ExecutionContext context,
+    public Chain<?> next(final Configuration configuration, final WorkerId workerId, final ExecutionContext context,
                          final ExecutableId parentId, final ExecutionRepositoryId executionRepositoryId, final String next,
                          final TransitionWork transition) throws Exception {
         final MutableJobContext jobContext = context.getJobContext();
@@ -82,7 +82,7 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.elem
         }
     }
 
-    private Chain<?> _runNextExecution(final RuntimeConfiguration configuration, final ExecutableId parentId, final ExecutionContext context,
+    private Chain<?> _runNextExecution(final Configuration configuration, final ExecutableId parentId, final ExecutionContext context,
                                        final WorkerId workerId, final ExecutionRepositoryId executionRepositoryId, final String next) throws Exception {
         final ExecutionWork execution = context.getJob().getNextExecution(next);
         if (execution == null) {

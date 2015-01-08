@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.spi.management;
 
+import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -17,7 +18,7 @@ import java.util.concurrent.Future;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface ExtendedJobOperator extends JobOperator, AutoCloseable {
+public interface ExtendedJobOperator extends JobOperator, Lifecycle {
 
     ExtendedJobInstance getJobInstanceById(final long jobInstanceId);
 

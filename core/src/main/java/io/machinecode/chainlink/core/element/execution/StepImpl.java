@@ -12,7 +12,7 @@ import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.work.TaskExecutable;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
@@ -160,7 +160,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         return this.partition != null && this.partition.getStrategy() != null;
     }
 
-    private List<ListenerImpl> _listeners(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    private List<ListenerImpl> _listeners(final Configuration configuration, final ExecutionContext context) throws Exception {
         if (this._listeners == null) {
             this._listeners = this.listeners.getListenersImplementing(configuration, context, StepListener.class);
         }
@@ -168,7 +168,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     }
 
     @Override
-    public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> before(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                               final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010100.step.before"), context, this.id);
@@ -276,7 +276,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     }
 
     @Override
-    public Chain<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> after(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                           final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                           final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010101.step.after"), context, childContext);

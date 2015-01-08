@@ -42,13 +42,13 @@ public abstract class DistributedWorker<A> implements Worker {
     @Override
     public void execute(final ExecutableEvent event) {
         final Command<Object, A> command = new ExecuteCommand<>(workerId, event);
-        transport.invokeRemote(remote, command, new DeferredImpl<Object, Throwable,Void>());
+        transport.invokeRemote(remote, command, new DeferredImpl<Object, Throwable,Void>(), transport.getTimeout(), transport.getTimeUnit());
     }
 
     @Override
     public void callback(final CallbackEvent event) {
         final Command<Object, A> command = new CallbackCommand<>(workerId, event);
-        transport.invokeRemote(remote, command, new DeferredImpl<Object, Throwable,Void>());
+        transport.invokeRemote(remote, command, new DeferredImpl<Object, Throwable,Void>(), transport.getTimeout(), transport.getTimeUnit());
     }
 
     @Override
@@ -65,7 +65,9 @@ public abstract class DistributedWorker<A> implements Worker {
                                 //This side has a different id than the remote side
                                 promise.resolve(new ChainAndIds(localId, remoteId, createLocalChain(jobExecutionId, remoteId)));
                             }
-                        }).onReject(promise)
+                        }).onReject(promise),
+                transport.getTimeout(),
+                transport.getTimeUnit()
         );
         return promise;
     }

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.work;
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -63,7 +63,7 @@ public abstract class ExecutableImpl<T extends Work> implements Executable, Seri
     }
 
     @Override
-    public void execute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
+    public void execute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
                         final ExecutionContext childContext) {
         try {
             log().tracef(Messages.get("CHAINLINK-015700.executable.execute"), this.context, this);
@@ -78,7 +78,7 @@ public abstract class ExecutableImpl<T extends Work> implements Executable, Seri
         return getClass().getSimpleName() + "[workerId=" + workerId + ",work=" + work + "]";
     }
 
-    protected abstract void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
+    protected abstract void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
                                       final ExecutableId parentId, final ExecutionContext context) throws Throwable;
 
     protected abstract Logger log();

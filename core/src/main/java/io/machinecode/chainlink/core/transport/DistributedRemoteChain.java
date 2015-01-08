@@ -46,7 +46,7 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
         try {
             final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
             try {
-                transport.invokeRemote(address, this.<Void>command("resolve", new Serializable[]{null}), promise);
+                transport.invokeRemote(address, this.<Void>command("resolve", new Serializable[]{null}), promise, this.timeout, this.unit);
             } finally {
                 promise.get(timeout, unit);
             }
@@ -62,7 +62,7 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
         try {
             final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
             try {
-                transport.invokeRemote(address, this.<Void>command("reject", failure), promise);
+                transport.invokeRemote(address, this.<Void>command("reject", failure), promise, this.timeout, this.unit);
             } finally {
                 promise.get(timeout, unit);
             }
@@ -78,7 +78,7 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
         try {
             final Deferred<Boolean,Throwable,Void> promise = new DeferredImpl<>();
             try {
-                transport.invokeRemote(address, this.<Boolean>command("link", new Serializable[]{null}), promise);
+                transport.invokeRemote(address, this.<Boolean>command("link", new Serializable[]{null}), promise, this.timeout, this.unit);
             } finally {
                 promise.get(timeout, unit);
             }
@@ -94,14 +94,15 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
         try {
             final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
             try {
-                transport.invokeRemote(address, this.<Void>command("linkAndResolve", null, null), promise);
+                transport.invokeRemote(address, this.<Void>command("linkAndResolve", null, null), promise, this.timeout, this.unit);
             } finally {
                 promise.get(timeout, unit);
             }
         } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
             log().errorf(e, ""); //TODO Message
         } finally {
-            super.linkAndResolve(value, link);
+            super.link(link);
+            super.resolve(value);
         }
     }
 
@@ -110,14 +111,15 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
         try {
             final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
             try {
-                transport.invokeRemote(address, this.<Void>command("linkAndReject", failure, null), promise);
+                transport.invokeRemote(address, this.<Void>command("linkAndReject", failure, null), promise, this.timeout, this.unit);
             } finally {
                 promise.get(timeout, unit);
             }
         } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
             log().errorf(e, ""); //TODO Message
         } finally {
-            super.linkAndReject(failure, link);
+            super.link(link);
+            super.reject(failure);
         }
     }
 

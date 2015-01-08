@@ -25,4 +25,13 @@ public class ExecuteCommand<A> implements Command<Object,A> {
         transport.getWorker(workerId).execute(event);
         return null;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ExecuteCommand{");
+        sb.append("workerId=").append(workerId);
+        sb.append(", event=").append(event);
+        sb.append('}');
+        return sb.toString();
+    }
 }

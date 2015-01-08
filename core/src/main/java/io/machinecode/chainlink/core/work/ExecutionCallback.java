@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.work;
 
 import io.machinecode.chainlink.core.then.ResolvedChain;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
@@ -32,7 +32,7 @@ public class ExecutionCallback extends ExecutableImpl<ExecutionWork> {
     }
 
     @Override
-    public void doExecute(final RuntimeConfiguration configuration, final Chain<?> chain, final WorkerId workerId,
+    public void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
                           final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
         Chain<?> next;
         try {

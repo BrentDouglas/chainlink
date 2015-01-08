@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.work;
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -16,10 +16,10 @@ import java.io.Serializable;
  */
 public interface JobWork extends Job, Work, Serializable {
 
-    Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    Chain<?> before(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                        final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception;
 
-    void after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    void after(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context) throws Exception;
 
     /**

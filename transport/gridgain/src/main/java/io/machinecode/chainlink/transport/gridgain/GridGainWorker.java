@@ -15,8 +15,8 @@ import java.util.UUID;
  */
 public class GridGainWorker extends DistributedWorker<UUID> {
 
-    public GridGainWorker(final GridGainTransport registry, final UUID local, final UUID remote, final WorkerId workerId) {
-        super(registry, local, remote, workerId);
+    public GridGainWorker(final GridGainTransport transport, final UUID local, final UUID remote, final WorkerId workerId) {
+        super(transport, local, remote, workerId);
     }
 
     @Override

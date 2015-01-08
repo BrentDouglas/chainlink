@@ -1,9 +1,10 @@
 package io.machinecode.chainlink.core.execution;
 
+import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.registry.UUIDId;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.Notify;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.CallbackEvent;
 import io.machinecode.chainlink.spi.execution.ChainAndIds;
@@ -33,13 +34,13 @@ public class EventedWorker extends Thread implements Worker {
 
     protected final WorkerId workerId;
     protected final Object lock;
-    protected final Queue<ExecutableEvent> executables = new LinkedList<ExecutableEvent>();
-    protected final Queue<CallbackEvent> callbacks = new LinkedList<CallbackEvent>();
+    protected final Queue<ExecutableEvent> executables = new LinkedList<>();
+    protected final Queue<CallbackEvent> callbacks = new LinkedList<>();
     protected final Notify notify;
-    protected final RuntimeConfiguration configuration;
+    protected final Configuration configuration;
     protected volatile boolean running = true;
 
-    public EventedWorker(final RuntimeConfiguration configuration) {
+    public EventedWorker(final Configuration configuration) {
         super("Chainlink worker - " + IDS.incrementAndGet()); //TODO Message
         this.configuration = configuration;
         this.workerId = configuration.getTransport().generateWorkerId(this);
@@ -120,6 +121,7 @@ public class EventedWorker extends Thread implements Worker {
             try {
                 executable = configuration.getRegistry()
                         .getExecutable(cb.getJobExecutionId(), cb.getExecutableId());
+                LocalRegistry.assertExecutable(executable, cb.getJobExecutionId(), cb.getExecutableId());
                 previous = cb.getContext();
                 chainId = cb.getChainId();
             } catch (final Throwable e) {
@@ -131,6 +133,7 @@ public class EventedWorker extends Thread implements Worker {
         try {
             final Chain<?> chain = configuration.getRegistry()
                     .getChain(context.getJobExecutionId(), chainId);
+            LocalRegistry.assertChain(chain, context.getJobExecutionId(), chainId);
             chain.onComplete(notify);
             executable.execute(configuration, chain, workerId, previous);
         } catch (final Throwable e) {

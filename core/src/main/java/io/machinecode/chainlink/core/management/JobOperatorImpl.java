@@ -6,6 +6,7 @@ import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.management.jmx.JmxOperator;
+import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.work.JobExecutable;
@@ -58,13 +59,13 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     private static final Logger log = Logger.getLogger(JobOperatorImpl.class);
 
-    private final Configuration configuration;
-    private final Executor executor;
+    protected final Configuration configuration;
+    protected final Executor executor;
     protected final Transport<?> transport;
-    private final Registry registry;
-    private final Security security;
-    private final ExecutionRepositoryId executionRepositoryId;
-    private ObjectName jmxName;
+    protected final Registry registry;
+    protected final Security security;
+    protected final ExecutionRepositoryId executionRepositoryId;
+    protected final ObjectName jmxName;
 
     public JobOperatorImpl(final Configuration configuration, final Properties properties) {
         this.configuration = configuration;
@@ -87,6 +88,8 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             } catch (final Exception e) {
                 throw new RuntimeException(e); //TODO Message
             }
+        } else {
+            jmxName = null;
         }
     }
 
@@ -96,6 +99,13 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                 .append(":type=Operator,name=JmxOperator");
         //TODO This needs to bung on stuff about registry, repo, etc
         return builder.toString();
+    }
+
+    @Override
+    public void open(final Configuration configuration) throws Exception {
+        this.transport.open(configuration);
+        this.registry.open(configuration);
+        this.executor.open(configuration);
     }
 
     @Override
@@ -139,9 +149,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         try {
             this.security.canAccessJob(jobName);
             return registry.getExecutionRepository(this.executionRepositoryId).getJobInstanceCount(jobName); //TODO This needs to fetch a list of id's that we can then filter on
-        } catch (final NoSuchJobException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new IllegalStateException(e);
@@ -153,9 +161,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         try {
             this.security.canAccessJobInstance(jobInstanceId);
             return registry.getExecutionRepository(this.executionRepositoryId).getJobInstance(jobInstanceId);
-        } catch (final NoSuchJobInstanceException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobInstanceException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new IllegalStateException(e);
@@ -167,16 +173,14 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         try {
             security.canAccessJob(jobName);
             final List<JobInstance> jobInstances =  registry.getExecutionRepository(this.executionRepositoryId).getJobInstances(jobName, start, count);
-            final ArrayList<JobInstance> copy = new ArrayList<JobInstance>(jobInstances.size());
+            final ArrayList<JobInstance> copy = new ArrayList<>(jobInstances.size());
             for (final JobInstance jobInstance : jobInstances) {
                 if (!security.filterJobInstance(jobInstance.getInstanceId())) {
                     copy.add(jobInstance);
                 }
             }
             return copy;
-        } catch (final NoSuchJobException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new IllegalStateException(e);
@@ -187,16 +191,14 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException {
         try {
             final List<Long> jobExecutionIds = registry.getExecutionRepository(this.executionRepositoryId).getRunningExecutions(jobName); //TODO This should probably go through Registry
-            final ArrayList<Long> copy = new ArrayList<Long>(jobExecutionIds.size());
+            final ArrayList<Long> copy = new ArrayList<>(jobExecutionIds.size());
             for (final Long jobExecutionId : jobExecutionIds) {
                 if (!security.filterJobExecution(jobExecutionId)) {
                     copy.add(jobExecutionId);
                 }
             }
             return copy;
-        } catch (final NoSuchJobException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new IllegalStateException(e);
@@ -208,9 +210,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         try {
             this.security.canAccessJobExecution(jobExecutionId);
             return registry.getExecutionRepository(this.executionRepositoryId).getParameters(jobExecutionId);
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new IllegalStateException(e);
@@ -225,9 +225,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _startJob(job, jslName, parameters).getJobExecutionId();
-        } catch (final JobStartException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final JobStartException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
@@ -242,9 +240,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _startJob(job, jslName, parameters);
-        } catch (final JobStartException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final JobStartException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
@@ -257,9 +253,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         try {
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _startJob(job, jslName, parameters);
-        } catch (final JobStartException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final JobStartException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
@@ -269,7 +263,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     private JobOperationImpl _startJob(final JobWork job, final String jslName, final Properties parameters) throws Exception {
         JobFactory.validate(job);
 
-        final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+        final ExecutionRepository repository = repository();
         final ExtendedJobInstance instance = repository.createJobInstance(job.getId(), jslName, new Date());
         final ExtendedJobExecution execution = repository.createJobExecution(instance, parameters, new Date());
         final long jobExecutionId = execution.getExecutionId();
@@ -306,9 +300,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                     promise,
                     registry.getExecutionRepository(this.executionRepositoryId)
             );
-        } catch (final JobExecutionNotRunningException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final JobExecutionNotRunningException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobRestartException(e);
@@ -320,20 +312,13 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         log.tracef(Messages.get("CHAINLINK-001201.operator.restart"), jobExecutionId);
         this.security.canRestartJob(jobExecutionId);
         try {
-            final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+            final ExecutionRepository repository = repository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(instance.getJslName());
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _restart(job, jobExecutionId, instance, parameters).getJobExecutionId();
-        } catch (final JobExecutionAlreadyCompleteException e) {
-            throw e;
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobExecutionNotMostRecentException e) {
-            throw e;
-        } catch (final JobRestartException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final JobExecutionAlreadyCompleteException | NoSuchJobExecutionException
+                | JobExecutionNotMostRecentException | JobRestartException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobRestartException(e);
@@ -345,20 +330,13 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         log.tracef(Messages.get("CHAINLINK-001201.operator.restart"), jobExecutionId);
         this.security.canRestartJob(jobExecutionId);
         try {
-            final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+            final ExecutionRepository repository = repository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
             final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(instance.getJslName());
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _restart(job, jobExecutionId, instance, parameters);
-        } catch (final JobExecutionAlreadyCompleteException e) {
-            throw e;
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobExecutionNotMostRecentException e) {
-            throw e;
-        } catch (final JobRestartException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final JobExecutionAlreadyCompleteException | NoSuchJobExecutionException
+                | JobExecutionNotMostRecentException | JobRestartException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobRestartException(e);
@@ -367,7 +345,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     private JobOperationImpl _restart(final JobWork job, final long jobExecutionId, final JobInstance instance, final Properties parameters) throws Exception {
         JobFactory.validate(job);
-        final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+        final ExecutionRepository repository = repository();
         final ExtendedJobExecution lastExecution = repository.getJobExecution(jobExecutionId);
         final ExtendedJobExecution execution = repository.restartJobExecution(jobExecutionId, parameters);
         final long restartExecutionId = execution.getExecutionId();
@@ -408,7 +386,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         log.tracef(Messages.get("CHAINLINK-001202.operator.stop"), jobExecutionId);
         this.security.canRestartJob(jobExecutionId);
         try {
-            final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+            final ExecutionRepository repository = repository();
             final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId); //This will throw a NoSuchJobExecutionException if required
             final Promise<?,Throwable,?> promise = registry.getJob(jobExecutionId);
             if (promise == null) {
@@ -417,11 +395,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             executor.cancel(promise);
             log.tracef(Messages.get("CHAINLINK-001302.operator.stopped"), jobExecutionId, execution.getJobName());
             return promise;
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobExecutionNotRunningException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobExecutionNotRunningException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
@@ -441,11 +415,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                 Repository.abandonedJob(registry.getExecutionRepository(this.executionRepositoryId), jobExecutionId);
                 log.tracef(Messages.get("CHAINLINK-001303.operator.abandoned"), jobExecutionId);
             }
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobExecutionIsRunningException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobExecutionIsRunningException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
@@ -459,9 +429,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         final JobInstance jobInstance = registry.getExecutionRepository(this.executionRepositoryId).getJobInstanceForExecution(jobExecutionId);
             this.security.canAccessJobInstance(jobInstance.getInstanceId());
             return jobInstance;
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
@@ -472,18 +440,16 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     public List<JobExecution> getJobExecutions(final JobInstance instance) throws NoSuchJobInstanceException, JobSecurityException {
         this.security.canAccessJobInstance(instance.getInstanceId());
         try {
-            final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+            final ExecutionRepository repository = repository();
             final List<? extends JobExecution> jobExecutions = repository.getJobExecutions(instance.getInstanceId());
-            final List<JobExecution> delegates = new ArrayList<JobExecution>(jobExecutions.size());
+            final List<JobExecution> delegates = new ArrayList<>(jobExecutions.size());
             for (final JobExecution jobExecution : jobExecutions) {
                 if (!this.security.filterJobExecution(jobExecution.getExecutionId())) {
                     delegates.add(new DelegateJobExecution(jobExecution, repository));
                 }
             }
             return delegates;
-        } catch (final NoSuchJobInstanceException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobInstanceException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
@@ -494,11 +460,9 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     public JobExecution getJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         this.security.canAccessJobExecution(jobExecutionId);
         try {
-            final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+            final ExecutionRepository repository = repository();
             return new DelegateJobExecution(repository.getJobExecution(jobExecutionId), repository);
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
@@ -509,21 +473,25 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         this.security.canAccessJobExecution(jobExecutionId);
         try {
-            final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+            final ExecutionRepository repository = repository();
             final List<? extends StepExecution> stepExecutions =  repository.getStepExecutionsForJobExecution(jobExecutionId);
-            final List<StepExecution> delegates = new ArrayList<StepExecution>(stepExecutions.size());
+            final List<StepExecution> delegates = new ArrayList<>(stepExecutions.size());
             for (final StepExecution stepExecution : stepExecutions) {
                 if (!this.security.filterStepExecution(stepExecution.getStepExecutionId())) {
                     delegates.add(new DelegateStepExecution(stepExecution, repository));
                 }
             }
             return delegates;
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
             throw new JobStartException(e);
         }
+    }
+
+    protected ExecutionRepository repository() {
+        final ExecutionRepository repository = registry.getExecutionRepository(this.executionRepositoryId);
+        LocalRegistry.assertExecutionRepository(repository, executionRepositoryId);
+        return repository;
     }
 }

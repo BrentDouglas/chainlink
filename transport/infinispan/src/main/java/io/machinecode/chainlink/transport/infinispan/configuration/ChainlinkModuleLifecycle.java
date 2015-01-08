@@ -12,7 +12,7 @@ public class ChainlinkModuleLifecycle extends AbstractModuleLifecycle {
     @Override
     public void cacheStarted(final ComponentRegistry cr, final String cacheName) {
         final ChainlinkModuleCommandInitializer initializer = cr.getComponent(ChainlinkModuleCommandInitializer.class);
-        final InfinispanTransport registry = cr.getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
-        initializer.init(registry);
+        final InfinispanTransport transport = cr.getGlobalComponentRegistry().getComponent(InfinispanTransport.class);
+        initializer.init(transport);
     }
 }

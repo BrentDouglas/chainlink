@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.element.partition;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Reducer;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
@@ -22,7 +22,7 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         super(ref, properties);
     }
 
-    public void beginPartitionedStep(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public void beginPartitionedStep(final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
@@ -33,7 +33,7 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         }
     }
 
-    public void beforePartitionedStepCompletion(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public void beforePartitionedStepCompletion(final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
@@ -44,7 +44,7 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         }
     }
 
-    public void rollbackPartitionedStep(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public void rollbackPartitionedStep(final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
@@ -55,7 +55,7 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         }
     }
 
-    public void afterPartitionedStepCompletion(final RuntimeConfiguration configuration, final ExecutionContext context, final PartitionReducer.PartitionStatus status) throws Exception {
+    public void afterPartitionedStepCompletion(final Configuration configuration, final ExecutionContext context, final PartitionReducer.PartitionStatus status) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {

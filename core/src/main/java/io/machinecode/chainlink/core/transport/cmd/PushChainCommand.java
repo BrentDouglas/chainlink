@@ -30,4 +30,13 @@ public abstract class PushChainCommand<A> implements Command<ChainId,A> {
     }
 
     protected abstract DistributedRemoteChain<A> createRemoteChain(final Transport<A> transport, final A address);
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append("{");
+        sb.append("jobExecutionId=").append(jobExecutionId);
+        sb.append(", chainId=").append(chainId);
+        sb.append('}');
+        return sb.toString();
+    }
 }

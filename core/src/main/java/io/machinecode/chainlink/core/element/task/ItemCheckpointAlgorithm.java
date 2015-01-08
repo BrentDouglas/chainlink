@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.element.task;
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.util.Messages;
 
@@ -21,17 +21,17 @@ final class ItemCheckpointAlgorithm extends CheckpointAlgorithmImpl {
     }
 
     @Override
-    public int checkpointTimeout(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public int checkpointTimeout(final Configuration configuration, final ExecutionContext context) throws Exception {
         return timeout;
     }
 
     @Override
-    public void beginCheckpoint(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public void beginCheckpoint(final Configuration configuration, final ExecutionContext context) throws Exception {
         //
     }
 
     @Override
-    public boolean isReadyToCheckpoint(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public boolean isReadyToCheckpoint(final Configuration configuration, final ExecutionContext context) throws Exception {
         if (current > target) {
             throw new IllegalStateException(Messages.format("CHAINLINK-030000.item.checkpoint", current, target));
         }
@@ -39,7 +39,7 @@ final class ItemCheckpointAlgorithm extends CheckpointAlgorithmImpl {
     }
 
     @Override
-    public void endCheckpoint(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception {
+    public void endCheckpoint(final Configuration configuration, final ExecutionContext context) throws Exception {
         current = 0;
     }
 }

@@ -21,14 +21,14 @@ import java.util.concurrent.TimeoutException;
 */
 public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
-    private final InfinispanTransport registry;
+    private final InfinispanTransport transport;
     private final Deferred<U,Throwable,?> promise;
     private final Address address;
     private final long start;
     private Future<T> io;
 
-    public InfinispanFuture(final InfinispanTransport registry, final Deferred<U,Throwable,?> promise, final Address address, final long start) {
-        this.registry = registry;
+    public InfinispanFuture(final InfinispanTransport transport, final Deferred<U,Throwable,?> promise, final Address address, final long start) {
+        this.transport = transport;
         this.promise = promise;
         this.address = address;
         this.start = start;
@@ -38,7 +38,7 @@ public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
     public void notifyDone() {
         final FutureDeferred<T,Throwable> deferred = new FutureDeferred<>(
                 io,
-                System.currentTimeMillis() - start + registry.options.timeUnit().toMillis(registry.options.timeout()),
+                System.currentTimeMillis() - start + transport.options.timeUnit().toMillis(transport.options.timeout()),
                 TimeUnit.MILLISECONDS
         );
         deferred.onResolve(new OnResolve<T>() {
@@ -67,7 +67,7 @@ public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
                         }
                     }
                 }).onReject(promise);
-        registry.network.execute(deferred);
+        transport.network.execute(deferred);
     }
 
     @Override

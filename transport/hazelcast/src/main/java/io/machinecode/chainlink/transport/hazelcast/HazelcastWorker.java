@@ -14,8 +14,8 @@ import io.machinecode.chainlink.transport.hazelcast.cmd.HazelcastPushChainComman
  */
 public class HazelcastWorker extends DistributedWorker<Member> {
 
-    public HazelcastWorker(final HazelcastTransport registry, final Member local, final Member remote, final WorkerId workerId) {
-        super(registry, local, remote, workerId);
+    public HazelcastWorker(final HazelcastTransport transport, final Member local, final Member remote, final WorkerId workerId) {
+        super(transport, local, remote, workerId);
     }
 
     @Override

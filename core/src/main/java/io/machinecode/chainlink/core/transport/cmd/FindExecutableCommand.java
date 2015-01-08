@@ -20,7 +20,16 @@ public class FindExecutableCommand<A> implements Command<Executable,A> {
     }
 
     @Override
-    public Executable perform(final Transport<A> registry, final A origin) throws Throwable {
-        return registry.getExecutable(jobExecutionId, id);
+    public Executable perform(final Transport<A> transport, final A origin) throws Throwable {
+        return transport.getRegistry().getExecutable(jobExecutionId, id);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("FindExecutableCommand{");
+        sb.append("jobExecutionId=").append(jobExecutionId);
+        sb.append(", id=").append(id);
+        sb.append('}');
+        return sb.toString();
     }
 }

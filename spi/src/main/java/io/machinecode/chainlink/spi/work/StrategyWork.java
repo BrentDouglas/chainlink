@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.work;
 
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.element.partition.Strategy;
 
@@ -13,5 +13,5 @@ import java.io.Serializable;
  */
 public interface StrategyWork extends Strategy, Serializable {
 
-    PartitionPlan getPartitionPlan(final RuntimeConfiguration configuration, final ExecutionContext context) throws Exception;
+    PartitionPlan getPartitionPlan(final Configuration configuration, final ExecutionContext context) throws Exception;
 }

@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.element.transition.TransitionImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.inject.InjectablesImpl;
 import io.machinecode.chainlink.core.util.Statuses;
-import io.machinecode.chainlink.spi.configuration.RuntimeConfiguration;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.element.execution.Decision;
@@ -66,7 +66,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     }
 
     @Override
-    public Chain<?> before(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> before(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                            final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-019000.decision.before"), context, this.id);
@@ -86,7 +86,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     }
 
     @Override
-    public Chain<?> after(final RuntimeConfiguration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Chain<?> after(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                           final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                           final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-019001.decision.after"), context, this.id);
@@ -120,7 +120,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
         return that;
     }
 
-    public String decide(final RuntimeConfiguration configuration, final ExecutionContext context, final StepExecution[] executions) throws Exception {
+    public String decide(final Configuration configuration, final ExecutionContext context, final StepExecution[] executions) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {

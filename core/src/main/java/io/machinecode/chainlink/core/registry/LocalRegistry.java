@@ -4,6 +4,7 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ChainId;
@@ -49,6 +50,11 @@ public class LocalRegistry implements Registry {
 
     public LocalRegistry() {
         this.repositories = new THashMap<>();
+    }
+
+    @Override
+    public void open(final Configuration configuration) throws Exception {
+        // no op
     }
 
     @Override
@@ -177,7 +183,7 @@ public class LocalRegistry implements Registry {
         try {
             final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
             if (job == null) {
-                throw new IllegalStateException("No chain registered matching. je=" + jobExecutionId + ",chainId=" + id); //TODO Message
+                return null;
             }
             return job.getChain(id);
         } finally {
@@ -206,7 +212,7 @@ public class LocalRegistry implements Registry {
         try {
             final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
             if (job == null) {
-                throw new IllegalStateException("No executable registered matching. je=" + jobExecutionId + ",executableId=" + id); //TODO Message
+                return null;
             }
             return job.getExecutable(id);
         } finally {
@@ -285,6 +291,27 @@ public class LocalRegistry implements Registry {
         } finally {
             jobLock.set(false);
         }
+    }
+
+    public static Chain<?> assertChain(final Chain<?> chain, final long jobExecutionId, final ChainId id) {
+        if (chain == null) {
+            throw new IllegalStateException("No chain registered matching. je=" + jobExecutionId + ",chainId=" + id); //TODO Message
+        }
+        return chain;
+    }
+
+    public static ExecutionRepository assertExecutionRepository(final ExecutionRepository repository, final ExecutionRepositoryId id) {
+        if (repository == null) {
+            throw new IllegalStateException("No execution repository registered matching. executionRepositoryId=" + id); //TODO Message
+        }
+        return repository;
+    }
+
+    public static Executable assertExecutable(final Executable executable, final long jobExecutionId, final ExecutableId id) {
+        if (executable == null) {
+            throw new IllegalStateException("No executable registered matching. je=" + jobExecutionId + ",executableId=" + id); //TODO Message
+        }
+        return executable;
     }
 
     protected LocalJobRegistry _createJobRegistry(final long jobExecutionId) {
