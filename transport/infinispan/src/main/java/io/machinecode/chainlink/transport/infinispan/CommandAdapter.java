@@ -35,7 +35,7 @@ public class CommandAdapter extends BaseRpcCommand implements ChainlinkCommand {
 
     @Override
     public Object perform(final InvocationContext ctx) throws Throwable {
-        return command.perform(transport, origin);
+        return command.perform(transport, transport.getRegistry(), origin);
     }
 
     @Override

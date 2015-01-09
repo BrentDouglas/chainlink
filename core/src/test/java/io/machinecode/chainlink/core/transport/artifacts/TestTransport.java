@@ -8,7 +8,6 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.then.api.Deferred;
-import io.machinecode.then.core.FutureDeferred;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
@@ -35,7 +34,7 @@ public class TestTransport extends DistributedTransport<String> {
     }
 
     @Override
-    public String getLocal() {
+    public String getAddress() {
         return local;
     }
 
@@ -46,7 +45,7 @@ public class TestTransport extends DistributedTransport<String> {
 
     @Override
     protected DistributedWorker<String> createDistributedWorker(final String address, final WorkerId workerId) {
-        return new TestWorker(this, this.getLocal(), address, workerId);
+        return new TestWorker(this, this.getAddress(), address, workerId);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class TestTransport extends DistributedTransport<String> {
         try {
             promise.resolve(
                     transports.get(address)
-                            .invokeLocal(command, getLocal())
+                            .invokeLocal(command, getAddress())
                             .get(timeout, unit)
             );
         } catch (final Exception e) {

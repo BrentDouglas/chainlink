@@ -75,15 +75,15 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
         this.timeout = Long.parseLong(properties.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
         this.unit = TimeUnit.valueOf(properties.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
 
-        getRegistry().registerJobEventListener("cleanup-remote-jobs", new JobEventListener() {
+        this.getRegistry().registerJobEventListener("cleanup-remote-jobs", new JobEventListener() {
             @Override
-            public Promise<?,?,?> onRegister(final long jobExecutionId, final Chain<?> job) {
+            public Promise<?, ?, ?> onRegister(final long jobExecutionId, final Chain<?> job) {
                 remoteExecutions.put(jobExecutionId, new ArrayList<Pair<ChainId, A>>());
                 return null;
             }
 
             @Override
-            public Promise<?,?,?> onUnregister(final long jobExecutionId, final Chain<?> job) {
+            public Promise<?, ?, ?> onUnregister(final long jobExecutionId, final Chain<?> job) {
                 final CleanupCommand<A> command = new CleanupCommand<>(jobExecutionId);
                 final FutureDeferred<Object, Void> promise = new FutureDeferred<>(job, timeout, unit);
                 promise.onComplete(new OnComplete() {
@@ -91,11 +91,11 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
                     public void complete(final int status) {
                         for (final Pair<ChainId, A> pair : remoteExecutions.remove(jobExecutionId)) {
                             final A address = pair.getValue();
-                            if (!address.equals(getLocal())) {
+                            if (!address.equals(getAddress())) {
                                 try {
                                     _invoke(address, command);
                                 } catch (Exception e) {
-                                    log.errorf(e,""); // TODO Message
+                                    log.errorf(e, ""); // TODO Message
                                 }
                             }
                         }
@@ -110,7 +110,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
     @Override
     public void close() throws Exception {
-        getRegistry().unregisterJobEventListener("cleanup-remote-jobs");
+        this.getRegistry().unregisterJobEventListener("cleanup-remote-jobs");
         super.close();
     }
 
@@ -134,8 +134,9 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
         }
         final Object addr = workerId.getAddress();
         if (addr != null && isMatchingAddressType(addr)) {
+            @SuppressWarnings("unchecked")
             final A remote = (A)addr;
-            if (remote.equals(getLocal())) {
+            if (remote.equals(getAddress())) {
                 throw new IllegalStateException(); //This should have been handled at the start
             }
             final Worker rpcWorker = createDistributedWorker(remote, workerId);
@@ -159,7 +160,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
                     continue;
                 }
                 final Worker rpcWorker;
-                if (address.equals(getLocal())) {
+                if (address.equals(getAddress())) {
                     throw new IllegalStateException(); //Also should not have been distributed
                 } else {
                     rpcWorker = createDistributedWorker(address, workerId);
@@ -176,7 +177,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
     @Override
     public List<Worker> getWorkers(final int required) {
         final List<A> members = new ArrayList<>(this.getRemotes());
-        members.add(this.getLocal());
+        members.add(this.getAddress());
         final List<Future<WorkerId>> futures = new ArrayList<>(required);
         for (final A address : filterMembers(members, required)) {
             try {
@@ -189,12 +190,14 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
         for (final Future<WorkerId> future : futures) {
             try {
                 final WorkerId threadId = future.get(this.timeout, this.unit);
-                if (getLocal().equals(threadId.getAddress())) {
-                    workers.add(getWorker(threadId));
+                if (getAddress().equals(threadId.getAddress())) {
+                    workers.add(getLocalWorker(threadId));
                 } else {
                     final Object addr = threadId.getAddress();
                     if (isMatchingAddressType(addr)) {
-                        workers.add(createDistributedWorker((A)addr, threadId));
+                        @SuppressWarnings("unchecked")
+                        final A remote = (A)addr;
+                        workers.add(createDistributedWorker(remote, threadId));
                     }
                 }
             } catch (final TimeoutException | InterruptedException | ExecutionException e) {
@@ -227,7 +230,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
                     continue;
                 }
                 final Worker rpcWorker;
-                if (that.getAddress().equals(getLocal())) {
+                if (that.getAddress().equals(getAddress())) {
                     throw new IllegalStateException(); //Also should not have been distributed
                 } else {
                     rpcWorker = createDistributedWorker(that.getAddress(), that.getWorkerId());
@@ -243,7 +246,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
     @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        final ExecutionRepository ours = registry.getExecutionRepository(id);
+        final ExecutionRepository ours = getRegistry().getExecutionRepository(id);
         if (ours != null) {
             return ours;
         }
@@ -261,7 +264,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
                 final A address = future.get(this.timeout, this.unit);
                 if (address == null) {
                     continue;
-                } else if (getLocal().equals(address)) {
+                } else if (getAddress().equals(address)) {
                     throw new IllegalStateException(); //TODO Message
                 }
                 return createDistributedExecutionRepository(id, address);
@@ -274,7 +277,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
     @Override
     public Executable getExecutable(final long jobExecutionId, final ExecutableId id) {
-        final Executable ours = getRegistry().getExecutable(jobExecutionId, id);
+        final Executable ours = this.getRegistry().getExecutable(jobExecutionId, id);
         if (ours != null) {
             return ours;
         }
@@ -324,7 +327,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
 
     protected List<A> _remoteMembers(final Collection<A> all) {
         final List<A> that = new ArrayList<>(all);
-        that.remove(this.getLocal());
+        that.remove(this.getAddress());
         return Collections.unmodifiableList(that);
     }
 }

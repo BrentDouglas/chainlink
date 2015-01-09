@@ -97,7 +97,7 @@ public class HazelcastTransport extends DistributedTransport<Member> {
     }
 
     @Override
-    public Member getLocal() {
+    public Member getAddress() {
         return local;
     }
 
@@ -167,8 +167,11 @@ public class HazelcastTransport extends DistributedTransport<Member> {
 
         @Override
         public T call() throws Exception {
+            if (this.transport == null) {
+                throw new IllegalStateException(); //TODO Message
+            }
             try {
-                return command.perform(this.transport, this.origin);
+                return command.perform(this.transport, this.transport.getRegistry(), this.origin);
             } catch (final Exception e) {
                 throw e;
             } catch (final Throwable e) {

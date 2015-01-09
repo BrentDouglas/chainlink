@@ -13,6 +13,7 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.JobEventListener;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.Chain;
@@ -83,6 +84,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
         super(configuration, properties);
         final GlobalComponentRegistry gcr = manager.getGlobalComponentRegistry();
         gcr.registerComponent(this, InfinispanTransport.class); //TODO One Registry per config, this will be an issue
+        gcr.registerComponent(getRegistry(), Registry.class);
         if (manager.getStatus() == ComponentStatus.INSTANTIATED) {
             manager.start();
             gcr.start();
@@ -125,14 +127,14 @@ public class InfinispanTransport extends BaseTransport<Address> {
                 throw new RuntimeException(e);
             }
         }
-        getRegistry().registerJobEventListener(CLEANUP_INFINISPAN, new JobEventListener() {
+        this.getRegistry().registerJobEventListener(CLEANUP_INFINISPAN, new JobEventListener() {
             @Override
-            public Promise<?,?,?> onRegister(final long jobExecutionId, final Chain<?> job) {
+            public Promise<?, ?, ?> onRegister(final long jobExecutionId, final Chain<?> job) {
                 remoteExecutions.put(jobExecutionId, new ArrayList<Pair<ChainId, Address>>());
                 return null;
             }
 
-            public Promise<?,?,?> onUnregister(final long jobExecutionId, final Chain<?> job) {
+            public Promise<?, ?, ?> onUnregister(final long jobExecutionId, final Chain<?> job) {
                 final FutureDeferred<Object, Void> promise = new FutureDeferred<>(job, timeout, unit);
                 promise.onComplete(new OnComplete() {
                     @Override
@@ -158,7 +160,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
 
     @Override
     public void close() throws Exception {
-        getRegistry().unregisterJobEventListener(CLEANUP_INFINISPAN);
+        this.getRegistry().unregisterJobEventListener(CLEANUP_INFINISPAN);
         super.close();
     }
 
@@ -257,7 +259,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
             try {
                 final InfinispanWorkerId threadId = future.get(this.timeout, this.unit);
                 if (local.equals(threadId.getAddress())) {
-                    workers.add(getWorker(threadId));
+                    workers.add(getLocalWorker(threadId));
                 } else {
                     workers.add(new InfinispanWorker(this, local, threadId.getAddress(), threadId));
                 }
@@ -303,7 +305,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
 
     @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        final ExecutionRepository ours = registry.getExecutionRepository(id);
+        final ExecutionRepository ours = getRegistry().getExecutionRepository(id);
         if (ours != null) {
             return ours;
         }
@@ -360,7 +362,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
         return all.subList(0, required > all.size() ? all.size() : required);
     }
 
-    public Address getLocal() {
+    public Address getAddress() {
         return local;
     }
 
@@ -371,7 +373,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
         }
         rpc.invokeRemotelyInFuture(
                 Collections.singleton(address),
-                new CommandAdapter(cacheName, command, getLocal()),
+                new CommandAdapter(cacheName, command, getAddress()),
                 new RpcOptionsBuilder(options).timeout(timeout, unit).build(),
                 new InfinispanFuture<>(this, promise, address, System.currentTimeMillis())
         );

@@ -86,7 +86,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     }
 
     @Override
-    public Address getLocal() {
+    public Address getAddress() {
         return local;
     }
 
@@ -134,7 +134,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
             @SuppressWarnings("unchecked")
             final Command<?,Address> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
             log.tracef("Starting from %s: %s.", src, command);
-            final Object ret = command.perform(this, src);
+            final Object ret = command.perform(this, this.getRegistry(), src);
             log.tracef("Finished from %s: %s with %s.", src, command, ret);
             return ret;
         } catch (final Exception e) {

@@ -2,13 +2,6 @@ package io.machinecode.chainlink.core.transport;
 
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
-import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
-import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
-import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
-import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
-import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
-import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
-import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.artifacts.TestId;
 import io.machinecode.chainlink.core.transport.artifacts.TestExecutable;
 import io.machinecode.chainlink.core.transport.artifacts.TestTransport;
@@ -16,12 +9,9 @@ import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
-import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
-import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.transport.Transport;
@@ -29,11 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -122,7 +110,7 @@ public class DistributedTransportTest extends TransportTest {
     @Test
     public void localAddressTest() throws Exception {
         final Transport<?> transport = configuration().getTransport();
-        assertNotNull(transport.getLocal());
+        assertNotNull(transport.getAddress());
     }
 
     @Test

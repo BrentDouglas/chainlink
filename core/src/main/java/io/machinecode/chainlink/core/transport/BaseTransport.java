@@ -43,7 +43,7 @@ public abstract class BaseTransport<A> implements Transport<A> {
 
     protected final AtomicInteger currentWorker = new AtomicInteger(0);
 
-    protected final Registry registry;
+    private final Registry registry;
 
     protected final ExecutorService executor;
 
@@ -106,14 +106,13 @@ public abstract class BaseTransport<A> implements Transport<A> {
         }
     }
 
-    @Override
     public <T> Future<T> invokeLocal(final Command<T, A> command, final A origin) throws Exception {
         final Transport<A> self = this;
         return executor.submit(new Callable<T>() {
             @Override
             public T call() throws Exception {
                 try {
-                    return command.perform(self, origin);
+                    return command.perform(self, registry, origin);
                 } catch (final Throwable e) {
                     throw new Exception(e);
                 }
@@ -124,18 +123,17 @@ public abstract class BaseTransport<A> implements Transport<A> {
     @Override
     public <T> void invokeRemote(final A address, final Command<T, A> command, final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
         try {
-            promise.resolve(command.perform(this, getLocal()));
+            promise.resolve(command.perform(this, registry, getAddress()));
         } catch (final Throwable e) {
             promise.reject(e);
         }
     }
 
     @Override
-    public A getLocal() {
+    public A getAddress() {
         return null;
     }
 
-    @Override
     public Registry getRegistry() {
         return registry;
     }

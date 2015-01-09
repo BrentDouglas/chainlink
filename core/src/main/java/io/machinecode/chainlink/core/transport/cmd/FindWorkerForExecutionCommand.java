@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.core.transport.WorkerIdAndAddress;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
 
@@ -20,11 +21,11 @@ public class FindWorkerForExecutionCommand<A> implements Command<WorkerIdAndAddr
     }
 
     @Override
-    public WorkerIdAndAddress<A> perform(final Transport<A> transport, final A origin) throws Throwable {
+    public WorkerIdAndAddress<A> perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
         return transport.hasWorker(jobExecutionId, executableId)
                 ? new WorkerIdAndAddress<>(
                         transport.getWorker(jobExecutionId, executableId).id(),
-                        transport.getLocal()
+                        transport.getAddress()
                 )
                 : null;
     }

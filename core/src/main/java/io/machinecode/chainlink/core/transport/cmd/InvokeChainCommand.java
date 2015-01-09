@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.spi.registry.ChainId;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
@@ -33,8 +34,8 @@ public class InvokeChainCommand<T,A> implements Command<T,A> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public T perform(final Transport<A> transport, final A origin) throws Throwable {
-        final Chain<?> chain = transport.getRegistry().getChain(jobExecutionId, chainId);
+    public T perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
+        final Chain<?> chain = registry.getChain(jobExecutionId, chainId);
         LocalRegistry.assertChain(chain, jobExecutionId, chainId);
         Method method = null;
         for (final Method that : chain.getClass().getMethods()) {

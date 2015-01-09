@@ -41,13 +41,13 @@ public class EventedWorker extends Thread implements Worker {
     protected volatile boolean running = true;
 
     public EventedWorker(final Configuration configuration) {
-        super("Chainlink worker - " + IDS.incrementAndGet()); //TODO Message
+        super("chainlink-worker-" + IDS.incrementAndGet()); //TODO Message
         this.configuration = configuration;
         this.workerId = configuration.getTransport().generateWorkerId(this);
         lock = new Object() {
             @Override
             public String toString() {
-                return "Lock - " + workerId;
+                return getName() + "-lock-" + workerId;
             }
         };
         notify = new Notify(lock);

@@ -76,7 +76,7 @@ public class CoherenceTransport extends DistributedTransport<Member> {
     }
 
     @Override
-    public Member getLocal() {
+    public Member getAddress() {
         return local;
     }
 
@@ -170,7 +170,7 @@ public class CoherenceTransport extends DistributedTransport<Member> {
                 throw new IllegalStateException(); //TODO Message
             }
             try {
-                command.perform(this.transport, this.origin);
+                command.perform(this.transport, this.transport.getRegistry(), this.origin);
             } catch (final Throwable e) {
                 throw new RuntimeException(e);
             }

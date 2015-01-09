@@ -49,7 +49,7 @@ public class GridGainTransport extends DistributedTransport<UUID> {
         for (final GridNode node : all) {
             that.add(node.id());
         }
-        that.remove(this.getLocal());
+        that.remove(this.getAddress());
         return Collections.unmodifiableList(that);
     }
 
@@ -85,7 +85,7 @@ public class GridGainTransport extends DistributedTransport<UUID> {
     }
 
     @Override
-    public UUID getLocal() {
+    public UUID getAddress() {
         return local;
     }
 
@@ -116,7 +116,7 @@ public class GridGainTransport extends DistributedTransport<UUID> {
             log.tracef("Invoking %s on %s.", command, address);
             final GridFuture<T> future = this.grid.forNodeId(address)
                     .compute()
-                    .call(new GridGainCallable<>(command, getLocal(), grid));
+                    .call(new GridGainCallable<>(command, getAddress(), grid));
             final FutureDeferred<T, Void> run = new FutureDeferred<>(new GridGainFuture<>(future), timeout, unit);
             run.onResolve(promise)
                     .onReject(promise)

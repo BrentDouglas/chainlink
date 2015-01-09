@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
 
@@ -17,8 +18,8 @@ public class CleanupCommand<A> implements Command<Void,A> {
     }
 
     @Override
-    public Void perform(final Transport<A> transport, final A origin) throws Throwable {
-        transport.getRegistry().unregisterJob(jobExecutionId).get();
+    public Void perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
+        registry.unregisterJob(jobExecutionId).get();
         return null;
     }
 

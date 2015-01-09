@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.transport.cmd;
 import io.machinecode.chainlink.core.transport.DistributedRemoteChain;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.Registry;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
 
@@ -22,10 +23,10 @@ public abstract class PushChainCommand<A> implements Command<ChainId,A> {
     }
 
     @Override
-    public ChainId perform(final Transport<A> transport, final A origin) throws Throwable {
-        final Registry registry = transport.getRegistry();
+    public ChainId perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
+        final Chain<?> chain = createRemoteChain(transport, origin);
         final ChainId remoteId = transport.generateChainId();
-        registry.registerChain(jobExecutionId, remoteId, createRemoteChain(transport, origin));
+        registry.registerChain(jobExecutionId, remoteId, chain);
         return remoteId;
     }
 

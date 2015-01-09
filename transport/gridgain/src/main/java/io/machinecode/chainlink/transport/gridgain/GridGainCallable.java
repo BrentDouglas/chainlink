@@ -29,7 +29,7 @@ public class GridGainCallable<T> implements Callable<T>, Serializable {
     public T call() throws Exception {
         try {
             final GridGainTransport transport = GridGain.grid(gridName).<String, GridGainTransport>nodeLocalMap().get(GridGainTransport.class.getName());
-            return command.perform(transport, origin);
+            return command.perform(transport, transport.getRegistry(), origin);
         } catch (final Throwable e) {
             throw new Exception(e);
         }

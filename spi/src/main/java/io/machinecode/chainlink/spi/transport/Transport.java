@@ -6,13 +6,11 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.then.api.Deferred;
 
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,13 +18,10 @@ import java.util.concurrent.TimeUnit;
  */
 public interface Transport<A> extends Lifecycle {
 
-    <T> Future<T> invokeLocal(final Command<T, A> command, final A origin) throws Exception;
+    <T> void invokeRemote(final A address, final Command<T, A> command, final Deferred<T, Throwable,?> promise,
+                          final long timeout, final TimeUnit unit);
 
-    <T> void invokeRemote(final A address, final Command<T, A> command, final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit);
-
-    A getLocal();
-
-    Registry getRegistry();
+    A getAddress();
 
     Worker getWorker(final WorkerId id);
 

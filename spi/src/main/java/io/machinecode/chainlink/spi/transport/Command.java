@@ -1,5 +1,7 @@
 package io.machinecode.chainlink.spi.transport;
 
+import io.machinecode.chainlink.spi.registry.Registry;
+
 import java.io.Serializable;
 
 /**
@@ -7,5 +9,5 @@ import java.io.Serializable;
  */
 public interface Command<T, A> extends Serializable {
 
-    T perform(final Transport<A> transport, final A origin) throws Throwable;
+    T perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable;
 }

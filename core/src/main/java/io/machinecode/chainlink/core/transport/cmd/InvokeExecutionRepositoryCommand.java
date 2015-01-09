@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
@@ -30,9 +31,10 @@ public class InvokeExecutionRepositoryCommand<T,A> implements Command<T,A> {
     }
 
     @Override
-    public T perform(final Transport<A> transport, final A origin) throws Throwable {
+    @SuppressWarnings("unchecked")
+    public T perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
         //TODO Ensure local
-        final ExecutionRepository repository = transport.getRegistry().getExecutionRepository(executionRepositoryId);
+        final ExecutionRepository repository = registry.getExecutionRepository(executionRepositoryId);
         LocalRegistry.assertExecutionRepository(repository, executionRepositoryId);
         Method method = null;
         for (final Method that : ExecutionRepository.class.getDeclaredMethods()) {

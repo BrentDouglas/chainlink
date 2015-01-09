@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
 
@@ -20,8 +21,8 @@ public class FindExecutableCommand<A> implements Command<Executable,A> {
     }
 
     @Override
-    public Executable perform(final Transport<A> transport, final A origin) throws Throwable {
-        return transport.getRegistry().getExecutable(jobExecutionId, id);
+    public Executable perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
+        return registry.getExecutable(jobExecutionId, id);
     }
 
     @Override

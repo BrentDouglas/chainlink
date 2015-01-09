@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.spi.execution.CallbackEvent;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
@@ -20,7 +21,7 @@ public class CallbackCommand<A> implements Command<Object,A> {
     }
 
     @Override
-    public Object perform(final Transport<A> transport, final A origin) throws Throwable {
+    public Object perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
         transport.getWorker(workerId).callback(event);
         return null;
     }

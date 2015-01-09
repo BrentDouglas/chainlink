@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
@@ -19,10 +20,10 @@ public class FindExecutionRepositoryWithIdCommand<A> implements Command<A,A> {
     }
 
     @Override
-    public A perform(final Transport<A> transport, final A origin) throws Throwable {
-        final ExecutionRepository repository = transport.getRegistry().getExecutionRepository(executionRepositoryId);
+    public A perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
+        final ExecutionRepository repository = registry.getExecutionRepository(executionRepositoryId);
         if (repository != null) {
-            return transport.getLocal();
+            return transport.getAddress();
         }
         return null;
     }

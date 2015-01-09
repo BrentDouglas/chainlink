@@ -25,7 +25,7 @@ public class FindWorkerForExecutionCallable extends BaseCallable<Object, Object,
         return transport.hasWorker(jobExecutionId, executableId)
                 ? new WorkerIdAndAddress<>(
                         transport.getWorker(jobExecutionId, executableId).id(),
-                        transport.getLocal()
+                        transport.getAddress()
                 )
                 : null;
     }
