@@ -22,8 +22,6 @@ import org.apache.openejb.observer.Observes;
 import org.apache.openejb.observer.event.ObserverAdded;
 
 import javax.transaction.TransactionManager;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -82,11 +80,7 @@ public class TomEEEnvironment implements Environment {
         final File conf = system.getConf(subsystemXml);
         if (conf != null && conf.isFile()) {
             try (final InputStream stream = new FileInputStream(conf)) {
-                final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlinkSubSystem.class);
-                final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
-                final XmlChainlinkSubSystem xml = (XmlChainlinkSubSystem) unmarshaller.unmarshal(stream);
-
-                xml.configureSubSystem(model, loader);
+                XmlChainlinkSubSystem.configureSubSystemFromStream(model, loader, stream);
             }
         }
     }
@@ -112,15 +106,7 @@ public class TomEEEnvironment implements Environment {
         final String chainlinkXml = system.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
         final InputStream stream = loader.getResourceAsStream(chainlinkXml);
         if (stream != null) {
-            try {
-                final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
-                final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
-                final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
-
-                xml.configureDeployment(deployment, loader);
-            } finally {
-                stream.close();
-            }
+            XmlChainlink.configureDeploymentFromStream(deployment, loader, stream);
         }
         final TransactionManager transactionManager = context.getSystemInstance().getComponent(TransactionManager.class);
         final TomEEConfigurationDefaults defaults = new TomEEConfigurationDefaults(loader, transactionManager);

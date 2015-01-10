@@ -14,8 +14,6 @@ import org.glassfish.internal.data.ApplicationInfo;
 
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -64,15 +62,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
         //TODO This should come out of the config dir
         final InputStream stream = loader.getResourceAsStream(subsystemXml);
         if (stream != null) {
-            try {
-                final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlinkSubSystem.class);
-                final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
-                final XmlChainlinkSubSystem xml = (XmlChainlinkSubSystem) unmarshaller.unmarshal(stream);
-
-                xml.configureSubSystem(model, loader);
-            } finally {
-                stream.close();
-            }
+            XmlChainlinkSubSystem.configureSubSystemFromStream(model, loader, stream);
         }
     }
 
@@ -91,15 +81,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
         final String chainlinkXml = System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
         final InputStream stream = loader.getResourceAsStream(chainlinkXml);
         if (stream != null) {
-            try {
-                final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
-                final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
-                final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
-
-                xml.configureDeployment(deployment, loader);
-            } finally {
-                stream.close();
-            }
+            XmlChainlink.configureDeploymentFromStream(deployment, loader, stream);
         }
         final TransactionManager transactionManager = InitialContext.doLookup("java:appserver/TransactionManager");
         final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, transactionManager);

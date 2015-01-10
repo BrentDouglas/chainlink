@@ -1,8 +1,10 @@
 package io.machinecode.chainlink.core.base;
 
+import io.machinecode.chainlink.core.configuration.ConfigurationArtifactLoader;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
+import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
@@ -20,6 +22,7 @@ import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
@@ -54,11 +57,12 @@ public abstract class BaseTest extends Assert {
             this.visitJobOperatorModel(op);
             this._configuration = deployment.getConfiguration(Constants.DEFAULT_CONFIGURATION);
 
-            this._transactionManager = op.getTransactionManager().get(_configuration);
-            this._registry = op.getRegistry().get(_configuration);
-            this._repository = op.getExecutionRepository().get(_configuration);
-            this._marshalling = op.getMarshalling().get(_configuration);
-            this._executor = op.getExecutor().get(_configuration);
+            final ArtifactLoader loader = new ConfigurationArtifactLoader();
+            this._transactionManager = op.getTransactionManager().get(_configuration, loader);
+            this._registry = op.getRegistry().get(_configuration, loader);
+            this._repository = op.getExecutionRepository().get(_configuration, loader);
+            this._marshalling = op.getMarshalling().get(_configuration, loader);
+            this._executor = op.getExecutor().get(_configuration, loader);
         }
         return this._configuration;
     }

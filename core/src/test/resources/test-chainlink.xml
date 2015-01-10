@@ -3,15 +3,11 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://io.machinecode/xml/ns/chainlink http://io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
 
-    <job-operator name="Default">
-        <marshalling name="marshalling" factory=""/>
-        <mbean-server name="mbean-server" factory="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
-        <artifact-loader name="artifact-loader" factory="io.machinecode.chainlink.inject.cdi.CdiArtifactLoader"/>
-        <injector name="injector" factory="io.machinecode.chainlink.inject.cdi.CdiInjector"/>
-        <execution-repository name="execution-repository" factory=""/>
-        <registry name="registry" factory=""/>
-        <transport name="transport" factory=""/>
-        <executor name="executor" factory=""/>
+    <artifact-loader name="test" ref="io.machinecode.chainlink.core.configuration.TestArtifactLoaderFactory" />
+
+    <job-operator name="default">
+        <artifact-loader name="first" ref="testArtifactLoader"/>
+        <artifact-loader name="other" ref="io.machinecode.chainlink.core.configuration.OtherArtifactLoader" />
     </job-operator>
 
 </chainlink>

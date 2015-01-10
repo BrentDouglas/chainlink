@@ -38,7 +38,7 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
         return new ElementBuilder(
                 PathElement.pathElement(name),
                 ChainlinkExtension.getResourceDescriptionResolver(WildFlyConstants.JOB_OPERATOR, name)
-        ).addAttribute(new SimpleAttributeDefinitionBuilder(WildFlyConstants.FACTORY, ModelType.STRING)
+        ).addAttribute(new SimpleAttributeDefinitionBuilder(WildFlyConstants.REF, ModelType.STRING)
                 .setAllowNull(true)
                 .setAllowExpression(true)
                 .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)

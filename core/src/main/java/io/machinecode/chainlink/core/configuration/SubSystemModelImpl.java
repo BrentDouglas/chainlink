@@ -15,7 +15,7 @@ public class SubSystemModelImpl extends ScopeModelImpl implements SubSystemModel
 
     public SubSystemModelImpl(final ClassLoader loader) {
         super(new WeakReference<>(loader), new THashSet<String>());
-        this.deployment = new DeploymentModelImpl(this.loader, this.names);
+        this.deployment = new DeploymentModelImpl(this);
     }
 
     @Override

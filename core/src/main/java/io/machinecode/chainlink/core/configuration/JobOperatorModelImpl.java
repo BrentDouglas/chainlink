@@ -5,6 +5,19 @@ import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
+import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.Factory;
+import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
+import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
+import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
+import io.machinecode.chainlink.spi.configuration.factory.SecurityFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
+import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.Injector;
@@ -44,15 +57,15 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     DeclarationImpl<ClassLoader> classLoader;
     DeclarationImpl<Marshalling> marshalling;
     DeclarationImpl<Registry> registry;
-    DeclarationImpl<Transport<?>> transport;
+    DeclarationImpl<Transport> transport;
     DeclarationImpl<ExecutionRepository> executionRepository;
     DeclarationImpl<TransactionManager> transactionManager;
     DeclarationImpl<Executor> executor;
     DeclarationImpl<MBeanServer> mBeanServer;
-    LinkedHashMap<String, DeclarationImpl<JobLoader>> jobLoaders = new LinkedHashMap<>();
-    LinkedHashMap<String, DeclarationImpl<ArtifactLoader>> artifactLoaders = new LinkedHashMap<>();
-    LinkedHashMap<String, DeclarationImpl<Injector>> injectors = new LinkedHashMap<>();
-    LinkedHashMap<String, DeclarationImpl<Security>> securities = new LinkedHashMap<>();
+    final LinkedHashMap<String, DeclarationImpl<JobLoader>> jobLoaders = new LinkedHashMap<>();
+    final LinkedHashMap<String, DeclarationImpl<ArtifactLoader>> artifactLoaders = new LinkedHashMap<>();
+    final LinkedHashMap<String, DeclarationImpl<Injector>> injectors = new LinkedHashMap<>();
+    final LinkedHashMap<String, DeclarationImpl<Security>> securities = new LinkedHashMap<>();
     Properties properties;
 
     final WeakReference<ClassLoader> loader;
@@ -107,17 +120,17 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         return (DeclarationImpl<T>)value;
     }
 
-    protected <T> DeclarationImpl<T> createValue(final String name, final Class<?> clazz) {
+    protected <T> DeclarationImpl<T> createValue(final String name, final Class<? extends T> clazz, final Class<? extends Factory<? extends T>> interfaz) {
         if (names.contains(name)) {
             throw new IllegalStateException("Resource already declared for name: " + name); //TODO Message and better exception
         }
-        return new DeclarationImpl<>(loader, names, values, clazz, name);
+        return new DeclarationImpl<>(loader, names, values, clazz, interfaz, name);
     }
 
     @Override
     public DeclarationImpl<ClassLoader> getClassLoader() {
         if (classLoader == null) {
-            return classLoader = new DeclarationImpl<>(loader, names, values, ClassLoader.class, CLASS_LOADER);
+            return classLoader = new DeclarationImpl<>(loader, names, values, ClassLoader.class, ClassLoaderFactory.class, CLASS_LOADER);
         }
         return classLoader;
     }
@@ -125,15 +138,15 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<Marshalling> getMarshalling() {
         if (marshalling == null) {
-            return marshalling = new DeclarationImpl<>(loader, names, values, Marshalling.class, MARSHALLING);
+            return marshalling = new DeclarationImpl<>(loader, names, values, Marshalling.class, MarshallingFactory.class, MARSHALLING);
         }
         return marshalling;
     }
 
     @Override
-    public Declaration<Transport<?>> getTransport() {
+    public Declaration<Transport> getTransport() {
         if (transport == null) {
-            return transport = new DeclarationImpl<>(loader, names, values, Transport.class, TRANSPORT);
+            return transport = new DeclarationImpl<>(loader, names, values, Transport.class, TransportFactory.class, TRANSPORT);
         }
         return transport;
     }
@@ -141,7 +154,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<Registry> getRegistry() {
         if (registry == null) {
-            return registry = new DeclarationImpl<>(loader, names, values, Registry.class, REGISTRY);
+            return registry = new DeclarationImpl<>(loader, names, values, Registry.class, RegistryFactory.class, REGISTRY);
         }
         return registry;
     }
@@ -149,7 +162,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<ExecutionRepository> getExecutionRepository() {
         if (executionRepository == null) {
-            return executionRepository = new DeclarationImpl<>(loader, names, values, ExecutionRepository.class, EXECUTION_REPOSITORY);
+            return executionRepository = new DeclarationImpl<>(loader, names, values, ExecutionRepository.class, ExecutionRepositoryFactory.class, EXECUTION_REPOSITORY);
         }
         return executionRepository;
     }
@@ -157,7 +170,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<TransactionManager> getTransactionManager() {
         if (transactionManager == null) {
-            return transactionManager = new DeclarationImpl<>(loader, names, values, TransactionManager.class, TRANSACTION_MANAGER);
+            return transactionManager = new DeclarationImpl<>(loader, names, values, TransactionManager.class, TransactionManagerFactory.class, TRANSACTION_MANAGER);
         }
         return transactionManager;
     }
@@ -165,7 +178,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<Executor> getExecutor() {
         if (executor == null) {
-            return executor = new DeclarationImpl<>(loader, names, values, Executor.class, EXECUTOR);
+            return executor = new DeclarationImpl<>(loader, names, values, Executor.class, ExecutorFactory.class, EXECUTOR);
         }
         return executor;
     }
@@ -173,7 +186,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     @Override
     public DeclarationImpl<MBeanServer> getMBeanServer() {
         if (mBeanServer == null) {
-            return mBeanServer = new DeclarationImpl<>(loader, names, values, MBeanServer.class, MBEAN_SERVER);
+            return mBeanServer = new DeclarationImpl<>(loader, names, values, MBeanServer.class, MBeanServerFactory.class, MBEAN_SERVER);
         }
         return mBeanServer;
     }
@@ -184,7 +197,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         if (jobLoader != null) {
             return jobLoader;
         }
-        jobLoaders.put(name, jobLoader = createValue(name, JobLoader.class));
+        jobLoaders.put(name, jobLoader = createValue(name, JobLoader.class, JobLoaderFactory.class));
         return jobLoader;
     }
 
@@ -194,7 +207,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         if (artifactLoader != null) {
             return artifactLoader;
         }
-        artifactLoaders.put(name, artifactLoader = createValue(name, ArtifactLoader.class));
+        artifactLoaders.put(name, artifactLoader = createValue(name, ArtifactLoader.class, ArtifactLoaderFactory.class));
         return artifactLoader;
     }
 
@@ -204,7 +217,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         if (injector != null) {
             return injector;
         }
-        injectors.put(name, injector = createValue(name, Injector.class));
+        injectors.put(name, injector = createValue(name, Injector.class, InjectorFactory.class));
         return injector;
     }
 
@@ -214,7 +227,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         if (security != null) {
             return security;
         }
-        securities.put(name, security = createValue(name, Security.class));
+        securities.put(name, security = createValue(name, Security.class, SecurityFactory.class));
         return security;
     }
 
@@ -230,5 +243,9 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
         op.open(configuration);
         return op;
+    }
+
+    public ConfigurationImpl getConfiguration() throws Exception {
+        return scope.getConfiguration(name);
     }
 }

@@ -2,9 +2,10 @@ package io.machinecode.chainlink.core.configuration;
 
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.Resource;
 import io.machinecode.chainlink.spi.configuration.factory.Factory;
 import io.machinecode.chainlink.spi.exception.UnresolvableResourceException;
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -15,45 +16,48 @@ import java.util.Set;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class DeclarationImpl<T> implements Declaration<T>, Resource<T> {
+public class DeclarationImpl<T> implements Declaration<T> {
 
     final WeakReference<ClassLoader> loader;
     final Set<String> names;
     final Map<String, DeclarationImpl<?>> owner;
-    final Class<?> clazz;
+    final Class<? extends T> valueInterface;
+    final Class<? extends Factory<? extends T>> factoryInterface;
     String name;
     Properties properties;
     T value;
     Factory<? extends T> defaultFactory;
     Factory<? extends T> factory;
+    Class<? extends T> valueClass;
     Class<? extends Factory<? extends T>> factoryClass;
-    String fqcn;
+    String ref;
 
     T cache;
 
     public DeclarationImpl(final WeakReference<ClassLoader> loader, final Set<String> names, final Map<String, DeclarationImpl<?>> owner,
-                           final Class<?> clazz) {
+                           final Class<? extends T> valueInterface, final Class<? extends Factory<? extends T>> factoryInterface) {
         this.loader = loader;
         this.names = names;
         this.owner = owner;
-        this.clazz = clazz;
+        this.valueInterface = valueInterface;
+        this.factoryInterface = factoryInterface;
     }
 
     public DeclarationImpl(final WeakReference<ClassLoader> loader, final Set<String> names, final Map<String, DeclarationImpl<?>> owner,
-                           final Class<?> clazz, final String name) {
-        this(loader, names, owner, clazz);
+                           final Class<? extends T> valueInterface, final Class<? extends Factory<? extends T>> factoryInterface, final String name) {
+        this(loader, names, owner, valueInterface, factoryInterface);
         setName(name);
     }
 
     private DeclarationImpl(final DeclarationImpl<T> that, final Set<String> names, final Map<String, DeclarationImpl<?>> owner) {
-        this(that.loader, names, owner, that.clazz);
+        this(that.loader, names, owner, that.valueInterface, that.factoryInterface);
         this.name = that.name;
         this.properties = new Properties(that.properties);
         this.value = that.value;
         this.defaultFactory = that.defaultFactory;
         this.factory = that.factory;
         this.factoryClass = that.factoryClass;
-        this.fqcn = that.fqcn;
+        this.ref = that.ref;
         this.cache = that.cache;
     }
 
@@ -62,7 +66,7 @@ public class DeclarationImpl<T> implements Declaration<T>, Resource<T> {
     }
 
     boolean is(final Class<?> type) {
-        return clazz.isAssignableFrom(type);
+        return valueInterface.isAssignableFrom(type);
     }
 
     @Override
@@ -72,8 +76,14 @@ public class DeclarationImpl<T> implements Declaration<T>, Resource<T> {
     }
 
     @Override
-    public DeclarationImpl<T> set(final T that) {
+    public DeclarationImpl<T> setValue(final T that) {
         this.value = that;
+        return this;
+    }
+
+    @Override
+    public Declaration<T> setValueClass(final Class<? extends T> that) {
+        this.valueClass = that;
         return this;
     }
 
@@ -120,14 +130,13 @@ public class DeclarationImpl<T> implements Declaration<T>, Resource<T> {
     }
 
     @Override
-    public DeclarationImpl<T> setFactoryFqcn(final String fqcn) {
+    public DeclarationImpl<T> setRef(final String ref) {
         this.cache = null;
-        this.fqcn = fqcn;
+        this.ref = ref;
         return this;
     }
 
-    @Override
-    public T get(final Dependencies dependencies) {
+    public T get(final Dependencies dependencies, final ArtifactLoader loader) {
         if (cache != null) {
             return cache;
         }
@@ -138,18 +147,26 @@ public class DeclarationImpl<T> implements Declaration<T>, Resource<T> {
                 ? new Properties()
                 : this.properties;
         try {
-            if (factory != null) {
+            if (valueClass != null) {
+                return cache = valueClass.newInstance();
+            } else if (factory != null) {
                 return cache = factory.produce(dependencies, properties);
             } else if (factoryClass != null) {
                 return cache = factoryClass.newInstance().produce(dependencies, properties);
-            } else if (fqcn != null) {
-                final ClassLoader loader = this.loader.get();
-                if (loader == null) {
+            } else if (ref != null) {
+                final ClassLoader classLoader = this.loader.get();
+                if (classLoader == null) {
                     throw new UnresolvableResourceException(); //TODO Message
                 }
-                @SuppressWarnings("unchecked")
-                final Class<? extends Factory<? extends T>> clazz = (Class<? extends Factory<? extends T>>)loader.loadClass(fqcn);
-                return cache = clazz.newInstance().produce(dependencies, properties);
+                try {
+                    final Factory<? extends T> factory = loader.load(ref, factoryInterface, classLoader);
+                    if (factory == null) {
+                        throw new UnresolvableResourceException("No configuration found for node with name=" + name + ",clazz=" + valueInterface.getSimpleName()); //TODO
+                    }
+                    return cache = factory.produce(dependencies, properties);
+                } catch (final ArtifactOfWrongTypeException e) {
+                    return cache = loader.load(ref, valueInterface, classLoader);
+                }
             } else if (defaultFactory != null) {
                 return cache = defaultFactory.produce(dependencies, properties);
             }
@@ -158,6 +175,6 @@ public class DeclarationImpl<T> implements Declaration<T>, Resource<T> {
         } catch (final Exception e) {
             throw new UnresolvableResourceException(e); //TODO Message
         }
-        throw new UnresolvableResourceException("No configuration found for node with name=" + name + ",clazz=" + clazz.getSimpleName()); //TODO
+        throw new UnresolvableResourceException("No configuration found for node with name=" + name + ",clazz=" + valueInterface.getSimpleName()); //TODO
     }
 }

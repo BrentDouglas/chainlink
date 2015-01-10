@@ -1,14 +1,17 @@
 package io.machinecode.chainlink.core.configuration.xml.subsystem;
 
+import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.configuration.xml.XmlDeployment;
 import io.machinecode.chainlink.core.configuration.xml.XmlScope;
-import io.machinecode.chainlink.spi.exception.ConfigurationException;
-import io.machinecode.chainlink.spi.configuration.SubSystemModel;
 import io.machinecode.chainlink.spi.configuration.SubSystemConfiguration;
+import io.machinecode.chainlink.spi.exception.ConfigurationException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.InputStream;
 
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
@@ -36,20 +39,31 @@ public class XmlChainlinkSubSystem extends XmlScope {
         this.deployment = deployment;
     }
 
-    public void configureSubSystem(final SubSystemModel model, final ClassLoader loader) throws Exception {
-        configureScope(model, loader);
+    public void configureSubSystem(final SubSystemModelImpl model, final ClassLoader classLoader) throws Exception {
+        configureScope(model, classLoader);
         if (this.deployment != null) {
-            deployment.configureDeployment(model.getDeployment(), loader);
+            deployment.configureDeployment(model.getDeployment(), classLoader);
         }
-        if (this.factory != null) {
+        if (this.ref != null) {
             final SubSystemConfiguration configuration;
             try {
-                final Class<?> clazz = loader.loadClass(this.factory);
-                configuration = SubSystemConfiguration.class.cast(clazz.newInstance());
+                configuration = model.getArtifactLoader().load(this.ref, SubSystemConfiguration.class, classLoader);
             } catch (final Exception e) {
-                throw new ConfigurationException("attribute 'factory' must be the fqcn of a class extending " + SubSystemConfiguration.class.getName(), e); //TODO Message
+                throw new ConfigurationException("attribute 'ref' must be an injectable " + SubSystemConfiguration.class.getName(), e); //TODO Message
             }
             configuration.configureSubSystem(model);
+        }
+    }
+
+    public static void configureSubSystemFromStream(final SubSystemModelImpl model, final ClassLoader loader, final InputStream stream) throws Exception {
+        try {
+            final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlinkSubSystem.class);
+            final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+            final XmlChainlinkSubSystem xml = (XmlChainlinkSubSystem) unmarshaller.unmarshal(stream);
+
+            xml.configureSubSystem(model, loader);
+        } finally {
+            stream.close();
         }
     }
 }

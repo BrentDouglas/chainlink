@@ -20,6 +20,7 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:element name="artifact-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="job-operator" type="cl:JobOperatorType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
@@ -33,11 +34,10 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="cl:ScopeType">
-                <xs:attribute name="factory" use="optional" type="xs:string">
+                <xs:attribute name="ref" use="optional" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
-                            The fully qualified class name (fqcn) of the factory to use to configure this deployment.
-                            Must implement DeploymentConfiguration.
+                            An injectable reference for the DeploymentConfiguration to use to configure this deployment.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
@@ -68,11 +68,10 @@
                     <xs:element name="executor" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="property" type="cl:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
                 </xs:sequence>
-                <xs:attribute name="factory" use="optional" type="xs:string">
+                <xs:attribute name="ref" use="optional" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
-                            The fully qualified class name (fqcn) of the factory to use to configure this job operator.
-                            Must implement JobOperatorConfiguration.
+                            An injectable reference for the JobOperatorConfiguration to use to configure this job operator.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
@@ -98,10 +97,10 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="cl:NamedType">
-                <xs:attribute name="factory" use="required" type="xs:string">
+                <xs:attribute name="ref" use="required" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>
-                            The fully qualified class name (fqcn) of the factory to use.
+                            An injectable reference for either a factory or an artifact.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>

@@ -24,7 +24,7 @@ public interface JobOperatorModel {
 
     Declaration<Marshalling> getMarshalling();
 
-    Declaration<Transport<?>> getTransport();
+    Declaration<Transport> getTransport();
 
     Declaration<Registry> getRegistry();
 

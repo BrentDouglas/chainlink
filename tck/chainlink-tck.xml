@@ -4,21 +4,21 @@
                  xsi:schemaLocation="http://io.machinecode/xml/ns/chainlink http://io.machinecode/xml/ns/chainlink/chainlink_1_0.xsd">
 
     <job-operator name="default">
-        <marshalling name="marshalling" factory="@marshalling.factory.class@"/>
-        <mbean-server name="mbean-server" factory="@mbean.server.factory.class@"/>
-        <execution-repository name="execution-repository" factory="@execution.repository.factory.class@"/>
-        <registry name="registry" factory="@registry.factory.class@"/>
-        <transport name="transport" factory="@transport.factory.class@"/>
-        <executor name="executor" factory="@executor.factory.class@"/>
+        <marshalling name="marshalling" ref="@marshalling.factory.class@"/>
+        <mbean-server name="mbean-server" ref="@mbean.server.factory.class@"/>
+        <execution-repository name="execution-repository" ref="@execution.repository.factory.class@"/>
+        <registry name="registry" ref="@registry.factory.class@"/>
+        <transport name="transport" ref="@transport.factory.class@"/>
+        <executor name="executor" ref="@executor.factory.class@"/>
 
         <!--
-        <class-loader name="class-loader" factory="@class.loader.factory.class@"/>
-        <transaction-manager name="transaction-manager" factory="@transaction.manager.factory.class@"/>
+        <class-loader name="class-loader" ref="@class.loader.factory.class@"/>
+        <transaction-manager name="transaction-manager" ref="@transaction.manager.factory.class@"/>
 
-        <job-loader name="job-loader" factory="@job.loader.factory.class@"/>
-        <artifact-loader name="artifact-loader" factory="@artifact.loader.factory.class@"/>
-        <injector name="injector" factory="@injector.factory.class@"/>
-        <security name="security" factory="@security.factory.class@"/>
+        <job-loader name="job-loader" ref="@job.loader.factory.class@"/>
+        <artifact-loader name="artifact-loader" ref="@artifact.loader.factory.class@"/>
+        <injector name="injector" ref="@injector.factory.class@"/>
+        <security name="security" ref="@security.factory.class@"/>
         -->
     </job-operator>
 

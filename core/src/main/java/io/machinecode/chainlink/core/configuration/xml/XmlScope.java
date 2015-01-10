@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.configuration.xml;
 
-import io.machinecode.chainlink.spi.configuration.ScopeModel;
+import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -17,18 +17,29 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public class XmlScope {
 
-    @XmlAttribute(name = "factory", required = false)
-    protected String factory;
+    @XmlAttribute(name = "ref", required = false)
+    protected String ref;
+
+    @XmlElement(name = "artifact-loader", namespace = XmlChainlink.NAMESPACE, required = false)
+    private List<XmlDeclaration> artifactLoader = new ArrayList<>(0);
 
     @XmlElement(name = "job-operator", namespace = XmlChainlink.NAMESPACE, required = false)
     protected List<XmlJobOperator> jobOperators = new ArrayList<>(0);
 
-    public String getFactory() {
-        return factory;
+    public String getRef() {
+        return ref;
     }
 
-    public void setFactory(final String factory) {
-        this.factory = factory;
+    public void setRef(final String ref) {
+        this.ref = ref;
+    }
+
+    public List<XmlDeclaration> getArtifactLoader() {
+        return artifactLoader;
+    }
+
+    public void setArtifactLoader(final List<XmlDeclaration> artifactLoader) {
+        this.artifactLoader = artifactLoader;
     }
 
     public List<XmlJobOperator> getJobOperators() {
@@ -39,9 +50,13 @@ public class XmlScope {
         this.jobOperators = jobOperators;
     }
 
-    public void configureScope(final ScopeModel model, final ClassLoader loader) throws Exception {
+    public void configureScope(final ScopeModelImpl model, final ClassLoader classLoader) throws Exception {
+        for (final XmlDeclaration resource : this.artifactLoader) {
+            model.getArtifactLoader(resource.getName())
+                    .setRef(XmlJobOperator.ref(resource));
+        }
         for (final XmlJobOperator operator : this.jobOperators) {
-            operator.configureScope(model, loader);
+            operator.configureScope(model, classLoader);
         }
     }
 }

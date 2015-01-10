@@ -12,8 +12,6 @@ import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -85,15 +83,7 @@ public class SeEnvironment implements Environment, AutoCloseable {
                 stream = null;
             }
             if (stream != null) {
-                try {
-                    final JAXBContext context = JAXBContext.newInstance(XmlChainlink.class);
-                    final Unmarshaller unmarshaller = context.createUnmarshaller();
-                    final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
-
-                    xml.configureDeployment(model, tccl);
-                } finally {
-                    stream.close();
-                }
+                XmlChainlink.configureDeploymentFromStream(model, tccl, stream);
             }
             final SeConfigurationDefaults defaults = new SeConfigurationDefaults();
             for (final Map.Entry<String, JobOperatorModelImpl> entry : model.getJobOperators().entrySet()) {

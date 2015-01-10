@@ -21,8 +21,8 @@ public class SeamBatchletTest extends BatchletTest {
 
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
-        model.getArtifactLoader("artifactFactory").set(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class));
-        model.getInjector("injector").set(new VetoInjector());
+        model.getArtifactLoader("artifactFactory").setValue(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class));
+        model.getInjector("injector").setValue(new VetoInjector());
     }
 
     @BeforeClass

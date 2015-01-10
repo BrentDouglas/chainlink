@@ -77,7 +77,7 @@ public class DefaultInjector implements Injector {
                     }
                 }
             }
-        } while ((clazz = clazz.getSuperclass()) != Object.class);
+        } while ((clazz = clazz.getSuperclass()) != Object.class && clazz != null);
         return true;
     }
 

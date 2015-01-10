@@ -12,7 +12,9 @@ public interface Declaration<T> {
 
     Declaration<T> setProperties(final Properties properties);
 
-    Declaration<T> set(final T that);
+    Declaration<T> setValue(final T that);
+
+    Declaration<T> setValueClass(final Class<? extends T> that);
 
     Declaration<T> setName(final String name);
 
@@ -20,7 +22,7 @@ public interface Declaration<T> {
 
     Declaration<T> setFactoryClass(final Class<? extends Factory<? extends T>> that);
 
-    Declaration<T> setFactoryFqcn(final String fqcn);
+    Declaration<T> setRef(final String fqcn);
 
     Declaration<T> setDefaultValueFactory(final Factory<? extends T> that);
 }

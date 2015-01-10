@@ -59,22 +59,23 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
                     : this.scope.getValue().getDeployment();
             final JobOperatorModelImpl op = scope.getJobOperator(name);
 
+            //TODO Need to look at this
             op.getClassLoader()
-                    .setFactoryFqcn(nodeToString(model.get(WildFlyConstants.CLASS_LOADER)));
+                    .setRef(nodeToString(model, WildFlyConstants.CLASS_LOADER, WildFlyConstants.REF));
             op.getExecutor()
-                    .setFactoryFqcn(nodeToString(model.get(WildFlyConstants.EXECUTOR)));
+                    .setRef(nodeToString(model, WildFlyConstants.EXECUTOR, WildFlyConstants.REF));
             op.getTransport()
-                    .setFactoryFqcn(nodeToString(model.get(WildFlyConstants.TRANSPORT)));
+                    .setRef(nodeToString(model, WildFlyConstants.TRANSPORT, WildFlyConstants.REF));
             op.getRegistry()
-                    .setFactoryFqcn(nodeToString(model.get(WildFlyConstants.REGISTRY)));
+                    .setRef(nodeToString(model, WildFlyConstants.REGISTRY, WildFlyConstants.REF));
             op.getMarshalling()
-                    .setFactoryFqcn(nodeToString(model.get(WildFlyConstants.MARSHALLING)));
+                    .setRef(nodeToString(model, WildFlyConstants.MARSHALLING, WildFlyConstants.REF));
             op.getExecutionRepository()
-                    .setFactoryFqcn(nodeToString(model.get(WildFlyConstants.EXECUTION_REPOSITORY)));
+                    .setRef(nodeToString(model, WildFlyConstants.EXECUTION_REPOSITORY, WildFlyConstants.REF));
             op.getTransactionManager()
-                    .setFactoryFqcn(nodeToString(model.get(WildFlyConstants.TRANSACTION_MANAGER)));
+                    .setRef(nodeToString(model, WildFlyConstants.TRANSACTION_MANAGER, WildFlyConstants.REF));
             op.getMBeanServer()
-                    .setFactoryFqcn(nodeToString(model.get(WildFlyConstants.MBEAN_SERVER)));
+                    .setRef(nodeToString(model, WildFlyConstants.MBEAN_SERVER, WildFlyConstants.REF));
             addListNode(model.get(WildFlyConstants.JOB_LOADER), new Target() {
                 @Override
                 public DeclarationImpl target(final String name) {
@@ -144,7 +145,13 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
         return scope;
     }
 
-    static String nodeToString(final ModelNode node) {
+    static String nodeToString(ModelNode node, final String... path) {
+        for (final String part : path) {
+            node = node.get(part);
+            if (!node.isDefined()) {
+                return null;
+            }
+        }
         return node.isDefined()
                 ? node.asString()
                 : null;
@@ -163,7 +170,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
             if (!name.isDefined()) {
                 throw new IllegalStateException(); //TODO Message
             }
-            target.target(name.asString()).setFactoryFqcn(nodeToString(node.get(WildFlyConstants.FACTORY)));
+            target.target(name.asString()).setRef(nodeToString(node.get(WildFlyConstants.REF)));
         }
 
     }

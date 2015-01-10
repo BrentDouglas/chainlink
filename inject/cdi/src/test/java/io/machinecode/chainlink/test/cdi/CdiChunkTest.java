@@ -21,8 +21,8 @@ public class CdiChunkTest extends ChunkTest {
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         super.visitJobOperatorModel(model);
-        model.getArtifactLoader("artifactLoader").set(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class));
-        model.getInjector("injector").set(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class));
+        model.getArtifactLoader("artifactLoader").setValue(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class));
+        model.getInjector("injector").setValue(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class));
     }
 
     @BeforeClass

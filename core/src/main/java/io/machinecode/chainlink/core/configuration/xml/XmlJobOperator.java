@@ -1,10 +1,11 @@
 package io.machinecode.chainlink.core.configuration.xml;
 
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
-import io.machinecode.chainlink.spi.exception.ConfigurationException;
-import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
-import io.machinecode.chainlink.spi.configuration.ScopeModel;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.exception.ConfigurationException;
+import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -27,8 +28,8 @@ public class XmlJobOperator {
     @XmlAttribute(name = "name", required = true)
     private String name;
 
-    @XmlAttribute(name = "factory", required = false)
-    protected String factory;
+    @XmlAttribute(name = "ref", required = false)
+    protected String ref;
 
     @XmlElement(name = "class-loader", namespace = XmlChainlink.NAMESPACE, required = false)
     private XmlDeclaration classLoader;
@@ -77,12 +78,12 @@ public class XmlJobOperator {
         this.name = name;
     }
 
-    public String getFactory() {
-        return factory;
+    public String getRef() {
+        return ref;
     }
 
-    public void setFactory(final String factory) {
-        this.factory = factory;
+    public void setRef(final String ref) {
+        this.ref = ref;
     }
 
     public XmlDeclaration getClassLoader() {
@@ -193,11 +194,11 @@ public class XmlJobOperator {
         return dec == null ? def : dec.getName();
     }
 
-    private static String factory(final XmlDeclaration dec) {
-        return dec == null ? null : dec.getFactory();
+    static String ref(final XmlDeclaration dec) {
+        return dec == null ? null : dec.getRef();
     }
 
-    public void configureScope(final ScopeModel scope, final ClassLoader loader) throws Exception {
+    public void configureScope(final ScopeModelImpl scope, final ClassLoader classLoader) throws Exception {
         //TODO Do these need to get inserted into the model?
         final Properties properties = XmlProperty.convert(this.properties);
         final JobOperatorModel model = scope.getJobOperator(this.name);
@@ -205,62 +206,63 @@ public class XmlJobOperator {
         model.getExecutor()
                 .setName(name(this.executor, JobOperatorModelImpl.EXECUTOR))
                 .setProperties(properties)
-                .setFactoryFqcn(factory(this.executor));
+                .setRef(ref(this.executor));
         model.getTransport()
                 .setName(name(this.transport, JobOperatorModelImpl.TRANSPORT))
                 .setProperties(properties)
-                .setFactoryFqcn(factory(this.transport));
+                .setRef(ref(this.transport));
         model.getMarshalling()
                 .setName(name(this.marshalling, JobOperatorModelImpl.MARSHALLING))
                 .setProperties(properties)
-                .setFactoryFqcn(factory(this.marshalling));
+                .setRef(ref(this.marshalling));
         model.getRegistry()
                 .setName(name(this.registry, JobOperatorModelImpl.REGISTRY))
                 .setProperties(properties)
-                .setFactoryFqcn(factory(this.registry));
-        model.getMBeanServer()
-                .setName(name(this.mBeanServer, JobOperatorModelImpl.MBEAN_SERVER))
-                .setProperties(properties)
-                .setFactoryFqcn(factory(this.mBeanServer));
+                .setRef(ref(this.registry));
+        if (this.mBeanServer != null) {
+            model.getMBeanServer() //This is nullable, calling getMBeanServer() will add it to the model
+                    .setName(name(this.mBeanServer, JobOperatorModelImpl.MBEAN_SERVER))
+                    .setProperties(properties)
+                    .setRef(ref(this.mBeanServer));
+        }
         model.getExecutionRepository()
                 .setName(name(this.executionRepository, JobOperatorModelImpl.EXECUTION_REPOSITORY))
                 .setProperties(properties)
-                .setFactoryFqcn(factory(this.executionRepository));
+                .setRef(ref(this.executionRepository));
         model.getClassLoader()
                 .setName(name(this.classLoader, JobOperatorModelImpl.CLASS_LOADER))
                 .setProperties(properties)
-                .setFactoryFqcn(factory(this.classLoader));
+                .setRef(ref(this.classLoader));
         model.getTransactionManager()
                 .setName(name(this.transactionManager, JobOperatorModelImpl.TRANSACTION_MANAGER))
                 .setProperties(properties)
-                .setFactoryFqcn(factory(this.transactionManager));
+                .setRef(ref(this.transactionManager));
         for (final XmlDeclaration resource : this.jobLoader) {
             model.getJobLoader(resource.getName())
                     .setProperties(properties)
-                    .setFactoryFqcn(factory(resource));
+                    .setRef(ref(resource));
         }
         for (final XmlDeclaration resource : this.artifactLoader) {
             model.getArtifactLoader(resource.getName())
                     .setProperties(properties)
-                    .setFactoryFqcn(factory(resource));
+                    .setRef(ref(resource));
         }
         for (final XmlDeclaration resource : this.injector) {
             model.getInjector(resource.getName())
                     .setProperties(properties)
-                    .setFactoryFqcn(factory(resource));
+                    .setRef(ref(resource));
         }
         for (final XmlDeclaration resource : this.security) {
             model.getSecurity(resource.getName())
                     .setProperties(properties)
-                    .setFactoryFqcn(factory(resource));
+                    .setRef(ref(resource));
         }
-        if (this.factory != null) {
+        if (this.ref != null) {
             final JobOperatorConfiguration configuration;
             try {
-                final Class<?> clazz = loader.loadClass(this.factory);
-                configuration = JobOperatorConfiguration.class.cast(clazz.newInstance());
-            } catch (final Exception e) {
-                throw new ConfigurationException("attribute 'factory' must be the fqcn of a class extending " + JobOperatorConfiguration.class.getName(), e); //TODO Message
+                configuration = scope.getArtifactLoader().load(this.ref, JobOperatorConfiguration.class, classLoader);
+            } catch (final ArtifactOfWrongTypeException e) {
+                throw new ConfigurationException("attribute 'ref' must be the fqcn of a class extending " + JobOperatorConfiguration.class.getName(), e); //TODO Message
             }
             configuration.configureJobOperator(model);
         }

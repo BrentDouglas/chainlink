@@ -15,6 +15,6 @@ public abstract class EventOrderTest extends OperatorTest {
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         super.visitJobOperatorModel(model);
-        model.getTransactionManager().set(new EventOrderTransactionManager(180, TimeUnit.SECONDS));
+        model.getTransactionManager().setValue(new EventOrderTransactionManager(180, TimeUnit.SECONDS));
     }
 }

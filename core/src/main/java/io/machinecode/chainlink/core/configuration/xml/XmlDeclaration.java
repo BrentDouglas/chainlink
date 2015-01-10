@@ -12,14 +12,14 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
 @XmlAccessorType(NONE)
 public class XmlDeclaration extends XmlNamed {
 
-    @XmlAttribute(name = "factory", required = false)
-    protected String factory;
+    @XmlAttribute(name = "ref", required = false)
+    protected String ref;
 
-    public String getFactory() {
-        return factory;
+    public String getRef() {
+        return ref;
     }
 
-    public void setFactory(final String factory) {
-        this.factory = factory;
+    public void setRef(final String ref) {
+        this.ref = ref;
     }
 }

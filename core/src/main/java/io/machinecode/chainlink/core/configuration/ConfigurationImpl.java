@@ -7,6 +7,7 @@ import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.security.SecurityImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
@@ -46,40 +47,40 @@ public class ConfigurationImpl implements Configuration {
     protected final Executor executor;
     protected final Properties properties;
 
-    public ConfigurationImpl(final JobOperatorModelImpl model) throws Exception {
-        this.classLoader = nn(model.classLoader);
-        this.transactionManager = nn(model.transactionManager);
-        this.marshalling = nn(model.marshalling);
-        this.mBeanServer = n(model.mBeanServer);
-        this.jobLoader = new JobLoaderImpl(this.classLoader, _array(JobLoader.class, model.jobLoaders.values()));
-        this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, _array(ArtifactLoader.class, model.artifactLoaders.values()));
-        this.injector = new InjectorImpl(_array(Injector.class, model.injectors.values()));
-        this.security = new SecurityImpl(_array(Security.class, model.securities.values()));
+    public ConfigurationImpl(final JobOperatorModelImpl model, final ArtifactLoader loader) throws Exception {
+        this.classLoader = nn(model.classLoader, loader);
+        this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, _array(ArtifactLoader.class, model.artifactLoaders.values(), loader));
+        this.transactionManager = nn(model.transactionManager, loader);
+        this.marshalling = nn(model.marshalling, loader);
+        this.mBeanServer = n(model.mBeanServer, loader);
+        this.jobLoader = new JobLoaderImpl(this.classLoader, _array(JobLoader.class, model.jobLoaders.values(), loader));
+        this.injector = new InjectorImpl(_array(Injector.class, model.injectors.values(), loader));
+        this.security = new SecurityImpl(_array(Security.class, model.securities.values(), loader));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
-        this.registry = nn(model.registry);
-        this.transport = nn(model.transport);
-        this.executionRepository = nn(model.executionRepository);
-        this.executor = nn(model.executor);
+        this.registry = nn(model.registry, loader);
+        this.transport = nn(model.transport, loader);
+        this.executionRepository = nn(model.executionRepository, loader);
+        this.executor = nn(model.executor, loader);
         this.properties = model.getProperties();
     }
 
-    private <T> T n(final DeclarationImpl<T> dec) {
-        return dec == null ? null : dec.get(this);
+    private <T> T n(final DeclarationImpl<T> dec, final ArtifactLoader loader) {
+        return dec == null ? null : dec.get(this, loader);
     }
 
-    private <T> T nn(final DeclarationImpl<T> dec) {
+    private <T> T nn(final DeclarationImpl<T> dec, final ArtifactLoader loader) {
         if (dec == null) {
-            throw new RuntimeException(); //TODO Message and COnfigurationException
+            throw new ConfigurationException(); //TODO Message
         }
-        return dec.get(this);
+        return dec.get(this, loader);
     }
 
-    private <T> T[] _array(final Class<T> clazz, final Collection<DeclarationImpl<T>> values) {
+    private <T> T[] _array(final Class<T> clazz, final Collection<DeclarationImpl<T>> values, final ArtifactLoader loader) {
         @SuppressWarnings("unchecked")
         final T[] ret = (T[])Array.newInstance(clazz, values.size());
         int i = 0;
         for (final DeclarationImpl<T> that : values) {
-            ret[i++] = that.get(this);
+            ret[i++] = that.get(this, loader);
         }
         return ret;
     }

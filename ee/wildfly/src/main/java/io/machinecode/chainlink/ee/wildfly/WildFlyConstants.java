@@ -35,7 +35,6 @@ public interface WildFlyConstants {
     String INJECTOR = "injector";
     String SECURITY = "security";
 
-    String FACTORY = "factory";
     String REF = "ref";
 
     String NAME = "name";

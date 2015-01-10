@@ -25,7 +25,7 @@ public class GuiceBatchletTest extends BatchletTest {
 
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
-        model.getArtifactLoader("artifactLoader").set(new GuiceArtifactLoader(new BindingProvider() {
+        model.getArtifactLoader("artifactLoader").setValue(new GuiceArtifactLoader(new BindingProvider() {
             @Override
             public List<Binding> getBindings() {
                 return new ArrayList<Binding>() {{
@@ -36,7 +36,7 @@ public class GuiceBatchletTest extends BatchletTest {
                 }};
             }
         }));
-        model.getInjector("injector").set(new VetoInjector());
+        model.getInjector("injector").setValue(new VetoInjector());
     }
 
     @BeforeClass
