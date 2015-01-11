@@ -4,7 +4,6 @@ import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.core.base.BaseTest;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
-import io.machinecode.chainlink.core.repository.MutableMetricImpl;
 import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.element.execution.Step;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
@@ -29,7 +28,12 @@ public class RepositoryTest extends BaseTest {
     private JobImpl _job() {
         return JobFactory.produce(Jsl.job("job")
                 .addExecution(
-                        Jsl.step("step")
+                        Jsl.step("step1")
+                                .setTask(
+                                        Jsl.batchlet("runBatchlet")
+                                )
+                ).addExecution(
+                        Jsl.step("step2")
                                 .setTask(
                                         Jsl.batchlet("runBatchlet")
                                 )
@@ -95,6 +99,7 @@ public class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
+        final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
@@ -103,11 +108,11 @@ public class RepositoryTest extends BaseTest {
         );
         final ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)).getId(),
+                step1.getId(),
                 new Date()
         );
 
-        assertEquals("step", stepExecution.getStepName());
+        assertEquals(step1.getId(), stepExecution.getStepName());
         assertEquals(BatchStatus.STARTING, stepExecution.getBatchStatus());
         assertNull(stepExecution.getExitStatus());
         assertNotNull(stepExecution.getCreateTime());
@@ -454,7 +459,8 @@ public class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
-        final Step<?,?> step = Step.class.cast(job.getExecutions().get(0));
+        final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
+        final Step<?,?> step2 = Step.class.cast(job.getExecutions().get(1));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         ExtendedJobExecution first = repository().createJobExecution(
                 jobInstance,
@@ -464,34 +470,45 @@ public class RepositoryTest extends BaseTest {
         Thread.sleep(1);
         ExtendedStepExecution firstS1 = repository().createStepExecution(
                 first,
-                step.getId(),
+                step1.getId(),
                 new Date()
         );
         Thread.sleep(1);
         assertEquals(
                 firstS1.getStepExecutionId(),
-                repository().getLatestStepExecution(first.getExecutionId(), step.getId()).getStepExecutionId()
+                repository().getLatestStepExecution(first.getExecutionId(), step1.getId()).getStepExecutionId()
         );
         try {
-            repository().getPreviousStepExecution(first.getExecutionId(), firstS1.getStepExecutionId(), step.getId());
+            repository().getPreviousStepExecution(first.getExecutionId(), firstS1.getStepExecutionId(), step1.getId());
             fail();
         } catch (NoSuchJobExecutionException e) {
             //
         }
         ExtendedStepExecution firstS2 = repository().createStepExecution(
                 first,
-                step.getId(),
+                step2.getId(),
                 new Date()
         );
         Thread.sleep(1);
         assertEquals(
                 firstS2.getStepExecutionId(),
-                repository().getLatestStepExecution(first.getExecutionId(), step.getId()).getStepExecutionId()
+                repository().getLatestStepExecution(first.getExecutionId(), step2.getId()).getStepExecutionId()
         );
+        /*
         assertEquals(
                 firstS1.getStepExecutionId(),
-                repository().getPreviousStepExecution(first.getExecutionId(), firstS2.getStepExecutionId(), step.getId()).getStepExecutionId()
+                repository().getPreviousStepExecution(first.getExecutionId(), firstS2.getStepExecutionId(), step1.getId()).getStepExecutionId()
         );
+        */
+        repository().finishJobExecution(
+                first.getExecutionId(),
+                BatchStatus.COMPLETED,
+                BatchStatus.COMPLETED.name(),
+                null,
+                new Date()
+        );
+        assertEquals(0, repository().getStepExecutionCount(first.getExecutionId(), step1.getId()));
+        assertEquals(0, repository().getStepExecutionCount(first.getExecutionId(), step2.getId()));
 
         ExtendedJobExecution second = repository().createJobExecution(
                 jobInstance,
@@ -501,34 +518,45 @@ public class RepositoryTest extends BaseTest {
         Thread.sleep(1);
         ExtendedStepExecution secondS1 = repository().createStepExecution(
                 second,
-                step.getId(),
+                step1.getId(),
                 new Date()
         );
         Thread.sleep(1);
         assertEquals(
                 secondS1.getStepExecutionId(),
-                repository().getLatestStepExecution(second.getExecutionId(), step.getId()).getStepExecutionId()
+                repository().getLatestStepExecution(second.getExecutionId(), step1.getId()).getStepExecutionId()
         );
         try {
-            repository().getPreviousStepExecution(second.getExecutionId(), secondS1.getStepExecutionId(), step.getId());
+            repository().getPreviousStepExecution(second.getExecutionId(), secondS1.getStepExecutionId(), step1.getId());
             fail();
         } catch (NoSuchJobExecutionException e) {
             //
         }
         ExtendedStepExecution secondS2 = repository().createStepExecution(
                 second,
-                step.getId(),
+                step2.getId(),
                 new Date()
         );
         Thread.sleep(1);
         assertEquals(
                 secondS2.getStepExecutionId(),
-                repository().getLatestStepExecution(second.getExecutionId(), step.getId()).getStepExecutionId()
+                repository().getLatestStepExecution(second.getExecutionId(), step2.getId()).getStepExecutionId()
         );
+        /*
         assertEquals(
                 secondS1.getStepExecutionId(),
-                repository().getPreviousStepExecution(second.getExecutionId(), secondS2.getStepExecutionId(), step.getId()).getStepExecutionId()
+                repository().getPreviousStepExecution(second.getExecutionId(), secondS2.getStepExecutionId(), step1.getId()).getStepExecutionId()
         );
+        */
+        repository().finishJobExecution(
+                second.getExecutionId(),
+                BatchStatus.COMPLETED,
+                BatchStatus.COMPLETED.name(),
+                null,
+                new Date()
+        );
+        assertEquals(0, repository().getStepExecutionCount(second.getExecutionId(), step1.getId()));
+        assertEquals(0, repository().getStepExecutionCount(second.getExecutionId(), step2.getId()));
 
         ExtendedJobExecution third = repository().createJobExecution(
                 jobInstance,
@@ -538,51 +566,74 @@ public class RepositoryTest extends BaseTest {
         Thread.sleep(1);
         ExtendedStepExecution thirdS1 = repository().createStepExecution(
                 third,
-                step.getId(),
+                step1.getId(),
                 new Date()
         );
         Thread.sleep(1);
         assertEquals(
                 thirdS1.getStepExecutionId(),
-                repository().getLatestStepExecution(third.getExecutionId(), step.getId()).getStepExecutionId()
+                repository().getLatestStepExecution(third.getExecutionId(), step1.getId()).getStepExecutionId()
         );
         try {
-            repository().getPreviousStepExecution(third.getExecutionId(), thirdS1.getStepExecutionId(), step.getId());
+            repository().getPreviousStepExecution(third.getExecutionId(), thirdS1.getStepExecutionId(), step1.getId());
             fail();
         } catch (NoSuchJobExecutionException e) {
             //
         }
         ExtendedStepExecution thirdS2 = repository().createStepExecution(
                 third,
-                step.getId(),
+                step2.getId(),
                 new Date()
         );
         assertEquals(
                 thirdS2.getStepExecutionId(),
-                repository().getLatestStepExecution(third.getExecutionId(), step.getId()).getStepExecutionId()
+                repository().getLatestStepExecution(third.getExecutionId(), step2.getId()).getStepExecutionId()
         );
+        /*
         assertEquals(
                 thirdS1.getStepExecutionId(),
-                repository().getPreviousStepExecution(third.getExecutionId(), thirdS2.getStepExecutionId(), step.getId()).getStepExecutionId()
+                repository().getPreviousStepExecution(third.getExecutionId(), thirdS2.getStepExecutionId(), step1.getId()).getStepExecutionId()
         );
+        */
+        repository().finishJobExecution(
+                third.getExecutionId(),
+                BatchStatus.COMPLETED,
+                BatchStatus.COMPLETED.name(),
+                null,
+                new Date()
+        );
+        assertEquals(0, repository().getStepExecutionCount(third.getExecutionId(), step1.getId()));
+        assertEquals(0, repository().getStepExecutionCount(third.getExecutionId(), step2.getId()));
 
         repository().linkJobExecutions(
                 second.getExecutionId(),
                 first.getExecutionId()
         );
         assertEquals(
-                firstS2.getStepExecutionId(),
-                repository().getPreviousStepExecution(second.getExecutionId(), secondS1.getStepExecutionId(), step.getId()).getStepExecutionId()
+                firstS1.getStepExecutionId(),
+                repository().getPreviousStepExecution(second.getExecutionId(), secondS1.getStepExecutionId(), step1.getId()).getStepExecutionId()
         );
+        assertEquals(
+                firstS2.getStepExecutionId(),
+                repository().getPreviousStepExecution(second.getExecutionId(), secondS2.getStepExecutionId(), step2.getId()).getStepExecutionId()
+        );
+        assertEquals(1, repository().getStepExecutionCount(second.getExecutionId(), step1.getId()));
+        assertEquals(1, repository().getStepExecutionCount(second.getExecutionId(), step2.getId()));
 
         repository().linkJobExecutions(
                 third.getExecutionId(),
                 second.getExecutionId()
         );
         assertEquals(
-                secondS2.getStepExecutionId(),
-                repository().getPreviousStepExecution(third.getExecutionId(), thirdS1.getStepExecutionId(), step.getId()).getStepExecutionId()
+                secondS1.getStepExecutionId(),
+                repository().getPreviousStepExecution(third.getExecutionId(), thirdS1.getStepExecutionId(), step1.getId()).getStepExecutionId()
         );
+        assertEquals(
+                secondS2.getStepExecutionId(),
+                repository().getPreviousStepExecution(third.getExecutionId(), thirdS2.getStepExecutionId(), step2.getId()).getStepExecutionId()
+        );
+        assertEquals(2, repository().getStepExecutionCount(third.getExecutionId(), step1.getId()));
+        assertEquals(2, repository().getStepExecutionCount(third.getExecutionId(), step2.getId()));
     }
 
     @Test
@@ -593,6 +644,7 @@ public class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
+        final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
@@ -601,11 +653,11 @@ public class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)).getId(),
+                step1.getId(),
                 new Date()
         );
 
-        assertEquals("step", stepExecution.getStepName());
+        assertEquals(step1.getId(), stepExecution.getStepName());
         assertEquals(BatchStatus.STARTING, stepExecution.getBatchStatus());
         assertNull(stepExecution.getExitStatus());
         assertNotNull(stepExecution.getCreateTime());
@@ -622,7 +674,7 @@ public class RepositoryTest extends BaseTest {
         );
         stepExecution = repository().getStepExecution(stepExecution.getStepExecutionId());
 
-        assertEquals("step", stepExecution.getStepName());
+        assertEquals(step1.getId(), stepExecution.getStepName());
         assertEquals(BatchStatus.STARTED, stepExecution.getBatchStatus());
         assertNull(stepExecution.getExitStatus());
         assertNotNull(stepExecution.getCreateTime());
@@ -644,6 +696,7 @@ public class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
+        final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
@@ -652,7 +705,7 @@ public class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)).getId(),
+                step1.getId(),
                 new Date()
         );
 
@@ -679,7 +732,7 @@ public class RepositoryTest extends BaseTest {
         );
         final Serializable nextSerial = stepExecution.getPersistentUserData();
 
-        assertEquals("step", stepExecution.getStepName());
+        assertEquals(step1.getId(), stepExecution.getStepName());
         assertEquals(BatchStatus.STARTING, stepExecution.getBatchStatus());
         assertNull(stepExecution.getExitStatus());
         assertNotNull(stepExecution.getCreateTime());
@@ -712,7 +765,7 @@ public class RepositoryTest extends BaseTest {
         );
         final Serializable thirdSerial = stepExecution.getPersistentUserData();
 
-        assertEquals("step", stepExecution.getStepName());
+        assertEquals(step1.getId(), stepExecution.getStepName());
         assertEquals(BatchStatus.STARTED, stepExecution.getBatchStatus());
         assertNull(stepExecution.getExitStatus());
         assertNotNull(stepExecution.getCreateTime());
@@ -747,6 +800,7 @@ public class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
+        final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
@@ -755,7 +809,7 @@ public class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)).getId(),
+                step1.getId(),
                 new Date()
         );
 
@@ -788,7 +842,7 @@ public class RepositoryTest extends BaseTest {
         final Serializable nextReader = stepExecution.getReaderCheckpoint();
         final Serializable nextWriter = stepExecution.getWriterCheckpoint();
 
-        assertEquals("step", stepExecution.getStepName());
+        assertEquals(step1.getId(), stepExecution.getStepName());
         assertEquals(BatchStatus.STARTING, stepExecution.getBatchStatus());
         assertNull(stepExecution.getExitStatus());
         assertNotNull(stepExecution.getCreateTime());
@@ -830,7 +884,7 @@ public class RepositoryTest extends BaseTest {
         final Serializable thirdReader = stepExecution.getReaderCheckpoint();
         final Serializable thirdWriter = stepExecution.getWriterCheckpoint();
 
-        assertEquals("step", stepExecution.getStepName());
+        assertEquals(step1.getId(), stepExecution.getStepName());
         assertEquals(BatchStatus.STARTED, stepExecution.getBatchStatus());
         assertNull(stepExecution.getExitStatus());
         assertNotNull(stepExecution.getCreateTime());
@@ -870,6 +924,7 @@ public class RepositoryTest extends BaseTest {
         parameters.put("test", "value");
 
         final JobImpl job = _job();
+        final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
                 jobInstance,
@@ -878,7 +933,7 @@ public class RepositoryTest extends BaseTest {
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
                 jobExecution,
-                Step.class.cast(job.getExecutions().get(0)).getId(),
+                step1.getId(),
                 new Date()
         );
         repository().startStepExecution(
@@ -908,7 +963,7 @@ public class RepositoryTest extends BaseTest {
                 stepExecution.getStepExecutionId()
         );
 
-        assertEquals("step", stepExecution.getStepName());
+        assertEquals(step1.getId(), stepExecution.getStepName());
         assertEquals(BatchStatus.FAILED, stepExecution.getBatchStatus());
         assertEquals("some", stepExecution.getExitStatus());
         assertNotNull(stepExecution.getCreateTime());
@@ -1610,7 +1665,138 @@ public class RepositoryTest extends BaseTest {
     @Test
     public void getStepExecutionCountTest() throws Exception {
         printMethodName();
-        //TODO
+
+        final Properties parameters = new Properties();
+        parameters.put("test", "value");
+
+        final JobImpl job = _job();
+        final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
+        ExtendedJobExecution first = repository().createJobExecution(
+                jobInstance,
+                parameters,
+                new Date()
+        );
+        Thread.sleep(1);
+        ExtendedStepExecution firstS1 = repository().createStepExecution(
+                first,
+                step1.getId(),
+                new Date()
+        );
+        Thread.sleep(1);
+        repository().finishJobExecution(
+                firstS1.getJobExecutionId(),
+                BatchStatus.COMPLETED,
+                BatchStatus.COMPLETED.name(),
+                null,
+                new Date()
+        );
+
+        ExtendedStepExecution firstS2 = repository().createStepExecution(
+                first,
+                step1.getId(),
+                new Date()
+        );
+        Thread.sleep(1);
+        assertEquals(
+                firstS2.getStepExecutionId(),
+                repository().getLatestStepExecution(first.getExecutionId(), step1.getId()).getStepExecutionId()
+        );
+        assertEquals(
+                firstS1.getStepExecutionId(),
+                repository().getPreviousStepExecution(first.getExecutionId(), firstS2.getStepExecutionId(), step1.getId()).getStepExecutionId()
+        );
+
+        ExtendedJobExecution second = repository().createJobExecution(
+                jobInstance,
+                parameters,
+                new Date()
+        );
+        Thread.sleep(1);
+        ExtendedStepExecution secondS1 = repository().createStepExecution(
+                second,
+                step1.getId(),
+                new Date()
+        );
+        Thread.sleep(1);
+        assertEquals(
+                secondS1.getStepExecutionId(),
+                repository().getLatestStepExecution(second.getExecutionId(), step1.getId()).getStepExecutionId()
+        );
+        try {
+            repository().getPreviousStepExecution(second.getExecutionId(), secondS1.getStepExecutionId(), step1.getId());
+            fail();
+        } catch (NoSuchJobExecutionException e) {
+            //
+        }
+        ExtendedStepExecution secondS2 = repository().createStepExecution(
+                second,
+                step1.getId(),
+                new Date()
+        );
+        Thread.sleep(1);
+        assertEquals(
+                secondS2.getStepExecutionId(),
+                repository().getLatestStepExecution(second.getExecutionId(), step1.getId()).getStepExecutionId()
+        );
+        assertEquals(
+                secondS1.getStepExecutionId(),
+                repository().getPreviousStepExecution(second.getExecutionId(), secondS2.getStepExecutionId(), step1.getId()).getStepExecutionId()
+        );
+
+        ExtendedJobExecution third = repository().createJobExecution(
+                jobInstance,
+                parameters,
+                new Date()
+        );
+        Thread.sleep(1);
+        ExtendedStepExecution thirdS1 = repository().createStepExecution(
+                third,
+                step1.getId(),
+                new Date()
+        );
+        Thread.sleep(1);
+        assertEquals(
+                thirdS1.getStepExecutionId(),
+                repository().getLatestStepExecution(third.getExecutionId(), step1.getId()).getStepExecutionId()
+        );
+        try {
+            repository().getPreviousStepExecution(third.getExecutionId(), thirdS1.getStepExecutionId(), step1.getId());
+            fail();
+        } catch (NoSuchJobExecutionException e) {
+            //
+        }
+        ExtendedStepExecution thirdS2 = repository().createStepExecution(
+                third,
+                step1.getId(),
+                new Date()
+        );
+        assertEquals(
+                thirdS2.getStepExecutionId(),
+                repository().getLatestStepExecution(third.getExecutionId(), step1.getId()).getStepExecutionId()
+        );
+        assertEquals(
+                thirdS1.getStepExecutionId(),
+                repository().getPreviousStepExecution(third.getExecutionId(), thirdS2.getStepExecutionId(), step1.getId()).getStepExecutionId()
+        );
+
+        repository().linkJobExecutions(
+                second.getExecutionId(),
+                first.getExecutionId()
+        );
+        assertEquals(
+                firstS2.getStepExecutionId(),
+                repository().getPreviousStepExecution(second.getExecutionId(), secondS1.getStepExecutionId(), step1.getId()).getStepExecutionId()
+        );
+
+        repository().linkJobExecutions(
+                third.getExecutionId(),
+                second.getExecutionId()
+        );
+        assertEquals(
+                secondS2.getStepExecutionId(),
+                repository().getPreviousStepExecution(third.getExecutionId(), thirdS1.getStepExecutionId(), step1.getId()).getStepExecutionId()
+        );
     }
 
     //NoSuchJobExecutionException, JobSecurityException,

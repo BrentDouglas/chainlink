@@ -9,6 +9,7 @@ import io.machinecode.chainlink.core.repository.JobExecutionImpl;
 import org.bson.types.ObjectId;
 
 import javax.batch.runtime.BatchStatus;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -136,6 +137,7 @@ public class MongoJobExecution extends JobExecutionImpl {
 
     protected static void _from(final _Builder<?> builder, final MongoJobExecution that) {
         builder._id = that._id;
+        builder.previousJobExecutionIds = new ArrayList<>(that.previousJobExecutionIds);
         JobExecutionImpl._from(builder, that);
     }
 
