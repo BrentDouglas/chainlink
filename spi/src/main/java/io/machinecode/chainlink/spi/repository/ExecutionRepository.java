@@ -12,6 +12,8 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
+ * Implementations of this interface MUST be thread safe.
+ *
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
@@ -500,21 +502,29 @@ public interface ExecutionRepository {
     Properties getParameters(final long jobExecutionId) throws Exception;
 
     /**
-     * @see {@link javax.batch.operations.JobOperator#getJobInstance(long)}
+     * @see {@link io.machinecode.chainlink.spi.management.ExtendedJobOperator#getJobInstanceById(long)}
      *
-     * @param jobInstanceIdMER
-     * @return
-     * @throws javax.batch.operations.NoSuchJobExecutionException
+     * @param jobInstanceId The search term.
+     * @return The matching {@link ExtendedJobInstance} stored in this repository. A matching
+     * {@link ExtendedJobInstance} is defined as one where the result of calling
+     * {@link javax.batch.runtime.JobInstance#getInstanceId()} on it equals {@param jobInstanceId}.
+     * @throws javax.batch.operations.NoSuchJobInstanceException If no matching {@link ExtendedJobInstance} is found.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */
     ExtendedJobInstance getJobInstance(final long jobInstanceId) throws Exception;
 
     /**
+     * @see {@link javax.batch.operations.JobOperator#getJobInstance(long)}
      *
-     * @param jobExecutionId
-     * @return
-     * @throws javax.batch.operations.NoSuchJobExecutionException
+     * @param jobExecutionId The search term.
+     * @return The matching {@link ExtendedJobInstance} stored in this repository. A matching
+     * {@link ExtendedJobInstance} is defined as one where the result of calling
+     * {@link javax.batch.runtime.JobInstance#getInstanceId()} on it equals the result of calling
+     * {@link io.machinecode.chainlink.spi.repository.ExtendedJobExecution#getJobInstanceId()} on a matching
+     * {@link ExtendedJobExecution}. A matching {@link ExtendedJobExecution} is defined as one where the result of
+     * calling {@link javax.batch.runtime.JobExecution#getExecutionId()} equals {@param jobExecutionId}.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If no matching {@link ExtendedJobInstance} is found.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */
@@ -523,9 +533,11 @@ public interface ExecutionRepository {
     /**
      * @see {@link javax.batch.operations.JobOperator#getJobExecutions(javax.batch.runtime.JobInstance)}
      *
-     * @param jobInstanceId
-     * @return
-     * @throws javax.batch.operations.NoSuchJobInstanceException
+     * @param jobInstanceId The search term.
+     * @return A list of every matching {@link ExtendedJobExecution} stored in this repository. A matching
+     * {@link JobExecution} is defined as one where calling {@link io.machinecode.chainlink.spi.repository.ExtendedJobExecution#getJobInstanceId()}
+     * equals {@param jobInstanceId}.
+     * @throws javax.batch.operations.NoSuchJobInstanceException If no matching {@link ExtendedJobExecution} is found.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */
@@ -544,16 +556,20 @@ public interface ExecutionRepository {
      */
     ExtendedJobExecution getJobExecution(final long jobExecutionId) throws Exception;
 
-    //JobRestartException, javax.batch.operations.NoSuchJobExecutionException,
-    // javax.batch.operations.NoSuchJobInstanceException,
-    // JobExecutionNotMostRecentException, javax.batch.operations.JobSecurityException,
-
     /**
+     * @see {@link javax.batch.operations.JobOperator#restart(long, java.util.Properties)}
      *
-     * @param jobExecutionId
+     * @param jobExecutionId The search term.
      * @param parameters
-     * @return
-     * @throws javax.batch.operations.NoSuchJobExecutionException
+     * @return TODO
+     * @throws javax.batch.operations.NoSuchJobExecutionException If no matching {@link ExtendedJobExecution} is found.
+     * @throws javax.batch.operations.JobExecutionNotMostRecentException If the matching {@link ExtendedJobExecution} is
+     * not the most recent {@link ExtendedJobExecution} stored in the repository.
+     * @throws javax.batch.operations.JobExecutionAlreadyCompleteException If the matching {@link ExtendedJobExecution}
+     * returns {@link BatchStatus#COMPLETED} when {@link javax.batch.runtime.JobExecution#getBatchStatus()} is called.
+     * @throws javax.batch.operations.JobRestartException If the matching {@link ExtendedJobExecution}
+     * returns one of {@link BatchStatus#STARTED}, {@link BatchStatus#STARTING}, {@link BatchStatus#STOPPING} or
+     * {@link BatchStatus#ABANDONED} when {@link javax.batch.runtime.JobExecution#getBatchStatus()} is called.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */

@@ -180,7 +180,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
 
     @Override
     protected Set<String> fetchJobNames() throws Exception {
-        final Set<String> ret = new THashSet<String>();
+        final Set<String> ret = new THashSet<>();
         final List<Future<Set<String>>> futures = jobInstanceExecutor.submitEverywhere(new JobNameCallable());
         for (final Future<Set<String>> future : futures) {
             final Set<String> value = future.get();
@@ -206,7 +206,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
 
     @Override
     protected Collection<JobInstance> fetchJobInstances(final String jobName) throws Exception {
-        final List<JobInstance> ret = new ArrayList<JobInstance>();
+        final List<JobInstance> ret = new ArrayList<>();
         final List<Future<List<JobInstance>>> futures = jobInstanceExecutor.submitEverywhere(new JobInstanceCallable(jobName));
         for (final Future<List<JobInstance>> future : futures) {
             final List<JobInstance> value = future.get();
@@ -219,7 +219,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
 
     @Override
     protected Collection<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
-        final List<Long> ret = new ArrayList<Long>();
+        final List<Long> ret = new ArrayList<>();
         final List<Future<List<Long>>> futures = jobExecutionExecutor.submitEverywhere(new RunningJobExecutionIdCallable(jobName));
         for (final Future<List<Long>> future : futures) {
             final List<Long> value = future.get();
@@ -232,7 +232,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
 
     @Override
     protected Collection<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
-        final List<JobExecution> ret = new ArrayList<JobExecution>();
+        final List<JobExecution> ret = new ArrayList<>();
         final List<Future<List<JobExecution>>> futures = jobExecutionExecutor.submitEverywhere(new JobExecutionsForJobInstanceCallable(jobInstanceId));
         for (final Future<List<JobExecution>> future : futures) {
             final List<JobExecution> value = future.get();

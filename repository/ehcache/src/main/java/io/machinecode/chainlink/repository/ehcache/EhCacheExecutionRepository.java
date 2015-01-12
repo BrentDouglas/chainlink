@@ -148,7 +148,7 @@ public class EhCacheExecutionRepository extends BaseMapExecutionRepository {
                 .addCriteria(new AlwaysMatch())
                 .includeValues()
                 .execute();
-        final Set<String> ret = new THashSet<String>();
+        final Set<String> ret = new THashSet<>();
         for (final Result x : result.all()) {
             ret.add(((ExtendedJobInstance) x.getValue()).getJobName());
         }
@@ -176,7 +176,7 @@ public class EhCacheExecutionRepository extends BaseMapExecutionRepository {
                 .addCriteria(new EqualTo("job_name", jobName))
                 .includeValues()
                 .execute();
-        final List<JobInstance> ret = new ArrayList<JobInstance>(results.size());
+        final List<JobInstance> ret = new ArrayList<>(results.size());
         for (final Result x : results.all()) {
             ret.add(((ExtendedJobInstance) x.getValue()));
         }
@@ -190,7 +190,7 @@ public class EhCacheExecutionRepository extends BaseMapExecutionRepository {
                 .addCriteria(new InCollection("batch_status", Arrays.asList(BatchStatus.STARTED, BatchStatus.STARTING)))
                 .includeValues()
                 .execute();
-        final List<Long> ret = new ArrayList<Long>(results.size());
+        final List<Long> ret = new ArrayList<>(results.size());
         for (final Result x : results.all()) {
             ret.add(((ExtendedJobExecution) x.getValue()).getExecutionId());
         }
@@ -203,7 +203,7 @@ public class EhCacheExecutionRepository extends BaseMapExecutionRepository {
                 .addCriteria(new EqualTo("job_instance_id", jobInstanceId))
                 .includeValues()
                 .execute();
-        final List<JobExecution> ret = new ArrayList<JobExecution>(results.size());
+        final List<JobExecution> ret = new ArrayList<>(results.size());
         for (final Result x : results.all()) {
             ret.add(((ExtendedJobExecution) x.getValue()));
         }

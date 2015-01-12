@@ -138,7 +138,7 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
 
     @Override
     protected Set<String> fetchJobNames() throws Exception {
-        final Set<String> ret = new THashSet<String>();
+        final Set<String> ret = new THashSet<>();
         for (final Object value : jobInstances.invokeAll(new AllEntriesFilter(), new JobNameProcessor()).values()) {
             if (value != null) {
                 ret.add((String)value);
@@ -160,7 +160,7 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
 
     @Override
     protected Collection<JobInstance> fetchJobInstances(final String jobName) throws Exception {
-        final List<JobInstance> ret = new ArrayList<JobInstance>();
+        final List<JobInstance> ret = new ArrayList<>();
         for (final Object value : jobInstances.invokeAll(new AllEntriesFilter(), new JobInstanceProcessor(jobName)).values()) {
             if (value != null) {
                 ret.add((JobInstance)value);
@@ -171,7 +171,7 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
 
     @Override
     protected Collection<Long> fetchRunningJobExecutionIds(final String jobName) {
-        final List<Long> ret = new ArrayList<Long>();
+        final List<Long> ret = new ArrayList<>();
         for (final Object value : jobExecutions.invokeAll(new AllEntriesFilter(), new RunningJobExecutionIdProcessor(jobName)).values()) {
             if (value != null) {
                 ret.add((Long)value);
@@ -182,7 +182,7 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
 
     @Override
     protected Collection<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
-        final List<JobExecution> ret = new ArrayList<JobExecution>();
+        final List<JobExecution> ret = new ArrayList<>();
         for (final Object value : jobExecutions.invokeAll(new AllEntriesFilter(), new JobExecutionsForJobInstanceProcessor(jobInstanceId)).values()) {
             if (value != null) {
                 ret.add((JobExecution)value);

@@ -156,7 +156,7 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
         final GridCacheQueryFuture<List<?>> result = this.jobInstances.cache.queries()
                 .createSqlFieldsQuery("select jobName from GridGainJobInstance")
                 .execute();
-        final Set<String> ret = new THashSet<String>();
+        final Set<String> ret = new THashSet<>();
         for (final List<?> names : result.get()) {
             for (final Object name : names) {
                 ret.add((String)name);
@@ -182,7 +182,7 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
         final GridCacheQueryFuture<Map.Entry<Long,ExtendedJobInstance>> results = this.jobInstances.cache.queries()
                 .createSqlQuery(GridGainJobInstance.class, "jobName = ?")
                 .execute(jobName);
-        final Set<JobInstance> ret = new THashSet<JobInstance>();
+        final Set<JobInstance> ret = new THashSet<>();
         for (final Map.Entry<Long, ExtendedJobInstance> entry : results.get()) {
             ret.add(entry.getValue());
         }
@@ -194,7 +194,7 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
         final GridCacheQueryFuture<List<?>> results = this.jobExecutions.cache.queries()
                 .createSqlFieldsQuery("select jobExecutionId from GridGainJobExecution where jobName = ? and ( batchStatus = ? or batchStatus = ? )")
                 .execute(jobName, BatchStatus.STARTED, BatchStatus.STARTING);
-        final Set<Long> ret = new THashSet<Long>();
+        final Set<Long> ret = new THashSet<>();
         for (final List<?> list : results.get()) {
             for (final Object value : list) {
                 ret.add((Long)value);
@@ -208,7 +208,7 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
         final GridCacheQueryFuture<Map.Entry<Long,ExtendedJobExecution>> results = this.jobExecutions.cache.queries()
                 .createSqlQuery(GridGainJobExecution.class, "jobInstanceId = ?")
                 .execute(jobInstanceId);
-        final List<JobExecution> ret = new ArrayList<JobExecution>();
+        final List<JobExecution> ret = new ArrayList<>();
         for (final Map.Entry<Long, ExtendedJobExecution> entry : results.get()) {
             ret.add(entry.getValue());
         }

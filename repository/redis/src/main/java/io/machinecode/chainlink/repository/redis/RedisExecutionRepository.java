@@ -74,7 +74,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
     }
 
     public RedisExecutionRepository(final JedisShardInfo info, final ClassLoader loader, final Marshalling marshalling) throws Exception {
-        this.loader = new WeakReference<ClassLoader>(loader);
+        this.loader = new WeakReference<>(loader);
         this.info = info;
         this.marshalling = marshalling;
 
@@ -308,7 +308,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             }
             List<byte[]> jobExecutionIds = _list(jedis, JOB_EXECUTION_HISTORY_PREFIX, jobExecutionId);
             if (jobExecutionIds == null) {
-                jobExecutionIds = new ArrayList<byte[]>();
+                jobExecutionIds = new ArrayList<>();
             }
             jobExecutionIds.add(marshalling.marshall(restartJobExecutionId));
             jobExecutionIds.addAll(oldJobExecutionIds);
@@ -514,7 +514,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
         try {
             jedis = _open();
             final Set<byte[]> names = jedis.smembers(JOB_NAMES);
-            final Set<String> ret = new THashSet<String>();
+            final Set<String> ret = new THashSet<>();
             for (final byte[] name : names) {
                 ret.add((String) marshalling.unmarshall(name, this.loader.get()));
             }
@@ -545,7 +545,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws Exception {
-        final List<JobInstance> ret = new ArrayList<JobInstance>(count);
+        final List<JobInstance> ret = new ArrayList<>(count);
         Jedis jedis = null;
         final int end = start + count - 1;
         try {
@@ -570,7 +570,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
         Jedis jedis = null;
         try {
             jedis = _open();
-            final List<Long> ids = new ArrayList<Long>();
+            final List<Long> ids = new ArrayList<>();
             final List<byte[]> values = _list(jedis, JOB_NAME_JOB_EXECUTIONS_PREFIX, jobName);
             for (final byte[] value : values) {
                 final ExtendedJobExecution jobExecution = _je(jedis, value);
@@ -650,7 +650,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
 
     @Override
     public List<JobExecution> getJobExecutions(final long jobInstanceId) throws Exception {
-        final List<JobExecution> executions = new ArrayList<JobExecution>();
+        final List<JobExecution> executions = new ArrayList<>();
         Jedis jedis = null;
         try {
             jedis = _open();
@@ -733,7 +733,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if (values == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            final List<StepExecution> stepExecutions = new ArrayList<StepExecution>(values.size());
+            final List<StepExecution> stepExecutions = new ArrayList<>(values.size());
             for (final byte[] value : values) {
                 stepExecutions.add(_se(jedis, value));
             }
@@ -749,7 +749,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
     public ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws Exception {
         Jedis jedis = null;
         Date currentStepExecutionCreateTime = null;
-        final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
+        final List<ExtendedStepExecution> candidates = new ArrayList<>();
         try {
             jedis = _open();
             List<byte[]> historicJobExecutionIds = _list(jedis, JOB_EXECUTION_HISTORY_PREFIX, jobExecutionId);
@@ -757,7 +757,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             final byte[] stepExecutionIdBytes = marshalling.marshall(stepExecutionId);
-            final List<byte[]> stepExecutionIds = new ArrayList<byte[]>();
+            final List<byte[]> stepExecutionIds = new ArrayList<>();
 
             List<byte[]> executionIds = _list(jedis, JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, jobExecutionId);
             if (executionIds == null) {
@@ -767,7 +767,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             for (final byte[] historicJobExecutionId : historicJobExecutionIds) {
                 executionIds = _list(jedis, JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, historicJobExecutionId);
                 if (executionIds == null) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", historicJobExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", Arrays.toString(historicJobExecutionId)));
                 }
                 stepExecutionIds.addAll(executionIds);
             }
@@ -821,7 +821,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if (historicJobExecutionIds == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            final List<byte[]> stepExecutionIds = new ArrayList<byte[]>();
+            final List<byte[]> stepExecutionIds = new ArrayList<>();
             List<byte[]> executionIds = _list(jedis, JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, jobExecutionId);
             if (executionIds == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
@@ -830,11 +830,11 @@ public class RedisExecutionRepository implements ExecutionRepository {
             for (final byte[] historicJobExecutionId : historicJobExecutionIds) {
                 executionIds = _list(jedis, JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, historicJobExecutionId);
                 if (executionIds == null) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", historicJobExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", Arrays.toString(historicJobExecutionId)));
                 }
                 stepExecutionIds.addAll(executionIds);
             }
-            final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
+            final List<ExtendedStepExecution> candidates = new ArrayList<>();
             for (final byte[] stepExecutionId : stepExecutionIds) {
                 final ExtendedStepExecution execution = _se(jedis, stepExecutionId);
                 if (stepName.equals(execution.getStepName())) {
@@ -871,19 +871,19 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if (historicJobExecutionIds == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
-            final List<byte[]> stepExecutionIds = new ArrayList<byte[]>();
+            final List<byte[]> stepExecutionIds = new ArrayList<>();
             for (final byte[] historicJobExecutionId : historicJobExecutionIds) {
                 final List<byte[]> executionIds = _list(jedis, JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, historicJobExecutionId);
                 if (executionIds == null) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", historicJobExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", Arrays.toString(historicJobExecutionId)));
                 }
                 stepExecutionIds.addAll(executionIds);
             }
-            final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>(stepExecutionIds.size());
+            final List<ExtendedStepExecution> candidates = new ArrayList<>(stepExecutionIds.size());
             for (final byte[] stepExecutionId : stepExecutionIds) {
                 final ExtendedStepExecution stepExecution = _se(jedis, stepExecutionId);
                 if (stepExecution == null) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", Arrays.toString(stepExecutionId)));
                 }
                 if (stepName.equals(stepExecution.getStepName())) {
                     candidates.add(stepExecution);
@@ -936,11 +936,11 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if (partitionIds.isEmpty()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
             }
-            final List<PartitionExecution> ret = new ArrayList<PartitionExecution>();
+            final List<PartitionExecution> ret = new ArrayList<>();
             for (final byte[] partitionExecutionId : partitionIds) {
                 final PartitionExecution partitionExecution = _pe(jedis, partitionExecutionId);
                 if (partitionExecution == null) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", Arrays.toString(partitionExecutionId)));
                 }
                 switch (partitionExecution.getBatchStatus()) {
                     case FAILED:

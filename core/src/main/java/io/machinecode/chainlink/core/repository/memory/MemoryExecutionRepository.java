@@ -534,7 +534,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             return Collections.emptyList();
         }
         if (start + count > size) {
-            return Collections.emptyList();
+            return ret.subList(start, size);
         }
         return ret.subList(start, start + count);
     }
