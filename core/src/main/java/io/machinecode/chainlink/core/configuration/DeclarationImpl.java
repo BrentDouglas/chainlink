@@ -109,7 +109,7 @@ public class DeclarationImpl<T> implements Declaration<T> {
     }
 
     @Override
-    public DeclarationImpl<T> setDefaultValueFactory(final Factory<? extends T> that) {
+    public DeclarationImpl<T> setDefaultFactory(final Factory<? extends T> that) {
         this.cache = null;
         this.defaultFactory = that;
         return this;

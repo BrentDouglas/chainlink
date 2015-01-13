@@ -791,13 +791,15 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             try (final PreparedStatement statement = connection.prepareStatement(queryJobInstances())) {
                 statement.setString(1, jobName);
                 try (final ResultSet result = statement.executeQuery()) {
+                    boolean found = false;
                     for (int i = 0; i < start; ++i) {
                         if (!result.next()) {
                             throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
                         }
+                        found = true;
                     }
                     if (!result.next()) {
-                        if (!result.next()) {
+                        if (!found) {
                             throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
                         }
                         return Collections.emptyList();

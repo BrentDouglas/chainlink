@@ -4,13 +4,10 @@ import io.machinecode.chainlink.core.configuration.ConfigurationArtifactLoader;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
-import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
-import io.machinecode.chainlink.core.registry.LocalRegistry;
-import io.machinecode.chainlink.core.transaction.LocalTransactionManager;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
@@ -20,7 +17,6 @@ import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
-import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
@@ -28,6 +24,7 @@ import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 
 import javax.transaction.TransactionManager;
 import java.util.Properties;
@@ -49,6 +46,11 @@ public abstract class BaseTest extends Assert {
     protected Marshalling _marshalling;
     protected Registry _registry;
 
+    @Before
+    public void before()  throws Exception {
+        configuration();
+    }
+
     protected final Configuration configuration() throws Exception {
         if (this._configuration == null) {
             final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
@@ -63,6 +65,8 @@ public abstract class BaseTest extends Assert {
             this._repository = op.getExecutionRepository().get(_configuration, loader);
             this._marshalling = op.getMarshalling().get(_configuration, loader);
             this._executor = op.getExecutor().get(_configuration, loader);
+            // Make sure any factories get called
+            op.getConfiguration();
         }
         return this._configuration;
     }
@@ -71,24 +75,24 @@ public abstract class BaseTest extends Assert {
         final SubSystemModelImpl subSystem = new SubSystemModelImpl(tccl);
         final DeploymentModelImpl deployment = subSystem.getDeployment();
         final JobOperatorModelImpl jobOperator = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
-        jobOperator.getClassLoader().setDefaultValueFactory(new ClassLoaderFactory() {
+        jobOperator.getClassLoader().setDefaultFactory(new ClassLoaderFactory() {
             @Override
             public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
                 return tccl;
             }
         });
-        jobOperator.getTransactionManager().setDefaultValueFactory(new LocalTransactionManagerFactory(180, TimeUnit.SECONDS));
-        jobOperator.getExecutionRepository().setDefaultValueFactory(new MemoryExecutionRepositoryFactory());
-        jobOperator.getMarshalling().setDefaultValueFactory(new MarshallingFactory() {
+        jobOperator.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory(180, TimeUnit.SECONDS));
+        jobOperator.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
+        jobOperator.getMarshalling().setDefaultFactory(new MarshallingFactory() {
             @Override
             public Marshalling produce(final Dependencies dependencies, final Properties properties) throws Exception {
                 return ((MarshallingFactory) Class.forName(System.getProperty("marshalling.factory.class", JdkMarshallingFactory.class.getName())).newInstance())
                         .produce(dependencies, properties);
             }
         });
-        jobOperator.getTransport().setDefaultValueFactory(new LocalTransportFactory());
-        jobOperator.getRegistry().setDefaultValueFactory(new LocalRegistryFactory());
-        jobOperator.getExecutor().setDefaultValueFactory(new EventedExecutorFactory());
+        jobOperator.getTransport().setDefaultFactory(new LocalTransportFactory());
+        jobOperator.getRegistry().setDefaultFactory(new LocalRegistryFactory());
+        jobOperator.getExecutor().setDefaultFactory(new EventedExecutorFactory());
         return deployment;
     }
 

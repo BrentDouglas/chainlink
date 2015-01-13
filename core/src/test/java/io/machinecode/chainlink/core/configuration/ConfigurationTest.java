@@ -28,18 +28,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ConfigurationTest extends Assert {
 
     public void defaults(final ClassLoader tccl, final JobOperatorModel model) throws Exception {
-        model.getClassLoader().setDefaultValueFactory(new ClassLoaderFactory() {
+        model.getClassLoader().setDefaultFactory(new ClassLoaderFactory() {
             @Override
             public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
                 return tccl;
             }
         });
-        model.getTransactionManager().setDefaultValueFactory(new LocalTransactionManagerFactory(180, TimeUnit.SECONDS));
-        model.getExecutionRepository().setDefaultValueFactory(new MemoryExecutionRepositoryFactory());
-        model.getMarshalling().setDefaultValueFactory(new JdkMarshallingFactory());
-        model.getTransport().setDefaultValueFactory(new LocalTransportFactory());
-        model.getRegistry().setDefaultValueFactory(new LocalRegistryFactory());
-        model.getExecutor().setDefaultValueFactory(new EventedExecutorFactory());
+        model.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory(180, TimeUnit.SECONDS));
+        model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
+        model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
+        model.getTransport().setDefaultFactory(new LocalTransportFactory());
+        model.getRegistry().setDefaultFactory(new LocalRegistryFactory());
+        model.getExecutor().setDefaultFactory(new EventedExecutorFactory());
     }
 
     private JobOperatorModelImpl op() throws Exception {

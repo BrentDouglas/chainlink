@@ -178,24 +178,26 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
     }
 
     @Override
-    protected Collection<JobInstance> fetchJobInstances(final String jobName) throws Exception {
+    protected List<JobInstance> fetchJobInstances(final String jobName) throws Exception {
         final GridCacheQueryFuture<Map.Entry<Long,ExtendedJobInstance>> results = this.jobInstances.cache.queries()
                 .createSqlQuery(GridGainJobInstance.class, "jobName = ?")
                 .execute(jobName);
-        final Set<JobInstance> ret = new THashSet<>();
-        for (final Map.Entry<Long, ExtendedJobInstance> entry : results.get()) {
+        final Collection<Map.Entry<Long,ExtendedJobInstance>> values = results.get();
+        final List<JobInstance> ret = new ArrayList<>(values.size());
+        for (final Map.Entry<Long, ExtendedJobInstance> entry : values) {
             ret.add(entry.getValue());
         }
         return ret;
     }
 
     @Override
-    protected Collection<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
+    protected List<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
         final GridCacheQueryFuture<List<?>> results = this.jobExecutions.cache.queries()
                 .createSqlFieldsQuery("select jobExecutionId from GridGainJobExecution where jobName = ? and ( batchStatus = ? or batchStatus = ? )")
                 .execute(jobName, BatchStatus.STARTED, BatchStatus.STARTING);
-        final Set<Long> ret = new THashSet<>();
-        for (final List<?> list : results.get()) {
+        final Collection<List<?>> values = results.get();
+        final List<Long> ret = new ArrayList<>(values.size());
+        for (final List<?> list : values) {
             for (final Object value : list) {
                 ret.add((Long)value);
             }
@@ -204,7 +206,7 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
     }
 
     @Override
-    protected Collection<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
+    protected List<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
         final GridCacheQueryFuture<Map.Entry<Long,ExtendedJobExecution>> results = this.jobExecutions.cache.queries()
                 .createSqlQuery(GridGainJobExecution.class, "jobInstanceId = ?")
                 .execute(jobInstanceId);

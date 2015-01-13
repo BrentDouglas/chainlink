@@ -89,7 +89,7 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
         model.getMBeanServer().setFactory(mBeanServer == null || mBeanServer.isEmpty() ? null : mBeanServer.get(0));
         model.getMarshalling().setFactory(marshallingFactory == null || marshallingFactory.isEmpty() ? null : marshallingFactory.get(0));
         model.getExecutionRepository().setFactory(executionRepositories.get(0));
-        model.getTransport().setDefaultValueFactory(transports.get(0));
+        model.getTransport().setDefaultFactory(transports.get(0));
         model.getExecutor().setFactory(executors.get(0));
         model.getRegistry().setFactory(registries.get(0));
     }

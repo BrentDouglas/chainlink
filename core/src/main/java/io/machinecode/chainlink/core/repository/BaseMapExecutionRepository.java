@@ -71,9 +71,9 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
 
     protected abstract Set<String> fetchJobNames() throws Exception;
     protected abstract int fetchJobInstanceCount(final String jobName) throws Exception;
-    protected abstract Collection<JobInstance> fetchJobInstances(final String jobName) throws Exception;
-    protected abstract Collection<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception;
-    protected abstract Collection<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception;
+    protected abstract List<JobInstance> fetchJobInstances(final String jobName) throws Exception;
+    protected abstract List<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception;
+    protected abstract List<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception;
 
     @Override
     public synchronized ExtendedJobInstance createJobInstance(final String jobId, final String jslName, final Date timestamp) throws Exception {

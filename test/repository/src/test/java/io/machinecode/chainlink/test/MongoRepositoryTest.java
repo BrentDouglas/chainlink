@@ -9,6 +9,7 @@ import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.jboss.logging.Logger;
 import org.jongo.Jongo;
+import org.junit.After;
 
 import java.util.Properties;
 
@@ -20,18 +21,28 @@ public class MongoRepositoryTest extends RepositoryTest {
 
     private static final Logger log = Logger.getLogger(MongoRepositoryTest.class);
 
+    private Jongo jongo;
+
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         final String host = System.getProperty("mongo.host", "127.0.0.1");
         final int port = Integer.parseInt(System.getProperty("mongo.port", "27017"));
         final String database = System.getProperty("mongo.database");
         log.infof("Connection: {\n\turl: '%s'\n}", host);
-        final Jongo jongo = new Jongo(new MongoClient(host, port).getDB(database));
+        jongo = new Jongo(new MongoClient(host, port).getDB(database));
         model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
             @Override
             public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
                 return _repository = new MongoExecutionRepository(jongo, dependencies.getMarshalling(), true);
             }
         });
+    }
+
+    @After
+    public void after() throws Exception {
+        jongo.getCollection("job_instances").remove();
+        jongo.getCollection("job_executions").remove();
+        jongo.getCollection("step_executions").remove();
+        jongo.getCollection("partition_executions").remove();
     }
 }

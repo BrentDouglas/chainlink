@@ -548,9 +548,14 @@ public class RedisExecutionRepository implements ExecutionRepository {
         final List<JobInstance> ret = new ArrayList<>(count);
         Jedis jedis = null;
         final int end = start + count - 1;
+        final int finish = end < 0 ? 0 : end;
         try {
             jedis = _open();
-            List<byte[]> ids = jedis.lrange(marshalling.marshall(JOB_NAME_JOB_INSTANCES_PREFIX, jobName), start, end < 0 ? 0 : end);
+            final byte[] key = marshalling.marshall(JOB_NAME_JOB_INSTANCES_PREFIX, jobName);
+            List<byte[]> ids = jedis.lrange(key, start, finish);
+            if (ids.isEmpty() && jedis.llen(key) == 0) {
+                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+            }
             for (final byte[] id : ids) {
                 ret.add(_ji(jedis, id));
             }
@@ -558,9 +563,6 @@ public class RedisExecutionRepository implements ExecutionRepository {
             if(jedis != null) {
                 jedis.disconnect();
             }
-        }
-        if (ret.isEmpty()) {
-            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
         }
         return ret;
     }

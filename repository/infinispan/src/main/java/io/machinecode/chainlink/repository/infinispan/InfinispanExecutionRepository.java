@@ -19,7 +19,6 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.transaction.TransactionManager;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -205,7 +204,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
     }
 
     @Override
-    protected Collection<JobInstance> fetchJobInstances(final String jobName) throws Exception {
+    protected List<JobInstance> fetchJobInstances(final String jobName) throws Exception {
         final List<JobInstance> ret = new ArrayList<>();
         final List<Future<List<JobInstance>>> futures = jobInstanceExecutor.submitEverywhere(new JobInstanceCallable(jobName));
         for (final Future<List<JobInstance>> future : futures) {
@@ -218,7 +217,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
     }
 
     @Override
-    protected Collection<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
+    protected List<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
         final List<Long> ret = new ArrayList<>();
         final List<Future<List<Long>>> futures = jobExecutionExecutor.submitEverywhere(new RunningJobExecutionIdCallable(jobName));
         for (final Future<List<Long>> future : futures) {
@@ -231,7 +230,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
     }
 
     @Override
-    protected Collection<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
+    protected List<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
         final List<JobExecution> ret = new ArrayList<>();
         final List<Future<List<JobExecution>>> futures = jobExecutionExecutor.submitEverywhere(new JobExecutionsForJobInstanceCallable(jobInstanceId));
         for (final Future<List<JobExecution>> future : futures) {

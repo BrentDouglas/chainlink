@@ -24,5 +24,5 @@ public interface Declaration<T> {
 
     Declaration<T> setRef(final String fqcn);
 
-    Declaration<T> setDefaultValueFactory(final Factory<? extends T> that);
+    Declaration<T> setDefaultFactory(final Factory<? extends T> that);
 }

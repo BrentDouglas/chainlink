@@ -31,23 +31,23 @@ public class TomEEConfigurationDefaults implements JobOperatorConfiguration {
 
     @Override
     public void configureJobOperator(final JobOperatorModel model) throws Exception {
-        model.getClassLoader().setDefaultValueFactory(new ClassLoaderFactory() {
+        model.getClassLoader().setDefaultFactory(new ClassLoaderFactory() {
             @Override
             public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
                 return loader;
             }
         });
-        model.getTransactionManager().setDefaultValueFactory(new TransactionManagerFactory() {
+        model.getTransactionManager().setDefaultFactory(new TransactionManagerFactory() {
             @Override
             public TransactionManager produce(final Dependencies dependencies, final Properties properties) throws Exception {
                 return transactionManager;
             }
         });
-        model.getExecutionRepository().setDefaultValueFactory(new MemoryExecutionRepositoryFactory());
-        model.getMarshalling().setDefaultValueFactory(new JdkMarshallingFactory());
-        model.getMBeanServer().setDefaultValueFactory(new PlatformMBeanServerFactory());
-        model.getTransport().setDefaultValueFactory(new LocalTransportFactory());
-        model.getRegistry().setDefaultValueFactory(new LocalRegistryFactory());
-        model.getExecutor().setDefaultValueFactory(new EventedExecutorFactory());
+        model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
+        model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
+        model.getMBeanServer().setDefaultFactory(new PlatformMBeanServerFactory());
+        model.getTransport().setDefaultFactory(new LocalTransportFactory());
+        model.getRegistry().setDefaultFactory(new LocalRegistryFactory());
+        model.getExecutor().setDefaultFactory(new EventedExecutorFactory());
     }
 }

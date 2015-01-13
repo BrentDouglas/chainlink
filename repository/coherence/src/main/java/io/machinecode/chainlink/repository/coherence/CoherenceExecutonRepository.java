@@ -13,7 +13,6 @@ import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -159,7 +158,7 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
     }
 
     @Override
-    protected Collection<JobInstance> fetchJobInstances(final String jobName) throws Exception {
+    protected List<JobInstance> fetchJobInstances(final String jobName) throws Exception {
         final List<JobInstance> ret = new ArrayList<>();
         for (final Object value : jobInstances.invokeAll(new AllEntriesFilter(), new JobInstanceProcessor(jobName)).values()) {
             if (value != null) {
@@ -170,7 +169,7 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
     }
 
     @Override
-    protected Collection<Long> fetchRunningJobExecutionIds(final String jobName) {
+    protected List<Long> fetchRunningJobExecutionIds(final String jobName) {
         final List<Long> ret = new ArrayList<>();
         for (final Object value : jobExecutions.invokeAll(new AllEntriesFilter(), new RunningJobExecutionIdProcessor(jobName)).values()) {
             if (value != null) {
@@ -181,7 +180,7 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
     }
 
     @Override
-    protected Collection<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
+    protected List<JobExecution> fetchJobExecutionsForJobInstance(final long jobInstanceId) throws Exception {
         final List<JobExecution> ret = new ArrayList<>();
         for (final Object value : jobExecutions.invokeAll(new AllEntriesFilter(), new JobExecutionsForJobInstanceProcessor(jobInstanceId)).values()) {
             if (value != null) {

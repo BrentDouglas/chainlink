@@ -8,6 +8,7 @@ import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
+import org.junit.After;
 
 import java.util.Properties;
 
@@ -30,5 +31,20 @@ public class HazelcastRepositoryTest extends RepositoryTest {
                 );
             }
         });
+    }
+
+    @After
+    public void after() throws Exception {
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".ids").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobInstances").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutions").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".stepExecutions").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".partitionExecutions").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobInstanceExecutions").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionInstances").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionStepExecutions").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".latestJobExecutionForInstance").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions").clear();
+        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionHistory").clear();
     }
 }

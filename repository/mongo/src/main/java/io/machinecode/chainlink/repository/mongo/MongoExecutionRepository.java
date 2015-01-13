@@ -27,6 +27,7 @@ import javax.batch.runtime.StepExecution;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -397,29 +398,22 @@ public class MongoExecutionRepository implements ExecutionRepository {
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws NoSuchJobException, IOException {
         final MongoCollection jobInstances = jongo.getCollection(JOB_INSTANCES);
-        try (final MongoCursor<MongoJobInstance> cursor = jobInstances.find("{" + Fields.JOB_NAME + ":#}", jobName)
+        final String query = "{" + Fields.JOB_NAME + ":#}";
+        try (final MongoCursor<MongoJobInstance> cursor = jobInstances.find(query, jobName)
                 .skip(start)
                 .limit(count)
                 .as(MongoJobInstance.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                if (jobInstances.count(query, jobName) == 0) {
+                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                }
+                return Collections.emptyList();
             }
             final List<JobInstance> ret = new ArrayList<>(cursor.count());
             for (final MongoJobInstance instance : cursor) {
                 ret.add(instance);
             }
             return ret;
-            /*
-            Collections.reverse(ret);
-            final int size = ret.size();
-            if (start >= size) {
-                return Collections.emptyList();
-            }
-            if (start + count > size) {
-                return Collections.emptyList();
-            }
-            return ret.subList(start, start + count);
-            */
         }
     }
 

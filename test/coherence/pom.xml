@@ -29,6 +29,12 @@
             <testResource>
                 <directory>${project.basedir}/src/test/resources</directory>
             </testResource>
+            <testResource>
+                <directory>${root.dir}/tck/core/src/test/resources</directory>
+                <includes>
+                    <include>coherence-cache-config.xml</include>
+                </includes>
+            </testResource>
         </testResources>
         <plugins>
             <plugin>
