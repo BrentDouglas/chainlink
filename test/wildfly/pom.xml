@@ -14,7 +14,6 @@
     <properties>
         <container.dir>${project.build.directory}/wildfly-${version.org.wildfly}</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
-        <wildfly.jvm.arguments>-server</wildfly.jvm.arguments> <!-- Need to have something here for arquillian to handle it properly -->
     </properties>
 
     <dependencies>
@@ -40,7 +39,7 @@
                             </goals>
                             <configuration>
                                 <target>
-                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
+                                    <unzip src="${root.dir}/dist/target/chainlink-${project.version}-all.zip"
                                            dest="${container.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
@@ -136,7 +135,7 @@
                     <skipExec>false</skipExec>
                     <systemPropertyVariables>
                         <container.dir>${container.dir}</container.dir>
-                        <wildfly.jvm.arguments>${wildfly.jvm.arguments}</wildfly.jvm.arguments>
+                        <wildfly.opts>${wildfly.opts}</wildfly.opts>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -152,18 +151,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>debug</id>
-            <activation>
-                <property><name>debug</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <wildfly.jvm.arguments>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>

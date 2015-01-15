@@ -5,15 +5,14 @@ import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
-import io.machinecode.chainlink.core.management.JobOperatorImpl;
+import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
+import io.machinecode.chainlink.core.management.LazyJobOperator;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.glassfish.internal.data.ApplicationInfo;
 
-import javax.naming.InitialContext;
-import javax.transaction.TransactionManager;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -29,13 +28,18 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
 
     private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
     private SubSystemModelImpl model;
+    private final ThreadFactoryLookup threadFactory;
+
+    public GlassfishEnvironment(final ThreadFactoryLookup threadFactory) {
+        this.threadFactory = threadFactory;
+    }
 
     @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
-                final JobOperatorImpl op = app.ops.get(name);
+                final LazyJobOperator op = app.ops.get(name);
                 if (op == null) {
                     throw new NoConfigurationWithIdException("No configuration for id: " + name); //TODO Message
                 }
@@ -46,7 +50,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     }
 
     @Override
-    public Map<String, JobOperatorImpl> getJobOperators() {
+    public Map<String, LazyJobOperator> getJobOperators() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
@@ -76,15 +80,14 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
             app = new App(loader);
             this.operators.put(info.getName(), app);
         }
-        final DeploymentModelImpl deployment = this.model.getDeployment().copy();
+        final DeploymentModelImpl deployment = this.model.getDeployment().copy(loader);
 
         final String chainlinkXml = System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
         final InputStream stream = loader.getResourceAsStream(chainlinkXml);
         if (stream != null) {
             XmlChainlink.configureDeploymentFromStream(deployment, loader, stream);
         }
-        final TransactionManager transactionManager = InitialContext.doLookup("java:appserver/TransactionManager");
-        final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, transactionManager);
+        final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, threadFactory);
         boolean haveDefault = false;
         for (final Map.Entry<String, JobOperatorModelImpl> entry : deployment.getJobOperators().entrySet()) {
             final JobOperatorModelImpl jobOperatorModel = entry.getValue();
@@ -92,17 +95,21 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
             if (Constants.DEFAULT_CONFIGURATION.equals(entry.getKey())) {
                 haveDefault = true;
             }
+            final LazyJobOperator op = new LazyJobOperator(jobOperatorModel.createJobOperator());
+            op.open(jobOperatorModel.getConfiguration());
             app.ops.put(
                     entry.getKey(),
-                    jobOperatorModel.createJobOperator()
+                    op
             );
         }
         if (!haveDefault) {
             final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
             defaults.configureJobOperator(defaultModel);
+            final LazyJobOperator op = new LazyJobOperator(defaultModel.createJobOperator());
+            op.open(defaultModel.getConfiguration());
             app.ops.put(
                     Constants.DEFAULT_CONFIGURATION,
-                    defaultModel.createJobOperator()
+                    op
             );
         }
     }
@@ -112,7 +119,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
                 info.getName()
         );
         Exception exception = null;
-        for (final JobOperatorImpl op : app.ops.values()) {
+        for (final LazyJobOperator op : app.ops.values()) {
             try {
                 op.close();
             } catch (Exception e) {
@@ -135,7 +142,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
 
     private static class App {
         final WeakReference<ClassLoader> loader;
-        final ConcurrentMap<String, JobOperatorImpl> ops;
+        final ConcurrentMap<String, LazyJobOperator> ops;
 
         private App(final ClassLoader loader) {
             this.loader = new WeakReference<>(loader);

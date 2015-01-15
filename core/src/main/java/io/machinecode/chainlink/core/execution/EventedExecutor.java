@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.execution;
 import io.machinecode.chainlink.core.then.AllChain;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.RejectedChain;
+import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -21,12 +22,14 @@ import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -38,21 +41,47 @@ public class EventedExecutor implements Executor {
 
     protected final Registry registry;
     protected final Transport<?> transport;
-    private final ExecutorService cancellation = Executors.newSingleThreadExecutor();
+    protected final ExecutorService cancellation;
+    protected final ThreadFactory factory;
+    protected final List<Worker> workers;
+    protected final int threads;
 
-    public EventedExecutor(final Dependencies dependencies, final Properties properties) {
+    public EventedExecutor(final Dependencies dependencies, final Properties properties, final ThreadFactory factory) {
         this.registry = dependencies.getRegistry();
         this.transport = dependencies.getTransport();
+        this.threads = Integer.decode(properties.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));
+        this.factory = factory;
+        this.cancellation = Executors.newSingleThreadExecutor(factory);
+        this.workers = new ArrayList<>();
     }
 
     @Override
     public void open(final Configuration configuration) throws Exception {
-        // no op
+        for (int i = 0; i < this.threads; ++i) {
+            final Worker worker = new EventedWorker(configuration);
+            this.workers.add(worker);
+            factory.newThread(worker).start();
+        }
     }
 
     @Override
-    public void close() {
+    public void close() throws Exception {
+        Exception exception = null;
+        for (final Worker worker : workers) {
+            try {
+                worker.close();
+            } catch (final Exception e) {
+                if (exception == null) {
+                    exception = e;
+                } else {
+                    exception.addSuppressed(e);
+                }
+            }
+        }
         this.cancellation.shutdown();
+        if (exception != null) {
+            throw exception;
+        }
     }
 
     @Override
@@ -158,4 +187,5 @@ public class EventedExecutor implements Executor {
     }
 
     private interface Collect extends OnResolve<ChainAndIds>, OnReject<Throwable> {}
+
 }

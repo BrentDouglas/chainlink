@@ -22,6 +22,9 @@ public interface Constants {
     String TIMEOUT                      = NAMESPACE + ".transport.timeout";
     String TIMEOUT_UNIT                 = NAMESPACE + ".transport.timeout_unit";
 
+    String TRANSACTION_MANAGER_JNDI_NAME= NAMESPACE + ".transaction_manager.jndi_name";
+    String THREAD_FACTORY_JNDI_NAME     = NAMESPACE + ".executor.thread_factory.jndi_name";
+
     interface Defaults {
         String CHAINLINK_XML            = "chainlink.xml";
         String CHAINLINK_SUBSYSTEM_XML  = "chainlink-subsystem.xml";

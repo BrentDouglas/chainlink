@@ -16,6 +16,11 @@
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <deployment.dir>${chainlink.dir}/app/</deployment.dir>
         <chainlink.opts> </chainlink.opts>
+
+        <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
+
+        <cdi.injector.configuration.destination>META-INF</cdi.injector.configuration.destination>
+        <cdi.artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.WeldArtifactLoaderFactory</cdi.artifact.loader.factory.class>
     </properties>
 
     <dependencies>
@@ -141,6 +146,10 @@
                         <phase>post-integration-test</phase>
                     </execution>
                     <execution>
+                        <id>install-chainlink.xml</id>
+                        <phase>process-test-resources</phase>
+                    </execution>
+                    <execution>
                         <id>install-background-server</id>
                         <phase>process-test-resources</phase>
                         <goals>
@@ -148,7 +157,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
+                                <unzip src="${root.dir}/dist/target/chainlink-${project.version}-all.zip"
                                        dest="${container.dir}"/>
                                 <chmod file="${chainlink.dir}/install" perm="754"/>
                                 <exec executable="${chainlink.dir}/install"
@@ -156,25 +165,6 @@
                                     <arg value="-c"/><arg value="se"/>
                                     <arg value="-m"/><arg value="all"/>
                                 </exec>
-
-                                <copy file="${project.basedir}/../chainlink-tck.xml"
-                                      tofile="${project.build.testOutputDirectory}/chainlink.xml"
-                                      filtering="true"
-                                      overwrite="true">
-                                    <filterset>
-                                        <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
-                                        <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
-                                        <filter token="executor.factory.class" value="${executor.factory.class}" />
-                                        <filter token="transport.factory.class" value="${transport.factory.class}" />
-                                        <filter token="registry.factory.class" value="${registry.factory.class}" />
-                                        <filter token="injector.factory.class" value="${injector.factory.class}" />
-                                        <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
-                                        <filter token="security.factory.class" value="${security.factory.class}" />
-                                        <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
-                                        <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
-                                        <filter token="marshalling.factory.class" value="${marshalling.factory.class}" />
-                                    </filterset>
-                                </copy>
                                 <copy file="${project.build.testOutputDirectory}/chainlink.xml"
                                       tofile="${chainlink.dir}/cnf/chainlink-tck.xml"
                                       overwrite="true">

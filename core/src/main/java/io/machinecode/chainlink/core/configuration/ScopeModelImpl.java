@@ -77,8 +77,14 @@ public class ScopeModelImpl implements ScopeModel {
     }
 
     public ConfigurationImpl getConfiguration(final String name) throws Exception {
+        return getConfiguration(name, null);
+    }
+
+    public ConfigurationImpl getConfiguration(final String name, final ArtifactLoader loader) throws Exception {
         if (!loadedConfigurations) {
-            final ArtifactLoader artifactLoader = getArtifactLoader();
+            final ArtifactLoader artifactLoader = loader == null
+                    ? getConfigurationArtifactLoader()
+                    : getConfigurationArtifactLoader(loader);
             for (final Map.Entry<String, JobOperatorModelImpl> entry : jobOperators.entrySet()) {
                 this.configurations.put(entry.getKey(), new ConfigurationImpl(entry.getValue(), artifactLoader));
             }
@@ -87,9 +93,16 @@ public class ScopeModelImpl implements ScopeModel {
         return this.configurations.get(name);
     }
 
-    public ArtifactLoader getArtifactLoader() {
+    public ArtifactLoader getConfigurationArtifactLoader() {
         if (this._artifactLoader == null) {
             this._artifactLoader = new ConfigurationArtifactLoader(this._artifactLoaders());
+        }
+        return this._artifactLoader;
+    }
+
+    public ArtifactLoader getConfigurationArtifactLoader(final ArtifactLoader loader) {
+        if (this._artifactLoader == null) {
+            this._artifactLoader = new ConfigurationArtifactLoader(loader, this._artifactLoaders());
         }
         return this._artifactLoader;
     }
@@ -105,7 +118,7 @@ public class ScopeModelImpl implements ScopeModel {
             this._artifactLoaders = new ArtifactLoader[this.artifactLoaders.size()];
         } else {
             final ArtifactLoader[] pal = this.parent._artifactLoaders();
-            init = parent.getArtifactLoader();
+            init = parent.getConfigurationArtifactLoader();
             this._artifactLoaders = new ArtifactLoader[pal.length + this.artifactLoaders.size()];
             System.arraycopy(pal, 0, this._artifactLoaders, 0, pal.length);
             i = pal.length;

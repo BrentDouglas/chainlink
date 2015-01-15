@@ -21,7 +21,6 @@ import org.apache.openejb.loader.SystemInstance;
 import org.apache.openejb.observer.Observes;
 import org.apache.openejb.observer.event.ObserverAdded;
 
-import javax.transaction.TransactionManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -72,10 +71,19 @@ public class TomEEEnvironment implements Environment {
         return Collections.emptyMap();
     }
 
-    public void postCreateSubsystem(@Observes final ContainerSystemPostCreate event) throws Exception {
+    private synchronized SubSystemModelImpl ensureModel() {
+        if (model != null) {
+            return model;
+        }
         final SystemInstance system = SystemInstance.get();
         final ClassLoader loader = system.getClassLoader();
-        this.model = new SubSystemModelImpl(loader);
+        return model = new SubSystemModelImpl(loader);
+    }
+
+    public void postCreateSubsystem(@Observes final ContainerSystemPostCreate event) throws Exception {
+        final SubSystemModelImpl model = ensureModel();
+        final SystemInstance system = SystemInstance.get();
+        final ClassLoader loader = system.getClassLoader();
         final String subsystemXml = system.getProperty(Constants.CHAINLINK_SUBSYSTEM_XML, Constants.Defaults.CHAINLINK_SUBSYSTEM_XML);
         final File conf = system.getConf(subsystemXml);
         if (conf != null && conf.isFile()) {
@@ -90,14 +98,12 @@ public class TomEEEnvironment implements Environment {
     }
 
     public void postCreateApp(@Observes final AssemblerAfterApplicationCreated event) throws Exception {
-        if (model == null) {
-            throw new IllegalStateException(); //TODO Message
-        }
+        final SubSystemModelImpl model = ensureModel();
         final SystemInstance system = SystemInstance.get();
         final AppInfo info = event.getApp();
         final AppContext context = event.getContext();
         final ClassLoader loader = context.getClassLoader();
-        final DeploymentModelImpl deployment = model.getDeployment().copy();
+        final DeploymentModelImpl deployment = model.getDeployment().copy(loader);
         App app = this.operators.get(info.appId);
         if (app == null) {
             app = new App(loader);
@@ -108,8 +114,7 @@ public class TomEEEnvironment implements Environment {
         if (stream != null) {
             XmlChainlink.configureDeploymentFromStream(deployment, loader, stream);
         }
-        final TransactionManager transactionManager = context.getSystemInstance().getComponent(TransactionManager.class);
-        final TomEEConfigurationDefaults defaults = new TomEEConfigurationDefaults(loader, transactionManager);
+        final TomEEConfigurationDefaults defaults = new TomEEConfigurationDefaults(loader);
         boolean haveDefault = false;
         for (final Map.Entry<String, JobOperatorModelImpl> entry : deployment.getJobOperators().entrySet()) {
             final JobOperatorModelImpl jobOperatorModel = entry.getValue();
@@ -119,7 +124,7 @@ public class TomEEEnvironment implements Environment {
             }
             app.ops.put(
                     entry.getKey(),
-                    jobOperatorModel.createJobOperator()
+                    jobOperatorModel.createAndOpenJobOperator()
             );
         }
         if (!haveDefault) {
@@ -127,7 +132,7 @@ public class TomEEEnvironment implements Environment {
             defaults.configureJobOperator(defaultModel);
             app.ops.put(
                     Constants.DEFAULT_CONFIGURATION,
-                    defaultModel.createJobOperator()
+                    defaultModel.createAndOpenJobOperator()
             );
         }
     }

@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.configuration;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
-import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
@@ -144,7 +143,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     }
 
     @Override
-    public Declaration<Transport> getTransport() {
+    public DeclarationImpl<Transport> getTransport() {
         if (transport == null) {
             return transport = new DeclarationImpl<>(loader, names, values, Transport.class, TransportFactory.class, TRANSPORT);
         }
@@ -238,11 +237,23 @@ public class JobOperatorModelImpl implements JobOperatorModel {
                 : this.properties;
     }
 
-    public JobOperatorImpl createJobOperator() throws Exception {
+    public JobOperatorImpl createAndOpenJobOperator() throws Exception {
         final ConfigurationImpl configuration = scope.getConfiguration(name);
         final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
         op.open(configuration);
         return op;
+    }
+
+    public JobOperatorImpl createAndOpenJobOperator(final ArtifactLoader loader) throws Exception {
+        final ConfigurationImpl configuration = scope.getConfiguration(name, loader);
+        final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
+        op.open(configuration);
+        return op;
+    }
+
+    public JobOperatorImpl createJobOperator() throws Exception {
+        final ConfigurationImpl configuration = scope.getConfiguration(name);
+        return new JobOperatorImpl(configuration, getProperties());
     }
 
     public ConfigurationImpl getConfiguration() throws Exception {

@@ -18,7 +18,7 @@ public class ConfigurationService implements Service<SubSystemModelImpl> {
     public static final ServiceName SERVICE_NAME = ChainlinkService.SERVICE_NAME.append(WildFlyConstants.MODEL);
 
     private SubSystemModelImpl model;
-    final InjectedValue<ClassLoader> loader;
+    private final InjectedValue<ClassLoader> loader;
 
     public ConfigurationService(final InjectedValue<ClassLoader> loader) {
         this.loader = loader;

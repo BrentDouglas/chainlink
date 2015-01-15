@@ -16,7 +16,9 @@
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <deployment.dir>${project.build.directory}/deps</deployment.dir>
 
-        <wildfly.jvm.arguments>-server</wildfly.jvm.arguments> <!-- Need to have something here for arquillian to handle it properly -->
+        <cdi.artifact.loader.factory.class>io.machinecode.chainlink.inject.cdi.CdiArtifactLoaderFactory</cdi.artifact.loader.factory.class>
+
+        <thread.factory.jndi.name>java:jboss/ee/concurrency/factory/default</thread.factory.jndi.name>
     </properties>
 
     <dependencies>
@@ -195,7 +197,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
+                                <unzip src="${root.dir}/dist/target/chainlink-${project.version}-all.zip"
                                        dest="${container.dir}"/>
                                 <chmod file="${chainlink.dir}/install" perm="754"/>
                                 <exec executable="${chainlink.dir}/install"
@@ -295,7 +297,9 @@
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/hazelcast.xml"/>
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/tck-udp.xml"/>
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/ChainlinkMessages_en.properties"/>
+                                    <arg value="-r"/><arg value="${project.build.testOutputDirectory}/chainlink.xml"/>
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/META-INF"/>
+                                    <arg value="-w"/><arg value="${project.build.testOutputDirectory}/WEB-INF"/>
                                     <arg value="-w"/><arg value="${project.basedir}/src/test/resources/WEB-INF/web.xml"/>
                                     <arg value="-e"/><arg value="${project.build.directory}/exported-tests"/>
                                 </exec>
@@ -414,7 +418,7 @@
                     <skipExec>false</skipExec>
                     <systemPropertyVariables>
                         <container.dir>${container.dir}</container.dir>
-                        <wildfly.jvm.arguments>${wildfly.jvm.arguments}</wildfly.jvm.arguments>
+                        <wildfly.opts>${wildfly.opts}</wildfly.opts>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

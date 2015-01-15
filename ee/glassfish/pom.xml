@@ -37,6 +37,11 @@
             <artifactId>internal-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.main.concurrent</groupId>
+            <artifactId>concurrent-connector</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

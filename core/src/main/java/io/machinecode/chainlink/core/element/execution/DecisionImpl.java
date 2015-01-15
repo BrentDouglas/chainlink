@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.element.execution;
 
 import io.machinecode.chainlink.core.element.PropertiesImpl;
+import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.inject.InjectablesImpl;
@@ -39,8 +40,6 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     private final List<TransitionImpl> transitions;
     private final PropertiesImpl properties;
     private final ArtifactReferenceImpl ref;
-
-    protected transient Decider _decider;
 
     public DecisionImpl(final String id, final ArtifactReferenceImpl ref, final PropertiesImpl properties,
                         final List<TransitionImpl> transitions) {
@@ -108,18 +107,6 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
         return log;
     }
 
-    public Decider load(final InjectionContext injectionContext, final ExecutionContext context) throws Exception {
-        if (this._decider != null) {
-            return this._decider;
-        }
-        final Decider that = this.ref.load(Decider.class, injectionContext, context);
-        if (that == null) {
-            throw new IllegalStateException(Messages.format("CHAINLINK-025004.artifact.null", context, this.ref));
-        }
-        this._decider = that;
-        return that;
-    }
-
     public String decide(final Configuration configuration, final ExecutionContext context, final StepExecution[] executions) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
@@ -129,7 +116,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
                     context.getStepContext(),
                     properties.getProperties()
             ));
-            return load(injectionContext, context).decide(executions);
+            return PropertyReferenceImpl.load(this.ref, Decider.class, configuration, context).decide(executions);
         } finally {
             provider.setInjectables(null);
         }

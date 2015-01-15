@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.configuration;
 import gnu.trove.set.hash.TLinkedHashSet;
 import io.machinecode.chainlink.core.inject.ClassLoaderArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
-import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
 import java.util.Collections;
 
@@ -16,15 +15,25 @@ public class ConfigurationArtifactLoader implements ArtifactLoader {
     private final ClassLoaderArtifactLoader configuredLoader;
     private final TLinkedHashSet<ArtifactLoader> loaders;
 
-    public ConfigurationArtifactLoader(final ArtifactLoader... artifactLoaders) {
+    public ConfigurationArtifactLoader(final ArtifactLoader extra, final ArtifactLoader... loaders) {
+        this();
+        this.loaders.add(extra);
+        Collections.addAll(this.loaders, loaders);
+    }
+
+    public ConfigurationArtifactLoader(final ArtifactLoader... loaders) {
+        this();
+        Collections.addAll(this.loaders, loaders);
+    }
+
+    public ConfigurationArtifactLoader() {
         this.configuredLoader = new ClassLoaderArtifactLoader();
         this.loaders = new TLinkedHashSet<>();
-        Collections.addAll(this.loaders, artifactLoaders);
     }
 
 
     @Override
-    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws ArtifactOfWrongTypeException {
+    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
         for (final ArtifactLoader artifactLoader : this.loaders) {
             final T that = artifactLoader.load(id, as, loader);
             if (that != null) {

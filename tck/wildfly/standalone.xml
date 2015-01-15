@@ -83,24 +83,9 @@
 
     <profile>
         <subsystem xmlns="urn:jboss:domain:chainlink:1.0">
-            <job-operator name="default">
-                <executor name="a" ref="@executor.factory.class@"/>
-                <registry name="b" ref="@registry.factory.class@"/>
-                <marshalling name="d" ref="@marshalling.factory.class@"/>
-                <mbean-server name="e" ref="@mbean.server.factory.class@"/>
-                <execution-repository name="f" ref="@execution.repository.factory.class@"/>
-
-                <!--
-                <class-loader ref="@class.loader.factory.class@"/>
-                <transaction-manager ref="@transaction.manager.factory.class@"/>
-
-                <job-loader ref="@job.loader.factory.class@"/>
-                <artifact-loader ref="@artifact.loader.factory.class@"/>
-                <injector ref="@injector.factory.class@"/>
-                <security ref="@security.factory.class@"/>
-                -->
-                <property name="test" value="test-value"/>
-            </job-operator>
+            <deployment>
+                <job-operator name="default"/>
+            </deployment>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:logging:3.0">
             <console-handler name="CONSOLE">

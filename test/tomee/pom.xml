@@ -42,7 +42,7 @@
                             <configuration>
                                 <target>
                                     <mkdir dir="${tests.dir}"/>
-                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
+                                    <unzip src="${root.dir}/dist/target/chainlink-${project.version}-all.zip"
                                            dest="${container.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"

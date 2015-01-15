@@ -9,9 +9,9 @@ import io.machinecode.then.api.Promise;
  */
 public interface Worker extends Runnable, AutoCloseable {
 
-    void start();
-
     WorkerId id();
+
+    boolean isActive();
 
     void execute(final ExecutableEvent event);
 

@@ -6,7 +6,7 @@
     <container qualifier="wildfly" default="true">
         <configuration>
             <property name="jbossHome">${container.dir}</property>
-            <property name="javaVmArguments">${wildfly.jvm.arguments}</property>
+            <property name="javaVmArguments">${wildfly.opts}</property>
             <property name="allowConnectingToRunningServer">false</property>
         </configuration>
     </container>

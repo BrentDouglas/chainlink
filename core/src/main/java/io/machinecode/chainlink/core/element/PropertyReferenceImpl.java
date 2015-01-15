@@ -38,17 +38,21 @@ public class PropertyReferenceImpl<T> implements PropertyReference, Serializable
     }
 
     public synchronized T load(final Class<T> clazz, final Configuration configuration, final ExecutionContext context) throws Exception {
+        return load(this.ref, clazz, configuration, context);
+    }
+
+    public static synchronized <T> T load(final ArtifactReferenceImpl ref, final Class<T> clazz, final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final Registry registry = configuration.getRegistry();
-        final T artifact = registry.loadArtifact(clazz, this.ref.ref(), context);
+        final T artifact = registry.loadArtifact(clazz, ref.ref(), context);
         if (artifact != null) {
             return artifact;
         }
-        final T that = this.ref.load(clazz, injectionContext, context);
+        final T that = ref.load(clazz, injectionContext, context);
         if (that == null) {
-            throw new IllegalStateException(Messages.format("CHAINLINK-025004.artifact.null", context, this.ref.ref()));
+            throw new IllegalStateException(Messages.format("CHAINLINK-025004.artifact.null", context, ref.ref()));
         }
-        registry.storeArtifact(clazz, this.ref.ref(), context, that);
+        registry.storeArtifact(clazz, ref.ref(), context, that);
         return that;
     }
 

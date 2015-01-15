@@ -36,11 +36,10 @@ public class CdiInjector implements Injector {
         }
     }
 
-    // TODO Returning false makes the default injector override any previously injected values
-    // Need to return (bean instanceof CDI Proxy)
     @Override
     public boolean inject(final Object bean) throws Exception {
-        return false;
+        final String name = bean.getClass().getName();
+        return name.contains("_$$_Weld"); //TODO Also check OWB
     }
 
     @Produces

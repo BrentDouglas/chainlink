@@ -21,14 +21,11 @@ import org.jboss.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public class EventedWorker extends Thread implements Worker {
-
-    private static final AtomicLong IDS = new AtomicLong();
+public class EventedWorker implements Worker {
 
     private static final Logger log = Logger.getLogger(EventedWorker.class);
 
@@ -38,16 +35,16 @@ public class EventedWorker extends Thread implements Worker {
     protected final Queue<CallbackEvent> callbacks = new LinkedList<>();
     protected final Notify notify;
     protected final Configuration configuration;
-    protected volatile boolean running = true;
+    protected volatile boolean started = true;
+    protected volatile boolean stopped = false;
 
     public EventedWorker(final Configuration configuration) {
-        super("chainlink-worker-" + IDS.incrementAndGet()); //TODO Message
         this.configuration = configuration;
         this.workerId = configuration.getTransport().generateWorkerId(this);
         lock = new Object() {
             @Override
             public String toString() {
-                return getName() + "-lock-" + workerId;
+                return "lock-" + workerId;
             }
         };
         notify = new Notify(lock);
@@ -56,6 +53,11 @@ public class EventedWorker extends Thread implements Worker {
     @Override
     public WorkerId id() {
         return workerId;
+    }
+
+    @Override
+    public boolean isActive() {
+        return started && !stopped;
     }
 
     @Override
@@ -85,13 +87,17 @@ public class EventedWorker extends Thread implements Worker {
 
     @Override
     public void run() {
-        while (running) {
-            _runExecutable();
+        this.started = true;
+        configuration.getTransport().registerWorker(this);
+        boolean ran;
+        do {
             _awaitIfEmpty();
-        }
+            ran = _runExecutable();
+        } while (!stopped || ran);
+        configuration.getTransport().unregisterWorker(this);
     }
 
-    private void _runExecutable() {
+    private boolean _runExecutable() {
         final ExecutionContext previous;
         final Executable executable;
         final ChainId chainId;
@@ -108,14 +114,14 @@ public class EventedWorker extends Thread implements Worker {
         if (cb == null) {
             try {
                 if (ex == null) {
-                    return;
+                    return false;
                 }
                 executable = ex.getExecutable();
                 previous = null;
                 chainId = ex.getChainId();
             } catch (final Throwable e) {
                 log.errorf(e, Messages.get("CHAINLINK-024007.worker.fetch.exception"), this, ex);
-                return;
+                return false;
             }
         } else {
             try {
@@ -126,7 +132,7 @@ public class EventedWorker extends Thread implements Worker {
                 chainId = cb.getChainId();
             } catch (final Throwable e) {
                 log.errorf(e, Messages.get("CHAINLINK-024007.worker.fetch.exception"), this, cb);
-                return;
+                return false;
             }
         }
         final ExecutionContext context = executable.getContext();
@@ -139,6 +145,7 @@ public class EventedWorker extends Thread implements Worker {
         } catch (final Throwable e) {
             log.errorf(e, Messages.get("CHAINLINK-024004.worker.execute.exception"), context, this, executable);
         }
+        return true;
     }
 
     private void _awaitIfEmpty() {
@@ -165,7 +172,7 @@ public class EventedWorker extends Thread implements Worker {
 
     @Override
     public void close() {
-        running = false;
+        stopped = true;
         synchronized (lock) {
             lock.notifyAll();
         }
@@ -173,6 +180,6 @@ public class EventedWorker extends Thread implements Worker {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[workerId=" + workerId + ",executables=" + executables.size() + ",callbacks=" + callbacks.size() + ",running=" + running + "]";
+        return getClass().getSimpleName() + "[workerId=" + workerId + ",executables=" + executables.size() + ",callbacks=" + callbacks.size() + ",running=" + isActive() + "]";
     }
 }

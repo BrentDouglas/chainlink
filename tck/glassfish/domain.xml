@@ -95,6 +95,7 @@
       <connector-service></connector-service>
       <transaction-service tx-log-dir="${com.sun.aas.instanceRoot}/logs"></transaction-service>
       <batch-runtime-configuration></batch-runtime-configuration>
+      <!--<chainlink-subsystem></chainlink-subsystem>-->
       <jms-service default-jms-host="default_JMS_host" type="EMBEDDED">
         <jms-host port="${JMS_PROVIDER_PORT}" name="default_JMS_host" host="localhost"></jms-host>
       </jms-service>
@@ -174,9 +175,9 @@
         </message-security-config>
         <property name="default-digest-algorithm" value="SHA-256"></property>
       </security-service>
-      <java-config classpath-suffix="" debug-options="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9009" system-classpath="">
+      <java-config classpath-suffix="" debug-options="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009" system-classpath="">
         <jvm-options>-XX:MaxPermSize=192m</jvm-options>
-        <jvm-options>-client</jvm-options>
+        <jvm-options>-server</jvm-options>
         <jvm-options>-Djava.awt.headless=true</jvm-options>
         <jvm-options>-Djdk.corba.allowOutputStreamSubclass=true</jvm-options>
         <jvm-options>-Djavax.xml.accessExternalSchema=all</jvm-options>

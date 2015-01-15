@@ -20,7 +20,7 @@ public class XmlDeployment extends XmlScope {
         if (this.ref != null) {
             final DeploymentConfiguration configuration;
             try {
-                configuration = model.getArtifactLoader().load(this.ref, DeploymentConfiguration.class, classLoader);
+                configuration = model.getConfigurationArtifactLoader().load(this.ref, DeploymentConfiguration.class, classLoader);
             } catch (final Exception e) {
                 throw new ConfigurationException("attribute 'ref' must be an injectable " + DeploymentConfiguration.class.getName(), e); //TODO Message
             }

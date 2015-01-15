@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.configuration;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.spi.configuration.DeploymentModel;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 /**
@@ -15,14 +16,14 @@ public class DeploymentModelImpl extends ScopeModelImpl implements DeploymentMod
         super(parent);
     }
 
-    private DeploymentModelImpl(final DeploymentModelImpl that) {
-        super(that.loader, new THashSet<>(that.names), that.parent);
+    private DeploymentModelImpl(final DeploymentModelImpl that, final ClassLoader loader) {
+        super(new WeakReference<>(loader), new THashSet<>(that.names), that.parent);
         for (final Map.Entry<String, JobOperatorModelImpl> entry : that.jobOperators.entrySet()) {
             this.jobOperators.put(entry.getKey(), entry.getValue().copy(this));
         }
     }
 
-    public DeploymentModelImpl copy() {
-        return new DeploymentModelImpl(this);
+    public DeploymentModelImpl copy(final ClassLoader loader) {
+        return new DeploymentModelImpl(this, loader);
     }
 }

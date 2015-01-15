@@ -2,11 +2,9 @@ package io.machinecode.chainlink.core.transport;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
-import io.machinecode.chainlink.core.execution.EventedWorker;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.registry.ThreadId;
 import io.machinecode.chainlink.core.registry.UUIDId;
-import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Executable;
@@ -29,15 +27,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public abstract class BaseTransport<A> implements Transport<A> {
 
-    protected final AtomicBoolean workerLock = new AtomicBoolean(false);
+    protected final Lock workerLock = new ReentrantLock();
+    protected final Condition workerCondition = workerLock.newCondition();
     protected final List<Worker> workerOrder;
     protected final TMap<WorkerId, Worker> workers;
 
@@ -56,33 +57,35 @@ public abstract class BaseTransport<A> implements Transport<A> {
 
     @Override
     public void open(final Configuration configuration) throws Exception {
-        final int numThreads;
+        // no op
+    }
+
+    @Override
+    public void registerWorker(final Worker worker) {
+        workerLock.lock();
         try {
-            numThreads = Integer.decode(configuration.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));
-        } catch (final NumberFormatException e) {
-            throw new RuntimeException(e); //TODO Message
+            this.workerOrder.add(worker);
+            this.workers.put(worker.id(), worker);
+            workerCondition.signalAll();
+        } finally {
+            workerLock.unlock();
         }
-        for (int i = 0; i < numThreads; ++i) {
-            final Worker worker;
-            try {
-                worker = new EventedWorker(configuration);
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO Message
-            }
-            worker.start();
-            while (!workerLock.compareAndSet(false, true)) {}
-            try {
-                this.workerOrder.add(worker);
-                this.workers.put(worker.id(), worker);
-            } finally {
-                workerLock.set(false);
-            }
+    }
+
+    @Override
+    public void unregisterWorker(final Worker worker) {
+        workerLock.lock();
+        try {
+            this.workerOrder.remove(worker);
+            this.workers.remove(worker.id());
+        } finally {
+            workerLock.unlock();
         }
     }
 
     @Override
     public void close() throws Exception {
-        while (!workerLock.compareAndSet(false, true)) {}
+        workerLock.lock();
         try {
             this.workerOrder.clear();
             Exception exception = null;
@@ -102,7 +105,7 @@ public abstract class BaseTransport<A> implements Transport<A> {
                 throw exception;
             }
         } finally {
-            workerLock.set(false);
+            workerLock.unlock();
         }
     }
 
@@ -215,11 +218,11 @@ public abstract class BaseTransport<A> implements Transport<A> {
     }
 
     protected Worker getLocalWorker(final WorkerId workerId) {
-        while (!workerLock.compareAndSet(false, true)) {}
+        workerLock.lock();
         try {
             return workers.get(workerId);
         } finally {
-            workerLock.set(false);
+            workerLock.unlock();
         }
     }
 
@@ -232,30 +235,42 @@ public abstract class BaseTransport<A> implements Transport<A> {
     }
 
     protected Worker getLocalWorker() {
-        while (!workerLock.compareAndSet(false, true)) {}
+        workerLock.lock();
         try {
-            if (currentWorker.get() >= workers.size()) {
-                currentWorker.set(0);
-            }
-            return workerOrder.get(currentWorker.getAndIncrement());
+            return _getActiveLocalWorker();
         } finally {
-            workerLock.set(false);
+            workerLock.unlock();
         }
     }
 
     protected List<Worker> getLocalWorkers(final int required) {
         final ArrayList<Worker> ret = new ArrayList<>(required);
-        while (!workerLock.compareAndSet(false, true)) {}
+        workerLock.lock();
         try {
             for (int i = 0; i < required; ++i) {
-                if (currentWorker.get() >= workers.size()) {
-                    currentWorker.set(0);
-                }
-                ret.add(workerOrder.get(currentWorker.getAndIncrement()));
+                ret.add(_getActiveLocalWorker());
             }
         } finally {
-            workerLock.set(false);
+            workerLock.unlock();
         }
         return ret;
+    }
+
+    private Worker _getActiveLocalWorker() {
+        Worker worker;
+        do {
+            if (workerOrder.size() == 0) {
+                try {
+                    workerCondition.await();
+                } catch (final InterruptedException e) {
+                    throw new RuntimeException(e); //TODO
+                }
+            }
+            if (currentWorker.get() >= workerOrder.size()) {
+                currentWorker.set(0);
+            }
+            worker = workerOrder.get(currentWorker.getAndIncrement());
+        } while (!worker.isActive());
+        return worker;
     }
 }

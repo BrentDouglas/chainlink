@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.configuration.xml;
 
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
+import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
@@ -198,45 +199,45 @@ public class XmlJobOperator {
         return dec == null ? null : dec.getRef();
     }
 
+    private static void set(final Declaration<?> dec, final String ref) {
+        if (ref == null || ref.trim().isEmpty()) {
+            return;
+        }
+        dec.setRef(ref);
+    }
+
     public void configureScope(final ScopeModelImpl scope, final ClassLoader classLoader) throws Exception {
         //TODO Do these need to get inserted into the model?
         final Properties properties = XmlProperty.convert(this.properties);
         final JobOperatorModel model = scope.getJobOperator(this.name);
 
-        model.getExecutor()
+        set(model.getExecutor()
                 .setName(name(this.executor, JobOperatorModelImpl.EXECUTOR))
-                .setProperties(properties)
-                .setRef(ref(this.executor));
-        model.getTransport()
+                .setProperties(properties), ref(this.executor));
+        set(model.getTransport()
                 .setName(name(this.transport, JobOperatorModelImpl.TRANSPORT))
-                .setProperties(properties)
-                .setRef(ref(this.transport));
-        model.getMarshalling()
+                .setProperties(properties), ref(this.transport));
+        set(model.getMarshalling()
                 .setName(name(this.marshalling, JobOperatorModelImpl.MARSHALLING))
-                .setProperties(properties)
-                .setRef(ref(this.marshalling));
-        model.getRegistry()
+                .setProperties(properties), ref(this.marshalling));
+        set(model.getRegistry()
                 .setName(name(this.registry, JobOperatorModelImpl.REGISTRY))
-                .setProperties(properties)
-                .setRef(ref(this.registry));
+                .setProperties(properties), ref(this.registry));
         if (this.mBeanServer != null) {
             model.getMBeanServer() //This is nullable, calling getMBeanServer() will add it to the model
                     .setName(name(this.mBeanServer, JobOperatorModelImpl.MBEAN_SERVER))
                     .setProperties(properties)
                     .setRef(ref(this.mBeanServer));
         }
-        model.getExecutionRepository()
+        set(model.getExecutionRepository()
                 .setName(name(this.executionRepository, JobOperatorModelImpl.EXECUTION_REPOSITORY))
-                .setProperties(properties)
-                .setRef(ref(this.executionRepository));
-        model.getClassLoader()
+                .setProperties(properties), ref(this.executionRepository));
+        set(model.getClassLoader()
                 .setName(name(this.classLoader, JobOperatorModelImpl.CLASS_LOADER))
-                .setProperties(properties)
-                .setRef(ref(this.classLoader));
-        model.getTransactionManager()
+                .setProperties(properties), ref(this.classLoader));
+        set(model.getTransactionManager()
                 .setName(name(this.transactionManager, JobOperatorModelImpl.TRANSACTION_MANAGER))
-                .setProperties(properties)
-                .setRef(ref(this.transactionManager));
+                .setProperties(properties), ref(this.transactionManager));
         for (final XmlDeclaration resource : this.jobLoader) {
             model.getJobLoader(resource.getName())
                     .setProperties(properties)
@@ -260,7 +261,7 @@ public class XmlJobOperator {
         if (this.ref != null) {
             final JobOperatorConfiguration configuration;
             try {
-                configuration = scope.getArtifactLoader().load(this.ref, JobOperatorConfiguration.class, classLoader);
+                configuration = scope.getConfigurationArtifactLoader().load(this.ref, JobOperatorConfiguration.class, classLoader);
             } catch (final ArtifactOfWrongTypeException e) {
                 throw new ConfigurationException("attribute 'ref' must be the fqcn of a class extending " + JobOperatorConfiguration.class.getName(), e); //TODO Message
             }

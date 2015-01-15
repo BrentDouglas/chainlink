@@ -21,8 +21,8 @@ public class CdiNoRollbackChunkTest extends NoRollbackChunkTest {
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         super.visitJobOperatorModel(model);
-        model.getArtifactLoader("artifactLoader").setValue(CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class));
-        model.getInjector("injector").setValue(CdiArtifactLoader.inject(container.getBeanManager(), CdiInjector.class));
+        model.getArtifactLoader("artifactLoader").setValue(new CdiArtifactLoader(container.getBeanManager()));
+        model.getInjector("injector").setValue(new CdiInjector());
     }
 
     @BeforeClass

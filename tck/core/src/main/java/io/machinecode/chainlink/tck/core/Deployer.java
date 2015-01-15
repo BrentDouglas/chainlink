@@ -52,7 +52,17 @@ public class Deployer {
             }
             if (webResources != null) {
                 for (final String resource : webResources) {
-                    archive.addAsWebInfResource(new File(resource));
+                    final File file = new File(resource);
+                    if (file.isFile()) {
+                        archive.addAsWebInfResource(file, file.getName());
+                    } else if (file.isDirectory()) {
+                        final File[] files = file.listFiles();
+                        if (files != null) {
+                            for (final File child: files) {
+                                archive.addAsWebInfResource(child, child.getName());
+                            }
+                        }
+                    }
                 }
             }
             if (export != null) {

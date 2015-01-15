@@ -2,7 +2,6 @@ package io.machinecode.chainlink.core.inject;
 
 import gnu.trove.set.hash.TLinkedHashSet;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
-import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
 import java.util.Collections;
 
@@ -29,7 +28,7 @@ public class ArtifactLoaderImpl implements ArtifactLoader {
 
 
     @Override
-    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws ArtifactOfWrongTypeException {
+    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
         // 1. Provided Loaders
         for (final ArtifactLoader artifactLoader : this.loaders) {
             final T that = artifactLoader.load(id, as, loader);

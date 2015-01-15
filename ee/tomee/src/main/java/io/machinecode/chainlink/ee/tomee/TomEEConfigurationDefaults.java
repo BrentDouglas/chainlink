@@ -10,9 +10,7 @@ import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
-import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 
-import javax.transaction.TransactionManager;
 import java.util.Properties;
 
 /**
@@ -22,11 +20,9 @@ import java.util.Properties;
 public class TomEEConfigurationDefaults implements JobOperatorConfiguration {
 
     final ClassLoader loader;
-    final TransactionManager transactionManager;
 
-    TomEEConfigurationDefaults(final ClassLoader loader, final TransactionManager transactionManager) {
+    TomEEConfigurationDefaults(final ClassLoader loader) {
         this.loader = loader;
-        this.transactionManager = transactionManager;
     }
 
     @Override
@@ -37,12 +33,7 @@ public class TomEEConfigurationDefaults implements JobOperatorConfiguration {
                 return loader;
             }
         });
-        model.getTransactionManager().setDefaultFactory(new TransactionManagerFactory() {
-            @Override
-            public TransactionManager produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return transactionManager;
-            }
-        });
+        model.getTransactionManager().setDefaultFactory(new TomEETransactionManagerFactory());
         model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
         model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
         model.getMBeanServer().setDefaultFactory(new PlatformMBeanServerFactory());
@@ -50,4 +41,5 @@ public class TomEEConfigurationDefaults implements JobOperatorConfiguration {
         model.getRegistry().setDefaultFactory(new LocalRegistryFactory());
         model.getExecutor().setDefaultFactory(new EventedExecutorFactory());
     }
+
 }

@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+
     <artifactId>chainlink-tck</artifactId>
     <packaging>pom</packaging>
     <modules>
@@ -19,9 +20,11 @@
         <tck.source>${project.build.directory}/tck-source</tck.source>
 
         <container.debug>false</container.debug>
+        <wildfly.opts>-server</wildfly.opts> <!-- Need to have something here for arquillian to handle it properly -->
+        <glassfish.opts> </glassfish.opts>
 
         <execution.repository.factory.class>io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
-        <executor.factory.class>io.machinecode.chainlink.core.execution.EventedExecutorFactory</executor.factory.class>
+        <executor.factory.class>io.machinecode.chainlink.core.execution.JndiEventedExecutorFactory</executor.factory.class>
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
         <mbean.server.factory.class>io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory</mbean.server.factory.class>
@@ -29,6 +32,12 @@
 
         <injector.configuration.source.file>META-INF/batch.xml</injector.configuration.source.file>
         <injector.configuration.destination.file>${injector.configuration.source.file}</injector.configuration.destination.file>
+        <cdi.injector.configuration.destination>WEB-INF</cdi.injector.configuration.destination>
+
+        <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.NoOpArtifactLoaderFactory</artifact.loader.factory.class>
+        <injector.factory.class>io.machinecode.chainlink.tck.core.inject.NoOpInjectorFactory</injector.factory.class>
+
+        <cdi.artifact.loader.factory.class>io.machinecode.chainlink.inject.cdi.JndiCdiArtifactLoaderFactory</cdi.artifact.loader.factory.class>
 
         <database.driver>org.h2.Driver</database.driver>
         <database.prefix>h2</database.prefix>
@@ -264,7 +273,8 @@
             </activation>
             <properties>
                 <container.debug>true</container.debug>
-                <wildfly.jvm.arguments>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.jvm.arguments>
+                <wildfly.opts>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.opts>
+                <glassfish.opts>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</glassfish.opts>
                 <chainlink.opts>-server -Xms256m -Xmx256m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:+ExplicitGCInvokesConcurrent -XX:+UseCompressedOops -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</chainlink.opts>
             </properties>
         </profile>
@@ -451,9 +461,10 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.CdiArtifactLoaderFactory</artifact.loader.factory.class>
-                <injector.factory.class>io.machinecode.chainlink.tck.core.inject.CdiInjectorFactory</injector.factory.class>
+                <artifact.loader.factory.class>${cdi.artifact.loader.factory.class}</artifact.loader.factory.class>
+                <injector.factory.class>io.machinecode.chainlink.inject.cdi.CdiInjectorFactory</injector.factory.class>
                 <injector.configuration.source.file>META-INF/beans.xml</injector.configuration.source.file>
+                <injector.configuration.destination.file>${cdi.injector.configuration.destination}/beans.xml</injector.configuration.destination.file>
             </properties>
             <dependencies>
                 <dependency>
@@ -837,6 +848,26 @@
                                           overwrite="true">
                                         <filterset>
                                             <filter token="marshalling.factory.class" value="${marshalling.factory.class}" />
+                                        </filterset>
+                                    </copy>
+                                    <copy file="${project.basedir}/../chainlink-tck.xml"
+                                          tofile="${project.build.testOutputDirectory}/chainlink.xml"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
+                                            <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
+                                            <filter token="executor.factory.class" value="${executor.factory.class}" />
+                                            <filter token="transport.factory.class" value="${transport.factory.class}" />
+                                            <filter token="registry.factory.class" value="${registry.factory.class}" />
+                                            <filter token="injector.factory.class" value="${injector.factory.class}" />
+                                            <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
+                                            <filter token="security.factory.class" value="${security.factory.class}" />
+                                            <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />
+                                            <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
+                                            <filter token="marshalling.factory.class" value="${marshalling.factory.class}" />
+                                            <filter token="thread.factory.jndi.name" value="${thread.factory.jndi.name}" />
+                                            <filter token="transaction.manager.jndi.name" value="${transaction.manager.jndi.name}" />
                                         </filterset>
                                     </copy>
                                 </target>

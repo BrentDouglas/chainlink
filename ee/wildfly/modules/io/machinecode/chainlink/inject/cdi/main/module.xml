@@ -8,6 +8,7 @@
         <module name="io.machinecode.chainlink"/>
         <module name="javax.batch.api"/>
         <module name="javax.inject.api"/>
+        <module name="javax.api"/>
         <module name="javax.enterprise.api"/>
         <module name="org.jboss.logging"/>
     </dependencies>

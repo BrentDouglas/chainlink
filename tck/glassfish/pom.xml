@@ -15,6 +15,7 @@
         <container.dir>${project.build.directory}/glassfish4</container.dir>
         <chainlink.dir>${container.dir}/chainlink-${project.version}</chainlink.dir>
         <deployment.dir>${project.build.directory}/deps</deployment.dir>
+        <thread.factory.jndi.name>concurrent/__defaultManagedThreadFactory</thread.factory.jndi.name>
     </properties>
 
     <dependencies>
@@ -198,7 +199,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
+                                <unzip src="${root.dir}/dist/target/chainlink-${project.version}-all.zip"
                                        dest="${container.dir}"/>
                                 <chmod file="${chainlink.dir}/install" perm="754"/>
                                 <exec executable="${chainlink.dir}/install"
@@ -209,34 +210,12 @@
                                 </exec>
                                 <copy file="${project.basedir}/domain.xml"
                                       tofile="${container.dir}/glassfish/domains/domain1/config/domain.xml"
-                                      overwrite="true">
-                                </copy>
-                                <!--
-                                <copy file="${project.basedir}/post-start-commands.txt"
-                                      tofile="${project.build.directory}/commands/post-start-commands.txt"
                                       filtering="true"
                                       overwrite="true">
                                     <filterset>
-                                        <filter token="tck.database.url" value="${tck.database.url}" />
-                                        <filter token="tck.database.driver" value="${tck.database.driver}" />
-                                        <filter token="tck.database.datasource" value="${tck.database.datasource}" />
-                                        <filter token="tck.database.user" value="${tck.database.user}" />
-                                        <filter token="tck.database.password" value="${tck.database.password}" />
+                                        <filter token="glassfish.opts" value="${glassfish.opts}" />
                                     </filterset>
                                 </copy>
-                                <copy file="${project.basedir}/pre-stop-commands.txt"
-                                      tofile="${project.build.directory}/commands/pre-stop-commands.txt"
-                                      filtering="true"
-                                      overwrite="true">
-                                    <filterset>
-                                        <filter token="tck.database.url" value="${tck.database.url}" />
-                                        <filter token="tck.database.driver" value="${tck.database.driver}" />
-                                        <filter token="tck.database.datasource" value="${tck.database.datasource}" />
-                                        <filter token="tck.database.user" value="${tck.database.user}" />
-                                        <filter token="tck.database.password" value="${tck.database.password}" />
-                                    </filterset>
-                                </copy>
-                                -->
                                 <exec executable="${container.dir}/glassfish/bin/asadmin"
                                       dir="${container.dir}">
                                     <arg value="start-database"/>
@@ -331,7 +310,9 @@
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/hazelcast.xml"/>
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/tck-udp.xml"/>
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/ChainlinkMessages_en.properties"/>
+                                    <arg value="-r"/><arg value="${project.build.testOutputDirectory}/chainlink.xml"/>
                                     <arg value="-r"/><arg value="${project.build.testOutputDirectory}/META-INF"/>
+                                    <arg value="-w"/><arg value="${project.build.testOutputDirectory}/WEB-INF"/>
                                     <arg value="-w"/><arg value="${project.basedir}/src/test/resources/WEB-INF/web.xml"/>
                                     <arg value="-e"/><arg value="${project.build.directory}/exported-tests"/>
                                 </exec>

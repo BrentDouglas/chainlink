@@ -39,7 +39,7 @@
                             </goals>
                             <configuration>
                                 <target>
-                                    <unzip src="${project.build.directory}/../../../dist/target/chainlink-${project.version}-all.zip"
+                                    <unzip src="${root.dir}/dist/target/chainlink-${project.version}-all.zip"
                                            dest="${container.dir}"/>
                                     <chmod file="${chainlink.dir}/install" perm="754"/>
                                     <exec executable="${chainlink.dir}/install"
@@ -48,6 +48,14 @@
                                         <arg value="-d"/><arg value="${container.dir}"/>
                                         <arg value="-m"/><arg value="all"/>
                                     </exec>
+                                    <copy file="${root.dir}/tck/glassfish/domain.xml"
+                                          tofile="${container.dir}/glassfish/domains/domain1/config/domain.xml"
+                                          filtering="true"
+                                          overwrite="true">
+                                        <filterset>
+                                            <filter token="glassfish.opts" value="${glassfish.opts}" />
+                                        </filterset>
+                                    </copy>
                                 </target>
                             </configuration>
                         </execution>

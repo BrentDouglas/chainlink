@@ -91,7 +91,7 @@ public class SeEnvironment implements Environment, AutoCloseable {
                 defaults.configureJobOperator(jobOperatorModel);
                 operators.put(
                         entry.getKey(),
-                        jobOperatorModel.createJobOperator()
+                        jobOperatorModel.createAndOpenJobOperator()
                 );
             }
         } catch (final RuntimeException e) {

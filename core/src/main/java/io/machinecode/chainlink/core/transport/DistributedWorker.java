@@ -40,6 +40,11 @@ public abstract class DistributedWorker<A> implements Worker {
     }
 
     @Override
+    public boolean isActive() {
+        return true;
+    }
+
+    @Override
     public void execute(final ExecutableEvent event) {
         final Command<Object, A> command = new ExecuteCommand<>(workerId, event);
         transport.invokeRemote(remote, command, new DeferredImpl<Object, Throwable,Void>(), transport.getTimeout(), transport.getTimeUnit());
@@ -75,11 +80,6 @@ public abstract class DistributedWorker<A> implements Worker {
     protected abstract Command<ChainId, A> createPushChainCommand(final long jobExecutionId, final ChainId localId);
 
     protected abstract Chain<?> createLocalChain(final long jobExecutionId, final ChainId remoteId);
-
-    @Override
-    public void start() {
-        //no-op
-    }
 
     @Override
     public void close() {

@@ -77,12 +77,14 @@ public class DeclarationImpl<T> implements Declaration<T> {
 
     @Override
     public DeclarationImpl<T> setValue(final T that) {
+        this.cache = null;
         this.value = that;
         return this;
     }
 
     @Override
     public Declaration<T> setValueClass(final Class<? extends T> that) {
+        this.cache = null;
         this.valueClass = that;
         return this;
     }
@@ -130,13 +132,13 @@ public class DeclarationImpl<T> implements Declaration<T> {
     }
 
     @Override
-    public DeclarationImpl<T> setRef(final String ref) {
+    public DeclarationImpl<T> setRef(final String that) {
         this.cache = null;
-        this.ref = ref;
+        this.ref = that;
         return this;
     }
 
-    public T get(final Dependencies dependencies, final ArtifactLoader loader) {
+    public T get(final Dependencies dependencies, final ArtifactLoader artifactLoader) {
         if (cache != null) {
             return cache;
         }
@@ -159,13 +161,13 @@ public class DeclarationImpl<T> implements Declaration<T> {
                     throw new UnresolvableResourceException(); //TODO Message
                 }
                 try {
-                    final Factory<? extends T> factory = loader.load(ref, factoryInterface, classLoader);
+                    final Factory<? extends T> factory = artifactLoader.load(ref, factoryInterface, classLoader);
                     if (factory == null) {
                         throw new UnresolvableResourceException("No configuration found for node with name=" + name + ",clazz=" + valueInterface.getSimpleName()); //TODO
                     }
                     return cache = factory.produce(dependencies, properties);
                 } catch (final ArtifactOfWrongTypeException e) {
-                    return cache = loader.load(ref, valueInterface, classLoader);
+                    return cache = artifactLoader.load(ref, valueInterface, classLoader);
                 }
             } else if (defaultFactory != null) {
                 return cache = defaultFactory.produce(dependencies, properties);

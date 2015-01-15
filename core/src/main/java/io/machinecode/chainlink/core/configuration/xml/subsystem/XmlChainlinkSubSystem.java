@@ -47,7 +47,7 @@ public class XmlChainlinkSubSystem extends XmlScope {
         if (this.ref != null) {
             final SubSystemConfiguration configuration;
             try {
-                configuration = model.getArtifactLoader().load(this.ref, SubSystemConfiguration.class, classLoader);
+                configuration = model.getConfigurationArtifactLoader().load(this.ref, SubSystemConfiguration.class, classLoader);
             } catch (final Exception e) {
                 throw new ConfigurationException("attribute 'ref' must be an injectable " + SubSystemConfiguration.class.getName(), e); //TODO Message
             }

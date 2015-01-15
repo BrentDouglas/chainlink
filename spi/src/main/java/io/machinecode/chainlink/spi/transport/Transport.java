@@ -35,6 +35,10 @@ public interface Transport<A> extends Lifecycle {
 
     boolean hasWorker(final long jobExecutionId, final ExecutableId executableId);
 
+    void registerWorker(final Worker worker);
+
+    void unregisterWorker(final Worker worker);
+
     WorkerId leastBusyWorker();
 
     ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id);

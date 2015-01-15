@@ -3,6 +3,7 @@ package io.machinecode.chainlink.ee.wildfly.configuration;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
+import io.machinecode.chainlink.core.transaction.ReferenceTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.marshalling.jboss.JbossMarshallingFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
@@ -10,7 +11,6 @@ import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
-import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 
 import javax.transaction.TransactionManager;
 import java.lang.ref.WeakReference;
@@ -38,12 +38,7 @@ public class WildFlyConfigurationDefaults implements JobOperatorConfiguration {
                 return loader.get();
             }
         });
-        model.getTransactionManager().setDefaultFactory(new TransactionManagerFactory() {
-            @Override
-            public TransactionManager produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return transactionManager;
-            }
-        });
+        model.getTransactionManager().setDefaultFactory(new ReferenceTransactionManagerFactory(transactionManager));
         model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
         model.getMarshalling().setDefaultFactory(new JbossMarshallingFactory());
         model.getMBeanServer().setDefaultFactory(new PlatformMBeanServerFactory());

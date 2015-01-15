@@ -1,13 +1,17 @@
 package io.machinecode.chainlink.ee.wildfly.service;
 
 import io.machinecode.chainlink.core.configuration.DeclarationImpl;
+import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
+import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.ee.wildfly.WildFlyConstants;
 import io.machinecode.chainlink.ee.wildfly.WildFlyEnvironment;
 import io.machinecode.chainlink.ee.wildfly.configuration.WildFlyConfigurationDefaults;
+import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
@@ -18,7 +22,9 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
+import javax.enterprise.inject.spi.BeanManager;
 import javax.transaction.TransactionManager;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -42,6 +48,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
     private final InjectedValue<WildFlyEnvironment> environment = new InjectedValue<>();
     private final InjectedValue<TransactionManager> transactionManager = new InjectedValue<>();
     private final InjectedValue<SubSystemModelImpl> scope = new InjectedValue<>();
+    private final InjectedValue<BeanManager> beanManager = new InjectedValue<>();
 
     public JobOperatorService(final ServiceName module, final ClassLoader loader, final String name, final boolean global, final ModelNode model) {
         this.module = module;
@@ -54,61 +61,85 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
     @Override
     public void start(final StartContext context) throws StartException {
         try {
-            final ScopeModelImpl scope = global
-                    ? this.scope.getValue()
-                    : this.scope.getValue().getDeployment();
-            final JobOperatorModelImpl op = scope.getJobOperator(name);
+            final ClassLoader classLoader = loader.get();
+            if (classLoader == null) {
+                throw new StartException(); //TODO Message
+            }
+            final DeploymentModelImpl deployment;
+            final ScopeModelImpl scope;
+            if (!global) {
+                scope = deployment = this.scope.getValue().getDeployment();
+            } else {
+                scope = this.scope.getValue();
+                deployment = null;
+            }
+            final JobOperatorModelImpl operator = scope.getJobOperator(name);
 
-            //TODO Need to look at this
-            op.getClassLoader()
-                    .setRef(nodeToString(model, WildFlyConstants.CLASS_LOADER, WildFlyConstants.REF));
-            op.getExecutor()
-                    .setRef(nodeToString(model, WildFlyConstants.EXECUTOR, WildFlyConstants.REF));
-            op.getTransport()
-                    .setRef(nodeToString(model, WildFlyConstants.TRANSPORT, WildFlyConstants.REF));
-            op.getRegistry()
-                    .setRef(nodeToString(model, WildFlyConstants.REGISTRY, WildFlyConstants.REF));
-            op.getMarshalling()
-                    .setRef(nodeToString(model, WildFlyConstants.MARSHALLING, WildFlyConstants.REF));
-            op.getExecutionRepository()
-                    .setRef(nodeToString(model, WildFlyConstants.EXECUTION_REPOSITORY, WildFlyConstants.REF));
-            op.getTransactionManager()
-                    .setRef(nodeToString(model, WildFlyConstants.TRANSACTION_MANAGER, WildFlyConstants.REF));
-            op.getMBeanServer()
-                    .setRef(nodeToString(model, WildFlyConstants.MBEAN_SERVER, WildFlyConstants.REF));
+            set(operator.getClassLoader(), nodeToString(model, WildFlyConstants.CLASS_LOADER, WildFlyConstants.REF));
+            set(operator.getExecutor(), nodeToString(model, WildFlyConstants.EXECUTOR, WildFlyConstants.REF));
+            set(operator.getTransport(), nodeToString(model, WildFlyConstants.TRANSPORT, WildFlyConstants.REF));
+            set(operator.getRegistry(), nodeToString(model, WildFlyConstants.REGISTRY, WildFlyConstants.REF));
+            set(operator.getMarshalling(), nodeToString(model, WildFlyConstants.MARSHALLING, WildFlyConstants.REF));
+            set(operator.getExecutionRepository(), nodeToString(model, WildFlyConstants.EXECUTION_REPOSITORY, WildFlyConstants.REF));
+            set(operator.getTransactionManager(), nodeToString(model, WildFlyConstants.TRANSACTION_MANAGER, WildFlyConstants.REF));
+            final String mBeanServer = nodeToString(model, WildFlyConstants.MBEAN_SERVER, WildFlyConstants.REF);
+            if (mBeanServer != null) {
+                operator.getMBeanServer().setRef(mBeanServer);
+            }
             addListNode(model.get(WildFlyConstants.JOB_LOADER), new Target() {
                 @Override
                 public DeclarationImpl target(final String name) {
-                    return op.getJobLoader(name);
+                    return operator.getJobLoader(name);
                 }
             });
             addListNode(model.get(WildFlyConstants.ARTIFACT_LOADER), new Target() {
                 @Override
                 public DeclarationImpl target(final String name) {
-                    return op.getArtifactLoader(name);
+                    return operator.getArtifactLoader(name);
                 }
             });
             addListNode(model.get(WildFlyConstants.INJECTOR), new Target() {
                 @Override
                 public DeclarationImpl target(final String name) {
-                    return op.getInjector(name);
+                    return operator.getInjector(name);
                 }
             });
             addListNode(model.get(WildFlyConstants.SECURITY), new Target() {
                 @Override
                 public DeclarationImpl target(final String name) {
-                    return op.getSecurity(name);
+                    return operator.getSecurity(name);
                 }
             });
 
             new WildFlyConfigurationDefaults(loader, transactionManager.getValue())
-                    .configureJobOperator(op);
+                    .configureJobOperator(operator);
 
-            operator = op.createJobOperator();
-            environment.getValue().addOperator(module, name, loader.get(), operator);
+            final ArtifactLoader art = new WildFlyArtifactLoader(beanManager.getOptionalValue());
+
+            if (!global) {
+                final DeploymentModelImpl dep = deployment.copy(classLoader);
+                final JobOperatorModelImpl op = dep.getJobOperator(name);
+                final String chainlinkXml = System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
+                final InputStream stream = classLoader.getResourceAsStream(chainlinkXml);
+                if (stream != null) {
+                    XmlChainlink.configureDeploymentFromStream(dep, classLoader, stream);
+                }
+                this.operator = op.createAndOpenJobOperator(art);
+                environment.getValue().addOperator(module, name, loader.get(), this.operator);
+            } else {
+                this.operator = operator.createAndOpenJobOperator(art);
+                environment.getValue().addOperator(module, name, loader.get(), this.operator);
+            }
         } catch (final Exception e) {
             throw new StartException(e);
         }
+    }
+
+    private static void set(final DeclarationImpl<?> dec, final String ref) {
+        if (ref == null || ref.isEmpty()) {
+            return;
+        }
+        dec.setRef(ref);
     }
 
     @Override
@@ -143,6 +174,10 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
 
     public InjectedValue<SubSystemModelImpl> getScope() {
         return scope;
+    }
+
+    public InjectedValue<BeanManager> getBeanManager() {
+        return beanManager;
     }
 
     static String nodeToString(ModelNode node, final String... path) {

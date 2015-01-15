@@ -18,6 +18,8 @@
         <marshalling.factory.class>io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory</marshalling.factory.class>
 
         <container.debug>false</container.debug>
+        <wildfly.opts>-server</wildfly.opts> <!-- Need to have something here for arquillian to handle it properly -->
+        <glassfish.opts> </glassfish.opts>
     </properties>
 
     <dependencies>
@@ -177,6 +179,8 @@
             </activation>
             <properties>
                 <container.debug>true</container.debug>
+                <wildfly.opts>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.opts>
+                <glassfish.opts>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</glassfish.opts>
             </properties>
         </profile>
     </profiles>

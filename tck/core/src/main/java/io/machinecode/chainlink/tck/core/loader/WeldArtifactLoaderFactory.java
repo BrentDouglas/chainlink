@@ -13,10 +13,10 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class CdiArtifactLoaderFactory implements ArtifactLoaderFactory {
+public class WeldArtifactLoaderFactory implements ArtifactLoaderFactory {
 
-    public static final Weld weld;
-    public static final WeldContainer container;
+    private static final Weld weld;
+    private static final WeldContainer container;
 
     static {
         weld = new Weld();
@@ -31,6 +31,6 @@ public class CdiArtifactLoaderFactory implements ArtifactLoaderFactory {
 
     @Override
     public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) {
-        return CdiArtifactLoader.inject(container.getBeanManager(), CdiArtifactLoader.class);
+        return new CdiArtifactLoader(container.getBeanManager());
     }
 }
