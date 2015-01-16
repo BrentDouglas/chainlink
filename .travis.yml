@@ -9,6 +9,7 @@ jdk:
 env:
   global:
     - MAVEN_OPTS="-Xms512m -Xmx512m"
+    - JAVA_OPTS="-Xms512m -Xmx512m"
   matrix:
     # Integration tests
     - BUILD_ARGS="-T -l -d h2"
@@ -18,23 +19,25 @@ env:
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c se"
     - BUILD_ARGS="-I -t local      -i spring -r memory     -c se"
     - BUILD_ARGS="-I -t infinispan -i batch  -r memory     -c se"
+    - BUILD_ARGS="-I -t gridgain   -i batch  -r memory     -c se"
+    - BUILD_ARGS="-I -t hazelcast  -i batch  -r memory     -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c se"
-    #- BUILD_ARGS="-I -t local      -i batch  -r gridgain   -c se" # Currently both fail StepExecutionTests.testStepInFlowInSplitStepExecution
-    #- BUILD_ARGS="-I -t local      -i batch  -r hazelcast  -c se"
+    - BUILD_ARGS="-I -t local      -i batch  -r gridgain   -c se"
+    - BUILD_ARGS="-I -t local      -i batch  -r hazelcast  -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r ehcache    -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se -d postgresql"
     - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se -d postgresql"
     - BUILD_ARGS="-I -t local      -i batch  -r redis      -c se"
-    #- BUILD_ARGS="-I -t local      -i batch  -r mongo      -c se" # Broken for a number of tests
+    - BUILD_ARGS="-I -t local      -i batch  -r mongo      -c se"
     # TCK EE
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c glassfish"
-    # - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c glassfish" # Need to majic OSGI deps in inject-cdi module somehow
+    # - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c glassfish" #  This is failing two of the TransactionTests. Need to investigate.
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c tomee"
-    #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee" # Also needs access to inject-cdi module
+    - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee"
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
-    #- BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly" # Need a factory that doesn't try to start weld
+    - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly"
 
 services:
   - mongodb
@@ -51,5 +54,5 @@ script: ./testsuite ${BUILD_ARGS}
 
 after_failure:
   - if [ -e tck/glassfish/target/glassfish4/glassfish/domains/domain1/logs/server.log ]; then cat tck/glassfish/target/glassfish4/glassfish/domains/domain1/logs/server.log; fi
-  - if [ -e tck/se/target/chainlinkd/*/log/console*.log ]; then cat tck/se/target/chainlinkd/*/log/console*.log
+  - if [ -e tck/se/target/chainlinkd/*/log/console*.log ]; then cat tck/se/target/chainlinkd/*/log/console*.log; fi
 
