@@ -40,9 +40,13 @@ public class XmlProperty {
 
     public static Properties convert(final List<XmlProperty> properties) {
         final Properties ret = new Properties();
-        for (final XmlProperty property : properties) {
-            ret.put(property.getName(), property.getValue());
-        }
+        convert(properties, ret);
         return ret;
+    }
+
+    public static void convert(final List<XmlProperty> properties, final Properties target) {
+        for (final XmlProperty property : properties) {
+            target.setProperty(property.getName(), property.getValue());
+        }
     }
 }

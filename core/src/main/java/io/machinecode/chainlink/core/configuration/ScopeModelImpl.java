@@ -9,6 +9,7 @@ import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -123,8 +124,9 @@ public class ScopeModelImpl implements ScopeModel {
             System.arraycopy(pal, 0, this._artifactLoaders, 0, pal.length);
             i = pal.length;
         }
+        final Properties properties = new Properties();
         for (final DeclarationImpl<ArtifactLoader> dec : this.artifactLoaders.values()) {
-            this._artifactLoaders[i++] = dec.get(_dependencies, init);
+            this._artifactLoaders[i++] = dec.get(_dependencies, properties, init);
         }
         return this._artifactLoaders;
     }

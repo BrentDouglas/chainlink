@@ -48,6 +48,7 @@ public class ConfigurationImpl implements Configuration {
     protected final Properties properties;
 
     public ConfigurationImpl(final JobOperatorModelImpl model, final ArtifactLoader loader) throws Exception {
+        this.properties = model.getProperties();
         this.classLoader = nn(model.classLoader, loader);
         this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, _array(ArtifactLoader.class, model.artifactLoaders.values(), loader));
         this.transactionManager = nn(model.transactionManager, loader);
@@ -61,18 +62,17 @@ public class ConfigurationImpl implements Configuration {
         this.transport = nn(model.transport, loader);
         this.executionRepository = nn(model.executionRepository, loader);
         this.executor = nn(model.executor, loader);
-        this.properties = model.getProperties();
     }
 
     private <T> T n(final DeclarationImpl<T> dec, final ArtifactLoader loader) {
-        return dec == null ? null : dec.get(this, loader);
+        return dec == null ? null : dec.get(this, this.properties, loader);
     }
 
     private <T> T nn(final DeclarationImpl<T> dec, final ArtifactLoader loader) {
         if (dec == null) {
             throw new ConfigurationException(); //TODO Message
         }
-        return dec.get(this, loader);
+        return dec.get(this, this.properties, loader);
     }
 
     private <T> T[] _array(final Class<T> clazz, final Collection<DeclarationImpl<T>> values, final ArtifactLoader loader) {
@@ -80,7 +80,7 @@ public class ConfigurationImpl implements Configuration {
         final T[] ret = (T[])Array.newInstance(clazz, values.size());
         int i = 0;
         for (final DeclarationImpl<T> that : values) {
-            ret[i++] = that.get(this, loader);
+            ret[i++] = that.get(this, this.properties, loader);
         }
         return ret;
     }

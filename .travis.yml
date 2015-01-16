@@ -38,6 +38,7 @@ env:
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee"
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly"
+    - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c wildfly"
 
 services:
   - mongodb

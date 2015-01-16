@@ -1,7 +1,9 @@
 package io.machinecode.chainlink.core.management;
 
+import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.element.Job;
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.then.api.Promise;
@@ -25,34 +27,45 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Calls open on the first component invocation which some factories may require.
+ * Calls open on the first component invocation which some factories may
+ * require.
  *
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public class LazyJobOperator implements ExtendedJobOperator {
 
-    final JobOperatorImpl delegate;
-    private transient Configuration configuration;
+    private JobOperatorImpl delegate;
+    private JobOperatorModelImpl model;
+    private ArtifactLoader loader;
 
-    public LazyJobOperator(final JobOperatorImpl delegate) {
-        this.delegate = delegate;
+    public LazyJobOperator(final JobOperatorModelImpl model) {
+        this(model, null);
+    }
+
+    public LazyJobOperator(final JobOperatorModelImpl model, final ArtifactLoader loader) {
+        this.model = model;
+        this.loader = loader;
     }
 
     synchronized void lazyOpen() {
-        if (configuration != null) {
+        if (delegate != null) {
             try {
-                delegate.open(configuration);
+                delegate = loader == null
+                        ? model.createJobOperator()
+                        : model.createJobOperator(loader);
             } catch (final Exception e) {
                 throw new BatchRuntimeException(e);
+            } finally {
+                this.model = null;
+                this.loader = null;
             }
-            this.configuration = null;
         }
     }
 
     @Override
-    public synchronized void open(final Configuration configuration) throws Exception {
-        this.configuration = configuration;
+    public void open(final Configuration configuration) throws Exception {
+        throw new IllegalStateException(); //TODO Message
     }
 
     @Override

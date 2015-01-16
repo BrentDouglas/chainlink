@@ -124,7 +124,7 @@ public class TomEEEnvironment implements Environment {
             }
             app.ops.put(
                     entry.getKey(),
-                    jobOperatorModel.createAndOpenJobOperator()
+                    jobOperatorModel.createJobOperator()
             );
         }
         if (!haveDefault) {
@@ -132,7 +132,7 @@ public class TomEEEnvironment implements Environment {
             defaults.configureJobOperator(defaultModel);
             app.ops.put(
                     Constants.DEFAULT_CONFIGURATION,
-                    defaultModel.createAndOpenJobOperator()
+                    defaultModel.createJobOperator()
             );
         }
     }

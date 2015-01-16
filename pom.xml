@@ -90,7 +90,7 @@
         <version.org.jboss.marshalling.jboss-marshalling>1.4.10.Final</version.org.jboss.marshalling.jboss-marshalling>
         <version.org.jboss.seam.jboss-seam>2.2.2.Final</version.org.jboss.seam.jboss-seam>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>1.0.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec>
-        <version.org.jboss.weld.se.weld-se>2.1.0.Final</version.org.jboss.weld.se.weld-se>
+        <version.org.jboss.weld.se.weld-se>2.2.2.Final</version.org.jboss.weld.se.weld-se>
         <version.org.jboss.spec.jboss-javaee-6.0>2.0.0.Final</version.org.jboss.spec.jboss-javaee-6.0>
         <version.org.jgroups.jgroups>3.6.1.Final</version.org.jgroups.jgroups>
         <version.org.jongo.jongo>1.1</version.org.jongo.jongo>

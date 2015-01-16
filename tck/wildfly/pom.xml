@@ -19,6 +19,7 @@
         <cdi.artifact.loader.factory.class>io.machinecode.chainlink.inject.cdi.CdiArtifactLoaderFactory</cdi.artifact.loader.factory.class>
 
         <thread.factory.jndi.name>java:jboss/ee/concurrency/factory/default</thread.factory.jndi.name>
+        <cache.manager.jndi.name>java:jboss/infinispan/container/chainlink</cache.manager.jndi.name>
     </properties>
 
     <dependencies>
@@ -173,6 +174,63 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>re-infinispan</id>
+            <activation>
+                <property><name>re-infinispan</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <execution.repository.factory.class>io.machinecode.chainlink.repository.infinispan.JndiInfinispanExecutionRepositoryFactory</execution.repository.factory.class>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                                <manifestEntries>
+                                    <Dependencies>
+                                        io.machinecode.chainlink.repository.infinispan,
+                                        javaee.api,
+                                        org.infinispan
+                                    </Dependencies>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>tr-infinispan</id>
+            <activation>
+                <property><name>tr-infinispan</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                                <manifestEntries>
+                                    <Dependencies>
+                                        io.machinecode.chainlink.transport.infinispan,
+                                        javax.transaction.api,
+                                        org.infinispan
+                                    </Dependencies>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <build>
@@ -227,6 +285,8 @@
                                         <filter token="registry.factory.class" value="${registry.factory.class}" />
                                         <filter token="mbean.server.factory.class" value="${mbean.server.factory.class}" />
                                         <filter token="marshalling.factory.class" value="${marshalling.factory.class}" />
+
+                                        <filter token="cache.manager.jndi.name" value="${cache.manager.jndi.name}" />
                                     </filterset>
                                 </copy>
                             </target>

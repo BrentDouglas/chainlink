@@ -95,7 +95,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
             if (Constants.DEFAULT_CONFIGURATION.equals(entry.getKey())) {
                 haveDefault = true;
             }
-            final LazyJobOperator op = new LazyJobOperator(jobOperatorModel.createJobOperator());
+            final LazyJobOperator op = new LazyJobOperator(jobOperatorModel);
             op.open(jobOperatorModel.getConfiguration());
             app.ops.put(
                     entry.getKey(),
@@ -105,7 +105,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
         if (!haveDefault) {
             final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT_CONFIGURATION);
             defaults.configureJobOperator(defaultModel);
-            final LazyJobOperator op = new LazyJobOperator(defaultModel.createJobOperator());
+            final LazyJobOperator op = new LazyJobOperator(defaultModel);
             op.open(defaultModel.getConfiguration());
             app.ops.put(
                     Constants.DEFAULT_CONFIGURATION,

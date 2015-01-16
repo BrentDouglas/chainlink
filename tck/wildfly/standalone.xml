@@ -84,7 +84,9 @@
     <profile>
         <subsystem xmlns="urn:jboss:domain:chainlink:1.0">
             <deployment>
-                <job-operator name="default"/>
+                <job-operator name="default">
+                    <property name="io.machinecode.chainlink.infinispan.cache_manager.jndi_name" value="@cache.manager.jndi.name@"/>
+                </job-operator>
             </deployment>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:logging:3.0">
@@ -212,6 +214,44 @@
             <buffer-pool name="default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:infinispan:3.0">
+            <cache-container name="chainlink" default-cache="default" module="io.machinecode.chainlink.repository.infinispan" start="EAGER">
+                <local-cache name="default">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.ids">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobInstances">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobExecutions">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.stepExecutions">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.partitionExecutions">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobInstanceExecutions">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobExecutionInstances">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobExecutionStepExecutions">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.latestJobExecutionForInstance">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.stepExecutionPartitionExecutions">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobExecutionHistory">
+                    <transaction mode="BATCH" locking="PESSIMISTIC"/>
+                </local-cache>
+            </cache-container>
             <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
                 <local-cache name="default">
                     <transaction mode="BATCH"/>

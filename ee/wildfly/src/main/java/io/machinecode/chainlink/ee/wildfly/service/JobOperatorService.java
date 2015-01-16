@@ -110,12 +110,14 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
                     return operator.getSecurity(name);
                 }
             });
+            addProperties(model.get(WildFlyConstants.PROPERTY), operator);
 
             new WildFlyConfigurationDefaults(loader, transactionManager.getValue())
                     .configureJobOperator(operator);
 
             final ArtifactLoader art = new WildFlyArtifactLoader(beanManager.getOptionalValue());
 
+            final JobOperatorModelImpl model;
             if (!global) {
                 final DeploymentModelImpl dep = deployment.copy(classLoader);
                 final JobOperatorModelImpl op = dep.getJobOperator(name);
@@ -124,12 +126,19 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
                 if (stream != null) {
                     XmlChainlink.configureDeploymentFromStream(dep, classLoader, stream);
                 }
-                this.operator = op.createAndOpenJobOperator(art);
-                environment.getValue().addOperator(module, name, loader.get(), this.operator);
+                model = op;
             } else {
-                this.operator = operator.createAndOpenJobOperator(art);
-                environment.getValue().addOperator(module, name, loader.get(), this.operator);
+                model = operator;
             }
+            final Thread thread = Thread.currentThread();
+            final ClassLoader tccl = thread.getContextClassLoader();
+            thread.setContextClassLoader(classLoader);
+            try {
+                this.operator = model.createJobOperator(art);
+            } finally {
+                thread.setContextClassLoader(tccl);
+            }
+            environment.getValue().addOperator(module, name, loader.get(), this.operator);
         } catch (final Exception e) {
             throw new StartException(e);
         }
@@ -207,7 +216,23 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
             }
             target.target(name.asString()).setRef(nodeToString(node.get(WildFlyConstants.REF)));
         }
+    }
 
+    static void addProperties(final ModelNode root, final JobOperatorModelImpl operator) {
+        if (!root.isDefined()) {
+            return;
+        }
+        final List<ModelNode> nodes = root.asList();
+        if (nodes == null || nodes.isEmpty()) {
+            return;
+        }
+        for (final ModelNode node : nodes) {
+            final ModelNode name = node.get(WildFlyConstants.NAME);
+            if (!name.isDefined()) {
+                throw new IllegalStateException(); //TODO Message
+            }
+            operator.getProperties().setProperty(name.asString(), node.get(WildFlyConstants.VALUE).asString());
+        }
     }
 
     private interface Target {

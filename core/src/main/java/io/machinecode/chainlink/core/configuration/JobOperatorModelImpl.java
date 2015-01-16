@@ -237,14 +237,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
                 : this.properties;
     }
 
-    public JobOperatorImpl createAndOpenJobOperator() throws Exception {
-        final ConfigurationImpl configuration = scope.getConfiguration(name);
-        final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
-        op.open(configuration);
-        return op;
-    }
-
-    public JobOperatorImpl createAndOpenJobOperator(final ArtifactLoader loader) throws Exception {
+    public JobOperatorImpl createJobOperator(final ArtifactLoader loader) throws Exception {
         final ConfigurationImpl configuration = scope.getConfiguration(name, loader);
         final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
         op.open(configuration);
@@ -253,7 +246,9 @@ public class JobOperatorModelImpl implements JobOperatorModel {
 
     public JobOperatorImpl createJobOperator() throws Exception {
         final ConfigurationImpl configuration = scope.getConfiguration(name);
-        return new JobOperatorImpl(configuration, getProperties());
+        final JobOperatorImpl op = new JobOperatorImpl(configuration, getProperties());
+        op.open(configuration);
+        return op;
     }
 
     public ConfigurationImpl getConfiguration() throws Exception {

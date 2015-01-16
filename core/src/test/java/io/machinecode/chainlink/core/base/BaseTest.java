@@ -60,11 +60,11 @@ public abstract class BaseTest extends Assert {
             this._configuration = deployment.getConfiguration(Constants.DEFAULT_CONFIGURATION);
 
             final ArtifactLoader loader = new ConfigurationArtifactLoader();
-            this._transactionManager = op.getTransactionManager().get(_configuration, loader);
-            this._registry = op.getRegistry().get(_configuration, loader);
-            this._repository = op.getExecutionRepository().get(_configuration, loader);
-            this._marshalling = op.getMarshalling().get(_configuration, loader);
-            this._executor = op.getExecutor().get(_configuration, loader);
+            this._transactionManager = op.getTransactionManager().get(_configuration, op.getProperties(), loader);
+            this._registry = op.getRegistry().get(_configuration, op.getProperties(), loader);
+            this._repository = op.getExecutionRepository().get(_configuration, op.getProperties(), loader);
+            this._marshalling = op.getMarshalling().get(_configuration, op.getProperties(), loader);
+            this._executor = op.getExecutor().get(_configuration, op.getProperties(), loader);
             // Make sure any factories get called
             op.getConfiguration();
         }

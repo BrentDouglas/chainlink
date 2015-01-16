@@ -10,10 +10,7 @@
     <dependencies>
         <module name="io.machinecode.then"/>
         <module name="gnu.trove"/>
-        <module name="javax.api"/>
         <module name="javaee.api"/>
-        <module name="javax.enterprise.api"/>
-        <module name="javax.transaction.api"/>
         <module name="org.jboss.as.controller"/>
         <module name="org.jboss.as.ee"/>
         <module name="org.jboss.as.server"/>

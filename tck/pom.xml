@@ -868,6 +868,7 @@
                                             <filter token="marshalling.factory.class" value="${marshalling.factory.class}" />
                                             <filter token="thread.factory.jndi.name" value="${thread.factory.jndi.name}" />
                                             <filter token="transaction.manager.jndi.name" value="${transaction.manager.jndi.name}" />
+                                            <filter token="cache.manager.jndi.name" value="${cache.manager.jndi.name}" />
                                         </filterset>
                                     </copy>
                                 </target>

@@ -22,6 +22,7 @@
         <property name="io.machinecode.chainlink.transaction_manager.jndi_name" value="@transaction.manager.jndi.name@"/>
         -->
         <property name="io.machinecode.chainlink.executor.thread_factory.jndi_name" value="@thread.factory.jndi.name@"/>
+        <property name="io.machinecode.chainlink.infinispan.cache_manager.jndi_name" value="@cache.manager.jndi.name@"/>
     </job-operator>
 
 </chainlink>

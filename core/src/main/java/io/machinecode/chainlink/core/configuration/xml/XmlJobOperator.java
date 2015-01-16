@@ -14,7 +14,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
@@ -208,54 +207,43 @@ public class XmlJobOperator {
 
     public void configureScope(final ScopeModelImpl scope, final ClassLoader classLoader) throws Exception {
         //TODO Do these need to get inserted into the model?
-        final Properties properties = XmlProperty.convert(this.properties);
         final JobOperatorModel model = scope.getJobOperator(this.name);
 
+        XmlProperty.convert(this.properties, model.getProperties());
+
         set(model.getExecutor()
-                .setName(name(this.executor, JobOperatorModelImpl.EXECUTOR))
-                .setProperties(properties), ref(this.executor));
+                .setName(name(this.executor, JobOperatorModelImpl.EXECUTOR)), ref(this.executor));
         set(model.getTransport()
-                .setName(name(this.transport, JobOperatorModelImpl.TRANSPORT))
-                .setProperties(properties), ref(this.transport));
+                .setName(name(this.transport, JobOperatorModelImpl.TRANSPORT)), ref(this.transport));
         set(model.getMarshalling()
-                .setName(name(this.marshalling, JobOperatorModelImpl.MARSHALLING))
-                .setProperties(properties), ref(this.marshalling));
+                .setName(name(this.marshalling, JobOperatorModelImpl.MARSHALLING)), ref(this.marshalling));
         set(model.getRegistry()
-                .setName(name(this.registry, JobOperatorModelImpl.REGISTRY))
-                .setProperties(properties), ref(this.registry));
+                .setName(name(this.registry, JobOperatorModelImpl.REGISTRY)), ref(this.registry));
         if (this.mBeanServer != null) {
             model.getMBeanServer() //This is nullable, calling getMBeanServer() will add it to the model
                     .setName(name(this.mBeanServer, JobOperatorModelImpl.MBEAN_SERVER))
-                    .setProperties(properties)
                     .setRef(ref(this.mBeanServer));
         }
         set(model.getExecutionRepository()
-                .setName(name(this.executionRepository, JobOperatorModelImpl.EXECUTION_REPOSITORY))
-                .setProperties(properties), ref(this.executionRepository));
+                .setName(name(this.executionRepository, JobOperatorModelImpl.EXECUTION_REPOSITORY)), ref(this.executionRepository));
         set(model.getClassLoader()
-                .setName(name(this.classLoader, JobOperatorModelImpl.CLASS_LOADER))
-                .setProperties(properties), ref(this.classLoader));
+                .setName(name(this.classLoader, JobOperatorModelImpl.CLASS_LOADER)), ref(this.classLoader));
         set(model.getTransactionManager()
-                .setName(name(this.transactionManager, JobOperatorModelImpl.TRANSACTION_MANAGER))
-                .setProperties(properties), ref(this.transactionManager));
+                .setName(name(this.transactionManager, JobOperatorModelImpl.TRANSACTION_MANAGER)), ref(this.transactionManager));
         for (final XmlDeclaration resource : this.jobLoader) {
             model.getJobLoader(resource.getName())
-                    .setProperties(properties)
                     .setRef(ref(resource));
         }
         for (final XmlDeclaration resource : this.artifactLoader) {
             model.getArtifactLoader(resource.getName())
-                    .setProperties(properties)
                     .setRef(ref(resource));
         }
         for (final XmlDeclaration resource : this.injector) {
             model.getInjector(resource.getName())
-                    .setProperties(properties)
                     .setRef(ref(resource));
         }
         for (final XmlDeclaration resource : this.security) {
             model.getSecurity(resource.getName())
-                    .setProperties(properties)
                     .setRef(ref(resource));
         }
         if (this.ref != null) {

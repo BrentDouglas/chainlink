@@ -56,8 +56,7 @@ public class InfinispanExecutionRepositoryFactory implements ExecutionRepository
                                 .cacheMode(CacheMode.LOCAL)
                                 .sync()
                                 .build()
-                ),
-                dependencies.getTransactionManager()
+                )
         );
     }
 }

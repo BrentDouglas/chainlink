@@ -60,12 +60,10 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
     protected final DistributedExecutorService jobExecutionExecutor;
 
     protected final EmbeddedCacheManager cacheManager;
-    protected final TransactionManager transactionManager;
 
-    public InfinispanExecutionRepository(final Marshalling marshalling, final EmbeddedCacheManager cacheManager, final TransactionManager transactionManager) {
+    public InfinispanExecutionRepository(final Marshalling marshalling, final EmbeddedCacheManager cacheManager) {
         super(marshalling);
         this.cacheManager = cacheManager;
-        this.transactionManager = transactionManager;
 
         this.ids = _cache(cacheManager, IDS);
         this.jobInstances = _cache(cacheManager, JOB_INSTANCES);
@@ -81,11 +79,13 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
 
         this.jobInstanceExecutor = new DefaultExecutorService(jobInstances);
         this.jobExecutionExecutor = new DefaultExecutorService(jobExecutions);
+    }
 
-        final TransactionConfiguration transactionConfiguration = cacheManager.getDefaultCacheConfiguration().transaction();
-        if (transactionConfiguration.lockingMode() != LockingMode.PESSIMISTIC
-                || !transactionConfiguration.transactionMode().isTransactional()) {
-            throw new IllegalStateException("EmbeddedCacheManager must be transactional with pessimistic locking."); //TODO Message
+    private static void assertConfig(final Cache<?,?> cache) {
+        final TransactionConfiguration tr = cache.getCacheConfiguration().transaction();
+        if (tr.lockingMode() != LockingMode.PESSIMISTIC
+                || !tr.transactionMode().isTransactional()) {
+            throw new IllegalStateException("Cache " + cache.getName() + " must be transactional with pessimistic locking."); //TODO Message
         }
     }
 
@@ -101,6 +101,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
                 throw new RuntimeException(e);
             }
         }
+        assertConfig(cache);
         return cache.getAdvancedCache();
     }
 
@@ -162,6 +163,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
 
     @Override
     protected long _id(final String key) throws Exception {
+        final TransactionManager transactionManager = ids.getTransactionManager();
         transactionManager.begin();
         try {
             final long id;

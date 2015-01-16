@@ -67,8 +67,7 @@ public class InfinispanRepositoryTest extends RepositoryTest {
                                         .cacheMode(CacheMode.LOCAL)
                                         .sync()
                                         .build()
-                        ),
-                        dependencies.getTransactionManager()
+                        )
                 );
             }
         });

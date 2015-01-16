@@ -24,7 +24,6 @@ public class DeclarationImpl<T> implements Declaration<T> {
     final Class<? extends T> valueInterface;
     final Class<? extends Factory<? extends T>> factoryInterface;
     String name;
-    Properties properties;
     T value;
     Factory<? extends T> defaultFactory;
     Factory<? extends T> factory;
@@ -52,7 +51,6 @@ public class DeclarationImpl<T> implements Declaration<T> {
     private DeclarationImpl(final DeclarationImpl<T> that, final Set<String> names, final Map<String, DeclarationImpl<?>> owner) {
         this(that.loader, names, owner, that.valueInterface, that.factoryInterface);
         this.name = that.name;
-        this.properties = new Properties(that.properties);
         this.value = that.value;
         this.defaultFactory = that.defaultFactory;
         this.factory = that.factory;
@@ -67,12 +65,6 @@ public class DeclarationImpl<T> implements Declaration<T> {
 
     boolean is(final Class<?> type) {
         return valueInterface.isAssignableFrom(type);
-    }
-
-    @Override
-    public DeclarationImpl<T> setProperties(final Properties properties) {
-        this.properties = properties;
-        return this;
     }
 
     @Override
@@ -138,16 +130,13 @@ public class DeclarationImpl<T> implements Declaration<T> {
         return this;
     }
 
-    public T get(final Dependencies dependencies, final ArtifactLoader artifactLoader) {
+    public T get(final Dependencies dependencies, final Properties properties, final ArtifactLoader artifactLoader) {
         if (cache != null) {
             return cache;
         }
         if (value != null) {
             return cache = value;
         }
-        final Properties properties = this.properties == null
-                ? new Properties()
-                : this.properties;
         try {
             if (valueClass != null) {
                 return cache = valueClass.newInstance();
