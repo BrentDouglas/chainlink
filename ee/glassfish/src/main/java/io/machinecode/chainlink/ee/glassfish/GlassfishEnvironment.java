@@ -3,21 +3,23 @@ package io.machinecode.chainlink.ee.glassfish;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
-import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
 import io.machinecode.chainlink.core.management.LazyJobOperator;
+import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishConfiguration;
+import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishSubSystem;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.glassfish.internal.data.ApplicationInfo;
 
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -28,9 +30,26 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
     private SubSystemModelImpl model;
     private final ThreadFactoryLookup threadFactory;
+    private Lock lock = new ReentrantLock();
 
     public GlassfishEnvironment(final ThreadFactoryLookup threadFactory) {
         this.threadFactory = threadFactory;
+    }
+
+    public void reload(final GlassfishSubSystem subSystem) throws Exception {
+        lock.lock();
+        try {
+            if (this.model == null) {
+                throw new IllegalStateException();
+            }
+            final ClassLoader loader = this.model.getClassLoader();
+            final SubSystemModelImpl model = new SubSystemModelImpl(loader);
+            GlassfishConfiguration.configureSubSystem(model, subSystem, loader);
+            //TODO This now need to reload operators
+            this.model = model;
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -59,19 +78,27 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
         return Collections.emptyMap();
     }
 
-    public void addSubsystem(final ClassLoader loader) throws Exception {
-        this.model = new SubSystemModelImpl(loader);
-        final String subsystemXml = System.getProperty(Constants.CHAINLINK_SUBSYSTEM_XML, Constants.Defaults.CHAINLINK_SUBSYSTEM_XML);
-        //TODO This should come out of the config dir
-        final InputStream stream = loader.getResourceAsStream(subsystemXml);
-        if (stream != null) {
-            XmlChainlinkSubSystem.configureSubSystemFromStream(model, loader, stream);
+    public void addSubsystem(final ClassLoader loader, final GlassfishSubSystem subSystem) throws Exception {
+        final SubSystemModelImpl model;
+        lock.lock();
+        try {
+            model = this.model = new SubSystemModelImpl(loader);
+        } finally {
+            lock.unlock();
         }
+        GlassfishConfiguration.configureSubSystem(model, subSystem, loader);
     }
 
     public void addApplication(final ApplicationInfo info) throws Exception {
-        if (model == null) {
-            throw new IllegalStateException(); //TODO Message
+        final SubSystemModelImpl model;
+        lock.lock();
+        try {
+            if (this.model == null) {
+                throw new IllegalStateException(); //TODO Message
+            }
+            model = this.model;
+        } finally {
+            lock.unlock();
         }
         App app = this.operators.get(info.getName());
         final ClassLoader loader = info.getAppClassLoader();
@@ -79,7 +106,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
             app = new App(loader);
             this.operators.put(info.getName(), app);
         }
-        final DeploymentModelImpl deployment = this.model.findDeployment(info.getName()).copy(loader);
+        final DeploymentModelImpl deployment = model.findDeployment(info.getName()).copy(loader);
 
         deployment.loadChainlinkXml();
 

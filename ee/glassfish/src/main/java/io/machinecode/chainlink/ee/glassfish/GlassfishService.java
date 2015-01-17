@@ -2,10 +2,11 @@ package io.machinecode.chainlink.ee.glassfish;
 
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
+import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishSubSystem;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.PropertyLookup;
 import org.glassfish.api.StartupRunLevel;
-//import org.glassfish.api.admin.ServerEnvironment;
+import org.glassfish.api.admin.ServerEnvironment;
 import org.glassfish.api.event.EventListener;
 import org.glassfish.api.event.EventTypes;
 import org.glassfish.api.event.Events;
@@ -18,7 +19,7 @@ import org.glassfish.internal.deployment.Deployment;
 import org.jvnet.hk2.annotations.Service;
 
 import javax.inject.Inject;
-//import javax.inject.Named;
+import javax.inject.Named;
 import javax.naming.InitialContext;
 import java.util.concurrent.ThreadFactory;
 
@@ -33,9 +34,9 @@ public class GlassfishService implements PostConstruct, EventListener {
     @Inject
     private Events events;
 
-    //@Inject
-    //@Named(ServerEnvironment.DEFAULT_INSTANCE_NAME)
-    //private GlassfishConfiguration configuration;
+    @Inject
+    @Named(ServerEnvironment.DEFAULT_INSTANCE_NAME)
+    private GlassfishSubSystem subSystem;
 
     @Inject
     private ServiceLocator serviceLocator;
@@ -49,7 +50,6 @@ public class GlassfishService implements PostConstruct, EventListener {
             @Override
             public ThreadFactory lookupThreadFactory(final PropertyLookup properties) throws Exception {
                 serviceLocator.getService(ManagedThreadFactoryConfigActivator.class);
-                //configuration.getThreadFactory());
                 return InitialContext.doLookup(properties.getProperty(Constants.THREAD_FACTORY_JNDI_NAME, "concurrent/__defaultManagedThreadFactory"));
             }
         });
@@ -60,8 +60,7 @@ public class GlassfishService implements PostConstruct, EventListener {
     public void event(final Event event) {
         try {
             if (event.is(EventTypes.SERVER_READY)) {
-                serviceLocator.getService(ManagedThreadFactoryConfigActivator.class);
-                environment.addSubsystem(Thread.currentThread().getContextClassLoader());
+                environment.addSubsystem(Thread.currentThread().getContextClassLoader(), subSystem);
             } else if (event.is(Deployment.APPLICATION_STARTED)) {
                 if (event.hook() != null) {
                     environment.addApplication((ApplicationInfo) event.hook());
@@ -76,5 +75,13 @@ public class GlassfishService implements PostConstruct, EventListener {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void reload() throws Exception {
+        environment.reload(subSystem);
+    }
+
+    public GlassfishSubSystem getSubSystem() {
+        return subSystem;
     }
 }

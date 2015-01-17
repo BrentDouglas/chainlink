@@ -95,7 +95,7 @@
       <connector-service></connector-service>
       <transaction-service tx-log-dir="${com.sun.aas.instanceRoot}/logs"></transaction-service>
       <batch-runtime-configuration></batch-runtime-configuration>
-      <!--<chainlink-subsystem></chainlink-subsystem>-->
+      <!--<chainlink></chainlink>-->
       <jms-service default-jms-host="default_JMS_host" type="EMBEDDED">
         <jms-host port="${JMS_PROVIDER_PORT}" name="default_JMS_host" host="localhost"></jms-host>
       </jms-service>

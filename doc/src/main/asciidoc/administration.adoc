@@ -1,0 +1,11 @@
+== Administration
+
+TODO
+
+include::administration-se.adoc[]
+
+include::administration-glassfish.adoc[]
+
+include::administration-tomee.adoc[]
+
+include::administration-wildfly.adoc[]

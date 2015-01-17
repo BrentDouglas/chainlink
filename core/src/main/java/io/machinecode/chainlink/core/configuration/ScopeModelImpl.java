@@ -73,6 +73,10 @@ public class ScopeModelImpl implements ScopeModel {
         return scope;
     }
 
+    public ClassLoader getClassLoader() {
+        return this.loader.get();
+    }
+
     public Map<String, JobOperatorModelImpl> getJobOperators() {
         return jobOperators;
     }

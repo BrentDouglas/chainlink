@@ -130,7 +130,9 @@
         <version.org.wildfly.arquillian.wildfly-arquillian-container-managed>1.0.0.Alpha2</version.org.wildfly.arquillian.wildfly-arquillian-container-managed>
 
         <!-- EE Plugins -->
-        <version.org.glassfish.hk2.hk2-inhabitant-generator>2.3.0</version.org.glassfish.hk2.hk2-inhabitant-generator>
+        <version.org.glassfish.hk2>2.3.0</version.org.glassfish.hk2>
+        <version.org.glassfish.hk2.hk2-inhabitant-generator>${version.org.glassfish.hk2}</version.org.glassfish.hk2.hk2-inhabitant-generator>
+        <version.org.glassfish.hk2.config-generator>${version.org.glassfish.hk2}</version.org.glassfish.hk2.config-generator>
     </properties>
 
     <dependencyManagement>
@@ -720,6 +722,11 @@
                     <groupId>org.glassfish.hk2</groupId>
                     <artifactId>hk2-inhabitant-generator</artifactId>
                     <version>${version.org.glassfish.hk2.hk2-inhabitant-generator}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.glassfish.hk2</groupId>
+                    <artifactId>config-generator</artifactId>
+                    <version>${version.org.glassfish.hk2.config-generator}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

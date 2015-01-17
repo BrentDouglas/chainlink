@@ -2,16 +2,27 @@ package io.machinecode.chainlink.core.configuration.xml;
 
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
+import io.machinecode.chainlink.core.configuration.def.JobOperatorDef;
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +32,9 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
+@XmlRootElement(namespace = XmlChainlink.NAMESPACE, name = "job-operator")
 @XmlAccessorType(NONE)
-public class XmlJobOperator {
+public class XmlJobOperator implements JobOperatorDef<XmlDeclaration, XmlProperty> {
 
     @XmlID
     @XmlAttribute(name = "name", required = true)
@@ -44,16 +56,16 @@ public class XmlJobOperator {
     private XmlDeclaration mBeanServer;
 
     @XmlElement(name = "job-loader", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> jobLoader = new ArrayList<>(0);
+    private List<XmlDeclaration> jobLoaders = new ArrayList<>(0);
 
     @XmlElement(name = "artifact-loader", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> artifactLoader = new ArrayList<>(0);
+    private List<XmlDeclaration> artifactLoaders = new ArrayList<>(0);
 
     @XmlElement(name = "injector", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> injector = new ArrayList<>(0);
+    private List<XmlDeclaration> injectors = new ArrayList<>(0);
 
     @XmlElement(name = "security", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> security = new ArrayList<>(0);
+    private List<XmlDeclaration> securities = new ArrayList<>(0);
 
     @XmlElement(name = "execution-repository", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlDeclaration executionRepository;
@@ -70,122 +82,152 @@ public class XmlJobOperator {
     @XmlElement(name = "property", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlProperty> properties = new ArrayList<>(0);
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(final String name) {
         this.name = name;
     }
 
+    @Override
     public String getRef() {
         return ref;
     }
 
+    @Override
     public void setRef(final String ref) {
         this.ref = ref;
     }
 
+    @Override
     public XmlDeclaration getClassLoader() {
         return classLoader;
     }
 
+    @Override
     public void setClassLoader(final XmlDeclaration classLoader) {
         this.classLoader = classLoader;
     }
 
+    @Override
     public XmlDeclaration getTransactionManager() {
         return transactionManager;
     }
 
+    @Override
     public void setTransactionManager(final XmlDeclaration transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public XmlDeclaration getMarshalling() {
         return marshalling;
     }
 
+    @Override
     public void setMarshalling(final XmlDeclaration marshalling) {
         this.marshalling = marshalling;
     }
 
-    public XmlDeclaration getmBeanServer() {
+    @Override
+    public XmlDeclaration getMBeanServer() {
         return mBeanServer;
     }
 
-    public void setmBeanServer(final XmlDeclaration mBeanServer) {
+    @Override
+    public void setMBeanServer(final XmlDeclaration mBeanServer) {
         this.mBeanServer = mBeanServer;
     }
 
-    public List<XmlDeclaration> getJobLoader() {
-        return jobLoader;
+    @Override
+    public List<XmlDeclaration> getJobLoaders() {
+        return jobLoaders;
     }
 
-    public void setJobLoader(final List<XmlDeclaration> jobLoader) {
-        this.jobLoader = jobLoader;
+    @Override
+    public void setJobLoaders(final List<XmlDeclaration> jobLoaders) {
+        this.jobLoaders = jobLoaders;
     }
 
-    public List<XmlDeclaration> getArtifactLoader() {
-        return artifactLoader;
+    @Override
+    public List<XmlDeclaration> getArtifactLoaders() {
+        return artifactLoaders;
     }
 
-    public void setArtifactLoader(final List<XmlDeclaration> artifactLoader) {
-        this.artifactLoader = artifactLoader;
+    @Override
+    public void setArtifactLoaders(final List<XmlDeclaration> artifactLoaders) {
+        this.artifactLoaders = artifactLoaders;
     }
 
-    public List<XmlDeclaration> getInjector() {
-        return injector;
+    @Override
+    public List<XmlDeclaration> getInjectors() {
+        return injectors;
     }
 
-    public void setInjector(final List<XmlDeclaration> injector) {
-        this.injector = injector;
+    @Override
+    public void setInjectors(final List<XmlDeclaration> injectors) {
+        this.injectors = injectors;
     }
 
-    public List<XmlDeclaration> getSecurity() {
-        return security;
+    @Override
+    public List<XmlDeclaration> getSecurities() {
+        return securities;
     }
 
-    public void setSecurity(final List<XmlDeclaration> security) {
-        this.security = security;
+    @Override
+    public void setSecurities(final List<XmlDeclaration> securities) {
+        this.securities = securities;
     }
 
+    @Override
     public XmlDeclaration getExecutionRepository() {
         return executionRepository;
     }
 
+    @Override
     public void setExecutionRepository(final XmlDeclaration executionRepository) {
         this.executionRepository = executionRepository;
     }
 
+    @Override
     public XmlDeclaration getRegistry() {
         return registry;
     }
 
+    @Override
     public void setRegistry(final XmlDeclaration registry) {
         this.registry = registry;
     }
 
+    @Override
     public XmlDeclaration getTransport() {
         return transport;
     }
 
+    @Override
     public void setTransport(final XmlDeclaration transport) {
         this.transport = transport;
     }
 
+    @Override
     public XmlDeclaration getExecutor() {
         return executor;
     }
 
+    @Override
     public void setExecutor(final XmlDeclaration executor) {
         this.executor = executor;
     }
 
+    @Override
     public List<XmlProperty> getProperties() {
         return properties;
     }
 
+    @Override
     public void setProperties(final List<XmlProperty> properties) {
         this.properties = properties;
     }
@@ -206,7 +248,6 @@ public class XmlJobOperator {
     }
 
     public void configureScope(final ScopeModelImpl scope, final ClassLoader classLoader) throws Exception {
-        //TODO Do these need to get inserted into the model?
         final JobOperatorModel model = scope.getJobOperator(this.name);
 
         XmlProperty.convert(this.properties, model.getProperties());
@@ -230,19 +271,19 @@ public class XmlJobOperator {
                 .setName(name(this.classLoader, JobOperatorModelImpl.CLASS_LOADER)), ref(this.classLoader));
         set(model.getTransactionManager()
                 .setName(name(this.transactionManager, JobOperatorModelImpl.TRANSACTION_MANAGER)), ref(this.transactionManager));
-        for (final XmlDeclaration resource : this.jobLoader) {
+        for (final XmlDeclaration resource : this.jobLoaders) {
             model.getJobLoader(resource.getName())
                     .setRef(ref(resource));
         }
-        for (final XmlDeclaration resource : this.artifactLoader) {
+        for (final XmlDeclaration resource : this.artifactLoaders) {
             model.getArtifactLoader(resource.getName())
                     .setRef(ref(resource));
         }
-        for (final XmlDeclaration resource : this.injector) {
+        for (final XmlDeclaration resource : this.injectors) {
             model.getInjector(resource.getName())
                     .setRef(ref(resource));
         }
-        for (final XmlDeclaration resource : this.security) {
+        for (final XmlDeclaration resource : this.securities) {
             model.getSecurity(resource.getName())
                     .setRef(ref(resource));
         }
@@ -255,5 +296,23 @@ public class XmlJobOperator {
             }
             configuration.configureJobOperator(model);
         }
+    }
+
+    public static XmlJobOperator read(final InputStream stream) throws Exception {
+        try {
+            final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
+            final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+            final XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(stream);
+            return unmarshaller.unmarshal(reader, XmlJobOperator.class).getValue();
+        } finally {
+            stream.close();
+        }
+    }
+
+    public void write(final OutputStream stream) throws Exception {
+        final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
+        final Marshaller marshaller = jaxb.createMarshaller();
+        final XMLStreamWriter writer = XMLOutputFactory.newFactory().createXMLStreamWriter(stream);
+        marshaller.marshal(this, writer);
     }
 }

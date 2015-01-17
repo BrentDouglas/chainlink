@@ -8,6 +8,8 @@ include::installation.adoc[]
 
 include::configuration.adoc[]
 
+include::administration.adoc[]
+
 include::spec.adoc[]
 
 include::usage.adoc[]

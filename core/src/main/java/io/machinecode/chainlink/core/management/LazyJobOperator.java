@@ -49,11 +49,14 @@ public class LazyJobOperator implements ExtendedJobOperator {
     }
 
     synchronized void lazyOpen() {
-        if (delegate == null) {
+        if (this.delegate == null) {
+            if (this.model == null) {
+                throw new IllegalStateException("JobOperator is closed.");
+            }
             try {
-                delegate = loader == null
-                        ? model.createJobOperator()
-                        : model.createJobOperator(loader);
+                this.delegate = this.loader == null
+                        ? this.model.createJobOperator()
+                        : this.model.createJobOperator(this.loader);
             } catch (final Exception e) {
                 throw new BatchRuntimeException(e);
             } finally {
@@ -69,8 +72,14 @@ public class LazyJobOperator implements ExtendedJobOperator {
     }
 
     @Override
-    public void close() throws Exception {
-        delegate.close();
+    public synchronized void close() throws Exception {
+        if (this.delegate != null) {
+            this.delegate.close();
+            this.delegate = null;
+        } else {
+            this.model = null;
+            this.loader = null;
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package example;
 
 import io.machinecode.chainlink.core.Chainlink;
+import io.machinecode.chainlink.core.configuration.ClassLoaderFactoryImpl;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
@@ -12,8 +13,6 @@ import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepository
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.spi.Constants;
-import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Environment;
 
@@ -38,12 +37,7 @@ public class ManualConfiguration {
     public static JobOperatorModelImpl setDefaults(final DeploymentModelImpl model, final ClassLoader tccl) {
         // Set defaults for the default JobOperator
         final JobOperatorModelImpl op = model.getJobOperator(Constants.DEFAULT);
-        op.getClassLoader().setDefaultFactory(new ClassLoaderFactory() {
-            @Override
-            public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return tccl;
-            }
-        });
+        op.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(tccl));
         op.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
         op.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
         op.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());

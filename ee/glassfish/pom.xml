@@ -47,12 +47,39 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check-style</id>
+                        <goals>
+                            <goal>checkstyle</goal>
+                        </goals>
+                        <configuration>
+                            <suppressionsLocation>${project.basedir}/checkstyle-supressions.xml</suppressionsLocation>
+                            <excludes>${project.build.directory}/generated-sources/hk2-config-generator/**/*</excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.glassfish.hk2</groupId>
                 <artifactId>hk2-inhabitant-generator</artifactId>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generate-inhabitants</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.glassfish.hk2</groupId>
+                <artifactId>config-generator</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-injectors</goal>
                         </goals>
                     </execution>
                 </executions>

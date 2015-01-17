@@ -1,0 +1,211 @@
+=== GlassFish
+
+==== Using `asadmin`
+
+The following asadmin commands are provided for Glassfish:
+
+- get-chainlink
+- get-chainlink-job-operator -j <job operator name>
+- get-chainlink-deployment -d <deployment name>
+- get-chainlink-deployment-job-operator -d <deployment name> -j <job operator name>
+- set-chainlink [ -f <file> | -b <base 64 of file> ]
+- set-chainlink-job-operator [ -f <file> | -b <base 64 of file> ]
+- set-chainlink-deployment [ -f <file> | -b <base 64 of file> ]
+- set-chainlink-deployment-job-operator -d <deployment name> [ -f <file> | -b <base 64 of file> ]
+- delete-chainlink
+- delete-chainlink-job-operator -j <job operator name>
+- delete-chainlink-deployment -d <deployment name>
+- delete-chainlink-deployment-job-operator -d <deployment name> -j <job operator name>
+- reload-chainlink
+
+[NOTE]
+====
+The output of the `get-chainlink-*` commands are not formatted. To make it easier to read you might
+consider using them with asadmin's terse (-t or --terse) options and combining them with an xml
+formatter. e.g.
+
+`./asadmin -t get-chainlink | xmllint --format -`
+====
+
+The options for the commands all function mor or less the same across commands. Here is a quick
+reference, though they are elaborated on per command.
+
+-j|--job-operator The name attribute of the job-operator element the command is to be applied to
+-d|--deployment   The name attribute of the deployment element the command is to be applied to
+-f|--file         The filename of a file containing the xml snippet to be applied to the model
+-b|--base64       A base64 encoded string ot the xml snippet to be applied to the model
+
+
+[TIP]
+====
+The recommended way of updating chainlink's configuration is to retrieve the existing configuration,
+modify it, and then upload the modifications. e.g. To change the whole server config:
+
+[source,shell]
+----
+./asadmin -t get-chainlink | xmllint --format - > ~/config.xml
+vim ~/config.xml # Make changes here
+./asadmin set-chainlink -f ~/config.xml
+----
+
+Or just a single operator:
+
+[source,shell]
+----
+./asadmin -t get-chainlink-deployment-job-operator -d default -j default | xmllint --format - > ~/config.xml
+vim ~/config.xml # Make changes here
+./asadmin set-chainlink-deployment-job-operator -d default -j default -f ~/config.xml
+----
+====
+
+===== get-chainlink
+
+Prints the entire Chainlink subsystem configuration. This command should never fail. The output is
+xml from the schema `chainlink-subsystem_1_0.xsd`.
+
+===== get-chainlink-job-operator -j <job operator name>
+
+Print the configuration from a single named job-operator element. The output is an xml snippet xml
+of a job-operator element from the schema `chainlink_1_0.xsd`.
+This command will fail if:
+
+1. The `job-operator` parameter is not provided.
+2. The named job-operator element does not exist.
+
+-j|--job-operator The name attribute of the job-operator element to be retrieved. The element must
+                  be a child of the subsystem element in the schema.
+
+===== get-chainlink-deployment -d <deployment name>
+
+Print the configuration from a single named deployment element. The output is an xml snippet xml of
+a deployment element from the schema `chainlink_1_0.xsd`.
+
+This command will fail if:
+
+1. The `deployment` parameter is not provided.
+2. The named deployment element does not exist.
+
+-d|--deployment   The name attribute of the deployment element to be retrieved.
+
+===== get-chainlink-deployment-job-operator -d <deployment name> -j <job operator name>
+
+Print the configuration from a single named job-operator element from a named deployment. The
+output is an xml snippet xml of a job-operator element from the schema `chainlink_1_0.xsd`.
+
+This command will fail if:
+
+1. Either the `deployment` or `job-operator` parameter is not provided.
+2. The named deployment element does not exist.
+3. The named job-operator element does not exist.
+
+-d|--deployment   The name attribute of the deployment element that contains the job-operator
+                  element.
+-j|--job-operator The name attribute of the job-operator element to be retrieved. The element must
+                  be a child of the deployment element in the schema.
+
+===== set-chainlink [ -f <file> | -b <base 64 of file> ]
+
+Set Chainlink's configuration to match that of the provided xml. This command is an 'upsert'. The
+command will fail if:
+
+1. Neither of the arguments `file` or `base64` are be provided
+2. Both of the arguments `file` or `base64` are be provided
+3. The xml content provided is not valid according to the schema `chainlink-subsystem_1_0.xsd`
+
+-f|--file         The filename of a file containing the xml model.
+-b|--base64       A base64 encoded string of the xml model.
+
+===== set-chainlink-job-operator [ -f <file> | -b <base 64 of file> ]
+
+Set a named job-operator element to match that of the provided xml.  This command is an 'upsert'.
+The command will fail if:
+
+1. Neither of the arguments `file` or `base64` are be provided
+2. Both of the arguments `file` or `base64` are be provided
+3. The xml content provided is not a valid snipped of the job-operator element in the schema
+   `chainlink_1_0.xsd`
+
+-f|--file         The filename of a file containing the xml model.
+-b|--base64       A base64 encoded string of the xml model.
+
+===== set-chainlink-deployment [ -f <file> | -b <base 64 of file> ]
+
+Set a named deployment element to match that of the provided xml.  This command is an 'upsert'.
+The command will fail if:
+
+1. Neither of the arguments `file` or `base64` are be provided
+2. Both of the arguments `file` or `base64` are be provided
+3. The xml content provided is not a valid snipped of the deployment element in the schema
+   `chainlink_1_0.xsd`
+
+-f|--file         The filename of a file containing the xml model.
+-b|--base64       A base64 encoded string of the xml model.
+
+===== set-chainlink-deployment-job-operator -d <deployment name> [ -f <file> | -b <base 64 of file> ]
+
+Set a named job-operator element from a named deployment element to match that of the provided
+xml. This command is an 'upsert'. The command will fail if:
+
+1. The `deployment` argument is not provided.
+2. The named `deployment` element does not exist.
+3. Neither of the arguments `file` or `base64` are be provided
+4. Both of the arguments `file` or `base64` are be provided
+5. The xml content provided is not a valid snipped of the job-operator element in the schema
+   `chainlink_1_0.xsd`
+
+-d|--deployment   The name attribute of the deployment element that contains/will contain the
+                  job-operator element.
+-f|--file         The filename of a file containing the xml model.
+-b|--base64       A base64 encoded string of the xml model.
+
+===== delete-chainlink
+
+Remove all Chainlink configuration. This command will always succeed. This command will return the
+existing configuration as per the get-chainlink command.
+
+===== delete-chainlink-job-operator -j <job operator name>
+
+Remove a single named job-operator element.  This command will return the existing configuration
+as per the get-chainlink-job-operator command. This command will fail if:
+
+1. The `job-operator` parameter is not provided.
+2. The named job-operator element does not exist.
+
+-j|--job-operator The name attribute of the job-operator element to be removed. The element must
+                  be a child of the subsystem element in the schema.
+
+===== delete-chainlink-deployment -d <deployment name>
+
+Remove a single named deployment element. This command will return the existing configuration as
+per the get-chainlink-deployment command. The command will fail if:
+
+1. The `deployment` argument is not provided.
+2. The named `deployment` element does not exist.
+
+-d|--deployment   The name attribute of the deployment element to be removed.
+
+===== delete-chainlink-deployment-job-operator -d <deployment name> -j <job operator name>
+
+Remove a single job-operator element contained in a named deployment element.  This command will
+return the existing configuration as per the get-chainlink-deployment-job-operator command. This
+command will fail if:
+
+1. Either the `deployment` or `job-operator` parameter is not provided.
+2. The named deployment element does not exist.
+3. The named job-operator element does not exist.
+
+-d|--deployment   The name attribute of the deployment element that contains the job-operator
+                  element.
+-j|--job-operator The name attribute of the job-operator element to be removed. The element must
+                  be a child of the deployment element in the schema.
+
+===== reload-chainlink
+
+Apply the configuration changes to the Chainlink runtime.
+
+[TIP]
+====
+Accidentally call delete-chainlink? The existing configuration is returned so you can save it to a
+file and then upload it again with set-chainlink. Remember configuration changes are not visible to
+Chainlink until reload-chainlink is called.
+====

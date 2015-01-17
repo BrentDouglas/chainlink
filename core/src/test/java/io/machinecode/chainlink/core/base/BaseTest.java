@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.base;
 
+import io.machinecode.chainlink.core.configuration.ClassLoaderFactoryImpl;
 import io.machinecode.chainlink.core.configuration.ConfigurationArtifactLoader;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
@@ -15,7 +16,6 @@ import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
@@ -74,12 +74,7 @@ public abstract class BaseTest extends Assert {
         final SubSystemModelImpl subSystem = new SubSystemModelImpl(tccl);
         final DeploymentModelImpl deployment = subSystem.getDeployment(Constants.DEFAULT);
         final JobOperatorModelImpl jobOperator = deployment.getJobOperator(Constants.DEFAULT);
-        jobOperator.getClassLoader().setDefaultFactory(new ClassLoaderFactory() {
-            @Override
-            public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return tccl;
-            }
-        });
+        jobOperator.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(tccl));
         jobOperator.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
         jobOperator.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
         jobOperator.getMarshalling().setDefaultFactory(new MarshallingFactory() {

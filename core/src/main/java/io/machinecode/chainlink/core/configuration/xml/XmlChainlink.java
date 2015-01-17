@@ -24,12 +24,14 @@ public class XmlChainlink extends XmlDeployment {
     public static final String NAMESPACE = "http://machinecode.io/xml/ns/chainlink";
 
     public static void configureDeploymentFromStream(final DeploymentModelImpl model, final ClassLoader loader, final InputStream stream) throws Exception {
-        try {
-            final JAXBContext context = JAXBContext.newInstance(XmlChainlink.class);
-            final Unmarshaller unmarshaller = context.createUnmarshaller();
-            final XmlChainlink xml = (XmlChainlink) unmarshaller.unmarshal(stream);
+        read(stream).configureDeployment(model, loader);
+    }
 
-            xml.configureDeployment(model, loader);
+    public static XmlChainlink read(final InputStream stream) throws Exception {
+        try {
+            final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
+            final Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+            return (XmlChainlink) unmarshaller.unmarshal(stream);
         } finally {
             stream.close();
         }

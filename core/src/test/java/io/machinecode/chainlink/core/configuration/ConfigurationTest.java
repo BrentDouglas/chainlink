@@ -9,7 +9,6 @@ import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
-import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.inject.Injector;
 import org.junit.Assert;
@@ -18,7 +17,6 @@ import org.junit.Test;
 
 import javax.batch.api.Batchlet;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -28,12 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ConfigurationTest extends Assert {
 
     public void defaults(final ClassLoader tccl, final JobOperatorModel model) throws Exception {
-        model.getClassLoader().setDefaultFactory(new ClassLoaderFactory() {
-            @Override
-            public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return tccl;
-            }
-        });
+        model.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(tccl));
         model.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
         model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
         model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
