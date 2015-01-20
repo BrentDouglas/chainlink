@@ -52,7 +52,7 @@ public class GlassfishService implements PostConstruct, EventListener {
                 serviceLocator.getService(ManagedThreadFactoryConfigActivator.class);
                 return InitialContext.doLookup(properties.getProperty(Constants.THREAD_FACTORY_JNDI_NAME, "concurrent/__defaultManagedThreadFactory"));
             }
-        });
+        }, subSystem);
         Chainlink.setEnvironment(this.environment);
     }
 
@@ -78,7 +78,7 @@ public class GlassfishService implements PostConstruct, EventListener {
     }
 
     public void reload() throws Exception {
-        environment.reload(subSystem);
+        environment.reload();
     }
 
     public GlassfishSubSystem getSubSystem() {

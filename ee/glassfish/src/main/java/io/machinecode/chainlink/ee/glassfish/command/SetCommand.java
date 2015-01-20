@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.ee.glassfish.command;
 
-import io.machinecode.chainlink.core.configuration.def.DeploymentDef;
-import io.machinecode.chainlink.core.configuration.def.JobOperatorDef;
-import io.machinecode.chainlink.core.configuration.def.SubSystemDef;
 import io.machinecode.chainlink.core.configuration.xml.XmlDeployment;
 import io.machinecode.chainlink.core.configuration.xml.XmlJobOperator;
 import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
+import io.machinecode.chainlink.spi.schema.DeploymentSchema;
+import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
+import io.machinecode.chainlink.spi.schema.SubSystemSchema;
 import org.glassfish.api.Param;
 
 import java.io.ByteArrayInputStream;
@@ -38,19 +38,19 @@ public abstract class SetCommand extends BaseCommand {
         throw new Exception("One of the arguments file or base64 must be provided.");
     }
 
-    public SubSystemDef<?,?,?,?> readSubsystem() throws Exception {
+    public SubSystemSchema<?,?,?,?> readSubsystem() throws Exception {
         try (final InputStream stream = stream()) {
             return XmlChainlinkSubSystem.read(stream);
         }
     }
 
-    public DeploymentDef<?,?,?> readDeployment() throws Exception {
+    public DeploymentSchema<?,?,?> readDeployment() throws Exception {
         try (final InputStream stream = stream()) {
             return XmlDeployment.read(stream);
         }
     }
 
-    public JobOperatorDef<?,?> readJobOperator() throws Exception {
+    public JobOperatorSchema<?,?> readJobOperator() throws Exception {
         try (final InputStream stream = stream()) {
             return XmlJobOperator.read(stream);
         }

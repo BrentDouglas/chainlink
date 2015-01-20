@@ -2,13 +2,13 @@ package io.machinecode.chainlink.ee.glassfish.command.config;
 
 import com.sun.enterprise.config.serverbeans.Config;
 import com.sun.enterprise.config.serverbeans.Domain;
-import io.machinecode.chainlink.core.configuration.def.DeploymentDef;
-import io.machinecode.chainlink.core.configuration.op.Op;
 import io.machinecode.chainlink.ee.glassfish.GlassfishService;
 import io.machinecode.chainlink.ee.glassfish.command.BaseCommand;
 import io.machinecode.chainlink.ee.glassfish.command.Code;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishDeployment;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishSubSystem;
+import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.spi.schema.DeploymentSchema;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
 import org.glassfish.api.admin.ExecuteOn;
@@ -44,16 +44,16 @@ public class ReloadCommand extends BaseCommand {
     }
 
     private static class CreateDeployment extends Code<GlassfishSubSystem> {
-        private final DeploymentDef<?,?,?> that;
+        private final DeploymentSchema<?,?,?> that;
 
-        public CreateDeployment(final DeploymentDef<?, ?, ?> that) {
+        public CreateDeployment(final DeploymentSchema<?,?,?> that) {
             this.that = that;
         }
 
         @Override
         public Object code(final GlassfishSubSystem subSystem) throws Exception {
             final GlassfishDeployment dep = subSystem.createChild(GlassfishDeployment.class);
-            BaseCommand.<DeploymentDef<?,?,?>,GlassfishDeployment>unlockedUpdate(dep, that, Op.ADD);
+            BaseCommand.<DeploymentSchema<?,?,?>,GlassfishDeployment>unlockedUpdate(dep, that, Op.ADD);
             subSystem.getDeployments().add(dep);
             return null;
         }

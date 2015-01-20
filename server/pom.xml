@@ -18,6 +18,7 @@
         <module>socket</module>
         -->
         <module>chainlinkd</module>
+        <module>rest</module>
     </modules>
 
 </project>

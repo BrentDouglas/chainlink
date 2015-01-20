@@ -1,8 +1,9 @@
 package io.machinecode.chainlink.ee.glassfish.configuration;
 
-import io.machinecode.chainlink.core.configuration.def.PropertyDef;
-import io.machinecode.chainlink.core.configuration.op.Mutable;
-import io.machinecode.chainlink.core.configuration.op.Op;
+import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.spi.schema.MutablePropertySchema;
+import io.machinecode.chainlink.spi.schema.PropertySchema;
 import org.jvnet.hk2.config.Attribute;
 import org.jvnet.hk2.config.ConfigBeanProxy;
 import org.jvnet.hk2.config.Configured;
@@ -12,7 +13,7 @@ import org.jvnet.hk2.config.Configured;
  * @since 1.0
  */
 @Configured
-public interface GlassfishProperty extends ConfigBeanProxy, PropertyDef, Hack<PropertyDef> {
+public interface GlassfishProperty extends ConfigBeanProxy, MutablePropertySchema, Hack<PropertySchema> {
 
     @Attribute("name")
     String getName();
@@ -24,7 +25,7 @@ public interface GlassfishProperty extends ConfigBeanProxy, PropertyDef, Hack<Pr
 
     void setValue(final String value);
 
-    class Duck implements Mutable<PropertyDef> {
+    class Duck implements Mutable<PropertySchema> {
 
         private final GlassfishProperty to;
 
@@ -33,12 +34,12 @@ public interface GlassfishProperty extends ConfigBeanProxy, PropertyDef, Hack<Pr
         }
 
         @Override
-        public boolean willAccept(final PropertyDef from) {
+        public boolean willAccept(final PropertySchema from) {
             return to.getName().equals(from.getName());
         }
 
         @Override
-        public void accept(final PropertyDef from, final Op... ops) {
+        public void accept(final PropertySchema from, final Op... ops) {
             to.setName(from.getName());
             to.setValue(from.getValue());
         }

@@ -19,11 +19,6 @@ import org.glassfish.config.support.CommandTarget;
 import org.glassfish.config.support.TargetType;
 import org.glassfish.hk2.api.PerLookup;
 import org.jvnet.hk2.annotations.Service;
-import org.jvnet.hk2.config.TransactionFailure;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -64,19 +59,10 @@ public class DeleteSubSystemJobOperatorCommand extends BaseCommand {
 
         @Override
         public Object code(final GlassfishSubSystem subSystem) throws Exception {
-            final List<GlassfishJobOperator> jobOperators = new ArrayList<>(subSystem.getJobOperators());
-            final ListIterator<GlassfishJobOperator> it = jobOperators.listIterator();
-            while (it.hasNext()) {
-                final GlassfishJobOperator that = it.next();
-                if (jobOperator.equals(that.getName())) {
-                    final XmlJobOperator xml = GlassfishXml.xmlJobOperator(that);
-                    context.getActionReport().setMessage(GlassfishXml.writeJobOperator(xml));
-                    it.remove();
-                    subSystem.setJobOperators(jobOperators);
-                    return null;
-                }
-            }
-            throw new TransactionFailure("No job operator with name " + jobOperator);
+            final GlassfishJobOperator operator = subSystem.removeJobOperator(jobOperator);
+            final XmlJobOperator xml = GlassfishXml.xmlJobOperator(operator);
+            context.getActionReport().setMessage(GlassfishXml.writeJobOperator(xml));
+            return null;
         }
     }
 }

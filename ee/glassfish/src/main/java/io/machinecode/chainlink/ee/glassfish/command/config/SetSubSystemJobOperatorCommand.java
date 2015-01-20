@@ -2,13 +2,13 @@ package io.machinecode.chainlink.ee.glassfish.command.config;
 
 import com.sun.enterprise.config.serverbeans.Config;
 import com.sun.enterprise.config.serverbeans.Domain;
-import io.machinecode.chainlink.core.configuration.def.JobOperatorDef;
-import io.machinecode.chainlink.core.configuration.op.Op;
 import io.machinecode.chainlink.ee.glassfish.command.BaseCommand;
 import io.machinecode.chainlink.ee.glassfish.command.Code;
 import io.machinecode.chainlink.ee.glassfish.command.SetCommand;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishJobOperator;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishSubSystem;
+import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
 import org.glassfish.api.admin.ExecuteOn;
@@ -40,26 +40,26 @@ public class SetSubSystemJobOperatorCommand extends SetCommand {
     @Override
     public void exec(final Config config, final AdminCommandContext context) throws Exception {
         final GlassfishSubSystem subSystem = requireSubsystem(config);
-        final JobOperatorDef<?,?> that = readJobOperator();
+        final JobOperatorSchema<?,?> that = readJobOperator();
         final GlassfishJobOperator op = subSystem.getJobOperator(that.getName());
         if (op == null) {
             locked(subSystem, new CreateSubSystemJobOperator(that));
         } else {
-            BaseCommand.<JobOperatorDef<?,?>,GlassfishJobOperator>lockedUpdate(op, that, Op.values());
+            BaseCommand.<JobOperatorSchema<?,?>,GlassfishJobOperator>lockedUpdate(op, that, Op.values());
         }
     }
 
     private static class CreateSubSystemJobOperator extends Code<GlassfishSubSystem> {
-        private final JobOperatorDef<?,?> that;
+        private final JobOperatorSchema<?,?> that;
 
-        public CreateSubSystemJobOperator(final JobOperatorDef<?, ?> that) {
+        public CreateSubSystemJobOperator(final JobOperatorSchema<?,?> that) {
             this.that = that;
         }
 
         @Override
         public Object code(final GlassfishSubSystem subSystem) throws Exception {
             final GlassfishJobOperator op = subSystem.createChild(GlassfishJobOperator.class);
-            BaseCommand.<JobOperatorDef<?,?>,GlassfishJobOperator>unlockedUpdate(op, that, Op.ADD);
+            BaseCommand.<JobOperatorSchema<?,?>,GlassfishJobOperator>unlockedUpdate(op, that, Op.ADD);
             subSystem.getJobOperators().add(op);
             return null;
         }

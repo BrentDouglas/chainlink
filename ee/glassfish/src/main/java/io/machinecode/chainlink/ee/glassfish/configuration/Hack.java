@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.ee.glassfish.configuration;
 
-import io.machinecode.chainlink.core.configuration.op.Mutable;
+import io.machinecode.chainlink.spi.management.Mutable;
 import org.jvnet.hk2.config.DuckTyped;
 
 /**

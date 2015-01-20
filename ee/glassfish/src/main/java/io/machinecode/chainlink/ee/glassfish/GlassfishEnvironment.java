@@ -9,8 +9,10 @@ import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishConfiguratio
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishSubSystem;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
+import io.machinecode.chainlink.spi.management.Configure;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.schema.SubSystemSchema;
 import org.glassfish.internal.data.ApplicationInfo;
 
 import java.lang.ref.WeakReference;
@@ -31,25 +33,16 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     private SubSystemModelImpl model;
     private final ThreadFactoryLookup threadFactory;
     private Lock lock = new ReentrantLock();
+    private final GlassfishSubSystem subSystem;
 
-    public GlassfishEnvironment(final ThreadFactoryLookup threadFactory) {
+    public GlassfishEnvironment(final ThreadFactoryLookup threadFactory, final GlassfishSubSystem subSystem) {
         this.threadFactory = threadFactory;
+        this.subSystem = subSystem;
     }
 
-    public void reload(final GlassfishSubSystem subSystem) throws Exception {
-        lock.lock();
-        try {
-            if (this.model == null) {
-                throw new IllegalStateException();
-            }
-            final ClassLoader loader = this.model.getClassLoader();
-            final SubSystemModelImpl model = new SubSystemModelImpl(loader);
-            GlassfishConfiguration.configureSubSystem(model, subSystem, loader);
-            //TODO This now need to reload operators
-            this.model = model;
-        } finally {
-            lock.unlock();
-        }
+    @Override
+    public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
+        throw new IllegalStateException("Not implemented yet");
     }
 
     @Override
@@ -68,6 +61,32 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     }
 
     @Override
+    public SubSystemSchema<?,?,?,?> getConfiguration() {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
+    public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
+    public void reload() throws Exception {
+        lock.lock();
+        try {
+            if (this.model == null) {
+                throw new IllegalStateException();
+            }
+            final ClassLoader loader = this.model.getClassLoader();
+            final SubSystemModelImpl model = new SubSystemModelImpl(loader);
+            GlassfishConfiguration.configureSubSystem(model, subSystem, loader);
+            //TODO This now need to reload operators
+            this.model = model;
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public Map<String, LazyJobOperator> getJobOperators() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {

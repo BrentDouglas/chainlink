@@ -20,11 +20,6 @@ import org.glassfish.config.support.CommandTarget;
 import org.glassfish.config.support.TargetType;
 import org.glassfish.hk2.api.PerLookup;
 import org.jvnet.hk2.annotations.Service;
-import org.jvnet.hk2.config.TransactionFailure;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -72,19 +67,10 @@ public class DeleteDeploymentJobOperatorCommand extends BaseCommand {
 
         @Override
         public Object code(final GlassfishDeployment dep) throws Exception {
-            final List<GlassfishJobOperator> jobOperators = new ArrayList<>(dep.getJobOperators());
-            final ListIterator<GlassfishJobOperator> it = jobOperators.listIterator();
-            while (it.hasNext()) {
-                final GlassfishJobOperator that = it.next();
-                if (jobOperator.equals(that.getName())) {
-                    final XmlJobOperator xml = GlassfishXml.xmlJobOperator(that);
-                    context.getActionReport().setMessage(GlassfishXml.writeJobOperator(xml));
-                    it.remove();
-                    dep.setJobOperators(jobOperators);
-                    return null;
-                }
-            }
-            throw new TransactionFailure("Chainlink deployment " + deployment + " has no job operator with name " + jobOperator); //TODO Message
+            final GlassfishJobOperator operator = dep.removeJobOperator(jobOperator);
+            final XmlJobOperator xml = GlassfishXml.xmlJobOperator(operator);
+            context.getActionReport().setMessage(GlassfishXml.writeJobOperator(xml));
+            return null;
         }
     }
 }

@@ -14,7 +14,10 @@ import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
+import io.machinecode.chainlink.spi.management.Configure;
 import io.machinecode.chainlink.spi.management.Environment;
+import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.schema.SubSystemSchema;
 
 import javax.batch.runtime.BatchRuntime;
 import java.util.Collections;
@@ -54,6 +57,11 @@ public class ManualConfiguration {
         final JobOperatorImpl operator = op.createJobOperator();
         Chainlink.setEnvironment(new Environment() {
             @Override
+            public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
+                throw new IllegalStateException("Not implemented yet");
+            }
+
+            @Override
             public JobOperatorImpl getJobOperator(final String name) throws NoConfigurationWithIdException {
                 if (Constants.DEFAULT.equals(name)) {
                     return operator;
@@ -62,8 +70,18 @@ public class ManualConfiguration {
             }
 
             @Override
-            public Map<String, JobOperatorImpl> getJobOperators() {
-                return Collections.singletonMap(Constants.DEFAULT, operator);
+            public SubSystemSchema<?, ?, ?, ?> getConfiguration() {
+                throw new IllegalStateException("Not implemented yet");
+            }
+
+            @Override
+            public SubSystemSchema<?, ?, ?, ?> setConfiguration(final Configure configure) {
+                throw new IllegalStateException("Not implemented yet");
+            }
+
+            @Override
+            public void reload() throws Exception {
+                throw new IllegalStateException("Not implemented yet");
             }
         });
     }

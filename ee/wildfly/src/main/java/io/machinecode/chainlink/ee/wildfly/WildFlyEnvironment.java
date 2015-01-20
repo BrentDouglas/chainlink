@@ -2,8 +2,10 @@ package io.machinecode.chainlink.ee.wildfly;
 
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
+import io.machinecode.chainlink.spi.management.Configure;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.schema.SubSystemSchema;
 import org.jboss.msc.service.ServiceName;
 
 import java.lang.ref.WeakReference;
@@ -22,6 +24,11 @@ public class WildFlyEnvironment implements Environment {
     private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
 
     @Override
+    public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
@@ -37,6 +44,20 @@ public class WildFlyEnvironment implements Environment {
     }
 
     @Override
+    public SubSystemSchema<?, ?, ?, ?> getConfiguration() {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
+    public SubSystemSchema<?, ?, ?, ?> setConfiguration(final Configure configure) {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
+    public void reload() {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
     public Map<String, JobOperatorImpl> getJobOperators() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {

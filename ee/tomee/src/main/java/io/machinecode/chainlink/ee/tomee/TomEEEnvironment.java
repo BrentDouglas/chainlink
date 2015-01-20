@@ -8,8 +8,10 @@ import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSub
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
+import io.machinecode.chainlink.spi.management.Configure;
 import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.schema.SubSystemSchema;
 import org.apache.openejb.AppContext;
 import org.apache.openejb.assembler.classic.AppInfo;
 import org.apache.openejb.assembler.classic.event.AssemblerAfterApplicationCreated;
@@ -45,6 +47,11 @@ public class TomEEEnvironment implements Environment {
     }
 
     @Override
+    public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
@@ -60,6 +67,20 @@ public class TomEEEnvironment implements Environment {
     }
 
     @Override
+    public SubSystemSchema<?, ?, ?, ?> getConfiguration() {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
+    public SubSystemSchema<?, ?, ?, ?> setConfiguration(final Configure configure) {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
+    public void reload() {
+        throw new IllegalStateException("Not implemented yet");
+    }
+
     public Map<String, JobOperatorImpl> getJobOperators() {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {

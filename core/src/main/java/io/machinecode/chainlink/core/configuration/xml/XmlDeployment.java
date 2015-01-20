@@ -1,10 +1,15 @@
 package io.machinecode.chainlink.core.configuration.xml;
 
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
-import io.machinecode.chainlink.core.configuration.def.DeploymentDef;
+import io.machinecode.chainlink.core.configuration.op.Transmute;
 import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.spi.configuration.DeploymentConfiguration;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
+import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.spi.schema.DeploymentSchema;
+import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
+import io.machinecode.chainlink.spi.schema.MutableDeploymentSchema;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -28,7 +33,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlRootElement(namespace = XmlChainlinkSubSystem.NAMESPACE, name = "deployment")
 @XmlAccessorType(NONE)
-public class XmlDeployment extends XmlScope implements DeploymentDef<XmlDeclaration, XmlProperty, XmlJobOperator> {
+public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<XmlDeclaration, XmlProperty, XmlJobOperator>, Mutable<DeploymentSchema<?,?,?>> {
 
     @XmlID
     @XmlAttribute(name = "name", required = false)
@@ -73,5 +78,18 @@ public class XmlDeployment extends XmlScope implements DeploymentDef<XmlDeclarat
         final Marshaller marshaller = jaxb.createMarshaller();
         final XMLStreamWriter writer = XMLOutputFactory.newFactory().createXMLStreamWriter(stream);
         marshaller.marshal(this, writer);
+    }
+
+    @Override
+    public boolean willAccept(final DeploymentSchema<?,?,?> that) {
+        return name == null || name.equals(that.getName());
+    }
+
+    @Override
+    public void accept(final DeploymentSchema<?,?,?> from, final Op... ops) throws Exception {
+        this.setName(from.getName());
+        this.setRef(from.getRef());
+        Transmute.list(this.getArtifactLoaders(), from.getArtifactLoaders(), new CreateXmlDeclaration(), ops);
+        Transmute.<JobOperatorSchema<?,?>, XmlJobOperator>list(this.getJobOperators(), from.getJobOperators(), new CreateXmlJobOperator(), ops);
     }
 }

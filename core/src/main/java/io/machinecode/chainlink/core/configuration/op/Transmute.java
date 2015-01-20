@@ -1,5 +1,8 @@
 package io.machinecode.chainlink.core.configuration.op;
 
+import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.spi.management.Op;
+
 import java.util.List;
 import java.util.ListIterator;
 

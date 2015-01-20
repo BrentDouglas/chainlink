@@ -1,8 +1,9 @@
 package io.machinecode.chainlink.ee.glassfish.configuration;
 
-import io.machinecode.chainlink.core.configuration.def.DeclarationDef;
-import io.machinecode.chainlink.core.configuration.op.Mutable;
-import io.machinecode.chainlink.core.configuration.op.Op;
+import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.spi.schema.DeclarationSchema;
+import io.machinecode.chainlink.spi.schema.MutableDeclarationSchema;
 import org.jvnet.hk2.config.Attribute;
 import org.jvnet.hk2.config.ConfigBeanProxy;
 import org.jvnet.hk2.config.Configured;
@@ -12,7 +13,7 @@ import org.jvnet.hk2.config.Configured;
  * @since 1.0
  */
 @Configured
-public interface GlassfishDeclaration extends ConfigBeanProxy, DeclarationDef, Hack<DeclarationDef> {
+public interface GlassfishDeclaration extends ConfigBeanProxy, MutableDeclarationSchema, Hack<DeclarationSchema> {
 
     @Attribute("name")
     String getName();
@@ -24,7 +25,7 @@ public interface GlassfishDeclaration extends ConfigBeanProxy, DeclarationDef, H
 
     void setRef(final String ref);
 
-    class Duck implements Mutable<DeclarationDef> {
+    class Duck implements Mutable<DeclarationSchema> {
 
         private final GlassfishDeclaration to;
 
@@ -33,12 +34,12 @@ public interface GlassfishDeclaration extends ConfigBeanProxy, DeclarationDef, H
         }
 
         @Override
-        public boolean willAccept(final DeclarationDef that) {
+        public boolean willAccept(final DeclarationSchema that) {
             return to.getName().equals(that.getName());
         }
 
         @Override
-        public void accept(final DeclarationDef from, final Op... ops) throws Exception {
+        public void accept(final DeclarationSchema from, final Op... ops) throws Exception {
             to.setName(from.getName());
             to.setRef(from.getRef());
         }

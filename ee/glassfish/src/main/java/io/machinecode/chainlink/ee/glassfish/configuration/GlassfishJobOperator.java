@@ -1,9 +1,10 @@
 package io.machinecode.chainlink.ee.glassfish.configuration;
 
-import io.machinecode.chainlink.core.configuration.def.JobOperatorDef;
 import io.machinecode.chainlink.core.configuration.op.Creator;
-import io.machinecode.chainlink.core.configuration.op.Mutable;
-import io.machinecode.chainlink.core.configuration.op.Op;
+import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
+import io.machinecode.chainlink.spi.schema.MutableJobOperatorSchema;
 import org.jvnet.hk2.config.Attribute;
 import org.jvnet.hk2.config.ConfigBeanProxy;
 import org.jvnet.hk2.config.Configured;
@@ -17,7 +18,7 @@ import java.util.List;
  * @since 1.0
  */
 @Configured(name = "job-operator")
-public interface GlassfishJobOperator extends ConfigBeanProxy, JobOperatorDef<GlassfishDeclaration, GlassfishProperty>, Hack<JobOperatorDef<?,?>> {
+public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperatorSchema<GlassfishDeclaration, GlassfishProperty>, Hack<JobOperatorSchema<?,?>> {
 
     @Attribute("name")
     String getName();
@@ -130,7 +131,7 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, JobOperatorDef<Gl
     @DuckTyped
     void setProperties(final List<GlassfishProperty> properties);
 
-    class Duck implements Mutable<JobOperatorDef<?,?>> {
+    class Duck implements Mutable<JobOperatorSchema<?,?>> {
 
         private final GlassfishJobOperator to;
 
@@ -187,12 +188,12 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, JobOperatorDef<Gl
         }
 
         @Override
-        public boolean willAccept(final JobOperatorDef<?,?> from) {
+        public boolean willAccept(final JobOperatorSchema<?,?> from) {
             return to.getName().equals(from.getName());
         }
 
         @Override
-        public void accept(final JobOperatorDef<?,?> from, final Op... ops) throws Exception {
+        public void accept(final JobOperatorSchema<?,?> from, final Op... ops) throws Exception {
             to.setName(from.getName());
             to.setRef(from.getRef());
             final Creator<GlassfishDeclaration> creator = new Creator<GlassfishDeclaration>() {

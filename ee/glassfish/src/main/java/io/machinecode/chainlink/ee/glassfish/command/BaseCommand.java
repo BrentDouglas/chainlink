@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.ee.glassfish.command;
 
 import com.sun.enterprise.config.serverbeans.Config;
-import io.machinecode.chainlink.core.configuration.op.Op;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishDeployment;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishJobOperator;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishSubSystem;
 import io.machinecode.chainlink.ee.glassfish.configuration.Hack;
+import io.machinecode.chainlink.spi.management.Op;
 import org.glassfish.api.ActionReport;
 import org.glassfish.api.Param;
 import org.glassfish.api.admin.AdminCommand;
@@ -51,38 +51,11 @@ public abstract class BaseCommand implements AdminCommand {
 
     public abstract void exec(final Config config, final AdminCommandContext context) throws Exception;
 
-    protected void assertNoSubsystemExists(final Config config) throws Exception {
-        if (config.checkIfExtensionExists(GlassfishSubSystem.class)) {
-            throw new Exception("Chainlink configuration already exists");
-        }
-    }
-
     protected GlassfishSubSystem requireSubsystem(final Config config) throws Exception {
         if (!config.checkIfExtensionExists(GlassfishSubSystem.class)) {
             throw new Exception("Chainlink not configured");
         }
         return config.getExtensionByType(GlassfishSubSystem.class);
-    }
-
-    protected void assertNoJobOperator(final GlassfishSubSystem subSystem, final String name) throws Exception {
-        final GlassfishJobOperator op = subSystem.getJobOperator(name);
-        if (op != null) {
-            throw new Exception("Chainlink job operator " + name + " already exists");
-        }
-    }
-
-    protected void assertNoDeploymentJobOperator(final GlassfishDeployment deployment, final String name) throws Exception {
-        final GlassfishJobOperator op = deployment.getJobOperator(name);
-        if (op != null) {
-            throw new Exception("Chainlink deployment " + deployment.getName() + " job operator " + name + " already exists");
-        }
-    }
-
-    protected void assertNoDeployment(final GlassfishSubSystem subSystem, final String name) throws Exception {
-        final GlassfishDeployment dep = subSystem.getDeployment(name);
-        if (dep != null) {
-            throw new Exception("Chainlink deployment " + name + " already exists");
-        }
     }
 
     protected GlassfishJobOperator requireJobOperator(final GlassfishSubSystem subSystem, final String name) throws Exception {

@@ -19,11 +19,6 @@ import org.glassfish.config.support.CommandTarget;
 import org.glassfish.config.support.TargetType;
 import org.glassfish.hk2.api.PerLookup;
 import org.jvnet.hk2.annotations.Service;
-import org.jvnet.hk2.config.TransactionFailure;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -64,19 +59,10 @@ public class DeleteDeploymentCommand extends BaseCommand {
 
         @Override
         public Object code(final GlassfishSubSystem subSystem) throws Exception {
-            final List<GlassfishDeployment> deployments = new ArrayList<>(subSystem.getDeployments());
-            final ListIterator<GlassfishDeployment> it = deployments.listIterator();
-            while (it.hasNext()) {
-                final GlassfishDeployment that = it.next();
-                if (deployment.equals(that.getName())) {
-                    final XmlDeployment xml = GlassfishXml.xmlDeployment(that);
-                    context.getActionReport().setMessage(GlassfishXml.writeDeployment(xml));
-                    it.remove();
-                    subSystem.setDeployments(deployments);
-                    return null;
-                }
-            }
-            throw new TransactionFailure("No deployment with name " + deployment); //TODO Message
+            final GlassfishDeployment that = subSystem.removeDeployment(deployment);
+            final XmlDeployment xml = GlassfishXml.xmlDeployment(that);
+            context.getActionReport().setMessage(GlassfishXml.writeDeployment(xml));
+            return null;
         }
     }
 }

@@ -2,12 +2,17 @@ package io.machinecode.chainlink.core.configuration.xml;
 
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
-import io.machinecode.chainlink.core.configuration.def.JobOperatorDef;
+import io.machinecode.chainlink.core.configuration.op.Creator;
+import io.machinecode.chainlink.core.configuration.op.Transmute;
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
+import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
+import io.machinecode.chainlink.spi.schema.MutableJobOperatorSchema;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -34,7 +39,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlRootElement(namespace = XmlChainlink.NAMESPACE, name = "job-operator")
 @XmlAccessorType(NONE)
-public class XmlJobOperator implements JobOperatorDef<XmlDeclaration, XmlProperty> {
+public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, XmlProperty>, Mutable<JobOperatorSchema<?,?>> {
 
     @XmlID
     @XmlAttribute(name = "name", required = true)
@@ -232,7 +237,34 @@ public class XmlJobOperator implements JobOperatorDef<XmlDeclaration, XmlPropert
         this.properties = properties;
     }
 
-    private static String name(final XmlNamed dec, final String def) {
+    @Override
+    public boolean willAccept(final JobOperatorSchema<?,?> that) {
+        return name == null || name.equals(that.getName());
+    }
+
+    @Override
+    public void accept(final JobOperatorSchema<?,?> from, final Op... ops) throws Exception {
+        this.setName(from.getName());
+        this.setRef(from.getRef());
+        final Creator<XmlDeclaration> creator = new CreateXmlDeclaration();
+        Transmute.list(this.getArtifactLoaders(), from.getArtifactLoaders(), creator, ops);
+        Transmute.list(this.getInjectors(), from.getInjectors(), creator, ops);
+        Transmute.list(this.getSecurities(), from.getSecurities(), creator, ops);
+        Transmute.list(this.getJobLoaders(), from.getJobLoaders(), creator, ops);
+
+        this.setClassLoader(Transmute.item(this.getClassLoader(), from.getClassLoader(), creator, ops));
+        this.setTransactionManager(Transmute.item(this.getTransactionManager(), from.getTransactionManager(), creator, ops));
+        this.setMarshalling(Transmute.item(this.getMarshalling(), from.getMarshalling(), creator, ops));
+        this.setMBeanServer(Transmute.item(this.getMBeanServer(), from.getMBeanServer(), creator, ops));
+        this.setExecutionRepository(Transmute.item(this.getExecutionRepository(), from.getExecutionRepository(), creator, ops));
+        this.setRegistry(Transmute.item(this.getRegistry(), from.getRegistry(), creator, ops));
+        this.setTransport(Transmute.item(this.getTransport(), from.getTransport(), creator, ops));
+        this.setExecutor(Transmute.item(this.getExecutor(), from.getExecutor(), creator, ops));
+
+        Transmute.list(this.getProperties(), from.getProperties(), new CreateXmlProperty(), ops);
+    }
+
+    private static String name(final XmlDeclaration dec, final String def) {
         return dec == null ? def : dec.getName();
     }
 
@@ -315,4 +347,5 @@ public class XmlJobOperator implements JobOperatorDef<XmlDeclaration, XmlPropert
         final XMLStreamWriter writer = XMLOutputFactory.newFactory().createXMLStreamWriter(stream);
         marshaller.marshal(this, writer);
     }
+
 }

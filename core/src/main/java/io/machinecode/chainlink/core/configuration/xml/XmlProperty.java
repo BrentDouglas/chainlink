@@ -1,7 +1,10 @@
 package io.machinecode.chainlink.core.configuration.xml;
 
-import io.machinecode.chainlink.core.configuration.def.PropertyDef;
 import io.machinecode.chainlink.spi.configuration.PropertyModel;
+import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.spi.schema.MutablePropertySchema;
+import io.machinecode.chainlink.spi.schema.PropertySchema;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -14,7 +17,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @since 1.0
  */
 @XmlAccessorType(NONE)
-public class XmlProperty implements PropertyDef {
+public class XmlProperty implements MutablePropertySchema, Mutable<PropertySchema> {
 
     public static final String ELEMENT = "property";
 
@@ -48,5 +51,16 @@ public class XmlProperty implements PropertyDef {
         for (final XmlProperty property : properties) {
             target.setProperty(property.getName(), property.getValue());
         }
+    }
+
+    @Override
+    public boolean willAccept(final PropertySchema from) {
+        return name == null || name.equals(from.getName());
+    }
+
+    @Override
+    public void accept(final PropertySchema from, final Op... ops) {
+        name = from.getName();
+        value = from.getValue();
     }
 }
