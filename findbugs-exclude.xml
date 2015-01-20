@@ -17,6 +17,7 @@
             <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$3" />
             <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$4" />
             <Class name="~io\.machinecode\.chainlink\.test\.core\.execution\.BaseTest.*" />
+            <Class name="~io\.machinecode\.chainlink\.server\.rest\.ChainlinkRestAdmin.*" />
             <Package name="io.machinecode.chainlink.tck.core.loader"/>
             <Package name="io.machinecode.chainlink.tck.core.transport"/>
             <Package name="io.machinecode.chainlink.tck.core.repository"/>

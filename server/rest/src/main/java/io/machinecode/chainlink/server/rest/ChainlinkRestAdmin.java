@@ -74,7 +74,7 @@ public class ChainlinkRestAdmin {
 
     @GET
     @Path("subsystem/job-operator/{jobOperator}")
-    public XmlJobOperator getSubsystemJobOperator(final @PathParam("jobOperator") String jobOperator) throws Exception {
+    public XmlJobOperator getSubsystemJobOperator(@PathParam("jobOperator") final  String jobOperator) throws Exception {
         final SubSystemSchema<?,?,?,?> subsystem = environment.getConfiguration();
         final JobOperatorSchema<?,?> op = subsystem.getJobOperator(jobOperator);
         if (op == null) {
@@ -117,7 +117,7 @@ public class ChainlinkRestAdmin {
 
     @DELETE
     @Path("subsystem/job-operator/{jobOperator}")
-    public XmlJobOperator deleteSubsystemJobOperator(final @PathParam("jobOperator") String jobOperator) throws Exception {
+    public XmlJobOperator deleteSubsystemJobOperator(@PathParam("jobOperator") final  String jobOperator) throws Exception {
         final SubSystemSchema<?,?,?,?> that = environment.setConfiguration(new Configure() {
             @Override
             public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
@@ -131,7 +131,7 @@ public class ChainlinkRestAdmin {
 
     @GET
     @Path("deployment/{deployment}")
-    public XmlDeployment getDeployment(final @PathParam("deployment") String deployment) throws Exception {
+    public XmlDeployment getDeployment(@PathParam("deployment") final  String deployment) throws Exception {
         final SubSystemSchema<?,?,?,?> subsystem = environment.getConfiguration();
         final DeploymentSchema<?,?,?> dep = subsystem.getDeployment(deployment);
         if (dep == null) {
@@ -174,7 +174,7 @@ public class ChainlinkRestAdmin {
 
     @DELETE
     @Path("deployment/{deployment}")
-    public XmlDeployment deleteDeployment(final @PathParam("deployment") String deployment) throws Exception {
+    public XmlDeployment deleteDeployment(@PathParam("deployment") final  String deployment) throws Exception {
         final SubSystemSchema<?,?,?,?> that = environment.setConfiguration(new Configure() {
             @Override
             public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
@@ -188,8 +188,8 @@ public class ChainlinkRestAdmin {
 
     @GET
     @Path("deployment/{deployment}/job-operator/{jobOperator}")
-    public XmlJobOperator getDeploymentJobOperator(final @PathParam("deployment") String deployment,
-                                                   final @PathParam("jobOperator") String jobOperator) throws Exception {
+    public XmlJobOperator getDeploymentJobOperator(@PathParam("deployment") final  String deployment,
+                                                   @PathParam("jobOperator") final  String jobOperator) throws Exception {
         final SubSystemSchema<?,?,?,?> subsystem = environment.getConfiguration();
         final DeploymentSchema<?,?,?> dec = subsystem.getDeployment(deployment);
         if (dec == null) {
@@ -206,7 +206,7 @@ public class ChainlinkRestAdmin {
 
     @POST
     @Path("deployment/{deployment}/job-operator")
-    public void insertDeploymentJobOperator(final @PathParam("deployment") String deployment,
+    public void insertDeploymentJobOperator(@PathParam("deployment") final String deployment,
                                          final XmlJobOperator insert) throws Exception {
         environment.setConfiguration(new Configure() {
             @Override
@@ -226,7 +226,7 @@ public class ChainlinkRestAdmin {
 
     @PUT
     @Path("deployment/{deployment}/job-operator")
-    public void updateDeploymentJobOperator(final @PathParam("deployment") String deployment,
+    public void updateDeploymentJobOperator(@PathParam("deployment") final String deployment,
                                             final XmlJobOperator update) throws Exception {
         environment.setConfiguration(new Configure() {
             @Override
@@ -246,8 +246,8 @@ public class ChainlinkRestAdmin {
 
     @DELETE
     @Path("deployment/{deployment}/job-operator/{jobOperator}")
-    public XmlJobOperator deleteDeploymentJobOperator(final @PathParam("deployment") String deployment,
-                                            final @PathParam("jobOperator") String jobOperator) throws Exception {
+    public XmlJobOperator deleteDeploymentJobOperator(@PathParam("deployment") final String deployment,
+                                                      @PathParam("jobOperator") final String jobOperator) throws Exception {
         final SubSystemSchema<?,?,?,?> that = environment.setConfiguration(new Configure() {
             @Override
             public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
