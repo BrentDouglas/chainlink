@@ -9,8 +9,8 @@ import io.machinecode.chainlink.core.element.partition.MapperImpl;
 import io.machinecode.chainlink.core.element.partition.PlanImpl;
 import io.machinecode.chainlink.core.element.task.BatchletImpl;
 import io.machinecode.chainlink.core.element.task.ChunkImpl;
-import io.machinecode.chainlink.core.util.Util;
-import io.machinecode.chainlink.core.util.Util.ExpressionTransformer;
+import io.machinecode.chainlink.core.util.Copy;
+import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
 import io.machinecode.chainlink.spi.element.execution.Decision;
 import io.machinecode.chainlink.spi.element.execution.Execution;
 import io.machinecode.chainlink.spi.element.execution.Flow;
@@ -102,10 +102,10 @@ public class Executions {
 
 
     public static List<ExecutionImpl> immutableCopyExecutionsDescriptor(final List<? extends Execution> that, final JobPropertyContext context) {
-        return Util.immutableCopy(that, context, EXECUTION_BUILD_TRANSFORMER);
+        return Copy.immutableCopy(that, context, EXECUTION_BUILD_TRANSFORMER);
     }
 
     public static List<ExecutionImpl> immutableCopyExecutionsPartition(final List<ExecutionImpl> that, final PropertyContext context) {
-        return Util.immutableCopy(that, context, EXECUTION_PARTITION_TRANSFORMER);
+        return Copy.immutableCopy(that, context, EXECUTION_PARTITION_TRANSFORMER);
     }
 }

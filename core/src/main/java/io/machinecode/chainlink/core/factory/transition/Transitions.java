@@ -5,8 +5,8 @@ import io.machinecode.chainlink.core.element.transition.FailImpl;
 import io.machinecode.chainlink.core.element.transition.NextImpl;
 import io.machinecode.chainlink.core.element.transition.StopImpl;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
-import io.machinecode.chainlink.core.util.Util;
-import io.machinecode.chainlink.core.util.Util.ExpressionTransformer;
+import io.machinecode.chainlink.core.util.Copy;
+import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
 import io.machinecode.chainlink.spi.element.transition.End;
 import io.machinecode.chainlink.spi.element.transition.Fail;
 import io.machinecode.chainlink.spi.element.transition.Next;
@@ -57,10 +57,10 @@ public class Transitions {
 
 
     public static List<TransitionImpl> immutableCopyTransitionsDescriptor(final List<? extends Transition> that, final JobPropertyContext context) {
-        return Util.immutableCopy(that, context, TRANSITION_EXECUTION_TRANSFORMER);
+        return Copy.immutableCopy(that, context, TRANSITION_EXECUTION_TRANSFORMER);
     }
 
     public static List<TransitionImpl> immutableCopyTransitionsPartition(final List<TransitionImpl> that, final PropertyContext context) {
-        return Util.immutableCopy(that, context, TRANSITION_PARTITION_TRANSFORMER);
+        return Copy.immutableCopy(that, context, TRANSITION_PARTITION_TRANSFORMER);
     }
 }

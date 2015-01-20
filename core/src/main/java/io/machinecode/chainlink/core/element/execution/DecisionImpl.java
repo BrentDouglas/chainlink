@@ -5,6 +5,7 @@ import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.element.transition.TransitionImpl;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.inject.InjectablesImpl;
+import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -78,7 +79,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
                 context,
                 actual == NO_STEPS
                         ? NO_STEP_EXECUTIONS
-                        : configuration.getExecutionRepository(executionRepositoryId).getStepExecutions(actual)
+                        : Repository.getExecutionRepository(configuration, executionRepositoryId).getStepExecutions(actual)
         );
         context.getJobContext().setExitStatus(exitStatus);
         return configuration.getExecutor().callback(callbackId, context);

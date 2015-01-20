@@ -142,22 +142,22 @@ public abstract class BaseTransport<A> implements Transport<A> {
     }
 
     @Override
-    public Worker getWorker(final WorkerId workerId) {
+    public Worker getWorker(final WorkerId workerId) throws Exception {
         return getLocalWorker(workerId);
     }
 
     @Override
-    public List<Worker> getWorkers(final int required) {
+    public List<Worker> getWorkers(final int required) throws Exception {
         return getLocalWorkers(required);
     }
 
     @Override
-    public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) {
+    public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) throws Exception {
         return getLocalWorker(jobExecutionId, executableId);
     }
 
     @Override
-    public Worker getWorker() {
+    public Worker getWorker() throws Exception {
         return getLocalWorker();
     }
 
@@ -172,12 +172,12 @@ public abstract class BaseTransport<A> implements Transport<A> {
     }
 
     @Override
-    public WorkerId leastBusyWorker() {
+    public WorkerId leastBusyWorker() throws Exception {
         return getWorker().id();
     }
 
     @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
+    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws Exception {
         return LocalRegistry.assertExecutionRepository(
                 registry.getExecutionRepository(id),
                 id
@@ -185,7 +185,7 @@ public abstract class BaseTransport<A> implements Transport<A> {
     }
 
     @Override
-    public Executable getExecutable(final long jobExecutionId, final ExecutableId executableId) {
+    public Executable getExecutable(final long jobExecutionId, final ExecutableId executableId) throws Exception {
         return LocalRegistry.assertExecutable(
                 registry.getExecutable(jobExecutionId, executableId),
                 jobExecutionId,
@@ -234,7 +234,7 @@ public abstract class BaseTransport<A> implements Transport<A> {
         return getLocalWorker(executable.getWorkerId());
     }
 
-    protected Worker getLocalWorker() {
+    protected Worker getLocalWorker() throws InterruptedException {
         workerLock.lock();
         try {
             return _getActiveLocalWorker();
@@ -243,7 +243,7 @@ public abstract class BaseTransport<A> implements Transport<A> {
         }
     }
 
-    protected List<Worker> getLocalWorkers(final int required) {
+    protected List<Worker> getLocalWorkers(final int required) throws InterruptedException {
         final ArrayList<Worker> ret = new ArrayList<>(required);
         workerLock.lock();
         try {
@@ -256,15 +256,11 @@ public abstract class BaseTransport<A> implements Transport<A> {
         return ret;
     }
 
-    private Worker _getActiveLocalWorker() {
+    private Worker _getActiveLocalWorker() throws InterruptedException {
         Worker worker;
         do {
             if (workerOrder.size() == 0) {
-                try {
-                    workerCondition.await();
-                } catch (final InterruptedException e) {
-                    throw new RuntimeException(e); //TODO
-                }
+                workerCondition.await();
             }
             if (currentWorker.get() >= workerOrder.size()) {
                 currentWorker.set(0);

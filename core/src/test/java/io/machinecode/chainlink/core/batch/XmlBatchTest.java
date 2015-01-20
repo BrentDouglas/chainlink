@@ -25,17 +25,15 @@ public class XmlBatchTest {
         try {
             context = JAXBContext.newInstance(BatchArtifacts.class);
             unmarshaller = context.createUnmarshaller();
-        } catch (JAXBException e) {
+        } catch (final JAXBException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static BatchArtifacts read(final InputStream stream) {
+    public static BatchArtifacts read(final InputStream stream) throws JAXBException {
         final BatchArtifacts artifacts;
         try {
             artifacts = (BatchArtifacts) unmarshaller.unmarshal(stream);
-        } catch (final JAXBException e) {
-            throw new RuntimeException(e);
         } finally {
             try {
                 stream.close();

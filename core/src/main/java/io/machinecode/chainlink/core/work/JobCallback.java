@@ -51,13 +51,13 @@ public class JobCallback extends ExecutableImpl<JobWork> {
             final BatchStatus batchStatus = jobContext.getBatchStatus();
             if (BatchStatus.FAILED.equals(batchStatus)) {
                 Repository.failedJob(
-                        configuration.getExecutionRepository(this.executionRepositoryId),
+                        Repository.getExecutionRepository(configuration, this.executionRepositoryId),
                         context.getJobExecutionId(),
                         jobContext.getExitStatus()
                 );
             } else if (BatchStatus.STOPPING.equals(batchStatus)) {
                 Repository.finishJob(
-                        configuration.getExecutionRepository(this.executionRepositoryId),
+                        Repository.getExecutionRepository(configuration, this.executionRepositoryId),
                         context.getJobExecutionId(),
                         BatchStatus.STOPPED,
                         jobContext.getExitStatus(),
@@ -65,7 +65,7 @@ public class JobCallback extends ExecutableImpl<JobWork> {
                 );
             } else {
                 Repository.completedJob(
-                        configuration.getExecutionRepository(this.executionRepositoryId),
+                        Repository.getExecutionRepository(configuration, this.executionRepositoryId),
                         context.getJobExecutionId(),
                         jobContext.getExitStatus()
                 );

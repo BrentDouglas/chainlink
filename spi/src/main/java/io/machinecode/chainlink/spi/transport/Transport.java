@@ -23,13 +23,13 @@ public interface Transport<A> extends Lifecycle {
 
     A getAddress();
 
-    Worker getWorker(final WorkerId id);
+    Worker getWorker(final WorkerId id) throws Exception;
 
-    Worker getWorker();
+    Worker getWorker() throws Exception;
 
-    List<Worker> getWorkers(final int required);
+    List<Worker> getWorkers(final int required) throws Exception;
 
-    Worker getWorker(final long jobExecutionId, final ExecutableId executableId);
+    Worker getWorker(final long jobExecutionId, final ExecutableId executableId) throws Exception;
 
     boolean hasWorker(final WorkerId workerId);
 
@@ -39,11 +39,11 @@ public interface Transport<A> extends Lifecycle {
 
     void unregisterWorker(final Worker worker);
 
-    WorkerId leastBusyWorker();
+    WorkerId leastBusyWorker() throws Exception;
 
-    ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id);
+    ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws Exception;
 
-    Executable getExecutable(final long jobExecutionId, final ExecutableId id);
+    Executable getExecutable(final long jobExecutionId, final ExecutableId id) throws Exception;
 
     ChainId generateChainId();
 

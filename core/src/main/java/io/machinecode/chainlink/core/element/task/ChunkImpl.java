@@ -201,7 +201,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             );
         } catch (final Throwable e) {
             if (partitionExecutionId != null) {
-                configuration.getExecutionRepository(executionRepositoryId).finishPartitionExecution(
+                Repository.getExecutionRepository(configuration, executionRepositoryId).finishPartitionExecution(
                         partitionExecutionId,
                         stepContext.getMetrics(),
                         stepContext.getPersistentUserData(),
@@ -1119,7 +1119,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             this.stepExecutionId = context.getStepExecutionId();
             this.partitionExecutionId = context.getPartitionExecutionId();
             this.transactionManager = configuration.getTransactionManager();
-            this.repository = configuration.getExecutionRepository(executionRepositoryId);
+            this.repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
             this.stepContext = context.getStepContext();
             this.context = context;
             this.configuration = configuration;

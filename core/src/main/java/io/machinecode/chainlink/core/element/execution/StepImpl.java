@@ -171,7 +171,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                               final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010100.step.before"), context, this.id);
-        final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
+        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
         final MutableJobContext jobContext = context.getJobContext();
         final long jobExecutionId = jobContext.getExecutionId();
         StepExecution stepExecution;
@@ -281,7 +281,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         log.debugf(Messages.get("CHAINLINK-010101.step.after"), context, childContext);
         final long jobExecutionId = context.getJobExecutionId();
         final long stepExecutionId = context.getStepExecutionId();
-        final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
+        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
         final MutableStepContext stepContext = context.getStepContext();
         final StepAccumulator accumulator = configuration.getRegistry()
                 .getStepAccumulator(jobExecutionId, id);

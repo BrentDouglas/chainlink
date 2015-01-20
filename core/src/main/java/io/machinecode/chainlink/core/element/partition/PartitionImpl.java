@@ -5,6 +5,7 @@ import io.machinecode.chainlink.core.context.ItemImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.core.expression.PropertyContextImpl;
+import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.work.TaskExecutable;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -94,7 +95,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Part
             this.reducer.beginPartitionedStep(configuration, context);
         }
         final MutableStepContext stepContext = context.getStepContext();
-        final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
+        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
         final Properties[] properties = plan.getPartitionProperties();
         final Executable[] executables;
         final long stepExecutionId = context.getStepExecutionId();

@@ -55,6 +55,9 @@ public class JobOperatorView implements ExtendedJobOperator {
         } catch (final RuntimeException e) {
             log.error("Failed to locate the required ExtendedJobOperator", e); //TODO Message
             throw e;
+        } catch (final Exception e) {
+            log.error("Failed to locate the required ExtendedJobOperator", e); //TODO Message
+            throw new RuntimeException(e);
         }
     }
 

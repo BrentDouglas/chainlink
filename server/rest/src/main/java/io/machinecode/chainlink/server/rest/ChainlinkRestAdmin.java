@@ -39,7 +39,7 @@ public class ChainlinkRestAdmin {
     private Environment environment;
 
     @PostConstruct
-    public void postConstruct() {
+    public void postConstruct() throws Exception {
         environment = Chainlink.getEnvironment();
     }
 

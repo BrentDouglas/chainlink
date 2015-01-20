@@ -68,12 +68,8 @@ public class JmxJobOperatorBean implements JmxJobOperatorBeanMBean, AutoCloseabl
     public void close() throws Exception {
         final MBeanServer server = configuration.getMBeanServer();
         if (server != null) {
-            try {
-                if (server.isRegistered(name)) {
-                    server.unregisterMBean(name);
-                }
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO Message
+            if (server.isRegistered(name)) {
+                server.unregisterMBean(name);
             }
         }
     }

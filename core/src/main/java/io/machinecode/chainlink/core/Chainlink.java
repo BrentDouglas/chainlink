@@ -36,7 +36,7 @@ public final class Chainlink {
         }
     }
 
-    public static Environment getEnvironment() {
+    public static Environment getEnvironment() throws Exception {
         lock.lock();
         try {
             if (Chainlink.environment != null) {

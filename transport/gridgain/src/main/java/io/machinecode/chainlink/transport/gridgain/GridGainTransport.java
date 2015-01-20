@@ -12,7 +12,6 @@ import io.machinecode.chainlink.core.transport.DistributedWorker;
 import io.machinecode.then.api.Deferred;
 import io.machinecode.then.core.FutureDeferred;
 import org.gridgain.grid.Grid;
-import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridFuture;
 import org.gridgain.grid.GridNode;
 import org.jboss.logging.Logger;
@@ -58,8 +57,6 @@ public class GridGainTransport extends DistributedTransport<UUID> {
         log.infof("GridGainRegistry is shutting down."); //TODO Message
         try {
             this.grid.close();
-        } catch (final GridException e) {
-            throw new RuntimeException(e);
         } finally {
             super.close();
         }

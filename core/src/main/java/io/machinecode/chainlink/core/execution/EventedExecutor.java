@@ -85,7 +85,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Chain<?> execute(final long jobExecutionId, final Executable executable) {
+    public Chain<?> execute(final long jobExecutionId, final Executable executable) throws Exception {
         final Chain<?> chain = new ChainImpl<Void>();
         final ChainId chainId = transport.generateChainId();
         registry.registerJob(jobExecutionId, chainId, chain);
@@ -94,7 +94,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Chain<?> execute(final Executable executable) {
+    public Chain<?> execute(final Executable executable) throws Exception {
         final Chain<?> chain = new ChainImpl<Void>();
         final ChainId chainId = transport.generateChainId();
         registry.registerChain(executable.getContext().getJobExecutionId(), chainId, chain);
@@ -102,7 +102,7 @@ public class EventedExecutor implements Executor {
         return chain;
     }
 
-    private void _execute(final Executable executable, final ChainId chainId) {
+    private void _execute(final Executable executable, final ChainId chainId) throws Exception {
         final WorkerId workerId = executable.getWorkerId();
         final Worker worker;
         if (workerId == null) {
@@ -114,7 +114,7 @@ public class EventedExecutor implements Executor {
     }
 
     @Override
-    public Chain<?> distribute(final int maxThreads, final Executable... executables) {
+    public Chain<?> distribute(final int maxThreads, final Executable... executables) throws Exception {
         final List<Worker> workers = transport.getWorkers(maxThreads);
         ListIterator<Worker> it = workers.listIterator();
         final Chain<?>[] chains = new Chain[executables.length];
@@ -147,33 +147,25 @@ public class EventedExecutor implements Executor {
                     .onReject(collect);
         }
         for (final Promise<ChainAndIds,Throwable,?> promise : promises) {
-            try {
-                promise.get();
-            } catch (final Exception e) {
-                throw new RuntimeException(e); //TODO Message?
-            }
+            promise.get();
         }
         return new AllChain<Executable>(chains);
     }
 
     @Override
-    public Chain<?> callback(final ExecutableId executableId, final ExecutionContext context) {
+    public Chain<?> callback(final ExecutableId executableId, final ExecutionContext context) throws Exception {
         final long jobExecutionId = context.getJobExecutionId();
         final Worker worker = transport.getWorker(jobExecutionId, executableId);
-        try {
-            return worker.chain(jobExecutionId)
-                    .onResolve(new OnResolve<ChainAndIds>() {
-                        @Override
-                        public void resolve(final ChainAndIds that) {
-                            registry.registerChain(jobExecutionId, that.getLocalId(), that.getChain());
-                            worker.callback(new CallbackEventImpl(jobExecutionId, executableId, that.getRemoteId(), context));
-                        }
-                    })
-                    .get()
-                    .getChain(); //TODO This is rubbish
-        } catch (final Exception e) {
-            throw new RuntimeException(e); //TODO
-        }
+        return worker.chain(jobExecutionId)
+                .onResolve(new OnResolve<ChainAndIds>() {
+                    @Override
+                    public void resolve(final ChainAndIds that) {
+                        registry.registerChain(jobExecutionId, that.getLocalId(), that.getChain());
+                        worker.callback(new CallbackEventImpl(jobExecutionId, executableId, that.getRemoteId(), context));
+                    }
+                })
+                .get()
+                .getChain(); //TODO This is rubbish
     }
 
     @Override

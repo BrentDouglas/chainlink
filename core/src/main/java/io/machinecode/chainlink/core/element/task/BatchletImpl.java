@@ -6,6 +6,7 @@ import io.machinecode.chainlink.core.element.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.element.partition.PartitionImpl;
 import io.machinecode.chainlink.core.factory.task.BatchletFactory;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
+import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
@@ -46,7 +47,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
                     final ExecutionContext context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
-        final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
+        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
         stepContext.setBatchStatus(BatchStatus.STARTED);
         Throwable throwable = null;
         try {

@@ -100,7 +100,7 @@ public class JobImpl implements Job, JobWork, Serializable {
     @Override
     public Chain<?> before(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
-        final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
+        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
         long jobExecutionId = context.getJobExecutionId();
         Repository.startedJob(repository, jobExecutionId);
         log.debugf(Messages.get("CHAINLINK-018000.job.create.job.context"), context);

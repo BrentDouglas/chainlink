@@ -122,7 +122,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
                             .setTimeout(unit.toMillis(timeout)),
                     new JGroupsFutureListener<>(address, command, this.network, promise, timeout, unit)
             );
-        } catch (Exception e) {
+        } catch (final Exception e) {
             promise.reject(e);
         }
     }
@@ -140,7 +140,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
         } catch (final Exception e) {
             throw e;
         } catch (final Throwable e) {
-            throw new RuntimeException(e);
+            throw new Exception(e);
         }
     }
 

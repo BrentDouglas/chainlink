@@ -123,7 +123,7 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
     protected abstract boolean isMatchingAddressType(final Object address);
 
     @Override
-    public Worker getWorker(final WorkerId workerId) {
+    public Worker getWorker(final WorkerId workerId) throws InterruptedException, ExecutionException, TimeoutException {
         final Worker worker = getLocalWorker(workerId);
         if (worker != null) {
             return worker;
@@ -153,29 +153,25 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
             }
         }
         for (final Future<A> future : futures) {
-            try {
-                //TODO Search these for completes rather that .get(...) them in order
-                final A address = future.get(this.timeout, this.unit);
-                if (address == null) {
-                    continue;
-                }
-                final Worker rpcWorker;
-                if (address.equals(getAddress())) {
-                    throw new IllegalStateException(); //Also should not have been distributed
-                } else {
-                    rpcWorker = createDistributedWorker(address, workerId);
-                    remoteWorkers.put(workerId, rpcWorker);
-                }
-                return rpcWorker;
-            } catch (final InterruptedException | ExecutionException | TimeoutException e) {
-                throw new RuntimeException(e);
+            //TODO Search these for completes rather that .get(...) them in order
+            final A address = future.get(this.timeout, this.unit);
+            if (address == null) {
+                continue;
             }
+            final Worker rpcWorker;
+            if (address.equals(getAddress())) {
+                throw new IllegalStateException(); //Also should not have been distributed
+            } else {
+                rpcWorker = createDistributedWorker(address, workerId);
+                remoteWorkers.put(workerId, rpcWorker);
+            }
+            return rpcWorker;
         }
         throw new IllegalStateException(); //TODO message
     }
 
     @Override
-    public List<Worker> getWorkers(final int required) {
+    public List<Worker> getWorkers(final int required) throws InterruptedException, ExecutionException, TimeoutException {
         final List<A> members = new ArrayList<>(this.getRemotes());
         members.add(this.getAddress());
         final List<Future<WorkerId>> futures = new ArrayList<>(required);
@@ -188,27 +184,23 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
         }
         final ArrayList<Worker> workers = new ArrayList<>(required);
         for (final Future<WorkerId> future : futures) {
-            try {
-                final WorkerId threadId = future.get(this.timeout, this.unit);
-                if (getAddress().equals(threadId.getAddress())) {
-                    workers.add(getLocalWorker(threadId));
-                } else {
-                    final Object addr = threadId.getAddress();
-                    if (isMatchingAddressType(addr)) {
-                        @SuppressWarnings("unchecked")
-                        final A remote = (A)addr;
-                        workers.add(createDistributedWorker(remote, threadId));
-                    }
+            final WorkerId threadId = future.get(this.timeout, this.unit);
+            if (getAddress().equals(threadId.getAddress())) {
+                workers.add(getLocalWorker(threadId));
+            } else {
+                final Object addr = threadId.getAddress();
+                if (isMatchingAddressType(addr)) {
+                    @SuppressWarnings("unchecked")
+                    final A remote = (A)addr;
+                    workers.add(createDistributedWorker(remote, threadId));
                 }
-            } catch (final TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
             }
         }
         return workers;
     }
 
     @Override
-    public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) {
+    public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) throws InterruptedException, ExecutionException, TimeoutException {
         final Worker worker = getLocalWorker(jobExecutionId, executableId);
         if (worker != null) {
             return worker;
@@ -223,29 +215,25 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
             }
         }
         for (final Future<WorkerIdAndAddress<A>> future : futures) {
-            try {
                 //TODO Search these for completes rather that .get(...) them in order
-                final WorkerIdAndAddress<A> that = future.get(this.timeout, this.unit);
-                if (that == null) {
-                    continue;
-                }
-                final Worker rpcWorker;
-                if (that.getAddress().equals(getAddress())) {
-                    throw new IllegalStateException(); //Also should not have been distributed
-                } else {
-                    rpcWorker = createDistributedWorker(that.getAddress(), that.getWorkerId());
-                    remoteWorkers.put(that.getWorkerId(), rpcWorker);
-                }
-                return rpcWorker;
-            } catch (final TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            final WorkerIdAndAddress<A> that = future.get(this.timeout, this.unit);
+            if (that == null) {
+                continue;
             }
+            final Worker rpcWorker;
+            if (that.getAddress().equals(getAddress())) {
+                throw new IllegalStateException(); //Also should not have been distributed
+            } else {
+                rpcWorker = createDistributedWorker(that.getAddress(), that.getWorkerId());
+                remoteWorkers.put(that.getWorkerId(), rpcWorker);
+            }
+            return rpcWorker;
         }
         throw new IllegalStateException(); //TODO message
     }
 
     @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
+    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws InterruptedException, ExecutionException, TimeoutException {
         final ExecutionRepository ours = getRegistry().getExecutionRepository(id);
         if (ours != null) {
             return ours;
@@ -260,23 +248,19 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
             }
         }
         for (final Future<A> future : futures) {
-            try {
-                final A address = future.get(this.timeout, this.unit);
-                if (address == null) {
-                    continue;
-                } else if (getAddress().equals(address)) {
-                    throw new IllegalStateException(); //TODO Message
-                }
-                return createDistributedExecutionRepository(id, address);
-            } catch (final TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            final A address = future.get(this.timeout, this.unit);
+            if (address == null) {
+                continue;
+            } else if (getAddress().equals(address)) {
+                throw new IllegalStateException(); //TODO Message
             }
+            return createDistributedExecutionRepository(id, address);
         }
         throw new IllegalStateException(); //TODO Message
     }
 
     @Override
-    public Executable getExecutable(final long jobExecutionId, final ExecutableId id) {
+    public Executable getExecutable(final long jobExecutionId, final ExecutableId id) throws InterruptedException, ExecutionException, TimeoutException {
         final Executable ours = this.getRegistry().getExecutable(jobExecutionId, id);
         if (ours != null) {
             return ours;
@@ -291,15 +275,11 @@ public abstract class DistributedTransport<A> extends BaseTransport<A> {
             }
         }
         for (final Future<Executable> future : futures) {
-            try {
-                final Executable executable = future.get(this.timeout, this.unit);
-                if (executable == null) {
-                    continue;
-                }
-                return executable;
-            } catch (final TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            final Executable executable = future.get(this.timeout, this.unit);
+            if (executable == null) {
+                continue;
             }
+            return executable;
         }
         throw new IllegalStateException(); //TODO Message
     }

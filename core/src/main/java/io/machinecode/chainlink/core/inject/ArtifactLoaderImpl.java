@@ -3,6 +3,8 @@ package io.machinecode.chainlink.core.inject;
 import gnu.trove.set.hash.TLinkedHashSet;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -17,7 +19,7 @@ public class ArtifactLoaderImpl implements ArtifactLoader {
     private final ClassLoaderArtifactLoader configuredLoader;
     private final TLinkedHashSet<ArtifactLoader> loaders;
 
-    public ArtifactLoaderImpl(final ClassLoader classLoader, final ArtifactLoader... artifactLoaders) {
+    public ArtifactLoaderImpl(final ClassLoader classLoader, final ArtifactLoader... artifactLoaders) throws JAXBException, IOException {
         this.jarBatchLoader = new JarBatchArtifactLoader(classLoader);
         this.warBatchLoader = new WarBatchArtifactLoader(classLoader);
         this.configuredLoader = new ClassLoaderArtifactLoader();

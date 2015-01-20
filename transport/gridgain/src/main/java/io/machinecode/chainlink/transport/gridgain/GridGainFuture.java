@@ -2,6 +2,8 @@ package io.machinecode.chainlink.transport.gridgain;
 
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridFuture;
+import org.gridgain.grid.GridFutureTimeoutException;
+import org.gridgain.grid.GridInterruptedException;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -23,7 +25,7 @@ public class GridGainFuture<T> implements Future<T> {
     public boolean cancel(final boolean mayInterruptIfRunning) {
         try {
             return future.cancel();
-        } catch (GridException e) {
+        } catch (final GridException e) {
             throw new RuntimeException(e);
         }
     }
@@ -42,8 +44,12 @@ public class GridGainFuture<T> implements Future<T> {
     public T get() throws InterruptedException, ExecutionException {
         try {
             return future.get();
-        } catch (GridException e) {
-            throw new RuntimeException(e);
+        } catch (final GridInterruptedException e) {
+            final InterruptedException ex = new InterruptedException();
+            ex.addSuppressed(e);
+            throw ex;
+        } catch (final GridException e) {
+            throw new ExecutionException(e);
         }
     }
 
@@ -51,8 +57,16 @@ public class GridGainFuture<T> implements Future<T> {
     public T get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         try {
             return future.get(timeout, unit);
-        } catch (GridException e) {
-            throw new RuntimeException(e);
+        } catch (final GridInterruptedException e) {
+            final InterruptedException ex = new InterruptedException();
+            ex.addSuppressed(e);
+            throw ex;
+        } catch (final GridFutureTimeoutException e) {
+            final TimeoutException ex = new TimeoutException();
+            ex.addSuppressed(e);
+            throw ex;
+        } catch (final GridException e) {
+            throw new ExecutionException(e);
         }
     }
 }

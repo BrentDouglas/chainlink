@@ -4,8 +4,8 @@ import io.machinecode.chainlink.core.element.execution.FlowImpl;
 import io.machinecode.chainlink.core.element.execution.SplitImpl;
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.factory.ElementFactory;
-import io.machinecode.chainlink.core.util.Util;
-import io.machinecode.chainlink.core.util.Util.ExpressionTransformer;
+import io.machinecode.chainlink.core.util.Copy;
+import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
 import io.machinecode.chainlink.spi.element.execution.Flow;
 import io.machinecode.chainlink.spi.element.execution.Split;
 import io.machinecode.chainlink.spi.expression.JobPropertyContext;
@@ -38,7 +38,7 @@ public class SplitFactory implements ElementFactory<Split, SplitImpl> {
     public SplitImpl produceExecution(final Split that, final JobPropertyContext context) {
         final String id = Expression.resolveExecutionProperty(that.getId(), context);
         final String next = Expression.resolveExecutionProperty(that.getNext(), context);
-        final List<FlowImpl> flows = Util.immutableCopy(that.getFlows(), context, FLOW_EXECUTION_TRANSFORMER);
+        final List<FlowImpl> flows = Copy.immutableCopy(that.getFlows(), context, FLOW_EXECUTION_TRANSFORMER);
         return new SplitImpl(id, next, flows);
     }
 
@@ -46,7 +46,7 @@ public class SplitFactory implements ElementFactory<Split, SplitImpl> {
     public SplitImpl producePartitioned(final SplitImpl that, final PropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String next = Expression.resolvePartitionProperty(that.getNext(), context);
-        final List<FlowImpl> flows = Util.immutableCopy(that.getFlows(), context, FLOW_PARTITION_TRANSFORMER);
+        final List<FlowImpl> flows = Copy.immutableCopy(that.getFlows(), context, FLOW_PARTITION_TRANSFORMER);
         return new SplitImpl(id, next, flows);
     }
 }

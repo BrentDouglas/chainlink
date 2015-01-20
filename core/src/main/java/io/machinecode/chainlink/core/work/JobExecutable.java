@@ -38,7 +38,7 @@ public class JobExecutable extends ExecutableImpl<JobWork> {
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("CHAINLINK-023002.work.job.before.exception", this.context));
             Repository.failedJob(
-                    configuration.getExecutionRepository(executionRepositoryId),
+                    Repository.getExecutionRepository(configuration, executionRepositoryId),
                     this.context.getJobExecutionId(),
                     this.context.getJobContext().getExitStatus()
             );

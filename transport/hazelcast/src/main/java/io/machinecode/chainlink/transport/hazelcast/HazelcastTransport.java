@@ -175,7 +175,7 @@ public class HazelcastTransport extends DistributedTransport<Member> {
             } catch (final Exception e) {
                 throw e;
             } catch (final Throwable e) {
-                throw new RuntimeException(e);
+                throw new Exception(e);
             }
         }
     }

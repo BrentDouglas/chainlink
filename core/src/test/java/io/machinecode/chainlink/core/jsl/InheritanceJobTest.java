@@ -42,13 +42,13 @@ public abstract class InheritanceJobTest {
     }
 
     @Before
-    public void before() {
+    public void before() throws Exception {
         if (repo == null) {
             repo = createRepo();
         }
     }
 
-    protected abstract AbstractJobLoader createRepo();
+    protected abstract AbstractJobLoader createRepo() throws Exception;
 
     @Test
     public void jobConfigTest() throws Exception {

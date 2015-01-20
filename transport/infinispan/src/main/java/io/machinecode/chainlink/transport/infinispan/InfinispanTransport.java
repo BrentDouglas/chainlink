@@ -91,11 +91,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
         }
         //TODO Add timeout
         while (manager.getStatus().ordinal() < ComponentStatus.RUNNING.ordinal()) {
-            try {
-                Thread.sleep(100);
-            } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            Thread.sleep(100);
         }
         this.network = Executors.newSingleThreadExecutor();
         this.reaper = Executors.newSingleThreadExecutor();
@@ -121,11 +117,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
         }
         //TODO Add timeout
         while (!manager.isRunning(this.cacheName)) {
-            try {
-                Thread.sleep(100);
-            } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            Thread.sleep(100);
         }
         this.getRegistry().registerJobEventListener(CLEANUP_INFINISPAN, new JobEventListener() {
             @Override
@@ -199,7 +191,7 @@ public class InfinispanTransport extends BaseTransport<Address> {
     }
 
     @Override
-    public Worker getWorker(final WorkerId workerId) {
+    public Worker getWorker(final WorkerId workerId) throws InterruptedException, ExecutionException, TimeoutException {
         final Worker worker = getLocalWorker(workerId);
         if (worker != null) {
             return worker;
@@ -226,29 +218,25 @@ public class InfinispanTransport extends BaseTransport<Address> {
             futures.add(distributor.submit(address, new FindWorkerByIdCallable(workerId)));
         }
         for (final Future<Address> future : futures) {
-            try {
-                //TODO Search these for completes rather that .get(...) them in order
-                final Address address = future.get(this.timeout, this.unit);
-                if (address == null) {
-                    continue;
-                }
-                final Worker rpcWorker;
-                if (address.equals(local)) {
-                    throw new IllegalStateException(); //Also should not have been distributed
-                } else {
-                    rpcWorker = new InfinispanWorker(this, local, address, workerId);
-                    remoteWorkers.put(workerId, rpcWorker);
-                }
-                return rpcWorker;
-            } catch (TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            //TODO Search these for completes rather that .get(...) them in order
+            final Address address = future.get(this.timeout, this.unit);
+            if (address == null) {
+                continue;
             }
+            final Worker rpcWorker;
+            if (address.equals(local)) {
+                throw new IllegalStateException(); //Also should not have been distributed
+            } else {
+                rpcWorker = new InfinispanWorker(this, local, address, workerId);
+                remoteWorkers.put(workerId, rpcWorker);
+            }
+            return rpcWorker;
         }
         throw new IllegalStateException(); //TODO message
     }
 
     @Override
-    public List<Worker> getWorkers(final int required) {
+    public List<Worker> getWorkers(final int required) throws InterruptedException, ExecutionException, TimeoutException {
         final List<Address> members = rpc.getMembers();
         final List<Future<InfinispanWorkerId>> futures = new ArrayList<>(required);
         for (final Address address : filterMembers(members, required)) {
@@ -256,22 +244,18 @@ public class InfinispanTransport extends BaseTransport<Address> {
         }
         final ArrayList<Worker> workers = new ArrayList<>(required);
         for (final Future<InfinispanWorkerId> future : futures) {
-            try {
-                final InfinispanWorkerId threadId = future.get(this.timeout, this.unit);
-                if (local.equals(threadId.getAddress())) {
-                    workers.add(getLocalWorker(threadId));
-                } else {
-                    workers.add(new InfinispanWorker(this, local, threadId.getAddress(), threadId));
-                }
-            } catch (TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            final InfinispanWorkerId threadId = future.get(this.timeout, this.unit);
+            if (local.equals(threadId.getAddress())) {
+                workers.add(getLocalWorker(threadId));
+            } else {
+                workers.add(new InfinispanWorker(this, local, threadId.getAddress(), threadId));
             }
         }
         return workers;
     }
 
     @Override
-    public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) {
+    public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) throws InterruptedException, ExecutionException, TimeoutException {
         final Worker worker = getLocalWorker(jobExecutionId, executableId);
         if (worker != null) {
             return worker;
@@ -282,29 +266,25 @@ public class InfinispanTransport extends BaseTransport<Address> {
             futures.add(distributor.submit(address, new FindWorkerForExecutionCallable(jobExecutionId, executableId)));
         }
         for (final Future<WorkerIdAndAddress<Address>> future : futures) {
-            try {
-                //TODO Search these for completes rather that .get(...) them in order
-                final WorkerIdAndAddress<Address> that = future.get(this.timeout, this.unit);
-                if (that == null) {
-                    continue;
-                }
-                final Worker rpcWorker;
-                if (that.getAddress().equals(local)) {
-                    throw new IllegalStateException(); //Also should not have been distributed
-                } else {
-                    rpcWorker = new InfinispanWorker(this, local, that.getAddress(), that.getWorkerId());
-                    remoteWorkers.put(that.getWorkerId(), rpcWorker);
-                }
-                return rpcWorker;
-            } catch (TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            //TODO Search these for completes rather that .get(...) them in order
+            final WorkerIdAndAddress<Address> that = future.get(this.timeout, this.unit);
+            if (that == null) {
+                continue;
             }
+            final Worker rpcWorker;
+            if (that.getAddress().equals(local)) {
+                throw new IllegalStateException(); //Also should not have been distributed
+            } else {
+                rpcWorker = new InfinispanWorker(this, local, that.getAddress(), that.getWorkerId());
+                remoteWorkers.put(that.getWorkerId(), rpcWorker);
+            }
+            return rpcWorker;
         }
         throw new IllegalStateException(); //TODO message
     }
 
     @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
+    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws InterruptedException, ExecutionException, TimeoutException {
         final ExecutionRepository ours = getRegistry().getExecutionRepository(id);
         if (ours != null) {
             return ours;
@@ -316,23 +296,19 @@ public class InfinispanTransport extends BaseTransport<Address> {
             futures.add(distributor.submit(address, new FindExecutionRepositoryWithIdCallable(id)));
         }
         for (final Future<Address> future : futures) {
-            try {
-                final Address address = future.get(this.timeout, this.unit);
-                if (address == null) {
-                    continue;
-                } else if (local.equals(address)) {
-                    throw new IllegalStateException(); //TODO Message
-                }
-                return new InfinispanProxyExecutionRepository(this, id, address);
-            } catch (TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            final Address address = future.get(this.timeout, this.unit);
+            if (address == null) {
+                continue;
+            } else if (local.equals(address)) {
+                throw new IllegalStateException(); //TODO Message
             }
+            return new InfinispanProxyExecutionRepository(this, id, address);
         }
         throw new IllegalStateException(); //TODO Message
     }
 
     @Override
-    public Executable getExecutable(final long jobExecutionId, final ExecutableId id) {
+    public Executable getExecutable(final long jobExecutionId, final ExecutableId id) throws Exception {
         final Executable ours = super.getExecutable(jobExecutionId, id);
         if (ours != null) {
             return ours;
@@ -344,15 +320,11 @@ public class InfinispanTransport extends BaseTransport<Address> {
             futures.add(distributor.submit(address, new FindExecutableCallable(jobExecutionId, id)));
         }
         for (final Future<Executable> future : futures) {
-            try {
-                final Executable executable = future.get(this.timeout, this.unit);
-                if (executable == null) {
-                    continue;
-                }
-                return executable;
-            } catch (TimeoutException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            final Executable executable = future.get(this.timeout, this.unit);
+            if (executable == null) {
+                continue;
             }
+            return executable;
         }
         throw new IllegalStateException(); //TODO Message
     }

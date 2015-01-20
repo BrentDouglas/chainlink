@@ -61,7 +61,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
 
     protected final EmbeddedCacheManager cacheManager;
 
-    public InfinispanExecutionRepository(final Marshalling marshalling, final EmbeddedCacheManager cacheManager) {
+    public InfinispanExecutionRepository(final Marshalling marshalling, final EmbeddedCacheManager cacheManager) throws InterruptedException {
         super(marshalling);
         this.cacheManager = cacheManager;
 
@@ -89,17 +89,13 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
         }
     }
 
-    private static <K,V> AdvancedCache<K,V> _cache(final EmbeddedCacheManager cacheManager, final String region) {
+    private static <K,V> AdvancedCache<K,V> _cache(final EmbeddedCacheManager cacheManager, final String region) throws InterruptedException {
         final Cache<K, V> cache = cacheManager.getCache(region, true);
         if (!cacheManager.isRunning(region)) {
             cacheManager.startCaches(region);
         }
         while (!cacheManager.isRunning(region)) {
-            try {
-                Thread.sleep(100);
-            } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            Thread.sleep(100);
         }
         assertConfig(cache);
         return cache.getAdvancedCache();

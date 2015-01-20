@@ -3,8 +3,8 @@ package io.machinecode.chainlink.core.factory;
 import io.machinecode.chainlink.core.element.PropertiesImpl;
 import io.machinecode.chainlink.core.element.PropertyImpl;
 import io.machinecode.chainlink.core.expression.Expression;
-import io.machinecode.chainlink.core.util.Util;
-import io.machinecode.chainlink.core.util.Util.ExpressionTransformer;
+import io.machinecode.chainlink.core.util.Copy;
+import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
 import io.machinecode.chainlink.spi.element.Properties;
 import io.machinecode.chainlink.spi.element.Property;
 import io.machinecode.chainlink.spi.expression.JobPropertyContext;
@@ -43,7 +43,7 @@ public class PropertiesFactory implements ElementFactory<Properties, PropertiesI
             properties = Collections.emptyList();
         } else {
             partition = Expression.resolveExecutionProperty(that.getPartition(), context);
-            properties = Util.immutableCopy(that.getProperties(), context, PROPERTY_BUILD_TRANSFORMER);
+            properties = Copy.immutableCopy(that.getProperties(), context, PROPERTY_BUILD_TRANSFORMER);
         }
         return new PropertiesImpl(
                 partition,
@@ -54,7 +54,7 @@ public class PropertiesFactory implements ElementFactory<Properties, PropertiesI
     @Override
     public PropertiesImpl producePartitioned(final PropertiesImpl that, final PropertyContext context) {
         final String partition = Expression.resolvePartitionProperty(that.getPartition(), context);
-        final List<PropertyImpl> properties = Util.immutableCopy(that.getProperties(), context, PROPERTY_PARTITION_TRANSFORMER);
+        final List<PropertyImpl> properties = Copy.immutableCopy(that.getProperties(), context, PROPERTY_PARTITION_TRANSFORMER);
         return new PropertiesImpl(
                 partition,
                 properties

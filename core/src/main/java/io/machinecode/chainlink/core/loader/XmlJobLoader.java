@@ -18,22 +18,13 @@ import java.io.InputStream;
  */
 public abstract class XmlJobLoader extends AbstractJobLoader {
 
-    private static final Unmarshaller unmarshaller;
-
-    static {
-        final JAXBContext context;
-        try {
-            context = JAXBContext.newInstance(XmlJob.class);
-            unmarshaller = context.createUnmarshaller();
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    private final Unmarshaller unmarshaller;
     private final ClassLoader loader;
 
-    public XmlJobLoader(final ClassLoader loader) {
+    public XmlJobLoader(final ClassLoader loader) throws JAXBException {
         this.loader = loader;
+        final JAXBContext context = JAXBContext.newInstance(XmlJob.class);
+        unmarshaller = context.createUnmarshaller();
     }
 
     final TMap<String, Node> repos = new THashMap<>();

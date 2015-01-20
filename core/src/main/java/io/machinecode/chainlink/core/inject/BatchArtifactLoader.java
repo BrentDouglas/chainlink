@@ -24,23 +24,14 @@ public abstract class BatchArtifactLoader implements ArtifactLoader {
 
     private static final Logger log = Logger.getLogger(BatchArtifactLoader.class);
 
-    private static final Unmarshaller unmarshaller;
-
-    static {
-        final JAXBContext context;
-        try {
-            context = JAXBContext.newInstance(BatchArtifacts.class);
-            unmarshaller = context.createUnmarshaller();
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    private final Unmarshaller unmarshaller;
     private final List<BatchArtifactRef> artifacts;
 
     public abstract String getPrefix();
 
-    public BatchArtifactLoader(final ClassLoader loader) {
+    public BatchArtifactLoader(final ClassLoader loader) throws JAXBException, IOException {
+        final JAXBContext context = JAXBContext.newInstance(BatchArtifacts.class);
+        unmarshaller = context.createUnmarshaller();
         final BatchArtifacts batchArtifacts;
         final InputStream stream = loader.getResourceAsStream(getPrefix() + "batch.xml");
         if (stream == null) {
@@ -49,14 +40,8 @@ public abstract class BatchArtifactLoader implements ArtifactLoader {
         }
         try {
             batchArtifacts = (BatchArtifacts) unmarshaller.unmarshal(stream);
-        } catch (final JAXBException e) {
-            throw new RuntimeException(e);
         } finally {
-            try {
-                stream.close();
-            } catch (final IOException e) {
-                //
-            }
+            stream.close();
         }
         this.artifacts = batchArtifacts.getRefs();
         for (final BatchArtifactRef ref : artifacts) {

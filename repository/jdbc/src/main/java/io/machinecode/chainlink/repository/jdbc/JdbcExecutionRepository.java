@@ -63,7 +63,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         this.password = password;
     }
 
-    public static JdbcExecutionRepository create(final DataSourceLookup lookup, final String username, final String password) {
+    public static JdbcExecutionRepository create(final DataSourceLookup lookup, final String username, final String password) throws SQLException {
         final DataSource dataSource = lookup.getDataSource();
         try (final Connection connection = username == null || password == null
                     ? dataSource.getConnection()
@@ -74,12 +74,10 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             } else {
                 return new JdbcExecutionRepository(dataSource, username, password);
             }
-        } catch (final SQLException e) {
-            throw new RuntimeException(e); //TODO
         }
     }
 
-    public static JdbcExecutionRepository create(final DataSourceLookup lookup) {
+    public static JdbcExecutionRepository create(final DataSourceLookup lookup) throws SQLException {
         return create(lookup, null, null);
     }
 

@@ -7,6 +7,7 @@ import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.NoSuchJobException;
+import javax.xml.bind.JAXBException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ public class JobLoaderImpl implements JobLoader {
     private final WarXmlJobLoader warLoader;
     private final Set<JobLoader> loaders;
 
-    public JobLoaderImpl(final ClassLoader classLoader, final JobLoader... jobLoaders) {
+    public JobLoaderImpl(final ClassLoader classLoader, final JobLoader... jobLoaders) throws JAXBException {
         this.jarLoader = new JarXmlJobLoader(classLoader);
         this.warLoader = new WarXmlJobLoader(classLoader);
         this.loaders = new TLinkedHashSet<>();

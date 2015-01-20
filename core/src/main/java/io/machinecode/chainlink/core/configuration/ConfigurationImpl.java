@@ -4,7 +4,6 @@ import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.core.inject.InjectionContextImpl;
 import io.machinecode.chainlink.core.inject.InjectorImpl;
 import io.machinecode.chainlink.core.loader.JobLoaderImpl;
-import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.security.SecurityImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
@@ -14,7 +13,6 @@ import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.security.Security;
@@ -118,13 +116,6 @@ public class ConfigurationImpl implements Configuration {
     @Override
     public Executor getExecutor() {
         return executor;
-    }
-
-    @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        final ExecutionRepository repository = transport.getExecutionRepository(id);
-        LocalRegistry.assertExecutionRepository(repository, id);
-        return repository;
     }
 
     @Override

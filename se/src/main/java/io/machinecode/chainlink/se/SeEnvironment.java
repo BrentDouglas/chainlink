@@ -137,7 +137,7 @@ public class SeEnvironment implements Environment, AutoCloseable {
         if (throwable instanceof Exception) {
             throw (Exception)throwable;
         } else {
-            throw new RuntimeException(throwable);
+            throw new Exception(throwable);
         }
     }
 
