@@ -33,7 +33,7 @@ public abstract class SetCommand extends BaseCommand {
             return new FileInputStream(file);
         }
         if (base64 != null) {
-            return new ByteArrayInputStream(Base64.getDecoder().decode(base64));
+            return new ByteArrayInputStream(Base64.getUrlDecoder().decode(base64));
         }
         throw new Exception("One of the arguments file or base64 must be provided.");
     }
