@@ -20,8 +20,6 @@ import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.schema.SubSystemSchema;
 
 import javax.batch.runtime.BatchRuntime;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -58,7 +56,7 @@ public class ManualConfiguration {
         Chainlink.setEnvironment(new Environment() {
             @Override
             public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
-                throw new IllegalStateException("Not implemented yet");
+                throw new IllegalStateException("Not implemented");
             }
 
             @Override
@@ -70,18 +68,18 @@ public class ManualConfiguration {
             }
 
             @Override
-            public SubSystemSchema<?, ?, ?, ?> getConfiguration() {
-                throw new IllegalStateException("Not implemented yet");
+            public SubSystemSchema<?,?,?,?> getConfiguration() {
+                throw new IllegalStateException("Not implemented");
             }
 
             @Override
-            public SubSystemSchema<?, ?, ?, ?> setConfiguration(final Configure configure) {
-                throw new IllegalStateException("Not implemented yet");
+            public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
+                throw new IllegalStateException("Not implemented");
             }
 
             @Override
             public void reload() throws Exception {
-                throw new IllegalStateException("Not implemented yet");
+                throw new IllegalStateException("Not implemented");
             }
         });
     }

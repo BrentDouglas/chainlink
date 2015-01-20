@@ -57,12 +57,12 @@ public class SeEnvironment implements Environment, AutoCloseable {
     }
 
     @Override
-    public SubSystemSchema<?, ?, ?, ?> getConfiguration() {
+    public SubSystemSchema<?,?,?,?> getConfiguration() {
         throw new IllegalStateException("Not implemented yet");
     }
 
     @Override
-    public SubSystemSchema<?, ?, ?, ?> setConfiguration(final Configure configure) {
+    public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
         throw new IllegalStateException("Not implemented yet");
     }
 

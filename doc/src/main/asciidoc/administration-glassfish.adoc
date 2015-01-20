@@ -163,7 +163,7 @@ The command will fail if:
 
 1. Neither of the arguments `file` or `base64` are provided.
 2. Both of the arguments `file` or `base64` are provided.
-3. The xml content provided is not a valid snipped of the `job-operator` element in the schema
+3. The xml content provided is not a valid snippet of the `job-operator` element in the schema
    `chainlink_1_0.xsd`.
 
 [cols="1,3"]
@@ -184,7 +184,7 @@ The command will fail if:
 
 1. Neither of the arguments `file` or `base64` are provided.
 2. Both of the arguments `file` or `base64` are provided.
-3. The xml content provided is not a valid snipped of the `deployment` element in the schema
+3. The xml content provided is not a valid snippet of the `deployment` element in the schema
    `chainlink_1_0.xsd`.
 
 [cols="1,3"]
@@ -207,7 +207,7 @@ xml. This command is an 'upsert'. The command will fail if:
 2. The named `deployment` element does not exist.
 3. Neither of the arguments `file` or `base64` are provided.
 4. Both of the arguments `file` or `base64` are provided.
-5. The xml content provided is not a valid snipped of the `job-operator` element in the schema
+5. The xml content provided is not a valid snippet of the `job-operator` element in the schema
    `chainlink_1_0.xsd`.
 
 [cols="1,3"]
