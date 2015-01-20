@@ -90,42 +90,42 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
     }
 
     @Override
-    public synchronized ExtendedJobExecution createJobExecution(final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws Exception {
-        final CopyOnWriteArrayList<Long> executions = jobInstanceExecutions().get(instance.getInstanceId());
+    public synchronized ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
+        final CopyOnWriteArrayList<Long> executions = jobInstanceExecutions().get(jobInstanceId);
         if (executions == null) {
-            throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
+            throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
         }
         final long jobExecutionId = _id(JOB_EXECUTION_ID);
         executions.add(jobExecutionId);
-        jobInstanceExecutions().put(instance.getInstanceId(), executions);
+        jobInstanceExecutions().put(jobInstanceId, executions);
         final ExtendedJobExecution execution = newJobExecutionBuilder()
-                .setJobInstanceId(instance.getInstanceId())
+                .setJobInstanceId(jobInstanceId)
                 .setJobExecutionId(jobExecutionId)
-                .setJobName(instance.getJobName())
+                .setJobName(jobName)
                 .setBatchStatus(BatchStatus.STARTING)
                 .setJobParameters(parameters)
                 .setCreateTime(timestamp)
                 .setLastUpdatedTime(timestamp)
                 .build();
         jobExecutions().put(jobExecutionId, execution);
-        jobExecutionInstances().put(jobExecutionId, instance.getInstanceId());
-        latestJobExecutionForInstance().put(instance.getInstanceId(), jobExecutionId);
+        jobExecutionInstances().put(jobExecutionId, jobInstanceId);
+        latestJobExecutionForInstance().put(jobInstanceId, jobExecutionId);
         jobExecutionStepExecutions().put(jobExecutionId, new CopyOnWriteArraySet<Long>());
         jobExecutionHistory().put(jobExecutionId, new CopyOnWriteArraySet<Long>());
         return execution;
     }
 
     @Override
-    public synchronized ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
-        final CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions().get(jobExecution.getExecutionId());
+    public synchronized ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception {
+        final CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions().get(jobExecutionId);
         if (executionIds == null) {
-            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
+            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
         }
         final long stepExecutionId = _id(STEP_EXECUTION_ID);
         executionIds.add(stepExecutionId);
-        jobExecutionStepExecutions().put(jobExecution.getExecutionId(), executionIds);
+        jobExecutionStepExecutions().put(jobExecutionId, executionIds);
         final ExtendedStepExecution execution = newStepExecutionBuilder()
-                .setJobExecutionId(jobExecution.getExecutionId())
+                .setJobExecutionId(jobExecutionId)
                 .setStepExecutionId(stepExecutionId)
                 .setStepName(stepName)
                 .setCreateTime(timestamp)
@@ -455,7 +455,8 @@ public abstract class BaseMapExecutionRepository implements ExecutionRepository 
                 throw new JobRestartException(Messages.format("CHAINLINK-006007.execution.repository.execution.not.eligible.for.restart", jobExecution.getExecutionId(), BatchStatus.STOPPED, BatchStatus.FAILED, jobExecution.getBatchStatus()));
         }
         return createJobExecution(
-                getJobInstance(jobExecution.getJobInstanceId()),
+                jobExecution.getJobInstanceId(),
+                jobExecution.getJobName(),
                 parameters,
                 new Date()
         );

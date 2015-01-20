@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.then.api.Promise;
 
@@ -172,7 +173,7 @@ public class LazyJobOperator implements ExtendedJobOperator {
     }
 
     @Override
-    public JobInstance getJobInstance(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public ExtendedJobInstance getJobInstance(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         lazyOpen();
         return delegate.getJobInstance(jobExecutionId);
     }
@@ -184,7 +185,7 @@ public class LazyJobOperator implements ExtendedJobOperator {
     }
 
     @Override
-    public JobExecution getJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public ExtendedJobExecution getJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         lazyOpen();
         return delegate.getJobExecution(jobExecutionId);
     }

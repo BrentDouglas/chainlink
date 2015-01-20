@@ -114,13 +114,13 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public JobExecutionImpl createJobExecution(final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws NoSuchJobInstanceException {
+    public JobExecutionImpl createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws NoSuchJobInstanceException {
         final long jobExecutionId;
         while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
         try {
-            final TLongList executions = jobInstanceExecutions.get(instance.getInstanceId());
+            final TLongList executions = jobInstanceExecutions.get(jobInstanceId);
             if (executions == null) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", instance.getInstanceId()));
+                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
             }
             jobExecutionId = jobExecutionIndex.getAndIncrement();
             executions.add(jobExecutionId);
@@ -128,9 +128,9 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             jobInstanceExecutionLock.set(false);
         }
         final JobExecutionImpl execution = new JobExecutionImpl.Builder()
-                .setJobInstanceId(instance.getInstanceId())
+                .setJobInstanceId(jobInstanceId)
                 .setJobExecutionId(jobExecutionId)
-                .setJobName(instance.getJobName())
+                .setJobName(jobName)
                 .setBatchStatus(BatchStatus.STARTING)
                 .setJobParameters(parameters)
                 .setCreateTime(timestamp)
@@ -144,13 +144,13 @@ public class MemoryExecutionRepository implements ExecutionRepository {
         }
         while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
         try {
-            jobExecutionInstances.put(jobExecutionId, instance.getInstanceId());
+            jobExecutionInstances.put(jobExecutionId, jobInstanceId);
         } finally {
             jobExecutionInstanceLock.set(false);
         }
         while (!latestJobExecutionForInstanceLock.compareAndSet(false, true)) {}
         try {
-            latestJobExecutionForInstance.put(instance.getInstanceId(), jobExecutionId);
+            latestJobExecutionForInstance.put(jobInstanceId, jobExecutionId);
         } finally {
             latestJobExecutionForInstanceLock.set(false);
         }
@@ -170,13 +170,13 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public StepExecutionImpl createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public StepExecutionImpl createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception {
         final long stepExecutionId;
         while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
         try {
-            final TLongSet executionIds = jobExecutionStepExecutions.get(jobExecution.getExecutionId());
+            final TLongSet executionIds = jobExecutionStepExecutions.get(jobExecutionId);
             if (executionIds == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             stepExecutionId = stepExecutionIndex.getAndIncrement();
             executionIds.add(stepExecutionId);
@@ -184,7 +184,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             jobExecutionStepExecutionLock.set(false);
         }
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
-                .setJobExecutionId(jobExecution.getExecutionId())
+                .setJobExecutionId(jobExecutionId)
                 .setStepExecutionId(stepExecutionId)
                 .setStepName(stepName)
                 .setCreateTime(timestamp)
@@ -543,6 +543,7 @@ public class MemoryExecutionRepository implements ExecutionRepository {
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException {
         while (!jobExecutionLock.compareAndSet(false, true)) {}
         try {
+            boolean found = false;
             final List<Long> ids = new ArrayList<Long>();
             for (final JobExecution jobExecution : jobExecutions.valueCollection()) {
                 if (jobName.equals(jobExecution.getJobName())) {
@@ -551,9 +552,10 @@ public class MemoryExecutionRepository implements ExecutionRepository {
                         case STARTED:
                             ids.add(jobExecution.getExecutionId());
                     }
+                    found = true;
                 }
             }
-            if (ids.isEmpty()) {
+            if (!found) {
                 throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
             }
             return ids;
@@ -689,7 +691,8 @@ public class MemoryExecutionRepository implements ExecutionRepository {
             jobExecutionLock.set(false);
         }
         return createJobExecution(
-                getJobInstance(jobInstanceId),
+                jobInstanceId,
+                getJobInstance(jobInstanceId).getJobName(),
                 parameters,
                 new Date()
         );

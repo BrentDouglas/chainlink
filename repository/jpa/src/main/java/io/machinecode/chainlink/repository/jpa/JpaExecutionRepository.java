@@ -79,7 +79,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception {
+    public ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
         final EntityManager em = em();
         final ExtendedTransactionManager transaction = lookup.getTransactionManager(em);
         try {
@@ -87,7 +87,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            final ExtendedJobExecution that = _createJobExecution(em, jobInstance, parameters, timestamp);
+            final ExtendedJobExecution that = _createJobExecution(em, jobInstanceId, jobName, parameters, timestamp);
             transaction.commit();
             return that;
         } catch (final Exception e) {
@@ -100,17 +100,17 @@ public class JpaExecutionRepository implements ExecutionRepository {
         }
     }
 
-    public ExtendedJobExecution _createJobExecution(final EntityManager em, final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception {
-            final JpaJobInstance instance = em.find(JpaJobInstance.class, jobInstance.getInstanceId());
+    public ExtendedJobExecution _createJobExecution(final EntityManager em, final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
+            final JpaJobInstance instance = em.find(JpaJobInstance.class, jobInstanceId);
             if (instance == null) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstance.getInstanceId()));
+                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
             }
             final JpaJobExecution execution = new JpaJobExecution()
                     .setBatchStatus(BatchStatus.STARTING)
                     .setCreateTime(timestamp)
                     .setLastUpdatedTime(timestamp)
                     .setJobParameters(parameters)
-                    .setJobName(jobInstance.getJobName())
+                    .setJobName(jobName)
                     .setJobInstance(instance);
             em.persist(execution);
             em.flush();
@@ -118,7 +118,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception {
         final EntityManager em = em();
         final ExtendedTransactionManager transaction = lookup.getTransactionManager(em);
         try {
@@ -126,9 +126,9 @@ public class JpaExecutionRepository implements ExecutionRepository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            final JpaJobExecution jpaJobExecution = em.find(JpaJobExecution.class, jobExecution.getExecutionId());
+            final JpaJobExecution jpaJobExecution = em.find(JpaJobExecution.class, jobExecutionId);
             if (jpaJobExecution == null) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecution.getExecutionId()));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
             }
             final JpaStepExecution execution = new JpaStepExecution()
                     .setBatchStatus(BatchStatus.STARTING)
@@ -535,7 +535,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
             final List<String> names = em.createNamedQuery("JpaJobInstance.jobNames", String.class)
                     .getResultList();
             transaction.commit();
-            return new HashSet<String>(names);
+            return new HashSet<>(names);
         } catch (final Exception e) {
             transaction.rollback();
             throw e;
@@ -597,7 +597,7 @@ public class JpaExecutionRepository implements ExecutionRepository {
                 transaction.commit();
                 return Collections.emptyList();
             }
-            final List<JobInstance> copy = new ArrayList<JobInstance>(size);
+            final List<JobInstance> copy = new ArrayList<>(size);
             for (final JpaJobInstance instance : instances) {
                 copy.add(new JobInstanceImpl(instance));
             }
@@ -806,7 +806,8 @@ public class JpaExecutionRepository implements ExecutionRepository {
             }
             final ExtendedJobExecution that = _createJobExecution(
                     em,
-                    getJobInstance(jobInstanceId),
+                    jobInstanceId,
+                    jobExecution.getJobName(),
                     parameters,
                     new Date()
             );

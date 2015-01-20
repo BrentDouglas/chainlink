@@ -28,4 +28,8 @@ public class StopBatchlet extends javax.batch.api.AbstractBatchlet {
             this.notifyAll();
         }
     }
+
+    public static void reset() {
+        hasStopped.set(false);
+    }
 }

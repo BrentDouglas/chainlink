@@ -96,12 +96,12 @@ public class MongoExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) {
+    public ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) {
         final long jobExecutionId = _id(JOB_EXECUTION_ID);
         final MongoJobExecution execution = new MongoJobExecution.Builder()
-                .setJobInstanceId(jobInstance.getInstanceId())
+                .setJobInstanceId(jobInstanceId)
                 .setJobExecutionId(jobExecutionId)
-                .setJobName(jobInstance.getJobName())
+                .setJobName(jobName)
                 .setBatchStatus(STARTING)
                 .setJobParameters(parameters)
                 .setCreateTime(timestamp)
@@ -111,7 +111,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         jobExecutions.insert(execution);
 
         final MongoCollection jobInstances = jongo.getCollection(JOB_INSTANCES);
-        jobInstances.findAndModify("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstance.getInstanceId())
+        jobInstances.findAndModify("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstanceId)
                 .with("{$set:{" + Fields.LATEST_JOB_EXECUTION_ID + ":#}}", jobExecutionId)
                 .upsert()
                 .map(DO_NOTHING);
@@ -120,10 +120,10 @@ public class MongoExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) {
+    public ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) {
         final long stepExecutionId = _id(STEP_EXECUTION_ID);
         final MongoStepExecution execution = new MongoStepExecution.Builder()
-                .setJobExecutionId(jobExecution.getExecutionId())
+                .setJobExecutionId(jobExecutionId)
                 .setStepExecutionId(stepExecutionId)
                 .setStepName(stepName)
                 .setCreateTime(timestamp)
@@ -514,7 +514,8 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 throw new JobRestartException(Messages.format("CHAINLINK-006007.execution.repository.execution.not.eligible.for.restart", jobExecution.getExecutionId(), STOPPED, FAILED, jobExecution.getBatchStatus()));
         }
         return createJobExecution(
-                _jobInstance(jobInstanceId, jobInstances),
+                jobInstanceId,
+                jobExecution.getJobName(),
                 parameters,
                 new Date()
         );

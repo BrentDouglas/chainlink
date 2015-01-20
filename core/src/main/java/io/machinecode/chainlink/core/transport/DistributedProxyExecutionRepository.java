@@ -52,16 +52,16 @@ public abstract class DistributedProxyExecutionRepository<A> implements Executio
     }
 
     @Override
-    public ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception {
+    public ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
         final DeferredImpl<ExtendedJobExecution,Throwable,Void> promise = new DeferredImpl<>();
-        transport.invokeRemote(address, this.<ExtendedJobExecution>_cmd("createJobExecution", jobInstance, parameters, timestamp), promise, this.timeout, this.unit);
+        transport.invokeRemote(address, this.<ExtendedJobExecution>_cmd("createJobExecution", jobInstanceId, jobName, parameters, timestamp), promise, this.timeout, this.unit);
         return promise.get(timeout, unit);
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception {
         final DeferredImpl<ExtendedStepExecution,Throwable,Void> promise = new DeferredImpl<>();
-        transport.invokeRemote(address, this.<ExtendedStepExecution>_cmd("createStepExecution", jobExecution, stepName, timestamp), promise, this.timeout, this.unit);
+        transport.invokeRemote(address, this.<ExtendedStepExecution>_cmd("createStepExecution", jobExecutionId, stepName, timestamp), promise, this.timeout, this.unit);
         return promise.get(timeout, unit);
     }
 

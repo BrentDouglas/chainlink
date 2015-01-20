@@ -24,6 +24,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +42,7 @@ import java.util.Properties;
         @NamedQuery(name = "JpaJobExecution.withJobName", query = "select j from JpaJobInstance j where j.jobName=:jobName order by j.createTime asc"),
         @NamedQuery(name = "JpaJobExecution.previous", query = "select h.previousJobExecution from JpaJobExecutionHistory h where h.jobExecution.id=:jobExecutionId")
 })
-public class JpaJobExecution implements ExtendedJobExecution {
+public class JpaJobExecution implements ExtendedJobExecution, Serializable {
     private static final long serialVersionUID = 1L;
 
     private long id;

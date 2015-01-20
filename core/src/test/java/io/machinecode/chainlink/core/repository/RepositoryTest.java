@@ -67,7 +67,8 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
@@ -86,7 +87,8 @@ public class RepositoryTest extends BaseTest {
         assertEquals(1, params.stringPropertyNames().size());
 
         final ExtendedJobExecution second = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
@@ -105,12 +107,13 @@ public class RepositoryTest extends BaseTest {
         final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         final ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 step1.getId(),
                 new Date()
         );
@@ -129,7 +132,7 @@ public class RepositoryTest extends BaseTest {
         _isEmptyMetrics(stepExecution.getMetrics());
 
         final ExtendedStepExecution second = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
@@ -147,12 +150,13 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         final ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
@@ -197,12 +201,13 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         final ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
@@ -267,7 +272,8 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution old = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
@@ -304,7 +310,8 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
@@ -380,7 +387,8 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
@@ -466,13 +474,14 @@ public class RepositoryTest extends BaseTest {
         final Step<?,?> step2 = Step.class.cast(job.getExecutions().get(1));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         ExtendedJobExecution first = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         Thread.sleep(1);
         ExtendedStepExecution firstS1 = repository().createStepExecution(
-                first,
+                first.getExecutionId(),
                 step1.getId(),
                 new Date()
         );
@@ -488,7 +497,7 @@ public class RepositoryTest extends BaseTest {
             //
         }
         ExtendedStepExecution firstS2 = repository().createStepExecution(
-                first,
+                first.getExecutionId(),
                 step2.getId(),
                 new Date()
         );
@@ -508,13 +517,14 @@ public class RepositoryTest extends BaseTest {
         assertEquals(0, repository().getStepExecutionCount(first.getExecutionId(), step2.getId()));
 
         ExtendedJobExecution second = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         Thread.sleep(1);
         ExtendedStepExecution secondS1 = repository().createStepExecution(
-                second,
+                second.getExecutionId(),
                 step1.getId(),
                 new Date()
         );
@@ -530,7 +540,7 @@ public class RepositoryTest extends BaseTest {
             //
         }
         ExtendedStepExecution secondS2 = repository().createStepExecution(
-                second,
+                second.getExecutionId(),
                 step2.getId(),
                 new Date()
         );
@@ -550,13 +560,14 @@ public class RepositoryTest extends BaseTest {
         assertEquals(0, repository().getStepExecutionCount(second.getExecutionId(), step2.getId()));
 
         ExtendedJobExecution third = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         Thread.sleep(1);
         ExtendedStepExecution thirdS1 = repository().createStepExecution(
-                third,
+                third.getExecutionId(),
                 step1.getId(),
                 new Date()
         );
@@ -572,7 +583,7 @@ public class RepositoryTest extends BaseTest {
             //
         }
         ExtendedStepExecution thirdS2 = repository().createStepExecution(
-                third,
+                third.getExecutionId(),
                 step2.getId(),
                 new Date()
         );
@@ -632,12 +643,13 @@ public class RepositoryTest extends BaseTest {
         final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 step1.getId(),
                 new Date()
         );
@@ -684,12 +696,13 @@ public class RepositoryTest extends BaseTest {
         final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 step1.getId(),
                 new Date()
         );
@@ -788,12 +801,13 @@ public class RepositoryTest extends BaseTest {
         final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 step1.getId(),
                 new Date()
         );
@@ -912,12 +926,13 @@ public class RepositoryTest extends BaseTest {
         final Step<?,?> step1 = Step.class.cast(job.getExecutions().get(0));
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 step1.getId(),
                 new Date()
         );
@@ -985,12 +1000,13 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
@@ -1088,12 +1104,13 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );
@@ -1323,12 +1340,13 @@ public class RepositoryTest extends BaseTest {
         final JobImpl job = _job();
         final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
         final ExtendedJobExecution jobExecution = repository().createJobExecution(
-                jobInstance,
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
                 parameters,
                 new Date()
         );
         ExtendedStepExecution stepExecution = repository().createStepExecution(
-                jobExecution,
+                jobExecution.getExecutionId(),
                 Step.class.cast(job.getExecutions().get(0)).getId(),
                 new Date()
         );

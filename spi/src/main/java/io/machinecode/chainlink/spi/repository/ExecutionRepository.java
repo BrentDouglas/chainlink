@@ -55,14 +55,15 @@ public interface ExecutionRepository {
      * {@link ExtendedJobExecution#getJobParameters()} returns either {@param parameters} and
      * {@link ExtendedJobExecution#getRestartElementId()} returns null.
      *
-     * @param jobInstance The {@link ExtendedJobInstance} to link this {@link ExtendedJobExecution} with.
+     * @param jobInstanceId The id of the{@link ExtendedJobInstance} to link this {@link ExtendedJobExecution} with.
+     * @param jobName TODO
      * @param parameters The parameters passed to this execution when it was started or restarted.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link ExtendedJobExecution} in accordance with the above rules.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */
-    ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception;
+    ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception;
 
     /**
      * This method must generate a {@code long} to be used as an identifier of the {@link ExtendedStepExecution} returned
@@ -86,14 +87,14 @@ public interface ExecutionRepository {
      * {@link ExtendedStepExecution#getMetrics()} returns an array of metrics with one for each {@link Metric.MetricType}
      *     where {@link Metric#getValue()} returns 0.
      *
-     * @param jobExecution The {@link ExtendedJobExecution} to link this {@link ExtendedStepExecution} with.
+     * @param jobExecutionId The id of the {@link ExtendedJobExecution} to link this {@link ExtendedStepExecution} with.
      * @param stepName The id of the JSL step this execution represents.
      * @param timestamp The current time on the JVM calling this method.
      * @return An instance of {@link ExtendedStepExecution} in accordance with the above rules.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */
-    ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception;
+    ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception;
 
     /**
      * This method must generate a {@code long} to be used as an identifier of the {@link PartitionExecution} returned

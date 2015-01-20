@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.spi.management;
 
 import io.machinecode.chainlink.spi.Lifecycle;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
@@ -19,6 +20,10 @@ import java.util.concurrent.Future;
  * @since 1.0
  */
 public interface ExtendedJobOperator extends JobOperator, Lifecycle {
+
+    ExtendedJobInstance getJobInstance(long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
+
+    ExtendedJobExecution getJobExecution(long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException;
 
     ExtendedJobInstance getJobInstanceById(final long jobInstanceId);
 

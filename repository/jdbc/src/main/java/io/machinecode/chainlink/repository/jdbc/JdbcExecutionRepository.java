@@ -122,12 +122,12 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedJobExecution createJobExecution(final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception {
+    public ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
         Connection connection = null;
         try {
             connection = _connection();
             connection.setAutoCommit(false);
-            return _createJobExecution(connection, jobInstance, parameters, timestamp);
+            return _createJobExecution(connection, jobInstanceId, jobName, parameters, timestamp);
         } catch (final Exception e) {
             if (connection != null) {
                 connection.rollback();
@@ -140,11 +140,11 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         }
     }
 
-    public JobExecutionImpl _createJobExecution(final Connection connection, final ExtendedJobInstance jobInstance, final Properties parameters, final Date timestamp) throws Exception {
+    public JobExecutionImpl _createJobExecution(final Connection connection, final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
         final long jobExecutionId;
         try (final PreparedStatement statement = connection.prepareStatement(insertJobExecution(), Statement.RETURN_GENERATED_KEYS)) {
-            statement.setLong(1, jobInstance.getInstanceId());
-            statement.setString(2, jobInstance.getJobName());
+            statement.setLong(1, jobInstanceId);
+            statement.setString(2, jobName);
             statement.setString(3, BatchStatus.STARTING.name());
             final Timestamp ts = new Timestamp(timestamp.getTime());
             statement.setTimestamp(4, ts);
@@ -186,9 +186,9 @@ public class JdbcExecutionRepository implements ExecutionRepository {
         }
         connection.commit();
         return new JobExecutionImpl.Builder()
-                .setJobInstanceId(jobInstance.getInstanceId())
+                .setJobInstanceId(jobInstanceId)
                 .setJobExecutionId(jobExecutionId)
-                .setJobName(jobInstance.getJobName())
+                .setJobName(jobName)
                 .setBatchStatus(BatchStatus.STARTING)
                 .setJobParameters(parameters)
                 .setCreateTime(timestamp)
@@ -197,14 +197,14 @@ public class JdbcExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception {
         Connection connection = null;
         try {
             connection = _connection();
             connection.setAutoCommit(false);
             final long stepExecutionId;
             try (final PreparedStatement statement = connection.prepareStatement(insertStepExecution(), Statement.RETURN_GENERATED_KEYS)) {
-                statement.setLong(1, jobExecution.getExecutionId());
+                statement.setLong(1, jobExecutionId);
                 statement.setString(2, stepName);
                 statement.setString(3, BatchStatus.STARTING.name());
                 final Timestamp ts = new Timestamp(timestamp.getTime());
@@ -246,7 +246,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             }
             connection.commit();
             return new StepExecutionImpl.Builder()
-                    .setJobExecutionId(jobExecution.getExecutionId())
+                    .setJobExecutionId(jobExecutionId)
                     .setStepExecutionId(stepExecutionId)
                     .setStepName(stepName)
                     .setBatchStatus(BatchStatus.STARTING)
@@ -1012,7 +1012,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 default:
                     throw new JobRestartException(Messages.format("CHAINLINK-006007.execution.repository.execution.not.eligible.for.restart", latest.getExecutionId(), BatchStatus.STOPPED, BatchStatus.FAILED, latest.getBatchStatus()));
             }
-            return _createJobExecution(connection, jobInstance, parameters, new Date());
+            return _createJobExecution(connection, jobInstance.getInstanceId(), jobInstance.getJobName(), parameters, new Date());
         } catch (final Exception e) {
             if (connection != null) {
                 connection.rollback();

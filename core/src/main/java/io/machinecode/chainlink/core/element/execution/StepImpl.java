@@ -22,7 +22,6 @@ import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.StepAccumulator;
 import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.util.Messages;
@@ -174,7 +173,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         log.debugf(Messages.get("CHAINLINK-010100.step.before"), context, this.id);
         final ExecutionRepository repository = configuration.getExecutionRepository(executionRepositoryId);
         final MutableJobContext jobContext = context.getJobContext();
-        final ExtendedJobExecution jobExecution = repository.getJobExecution(jobContext.getExecutionId());
+        final long jobExecutionId = jobContext.getExecutionId();
         StepExecution stepExecution;
         Serializable persistentData = null;
         Long restartStepExecutionId = null;
@@ -219,7 +218,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                 log.debugf(Messages.get("CHAINLINK-010214.step.start.limit"), context, this.id, startCount, startLimit);
             }
         }
-        stepExecution = repository.createStepExecution(jobExecution, this.id, new Date());
+        stepExecution = repository.createStepExecution(jobExecutionId, this.id, new Date());
 
         final long stepExecutionId = stepExecution.getStepExecutionId();
         final MutableStepContext stepContext = new StepContextImpl(stepExecutionId, this, PropertiesConverter.convert(this.properties));

@@ -15,6 +15,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,7 @@ import java.util.List;
         @NamedQuery(name = "JpaJobInstance.countWithJobName", query = "select count(i) from JpaJobInstance i where i in (select distinct j from JpaJobInstance j where j.jobName=:jobName)"),
         @NamedQuery(name = "JpaJobInstance.jobNames", query = "select distinct j.jobName from JpaJobInstance j order by j.jobName asc")
 })
-public class JpaJobInstance implements ExtendedJobInstance {
+public class JpaJobInstance implements ExtendedJobInstance, Serializable {
     private static final long serialVersionUID = 1L;
 
     private long id;

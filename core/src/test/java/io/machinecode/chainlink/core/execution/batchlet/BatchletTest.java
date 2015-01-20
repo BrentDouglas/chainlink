@@ -39,6 +39,7 @@ public class BatchletTest extends OperatorTest {
     @Test
     public void stopBatchletTest() throws Exception {
         printMethodName();
+        StopBatchlet.reset();
         final Job job = Jsl.job("stop-job")
                 .addExecution(
                         Jsl.step("step")

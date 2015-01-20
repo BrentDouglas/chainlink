@@ -18,6 +18,12 @@ public class FluentJobLoader extends AbstractJobLoader {
         return this;
     }
 
+    public FluentJobLoader add(final InheritableJob<?,?,?,?> job) {
+        final String jslName = job.getId();
+        repos.put(jslName, new Node(jslName, job));
+        return this;
+    }
+
     final TMap<String, Node> repos = new THashMap<>();
 
     @Override

@@ -123,11 +123,11 @@ public class RedisExecutionRepository implements ExecutionRepository {
     }
 
     @Override
-    public JobExecutionImpl createJobExecution(final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws Exception {
+    public JobExecutionImpl createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
         Jedis jedis = null;
         try {
             jedis = _open();
-            return _createJobExecution(jedis, instance, parameters, timestamp);
+            return _createJobExecution(jedis, jobInstanceId, jobName, parameters, timestamp);
         } finally {
             if(jedis != null) {
                 jedis.disconnect();
@@ -135,12 +135,12 @@ public class RedisExecutionRepository implements ExecutionRepository {
         }
     }
 
-    private JobExecutionImpl _createJobExecution(final BinaryJedisCommands jedis, final ExtendedJobInstance instance, final Properties parameters, final Date timestamp) throws Exception {
+    private JobExecutionImpl _createJobExecution(final BinaryJedisCommands jedis, final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
         final long jobExecutionId = jedis.incr(JOB_EXECUTION_ID);
         final JobExecutionImpl execution = new JobExecutionImpl.Builder()
-                .setJobInstanceId(instance.getInstanceId())
+                .setJobInstanceId(jobInstanceId)
                 .setJobExecutionId(jobExecutionId)
-                .setJobName(instance.getJobName())
+                .setJobName(jobName)
                 .setBatchStatus(BatchStatus.STARTING)
                 .setJobParameters(parameters)
                 .setCreateTime(timestamp)
@@ -148,28 +148,28 @@ public class RedisExecutionRepository implements ExecutionRepository {
                 .build();
         jedis.set(marshalling.marshall(JOB_EXECUTION_PREFIX, jobExecutionId), marshalling.marshall(execution));
         jedis.set(
-                marshalling.marshall(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, instance.getInstanceId()),
+                marshalling.marshall(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, jobInstanceId),
                 marshalling.marshall(jobExecutionId)
         );
         jedis.rpush(
-                marshalling.marshall(JOB_INSTANCE_EXECUTIONS_PREFIX, instance.getInstanceId()),
+                marshalling.marshall(JOB_INSTANCE_EXECUTIONS_PREFIX, jobInstanceId),
                 marshalling.marshall(jobExecutionId)
         );
         jedis.rpush(
-                marshalling.marshall(JOB_NAME_JOB_EXECUTIONS_PREFIX, instance.getJobName()),
+                marshalling.marshall(JOB_NAME_JOB_EXECUTIONS_PREFIX, jobInstanceId),
                 marshalling.marshall(jobExecutionId)
         );
         return execution;
     }
 
     @Override
-    public StepExecutionImpl createStepExecution(final ExtendedJobExecution jobExecution, final String stepName, final Date timestamp) throws Exception {
+    public StepExecutionImpl createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception {
         Jedis jedis = null;
         try {
             jedis = _open();
             final long stepExecutionId = jedis.incr(STEP_EXECUTION_ID);
             final StepExecutionImpl execution = new StepExecutionImpl.Builder()
-                    .setJobExecutionId(jobExecution.getExecutionId())
+                    .setJobExecutionId(jobExecutionId)
                     .setStepExecutionId(stepExecutionId)
                     .setStepName(stepName)
                     .setCreateTime(timestamp)
@@ -181,7 +181,7 @@ public class RedisExecutionRepository implements ExecutionRepository {
                     marshalling.marshall(STEP_EXECUTION_PREFIX, stepExecutionId),
                     marshalling.marshall(execution));
             jedis.rpush(
-                    marshalling.marshall(JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, jobExecution.getExecutionId()),
+                    marshalling.marshall(JOB_EXECUTIONS_STEP_EXECUTIONS_PREFIX, jobExecutionId),
                     marshalling.marshall(stepExecutionId)
             );
             return execution;
@@ -715,7 +715,8 @@ public class RedisExecutionRepository implements ExecutionRepository {
             }
             return _createJobExecution(
                     jedis,
-                    getJobInstance(jobExecution.getJobInstanceId()),
+                    jobExecution.getJobInstanceId(),
+                    jobExecution.getJobName(),
                     parameters,
                     new Date()
             );

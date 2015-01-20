@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.management.JobOperation;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import org.jboss.logging.Logger;
 
@@ -128,7 +129,7 @@ public class JobOperatorView implements ExtendedJobOperator {
     }
 
     @Override
-    public JobInstance getJobInstance(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public ExtendedJobInstance getJobInstance(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
         return delegate.getJobInstance(executionId);
     }
 
@@ -138,7 +139,7 @@ public class JobOperatorView implements ExtendedJobOperator {
     }
 
     @Override
-    public JobExecution getJobExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
+    public ExtendedJobExecution getJobExecution(final long executionId) throws NoSuchJobExecutionException, JobSecurityException {
         return delegate.getJobExecution(executionId);
     }
 

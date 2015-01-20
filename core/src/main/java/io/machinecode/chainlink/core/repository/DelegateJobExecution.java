@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.repository;
 
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -13,7 +14,7 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @see https://java.net/bugzilla/show_bug.cgi?id=4834
  */
-public class DelegateJobExecution implements JobExecution {
+public class DelegateJobExecution implements ExtendedJobExecution {
     private final long executionId;
     private final String jobName;
     private final ExecutionRepository repository;
@@ -38,9 +39,7 @@ public class DelegateJobExecution implements JobExecution {
     public BatchStatus getBatchStatus() {
         try {
             return repository.getJobExecution(executionId).getBatchStatus();
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -51,9 +50,7 @@ public class DelegateJobExecution implements JobExecution {
     public Date getStartTime() {
         try {
             return repository.getJobExecution(executionId).getStartTime();
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -64,9 +61,7 @@ public class DelegateJobExecution implements JobExecution {
     public Date getEndTime() {
         try {
             return repository.getJobExecution(executionId).getEndTime();
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -77,9 +72,7 @@ public class DelegateJobExecution implements JobExecution {
     public String getExitStatus() {
         try {
             return repository.getJobExecution(executionId).getExitStatus();
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -90,9 +83,7 @@ public class DelegateJobExecution implements JobExecution {
     public Date getCreateTime() {
         try {
             return repository.getJobExecution(executionId).getCreateTime();
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -103,9 +94,7 @@ public class DelegateJobExecution implements JobExecution {
     public Date getLastUpdatedTime() {
         try {
             return repository.getJobExecution(executionId).getLastUpdatedTime();
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -116,9 +105,30 @@ public class DelegateJobExecution implements JobExecution {
     public Properties getJobParameters() {
         try {
             return repository.getJobExecution(executionId).getJobParameters();
-        } catch (final NoSuchJobExecutionException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (final JobSecurityException e) {
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String getRestartElementId() {
+
+        try {
+            return repository.getJobExecution(executionId).getRestartElementId();
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public long getJobInstanceId() {
+        try {
+            return repository.getJobExecution(executionId).getJobInstanceId();
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
