@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.util;
 
-import io.machinecode.chainlink.spi.element.Properties;
-import io.machinecode.chainlink.spi.element.Property;
+import io.machinecode.chainlink.spi.jsl.Properties;
+import io.machinecode.chainlink.spi.jsl.Property;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

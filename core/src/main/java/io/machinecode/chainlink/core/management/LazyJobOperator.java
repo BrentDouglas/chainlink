@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;

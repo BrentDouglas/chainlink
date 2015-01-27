@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.machinecode.chainlink.spi.element.Job.NAMESPACE;
+import static io.machinecode.chainlink.spi.jsl.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**

@@ -3,9 +3,9 @@ package io.machinecode.chainlink.core.validation.execution;
 import io.machinecode.chainlink.core.validation.PropertyReferenceValidator;
 import io.machinecode.chainlink.core.validation.transition.TransitionValidator;
 import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
-import io.machinecode.chainlink.spi.element.execution.Decision;
-import io.machinecode.chainlink.spi.element.transition.Transition;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.jsl.execution.Decision;
+import io.machinecode.chainlink.spi.jsl.transition.Transition;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

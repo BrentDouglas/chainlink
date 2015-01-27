@@ -4,10 +4,10 @@ import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.repository.MetricImpl;
 import io.machinecode.chainlink.core.repository.MutableMetricImpl;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.context.MutableMetric;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
-import io.machinecode.chainlink.spi.element.execution.Step;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.jsl.execution.Step;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;

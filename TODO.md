@@ -10,3 +10,5 @@
 - Change the way workers are located
 - Glassfish isn't passing the TCK TransactionTests when using a managed
   thread factory.
+- Hook progress up
+- Look at thread safety in extensions

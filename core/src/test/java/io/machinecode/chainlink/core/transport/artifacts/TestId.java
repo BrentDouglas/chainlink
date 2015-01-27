@@ -4,11 +4,14 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 
+import java.io.Serializable;
+
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class TestId implements ExecutableId, ExecutionRepositoryId, ChainId {
+public class TestId implements ExecutableId, ExecutionRepositoryId, ChainId, Serializable {
+    private static final long serialVersionUID = 1L;
 
     final long id;
     final String address;
@@ -16,6 +19,11 @@ public class TestId implements ExecutableId, ExecutionRepositoryId, ChainId {
     public TestId(final long id, final String address) {
         this.id = id;
         this.address = address;
+    }
+
+    @Override
+    public Object getAddress() {
+        return address;
     }
 
     @Override

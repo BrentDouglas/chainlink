@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.execution.chunk;
 
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
-import io.machinecode.chainlink.spi.element.Job;
+import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent;
 import io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderAccumulator;
 import io.machinecode.chainlink.core.execution.chunk.artifact.exception.FailReadException;

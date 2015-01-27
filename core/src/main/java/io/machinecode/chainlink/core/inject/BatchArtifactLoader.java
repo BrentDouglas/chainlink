@@ -2,9 +2,9 @@ package io.machinecode.chainlink.core.inject;
 
 import io.machinecode.chainlink.core.inject.batch.BatchArtifactRef;
 import io.machinecode.chainlink.core.inject.batch.BatchArtifacts;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
-import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.BatchRuntimeException;

@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core.loader;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
-import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.NoSuchJobException;
 

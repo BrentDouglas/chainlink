@@ -1,14 +1,14 @@
 package io.machinecode.chainlink.core.factory.partition;
 
-import io.machinecode.chainlink.core.element.PropertiesImpl;
-import io.machinecode.chainlink.core.element.partition.CollectorImpl;
 import io.machinecode.chainlink.core.expression.Expression;
+import io.machinecode.chainlink.core.expression.JobPropertyContext;
 import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
-import io.machinecode.chainlink.spi.element.partition.Collector;
-import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
+import io.machinecode.chainlink.core.jsl.impl.partition.CollectorImpl;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.spi.jsl.partition.Collector;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

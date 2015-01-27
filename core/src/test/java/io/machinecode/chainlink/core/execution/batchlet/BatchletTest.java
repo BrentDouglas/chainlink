@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.execution.batchlet;
 
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
-import io.machinecode.chainlink.spi.element.Job;
+import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.core.base.OperatorTest;
 import io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet;
 import io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet;

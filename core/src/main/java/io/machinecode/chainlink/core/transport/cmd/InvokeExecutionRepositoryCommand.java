@@ -1,11 +1,9 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.core.registry.LocalRegistry;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.transport.Command;
-import io.machinecode.chainlink.spi.transport.Transport;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +14,7 @@ import java.util.Arrays;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class InvokeExecutionRepositoryCommand<T,A> implements Command<T,A> {
+public class InvokeExecutionRepositoryCommand<T> implements Command<T> {
     private static final long serialVersionUID = 1L;
 
     final ExecutionRepositoryId executionRepositoryId;
@@ -32,9 +30,9 @@ public class InvokeExecutionRepositoryCommand<T,A> implements Command<T,A> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public T perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
+    public T perform(final Configuration configuration, final Object origin) throws Throwable {
         //TODO Ensure local
-        final ExecutionRepository repository = registry.getExecutionRepository(executionRepositoryId);
+        final ExecutionRepository repository = configuration.getRegistry().getExecutionRepository(executionRepositoryId);
         LocalRegistry.assertExecutionRepository(repository, executionRepositoryId);
         Method method = null;
         for (final Method that : ExecutionRepository.class.getDeclaredMethods()) {

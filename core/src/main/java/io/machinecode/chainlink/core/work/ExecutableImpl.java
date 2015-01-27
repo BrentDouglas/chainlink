@@ -1,14 +1,13 @@
 package io.machinecode.chainlink.core.work;
 
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.chainlink.spi.work.Work;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
@@ -16,7 +15,7 @@ import java.io.Serializable;
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public abstract class ExecutableImpl<T extends Work> implements Executable, Serializable {
+public abstract class ExecutableImpl<T> implements Executable, Serializable {
 
     protected final T work;
     protected final WorkerId workerId;

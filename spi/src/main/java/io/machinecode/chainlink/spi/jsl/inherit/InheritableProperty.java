@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.spi.jsl.inherit;
 
-import io.machinecode.chainlink.spi.Copyable;
-import io.machinecode.chainlink.spi.element.Property;
+import io.machinecode.chainlink.spi.jsl.Property;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

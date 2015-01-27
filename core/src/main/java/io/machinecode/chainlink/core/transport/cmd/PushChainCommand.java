@@ -1,17 +1,18 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
+import io.machinecode.chainlink.core.registry.UUIDId;
+import io.machinecode.chainlink.core.transport.BaseTransport;
 import io.machinecode.chainlink.core.transport.DistributedRemoteChain;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.spi.transport.Command;
 import io.machinecode.chainlink.spi.transport.Transport;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public abstract class PushChainCommand<A> implements Command<ChainId,A> {
+public class PushChainCommand implements Command<ChainId> {
     private static final long serialVersionUID = 1L;
 
     protected final long jobExecutionId;
@@ -23,14 +24,14 @@ public abstract class PushChainCommand<A> implements Command<ChainId,A> {
     }
 
     @Override
-    public ChainId perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
-        final Chain<?> chain = createRemoteChain(transport, origin);
-        final ChainId remoteId = transport.generateChainId();
-        registry.registerChain(jobExecutionId, remoteId, chain);
+    public ChainId perform(final Configuration configuration, final Object origin) throws Throwable {
+        final Transport transport = configuration.getTransport();
+        //TODO Fix this
+        final Chain<?> chain = new DistributedRemoteChain((BaseTransport<?>)transport, origin, jobExecutionId, chainId);
+        final ChainId remoteId = new UUIDId(transport);
+        configuration.getRegistry().registerChain(jobExecutionId, remoteId, chain);
         return remoteId;
     }
-
-    protected abstract DistributedRemoteChain<A> createRemoteChain(final Transport<A> transport, final A address);
 
     @Override
     public String toString() {

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.transport.jgroups;
 
-import io.machinecode.chainlink.spi.transport.Command;
+import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.OnCancel;
 import io.machinecode.then.api.OnReject;
@@ -22,14 +22,14 @@ public class JGroupsFutureListener<T> implements FutureListener<T>, OnReject<Thr
     private static final Logger log = Logger.getLogger(JGroupsFutureListener.class);
 
     final Address address;
-    final Command<T,Address> command;
+    final Command<T> command;
 
     final Executor network;
     final Deferred<T, Throwable, ?> promise;
     final long timeout;
     final TimeUnit unit;
 
-    public JGroupsFutureListener(final Address address, final Command<T, Address> command, final Executor network,
+    public JGroupsFutureListener(final Address address, final Command<T> command, final Executor network,
                                  final Deferred<T, Throwable, ?> promise, final long timeout, final TimeUnit unit) {
         this.address = address;
         this.command = command;

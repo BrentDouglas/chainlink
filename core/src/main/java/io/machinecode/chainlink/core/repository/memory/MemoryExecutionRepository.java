@@ -16,13 +16,13 @@ import io.machinecode.chainlink.core.repository.JobInstanceImpl;
 import io.machinecode.chainlink.core.repository.MutableMetricImpl;
 import io.machinecode.chainlink.core.repository.PartitionExecutionImpl;
 import io.machinecode.chainlink.core.repository.StepExecutionImpl;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;

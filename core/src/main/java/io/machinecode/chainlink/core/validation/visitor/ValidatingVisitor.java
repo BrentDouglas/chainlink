@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.core.validation.visitor;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.spi.jsl.util.ImmutablePair;
-import io.machinecode.chainlink.spi.element.Element;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.core.util.ImmutablePair;
+import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.jsl.Element;
 
 import java.util.Set;
 

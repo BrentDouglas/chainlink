@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.core.loader;
 
 import gnu.trove.set.hash.TLinkedHashSet;
-import io.machinecode.chainlink.spi.element.Job;
+import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.loader.JobLoader;
-import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.NoSuchJobException;

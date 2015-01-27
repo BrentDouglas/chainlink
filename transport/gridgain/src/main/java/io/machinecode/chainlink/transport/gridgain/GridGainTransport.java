@@ -1,16 +1,12 @@
 package io.machinecode.chainlink.transport.gridgain;
 
-import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.transport.Command;
-import io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.core.transport.DistributedTransport;
-import io.machinecode.chainlink.core.transport.DistributedWorker;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.core.transport.cmd.Command;
+import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.FutureDeferred;
+import io.machinecode.then.core.RejectedDeferred;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridFuture;
 import org.gridgain.grid.GridNode;
@@ -39,7 +35,6 @@ public class GridGainTransport extends DistributedTransport<UUID> {
         super(dependencies, properties);
         this.grid = grid;
         this.local = grid.localNode().id();
-        grid.nodeLocalMap().addIfAbsent(GridGainTransport.class.getName(), this);
         log.infof("GridGainRegistry started on address: [%s]", this.local); //TODO Message
     }
 
@@ -53,32 +48,15 @@ public class GridGainTransport extends DistributedTransport<UUID> {
     }
 
     @Override
+    public void open(final Configuration configuration) throws Exception {
+        super.open(configuration);
+        grid.nodeLocalMap().addIfAbsent(Configuration.class.getName(), configuration);
+    }
+
+    @Override
     public void close() throws Exception {
         log.infof("GridGainRegistry is shutting down."); //TODO Message
-        try {
-            this.grid.close();
-        } finally {
-            super.close();
-        }
-    }
-
-    @Override
-    public ExecutableId generateExecutableId() {
-        return new GridGainUUIDId(local);
-    }
-
-    @Override
-    public WorkerId generateWorkerId(final Worker worker) {
-        if (worker instanceof Thread) {
-            return new GridGainWorkerId((Thread)worker, local);
-        } else {
-            return new GridGainUUIDId(local);
-        }
-    }
-
-    @Override
-    public ExecutionRepositoryId generateExecutionRepositoryId() {
-        return new GridGainUUIDId(local);
+        super.close();
     }
 
     @Override
@@ -92,35 +70,31 @@ public class GridGainTransport extends DistributedTransport<UUID> {
     }
 
     @Override
-    protected DistributedWorker<UUID> createDistributedWorker(final UUID address, final WorkerId workerId) {
-        return new GridGainWorker(this, this.local, address, workerId);
-    }
-
-    @Override
-    protected DistributedProxyExecutionRepository<UUID> createDistributedExecutionRepository(final ExecutionRepositoryId id, final UUID address) {
-        return new GridGainProxyExecutionRepository(this, id, address);
-    }
-
-    @Override
-    protected boolean isMatchingAddressType(final Object address) {
-        return address instanceof UUID;
-    }
-
-    @Override
-    public <T> void invokeRemote(final UUID address, final Command<T, UUID> command,
-                                 final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
+    public <T> Promise<T,Throwable,Object> invokeRemote(final Object address, final Command<T> command,
+                                 final long timeout, final TimeUnit unit) {
+        if (!(address instanceof UUID)) {
+            return new RejectedDeferred<T, Throwable, Object>(new Exception("Expected " + UUID.class.getName() + ". Found " + address.getClass())); //TODO Message
+        }
+        final UUID uuid = (UUID) address;
         try {
             log.tracef("Invoking %s on %s.", command, address);
-            final GridFuture<T> future = this.grid.forNodeId(address)
+            final GridFuture<T> future = this.grid.forNodeId(uuid)
                     .compute()
-                    .call(new GridGainCallable<>(command, getAddress(), grid));
-            final FutureDeferred<T, Void> run = new FutureDeferred<>(new GridGainFuture<>(future), timeout, unit);
-            run.onResolve(promise)
-                    .onReject(promise)
-                    .onCancel(promise);
-            network.execute(run);
-        } catch (Exception e) {
-            promise.reject(e);
+                    .call(new GridGainCallable<>(command, getAddress()));
+            return new FutureDeferred<>(new GridGainFuture<>(future), timeout, unit);
+        } catch (final Throwable e) {
+            return new RejectedDeferred<>(e);
         }
+    }
+
+    @Override
+    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command, final long timeout, final TimeUnit unit) {
+        log.tracef("Invoking %s on all remotes.", command);
+        final GridFuture<Collection<T>> future = this.grid.forRemotes()
+                .compute()
+                .broadcast(new GridGainCallable<>(command, getAddress()));
+        final FutureDeferred<Collection<T>,Object> run = new FutureDeferred<>(new GridGainFuture<>(future), timeout, unit);
+        network.execute(run);
+        return run;
     }
 }

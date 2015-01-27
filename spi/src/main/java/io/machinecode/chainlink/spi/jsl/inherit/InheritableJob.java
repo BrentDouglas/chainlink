@@ -1,11 +1,9 @@
 package io.machinecode.chainlink.spi.jsl.inherit;
 
-import io.machinecode.chainlink.spi.Inheritable;
-import io.machinecode.chainlink.spi.Mergeable;
-import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.Listeners;
-import io.machinecode.chainlink.spi.element.Properties;
-import io.machinecode.chainlink.spi.element.execution.Execution;
+import io.machinecode.chainlink.spi.jsl.Job;
+import io.machinecode.chainlink.spi.jsl.Listeners;
+import io.machinecode.chainlink.spi.jsl.Properties;
+import io.machinecode.chainlink.spi.jsl.execution.Execution;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 
 import java.util.List;

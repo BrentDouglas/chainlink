@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.loader;
 
-import io.machinecode.chainlink.spi.element.Job;
+import io.machinecode.chainlink.spi.jsl.Job;
 
 import javax.batch.operations.NoSuchJobException;
 

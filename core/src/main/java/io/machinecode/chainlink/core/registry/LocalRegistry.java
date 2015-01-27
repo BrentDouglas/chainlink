@@ -4,6 +4,7 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
@@ -16,16 +17,16 @@ import io.machinecode.chainlink.spi.registry.SplitAccumulator;
 import io.machinecode.chainlink.spi.registry.StepAccumulator;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.AllDeferred;
+import io.machinecode.then.core.WhenDeferred;
 import org.jboss.logging.Logger;
 
 import javax.batch.operations.JobExecutionNotRunningException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -37,14 +38,14 @@ public class LocalRegistry implements Registry {
 
     protected final TMap<ExecutionRepositoryId, ExecutionRepository> repositories;
 
-    protected final AtomicBoolean repositoryLock = new AtomicBoolean(false);
+    protected final Lock repositoryLock = new ReentrantLock();
 
     protected final TLongObjectMap<LocalJobRegistry> jobRegistries = new TLongObjectHashMap<>();
     protected final TLongObjectMap<Chain<?>> jobs = new TLongObjectHashMap<>();
-    protected final AtomicBoolean jobLock = new AtomicBoolean(false);
+    protected final Lock jobLock = new ReentrantLock();
 
     protected final TLongObjectMap<TMap<Key, Object>> artifacts = new TLongObjectHashMap<>();
-    protected final AtomicBoolean artifactLock = new AtomicBoolean(false);
+    protected final Lock artifactLock = new ReentrantLock();
 
     protected final TMap<String, JobEventListener> jobEvents = new THashMap<>();
 
@@ -64,32 +65,32 @@ public class LocalRegistry implements Registry {
 
     @Override
     public ExecutionRepositoryId registerExecutionRepository(final ExecutionRepositoryId id, final ExecutionRepository repository) {
-        while (!repositoryLock.compareAndSet(false, true)) {}
+        repositoryLock.lock();
         try {
             this.repositories.put(id, repository);
         } finally {
-            repositoryLock.set(false);
+            repositoryLock.unlock();
         }
         return id;
     }
 
     @Override
     public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
-        while (!repositoryLock.compareAndSet(false, true)) {}
+        repositoryLock.lock();
         try {
             return this.repositories.get(id);
         } finally {
-            repositoryLock.set(false);
+            repositoryLock.unlock();
         }
     }
 
     @Override
     public ExecutionRepository unregisterExecutionRepository(final ExecutionRepositoryId id) {
-        while (!repositoryLock.compareAndSet(false, true)) {}
+        repositoryLock.lock();
         try {
             return this.repositories.remove(id);
         } finally {
-            repositoryLock.set(false);
+            repositoryLock.unlock();
         }
     }
 
@@ -97,7 +98,7 @@ public class LocalRegistry implements Registry {
     public Promise<?,?,?> registerJob(final long jobExecutionId, final ChainId chainId, final Chain<?> chain) {
         final LocalJobRegistry jobRegistry = _createJobRegistry(jobExecutionId);
         jobRegistry.registerChain(chainId, chain);
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             this.jobs.put(jobExecutionId, chain);
             this.jobRegistries.put(jobExecutionId, jobRegistry);
@@ -105,13 +106,13 @@ public class LocalRegistry implements Registry {
             log.debugf(Messages.get("CHAINLINK-005100.registry.put.job"), jobExecutionId);
             return this.onRegisterJob(jobExecutionId, chain);
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
         }
     }
 
     @Override
     public Chain<?> getJob(final long jobExecutionId) throws JobExecutionNotRunningException {
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             final Chain<?> job = this.jobs.get(jobExecutionId);
             if (job == null) {
@@ -119,13 +120,13 @@ public class LocalRegistry implements Registry {
             }
             return job;
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
         }
     }
 
     @Override
     public Promise<?,?,?> unregisterJob(final long jobExecutionId) {
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             final Chain<?> job = this.jobs.remove(jobExecutionId);
             return this.onUnregisterJob(jobExecutionId, job).onComplete(new OnComplete() {
@@ -135,7 +136,7 @@ public class LocalRegistry implements Registry {
                 }
             });
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
         }
     }
 
@@ -147,7 +148,7 @@ public class LocalRegistry implements Registry {
                 promises.add(promise);
             }
         }
-        return new AllDeferred<Void, Void, Void>(promises);
+        return new WhenDeferred<>(promises);
     }
 
     protected Promise<?,?,?> onUnregisterJob(final long jobExecutionId, final Chain<?> job) {
@@ -159,13 +160,13 @@ public class LocalRegistry implements Registry {
                 promises.add(promise);
             }
         }
-        return new AllDeferred<Void, Void, Void>(promises);
+        return new WhenDeferred<>(promises);
     }
 
     @Override
     public void registerChain(final long jobExecutionId, final ChainId id, final Chain<?> chain) {
         log.debugf("[je=%s] Registering chain with chainId=%s, chain=%s", jobExecutionId, id, chain); //TODO Message
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
             if (job == null) {
@@ -173,13 +174,13 @@ public class LocalRegistry implements Registry {
             }
             job.registerChain(id, chain);
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
         }
     }
 
     @Override
     public Chain<?> getChain(final long jobExecutionId, final ChainId id) {
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
             if (job == null) {
@@ -187,14 +188,14 @@ public class LocalRegistry implements Registry {
             }
             return job.getChain(id);
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
         }
     }
 
     @Override
     public void registerExecutable(final long jobExecutionId, final Executable executable) {
         final ExecutableId id = executable.getId();
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
             if (job == null) {
@@ -202,13 +203,13 @@ public class LocalRegistry implements Registry {
             }
             job.registerExecutable(id, executable);
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
         }
     }
 
     @Override
     public Executable getExecutable(final long jobExecutionId, final ExecutableId id) {
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
             if (job == null) {
@@ -216,36 +217,56 @@ public class LocalRegistry implements Registry {
             }
             return job.getExecutable(id);
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
+        }
+    }
+
+    @Override
+    public void registerJobEventListener(final String key, final JobEventListener on) {
+        jobLock.lock();
+        try {
+            this.jobEvents.put(key, on);
+        } finally {
+            jobLock.unlock();
+        }
+    }
+
+    @Override
+    public void unregisterJobEventListener(final String key) {
+        jobLock.lock();
+        try {
+            this.jobEvents.remove(key);
+        } finally {
+            jobLock.unlock();
         }
     }
 
     @Override
     public StepAccumulator getStepAccumulator(final long jobExecutionId, final String id) {
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
             return job.getStepAccumulator(id);
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
         }
     }
 
     @Override
     public SplitAccumulator getSplitAccumulator(final long jobExecutionId, final String id) {
-        while (!jobLock.compareAndSet(false, true)) {}
+        jobLock.lock();
         try {
             final LocalJobRegistry job = this.jobRegistries.get(jobExecutionId);
             return job.getSplitAccumulator(id);
         } finally {
-            jobLock.set(false);
+            jobLock.unlock();
         }
     }
 
     @Override
     public <T> T loadArtifact(final Class<T> clazz, final String ref, final ExecutionContext context) {
         final long jobExecutionId = context.getJobExecutionId();
-        while (!artifactLock.compareAndSet(false, true)) {}
+        artifactLock.lock();
         try {
             final TMap<Key, Object> artifacts = this.artifacts.get(jobExecutionId);
             if (artifacts == null) {
@@ -253,14 +274,14 @@ public class LocalRegistry implements Registry {
             }
             return clazz.cast(artifacts.get(new Key(jobExecutionId, context.getStepExecutionId(), context.getPartitionExecutionId(), ref, clazz)));
         } finally {
-            artifactLock.set(false);
+            artifactLock.unlock();
         }
     }
 
     @Override
     public <T> void storeArtifact(final Class<T> clazz, final String ref, final ExecutionContext context, final T value) {
         final long jobExecutionId = context.getJobExecutionId();
-        while (!artifactLock.compareAndSet(false, true)) {}
+        artifactLock.lock();
         try {
             TMap<Key, Object> artifacts = this.artifacts.get(jobExecutionId);
             if (artifacts == null) {
@@ -269,27 +290,7 @@ public class LocalRegistry implements Registry {
             }
             artifacts.put(new Key(jobExecutionId, context.getStepExecutionId(), context.getPartitionExecutionId(), ref, clazz), value);
         } finally {
-            artifactLock.set(false);
-        }
-    }
-
-    @Override
-    public void registerJobEventListener(final String key, final JobEventListener on) {
-        while (!jobLock.compareAndSet(false, true)) {}
-        try {
-            this.jobEvents.put(key, on);
-        } finally {
-            jobLock.set(false);
-        }
-    }
-
-    @Override
-    public void unregisterJobEventListener(final String key) {
-        while (!jobLock.compareAndSet(false, true)) {}
-        try {
-            this.jobEvents.remove(key);
-        } finally {
-            jobLock.set(false);
+            artifactLock.unlock();
         }
     }
 

@@ -3,28 +3,28 @@ package io.machinecode.chainlink.core.management;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
-import io.machinecode.chainlink.core.element.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
+import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
+import io.machinecode.chainlink.core.registry.UUIDId;
+import io.machinecode.chainlink.core.repository.DelegateJobExecution;
+import io.machinecode.chainlink.core.repository.DelegateStepExecution;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repository;
 import io.machinecode.chainlink.core.work.JobExecutable;
-import io.machinecode.chainlink.core.repository.DelegateJobExecution;
-import io.machinecode.chainlink.core.repository.DelegateStepExecution;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.element.Job;
 import io.machinecode.chainlink.spi.execution.Executor;
+import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
-import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.chainlink.spi.security.Security;
-import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.chainlink.spi.work.JobWork;
+import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
@@ -57,7 +57,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     protected final Configuration configuration;
     protected final Executor executor;
-    protected final Transport<?> transport;
+    protected final Transport transport;
     protected final Registry registry;
     protected final Security security;
     protected final ExecutionRepositoryId executionRepositoryId;
@@ -69,7 +69,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         this.registry = configuration.getRegistry();
         this.security = this.configuration.getSecurity();
         this.executionRepositoryId = this.registry.registerExecutionRepository(
-                transport.generateExecutionRepositoryId(),
+                new UUIDId(transport),
                 configuration.getExecutionRepository()
         );
     }
@@ -185,7 +185,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         log.tracef(Messages.get("CHAINLINK-001200.operator.start"), jslName);
         this.security.canStartJob(jslName);
         try {
-            final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
+            final Job theirs = configuration.getJobLoader().load(jslName);
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _startJob(job, jslName, parameters).getJobExecutionId();
         } catch (final JobStartException | JobSecurityException e) {
@@ -200,7 +200,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         log.tracef(Messages.get("CHAINLINK-001200.operator.start"), jslName);
         this.security.canStartJob(jslName);
         try {
-            final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(jslName);
+            final Job theirs = configuration.getJobLoader().load(jslName);
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _startJob(job, jslName, parameters);
         } catch (final JobStartException | JobSecurityException e) {
@@ -223,7 +223,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         }
     }
 
-    private JobOperationImpl _startJob(final JobWork job, final String jslName, final Properties parameters) throws Exception {
+    private JobOperationImpl _startJob(final JobImpl job, final String jslName, final Properties parameters) throws Exception {
         JobFactory.validate(job);
 
         final ExecutionRepository repository = repository();
@@ -231,7 +231,6 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         final ExtendedJobExecution execution = repository.createJobExecution(instance.getInstanceId(), job.getId(), parameters, new Date());
         final long jobExecutionId = execution.getExecutionId();
         final ExecutionContext context = new ExecutionContextImpl(
-                job,
                 new JobContextImpl(instance, execution, PropertiesConverter.convert(job.getProperties())),
                 null,
                 jobExecutionId,
@@ -277,7 +276,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         try {
             final ExecutionRepository repository = repository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
-            final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(instance.getJslName());
+            final Job theirs = configuration.getJobLoader().load(instance.getJslName());
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _restart(job, jobExecutionId, instance, parameters).getJobExecutionId();
         } catch (final JobExecutionAlreadyCompleteException | NoSuchJobExecutionException
@@ -295,7 +294,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         try {
             final ExecutionRepository repository = repository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
-            final io.machinecode.chainlink.spi.element.Job theirs = configuration.getJobLoader().load(instance.getJslName());
+            final Job theirs = configuration.getJobLoader().load(instance.getJslName());
             final JobImpl job = JobFactory.produce(theirs, parameters);
             return _restart(job, jobExecutionId, instance, parameters);
         } catch (final JobExecutionAlreadyCompleteException | NoSuchJobExecutionException
@@ -306,17 +305,16 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         }
     }
 
-    private JobOperationImpl _restart(final JobWork job, final long jobExecutionId, final JobInstance instance, final Properties parameters) throws Exception {
+    private JobOperationImpl _restart(final JobImpl job, final long jobExecutionId, final JobInstance instance, final Properties parameters) throws Exception {
         JobFactory.validate(job);
         final ExecutionRepository repository = repository();
         final ExtendedJobExecution lastExecution = repository.getJobExecution(jobExecutionId);
         final ExtendedJobExecution execution = repository.restartJobExecution(jobExecutionId, parameters);
         final long restartExecutionId = execution.getExecutionId();
-        if (!job.isRestartable()) {
+        if (!Boolean.parseBoolean(job.getRestartable())) {
             throw new JobRestartException(Messages.format("CHAINLINK-001100.operator.cant.restart.job", jobExecutionId, job.getId(), restartExecutionId));
         }
         final ExecutionContext context = new ExecutionContextImpl(
-                job,
                 new JobContextImpl(instance, execution, PropertiesConverter.convert(job.getProperties())),
                 null,
                 execution.getExecutionId(),

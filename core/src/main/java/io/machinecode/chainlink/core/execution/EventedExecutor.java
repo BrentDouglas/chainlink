@@ -1,35 +1,35 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.core.then.AllChain;
+import gnu.trove.map.TMap;
+import gnu.trove.map.hash.THashMap;
+import io.machinecode.chainlink.core.registry.UUIDId;
 import io.machinecode.chainlink.core.then.ChainImpl;
-import io.machinecode.chainlink.core.then.RejectedChain;
-import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.core.transport.WorkerState;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.execution.ChainAndIds;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
+import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.then.api.OnReject;
-import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Properties;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -40,11 +40,14 @@ public class EventedExecutor implements Executor {
     private static final Logger log = Logger.getLogger(EventedExecutor.class);
 
     protected final Registry registry;
-    protected final Transport<?> transport;
+    protected final Transport transport;
     protected final ExecutorService cancellation;
     protected final ThreadFactory factory;
-    protected final List<Worker> workers;
     protected final int threads;
+    protected Configuration configuration;
+
+    protected final Lock workerLock = new ReentrantLock();
+    protected final TMap<WorkerId, EventedWorker> workers = new THashMap<>();
 
     public EventedExecutor(final Dependencies dependencies, final Properties properties, final ThreadFactory factory) {
         this.registry = dependencies.getRegistry();
@@ -52,14 +55,14 @@ public class EventedExecutor implements Executor {
         this.threads = Integer.decode(properties.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));
         this.factory = factory;
         this.cancellation = Executors.newSingleThreadExecutor(factory);
-        this.workers = new ArrayList<>();
     }
 
     @Override
     public void open(final Configuration configuration) throws Exception {
+        this.configuration = configuration;
         for (int i = 0; i < this.threads; ++i) {
-            final Worker worker = new EventedWorker(configuration);
-            this.workers.add(worker);
+            final EventedWorker worker = new EventedWorker(configuration);
+            this.workers.put(worker.getId(), worker);
             factory.newThread(worker).start();
         }
     }
@@ -67,7 +70,7 @@ public class EventedExecutor implements Executor {
     @Override
     public void close() throws Exception {
         Exception exception = null;
-        for (final Worker worker : workers) {
+        for (final EventedWorker worker : workers.values()) {
             try {
                 worker.close();
             } catch (final Exception e) {
@@ -87,7 +90,7 @@ public class EventedExecutor implements Executor {
     @Override
     public Chain<?> execute(final long jobExecutionId, final Executable executable) throws Exception {
         final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = transport.generateChainId();
+        final ChainId chainId = new UUIDId(transport);
         registry.registerJob(jobExecutionId, chainId, chain);
         _execute(executable, chainId);
         return chain;
@@ -96,7 +99,7 @@ public class EventedExecutor implements Executor {
     @Override
     public Chain<?> execute(final Executable executable) throws Exception {
         final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = transport.generateChainId();
+        final ChainId chainId = new UUIDId(transport);
         registry.registerChain(executable.getContext().getJobExecutionId(), chainId, chain);
         _execute(executable, chainId);
         return chain;
@@ -106,66 +109,46 @@ public class EventedExecutor implements Executor {
         final WorkerId workerId = executable.getWorkerId();
         final Worker worker;
         if (workerId == null) {
-            worker = transport.getWorker();
+            worker = getWorker();
         } else {
-            worker = transport.getWorker(workerId);
+            final Worker local = getWorker(workerId);
+            if (local != null) {
+                worker = local;
+            } else {
+                throw new Exception(); // TODO Message
+            }
         }
         worker.execute(new ExecutableEventImpl(executable, chainId));
     }
 
-    @Override
-    public Chain<?> distribute(final int maxThreads, final Executable... executables) throws Exception {
-        final List<Worker> workers = transport.getWorkers(maxThreads);
-        ListIterator<Worker> it = workers.listIterator();
-        final Chain<?>[] chains = new Chain[executables.length];
-        @SuppressWarnings("unchecked")
-        final Promise<ChainAndIds,Throwable,?>[] promises = new Promise[executables.length];
-        int i = 0;
-        for (final Executable executable : executables) {
-            if (!it.hasNext()) {
-                it = workers.listIterator();
-            }
-            final Worker worker = it.next();
-            final int index = i++;
-            final long jobExecutionId = executable.getContext().getJobExecutionId();
-            final Collect collect = new Collect() {
-                @Override
-                public void reject(final Throwable fail) {
-                    log.errorf(fail, ""); //TODO Message
-                    chains[index] = new RejectedChain<Void>(fail);
-                }
-
-                @Override
-                public void resolve(final ChainAndIds that) {
-                    chains[index] = that.getChain();
-                    registry.registerChain(jobExecutionId, that.getLocalId(), that.getChain());
-                    worker.execute(new ExecutableEventImpl(executable, that.getRemoteId()));
-                }
-            };
-            (promises[index] = worker.chain(jobExecutionId))
-                    .onResolve(collect)
-                    .onReject(collect);
+    private Worker getWorker() {
+        final TreeSet<EventedWorker> set = new TreeSet<>(WorkerState.COMPARATOR);
+        workerLock.lock();
+        try {
+            set.addAll(workers.values());
+        } finally {
+            workerLock.unlock();
         }
-        for (final Promise<ChainAndIds,Throwable,?> promise : promises) {
-            promise.get();
-        }
-        return new AllChain<Executable>(chains);
+        return set.first();
     }
 
     @Override
     public Chain<?> callback(final ExecutableId executableId, final ExecutionContext context) throws Exception {
         final long jobExecutionId = context.getJobExecutionId();
-        final Worker worker = transport.getWorker(jobExecutionId, executableId);
-        return worker.chain(jobExecutionId)
-                .onResolve(new OnResolve<ChainAndIds>() {
-                    @Override
-                    public void resolve(final ChainAndIds that) {
-                        registry.registerChain(jobExecutionId, that.getLocalId(), that.getChain());
-                        worker.callback(new CallbackEventImpl(jobExecutionId, executableId, that.getRemoteId(), context));
-                    }
-                })
-                .get()
-                .getChain(); //TODO This is rubbish
+        final Executable executable = configuration.getRegistry().getExecutable(jobExecutionId, executableId);
+        if (executable == null) {
+            throw new Exception("No worker found with jobExecutionId=" + jobExecutionId + " and executableId" + executableId);
+        }
+        final WorkerId workerId = executable.getWorkerId();
+        final Worker worker = configuration.getExecutor().getWorker(workerId);
+        if (worker == null) {
+            throw new Exception("No worker found with workerId=" + workerId);
+        }
+        final UUIDId id = new UUIDId(configuration.getTransport());
+        final Chain<?> chain = new ChainImpl<>();
+        registry.registerChain(jobExecutionId, id, chain);
+        worker.callback(new CallbackEventImpl(jobExecutionId, executableId, id, context));
+        return chain;
     }
 
     @Override
@@ -178,6 +161,34 @@ public class EventedExecutor implements Executor {
         });
     }
 
-    private interface Collect extends OnResolve<ChainAndIds>, OnReject<Throwable> {}
+    @Override
+    public Worker getWorker(final WorkerId workerId) throws Exception {
+        workerLock.lock();
+        try {
+            return workers.get(workerId);
+        } finally {
+            workerLock.unlock();
+        }
+    }
 
+    @Override
+    public List<Worker> getWorkers(final int required) {
+        final TreeSet<EventedWorker> set = new TreeSet<>(WorkerState.COMPARATOR);
+        workerLock.lock();
+        try {
+            set.addAll(workers.values());
+        } finally {
+            workerLock.unlock();
+        }
+        final List<Worker> ret = new ArrayList<>(required);
+        EventedWorker state = set.first();
+        for (int i = 0; i < required; ++i) {
+            ret.add(state);
+            state = set.higher(state);
+            if (state == null) {
+                state = set.first();
+            }
+        }
+        return ret;
+    }
 }

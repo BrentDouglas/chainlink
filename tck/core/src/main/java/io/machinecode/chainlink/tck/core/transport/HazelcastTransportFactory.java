@@ -3,9 +3,9 @@ package io.machinecode.chainlink.tck.core.transport;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.hazelcast.HazelcastTransport;
-import io.machinecode.chainlink.spi.configuration.Dependencies;
 
 import java.util.Properties;
 

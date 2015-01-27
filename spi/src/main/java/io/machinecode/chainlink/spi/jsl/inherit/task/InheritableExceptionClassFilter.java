@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.spi.jsl.inherit.task;
 
-import io.machinecode.chainlink.spi.Copyable;
-import io.machinecode.chainlink.spi.element.task.ExceptionClass;
-import io.machinecode.chainlink.spi.element.task.ExceptionClassFilter;
+import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
+import io.machinecode.chainlink.spi.jsl.task.ExceptionClass;
+import io.machinecode.chainlink.spi.jsl.task.ExceptionClassFilter;
 import io.machinecode.chainlink.spi.jsl.inherit.MergeableList;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
 

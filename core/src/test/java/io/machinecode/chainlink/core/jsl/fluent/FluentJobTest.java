@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.core.jsl.fluent;
 
 import io.machinecode.chainlink.core.ExpressionTest;
-import io.machinecode.chainlink.core.element.JobImpl;
+import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.jsl.InheritanceJobTest;
-import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.task.Chunk.CheckpointPolicy;
+import io.machinecode.chainlink.spi.jsl.Job;
+import io.machinecode.chainlink.spi.jsl.task.Chunk.CheckpointPolicy;
 import junit.framework.Assert;
 import org.junit.Test;
 

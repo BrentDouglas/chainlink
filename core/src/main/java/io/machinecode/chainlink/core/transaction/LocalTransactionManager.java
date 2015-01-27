@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.transaction;
 
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
 import org.jboss.logging.Logger;
 
 import javax.transaction.HeuristicMixedException;

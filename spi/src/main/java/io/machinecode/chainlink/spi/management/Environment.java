@@ -35,9 +35,8 @@ public interface Environment {
      * @param configure Some code to run with a mutable view of the current configuration. Changes
      *                  applied here will are stored in an implementation specific manner and are
      *                  immediately available to {@link #getConfiguration()} and subsequent calls
-     *                  to {@link #setConfiguration(Configure)} though are not visible to
-     *                  {@link #getJobOperator(String)} and {@link #getSubsystemJobOperator(String)}
-     *                  until {@link #reload()} is called.
+     *                  to this method though are not visible to {@link #getJobOperator(String)}
+     *                  and {@link #getSubsystemJobOperator(String)} until {@link #reload()} is called.
      *
      *                  If an Exception is thrown while running {@link Configure#configure(io.machinecode.chainlink.spi.schema.MutableSubSystemSchema)}
      *                  no changes will be visible to any methods.

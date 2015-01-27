@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core;
 
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
-import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.execution.Step;
+import io.machinecode.chainlink.spi.jsl.Job;
+import io.machinecode.chainlink.spi.jsl.execution.Step;
 import junit.framework.Assert;
 import org.junit.Test;
 

@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.tck.core.transport;
 
 import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.gridgain.GridGainTransport;
-import io.machinecode.chainlink.spi.configuration.Dependencies;
 import org.gridgain.grid.GridConfiguration;
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridGain;

@@ -11,7 +11,7 @@
     </Match>
     <Match>
         <Or>
-            <Class name="io.machinecode.chainlink.core.execution.EventedExecutor$3" />
+            <Class name="io.machinecode.chainlink.core.execution.EventedExecutor$1" />
             <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$1" />
             <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$2" />
             <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$3" />
@@ -27,7 +27,7 @@
     </Match>
     <Match>
         <Or>
-            <Class name="io.machinecode.chainlink.core.element.execution.StepImpl" />
+            <Class name="io.machinecode.chainlink.core.jsl.impl.execution.StepImpl" />
             <Class name="io.machinecode.chainlink.repository.infinispan.RunningJobExecutionIdCallable" />
             <Class name="io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepository" />
             <Class name="io.machinecode.chainlink.repository.redis.RedisExecutionRepository" />
@@ -49,9 +49,9 @@
             <Class name="io.machinecode.chainlink.core.context.ExecutionContextImpl" />
             <Class name="io.machinecode.chainlink.core.context.JobContextImpl" />
             <Class name="io.machinecode.chainlink.core.context.StepContextImpl" />
-            <Class name="io.machinecode.chainlink.core.element.JobImpl" />
-            <Class name="io.machinecode.chainlink.core.element.ListenerImpl" />
-            <Class name="io.machinecode.chainlink.core.element.execution.StepImpl" />
+            <Class name="io.machinecode.chainlink.core.jsl.impl.JobImpl" />
+            <Class name="io.machinecode.chainlink.core.jsl.impl.ListenerImpl" />
+            <Class name="io.machinecode.chainlink.core.jsl.impl.execution.StepImpl" />
             <Class name="io.machinecode.chainlink.core.util.ResolvableClass" />
             <Class name="io.machinecode.chainlink.inject.seam.SeamInjectionInterceptor" />
         </Or>

@@ -1,6 +1,6 @@
 package example;
 
-import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.SubSystemConfiguration;
 import io.machinecode.chainlink.spi.configuration.SubSystemModel;
 

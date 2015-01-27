@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.core.factory.transition;
 
-import io.machinecode.chainlink.core.element.transition.EndImpl;
 import io.machinecode.chainlink.core.expression.Expression;
+import io.machinecode.chainlink.core.expression.JobPropertyContext;
 import io.machinecode.chainlink.core.factory.ElementFactory;
-import io.machinecode.chainlink.spi.element.transition.End;
-import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.jsl.impl.transition.EndImpl;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.spi.jsl.transition.End;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.jsl.inherit.transition;
 
-import io.machinecode.chainlink.spi.element.transition.Stop;
+import io.machinecode.chainlink.spi.jsl.transition.Stop;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

@@ -1,13 +1,13 @@
 package io.machinecode.chainlink.core.jsl.xml.task;
 
-import io.machinecode.chainlink.spi.element.task.Chunk;
 import io.machinecode.chainlink.spi.jsl.inherit.task.InheritableChunk;
+import io.machinecode.chainlink.spi.jsl.task.Chunk;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import static io.machinecode.chainlink.spi.element.Job.NAMESPACE;
+import static io.machinecode.chainlink.spi.jsl.Job.NAMESPACE;
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
 /**

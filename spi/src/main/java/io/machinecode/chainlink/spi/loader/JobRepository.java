@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.spi.loader;
 
-import io.machinecode.chainlink.spi.InheritableElement;
-import io.machinecode.chainlink.spi.ParentNotFoundException;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableElement;
+import io.machinecode.chainlink.spi.exception.ParentNotFoundException;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -16,7 +16,7 @@ public interface JobRepository {
      * @param defaultJobXml The default job XML to search for the parent in.
      * @param <T>
      * @return The parent element.
-     * @throws io.machinecode.chainlink.spi.ParentNotFoundException If the parent element is not in this repository.
+     * @throws io.machinecode.chainlink.spi.exception.ParentNotFoundException If the parent element is not in this repository.
      */
     <T extends InheritableElement<T>> T findParent(final Class<T> clazz, final T that, final String defaultJobXml) throws ParentNotFoundException;
 

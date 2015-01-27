@@ -37,7 +37,7 @@ public interface Dependencies {
 
     ExecutionRepository getExecutionRepository();
 
-    Transport<?> getTransport();
+    Transport getTransport();
 
     Registry getRegistry();
 

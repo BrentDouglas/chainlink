@@ -1,11 +1,10 @@
 package io.machinecode.chainlink.spi.jsl.inherit;
 
-import io.machinecode.chainlink.spi.Copyable;
-import io.machinecode.chainlink.spi.element.partition.Analyser;
-import io.machinecode.chainlink.spi.element.partition.Collector;
-import io.machinecode.chainlink.spi.element.partition.Partition;
-import io.machinecode.chainlink.spi.element.partition.Reducer;
-import io.machinecode.chainlink.spi.element.partition.Strategy;
+import io.machinecode.chainlink.spi.jsl.partition.Analyser;
+import io.machinecode.chainlink.spi.jsl.partition.Collector;
+import io.machinecode.chainlink.spi.jsl.partition.Partition;
+import io.machinecode.chainlink.spi.jsl.partition.Reducer;
+import io.machinecode.chainlink.spi.jsl.partition.Strategy;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

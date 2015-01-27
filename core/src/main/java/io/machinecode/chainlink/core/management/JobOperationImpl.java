@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.core.management;
 
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.management.JobOperation;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
@@ -60,9 +60,7 @@ public class JobOperationImpl implements JobOperation {
             final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId);
             log.tracef(Messages.get("CHAINLINK-033000.operation.get"), jobExecutionId, execution);
             return execution;
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new ExecutionException(e);
@@ -78,9 +76,7 @@ public class JobOperationImpl implements JobOperation {
             final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId);
             log.tracef(Messages.get("CHAINLINK-033000.operation.get"), jobExecutionId, execution);
             return execution;
-        } catch (final NoSuchJobExecutionException e) {
-            throw e;
-        } catch (final JobSecurityException e) {
+        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (Exception e) {
             throw new ExecutionException(e);

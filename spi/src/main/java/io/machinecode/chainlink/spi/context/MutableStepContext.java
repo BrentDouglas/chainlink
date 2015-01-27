@@ -10,9 +10,9 @@ import javax.batch.runtime.context.StepContext;
  */
 public interface MutableStepContext extends StepContext {
 
-    void setException(Exception exception);
+    void setException(final Exception exception);
 
-    void setBatchStatus(BatchStatus batchStatus);
+    void setBatchStatus(final BatchStatus batchStatus);
 
-    MutableMetric getMetric(MetricType type);
+    MutableMetric getMetric(final MetricType type);
 }

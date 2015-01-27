@@ -5,7 +5,7 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
 
 /**
@@ -15,8 +15,11 @@ import io.machinecode.chainlink.spi.then.Chain;
 public class TestExecutable implements Executable {
 
     final ExecutableId id;
+    final TestExecutionContext context;
+    WorkerId workerId;
 
-    public TestExecutable(final long id, final String address) {
+    public TestExecutable(final long id, final String address, final TestExecutionContext context) {
+        this.context = context;
         this.id = new TestId(id, address);
     }
 
@@ -27,26 +30,26 @@ public class TestExecutable implements Executable {
 
     @Override
     public ExecutableId getParentId() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public WorkerId getWorkerId() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return workerId;
     }
 
     @Override
     public ExecutionRepositoryId getExecutionRepositoryId() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public ExecutionContext getContext() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return context;
     }
 
     @Override
     public void execute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId, final ExecutionContext childContext) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.workerId = workerId;
     }
 }

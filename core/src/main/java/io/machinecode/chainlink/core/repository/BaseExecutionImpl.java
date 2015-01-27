@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.core.repository;
 
 import io.machinecode.chainlink.spi.repository.BaseExecution;
-import io.machinecode.chainlink.spi.repository.BaseExecutionBuilder;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.Metric;

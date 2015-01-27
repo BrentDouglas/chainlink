@@ -1,12 +1,10 @@
 package io.machinecode.chainlink.core.transport;
 
 import io.machinecode.chainlink.core.then.ChainImpl;
+import io.machinecode.chainlink.core.transport.cmd.Command;
+import io.machinecode.chainlink.core.transport.cmd.InvokeChainCommand;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.spi.transport.Command;
-import io.machinecode.chainlink.spi.transport.Transport;
-import io.machinecode.then.api.Deferred;
-import io.machinecode.then.core.DeferredImpl;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
@@ -19,18 +17,18 @@ import java.util.concurrent.TimeoutException;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
+public class DistributedRemoteChain extends ChainImpl<Void> {
 
     private static final Logger log = Logger.getLogger(DistributedRemoteChain.class);
 
-    protected final Transport<A> transport;
-    protected final A address;
+    protected final BaseTransport<?> transport;
+    protected final Object address;
     protected final long jobExecutionId;
     protected final ChainId chainId;
     protected final long timeout;
     protected final TimeUnit unit;
 
-    public DistributedRemoteChain(final Transport<A> transport, final A address, final long jobExecutionId, final ChainId chainId) {
+    public DistributedRemoteChain(final BaseTransport<?> transport, final Object address, final long jobExecutionId, final ChainId chainId) {
         this.transport = transport;
         this.address = address;
         this.jobExecutionId = jobExecutionId;
@@ -39,17 +37,15 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
         this.unit = transport.getTimeUnit();
     }
 
-    protected abstract <T> Command<T, A> command(final String name, final Serializable... params);
+    protected <T> Command<T> command(final String name, final Serializable... params) {
+        return new InvokeChainCommand<>(jobExecutionId, chainId, name, params);
+    }
 
     @Override
     public void resolve(final Void value) {
         try {
-            final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
-            try {
-                transport.invokeRemote(address, this.<Void>command("resolve", new Serializable[]{null}), promise, this.timeout, this.unit);
-            } finally {
-                promise.get(timeout, unit);
-            }
+            transport.invokeRemote(address, this.<Void>command("resolve", new Serializable[]{null}), this.timeout, this.unit)
+                    .get(timeout, unit);
         } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
             log().errorf(e, ""); //TODO Message
         } finally {
@@ -60,12 +56,8 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
     @Override
     public void reject(final Throwable failure) {
         try {
-            final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
-            try {
-                transport.invokeRemote(address, this.<Void>command("reject", failure), promise, this.timeout, this.unit);
-            } finally {
-                promise.get(timeout, unit);
-            }
+            transport.invokeRemote(address, this.<Void>command("reject", failure), this.timeout, this.unit)
+                    .get(timeout, unit);
         } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
             log().errorf(e, ""); //TODO Message
         } finally {
@@ -76,12 +68,8 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
     @Override
     public void link(final Chain<?> that) {
         try {
-            final Deferred<Boolean,Throwable,Void> promise = new DeferredImpl<>();
-            try {
-                transport.invokeRemote(address, this.<Boolean>command("link", new Serializable[]{null}), promise, this.timeout, this.unit);
-            } finally {
-                promise.get(timeout, unit);
-            }
+            transport.invokeRemote(address, this.<Boolean>command("link", new Serializable[]{null}), this.timeout, this.unit)
+                    .get(timeout, unit);
         } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
             log().errorf(e, ""); //TODO Message
         } finally {
@@ -92,12 +80,8 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
     @Override
     public void linkAndResolve(final Void value, final Chain<?> link) {
         try {
-            final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
-            try {
-                transport.invokeRemote(address, this.<Void>command("linkAndResolve", null, null), promise, this.timeout, this.unit);
-            } finally {
-                promise.get(timeout, unit);
-            }
+            transport.invokeRemote(address, this.<Void>command("linkAndResolve", null, null), this.timeout, this.unit)
+                    .get(timeout, unit);
         } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
             log().errorf(e, ""); //TODO Message
         } finally {
@@ -109,12 +93,8 @@ public abstract class DistributedRemoteChain<A> extends ChainImpl<Void> {
     @Override
     public void linkAndReject(final Throwable failure, final Chain<?> link) {
         try {
-            final Deferred<Void,Throwable,Void> promise = new DeferredImpl<>();
-            try {
-                transport.invokeRemote(address, this.<Void>command("linkAndReject", failure, null), promise, this.timeout, this.unit);
-            } finally {
-                promise.get(timeout, unit);
-            }
+            transport.invokeRemote(address, this.<Void>command("linkAndReject", failure, null), this.timeout, this.unit)
+                    .get(timeout, unit);
         } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
             log().errorf(e, ""); //TODO Message
         } finally {

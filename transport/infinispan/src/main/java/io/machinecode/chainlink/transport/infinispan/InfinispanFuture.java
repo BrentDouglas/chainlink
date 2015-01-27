@@ -22,52 +22,52 @@ import java.util.concurrent.TimeoutException;
 public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
     private final InfinispanTransport transport;
-    private final Deferred<U,Throwable,?> promise;
+    private final Deferred<U,Throwable,?> deferred;
     private final Address address;
     private final long start;
     private Future<T> io;
 
-    public InfinispanFuture(final InfinispanTransport transport, final Deferred<U,Throwable,?> promise, final Address address, final long start) {
+    public InfinispanFuture(final InfinispanTransport transport, final Deferred<U,Throwable,?> deferred, final Address address, final long start) {
         this.transport = transport;
-        this.promise = promise;
+        this.deferred = deferred;
         this.address = address;
         this.start = start;
     }
 
     @Override
     public void notifyDone() {
-        final FutureDeferred<T,Throwable> deferred = new FutureDeferred<>(
+        final FutureDeferred<T,Throwable> def = new FutureDeferred<>(
                 io,
                 System.currentTimeMillis() - start + transport.options.timeUnit().toMillis(transport.options.timeout()),
                 TimeUnit.MILLISECONDS
         );
-        deferred.onResolve(new OnResolve<T>() {
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    public void resolve(final T ret) {
-                        try {
-                            if (ret == null || !(ret instanceof Map)) {
-                                promise.reject(new IllegalStateException()); //TODO Message
-                                return;
-                            }
-                            final Response response = ((Map<Address, Response>) ret).get(address);
-                            if (response == null) {
-                                promise.resolve(null);
-                            } else if (response.isSuccessful()) {
-                                promise.resolve((U) ((SuccessfulResponse) response).getResponseValue());
-                            } else {
-                                if (response instanceof ExceptionResponse) {
-                                    promise.reject(((ExceptionResponse) response).getException());
-                                } else {
-                                    promise.reject(new IllegalStateException()); //TODO Message
-                                }
-                            }
-                        } catch (final Throwable e) {
-                            promise.reject(e);
+        def.onResolve(new OnResolve<T>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public void resolve(final T ret) {
+                try {
+                    if (ret == null || !(ret instanceof Map)) {
+                        deferred.reject(new IllegalStateException()); //TODO Message
+                        return;
+                    }
+                    final Response response = ((Map<Address, Response>) ret).get(address);
+                    if (response == null) {
+                        deferred.resolve(null);
+                    } else if (response.isSuccessful()) {
+                        deferred.resolve((U) ((SuccessfulResponse) response).getResponseValue());
+                    } else {
+                        if (response instanceof ExceptionResponse) {
+                            deferred.reject(((ExceptionResponse) response).getException());
+                        } else {
+                            deferred.reject(new IllegalStateException()); //TODO Message
                         }
                     }
-                }).onReject(promise);
-        transport.network.execute(deferred);
+                } catch (final Throwable e) {
+                    deferred.reject(e);
+                }
+            }
+        }).onReject(deferred);
+        transport.network.execute(def);
     }
 
     @Override

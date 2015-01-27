@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.core.repository;
 
-import io.machinecode.chainlink.core.element.JobImpl;
+import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.base.BaseTest;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.context.MutableMetric;
-import io.machinecode.chainlink.spi.element.execution.Step;
+import io.machinecode.chainlink.spi.jsl.execution.Step;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;

@@ -1,33 +1,35 @@
 package io.machinecode.chainlink.core.registry;
 
+import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
+import io.machinecode.chainlink.spi.transport.Addressed;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class UUIDId implements ChainId, ExecutableId, WorkerId, ExecutionRepositoryId, Serializable {
+public class UUIDId implements ExecutionRepositoryId, ExecutableId, ChainId, WorkerId {
     private static final long serialVersionUID = 1L;
 
     final UUID uuid;
+    final Object address;
 
-    protected UUIDId(final UUID uuid) {
+    public UUIDId(final UUID uuid, final Addressed addressed) {
         this.uuid = uuid;
+        this.address = addressed.getAddress();
     }
 
-    public UUIDId() {
-        this(UUID.randomUUID());
+    public UUIDId(final Addressed addressed) {
+        this(UUID.randomUUID(), addressed);
     }
 
     @Override
     public Object getAddress() {
-        return null;
+        return address;
     }
 
     @Override
@@ -35,16 +37,17 @@ public class UUIDId implements ChainId, ExecutableId, WorkerId, ExecutionReposit
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final UUIDId that = (UUIDId) o;
-        return uuid.equals(that.uuid);
+        return !(address != null ? !address.equals(that.address) : that.address != null) && uuid.equals(that.uuid);
+
     }
 
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return 31 * uuid.hashCode() + (address != null ? address.hashCode() : 0);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[uuid=" + uuid + "]";
+        return getClass().getSimpleName() + "[address=" + address + ",uuid=" + uuid + "]";
     }
 }

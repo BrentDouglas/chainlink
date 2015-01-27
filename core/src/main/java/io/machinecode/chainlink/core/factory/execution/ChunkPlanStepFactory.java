@@ -1,24 +1,24 @@
 package io.machinecode.chainlink.core.factory.execution;
 
-import io.machinecode.chainlink.core.element.ListenersImpl;
-import io.machinecode.chainlink.core.element.PropertiesImpl;
-import io.machinecode.chainlink.core.element.execution.StepImpl;
-import io.machinecode.chainlink.core.element.partition.PartitionImpl;
-import io.machinecode.chainlink.core.element.partition.PlanImpl;
-import io.machinecode.chainlink.core.element.task.ChunkImpl;
-import io.machinecode.chainlink.core.element.transition.TransitionImpl;
 import io.machinecode.chainlink.core.expression.Expression;
+import io.machinecode.chainlink.core.expression.JobPropertyContext;
 import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.factory.StepListenersFactory;
 import io.machinecode.chainlink.core.factory.partition.PlanPartitionFactory;
 import io.machinecode.chainlink.core.factory.task.ChunkFactory;
 import io.machinecode.chainlink.core.factory.transition.Transitions;
-import io.machinecode.chainlink.spi.element.execution.Step;
-import io.machinecode.chainlink.spi.element.partition.Plan;
-import io.machinecode.chainlink.spi.element.task.Chunk;
-import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
+import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
+import io.machinecode.chainlink.core.jsl.impl.execution.StepImpl;
+import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
+import io.machinecode.chainlink.core.jsl.impl.partition.PlanImpl;
+import io.machinecode.chainlink.core.jsl.impl.task.ChunkImpl;
+import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.spi.jsl.execution.Step;
+import io.machinecode.chainlink.spi.jsl.partition.Plan;
+import io.machinecode.chainlink.spi.jsl.task.Chunk;
 
 import java.util.List;
 

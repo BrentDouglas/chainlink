@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.context;
 
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;

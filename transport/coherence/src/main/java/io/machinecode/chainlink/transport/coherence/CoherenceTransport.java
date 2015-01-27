@@ -7,16 +7,15 @@ import com.tangosol.net.InvocationObserver;
 import com.tangosol.net.InvocationService;
 import com.tangosol.net.Member;
 import com.tangosol.util.UID;
-import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.transport.Command;
-import io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.core.transport.DistributedTransport;
-import io.machinecode.chainlink.core.transport.DistributedWorker;
+import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
+import io.machinecode.then.core.DeferredImpl;
+import io.machinecode.then.core.RejectedDeferred;
 import org.jboss.logging.Logger;
 
 import java.util.Collections;
@@ -38,15 +37,20 @@ public class CoherenceTransport extends DistributedTransport<Member> {
     final Member local;
     protected volatile List<Member> remotes;
 
-    public CoherenceTransport(final Dependencies dependencies, final Properties properties, final String invocationServiceName) throws Exception {
+    public CoherenceTransport(final Dependencies dependencies, final Properties properties) throws Exception {
         super(dependencies, properties);
-        this.invocationServiceName = invocationServiceName;
+        this.invocationServiceName = properties.getProperty(Constants.COHERENCE_INVOCATION_SERVICE, Constants.Defaults.COHERENCE_INVOCATION_SERVICE);
         final Cluster cluster = CacheFactory.ensureCluster();
         this.executor = (InvocationService) CacheFactory.getService(invocationServiceName);
-        this.executor.setUserContext(this);
         this.local = cluster.getLocalMember();
         this.remotes = _remoteMembers(cluster.getMemberSet());
         log.infof("CoherenceRegistry started on address: [%s]", this.local); //TODO Message
+    }
+
+    @Override
+    public void open(final Configuration configuration) throws Exception {
+        super.open(configuration);
+        this.executor.setUserContext(configuration);
     }
 
     @Override
@@ -54,25 +58,6 @@ public class CoherenceTransport extends DistributedTransport<Member> {
         log.infof("CoherenceRegistry is shutting down."); //TODO Message
         this.executor.shutdown();
         super.close();
-    }
-
-    @Override
-    public ExecutableId generateExecutableId() {
-        return new CoherenceUUIDId(local);
-    }
-
-    @Override
-    public WorkerId generateWorkerId(final Worker worker) {
-        if (worker instanceof Thread) {
-            return new CoherenceWorkerId((Thread)worker, local);
-        } else {
-            return new CoherenceUUIDId(local);
-        }
-    }
-
-    @Override
-    public ExecutionRepositoryId generateExecutionRepositoryId() {
-        return new CoherenceUUIDId(local);
     }
 
     @Override
@@ -86,22 +71,11 @@ public class CoherenceTransport extends DistributedTransport<Member> {
     }
 
     @Override
-    protected DistributedWorker<Member> createDistributedWorker(final Member address, final WorkerId workerId) {
-        return new CoherenceWorker(this, this.local, address, workerId);
-    }
-
-    @Override
-    protected DistributedProxyExecutionRepository<Member> createDistributedExecutionRepository(final ExecutionRepositoryId id, final Member address) {
-        return new CoherenceProxyExecutionRepository(this, id, address);
-    }
-
-    @Override
-    protected boolean isMatchingAddressType(final Object address) {
-        return address instanceof Member;
-    }
-
-    @Override
-    public <T> void invokeRemote(final Member address, final Command<T, Member> command, final Deferred<T, Throwable,?> deferred, final long timeout, final TimeUnit unit) {
+    public <T> Promise<T,Throwable,Object> invokeRemote(final Object address, final Command<T> command, final long timeout, final TimeUnit unit) {
+        if (!(address instanceof Member)) {
+            return new RejectedDeferred<T, Throwable, Object>(new Exception("Expected " + Member.class.getName() + ". Found " + address.getClass())); //TODO Message
+        }
+        final DeferredImpl<T,Throwable,Object> deferred = new DeferredImpl<>();
         try {
             log.tracef("Invoking %s on %s.", command, address);
             this.executor.execute(
@@ -109,9 +83,10 @@ public class CoherenceTransport extends DistributedTransport<Member> {
                     Collections.singleton(address),
                     new DeferredObserver<>(deferred)
             );
-        } catch (Exception e) {
+        } catch (final Throwable e) {
             deferred.reject(e);
         }
+        return deferred;
     }
 
     public static class DeferredObserver<T> implements InvocationObserver {
@@ -144,13 +119,13 @@ public class CoherenceTransport extends DistributedTransport<Member> {
     public static class Invocation extends AbstractInvocable {
         private static final long serialVersionUID = 1L;
 
-        private final Command<?, Member> command;
+        private final Command<?> command;
         private final UID uuid;
         private final String invocationServiceName;
-        private transient CoherenceTransport transport;
+        private transient Configuration configuration;
         private transient Member origin;
 
-        public Invocation(final Command<?, Member> command, final Member origin, final String invocationServiceName) {
+        public Invocation(final Command<?> command, final Member origin, final String invocationServiceName) {
             this.command = command;
             this.invocationServiceName = invocationServiceName;
             this.uuid = origin.getUid();
@@ -158,7 +133,7 @@ public class CoherenceTransport extends DistributedTransport<Member> {
 
         @Override
         public void run() {
-            this.transport = (CoherenceTransport) CacheFactory.getService(this.invocationServiceName).getUserContext();
+            this.configuration = (Configuration) CacheFactory.getService(this.invocationServiceName).getUserContext();
             for (final Object that : CacheFactory.getCluster().getMemberSet()) {
                 final Member member = (Member) that;
                 if (member.getUid().equals(this.uuid)) {
@@ -170,7 +145,7 @@ public class CoherenceTransport extends DistributedTransport<Member> {
                 throw new IllegalStateException(); //TODO Message
             }
             try {
-                command.perform(this.transport, this.transport.getRegistry(), this.origin);
+                command.perform(this.configuration, this.origin);
             } catch (final Throwable e) {
                 throw new RuntimeException(e);
             }

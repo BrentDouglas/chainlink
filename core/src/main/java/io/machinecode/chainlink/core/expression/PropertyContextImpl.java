@@ -21,7 +21,7 @@ public class PropertyContextImpl implements PropertyContext {
 
     public PropertyContextImpl(final Properties properties) {
         this.properties = properties;
-        this.references = new THashMap<String, ArtifactReference>();
+        this.references = new THashMap<>();
     }
 
     @Override
@@ -30,8 +30,8 @@ public class PropertyContextImpl implements PropertyContext {
     }
 
     @Override
-    public <T extends ArtifactReference> T getReference(final T that) {
-        final T old = (T) references.putIfAbsent(that.ref(), that);
+    public ArtifactReference getReference(final ArtifactReference that) {
+        final ArtifactReference old = references.putIfAbsent(that.ref(), that);
         return old == null ? that : old;
     }
 }

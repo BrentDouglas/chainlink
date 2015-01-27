@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.jsl.fluent;
 
-import io.machinecode.chainlink.spi.element.Listener;
+import io.machinecode.chainlink.spi.jsl.Listener;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

@@ -3,7 +3,7 @@ package io.machinecode.chainlink.inject.seam;
 import io.machinecode.chainlink.core.inject.DefaultInjector;
 import io.machinecode.chainlink.core.inject.LoadProviders;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;

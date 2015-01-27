@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.xml.task;
 
-import io.machinecode.chainlink.spi.Mergeable;
-import io.machinecode.chainlink.spi.element.task.Task;
+import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
+import io.machinecode.chainlink.spi.jsl.task.Task;
 
 import javax.xml.bind.annotation.XmlType;
 

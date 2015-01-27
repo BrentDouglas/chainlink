@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.spi.jsl.inherit.execution;
 
-import io.machinecode.chainlink.spi.Inheritable;
-import io.machinecode.chainlink.spi.element.execution.Flow;
-import io.machinecode.chainlink.spi.element.execution.Split;
+import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
+import io.machinecode.chainlink.spi.jsl.execution.Flow;
+import io.machinecode.chainlink.spi.jsl.execution.Split;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 

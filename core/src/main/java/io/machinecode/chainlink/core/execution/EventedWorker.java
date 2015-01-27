@@ -2,21 +2,18 @@ package io.machinecode.chainlink.core.execution;
 
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.registry.UUIDId;
-import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.then.Notify;
+import io.machinecode.chainlink.core.transport.WorkerState;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.CallbackEvent;
-import io.machinecode.chainlink.spi.execution.ChainAndIds;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.ExecutableEvent;
 import io.machinecode.chainlink.spi.execution.Worker;
+import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
-import io.machinecode.chainlink.spi.util.Messages;
-import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.ResolvedDeferred;
 import org.jboss.logging.Logger;
 
 import java.util.LinkedList;
@@ -25,7 +22,7 @@ import java.util.Queue;
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public class EventedWorker implements Worker {
+public class EventedWorker implements Worker, WorkerState, Runnable, AutoCloseable {
 
     private static final Logger log = Logger.getLogger(EventedWorker.class);
 
@@ -40,7 +37,7 @@ public class EventedWorker implements Worker {
 
     public EventedWorker(final Configuration configuration) {
         this.configuration = configuration;
-        this.workerId = configuration.getTransport().generateWorkerId(this);
+        this.workerId = new UUIDId(configuration.getTransport());
         lock = new Object() {
             @Override
             public String toString() {
@@ -51,11 +48,10 @@ public class EventedWorker implements Worker {
     }
 
     @Override
-    public WorkerId id() {
+    public WorkerId getId() {
         return workerId;
     }
 
-    @Override
     public boolean isActive() {
         return started && !stopped;
     }
@@ -80,21 +76,13 @@ public class EventedWorker implements Worker {
     }
 
     @Override
-    public Promise<ChainAndIds,Throwable,?> chain(final long jobExecutionId) {
-        final UUIDId id = new UUIDId();
-        return new ResolvedDeferred<ChainAndIds,Throwable,Void>(new ChainAndIds(id, id, new ChainImpl<Void>()));
-    }
-
-    @Override
     public void run() {
         this.started = true;
-        configuration.getTransport().registerWorker(this);
         boolean ran;
         do {
             _awaitIfEmpty();
             ran = _runExecutable();
         } while (!stopped || ran);
-        configuration.getTransport().unregisterWorker(this);
     }
 
     private boolean _runExecutable() {
@@ -181,5 +169,15 @@ public class EventedWorker implements Worker {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[workerId=" + workerId + ",executables=" + executables.size() + ",callbacks=" + callbacks.size() + ",running=" + isActive() + "]";
+    }
+
+    @Override
+    public int getExecutions() {
+        return executables.size();
+    }
+
+    @Override
+    public int getCallbacks() {
+        return callbacks.size();
     }
 }

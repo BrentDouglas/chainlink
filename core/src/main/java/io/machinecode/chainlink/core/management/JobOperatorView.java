@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.core.Chainlink;
-import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.management.JobOperation;

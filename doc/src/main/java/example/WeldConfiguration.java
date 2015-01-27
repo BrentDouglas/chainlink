@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoaderFactory;
 import io.machinecode.chainlink.inject.cdi.CdiInjectorFactory;
-import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.core.Constants;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 

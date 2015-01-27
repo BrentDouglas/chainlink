@@ -40,7 +40,7 @@ public class ConfigurationImpl implements Configuration {
     protected final Security security;
     protected final InjectionContext injectionContext;
     protected final ExecutionRepository executionRepository;
-    protected final Transport<?> transport;
+    protected final Transport transport;
     protected final Registry registry;
     protected final Executor executor;
     protected final Properties properties;
@@ -154,7 +154,7 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public Transport<?> getTransport() {
+    public Transport getTransport() {
         return transport;
     }
 }

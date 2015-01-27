@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.tck.core.transport;
 
+import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
-import io.machinecode.chainlink.spi.configuration.Dependencies;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;

@@ -3,8 +3,8 @@ package io.machinecode.chainlink.core.validation.partition;
 import io.machinecode.chainlink.core.validation.PropertiesValidator;
 import io.machinecode.chainlink.core.validation.visitor.ValidatingVisitor;
 import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
-import io.machinecode.chainlink.spi.element.Properties;
-import io.machinecode.chainlink.spi.element.partition.Plan;
+import io.machinecode.chainlink.spi.jsl.Properties;
+import io.machinecode.chainlink.spi.jsl.partition.Plan;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

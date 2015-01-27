@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.core.repository;
 
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.repository.ExtendedJobExecutionBuilder;
 
 import javax.batch.runtime.BatchStatus;
 import java.io.Serializable;

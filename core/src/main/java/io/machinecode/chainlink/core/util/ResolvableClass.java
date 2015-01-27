@@ -1,7 +1,5 @@
 package io.machinecode.chainlink.core.util;
 
-import io.machinecode.chainlink.spi.util.Resolvable;
-
 import java.io.Serializable;
 
 /**

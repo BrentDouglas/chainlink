@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.jsl.xml;
 
-import io.machinecode.chainlink.spi.element.Listener;
+import io.machinecode.chainlink.spi.jsl.Listener;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 

@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
-import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Configure;
 import io.machinecode.chainlink.spi.management.Environment;

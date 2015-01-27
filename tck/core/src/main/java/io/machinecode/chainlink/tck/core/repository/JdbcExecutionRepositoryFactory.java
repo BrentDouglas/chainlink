@@ -62,7 +62,7 @@ public class JdbcExecutionRepositoryFactory implements ExecutionRepositoryFactor
     }
 
     @Override
-    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) {
+    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws SQLException {
         return JdbcExecutionRepository.create(new DataSourceLookup() {
             @Override
             public DataSource getDataSource() {

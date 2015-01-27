@@ -22,8 +22,7 @@ public class CoherenceTransportFactory implements TransportFactory {
         });
         return new CoherenceTransport(
                 dependencies,
-                properties,
-                "InvocationService"
+                properties
         );
     }
 }

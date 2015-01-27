@@ -2,7 +2,7 @@ package io.machinecode.chainlink.inject.jndi;
 
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
 import org.jboss.logging.Logger;
 
 import javax.naming.InitialContext;

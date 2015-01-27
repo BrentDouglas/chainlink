@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core.validation;
 
 import io.machinecode.chainlink.core.validation.visitor.ValidatingVisitor;
 import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
-import io.machinecode.chainlink.spi.element.Listener;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.jsl.Listener;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

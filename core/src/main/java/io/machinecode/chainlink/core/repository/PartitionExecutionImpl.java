@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.core.repository;
 
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.repository.PartitionExecutionBuilder;
 
 import java.util.List;
 import java.util.Properties;

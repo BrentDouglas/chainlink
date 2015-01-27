@@ -1,20 +1,16 @@
 package io.machinecode.chainlink.transport.jgroups;
 
-import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.execution.Worker;
-import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.transport.Command;
-import io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.core.transport.DistributedTransport;
-import io.machinecode.chainlink.core.transport.DistributedWorker;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.then.api.OnCancel;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.OnReject;
 import io.machinecode.then.api.OnResolve;
+import io.machinecode.then.api.Promise;
+import io.machinecode.then.core.DeferredImpl;
 import io.machinecode.then.core.FutureDeferred;
+import io.machinecode.then.core.RejectedDeferred;
 import org.jboss.logging.Logger;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -44,13 +40,11 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     final Address local;
     protected volatile List<Address> remotes;
 
-    public JGroupsTransport(final Dependencies dependencies, final Properties properties, final JChannel channel, final String clusterName) throws Exception {
+    public JGroupsTransport(final Dependencies dependencies, final Properties properties, final JChannel channel) throws Exception {
         super(dependencies, properties);
         this.channel = channel;
-        try {
-            channel.connect(clusterName);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        if (!(channel.isConnected() || channel.isConnecting())) {
+            throw new IllegalStateException("Must already have called JChannel#connect(...)"); //TODO Message
         }
         this.local = channel.getAddress();
         this.remotes = _remoteMembers(this.channel.getView().getMembers());
@@ -62,27 +56,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     @Override
     public void close() throws Exception {
         log.infof("JGroupsRegistry is shutting down."); //TODO Message
-        this.channel.close();
         super.close();
-    }
-
-    @Override
-    public ExecutableId generateExecutableId() {
-        return new JGroupsUUIDId(local);
-    }
-
-    @Override
-    public WorkerId generateWorkerId(final Worker worker) {
-        if (worker instanceof Thread) {
-            return new JGroupsWorkerId((Thread)worker, local);
-        } else {
-            return new JGroupsUUIDId(local);
-        }
-    }
-
-    @Override
-    public ExecutionRepositoryId generateExecutionRepositoryId() {
-        return new JGroupsUUIDId(local);
     }
 
     @Override
@@ -96,45 +70,35 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     }
 
     @Override
-    protected DistributedWorker<Address> createDistributedWorker(final Address address, final WorkerId workerId) {
-        return new JGroupsWorker(this, this.local, address, workerId);
-    }
-
-    @Override
-    protected DistributedProxyExecutionRepository<Address> createDistributedExecutionRepository(final ExecutionRepositoryId id, final Address address) {
-        return new JGroupsProxyExecutionRepository(this, id, address);
-    }
-
-    @Override
-    protected boolean isMatchingAddressType(final Object address) {
-        return address instanceof Address;
-    }
-
-    @Override
-    public <T> void invokeRemote(final Address address, final Command<T, Address> command,
-                                 final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
+    public <T> Promise<T,Throwable,Object> invokeRemote(final Object address, final Command<T> command,
+                                 final long timeout, final TimeUnit unit) {
+        if (!(address instanceof Address)) {
+            return new RejectedDeferred<T,Throwable,Object>(new Exception("Expected " + Address.class.getName() + ". Found " + address.getClass())); //TODO Message
+        }
+        final Address addr = (Address)address;
+        final DeferredImpl<T,Throwable,Object> deferred = new DeferredImpl<>();
         try {
             log.tracef("Sending to %s: %s.", address, command);
             this.dispatcher.sendMessageWithFuture(
-                    new Message(address, marshalling.marshall(command)),
+                    new Message(addr, marshalling.marshall(command)),
                     RequestOptions.SYNC()
                             .setExclusionList(this.local)
                             .setTimeout(unit.toMillis(timeout)),
-                    new JGroupsFutureListener<>(address, command, this.network, promise, timeout, unit)
+                    new JGroupsFutureListener<>(addr, command, this.network, deferred, timeout, unit)
             );
-        } catch (final Exception e) {
-            promise.reject(e);
+        } catch (final Throwable e) {
+            deferred.reject(e);
         }
+        return deferred;
     }
 
     @Override
     public Object handle(final Message msg) throws Exception {
         try {
             final Address src = msg.src();
-            @SuppressWarnings("unchecked")
-            final Command<?,Address> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
+            final Command<?> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
             log.tracef("Starting from %s: %s.", src, command);
-            final Object ret = command.perform(this, this.getRegistry(), src);
+            final Object ret = command.perform(this.configuration, src);
             log.tracef("Finished from %s: %s with %s.", src, command, ret);
             return ret;
         } catch (final Exception e) {
@@ -147,8 +111,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     @Override
     public void handle(final Message msg, final Response response) throws Exception {
         final Address src = msg.src();
-        @SuppressWarnings("unchecked")
-        final Command<?,Address> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
+        final Command<?> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
         log.tracef("Starting async from %s: %s.", src, command);
         final Future<?> future = invokeLocal(command, src);
         final FutureDeferred<Object, Throwable> def = new FutureDeferred<>(future);
@@ -186,14 +149,14 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     public static class Listener implements OnResolve<Object>, OnReject<Throwable>, OnCancel, OnComplete {
 
         final Address origin;
-        final Command<?,Address> command;
+        final Command<?> command;
 
         final Response response;
         final Future<?> future;
         final long timeout;
         final TimeUnit unit;
 
-        public Listener(final Address origin, final Command<?, Address> command, final Response response, final Future<?> future, final long timeout, final TimeUnit unit) {
+        public Listener(final Address origin, final Command<?> command, final Response response, final Future<?> future, final long timeout, final TimeUnit unit) {
             this.origin = origin;
             this.command = command;
             this.response = response;

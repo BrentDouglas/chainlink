@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.spi.jsl.inherit.execution;
 
-import io.machinecode.chainlink.spi.Copyable;
-import io.machinecode.chainlink.spi.Inheritable;
-import io.machinecode.chainlink.spi.element.execution.Execution;
-import io.machinecode.chainlink.spi.element.execution.Flow;
-import io.machinecode.chainlink.spi.element.transition.Transition;
+import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
+import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
+import io.machinecode.chainlink.spi.jsl.execution.Execution;
+import io.machinecode.chainlink.spi.jsl.execution.Flow;
+import io.machinecode.chainlink.spi.jsl.transition.Transition;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableBase;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
 import io.machinecode.chainlink.spi.loader.JobRepository;

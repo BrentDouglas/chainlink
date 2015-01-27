@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.loader;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.jsl.xml.XmlJob;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
 
 import javax.batch.operations.NoSuchJobException;
 import javax.xml.bind.JAXBContext;

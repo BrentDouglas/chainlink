@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.then;
 
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.then.api.OnComplete;
 import org.jboss.logging.Logger;
 

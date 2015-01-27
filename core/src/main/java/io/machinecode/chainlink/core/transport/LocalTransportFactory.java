@@ -11,7 +11,7 @@ import java.util.Properties;
  */
 public class LocalTransportFactory implements TransportFactory {
     @Override
-    public Transport<?> produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public Transport produce(final Dependencies dependencies, final Properties properties) throws Exception {
         return new LocalTransport(dependencies, properties);
     }
 }

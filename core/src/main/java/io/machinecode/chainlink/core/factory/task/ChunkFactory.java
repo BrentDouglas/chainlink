@@ -1,18 +1,18 @@
 package io.machinecode.chainlink.core.factory.task;
 
-import io.machinecode.chainlink.core.element.ListenersImpl;
-import io.machinecode.chainlink.core.element.partition.PartitionImpl;
-import io.machinecode.chainlink.core.element.task.CheckpointAlgorithmImpl;
-import io.machinecode.chainlink.core.element.task.ChunkImpl;
-import io.machinecode.chainlink.core.element.task.ExceptionClassFilterImpl;
-import io.machinecode.chainlink.core.element.task.ItemProcessorImpl;
-import io.machinecode.chainlink.core.element.task.ItemReaderImpl;
-import io.machinecode.chainlink.core.element.task.ItemWriterImpl;
 import io.machinecode.chainlink.core.expression.Expression;
+import io.machinecode.chainlink.core.expression.JobPropertyContext;
 import io.machinecode.chainlink.core.factory.TaskFactory;
-import io.machinecode.chainlink.spi.element.task.Chunk;
-import io.machinecode.chainlink.spi.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
+import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
+import io.machinecode.chainlink.core.jsl.impl.task.CheckpointAlgorithmImpl;
+import io.machinecode.chainlink.core.jsl.impl.task.ChunkImpl;
+import io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassFilterImpl;
+import io.machinecode.chainlink.core.jsl.impl.task.ItemProcessorImpl;
+import io.machinecode.chainlink.core.jsl.impl.task.ItemReaderImpl;
+import io.machinecode.chainlink.core.jsl.impl.task.ItemWriterImpl;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.spi.jsl.task.Chunk;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

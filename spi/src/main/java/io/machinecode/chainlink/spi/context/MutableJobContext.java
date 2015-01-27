@@ -9,5 +9,5 @@ import javax.batch.runtime.context.JobContext;
  */
 public interface MutableJobContext extends JobContext {
 
-    void setBatchStatus(BatchStatus batchStatus);
+    void setBatchStatus(final BatchStatus batchStatus);
 }

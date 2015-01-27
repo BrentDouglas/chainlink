@@ -3,17 +3,13 @@ package io.machinecode.chainlink.core.repository;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
-import io.machinecode.chainlink.spi.repository.ExtendedJobExecutionBuilder;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
-import io.machinecode.chainlink.spi.repository.ExtendedJobInstanceBuilder;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
-import io.machinecode.chainlink.spi.repository.ExtendedStepExecutionBuilder;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.repository.PartitionExecutionBuilder;
-import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;

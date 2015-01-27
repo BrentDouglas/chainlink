@@ -73,7 +73,7 @@ public class ClassLoaderDependencies implements Dependencies {
     }
 
     @Override
-    public Transport<?> getTransport() {
+    public Transport getTransport() {
         return null;
     }
 

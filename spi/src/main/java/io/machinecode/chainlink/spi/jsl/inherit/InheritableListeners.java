@@ -1,8 +1,7 @@
 package io.machinecode.chainlink.spi.jsl.inherit;
 
-import io.machinecode.chainlink.spi.Copyable;
-import io.machinecode.chainlink.spi.element.Listener;
-import io.machinecode.chainlink.spi.element.Listeners;
+import io.machinecode.chainlink.spi.jsl.Listener;
+import io.machinecode.chainlink.spi.jsl.Listeners;
 
 import java.util.List;
 

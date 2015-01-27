@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.validation.task;
 
 import io.machinecode.chainlink.core.validation.PropertyReferenceValidator;
-import io.machinecode.chainlink.spi.element.task.ItemReader;
+import io.machinecode.chainlink.spi.jsl.task.ItemReader;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

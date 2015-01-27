@@ -1,19 +1,19 @@
 package io.machinecode.chainlink.core.factory.transition;
 
-import io.machinecode.chainlink.core.element.transition.EndImpl;
-import io.machinecode.chainlink.core.element.transition.FailImpl;
-import io.machinecode.chainlink.core.element.transition.NextImpl;
-import io.machinecode.chainlink.core.element.transition.StopImpl;
-import io.machinecode.chainlink.core.element.transition.TransitionImpl;
+import io.machinecode.chainlink.core.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.jsl.impl.transition.EndImpl;
+import io.machinecode.chainlink.core.jsl.impl.transition.FailImpl;
+import io.machinecode.chainlink.core.jsl.impl.transition.NextImpl;
+import io.machinecode.chainlink.core.jsl.impl.transition.StopImpl;
+import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
 import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
-import io.machinecode.chainlink.spi.element.transition.End;
-import io.machinecode.chainlink.spi.element.transition.Fail;
-import io.machinecode.chainlink.spi.element.transition.Next;
-import io.machinecode.chainlink.spi.element.transition.Stop;
-import io.machinecode.chainlink.spi.element.transition.Transition;
-import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.spi.jsl.transition.End;
+import io.machinecode.chainlink.spi.jsl.transition.Fail;
+import io.machinecode.chainlink.spi.jsl.transition.Next;
+import io.machinecode.chainlink.spi.jsl.transition.Stop;
+import io.machinecode.chainlink.spi.jsl.transition.Transition;
 
 import java.util.List;
 

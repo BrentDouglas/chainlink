@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.core.inject;
 
 import gnu.trove.set.hash.TLinkedHashSet;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.inject.Injector;
-import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import java.util.Collections;

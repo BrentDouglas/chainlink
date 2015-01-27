@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.fluent.task;
 
 import io.machinecode.chainlink.core.jsl.fluent.FluentPropertyReference;
-import io.machinecode.chainlink.spi.element.task.ItemWriter;
+import io.machinecode.chainlink.spi.jsl.task.ItemWriter;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

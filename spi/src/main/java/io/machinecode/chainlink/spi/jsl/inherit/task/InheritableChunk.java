@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.spi.jsl.inherit.task;
 
-import io.machinecode.chainlink.spi.Mergeable;
-import io.machinecode.chainlink.spi.element.task.CheckpointAlgorithm;
-import io.machinecode.chainlink.spi.element.task.Chunk;
-import io.machinecode.chainlink.spi.element.task.ExceptionClassFilter;
-import io.machinecode.chainlink.spi.element.task.ItemProcessor;
-import io.machinecode.chainlink.spi.element.task.ItemReader;
-import io.machinecode.chainlink.spi.element.task.ItemWriter;
+import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
+import io.machinecode.chainlink.spi.jsl.task.CheckpointAlgorithm;
+import io.machinecode.chainlink.spi.jsl.task.Chunk;
+import io.machinecode.chainlink.spi.jsl.task.ExceptionClassFilter;
+import io.machinecode.chainlink.spi.jsl.task.ItemProcessor;
+import io.machinecode.chainlink.spi.jsl.task.ItemReader;
+import io.machinecode.chainlink.spi.jsl.task.ItemWriter;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
 
 /**

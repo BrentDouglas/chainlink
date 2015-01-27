@@ -1,15 +1,13 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.execution.CallbackEvent;
-import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.transport.Command;
-import io.machinecode.chainlink.spi.transport.Transport;
+import io.machinecode.chainlink.spi.execution.WorkerId;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public class CallbackCommand<A> implements Command<Object,A> {
+public class CallbackCommand implements Command<Object> {
     private static final long serialVersionUID = 1L;
 
     final WorkerId workerId;
@@ -21,8 +19,8 @@ public class CallbackCommand<A> implements Command<Object,A> {
     }
 
     @Override
-    public Object perform(final Transport<A> transport, final Registry registry, final A origin) throws Throwable {
-        transport.getWorker(workerId).callback(event);
+    public Object perform(final Configuration configuration, final Object origin) throws Throwable {
+        configuration.getExecutor().getWorker(workerId).callback(event);
         return null;
     }
 

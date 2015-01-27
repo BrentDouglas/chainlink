@@ -1,13 +1,13 @@
 package io.machinecode.chainlink.core.factory;
 
-import io.machinecode.chainlink.core.element.ListenerImpl;
-import io.machinecode.chainlink.core.element.ListenersImpl;
+import io.machinecode.chainlink.core.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.jsl.impl.ListenerImpl;
+import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
 import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
-import io.machinecode.chainlink.spi.element.Listener;
-import io.machinecode.chainlink.spi.element.Listeners;
-import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.spi.jsl.Listener;
+import io.machinecode.chainlink.spi.jsl.Listeners;
 
 import java.util.Collections;
 import java.util.List;

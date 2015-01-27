@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.xml.task;
 
 import io.machinecode.chainlink.core.jsl.xml.XmlPropertyReference;
-import io.machinecode.chainlink.spi.element.task.ItemProcessor;
+import io.machinecode.chainlink.spi.jsl.task.ItemProcessor;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 

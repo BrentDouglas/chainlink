@@ -1,121 +1,173 @@
 package io.machinecode.chainlink.core.transport;
 
-import gnu.trove.map.TMap;
-import gnu.trove.map.hash.THashMap;
-import io.machinecode.chainlink.core.registry.LocalRegistry;
-import io.machinecode.chainlink.core.registry.ThreadId;
+import io.machinecode.chainlink.core.execution.CallbackEventImpl;
+import io.machinecode.chainlink.core.execution.ExecutableEventImpl;
 import io.machinecode.chainlink.core.registry.UUIDId;
+import io.machinecode.chainlink.core.then.AllChain;
+import io.machinecode.chainlink.core.then.ChainImpl;
+import io.machinecode.chainlink.core.transport.cmd.Command;
+import io.machinecode.chainlink.core.transport.cmd.FindWorkerIdForExecutionCommand;
+import io.machinecode.chainlink.core.transport.cmd.GetWorkerIdsCommand;
+import io.machinecode.chainlink.core.transport.cmd.PushChainCommand;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
+import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.registry.WorkerId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.transport.Command;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.Deferred;
+import io.machinecode.then.api.Promise;
+import io.machinecode.then.api.Reject;
+import io.machinecode.then.api.Resolve;
+import io.machinecode.then.core.RejectedDeferred;
+import io.machinecode.then.core.ResolvedDeferred;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
-public abstract class BaseTransport<A> implements Transport<A> {
+public abstract class BaseTransport<A> implements Transport {
 
-    protected final Lock workerLock = new ReentrantLock();
-    protected final Condition workerCondition = workerLock.newCondition();
-    protected final List<Worker> workerOrder;
-    protected final TMap<WorkerId, Worker> workers;
-
-    protected final AtomicInteger currentWorker = new AtomicInteger(0);
-
-    private final Registry registry;
+    protected final Registry registry;
 
     protected final ExecutorService executor;
+    protected Configuration configuration;
 
     public BaseTransport(final Dependencies dependencies, final Properties properties) {
         this.registry = dependencies.getRegistry();
-        this.workerOrder = new ArrayList<>();
-        this.workers = new THashMap<>();
         this.executor = Executors.newCachedThreadPool();
     }
 
     @Override
     public void open(final Configuration configuration) throws Exception {
-        // no op
-    }
-
-    @Override
-    public void registerWorker(final Worker worker) {
-        workerLock.lock();
-        try {
-            this.workerOrder.add(worker);
-            this.workers.put(worker.id(), worker);
-            workerCondition.signalAll();
-        } finally {
-            workerLock.unlock();
-        }
-    }
-
-    @Override
-    public void unregisterWorker(final Worker worker) {
-        workerLock.lock();
-        try {
-            this.workerOrder.remove(worker);
-            this.workers.remove(worker.id());
-        } finally {
-            workerLock.unlock();
-        }
+        this.configuration = configuration;
     }
 
     @Override
     public void close() throws Exception {
-        workerLock.lock();
-        try {
-            this.workerOrder.clear();
-            Exception exception = null;
-            for (final Worker worker : this.workers.values()) {
-                try {
-                    worker.close();
-                } catch (final Exception e) {
-                    if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
-                    }
-                }
-            }
-            this.workers.clear();
-            if (exception != null) {
-                throw exception;
-            }
-        } finally {
-            workerLock.unlock();
-        }
+        //
     }
 
-    public <T> Future<T> invokeLocal(final Command<T, A> command, final A origin) throws Exception {
-        final Transport<A> self = this;
+    @Override
+    public Promise<Chain<?>,Throwable,Object> distribute(final int maxThreads, final Executable... executables) throws Exception {
+        return _getWorkers(maxThreads).then(new Reject<List<RemoteExecution>, Throwable, Chain<?>, Throwable, Object>() {
+            @Override
+            public void resolve(final List<RemoteExecution> that, final Deferred<Chain<?>, Throwable, Object> next) {
+                ListIterator<RemoteExecution> it = that.listIterator();
+                final Chain<?>[] chains = new Chain[executables.length];
+                int i = 0;
+                for (final Executable executable : executables) {
+                    if (!it.hasNext()) {
+                        it = that.listIterator();
+                    }
+                    final RemoteExecution remote = it.next();
+                    final int index = i++;
+                    final long jobExecutionId = executable.getContext().getJobExecutionId();
+                    chains[index] = remote.getChain();
+                    registry.registerChain(jobExecutionId, remote.getLocalId(), remote.getChain());
+                    final Worker worker = remote.getWorker();
+                    worker.execute(new ExecutableEventImpl(executable, remote.getRemoteId()));
+                }
+                next.resolve(new AllChain<Executable>(chains));
+            }
+
+            // If looking for remotes failed we fall back to using only local workers
+            @Override
+            public void reject(final Throwable that, final Deferred<Chain<?>, Throwable, Object> next) {
+                try {
+                    final List<Worker> ret = configuration.getExecutor().getWorkers(maxThreads);
+                    ListIterator<Worker> it = ret.listIterator();
+                    final Chain<?>[] chains = new Chain[executables.length];
+                    int i = 0;
+                    for (final Executable executable : executables) {
+                        if (!it.hasNext()) {
+                            it = ret.listIterator();
+                        }
+                        final Chain<?> chain = new ChainImpl<Void>();
+                        final ChainId chainId = new UUIDId(BaseTransport.this);
+                        registry.registerChain(executable.getContext().getJobExecutionId(), chainId, chain);
+                        final Worker worker = it.next();
+                        worker.execute(new ExecutableEventImpl(executable, chainId));
+                        chains[i++] = chain;
+                    }
+                    next.resolve(new AllChain<Executable>(chains));
+                } catch (final Exception e) {
+                    e.addSuppressed(that);
+                    next.reject(e);
+                }
+            }
+        });
+    }
+
+    @Override
+    public Promise<Chain<?>,Throwable,Object> callback(final ExecutableId executableId, final ExecutionContext context) throws Exception {
+        final long jobExecutionId = context.getJobExecutionId();
+        return fetchWorker(jobExecutionId, executableId).then(new Reject<RemoteExecution, Throwable, Chain<?>, Throwable, Object>() {
+            @Override
+            public void resolve(final RemoteExecution that, final Deferred<Chain<?>,Throwable,Object> next) {
+                final Worker worker = that.getWorker();
+                registry.registerChain(jobExecutionId, that.getLocalId(), that.getChain());
+                worker.callback(new CallbackEventImpl(jobExecutionId, executableId, that.getRemoteId(), context));
+                next.resolve(that.getChain());
+            }
+
+            @Override
+            public void reject(final Throwable that, final Deferred<Chain<?>, Throwable, Object> next) {
+                try {
+                    next.resolve(configuration.getExecutor().callback(executableId, context));
+                } catch (final Exception e) {
+                    e.addSuppressed(that);
+                    next.reject(e);
+                }
+            }
+        });
+    }
+
+    @Override
+    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws Exception {
+        final ExecutionRepository ours = configuration.getRegistry().getExecutionRepository(id);
+        if (ours != null) {
+            return ours;
+        }
+        return new DistributedProxyExecutionRepository(this, id);
+    }
+
+    private Promise<RemoteExecution,Throwable,Object> fetchWorker(final long jobExecutionId, final ExecutableId executableId) throws Exception {
+        final Executable executable = configuration.getRegistry().getExecutable(jobExecutionId, executableId);
+        if (executable != null) {
+            final Worker worker = configuration.getExecutor().getWorker(executable.getWorkerId());
+            if (worker == null) {
+                return new RejectedDeferred<RemoteExecution, Throwable, Object>(new Exception("No worker found with jobExecutionId=" + jobExecutionId + " and executableId" + executableId));
+            }
+            final UUIDId id = new UUIDId(this);
+            return new ResolvedDeferred<RemoteExecution, Throwable, Object>(new RemoteExecutionImpl(worker, id, id, new ChainImpl<Void>()));
+        }
+        return _getWorker(jobExecutionId, executableId);
+    }
+
+    public <T> Future<T> invokeLocal(final Command<T> command, final A origin) throws Exception {
+        final BaseTransport<?> self = this;
         return executor.submit(new Callable<T>() {
             @Override
             public T call() throws Exception {
                 try {
-                    return command.perform(self, registry, origin);
+                    return command.perform(self.configuration, origin);
                 } catch (final Throwable e) {
                     throw new Exception(e);
                 }
@@ -123,150 +175,79 @@ public abstract class BaseTransport<A> implements Transport<A> {
         });
     }
 
-    @Override
-    public <T> void invokeRemote(final A address, final Command<T, A> command, final Deferred<T, Throwable,?> promise, final long timeout, final TimeUnit unit) {
-        try {
-            promise.resolve(command.perform(this, registry, getAddress()));
-        } catch (final Throwable e) {
-            promise.reject(e);
-        }
+    public <T> Promise<T, Throwable, Object> invokeRemote(final Object address, final Command<T> command) {
+        return invokeRemote(address, command, getTimeout(), getTimeUnit());
     }
 
-    @Override
-    public A getAddress() {
-        return null;
+    public abstract <T> Promise<T,Throwable,Object> invokeRemote(final Object address, final Command<T> command, final long timeout, final TimeUnit unit);
+
+    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
+        return invokeEverywhere(command, getTimeout(), getTimeUnit());
     }
 
-    public Registry getRegistry() {
-        return registry;
-    }
+    protected abstract <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command, final long timeout, final TimeUnit unit);
 
-    @Override
-    public Worker getWorker(final WorkerId workerId) throws Exception {
-        return getLocalWorker(workerId);
-    }
-
-    @Override
-    public List<Worker> getWorkers(final int required) throws Exception {
-        return getLocalWorkers(required);
-    }
-
-    @Override
-    public Worker getWorker(final long jobExecutionId, final ExecutableId executableId) throws Exception {
-        return getLocalWorker(jobExecutionId, executableId);
-    }
-
-    @Override
-    public Worker getWorker() throws Exception {
-        return getLocalWorker();
-    }
-
-    @Override
-    public boolean hasWorker(final WorkerId workerId) {
-        return getLocalWorker(workerId) != null;
-    }
-
-    @Override
-    public boolean hasWorker(final long jobExecutionId, final ExecutableId executableId) {
-        return getLocalWorker(jobExecutionId, executableId) != null;
-    }
-
-    @Override
-    public WorkerId leastBusyWorker() throws Exception {
-        return getWorker().id();
-    }
-
-    @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws Exception {
-        return LocalRegistry.assertExecutionRepository(
-                registry.getExecutionRepository(id),
-                id
-        );
-    }
-
-    @Override
-    public Executable getExecutable(final long jobExecutionId, final ExecutableId executableId) throws Exception {
-        return LocalRegistry.assertExecutable(
-                registry.getExecutable(jobExecutionId, executableId),
-                jobExecutionId,
-                executableId
-        );
-    }
-
-    @Override
-    public ChainId generateChainId() {
-        return new UUIDId();
-    }
-
-    @Override
-    public ExecutableId generateExecutableId() {
-        return new UUIDId();
-    }
-
-    @Override
-    public WorkerId generateWorkerId(final Worker worker) {
-        if (worker instanceof Thread) {
-            return new ThreadId((Thread)worker);
-        } else {
-            return new UUIDId();
-        }
-    }
-
-    @Override
-    public ExecutionRepositoryId generateExecutionRepositoryId() {
-        return new UUIDId();
-    }
-
-    protected Worker getLocalWorker(final WorkerId workerId) {
-        workerLock.lock();
-        try {
-            return workers.get(workerId);
-        } finally {
-            workerLock.unlock();
-        }
-    }
-
-    protected Worker getLocalWorker(final long jobExecutionId, final ExecutableId executableId) {
-        final Executable executable = registry.getExecutable(jobExecutionId, executableId);
-        if (executable == null) {
-            return null;
-        }
-        return getLocalWorker(executable.getWorkerId());
-    }
-
-    protected Worker getLocalWorker() throws InterruptedException {
-        workerLock.lock();
-        try {
-            return _getActiveLocalWorker();
-        } finally {
-            workerLock.unlock();
-        }
-    }
-
-    protected List<Worker> getLocalWorkers(final int required) throws InterruptedException {
-        final ArrayList<Worker> ret = new ArrayList<>(required);
-        workerLock.lock();
-        try {
-            for (int i = 0; i < required; ++i) {
-                ret.add(_getActiveLocalWorker());
+    private Promise<RemoteExecution,Throwable,?> getRemoteChainAndIds(final WorkerId workerId, final long jobExecutionId) {
+        final ChainId localId = new UUIDId(this);
+        return invokeRemote(
+                workerId.getAddress(),
+                new PushChainCommand(jobExecutionId, localId),
+                getTimeout(),
+                getTimeUnit()
+        ).then(new Resolve<ChainId, RemoteExecution, Throwable, Object>() {
+            @Override
+            public void resolve(final ChainId remoteId, final Deferred<RemoteExecution, Throwable, Object> next) {
+                next.resolve(
+                        new RemoteExecutionImpl(
+                                new DistributedWorker(BaseTransport.this, workerId),
+                                localId,
+                                remoteId,
+                                new DistributedLocalChain(BaseTransport.this, workerId.getAddress(), jobExecutionId, remoteId)
+                        )
+                );
             }
-        } finally {
-            workerLock.unlock();
-        }
-        return ret;
+        });
     }
 
-    private Worker _getActiveLocalWorker() throws InterruptedException {
-        Worker worker;
-        do {
-            if (workerOrder.size() == 0) {
-                workerCondition.await();
+    private Promise<RemoteExecution,Throwable,Object> _getWorker(final long jobExecutionId, final ExecutableId executableId) {
+        return invokeEverywhere(new FindWorkerIdForExecutionCommand(jobExecutionId, executableId)).then(new Resolve<Iterable<WorkerId>, RemoteExecution, Throwable, Object>() {
+            @Override
+            public void resolve(final Iterable<WorkerId> that, final Deferred<RemoteExecution, Throwable, Object> next) {
+                for (final WorkerId id : that) {
+                    if (id != null) {
+                        getRemoteChainAndIds(id, jobExecutionId)
+                                .onResolve(next)
+                                .onReject(next)
+                                .onCancel(next);
+                        return;
+                    }
+                }
+                next.reject(null);
             }
-            if (currentWorker.get() >= workerOrder.size()) {
-                currentWorker.set(0);
+        });
+    }
+
+    private Promise<List<RemoteExecution>,Throwable,Object> _getWorkers(final int required) {
+        return invokeEverywhere(new GetWorkerIdsCommand(required)).then(new Resolve<Iterable<Iterable<WorkerId>>, List<RemoteExecution>, Throwable, Object>() {
+            @Override
+            public void resolve(final Iterable<Iterable<WorkerId>> that, final Deferred<List<RemoteExecution>, Throwable, Object> next) {
+                final List<RemoteExecution> ret = new ArrayList<>(required);
+                int i = 0;
+                while (i < required) {
+                    for (final Iterable<WorkerId> node : that) {
+                        for (final WorkerId workerId : node) {
+                            final UUIDId id = new UUIDId(BaseTransport.this);
+                            ret.add(new RemoteExecutionImpl(new DistributedWorker(BaseTransport.this, workerId), id, id, new ChainImpl<Void>()));
+                            ++i;
+                        }
+                    }
+                    if (ret.isEmpty()) {
+                        next.reject(new Exception("No remote workers found"));
+                        return;
+                    }
+                }
+                next.resolve(ret);
             }
-            worker = workerOrder.get(currentWorker.getAndIncrement());
-        } while (!worker.isActive());
-        return worker;
+        });
     }
 }

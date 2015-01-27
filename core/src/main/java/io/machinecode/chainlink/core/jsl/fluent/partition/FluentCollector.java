@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.fluent.partition;
 
 import io.machinecode.chainlink.core.jsl.fluent.FluentPropertyReference;
-import io.machinecode.chainlink.spi.element.partition.Collector;
+import io.machinecode.chainlink.spi.jsl.partition.Collector;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

@@ -1,18 +1,14 @@
 package io.machinecode.chainlink.core.transport.artifacts;
 
-import io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository;
 import io.machinecode.chainlink.core.transport.DistributedTransport;
-import io.machinecode.chainlink.core.transport.DistributedWorker;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.registry.WorkerId;
-import io.machinecode.chainlink.spi.transport.Command;
-import io.machinecode.then.api.Deferred;
+import io.machinecode.chainlink.core.transport.cmd.Command;
+import io.machinecode.then.api.Promise;
+import io.machinecode.then.core.RejectedDeferred;
+import io.machinecode.then.core.ResolvedDeferred;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,7 +20,6 @@ public class TestTransport extends DistributedTransport<String> {
     final ConcurrentMap<String, TestTransport> transports;
     final String local;
     final List<String> remotes;
-    final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public TestTransport(final ConcurrentMap<String, TestTransport> transports, final String local, final List<String> remotes, final Dependencies dependencies, final java.util.Properties properties) throws Exception {
         super(dependencies, properties);
@@ -44,30 +39,18 @@ public class TestTransport extends DistributedTransport<String> {
     }
 
     @Override
-    protected DistributedWorker<String> createDistributedWorker(final String address, final WorkerId workerId) {
-        return new TestWorker(this, this.getAddress(), address, workerId);
-    }
-
-    @Override
-    protected DistributedProxyExecutionRepository<String> createDistributedExecutionRepository(final ExecutionRepositoryId id, final String address) {
-        return new TestRepositoryProxy(this, id, address);
-    }
-
-    @Override
-    protected boolean isMatchingAddressType(final Object address) {
-        return address instanceof String;
-    }
-
-    @Override
-    public <T> void invokeRemote(final String address, final Command<T, String> command, final Deferred<T, Throwable, ?> promise, final long timeout, final TimeUnit unit) {
+    public <T> Promise<T, Throwable, Object> invokeRemote(final Object address, final Command<T> command, final long timeout, final TimeUnit unit) {
+        if (!(address instanceof String)) {
+            return new RejectedDeferred<T, Throwable,Object>(new IllegalStateException("Should get a string"));
+        }
         try {
-            promise.resolve(
+            return new ResolvedDeferred<>(
                     transports.get(address)
                             .invokeLocal(command, getAddress())
                             .get(timeout, unit)
             );
-        } catch (final Exception e) {
-            promise.reject(e);
+        } catch (final Throwable e) {
+            return new RejectedDeferred<>(e);
         }
     }
 }

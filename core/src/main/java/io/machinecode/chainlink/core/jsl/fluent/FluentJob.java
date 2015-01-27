@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.jsl.fluent.execution.FluentExecution;
 import io.machinecode.chainlink.core.jsl.fluent.execution.FluentFlow;
 import io.machinecode.chainlink.core.jsl.fluent.execution.FluentSplit;
 import io.machinecode.chainlink.core.jsl.fluent.execution.FluentStep;
-import io.machinecode.chainlink.spi.element.Job;
+import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
 import io.machinecode.chainlink.spi.loader.JobRepository;
 

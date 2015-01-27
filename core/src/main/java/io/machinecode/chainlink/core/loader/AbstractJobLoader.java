@@ -2,9 +2,10 @@ package io.machinecode.chainlink.core.loader;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
-import io.machinecode.chainlink.spi.Inheritable;
-import io.machinecode.chainlink.spi.InheritableElement;
-import io.machinecode.chainlink.spi.ParentNotFoundException;
+import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.exception.ParentNotFoundException;
+import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableElement;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableExecution;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableFlow;
@@ -12,7 +13,6 @@ import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableSplit;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.loader.JobRepository;
-import io.machinecode.chainlink.spi.util.Messages;
 
 import javax.batch.operations.NoSuchJobException;
 

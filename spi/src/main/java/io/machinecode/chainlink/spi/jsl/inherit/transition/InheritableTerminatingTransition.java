@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.spi.jsl.inherit.transition;
 
-import io.machinecode.chainlink.spi.Copyable;
-import io.machinecode.chainlink.spi.element.transition.TerminatingTransition;
+import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
+import io.machinecode.chainlink.spi.jsl.transition.TerminatingTransition;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

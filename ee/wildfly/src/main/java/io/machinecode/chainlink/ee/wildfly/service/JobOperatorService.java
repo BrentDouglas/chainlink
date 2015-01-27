@@ -9,7 +9,7 @@ import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.ee.wildfly.WildFlyConstants;
 import io.machinecode.chainlink.ee.wildfly.WildFlyEnvironment;
 import io.machinecode.chainlink.ee.wildfly.configuration.WildFlyConfigurationDefaults;
-import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.jboss.dmr.ModelNode;

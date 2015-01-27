@@ -12,7 +12,7 @@ import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
-import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Configure;
 import io.machinecode.chainlink.spi.management.Environment;

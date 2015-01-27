@@ -4,7 +4,7 @@ import io.machinecode.chainlink.core.inject.DefaultInjector;
 import io.machinecode.chainlink.core.inject.LoadProviders;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.Injector;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.runtime.context.JobContext;

@@ -14,7 +14,7 @@ public class DefaultThreadFactory implements ThreadFactory, ThreadFactoryLookup 
 
     @Override
     public Thread newThread(final Runnable r) {
-        return new Thread(r, "chainlink-" + "-"+ id++);
+        return new Thread(r, "chainlink-" + id++);
     }
 
     @Override

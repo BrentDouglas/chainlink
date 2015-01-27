@@ -3,10 +3,10 @@ package io.machinecode.chainlink.core.validation;
 import io.machinecode.chainlink.core.validation.execution.ExcecutionValidator;
 import io.machinecode.chainlink.core.validation.visitor.ValidatingVisitor;
 import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
-import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.execution.Decision;
-import io.machinecode.chainlink.spi.element.execution.Execution;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.jsl.Job;
+import io.machinecode.chainlink.spi.jsl.execution.Decision;
+import io.machinecode.chainlink.spi.jsl.execution.Execution;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

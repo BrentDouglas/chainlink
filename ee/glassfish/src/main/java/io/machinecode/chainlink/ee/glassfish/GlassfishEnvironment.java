@@ -7,7 +7,7 @@ import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
 import io.machinecode.chainlink.core.management.LazyJobOperator;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishConfiguration;
 import io.machinecode.chainlink.ee.glassfish.configuration.GlassfishSubSystem;
-import io.machinecode.chainlink.spi.Constants;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.Configure;
 import io.machinecode.chainlink.spi.management.Environment;

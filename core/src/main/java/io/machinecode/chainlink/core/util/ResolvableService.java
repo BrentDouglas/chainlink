@@ -1,7 +1,5 @@
 package io.machinecode.chainlink.core.util;
 
-import io.machinecode.chainlink.spi.util.Resolvable;
-
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;

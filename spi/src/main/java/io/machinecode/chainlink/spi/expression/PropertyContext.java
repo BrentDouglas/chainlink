@@ -12,5 +12,5 @@ public interface PropertyContext {
 
     Properties getProperties();
 
-    <T extends ArtifactReference> T getReference(T ref);
+    ArtifactReference getReference(final ArtifactReference ref);
 }

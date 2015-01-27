@@ -1,10 +1,9 @@
 package io.machinecode.chainlink.core.util;
 
-import io.machinecode.chainlink.core.registry.LocalRegistry;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.repository.ExecutionRepository;
-import io.machinecode.chainlink.spi.util.Messages;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
@@ -22,9 +21,7 @@ public class Repository {
     private static final Logger log = Logger.getLogger(Repository.class);
 
     public static ExecutionRepository getExecutionRepository(final Configuration configuration, final ExecutionRepositoryId id) throws Exception {
-        final ExecutionRepository repository = configuration.getTransport().getExecutionRepository(id);
-        LocalRegistry.assertExecutionRepository(repository, id);
-        return repository;
+        return configuration.getTransport().getExecutionRepository(id);
     }
 
     public static void failedJob(final ExecutionRepository repository, final long jobExecutionId, final String exitStatus) throws Exception{

@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.core.expression;
 
 import io.machinecode.chainlink.core.util.Index;
-import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 
 import java.util.Properties;

@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.transport.infinispan;
 
-import io.machinecode.chainlink.spi.transport.Command;
+import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.chainlink.transport.infinispan.configuration.ChainlinkCommand;
 import org.infinispan.commands.remote.BaseRpcCommand;
 import org.infinispan.context.InvocationContext;
@@ -14,28 +15,28 @@ public class CommandAdapter extends BaseRpcCommand implements ChainlinkCommand {
     public static final byte COMMAND_ID_61 = 61;
 
     private Address origin;
-    private Command<?,Address> command;
+    private Command<?> command;
 
-    private transient InfinispanTransport transport;
+    private transient Configuration configuration;
 
     public CommandAdapter(final String cacheName) {
         super(cacheName);
     }
 
-    public CommandAdapter(final String cacheName, final Command<?,Address> command, final Address origin) {
+    public CommandAdapter(final String cacheName, final Command<?> command, final Address origin) {
         super(cacheName);
         this.command = command;
         this.origin = origin;
     }
 
     @Override
-    public void init(final InfinispanTransport transport) {
-        this.transport = transport;
+    public void init(final Configuration configuration) {
+        this.configuration = configuration;
     }
 
     @Override
     public Object perform(final InvocationContext ctx) throws Throwable {
-        return command.perform(transport, transport.getRegistry(), origin);
+        return command.perform(configuration, origin);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class CommandAdapter extends BaseRpcCommand implements ChainlinkCommand {
     @Override
     public void setParameters(final int commandId, final Object[] parameters) {
         if (commandId != getCommandId()) throw new IllegalStateException(); //TODO Message
-        this.command = (Command<?,Address>)parameters[0];
+        this.command = (Command<?>)parameters[0];
         this.origin = (Address)parameters[1];
     }
 

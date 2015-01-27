@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.core.validation.visitor;
 
 import gnu.trove.map.hash.THashMap;
-import io.machinecode.chainlink.spi.element.Element;
-import io.machinecode.chainlink.spi.element.Job;
-import io.machinecode.chainlink.spi.element.execution.Execution;
-import io.machinecode.chainlink.spi.element.execution.Flow;
-import io.machinecode.chainlink.spi.element.execution.TransitionExecution;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.jsl.Element;
+import io.machinecode.chainlink.spi.jsl.Job;
+import io.machinecode.chainlink.spi.jsl.execution.Execution;
+import io.machinecode.chainlink.spi.jsl.execution.Flow;
+import io.machinecode.chainlink.spi.jsl.execution.TransitionExecution;
 import io.machinecode.chainlink.spi.util.Pair;
 
 import java.util.ArrayList;

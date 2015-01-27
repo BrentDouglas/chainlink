@@ -1,7 +1,5 @@
 package io.machinecode.chainlink.spi.context;
 
-import io.machinecode.chainlink.spi.work.JobWork;
-
 import java.io.Serializable;
 
 /**
@@ -9,8 +7,6 @@ import java.io.Serializable;
  * @since 1.0
  */
 public interface ExecutionContext extends Serializable {
-
-    JobWork getJob();
 
     Long getRestartJobExecutionId();
 

@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.core.inject;
 
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.Injector;
-import io.machinecode.chainlink.spi.util.Messages;
 import io.machinecode.chainlink.spi.util.Pair;
 
 import javax.batch.api.BatchProperty;

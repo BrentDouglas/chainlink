@@ -1,15 +1,15 @@
 package io.machinecode.chainlink.core.factory.execution;
 
-import io.machinecode.chainlink.core.element.execution.FlowImpl;
-import io.machinecode.chainlink.core.element.execution.SplitImpl;
 import io.machinecode.chainlink.core.expression.Expression;
+import io.machinecode.chainlink.core.expression.JobPropertyContext;
 import io.machinecode.chainlink.core.factory.ElementFactory;
+import io.machinecode.chainlink.core.jsl.impl.execution.FlowImpl;
+import io.machinecode.chainlink.core.jsl.impl.execution.SplitImpl;
 import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
-import io.machinecode.chainlink.spi.element.execution.Flow;
-import io.machinecode.chainlink.spi.element.execution.Split;
-import io.machinecode.chainlink.spi.expression.JobPropertyContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.spi.jsl.execution.Flow;
+import io.machinecode.chainlink.spi.jsl.execution.Split;
 
 import java.util.List;
 

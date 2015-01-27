@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.test.cdi;
 
-import io.machinecode.chainlink.core.element.JobImpl;
+import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;

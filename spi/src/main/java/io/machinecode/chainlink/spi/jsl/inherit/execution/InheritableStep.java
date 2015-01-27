@@ -1,19 +1,19 @@
 package io.machinecode.chainlink.spi.jsl.inherit.execution;
 
-import io.machinecode.chainlink.spi.Copyable;
-import io.machinecode.chainlink.spi.Mergeable;
-import io.machinecode.chainlink.spi.element.Listeners;
-import io.machinecode.chainlink.spi.element.Properties;
-import io.machinecode.chainlink.spi.element.execution.Step;
-import io.machinecode.chainlink.spi.element.partition.Partition;
-import io.machinecode.chainlink.spi.element.task.Batchlet;
-import io.machinecode.chainlink.spi.element.task.Chunk;
-import io.machinecode.chainlink.spi.element.task.Task;
-import io.machinecode.chainlink.spi.element.transition.Transition;
+import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
+import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
+import io.machinecode.chainlink.spi.jsl.Listeners;
+import io.machinecode.chainlink.spi.jsl.Properties;
+import io.machinecode.chainlink.spi.jsl.execution.Step;
+import io.machinecode.chainlink.spi.jsl.partition.Partition;
+import io.machinecode.chainlink.spi.jsl.task.Batchlet;
+import io.machinecode.chainlink.spi.jsl.task.Chunk;
+import io.machinecode.chainlink.spi.jsl.task.Task;
+import io.machinecode.chainlink.spi.jsl.transition.Transition;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableBase;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
 import io.machinecode.chainlink.spi.loader.JobRepository;
-import io.machinecode.chainlink.spi.util.Messages;
+import io.machinecode.chainlink.spi.Messages;
 
 import javax.batch.operations.JobStartException;
 import java.util.List;
