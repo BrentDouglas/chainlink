@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.execution;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.Constants;
-import io.machinecode.chainlink.core.transport.WorkerState;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -76,7 +75,7 @@ public class EventedExecutor implements Executor {
 
     @Override
     public Worker getWorker() {
-        final TreeSet<EventedWorker> set = new TreeSet<>(WorkerState.COMPARATOR);
+        final TreeSet<EventedWorker> set = new TreeSet<>(EventedWorker.COMPARATOR);
         workerLock.lock();
         try {
             set.addAll(workers.values());
@@ -98,7 +97,7 @@ public class EventedExecutor implements Executor {
 
     @Override
     public List<Worker> getWorkers(final int required) {
-        final TreeSet<EventedWorker> set = new TreeSet<>(WorkerState.COMPARATOR);
+        final TreeSet<EventedWorker> set = new TreeSet<>(EventedWorker.COMPARATOR);
         workerLock.lock();
         try {
             set.addAll(workers.values());

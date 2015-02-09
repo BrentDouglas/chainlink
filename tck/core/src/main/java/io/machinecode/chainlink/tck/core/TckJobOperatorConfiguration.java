@@ -1,17 +1,17 @@
 package io.machinecode.chainlink.tck.core;
 
-import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
-import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;

@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.work;
 
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.registry.UUIDId;
+import io.machinecode.chainlink.core.then.LinkAndResolveChain;
 import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.spi.Messages;

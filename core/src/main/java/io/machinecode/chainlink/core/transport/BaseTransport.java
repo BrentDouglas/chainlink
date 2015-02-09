@@ -140,7 +140,7 @@ public abstract class BaseTransport<A> implements Transport {
                 return new RejectedDeferred<RemoteExecution, Throwable, Object>(new Exception("No worker found with jobExecutionId=" + jobExecutionId + " and executableId" + executableId));
             }
             final UUIDId id = new UUIDId(this);
-            return new ResolvedDeferred<RemoteExecution, Throwable, Object>(new RemoteExecutionImpl(worker, id, id, new ChainImpl<Void>()));
+            return new ResolvedDeferred<>(new RemoteExecution(worker, id, id, new ChainImpl<Void>()));
         }
         return _getWorker(jobExecutionId, executableId);
     }
@@ -182,7 +182,7 @@ public abstract class BaseTransport<A> implements Transport {
             @Override
             public void resolve(final ChainId remoteId, final Deferred<RemoteExecution, Throwable, Object> next) {
                 next.resolve(
-                        new RemoteExecutionImpl(
+                        new RemoteExecution(
                                 new DistributedWorker(BaseTransport.this, workerId),
                                 localId,
                                 remoteId,
@@ -221,7 +221,7 @@ public abstract class BaseTransport<A> implements Transport {
                     for (final Iterable<WorkerId> node : that) {
                         for (final WorkerId workerId : node) {
                             final UUIDId id = new UUIDId(BaseTransport.this);
-                            ret.add(new RemoteExecutionImpl(new DistributedWorker(BaseTransport.this, workerId), id, id, new ChainImpl<Void>()));
+                            ret.add(new RemoteExecution(new DistributedWorker(BaseTransport.this, workerId), id, id, new ChainImpl<Void>()));
                             ++i;
                         }
                     }

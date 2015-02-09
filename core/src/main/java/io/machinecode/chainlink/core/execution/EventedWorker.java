@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.execution;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.registry.UUIDId;
 import io.machinecode.chainlink.core.then.Notify;
-import io.machinecode.chainlink.core.transport.WorkerState;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -16,15 +15,19 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
+import java.io.Serializable;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public class EventedWorker implements Worker, WorkerState, Runnable, AutoCloseable {
+public class EventedWorker implements Worker, Runnable, AutoCloseable {
 
     private static final Logger log = Logger.getLogger(EventedWorker.class);
+
+    static DepthComparator COMPARATOR = new DepthComparator();
 
     protected final WorkerId workerId;
     protected final Object lock;
@@ -171,13 +174,24 @@ public class EventedWorker implements Worker, WorkerState, Runnable, AutoCloseab
         return getClass().getSimpleName() + "[workerId=" + workerId + ",executables=" + executables.size() + ",callbacks=" + callbacks.size() + ",running=" + isActive() + "]";
     }
 
-    @Override
-    public int getExecutions() {
+    int getExecutions() {
         return executables.size();
     }
 
-    @Override
-    public int getCallbacks() {
+    int getCallbacks() {
         return callbacks.size();
+    }
+
+    static class DepthComparator implements Comparator<EventedWorker>, Serializable {
+        private static final long serialVersionUID = 0L;
+
+        @Override
+        public int compare(final EventedWorker a, final EventedWorker b) {
+            int ret = Integer.compare(a.getExecutions(), b.getExecutions());
+            if (ret != 0) {
+                return ret;
+            }
+            return Integer.compare(a.getCallbacks(), b.getCallbacks());
+        }
     }
 }

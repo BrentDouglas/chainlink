@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.tck.core.transport;
 
 import io.machinecode.chainlink.repository.gridgain.GridGainRepository;
-import io.machinecode.chainlink.repository.gridgain.GridGainRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.gridgain.GridGainTransport;

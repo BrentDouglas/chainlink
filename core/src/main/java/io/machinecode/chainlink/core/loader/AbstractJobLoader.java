@@ -31,7 +31,7 @@ public abstract class AbstractJobLoader implements InheritableJobLoader {
 
     @Override
     public <T extends InheritableElement<T>> T findParent(final Class<T> clazz, final T that, final String defaultJobXml) throws ParentNotFoundException {
-        final String jslName = that.getJslName() == null ? defaultJobXml : that .getJslName();
+        final String jslName = that.getJslName() == null ? defaultJobXml : that.getJslName();
         return findParent(clazz, that.getParent(), jslName);
     }
 

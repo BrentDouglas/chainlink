@@ -3,6 +3,8 @@ package io.machinecode.chainlink.core.work;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.registry.UUIDId;
+import io.machinecode.chainlink.core.then.LinkAndRejectChain;
+import io.machinecode.chainlink.core.then.LinkAndResolveChain;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
