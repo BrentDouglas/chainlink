@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.security.Security;
 import io.machinecode.chainlink.spi.transport.Transport;
 
@@ -35,7 +35,7 @@ public interface Dependencies {
 
     Security getSecurity();
 
-    ExecutionRepository getExecutionRepository();
+    Repository getRepository();
 
     Transport getTransport();
 

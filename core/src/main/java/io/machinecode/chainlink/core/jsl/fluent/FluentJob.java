@@ -7,7 +7,7 @@ import io.machinecode.chainlink.core.jsl.fluent.execution.FluentSplit;
 import io.machinecode.chainlink.core.jsl.fluent.execution.FluentStep;
 import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +130,7 @@ public class FluentJob extends FluentInheritable<FluentJob> implements Inheritab
     }
 
     @Override
-    public FluentJob inherit(final JobRepository repository, final String defaultJobXml) {
+    public FluentJob inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return JobTool.inherit(FluentJob.class, this, repository, defaultJobXml);
     }
 

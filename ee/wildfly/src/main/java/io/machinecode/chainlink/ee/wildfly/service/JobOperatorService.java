@@ -78,7 +78,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
             set(operator.getTransport(), nodeToString(model, WildFlyConstants.TRANSPORT, WildFlyConstants.REF));
             set(operator.getRegistry(), nodeToString(model, WildFlyConstants.REGISTRY, WildFlyConstants.REF));
             set(operator.getMarshalling(), nodeToString(model, WildFlyConstants.MARSHALLING, WildFlyConstants.REF));
-            set(operator.getExecutionRepository(), nodeToString(model, WildFlyConstants.EXECUTION_REPOSITORY, WildFlyConstants.REF));
+            set(operator.getRepository(), nodeToString(model, WildFlyConstants.EXECUTION_REPOSITORY, WildFlyConstants.REF));
             set(operator.getTransactionManager(), nodeToString(model, WildFlyConstants.TRANSACTION_MANAGER, WildFlyConstants.REF));
             final String mBeanServer = nodeToString(model, WildFlyConstants.MBEAN_SERVER, WildFlyConstants.REF);
             if (mBeanServer != null) {

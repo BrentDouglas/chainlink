@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.repository.gridgain;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.core.repository.BaseMapExecutionRepository;
+import io.machinecode.chainlink.core.repository.BaseMapRepository;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -27,19 +27,19 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class GridGainExecutionRepository extends BaseMapExecutionRepository {
+public class GridGainRepository extends BaseMapRepository {
 
-    public static final String IDS = GridGainExecutionRepository.class.getCanonicalName() + ".ids";
-    public static final String JOB_INSTANCES = GridGainExecutionRepository.class.getCanonicalName() + ".jobInstances";
-    public static final String JOB_EXECUTIONS = GridGainExecutionRepository.class.getCanonicalName() + ".jobExecutions";
-    public static final String STEP_EXECUTIONS = GridGainExecutionRepository.class.getCanonicalName() + ".stepExecutions";
-    public static final String PARTITION_EXECUTIONS = GridGainExecutionRepository.class.getCanonicalName() + ".partitionExecutions";
-    public static final String JOB_INSTANCE_EXECUTIONS = GridGainExecutionRepository.class.getCanonicalName() + ".jobInstanceExecutions";
-    public static final String JOB_EXECUTION_INSTANCES = GridGainExecutionRepository.class.getCanonicalName() + ".jobExecutionInstances";
-    public static final String JOB_EXECUTION_STEP_EXECUTIONS = GridGainExecutionRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
-    public static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = GridGainExecutionRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
-    public static final String STEP_EXECUTION_PARTITION_EXECUTIONS = GridGainExecutionRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
-    public static final String JOB_EXECUTION_HISTORY = GridGainExecutionRepository.class.getCanonicalName() + ".jobExecutionHistory";
+    public static final String IDS = GridGainRepository.class.getCanonicalName() + ".ids";
+    public static final String JOB_INSTANCES = GridGainRepository.class.getCanonicalName() + ".jobInstances";
+    public static final String JOB_EXECUTIONS = GridGainRepository.class.getCanonicalName() + ".jobExecutions";
+    public static final String STEP_EXECUTIONS = GridGainRepository.class.getCanonicalName() + ".stepExecutions";
+    public static final String PARTITION_EXECUTIONS = GridGainRepository.class.getCanonicalName() + ".partitionExecutions";
+    public static final String JOB_INSTANCE_EXECUTIONS = GridGainRepository.class.getCanonicalName() + ".jobInstanceExecutions";
+    public static final String JOB_EXECUTION_INSTANCES = GridGainRepository.class.getCanonicalName() + ".jobExecutionInstances";
+    public static final String JOB_EXECUTION_STEP_EXECUTIONS = GridGainRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
+    public static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = GridGainRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
+    public static final String STEP_EXECUTION_PARTITION_EXECUTIONS = GridGainRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
+    public static final String JOB_EXECUTION_HISTORY = GridGainRepository.class.getCanonicalName() + ".jobExecutionHistory";
 
     protected final GridGainMap<String, Long> ids;
     protected final GridGainMap<Long, ExtendedJobInstance> jobInstances;
@@ -56,7 +56,7 @@ public class GridGainExecutionRepository extends BaseMapExecutionRepository {
     protected final Grid grid;
     protected final boolean transactional;
 
-    public GridGainExecutionRepository(final Marshalling marshalling, final Grid grid) {
+    public GridGainRepository(final Marshalling marshalling, final Grid grid) {
         super(marshalling);
         this.grid = grid;
 

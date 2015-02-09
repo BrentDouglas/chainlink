@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.test;
 
-import io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository;
+import io.machinecode.chainlink.repository.infinispan.InfinispanRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.infinispan.Cache;
 import org.infinispan.configuration.cache.CacheMode;
@@ -32,10 +32,10 @@ public class InfinispanRepositoryTest extends RepositoryTest {
     
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
-        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+        model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return _repository = new InfinispanExecutionRepository(
+            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new InfinispanRepository(
                         dependencies.getMarshalling(),
                         cacheManager = new DefaultCacheManager(
                                 new GlobalConfigurationBuilder()
@@ -75,17 +75,17 @@ public class InfinispanRepositoryTest extends RepositoryTest {
 
     @After
     public void after() throws Exception {
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".ids");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".jobInstances");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".jobExecutions");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".stepExecutions");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".partitionExecutions");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".jobInstanceExecutions");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".jobExecutionInstances");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".jobExecutionStepExecutions");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".latestJobExecutionForInstance");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions");
-        clear(InfinispanExecutionRepository.class.getCanonicalName() + ".jobExecutionHistory");
+        clear(InfinispanRepository.class.getCanonicalName() + ".ids");
+        clear(InfinispanRepository.class.getCanonicalName() + ".jobInstances");
+        clear(InfinispanRepository.class.getCanonicalName() + ".jobExecutions");
+        clear(InfinispanRepository.class.getCanonicalName() + ".stepExecutions");
+        clear(InfinispanRepository.class.getCanonicalName() + ".partitionExecutions");
+        clear(InfinispanRepository.class.getCanonicalName() + ".jobInstanceExecutions");
+        clear(InfinispanRepository.class.getCanonicalName() + ".jobExecutionInstances");
+        clear(InfinispanRepository.class.getCanonicalName() + ".jobExecutionStepExecutions");
+        clear(InfinispanRepository.class.getCanonicalName() + ".latestJobExecutionForInstance");
+        clear(InfinispanRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions");
+        clear(InfinispanRepository.class.getCanonicalName() + ".jobExecutionHistory");
     }
 
     private void clear(final String name) {

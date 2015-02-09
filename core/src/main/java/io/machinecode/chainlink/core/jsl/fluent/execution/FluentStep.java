@@ -11,7 +11,7 @@ import io.machinecode.chainlink.core.jsl.fluent.task.FluentChunk;
 import io.machinecode.chainlink.core.jsl.fluent.task.FluentTask;
 import io.machinecode.chainlink.core.jsl.fluent.transition.FluentTransition;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +162,7 @@ public class FluentStep
     }
 
     @Override
-    public FluentStep inherit(final JobRepository repository, final String defaultJobXml) {
+    public FluentStep inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return StepTool.inherit(FluentStep.class, this, repository, defaultJobXml);
     }
 

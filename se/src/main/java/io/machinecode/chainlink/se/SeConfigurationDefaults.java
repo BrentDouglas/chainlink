@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
-import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
+import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 
@@ -22,7 +22,7 @@ public class SeConfigurationDefaults implements JobOperatorConfiguration {
     public void configureJobOperator(final JobOperatorModel model) throws Exception {
         model.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(tccl));
         model.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
-        model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
+        model.getRepository().setDefaultFactory(new MemoryRepositoryFactory());
         model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
         model.getTransport().setDefaultFactory(new LocalTransportFactory());
         model.getRegistry().setDefaultFactory(new LocalRegistryFactory());

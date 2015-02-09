@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.spi.jsl.inherit.execution;
 
-import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
-import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
 import io.machinecode.chainlink.spi.jsl.Properties;
 import io.machinecode.chainlink.spi.jsl.execution.Decision;
-import io.machinecode.chainlink.spi.jsl.transition.Transition;
+import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
+import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.jsl.transition.Transition;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public interface InheritableDecision<T extends InheritableDecision<T, U, V>,
         public static <T extends InheritableDecision<T, U, V>,
                 U extends Mergeable<U> & Properties,
                 V extends Copyable & Transition>
-        T inherit(final T _this, final JobRepository repository, final String defaultJobXml) {
+        T inherit(final T _this, final InheritableJobLoader repository, final String defaultJobXml) {
             return _this.copy();
         }
 

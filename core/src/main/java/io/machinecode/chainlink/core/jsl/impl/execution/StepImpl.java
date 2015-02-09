@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.jsl.impl.execution;
 
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
@@ -13,9 +14,8 @@ import io.machinecode.chainlink.core.jsl.impl.partition.StrategyWork;
 import io.machinecode.chainlink.core.jsl.impl.task.TaskWork;
 import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
-import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.core.work.TaskExecutable;
-import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -24,10 +24,10 @@ import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.jsl.execution.Step;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.registry.StepAccumulator;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.ResolvedDeferred;
@@ -169,11 +169,11 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     }
 
     @Override
-    public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                               final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010100.step.before"), context, this.id);
-        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
+        final Repository repository = Repo.getRepository(configuration, repositoryId);
         final MutableJobContext jobContext = context.getJobContext();
         final long jobExecutionId = jobContext.getExecutionId();
         StepExecution stepExecution;
@@ -196,7 +196,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                             if (transition != null && transition.isTerminating()) {
                                 return configuration.getTransport().callback(parentId, context);
                             } else {
-                                return this.next(job, configuration, workerId, context, parentId, executionRepositoryId, this.next, transition);
+                                return this.next(job, configuration, workerId, context, parentId, repositoryId, this.next, transition);
                             }
                         }
                         break;
@@ -263,10 +263,10 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     null
             );
             return _resolve(configuration.getExecutor().execute(
-                    new TaskExecutable(callbackId, this.task, clonedContext, executionRepositoryId, timeout)
+                    new TaskExecutable(callbackId, this.task, clonedContext, repositoryId, timeout)
             ));
         } else {
-            final PartitionTarget target = this.partition.map(configuration, executionRepositoryId, this.task, callbackId, context, timeout, restartStepExecutionId);
+            final PartitionTarget target = this.partition.map(configuration, repositoryId, this.task, callbackId, context, timeout, restartStepExecutionId);
             this._partitions = target.getExecutables().length;
             return configuration.getTransport().distribute(
                     target.getThreads(),
@@ -276,13 +276,13 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     }
 
     @Override
-    public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                           final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                           final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010101.step.after"), context, childContext);
         final long jobExecutionId = context.getJobExecutionId();
         final long stepExecutionId = context.getStepExecutionId();
-        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
+        final Repository repository = Repo.getRepository(configuration, repositoryId);
         final MutableStepContext stepContext = context.getStepContext();
         final StepAccumulator accumulator = configuration.getRegistry()
                 .getStepAccumulator(jobExecutionId, id);
@@ -354,7 +354,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             }
             try {
                 log.debugf(Messages.get("CHAINLINK-010202.step.update.persistent.data"), context);
-                Repository.updateStep(
+                Repo.updateStep(
                         repository,
                         jobExecutionId,
                         stepExecutionId,
@@ -390,7 +390,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             context.getJobContext().setBatchStatus(stepContext.getBatchStatus());
             final String exitStatus = stepContext.getExitStatus();
             final TransitionImpl transition = this.transition(context, this.transitions, batchStatus, exitStatus);
-            Repository.finishStep(
+            Repo.finishStep(
                     repository,
                     jobExecutionId,
                     stepExecutionId,
@@ -403,12 +403,12 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             if (transition != null && transition.isTerminating()) {
                 return configuration.getTransport().callback(parentId, context);
             } else {
-                return this.next(job, configuration, workerId, context, parentId, executionRepositoryId, this.next, transition);
+                return this.next(job, configuration, workerId, context, parentId, repositoryId, this.next, transition);
             }
         } catch (final Throwable e) {
             log.debugf(e, Messages.get("CHAINLINK-010205.step.after.caught.exception"), context);
             context.getJobContext().setBatchStatus(FAILED);
-            Repository.finishStep(
+            Repo.finishStep(
                     repository,
                     jobExecutionId,
                     stepExecutionId,

@@ -1,19 +1,19 @@
 package io.machinecode.chainlink.spi.jsl.inherit.execution;
 
-import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
-import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.jsl.Listeners;
 import io.machinecode.chainlink.spi.jsl.Properties;
 import io.machinecode.chainlink.spi.jsl.execution.Step;
+import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableBase;
+import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
+import io.machinecode.chainlink.spi.jsl.inherit.Rules;
 import io.machinecode.chainlink.spi.jsl.partition.Partition;
 import io.machinecode.chainlink.spi.jsl.task.Batchlet;
 import io.machinecode.chainlink.spi.jsl.task.Chunk;
 import io.machinecode.chainlink.spi.jsl.task.Task;
 import io.machinecode.chainlink.spi.jsl.transition.Transition;
-import io.machinecode.chainlink.spi.jsl.inherit.InheritableBase;
-import io.machinecode.chainlink.spi.jsl.inherit.Rules;
-import io.machinecode.chainlink.spi.loader.JobRepository;
-import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import javax.batch.operations.JobStartException;
 import java.util.List;
@@ -71,7 +71,7 @@ public interface InheritableStep<T extends InheritableStep<T, P, L, M, X, Y>,
                 M extends Mergeable & Task,
                 X extends Copyable & Transition,
                 Y extends Copyable<Y> & Partition>
-        T inherit(final Class<T> clazz, final T _this, final JobRepository repository, final String defaultJobXml) {
+        T inherit(final Class<T> clazz, final T _this, final InheritableJobLoader repository, final String defaultJobXml) {
             final T copy = _this.copy();
             if (copy.getParent() != null) {
                 final T that = repository.findParent(clazz, copy, defaultJobXml);

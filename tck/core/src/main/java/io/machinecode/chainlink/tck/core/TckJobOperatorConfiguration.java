@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
@@ -59,7 +59,7 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
         try {
             marshallingFactory = new ResolvableService<>(MarshallingFactory.class).resolve(tccl);
         } catch (final ServiceConfigurationError e) {}
-        List<ExecutionRepositoryFactory> executionRepositories = new ResolvableService<>(ExecutionRepositoryFactory.class).resolve(tccl);
+        List<RepositoryFactory> executionRepositories = new ResolvableService<>(RepositoryFactory.class).resolve(tccl);
         List<ExecutorFactory> executors = new ResolvableService<>(ExecutorFactory.class).resolve(tccl);
         List<RegistryFactory> registries = new ResolvableService<>(RegistryFactory.class).resolve(tccl);
         List<TransportFactory> transports = new ResolvableService<>(TransportFactory.class).resolve(tccl);
@@ -88,7 +88,7 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
         }
         model.getMBeanServer().setFactory(mBeanServer == null || mBeanServer.isEmpty() ? null : mBeanServer.get(0));
         model.getMarshalling().setFactory(marshallingFactory == null || marshallingFactory.isEmpty() ? null : marshallingFactory.get(0));
-        model.getExecutionRepository().setFactory(executionRepositories.get(0));
+        model.getRepository().setFactory(executionRepositories.get(0));
         model.getTransport().setDefaultFactory(transports.get(0));
         model.getExecutor().setFactory(executors.get(0));
         model.getRegistry().setFactory(registries.get(0));

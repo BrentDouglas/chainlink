@@ -29,8 +29,8 @@
         <Or>
             <Class name="io.machinecode.chainlink.core.jsl.impl.execution.StepImpl" />
             <Class name="io.machinecode.chainlink.repository.infinispan.RunningJobExecutionIdCallable" />
-            <Class name="io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepository" />
-            <Class name="io.machinecode.chainlink.repository.redis.RedisExecutionRepository" />
+            <Class name="io.machinecode.chainlink.core.repository.memory.MemoryRepository" />
+            <Class name="io.machinecode.chainlink.repository.redis.RedisRepository" />
         </Or>
         <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
     </Match>
@@ -75,23 +75,23 @@
             <Class name="io.machinecode.chainlink.marshalling.jboss.JbossMarshalling" />
             <Class name="io.machinecode.chainlink.core.repository.MetricImpl" />
             <Class name="io.machinecode.chainlink.repository.jpa.JpaMetric" />
-            <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository" />
+            <Class name="io.machinecode.chainlink.repository.jdbc.JdbcRepository" />
             <Class name="io.machinecode.chainlink.repository.mongo.MongoMetric" />
             <Class name="io.machinecode.chainlink.ee.wildfly.schema.JobOperatorDeploymentAdd" />
         </Or>
        <Bug code="PZLA" />
     </Match>
     <Match>
-        <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository"/>
+        <Class name="io.machinecode.chainlink.repository.jdbc.JdbcRepository"/>
         <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
     </Match>
     <Match>
-        <Class name="io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository"/>
+        <Class name="io.machinecode.chainlink.repository.jdbc.JdbcRepository"/>
         <Bug pattern="REC_CATCH_EXCEPTION"/>
     </Match>
     <Match>
-        <Class name="io.machinecode.chainlink.core.transport.DistributedProxyExecutionRepository"/>
-        <Field name="executionRepositoryId"/>
+        <Class name="io.machinecode.chainlink.core.transport.DistributedProxyRepository"/>
+        <Field name="repositoryId"/>
         <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
     </Match>
     <Match>

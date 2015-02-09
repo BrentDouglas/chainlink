@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.repository.infinispan;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.core.repository.BaseMapExecutionRepository;
+import io.machinecode.chainlink.core.repository.BaseMapRepository;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -30,19 +30,19 @@ import java.util.concurrent.Future;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
+public class InfinispanRepository extends BaseMapRepository {
 
-    protected static final String IDS = InfinispanExecutionRepository.class.getCanonicalName() + ".ids";
-    protected static final String JOB_INSTANCES = InfinispanExecutionRepository.class.getCanonicalName() + ".jobInstances";
-    protected static final String JOB_EXECUTIONS = InfinispanExecutionRepository.class.getCanonicalName() + ".jobExecutions";
-    protected static final String STEP_EXECUTIONS = InfinispanExecutionRepository.class.getCanonicalName() + ".stepExecutions";
-    protected static final String PARTITION_EXECUTIONS = InfinispanExecutionRepository.class.getCanonicalName() + ".partitionExecutions";
-    protected static final String JOB_INSTANCE_EXECUTIONS = InfinispanExecutionRepository.class.getCanonicalName() + ".jobInstanceExecutions";
-    protected static final String JOB_EXECUTION_INSTANCES = InfinispanExecutionRepository.class.getCanonicalName() + ".jobExecutionInstances";
-    protected static final String JOB_EXECUTION_STEP_EXECUTIONS = InfinispanExecutionRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
-    protected static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = InfinispanExecutionRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
-    protected static final String STEP_EXECUTION_PARTITION_EXECUTIONS = InfinispanExecutionRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
-    protected static final String JOB_EXECUTION_HISTORY = InfinispanExecutionRepository.class.getCanonicalName() + ".jobExecutionHistory";
+    protected static final String IDS = InfinispanRepository.class.getCanonicalName() + ".ids";
+    protected static final String JOB_INSTANCES = InfinispanRepository.class.getCanonicalName() + ".jobInstances";
+    protected static final String JOB_EXECUTIONS = InfinispanRepository.class.getCanonicalName() + ".jobExecutions";
+    protected static final String STEP_EXECUTIONS = InfinispanRepository.class.getCanonicalName() + ".stepExecutions";
+    protected static final String PARTITION_EXECUTIONS = InfinispanRepository.class.getCanonicalName() + ".partitionExecutions";
+    protected static final String JOB_INSTANCE_EXECUTIONS = InfinispanRepository.class.getCanonicalName() + ".jobInstanceExecutions";
+    protected static final String JOB_EXECUTION_INSTANCES = InfinispanRepository.class.getCanonicalName() + ".jobExecutionInstances";
+    protected static final String JOB_EXECUTION_STEP_EXECUTIONS = InfinispanRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
+    protected static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = InfinispanRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
+    protected static final String STEP_EXECUTION_PARTITION_EXECUTIONS = InfinispanRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
+    protected static final String JOB_EXECUTION_HISTORY = InfinispanRepository.class.getCanonicalName() + ".jobExecutionHistory";
 
     protected final AdvancedCache<String, Long> ids;
     protected final AdvancedCache<Long, ExtendedJobInstance> jobInstances;
@@ -61,7 +61,7 @@ public class InfinispanExecutionRepository extends BaseMapExecutionRepository {
 
     protected final EmbeddedCacheManager cacheManager;
 
-    public InfinispanExecutionRepository(final Marshalling marshalling, final EmbeddedCacheManager cacheManager) throws InterruptedException {
+    public InfinispanRepository(final Marshalling marshalling, final EmbeddedCacheManager cacheManager) throws InterruptedException {
         super(marshalling);
         this.cacheManager = cacheManager;
 

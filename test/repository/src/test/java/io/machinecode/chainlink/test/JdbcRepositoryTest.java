@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.test;
 
 import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
-import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
+import io.machinecode.chainlink.repository.jdbc.JdbcRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.base.DummyDataSource;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.jboss.logging.Logger;
@@ -37,10 +37,10 @@ public class JdbcRepositoryTest extends RepositoryTest {
         if (dataSource == null) {
             dataSource = new DummyDataSource(this.url, this.driverName);
         }
-        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+        model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return _repository = JdbcExecutionRepository.create(new DataSourceLookup() {
+            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = JdbcRepository.create(new DataSourceLookup() {
                     @Override
                     public DataSource getDataSource() {
                         return dataSource;

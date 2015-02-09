@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.factory.task.ChunkFactory;
 import io.machinecode.chainlink.core.jsl.impl.ListenerImpl;
 import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
-import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -13,9 +13,9 @@ import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.Chunk;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.repository.BaseExecution;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
@@ -184,7 +184,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     }
 
     @Override
-    public void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
+    public void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final RepositoryId repositoryId,
                     final ExecutionContext context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
@@ -194,13 +194,13 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                     this,
                     configuration,
                     promise,
-                    executionRepositoryId,
+                    repositoryId,
                     context,
                     timeout
             );
         } catch (final Throwable e) {
             if (partitionExecutionId != null) {
-                Repository.getExecutionRepository(configuration, executionRepositoryId).finishPartitionExecution(
+                Repo.getRepository(configuration, repositoryId).finishPartitionExecution(
                         partitionExecutionId,
                         stepContext.getMetrics(),
                         stepContext.getPersistentUserData(),
@@ -410,7 +410,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     private void _collect(final State state, final ExecutionContext context, final BatchStatus batchStatus, final String exitStatus) throws Exception {
         // TODO #checkpointInfo failed maybe it would be better to ignore updating that part
         if (state.partitionExecutionId == null) {
-            Repository.updateStep(
+            Repo.updateStep(
                     state.repository,
                     state.jobExecutionId,
                     state.stepExecutionId,
@@ -1080,7 +1080,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final long stepExecutionId;
         final Long partitionExecutionId;
         final TransactionManager transactionManager;
-        final ExecutionRepository repository;
+        final Repository repository;
         final MutableStepContext stepContext;
         final ExecutionContext context;
         final Configuration configuration;
@@ -1113,12 +1113,12 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final List<ListenerImpl> skipWriteListeners;
 
         private State(final ChunkImpl chunk, final Configuration configuration, final Promise<?,Throwable,?> promise,
-                      final ExecutionRepositoryId executionRepositoryId, final ExecutionContext context, final int timeout) throws Exception {
+                      final RepositoryId repositoryId, final ExecutionContext context, final int timeout) throws Exception {
             this.jobExecutionId = context.getJobExecutionId();
             this.stepExecutionId = context.getStepExecutionId();
             this.partitionExecutionId = context.getPartitionExecutionId();
             this.transactionManager = configuration.getTransactionManager();
-            this.repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
+            this.repository = Repo.getRepository(configuration, repositoryId);
             this.stepContext = context.getStepContext();
             this.context = context;
             this.configuration = configuration;

@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.repository;
 
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
+import io.machinecode.chainlink.spi.repository.Repository;
 
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -18,9 +18,9 @@ import java.util.Date;
 public class DelegateStepExecution implements ExtendedStepExecution {
     private final long executionId;
     private final String stepName;
-    private final ExecutionRepository repository;
+    private final Repository repository;
 
-    public DelegateStepExecution(final StepExecution execution, final ExecutionRepository repository) {
+    public DelegateStepExecution(final StepExecution execution, final Repository repository) {
         this.executionId = execution.getStepExecutionId();
         this.stepName = execution.getStepName();
         this.repository = repository;

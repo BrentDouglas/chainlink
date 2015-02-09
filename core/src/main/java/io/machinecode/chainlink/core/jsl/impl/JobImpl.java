@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.impl;
 
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
-import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.core.validation.InvalidJobException;
 import io.machinecode.chainlink.core.validation.JobTraversal;
@@ -13,8 +13,8 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.ResolvedDeferred;
@@ -92,11 +92,11 @@ public class JobImpl implements Job, Serializable {
         return _listeners;
     }
 
-    public Promise<Chain<?>,Throwable,?> before(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> before(final Configuration configuration, final RepositoryId repositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
-        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
+        final Repository repository = Repo.getRepository(configuration, repositoryId);
         long jobExecutionId = context.getJobExecutionId();
-        Repository.startedJob(repository, jobExecutionId);
+        Repo.startedJob(repository, jobExecutionId);
         log.debugf(Messages.get("CHAINLINK-018000.job.create.job.context"), context);
         Exception exception = null;
         for (final ListenerImpl listener : this._listeners(configuration, context)) {
@@ -123,18 +123,18 @@ public class JobImpl implements Job, Serializable {
 
         final Long restartJobExecutionId = context.getRestartJobExecutionId();
         if (restartJobExecutionId == null) {
-            return _runNext(configuration, callbackId, context, executionRepositoryId, this.executions.get(0));
+            return _runNext(configuration, callbackId, context, repositoryId, this.executions.get(0));
         }
         repository.linkJobExecutions(jobExecutionId, restartJobExecutionId);
         final String restartId = context.getRestartElementId();
         if (restartId == null) {
-            return _runNext(configuration, callbackId, context, executionRepositoryId, this.executions.get(0));
+            return _runNext(configuration, callbackId, context, repositoryId, this.executions.get(0));
         }
         log.debugf(Messages.get("CHAINLINK-018004.job.restart.transition"), context, restartId);
-        return _runNext(configuration, callbackId, context, executionRepositoryId, traversal.next(restartId));
+        return _runNext(configuration, callbackId, context, repositoryId, traversal.next(restartId));
     }
 
-    public void after(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public void after(final Configuration configuration, final RepositoryId repositoryId,
                       final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
         Exception exception = null;
         for (final ListenerImpl listener : this._listeners(configuration, context)) {
@@ -159,14 +159,14 @@ public class JobImpl implements Job, Serializable {
     }
 
     private Promise<Chain<?>,Throwable,?> _runNext(final Configuration configuration, final ExecutableId callbackId,
-                                        final ExecutionContext context, final ExecutionRepositoryId executionRepositoryId,
+                                        final ExecutionContext context, final RepositoryId repositoryId,
                                         final ExecutionImpl next) throws Exception {
         return new ResolvedDeferred<Chain<?>, Throwable, Object>(configuration.getExecutor().execute(new ExecutionExecutable(
                 this,
                 callbackId,
                 next,
                 context,
-                executionRepositoryId,
+                repositoryId,
                 null
         )));
     }

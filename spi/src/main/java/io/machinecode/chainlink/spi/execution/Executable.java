@@ -3,7 +3,7 @@ package io.machinecode.chainlink.spi.execution;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.then.Chain;
 
 /**
@@ -24,7 +24,7 @@ public interface Executable {
 
     WorkerId getWorkerId();
 
-    ExecutionRepositoryId getExecutionRepositoryId();
+    RepositoryId getRepositoryId();
 
     ExecutionContext getContext();
 

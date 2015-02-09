@@ -28,7 +28,7 @@ public interface JobOperatorSchema<Dec extends DeclarationSchema, Prop extends P
 
     List<Dec> getSecurities();
 
-    Dec getExecutionRepository();
+    Dec getRepository();
 
     Dec getRegistry();
 

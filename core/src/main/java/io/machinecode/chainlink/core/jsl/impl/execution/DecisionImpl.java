@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
-import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
@@ -17,7 +17,7 @@ import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.jsl.execution.Decision;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
@@ -67,7 +67,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
     }
 
     @Override
-    public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                            final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-019000.decision.before"), context, this.id);
@@ -80,14 +80,14 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
                 context,
                 actual == NO_STEPS
                         ? NO_STEP_EXECUTIONS
-                        : Repository.getExecutionRepository(configuration, executionRepositoryId).getStepExecutions(actual)
+                        : Repo.getRepository(configuration, repositoryId).getStepExecutions(actual)
         );
         context.getJobContext().setExitStatus(exitStatus);
         return configuration.getTransport().callback(callbackId, context);
     }
 
     @Override
-    public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                           final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                           final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-019001.decision.after"), context, this.id);
@@ -100,7 +100,7 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
         if (transition != null && transition.isTerminating()) {
             return configuration.getTransport().callback(parentId, context);
         } else {
-            return this.next(job, configuration, workerId, context, parentId, executionRepositoryId, null, transition);
+            return this.next(job, configuration, workerId, context, parentId, repositoryId, null, transition);
         }
     }
 

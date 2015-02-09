@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.factory.task.BatchletFactory;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertyReferenceImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
-import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -16,8 +16,8 @@ import io.machinecode.chainlink.spi.inject.ArtifactReference;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.jsl.task.Batchlet;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
@@ -42,11 +42,11 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
-    public void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
+    public void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final RepositoryId repositoryId,
                     final ExecutionContext context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
         final MutableStepContext stepContext = context.getStepContext();
-        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
+        final Repository repository = Repo.getRepository(configuration, repositoryId);
         stepContext.setBatchStatus(BatchStatus.STARTED);
         Throwable throwable = null;
         try {

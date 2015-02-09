@@ -7,7 +7,7 @@ import io.machinecode.chainlink.core.jsl.xml.transition.XmlNext;
 import io.machinecode.chainlink.core.jsl.xml.transition.XmlStop;
 import io.machinecode.chainlink.core.jsl.xml.transition.XmlTransition;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableFlow;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -98,7 +98,7 @@ public class XmlFlow extends XmlInheritable<XmlFlow> implements XmlExecution<Xml
     }
 
     @Override
-    public XmlFlow inherit(final JobRepository repository, final String defaultJobXml) {
+    public XmlFlow inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return FlowTool.inherit(XmlFlow.class, this, repository, defaultJobXml);
     }
 

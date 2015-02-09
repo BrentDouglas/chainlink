@@ -4,7 +4,7 @@ import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.jsl.Listeners;
 import io.machinecode.chainlink.spi.jsl.Properties;
 import io.machinecode.chainlink.spi.jsl.execution.Execution;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public interface InheritableJob<T extends InheritableJob<T, P, L, E>,
                 P extends Mergeable<P> & Properties,
                 L extends Mergeable<L> & Listeners,
                 E extends Inheritable & Execution>
-        T inherit(final Class<T> clazz, final T _this, final JobRepository repository, final String defaultJobXml) {
+        T inherit(final Class<T> clazz, final T _this, final InheritableJobLoader repository, final String defaultJobXml) {
             final T copy = _this.copy();
             if (copy.getParent() != null) {
                 final T that = repository.findParent(clazz, copy, defaultJobXml);

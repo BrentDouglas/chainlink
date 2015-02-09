@@ -10,12 +10,12 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.JobEventListener;
 import io.machinecode.chainlink.spi.registry.Registry;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.registry.SplitAccumulator;
 import io.machinecode.chainlink.spi.registry.StepAccumulator;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
@@ -36,7 +36,7 @@ public class LocalRegistry implements Registry {
 
     private static final Logger log = Logger.getLogger(LocalRegistry.class);
 
-    protected final TMap<ExecutionRepositoryId, ExecutionRepository> repositories;
+    protected final TMap<RepositoryId, Repository> repositories;
 
     protected final Lock repositoryLock = new ReentrantLock();
 
@@ -64,7 +64,7 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public ExecutionRepositoryId registerExecutionRepository(final ExecutionRepositoryId id, final ExecutionRepository repository) {
+    public RepositoryId registerRepository(final RepositoryId id, final Repository repository) {
         repositoryLock.lock();
         try {
             this.repositories.put(id, repository);
@@ -75,7 +75,7 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) {
+    public Repository getRepository(final RepositoryId id) {
         repositoryLock.lock();
         try {
             return this.repositories.get(id);
@@ -85,7 +85,7 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public ExecutionRepository unregisterExecutionRepository(final ExecutionRepositoryId id) {
+    public Repository unregisterRepository(final RepositoryId id) {
         repositoryLock.lock();
         try {
             return this.repositories.remove(id);
@@ -301,9 +301,9 @@ public class LocalRegistry implements Registry {
         return chain;
     }
 
-    public static ExecutionRepository assertExecutionRepository(final ExecutionRepository repository, final ExecutionRepositoryId id) {
+    public static Repository assertRepository(final Repository repository, final RepositoryId id) {
         if (repository == null) {
-            throw new IllegalStateException("No execution repository registered matching. executionRepositoryId=" + id); //TODO Message
+            throw new IllegalStateException("No execution repository registered matching. repositoryId=" + id); //TODO Message
         }
         return repository;
     }

@@ -50,10 +50,10 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
 
     void setMbeanServer(final GlassfishDeclaration mBeanServer);
 
-    @Element("execution-repository")
-    GlassfishDeclaration getExecutionRepository();
+    @Element("repository")
+    GlassfishDeclaration getRepository();
 
-    void setExecutionRepository(final GlassfishDeclaration executionRepository);
+    void setRepository(final GlassfishDeclaration repository);
 
     @Element("registry")
     GlassfishDeclaration getRegistry();
@@ -211,7 +211,7 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
             to.setTransactionManager(GlassfishTransmute.item(to.getTransactionManager(), from.getTransactionManager(), creator, ops));
             to.setMarshalling(GlassfishTransmute.item(to.getMarshalling(), from.getMarshalling(), creator, ops));
             to.setMBeanServer(GlassfishTransmute.item(to.getMBeanServer(), from.getMBeanServer(), creator, ops));
-            to.setExecutionRepository(GlassfishTransmute.item(to.getExecutionRepository(), from.getExecutionRepository(), creator, ops));
+            to.setRepository(GlassfishTransmute.item(to.getRepository(), from.getRepository(), creator, ops));
             to.setRegistry(GlassfishTransmute.item(to.getRegistry(), from.getRegistry(), creator, ops));
             to.setTransport(GlassfishTransmute.item(to.getTransport(), from.getTransport(), creator, ops));
             to.setExecutor(GlassfishTransmute.item(to.getExecutor(), from.getExecutor(), creator, ops));

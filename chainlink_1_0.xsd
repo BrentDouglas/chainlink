@@ -62,7 +62,7 @@
                     <xs:element name="artifact-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="injector" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="security" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="execution-repository" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="repository" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="registry" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="transport" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="executor" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>

@@ -31,7 +31,7 @@ public interface MutableJobOperatorSchema<Dec extends MutableDeclarationSchema, 
 
     void setSecurities(final List<Dec> securities);
 
-    void setExecutionRepository(final Dec executionRepository);
+    void setRepository(final Dec repository);
 
     void setRegistry(final Dec registry);
 

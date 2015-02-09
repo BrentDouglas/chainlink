@@ -181,7 +181,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.repository.infinispan.JndiInfinispanExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.repository.infinispan.JndiInfinispanRepositoryFactory</repository.factory.class>
             </properties>
             <build>
                 <plugins>
@@ -276,7 +276,7 @@
                                         <filter token="tck.database.password" value="${tck.database.password}" />
 
                                         <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
-                                        <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
+                                        <filter token="repository.factory.class" value="${repository.factory.class}" />
                                         <filter token="executor.factory.class" value="${executor.factory.class}" />
                                         <filter token="injector.factory.class" value="${injector.factory.class}" />
                                         <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />

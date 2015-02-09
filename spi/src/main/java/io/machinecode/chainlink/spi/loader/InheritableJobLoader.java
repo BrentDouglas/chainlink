@@ -1,13 +1,13 @@
 package io.machinecode.chainlink.spi.loader;
 
-import io.machinecode.chainlink.spi.jsl.inherit.InheritableElement;
 import io.machinecode.chainlink.spi.exception.ParentNotFoundException;
+import io.machinecode.chainlink.spi.jsl.inherit.InheritableElement;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface JobRepository {
+public interface InheritableJobLoader extends JobLoader {
 
     /**
      *

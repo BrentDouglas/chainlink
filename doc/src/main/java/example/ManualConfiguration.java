@@ -9,7 +9,7 @@ import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
-import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
+import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.Constants;
@@ -40,7 +40,7 @@ public class ManualConfiguration {
         final JobOperatorModelImpl op = model.getJobOperator(Constants.DEFAULT);
         op.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(tccl));
         op.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
-        op.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
+        op.getRepository().setDefaultFactory(new MemoryRepositoryFactory());
         op.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
         op.getTransport().setDefaultFactory(new LocalTransportFactory());
         op.getRegistry().setDefaultFactory(new LocalRegistryFactory());

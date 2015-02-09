@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.jsl.inherit;
 
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -12,5 +12,5 @@ public interface Inheritable<T extends Inheritable<T>> extends Copyable<T> {
      *
      * @param repository
      */
-    T inherit(JobRepository repository, String defaultJobXml);
+    T inherit(InheritableJobLoader repository, String defaultJobXml);
 }

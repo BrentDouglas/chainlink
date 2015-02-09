@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.fluent.execution;
 
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableSplit;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,7 @@ public class FluentSplit implements FluentExecution<FluentSplit>, InheritableSpl
     }
 
     @Override
-    public FluentSplit inherit(final JobRepository repository, final String defaultJobXml) {
+    public FluentSplit inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return SplitTool.inherit(this, repository, defaultJobXml);
     }
 

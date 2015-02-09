@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.spi.jsl.inherit;
 
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class Rules {
         return that == null ? null : new CopyList<>(that);
     }
 
-    public static <X extends Inheritable<X>> InheritList<X> inheritingList(final JobRepository repository, final String defaultJobXml, final List<? extends X> that) {
+    public static <X extends Inheritable<X>> InheritList<X> inheritingList(final InheritableJobLoader repository, final String defaultJobXml, final List<? extends X> that) {
         return that == null ? null : new InheritList<>(repository, defaultJobXml, that);
     }
 
@@ -47,7 +47,7 @@ public class Rules {
         return child.copy();
     }
 
-    public static <X extends Mergeable<X>> X recursiveElementRule(final X child, final X parent, final JobRepository repository, final String defaultJobXml) {
+    public static <X extends Mergeable<X>> X recursiveElementRule(final X child, final X parent, final InheritableJobLoader repository, final String defaultJobXml) {
         if (child == null) {
             return parent == null ? null : parent.copy();
         }

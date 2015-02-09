@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.work;
 
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.then.ResolvedChain;
-import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -43,7 +43,7 @@ public class JobCallback extends ExecutableImpl<JobImpl> {
         final MutableJobContext jobContext = context.getJobContext();
         Throwable throwable = null;
         try {
-            work.after(configuration, this.executionRepositoryId, workerId, parentId, this.context);
+            work.after(configuration, this.repositoryId, workerId, parentId, this.context);
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("CHAINLINK-023003.work.job.after.exception", context));
             jobContext.setBatchStatus(BatchStatus.FAILED);
@@ -51,22 +51,22 @@ public class JobCallback extends ExecutableImpl<JobImpl> {
         } finally {
             final BatchStatus batchStatus = jobContext.getBatchStatus();
             if (BatchStatus.FAILED.equals(batchStatus)) {
-                Repository.failedJob(
-                        Repository.getExecutionRepository(configuration, this.executionRepositoryId),
+                Repo.failedJob(
+                        Repo.getRepository(configuration, this.repositoryId),
                         context.getJobExecutionId(),
                         jobContext.getExitStatus()
                 );
             } else if (BatchStatus.STOPPING.equals(batchStatus)) {
-                Repository.finishJob(
-                        Repository.getExecutionRepository(configuration, this.executionRepositoryId),
+                Repo.finishJob(
+                        Repo.getRepository(configuration, this.repositoryId),
                         context.getJobExecutionId(),
                         BatchStatus.STOPPED,
                         jobContext.getExitStatus(),
                         context.getRestartElementId()
                 );
             } else {
-                Repository.completedJob(
-                        Repository.getExecutionRepository(configuration, this.executionRepositoryId),
+                Repo.completedJob(
+                        Repo.getRepository(configuration, this.repositoryId),
                         context.getJobExecutionId(),
                         jobContext.getExitStatus()
                 );

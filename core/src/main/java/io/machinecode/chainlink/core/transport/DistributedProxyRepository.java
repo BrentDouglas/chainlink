@@ -1,13 +1,13 @@
 package io.machinecode.chainlink.core.transport;
 
 import io.machinecode.chainlink.core.transport.cmd.Command;
-import io.machinecode.chainlink.core.transport.cmd.InvokeExecutionRepositoryCommand;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.core.transport.cmd.InvokeRepositoryCommand;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.Repository;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
@@ -25,24 +25,24 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class DistributedProxyExecutionRepository implements ExecutionRepository {
+public class DistributedProxyRepository implements Repository {
 
     protected final BaseTransport<?> transport;
     protected final Object address;
-    protected final ExecutionRepositoryId executionRepositoryId;
+    protected final RepositoryId repositoryId;
     protected final long timeout;
     protected final TimeUnit unit;
 
-    public DistributedProxyExecutionRepository(final BaseTransport<?> transport, final ExecutionRepositoryId executionRepositoryId) {
+    public DistributedProxyRepository(final BaseTransport<?> transport, final RepositoryId repositoryId) {
         this.transport = transport;
-        this.address = executionRepositoryId.getAddress();
-        this.executionRepositoryId = executionRepositoryId;
+        this.address = repositoryId.getAddress();
+        this.repositoryId = repositoryId;
         this.timeout = transport.getTimeout();
         this.unit = transport.getTimeUnit();
     }
 
     protected <T> Command<T> _cmd(final String name, final Serializable... params) {
-        return new InvokeExecutionRepositoryCommand<>(executionRepositoryId, name, params);
+        return new InvokeRepositoryCommand<>(repositoryId, name, params);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class ExecutionCallback extends ExecutableImpl<ExecutionImpl> {
             if (chain.isCancelled()) {
                 context.getJobContext().setBatchStatus(BatchStatus.STOPPING);
             }
-            next = work.after(job, configuration, this.executionRepositoryId, workerId, parentId, context, childContext);
+            next = work.after(job, configuration, this.repositoryId, workerId, parentId, context, childContext);
             next.onResolve(new LinkAndResolveChain(chain))
                     .onReject(chain)
                     .onCancel(chain);

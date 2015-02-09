@@ -2,11 +2,11 @@ package io.machinecode.chainlink.test;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import io.machinecode.chainlink.repository.hazelcast.HazelcastExecutonRepository;
+import io.machinecode.chainlink.repository.hazelcast.HazelcastRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.junit.After;
 
@@ -22,10 +22,10 @@ public class HazelcastRepositoryTest extends RepositoryTest {
 
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
-        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+        model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return _repository = new HazelcastExecutonRepository(
+            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new HazelcastRepository(
                         dependencies.getMarshalling(),
                         hazelcast
                 );
@@ -35,16 +35,16 @@ public class HazelcastRepositoryTest extends RepositoryTest {
 
     @After
     public void after() throws Exception {
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".ids").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobInstances").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutions").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".stepExecutions").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".partitionExecutions").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobInstanceExecutions").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionInstances").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionStepExecutions").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".latestJobExecutionForInstance").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions").clear();
-        hazelcast.getMap(HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionHistory").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".ids").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".jobInstances").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".jobExecutions").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".stepExecutions").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".partitionExecutions").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".jobInstanceExecutions").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".jobExecutionInstances").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".jobExecutionStepExecutions").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".latestJobExecutionForInstance").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions").clear();
+        hazelcast.getMap(HazelcastRepository.class.getCanonicalName() + ".jobExecutionHistory").clear();
     }
 }

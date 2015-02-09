@@ -6,7 +6,7 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
@@ -19,21 +19,21 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
 
     protected final T work;
     protected final WorkerId workerId;
-    protected final ExecutionRepositoryId executionRepositoryId;
+    protected final RepositoryId repositoryId;
     protected final ExecutableId parentId;
     protected final ExecutionContext context;
 
     public ExecutableImpl(final ExecutableId parentId, final ExecutionContext context,
-                          final T work, final ExecutionRepositoryId executionRepositoryId, final WorkerId workerId) {
+                          final T work, final RepositoryId repositoryId, final WorkerId workerId) {
         this.parentId = parentId;
         this.context = context;
         this.work = work;
         this.workerId = workerId;
-        this.executionRepositoryId = executionRepositoryId;
+        this.repositoryId = repositoryId;
     }
 
     public ExecutableImpl(final ExecutableId parentId, final ExecutableImpl<T> executable, final WorkerId workerId) {
-        this(parentId, executable.getContext(), executable.work, executable.executionRepositoryId, workerId);
+        this(parentId, executable.getContext(), executable.work, executable.repositoryId, workerId);
     }
 
     @Override
@@ -57,8 +57,8 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
     }
 
     @Override
-    public ExecutionRepositoryId getExecutionRepositoryId() {
-        return executionRepositoryId;
+    public RepositoryId getRepositoryId() {
+        return repositoryId;
     }
 
     @Override

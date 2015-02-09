@@ -2,10 +2,10 @@ package io.machinecode.chainlink.core.execution;
 
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.registry.UUIDId;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.transport.WorkerState;
-import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.context.ExecutionContext;

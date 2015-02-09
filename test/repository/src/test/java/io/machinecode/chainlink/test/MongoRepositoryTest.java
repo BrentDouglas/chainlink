@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.test;
 
 import com.mongodb.MongoClient;
-import io.machinecode.chainlink.repository.mongo.MongoExecutionRepository;
+import io.machinecode.chainlink.repository.mongo.MongoRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.jboss.logging.Logger;
 import org.jongo.Jongo;
@@ -30,10 +30,10 @@ public class MongoRepositoryTest extends RepositoryTest {
         final String database = System.getProperty("mongo.database");
         log.infof("Connection: {\n\turl: '%s'\n}", host);
         jongo = new Jongo(new MongoClient(host, port).getDB(database));
-        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+        model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return _repository = new MongoExecutionRepository(jongo, dependencies.getMarshalling(), true);
+            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new MongoRepository(jongo, dependencies.getMarshalling(), true);
             }
         });
     }

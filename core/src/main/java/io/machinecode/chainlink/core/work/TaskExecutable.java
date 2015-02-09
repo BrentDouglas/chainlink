@@ -8,7 +8,7 @@ import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.OnCancel;
 import io.machinecode.then.api.Promise;
@@ -26,8 +26,8 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
 
     final int timeout;
 
-    public TaskExecutable(final ExecutableId parentId, final TaskWork work, final ExecutionContext context, final ExecutionRepositoryId executionRepositoryId, final int timeout) {
-        super(parentId, context, work, executionRepositoryId, null);
+    public TaskExecutable(final ExecutableId parentId, final TaskWork work, final ExecutionContext context, final RepositoryId repositoryId, final int timeout) {
+        super(parentId, context, work, repositoryId, null);
         this.timeout = timeout;
     }
 
@@ -46,7 +46,7 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
         final MutableStepContext stepContext = context.getStepContext();
         final MutableJobContext jobContext = context.getJobContext();
         try {
-            work.run(configuration, chain, this.executionRepositoryId, this.context, timeout);
+            work.run(configuration, chain, this.repositoryId, this.context, timeout);
             final Promise<Chain<?>,Throwable,?> next = configuration.getTransport().callback(parentId, this.context);
             next.onResolve(new LinkAndResolveChain(chain))
                     .onReject(chain)

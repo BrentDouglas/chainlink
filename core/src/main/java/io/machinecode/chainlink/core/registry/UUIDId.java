@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.registry;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.transport.Addressed;
 
 import java.util.UUID;
@@ -12,7 +12,7 @@ import java.util.UUID;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class UUIDId implements ExecutionRepositoryId, ExecutableId, ChainId, WorkerId {
+public class UUIDId implements RepositoryId, ExecutableId, ChainId, WorkerId {
     private static final long serialVersionUID = 1L;
 
     final UUID uuid;

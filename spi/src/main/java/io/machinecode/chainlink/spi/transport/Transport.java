@@ -4,8 +4,8 @@ import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 
@@ -20,7 +20,7 @@ public interface Transport extends Lifecycle, Addressed {
 
     Promise<Chain<?>,Throwable,Object> callback(final ExecutableId executableId, final ExecutionContext context) throws Exception;
 
-    ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws Exception;
+    Repository getRepository(final RepositoryId id) throws Exception;
 
     long getTimeout();
 

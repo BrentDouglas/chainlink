@@ -2,9 +2,9 @@ package io.machinecode.chainlink.core.transport;
 
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.transport.cmd.CleanupCommand;
 import io.machinecode.chainlink.core.transport.cmd.Command;
-import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;

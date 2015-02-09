@@ -11,7 +11,7 @@ import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.jsl.execution.Flow;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
@@ -56,7 +56,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     }
 
     @Override
-    public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                            final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020000.flow.before"), context, id);
@@ -66,13 +66,13 @@ public class FlowImpl extends ExecutionImpl implements Flow {
                 callbackId,
                 execution,
                 context,
-                executionRepositoryId,
+                repositoryId,
                 null
         )));
     }
 
     @Override
-    public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                              final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                              final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020001.flow.after"), context, id);
@@ -85,7 +85,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
         if (transition != null && transition.isTerminating()) {
             return configuration.getTransport().callback(parentId, context);
         } else {
-            return this.next(job, configuration, workerId, context, parentId, executionRepositoryId, this.next, transition);
+            return this.next(job, configuration, workerId, context, parentId, repositoryId, this.next, transition);
         }
     }
 

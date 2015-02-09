@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
+import io.machinecode.chainlink.spi.repository.Repository;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -14,16 +14,16 @@ import java.util.Arrays;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class InvokeExecutionRepositoryCommand<T> implements Command<T> {
+public class InvokeRepositoryCommand<T> implements Command<T> {
     private static final long serialVersionUID = 1L;
 
-    final ExecutionRepositoryId executionRepositoryId;
+    final RepositoryId repositoryId;
     final String methodName;
     final Serializable[] parameters;
 
-    public InvokeExecutionRepositoryCommand(final ExecutionRepositoryId executionRepositoryId, final String name,
+    public InvokeRepositoryCommand(final RepositoryId repositoryId, final String name,
                                             final Serializable[] params) {
-        this.executionRepositoryId = executionRepositoryId;
+        this.repositoryId = repositoryId;
         this.methodName = name;
         this.parameters = params;
     }
@@ -32,10 +32,10 @@ public class InvokeExecutionRepositoryCommand<T> implements Command<T> {
     @SuppressWarnings("unchecked")
     public T perform(final Configuration configuration, final Object origin) throws Throwable {
         //TODO Ensure local
-        final ExecutionRepository repository = configuration.getRegistry().getExecutionRepository(executionRepositoryId);
-        LocalRegistry.assertExecutionRepository(repository, executionRepositoryId);
+        final Repository repository = configuration.getRegistry().getRepository(repositoryId);
+        LocalRegistry.assertRepository(repository, repositoryId);
         Method method = null;
-        for (final Method that : ExecutionRepository.class.getDeclaredMethods()) {
+        for (final Method that : Repository.class.getDeclaredMethods()) {
             if (that.getName().equals(methodName) && that.getParameterTypes().length == parameters.length) {
                 method = that;
                 break;
@@ -57,8 +57,8 @@ public class InvokeExecutionRepositoryCommand<T> implements Command<T> {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("InvokeExecutionRepositoryCommand{");
-        sb.append("executionRepositoryId=").append(executionRepositoryId);
+        final StringBuilder sb = new StringBuilder("InvokeRepositoryCommand{");
+        sb.append("repositoryId=").append(repositoryId);
         sb.append(", methodName='").append(methodName).append('\'');
         sb.append(", parameters=").append(Arrays.toString(parameters));
         sb.append('}');

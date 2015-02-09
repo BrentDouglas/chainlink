@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.spi.jsl.inherit.execution;
 
-import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
 import io.machinecode.chainlink.spi.jsl.execution.Execution;
+import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

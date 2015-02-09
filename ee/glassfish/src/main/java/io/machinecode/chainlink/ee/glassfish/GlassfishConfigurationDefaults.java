@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
 import io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory;
 import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
-import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
+import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.core.transaction.JndiTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
@@ -30,7 +30,7 @@ public class GlassfishConfigurationDefaults implements JobOperatorConfiguration 
     public void configureJobOperator(final JobOperatorModel model) throws Exception {
         model.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(loader));
         model.getTransactionManager().setDefaultFactory(new JndiTransactionManagerFactory("java:appserver/TransactionManager"));
-        model.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
+        model.getRepository().setDefaultFactory(new MemoryRepositoryFactory());
         model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
         model.getMBeanServer().setDefaultFactory(new PlatformMBeanServerFactory());
         model.getTransport().setDefaultFactory(new LocalTransportFactory());

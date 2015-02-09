@@ -9,12 +9,12 @@ import io.machinecode.chainlink.core.repository.JobInstanceImpl;
 import io.machinecode.chainlink.core.repository.MetricImpl;
 import io.machinecode.chainlink.core.repository.PartitionExecutionImpl;
 import io.machinecode.chainlink.core.repository.StepExecutionImpl;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.repository.Repository;
 
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -51,33 +51,33 @@ import java.util.Set;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class JdbcExecutionRepository implements ExecutionRepository {
+public class JdbcRepository implements Repository {
 
     private final DataSource dataSource;
     private final String username;
     private final String password;
 
-    public JdbcExecutionRepository(final DataSource dataSource, final String username, final String password) {
+    public JdbcRepository(final DataSource dataSource, final String username, final String password) {
         this.dataSource = dataSource;
         this.username = username;
         this.password = password;
     }
 
-    public static JdbcExecutionRepository create(final DataSourceLookup lookup, final String username, final String password) throws SQLException {
+    public static JdbcRepository create(final DataSourceLookup lookup, final String username, final String password) throws SQLException {
         final DataSource dataSource = lookup.getDataSource();
         try (final Connection connection = username == null || password == null
                     ? dataSource.getConnection()
                     : dataSource.getConnection(username, password)) {
             final String url = connection.getMetaData().getURL();
             if (url.startsWith("jdbc:postgresql")) {
-                return new PostgresJdbcExecutionRepository(dataSource, username, password);
+                return new PostgresJdbcRepository(dataSource, username, password);
             } else {
-                return new JdbcExecutionRepository(dataSource, username, password);
+                return new JdbcRepository(dataSource, username, password);
             }
         }
     }
 
-    public static JdbcExecutionRepository create(final DataSourceLookup lookup) throws SQLException {
+    public static JdbcRepository create(final DataSourceLookup lookup) throws SQLException {
         return create(lookup, null, null);
     }
 
@@ -404,7 +404,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setTimestamp(2, new Timestamp(timestamp.getTime()));
                 statement.setLong(3, jobExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                 }
             }
         } finally {
@@ -428,7 +428,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setTimestamp(5, ts);
                 statement.setLong(6, jobExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                 }
             }
         } finally {
@@ -517,7 +517,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setTimestamp(2, ts);
                 statement.setLong(3, stepExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
                 }
             }
             for (final Metric metric : metrics) {
@@ -600,7 +600,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setTimestamp(4, ts);
                 statement.setLong(5, stepExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
                 }
             }
             for (final Metric metric : metrics) {
@@ -638,7 +638,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setTimestamp(3, ts);
                 statement.setLong(4, partitionExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.repository.no.such.partition.execution", partitionExecutionId));
                 }
             }
         } finally {
@@ -665,7 +665,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setTimestamp(4, ts);
                 statement.setLong(5, partitionExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.repository.no.such.partition.execution", partitionExecutionId));
                 }
             }
             for (final Metric metric : metrics) {
@@ -707,7 +707,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setTimestamp(5, ts);
                 statement.setLong(6, partitionExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.repository.no.such.partition.execution", partitionExecutionId));
                 }
             }
             for (final Metric metric : metrics) {
@@ -770,7 +770,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 }
             }
             if (count == 0) {
-                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
             }
             return count;
         } finally {
@@ -792,13 +792,13 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                     boolean found = false;
                     for (int i = 0; i < start; ++i) {
                         if (!result.next()) {
-                            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
                         }
                         found = true;
                     }
                     if (!result.next()) {
                         if (!found) {
-                            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
                         }
                         return Collections.emptyList();
                     }
@@ -832,7 +832,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                     }
                 }
                 if (ids.isEmpty()) {
-                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
                 }
             }
             return ids;
@@ -858,7 +858,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                             ps.setLong(1, jobExecutionId);
                             try (final ResultSet rs = ps.executeQuery()) {
                                 if (!rs.next()) {
-                                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                                 }
                             }
                         }
@@ -894,7 +894,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setLong(1, jobInstanceId);
                 try (final ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
-                        throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
+                        throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
                     }
                     return  _ji(result);
                 }
@@ -915,7 +915,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setLong(1, jobExecutionId);
                 try (final ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
-                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                     }
                     return  _ji(result);
                 }
@@ -936,7 +936,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setLong(1, jobInstanceId);
                 try (final ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
-                        throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
+                        throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
                     }
                     final List<JobExecutionImpl> ret = new ArrayList<>();
                     do {
@@ -961,7 +961,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 statement.setLong(1, jobExecutionId);
                 try (final ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
-                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                     }
                     return  _je(connection, result);
                 }
@@ -984,7 +984,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 is.setLong(1, jobExecutionId);
                 try (final ResultSet ir = is.executeQuery()) {
                     if (!ir.next()) {
-                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                     }
                     jobInstance = _ji(ir);
                 }
@@ -993,7 +993,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             try (final PreparedStatement ls = connection.prepareStatement(queryLatestJobExecution())) {
                 try (final ResultSet lr = ls.executeQuery()) {
                     if (!lr.next()) {
-                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                     }
                     latest = _je(connection, lr);
                 }
@@ -1006,9 +1006,9 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 case FAILED:
                     break;
                 case COMPLETED:
-                    throw new JobExecutionAlreadyCompleteException(Messages.format("CHAINLINK-006006.execution.repository.execution.already.complete", jobExecutionId));
+                    throw new JobExecutionAlreadyCompleteException(Messages.format("CHAINLINK-006006.repository.execution.already.complete", jobExecutionId));
                 default:
-                    throw new JobRestartException(Messages.format("CHAINLINK-006007.execution.repository.execution.not.eligible.for.restart", latest.getExecutionId(), BatchStatus.STOPPED, BatchStatus.FAILED, latest.getBatchStatus()));
+                    throw new JobRestartException(Messages.format("CHAINLINK-006007.repository.execution.not.eligible.for.restart", latest.getExecutionId(), BatchStatus.STOPPED, BatchStatus.FAILED, latest.getBatchStatus()));
             }
             return _createJobExecution(connection, jobInstance.getInstanceId(), jobInstance.getJobName(), parameters, new Date());
         } catch (final Exception e) {
@@ -1039,7 +1039,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                             try (final ResultSet rs = ps.executeQuery()) {
                                 if (!rs.next()) {
                                     connection.commit();
-                                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                                 }
                             }
                             connection.commit();
@@ -1091,7 +1091,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setLong(1, stepExecutionId);
             try (final ResultSet result = statement.executeQuery()) {
                 if(!result.next()) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
                 }
                 return _se(connection, result);
             }
@@ -1113,7 +1113,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 try (final ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         connection.commit();
-                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.repository.no.step.named", jobExecutionId, stepName));
                     }
                     final StepExecutionImpl stepExecution = _se(connection, result);
                     connection.commit();
@@ -1145,7 +1145,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
                 try (final ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         connection.commit();
-                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+                        throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.repository.no.step.named", jobExecutionId, stepName));
                     }
                     final StepExecutionImpl stepExecution = _se(connection, result);
                     connection.commit();
@@ -1270,7 +1270,7 @@ public class JdbcExecutionRepository implements ExecutionRepository {
             statement.setLong(1, partitionExecutionId);
             try (final ResultSet result = statement.executeQuery()) {
                 if(!result.next()) {
-                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.repository.no.such.partition.execution", partitionExecutionId));
                 }
                 return _pe(connection, result);
             }

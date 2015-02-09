@@ -7,8 +7,8 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.core.transport.cmd.Command;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.Promise;
@@ -80,13 +80,13 @@ public class TestCoherenceTransport implements Transport {
     }
 
     @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws Exception {
+    public Repository getRepository(final RepositoryId id) throws Exception {
 
         final Thread ct = Thread.currentThread();
         final ClassLoader tccl = ct.getContextClassLoader();
         ct.setContextClassLoader(loader);
         try {
-            return delegate.getExecutionRepository(id);
+            return delegate.getRepository(id);
         } finally {
             ct.setContextClassLoader(tccl);
         }

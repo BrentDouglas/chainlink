@@ -8,8 +8,8 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
@@ -26,8 +26,8 @@ public class ExecutionExecutable extends ExecutableImpl<ExecutionImpl> {
 
     private final JobImpl job;
 
-    public ExecutionExecutable(final JobImpl job, final ExecutableId parentId, final ExecutionImpl work, final ExecutionContext context, final ExecutionRepositoryId executionRepositoryId, final WorkerId workerId) {
-        super(parentId, context, work, executionRepositoryId, workerId);
+    public ExecutionExecutable(final JobImpl job, final ExecutableId parentId, final ExecutionImpl work, final ExecutionContext context, final RepositoryId repositoryId, final WorkerId workerId) {
+        super(parentId, context, work, repositoryId, workerId);
         this.job = job;
     }
 
@@ -44,7 +44,7 @@ public class ExecutionExecutable extends ExecutableImpl<ExecutionImpl> {
             } else {
                 final ExecutableId callbackId = new UUIDId(configuration.getTransport());
                 registry.registerExecutable(context.getJobExecutionId(), new ExecutionCallback(job, callbackId, parentId, this, workerId));
-                next = work.before(job, configuration, this.executionRepositoryId, workerId, callbackId, parentId, this.context);
+                next = work.before(job, configuration, this.repositoryId, workerId, callbackId, parentId, this.context);
             }
             next.onResolve(new LinkAndResolveChain(chain))
                     .onReject(chain)

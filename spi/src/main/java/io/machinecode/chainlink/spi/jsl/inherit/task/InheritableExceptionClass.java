@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.spi.jsl.inherit.task;
 
 import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
-import io.machinecode.chainlink.spi.jsl.task.ExceptionClass;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
+import io.machinecode.chainlink.spi.jsl.task.ExceptionClass;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

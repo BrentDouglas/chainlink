@@ -23,7 +23,7 @@
         <wildfly.opts>-server</wildfly.opts> <!-- Need to have something here for arquillian to handle it properly -->
         <glassfish.opts> </glassfish.opts>
 
-        <execution.repository.factory.class>io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory</execution.repository.factory.class>
+        <repository.factory.class>io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory</repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.JndiEventedExecutorFactory</executor.factory.class>
         <registry.factory.class>io.machinecode.chainlink.core.registry.LocalRegistryFactory</registry.factory.class>
         <transport.factory.class>io.machinecode.chainlink.core.transport.LocalTransportFactory</transport.factory.class>
@@ -346,7 +346,7 @@
             </properties>
         </profile>
 
-        <!-- ExecutionRepository -->
+        <!-- Repository -->
         <profile>
             <id>re-coherence</id>
             <activation>
@@ -354,7 +354,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.repository.coherence.CoherenceExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.repository.coherence.CoherenceRepositoryFactory</repository.factory.class>
             </properties>
             <modules>
                 <module>coherence</module>
@@ -379,7 +379,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.EhCacheExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.EhCacheRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -389,7 +389,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.GridGainExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.GridGainRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -399,7 +399,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.HazelcastExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.HazelcastRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -409,7 +409,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.InfinispanExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.InfinispanRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -419,7 +419,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.JdbcExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.JdbcRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -429,7 +429,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.JpaExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.JpaRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -439,7 +439,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.MongoExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.MongoRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
         <profile>
@@ -449,7 +449,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <execution.repository.factory.class>io.machinecode.chainlink.tck.core.repository.RedisExecutionRepositoryFactory</execution.repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.RedisRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
 
@@ -770,12 +770,12 @@
                                             <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
                                         </filterset>
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory"
+                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory"
+                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory"
                                           filtering="true"
                                           overwrite="true">
                                         <filterset>
-                                            <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
+                                            <filter token="repository.factory.class" value="${repository.factory.class}" />
                                         </filterset>
                                     </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory"
@@ -856,7 +856,7 @@
                                           overwrite="true">
                                         <filterset>
                                             <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
-                                            <filter token="execution.repository.factory.class" value="${execution.repository.factory.class}" />
+                                            <filter token="repository.factory.class" value="${repository.factory.class}" />
                                             <filter token="executor.factory.class" value="${executor.factory.class}" />
                                             <filter token="transport.factory.class" value="${transport.factory.class}" />
                                             <filter token="registry.factory.class" value="${registry.factory.class}" />

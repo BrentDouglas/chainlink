@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.core.expression.PropertyContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.TaskWork;
-import io.machinecode.chainlink.core.util.Repository;
+import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.core.work.TaskExecutable;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
@@ -16,9 +16,9 @@ import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.jsl.partition.Partition;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
+import io.machinecode.chainlink.spi.repository.Repository;
 import org.jboss.logging.Logger;
 
 import javax.batch.api.partition.PartitionPlan;
@@ -78,7 +78,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
         return strategy.getPartitionPlan(configuration, context);
     }
 
-    public PartitionTarget map(final Configuration configuration, final ExecutionRepositoryId executionRepositoryId, final TaskWork task, final ExecutableId callbackId, final ExecutionContext context, final int timeout, final Long restartStepExecutionId) throws Exception {
+    public PartitionTarget map(final Configuration configuration, final RepositoryId repositoryId, final TaskWork task, final ExecutableId callbackId, final ExecutionContext context, final int timeout, final Long restartStepExecutionId) throws Exception {
         final PartitionPlan plan = loadPartitionPlan(configuration, context);
         final boolean restarting = restartStepExecutionId != null;
         final boolean override = plan.getPartitionsOverride();
@@ -91,7 +91,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
             this.reducer.beginPartitionedStep(configuration, context);
         }
         final MutableStepContext stepContext = context.getStepContext();
-        final ExecutionRepository repository = Repository.getExecutionRepository(configuration, executionRepositoryId);
+        final Repository repository = Repo.getRepository(configuration, repositoryId);
         final Properties[] properties = plan.getPartitionProperties();
         final Executable[] executables;
         final long stepExecutionId = context.getStepExecutionId();
@@ -129,7 +129,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
                         callbackId,
                         task.partition(new PropertyContextImpl(props)),
                         partitionContext,
-                        executionRepositoryId,
+                        repositoryId,
                         timeout
                 );
             }
@@ -163,7 +163,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
                         callbackId,
                         task.partition(new PropertyContextImpl(partitionProperties)),
                         partitionContext,
-                        executionRepositoryId,
+                        repositoryId,
                         timeout
                 );
             }

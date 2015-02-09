@@ -17,9 +17,9 @@ import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.Deferred;
@@ -140,12 +140,12 @@ public abstract class BaseTransport<A> implements Transport {
     }
 
     @Override
-    public ExecutionRepository getExecutionRepository(final ExecutionRepositoryId id) throws Exception {
-        final ExecutionRepository ours = configuration.getRegistry().getExecutionRepository(id);
+    public Repository getRepository(final RepositoryId id) throws Exception {
+        final Repository ours = configuration.getRegistry().getRepository(id);
         if (ours != null) {
             return ours;
         }
-        return new DistributedProxyExecutionRepository(this, id);
+        return new DistributedProxyRepository(this, id);
     }
 
     private Promise<RemoteExecution,Throwable,Object> fetchWorker(final long jobExecutionId, final ExecutableId executableId) throws Exception {

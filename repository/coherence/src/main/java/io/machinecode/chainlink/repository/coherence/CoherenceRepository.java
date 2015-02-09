@@ -3,7 +3,7 @@ package io.machinecode.chainlink.repository.coherence;
 import com.tangosol.net.CacheFactory;
 import com.tangosol.net.NamedCache;
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.core.repository.BaseMapExecutionRepository;
+import io.machinecode.chainlink.core.repository.BaseMapRepository;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -23,19 +23,19 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
+public class CoherenceRepository extends BaseMapRepository {
 
-    protected static final String IDS = CoherenceExecutonRepository.class.getCanonicalName() + ".ids";
-    protected static final String JOB_INSTANCES = CoherenceExecutonRepository.class.getCanonicalName() + ".jobInstances";
-    protected static final String JOB_EXECUTIONS = CoherenceExecutonRepository.class.getCanonicalName() + ".jobExecutions";
-    protected static final String STEP_EXECUTIONS = CoherenceExecutonRepository.class.getCanonicalName() + ".stepExecutions";
-    protected static final String PARTITION_EXECUTIONS = CoherenceExecutonRepository.class.getCanonicalName() + ".partitionExecutions";
-    protected static final String JOB_INSTANCE_EXECUTIONS = CoherenceExecutonRepository.class.getCanonicalName() + ".jobInstanceExecutions";
-    protected static final String JOB_EXECUTION_INSTANCES = CoherenceExecutonRepository.class.getCanonicalName() + ".jobExecutionInstances";
-    protected static final String JOB_EXECUTION_STEP_EXECUTIONS = CoherenceExecutonRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
-    protected static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = CoherenceExecutonRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
-    protected static final String STEP_EXECUTION_PARTITION_EXECUTIONS = CoherenceExecutonRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
-    protected static final String JOB_EXECUTION_HISTORY = CoherenceExecutonRepository.class.getCanonicalName() + ".jobExecutionHistory";
+    protected static final String IDS = CoherenceRepository.class.getCanonicalName() + ".ids";
+    protected static final String JOB_INSTANCES = CoherenceRepository.class.getCanonicalName() + ".jobInstances";
+    protected static final String JOB_EXECUTIONS = CoherenceRepository.class.getCanonicalName() + ".jobExecutions";
+    protected static final String STEP_EXECUTIONS = CoherenceRepository.class.getCanonicalName() + ".stepExecutions";
+    protected static final String PARTITION_EXECUTIONS = CoherenceRepository.class.getCanonicalName() + ".partitionExecutions";
+    protected static final String JOB_INSTANCE_EXECUTIONS = CoherenceRepository.class.getCanonicalName() + ".jobInstanceExecutions";
+    protected static final String JOB_EXECUTION_INSTANCES = CoherenceRepository.class.getCanonicalName() + ".jobExecutionInstances";
+    protected static final String JOB_EXECUTION_STEP_EXECUTIONS = CoherenceRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
+    protected static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = CoherenceRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
+    protected static final String STEP_EXECUTION_PARTITION_EXECUTIONS = CoherenceRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
+    protected static final String JOB_EXECUTION_HISTORY = CoherenceRepository.class.getCanonicalName() + ".jobExecutionHistory";
 
     protected final NamedCache ids;
     protected final NamedCache jobInstances;
@@ -49,7 +49,7 @@ public class CoherenceExecutonRepository extends BaseMapExecutionRepository {
     protected final NamedCache stepExecutionPartitionExecutions;
     protected final NamedCache jobExecutionHistory;
 
-    public CoherenceExecutonRepository(final Marshalling provider) {
+    public CoherenceRepository(final Marshalling provider) {
         super(provider);
 
         CacheFactory.ensureCluster();

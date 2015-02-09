@@ -54,7 +54,7 @@ public final class GlassfishXml {
         model.setMarshalling(xmlDec(op.getMarshalling()));
         model.setRegistry(xmlDec(op.getRegistry()));
         model.setMBeanServer(xmlDec(op.getMBeanServer()));
-        model.setExecutionRepository(xmlDec(op.getExecutionRepository()));
+        model.setRepository(xmlDec(op.getRepository()));
         model.setClassLoader(xmlDec(op.getClassLoader()));
         model.setTransactionManager(xmlDec(op.getTransactionManager()));
         for (final GlassfishDeclaration resource : op.getJobLoaders()) {

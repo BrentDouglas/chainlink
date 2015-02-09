@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.repository;
 
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.Repository;
 
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobExecutionException;
@@ -17,9 +17,9 @@ import java.util.Properties;
 public class DelegateJobExecution implements ExtendedJobExecution {
     private final long executionId;
     private final String jobName;
-    private final ExecutionRepository repository;
+    private final Repository repository;
 
-    public DelegateJobExecution(final JobExecution execution, final ExecutionRepository repository) {
+    public DelegateJobExecution(final JobExecution execution, final Repository repository) {
         this.executionId = execution.getExecutionId();
         this.jobName = execution.getJobName();
         this.repository = repository;

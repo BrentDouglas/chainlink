@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.jsl.xml.execution.XmlFlow;
 import io.machinecode.chainlink.core.jsl.xml.execution.XmlSplit;
 import io.machinecode.chainlink.core.jsl.xml.execution.XmlStep;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -116,7 +116,7 @@ public class XmlJob extends XmlInheritable<XmlJob> implements InheritableJob<Xml
     }
 
     @Override
-    public XmlJob inherit(final JobRepository repository, final String defaultJobXml) {
+    public XmlJob inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return JobTool.inherit(XmlJob.class, this, repository, defaultJobXml);
         //final XmlJob copy = this.copy();
         //if (copy.parent != null) {

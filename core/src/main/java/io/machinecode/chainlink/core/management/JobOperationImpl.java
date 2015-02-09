@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.management.JobOperation;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
@@ -23,9 +23,9 @@ public class JobOperationImpl implements JobOperation {
 
     private final long jobExecutionId;
     private final Promise<?,?,?> promise;
-    private final ExecutionRepository repository;
+    private final Repository repository;
 
-    public JobOperationImpl(final long jobExecutionId, final Promise<?,?,?> promise, final ExecutionRepository repository) {
+    public JobOperationImpl(final long jobExecutionId, final Promise<?,?,?> promise, final Repository repository) {
         this.jobExecutionId = jobExecutionId;
         this.promise = promise;
         this.repository = repository;

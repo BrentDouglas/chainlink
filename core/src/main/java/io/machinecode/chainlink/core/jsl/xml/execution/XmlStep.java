@@ -13,7 +13,7 @@ import io.machinecode.chainlink.core.jsl.xml.transition.XmlNext;
 import io.machinecode.chainlink.core.jsl.xml.transition.XmlStop;
 import io.machinecode.chainlink.core.jsl.xml.transition.XmlTransition;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -172,7 +172,7 @@ public class XmlStep
     }
 
     @Override
-    public XmlStep inherit(final JobRepository repository, final String defaultJobXml) {
+    public XmlStep inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return StepTool.inherit(XmlStep.class, this, repository, defaultJobXml);
     }
 

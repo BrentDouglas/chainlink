@@ -17,7 +17,7 @@ import java.util.Set;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface ExecutionRepository {
+public interface Repository {
 
     /**
      * This method must generate a {@code long} to be used as an identifier of the {@link ExtendedJobInstance} returned
@@ -146,7 +146,7 @@ public interface ExecutionRepository {
      *     to either {@param timestamp} or the time on the repository server when this method executes.
      *
      * Other methods of {@link JobExecution} and {@link ExtendedJobExecution} not listed will return values as defined
-     * in the javadoc for {@link #createJobExecution(ExtendedJobInstance, Properties, Date)}.
+     * in the javadoc for {@link #createJobExecution(long, String, java.util.Properties, java.util.Date)}.
      *
      * @param jobExecutionId The id of the {@link ExtendedJobExecution} that will be updated.
      * @param timestamp The current time on the JVM calling this method.
@@ -243,7 +243,7 @@ public interface ExecutionRepository {
      *     equal to either {@param timestamp} or the time on the repository server when this method executes.
      *
      * Other methods of {@link StepExecution} and {@link ExtendedStepExecution} not listed will return values as defined
-     * in the javadoc for {@link #createStepExecution(ExtendedJobExecution, String, Date)}.
+     * in the javadoc for {@link #createStepExecution(long, String, java.util.Date)}.
      *
      * @param stepExecutionId The id of the {@link ExtendedStepExecution} that will be updated.
      * @param timestamp The current time on the JVM calling this method.
@@ -578,7 +578,7 @@ public interface ExecutionRepository {
 
     /**
      * @param jobExecutionId The {@link javax.batch.runtime.JobExecution#getExecutionId()} to search.
-     * @return Every {@link StepExecution} that has been registered to this repository by calling {@link #createStepExecution(ExtendedJobExecution, String, java.util.Date)}
+     * @return Every {@link StepExecution} that has been registered to this repository by calling {@link #createStepExecution(long, String, java.util.Date)}
      * where {@param jobExecutionId} matches the result of calling {@link javax.batch.runtime.JobExecution#getExecutionId()}
      * on the first parameter. This list may be empty if a {@link JobExecution} stored in this repository matches but no
      * {@link StepExecution}'s have been. MUST not return null.

@@ -8,7 +8,6 @@ import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.PropertyModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.Factory;
 import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
@@ -16,6 +15,7 @@ import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
 import io.machinecode.chainlink.spi.configuration.factory.RegistryFactory;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.configuration.factory.SecurityFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
@@ -25,7 +25,7 @@ import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.security.Security;
 import io.machinecode.chainlink.spi.transport.Transport;
 
@@ -47,7 +47,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     public static final String MARSHALLING = "marshalling";
     public static final String TRANSPORT = "transport";
     public static final String REGISTRY = "registry";
-    public static final String EXECUTION_REPOSITORY = "execution-repository";
+    public static final String EXECUTION_REPOSITORY = "repository";
     public static final String TRANSACTION_MANAGER = "transaction-manager";
     public static final String EXECUTOR = "executor";
     public static final String MBEAN_SERVER = "mbean-server";
@@ -59,7 +59,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     DeclarationImpl<Marshalling> marshalling;
     DeclarationImpl<Registry> registry;
     DeclarationImpl<Transport> transport;
-    DeclarationImpl<ExecutionRepository> executionRepository;
+    DeclarationImpl<Repository> repository;
     DeclarationImpl<TransactionManager> transactionManager;
     DeclarationImpl<Executor> executor;
     DeclarationImpl<MBeanServer> mBeanServer;
@@ -85,7 +85,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         this.marshalling = _copyDec(that.marshalling);
         this.registry = _copyDec(that.registry);
         this.transport = _copyDec(that.transport);
-        this.executionRepository = _copyDec(that.executionRepository);
+        this.repository = _copyDec(that.repository);
         this.transactionManager = _copyDec(that.transactionManager);
         this.executor = _copyDec(that.executor);
         this.mBeanServer = _copyDec(that.mBeanServer);
@@ -161,11 +161,11 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     }
 
     @Override
-    public DeclarationImpl<ExecutionRepository> getExecutionRepository() {
-        if (executionRepository == null) {
-            return executionRepository = new DeclarationImpl<>(loader, names, values, ExecutionRepository.class, ExecutionRepositoryFactory.class, EXECUTION_REPOSITORY);
+    public DeclarationImpl<Repository> getRepository() {
+        if (repository == null) {
+            return repository = new DeclarationImpl<>(loader, names, values, Repository.class, RepositoryFactory.class, EXECUTION_REPOSITORY);
         }
-        return executionRepository;
+        return repository;
     }
 
     @Override

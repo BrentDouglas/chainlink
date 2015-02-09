@@ -2,13 +2,13 @@ package io.machinecode.chainlink.repository.mongo;
 
 import com.mongodb.DBObject;
 import gnu.trove.set.hash.THashSet;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
-import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.repository.Repository;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.jongo.MongoCursor;
@@ -43,7 +43,7 @@ import static javax.batch.runtime.BatchStatus.STOPPING;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class MongoExecutionRepository implements ExecutionRepository {
+public class MongoRepository implements Repository {
 
     protected static final String IDS = "ids";
     protected static final String JOB_INSTANCE_ID = "job_instance_id";
@@ -67,7 +67,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
     protected final Marshalling marshalling;
     //protected final boolean camel;
 
-    public MongoExecutionRepository(final Jongo jongo, final Marshalling marshalling, final boolean camel) {
+    public MongoRepository(final Jongo jongo, final Marshalling marshalling, final boolean camel) {
         this.jongo = jongo;
         this.marshalling = marshalling;
         //this.camel = camel;
@@ -167,7 +167,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.JOB_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoJobExecution> cursor = jobExecutions.find(query, jobExecutionId).as(MongoJobExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             final MongoJobExecution execution = cursor.next();
             jobExecutions.update(query, jobExecutionId).with(MongoJobExecution.from(execution)
@@ -185,7 +185,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.JOB_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoJobExecution> cursor = jobExecutions.find(query, jobExecutionId).as(MongoJobExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             final MongoJobExecution execution = cursor.next();
             jobExecutions.update(query, jobExecutionId).with(MongoJobExecution.from(execution)
@@ -202,7 +202,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.JOB_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoJobExecution> cursor = jobExecutions.find(query, jobExecutionId).as(MongoJobExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             final MongoJobExecution execution = cursor.next();
             jobExecutions.update(query, jobExecutionId).with(MongoJobExecution.from(execution)
@@ -234,7 +234,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.STEP_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoStepExecution> cursor = stepExecutions.find(query, stepExecutionId).as(MongoStepExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
             }
             final MongoStepExecution execution = cursor.next();
             stepExecutions.update(query, stepExecutionId).with(MongoStepExecution.from(execution)
@@ -253,7 +253,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.STEP_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoStepExecution> cursor = stepExecutions.find(query, stepExecutionId).as(MongoStepExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
             }
             final MongoStepExecution execution = cursor.next();
             stepExecutions.update(query, stepExecutionId).with(MongoStepExecution.from(execution)
@@ -274,7 +274,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.STEP_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoStepExecution> cursor = stepExecutions.find(query, stepExecutionId).as(MongoStepExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
             }
             final MongoStepExecution execution = cursor.next();
             stepExecutions.update(query, stepExecutionId).with(MongoStepExecution.from(execution)
@@ -294,7 +294,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.STEP_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoStepExecution> cursor = stepExecutions.find(query, stepExecutionId).as(MongoStepExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
             }
             final MongoStepExecution execution = cursor.next();
             stepExecutions.update(query, stepExecutionId).with(MongoStepExecution.from(execution)
@@ -314,7 +314,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.PARTITION_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoPartitionExecution> cursor = partitionExecutions.find(query, partitionExecutionId).as(MongoPartitionExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.repository.no.such.partition.execution", partitionExecutionId));
             }
             final MongoPartitionExecution partition = cursor.next();
             partitionExecutions.update(query, partitionExecutionId).with(MongoPartitionExecution.from(partition)
@@ -335,7 +335,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.PARTITION_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoPartitionExecution> cursor = partitionExecutions.find(query, partitionExecutionId).as(MongoPartitionExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.repository.no.such.partition.execution", partitionExecutionId));
             }
             final MongoPartitionExecution partition = cursor.next();
             partitionExecutions.update(query, partitionExecutionId).with(MongoPartitionExecution.from(partition)
@@ -356,7 +356,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final String query = "{" + Fields.PARTITION_EXECUTION_ID + ":#}";
         try (final MongoCursor<MongoPartitionExecution> cursor = partitionExecutions.find(query, partitionExecutionId).as(MongoPartitionExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.repository.no.such.partition.execution", partitionExecutionId));
             }
             final MongoPartitionExecution partition = cursor.next();
             partitionExecutions.update(query, partitionExecutionId).with(MongoPartitionExecution.from(partition)
@@ -390,7 +390,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         final MongoCollection jobInstances = jongo.getCollection(JOB_INSTANCES);
         final int ret = (int)jobInstances.count("{" + Fields.JOB_NAME + ":#}", jobName);
         if (ret == 0) {
-            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
         }
         return ret;
     }
@@ -405,7 +405,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 .as(MongoJobInstance.class)) {
             if (!cursor.hasNext()) {
                 if (jobInstances.count(query, jobName) == 0) {
-                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
                 }
                 return Collections.emptyList();
             }
@@ -425,7 +425,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 .projection("{" + Fields.JOB_EXECUTION_ID + ":1,_id:0}")
                 .map(new Handler<Long>(Fields.JOB_EXECUTION_ID))) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.execution.repository.no.such.job", jobName));
+                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
             }
             while (cursor.hasNext()) {
                 ret.add(cursor.next());
@@ -440,7 +440,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         try (final MongoCursor<MongoJobExecution> cursor = jobExecutions.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
                 .as(MongoJobExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             return cursor.next().getJobParameters();
         }
@@ -465,8 +465,8 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 .as(MongoJobExecution.class)) {
             if (!cursor.hasNext()) {
                 //TODO Wrong exception maybe
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
-                //throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
+                //throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             final List<MongoJobExecution> ret = new ArrayList<>(cursor.count());
             for (final MongoJobExecution that : cursor) {
@@ -482,7 +482,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         try (final MongoCursor<MongoJobExecution> cursor = jobExecutions.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
                 .as(MongoJobExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             return cursor.next();
         }
@@ -497,7 +497,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 .projection("{" + Fields.LATEST_JOB_EXECUTION_ID + ":1,_id:0}")
                 .map(new Handler<Long>(Fields.LATEST_JOB_EXECUTION_ID))) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
+                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
             }
             if (jobExecutionId != cursor.next()) {
                 throw new JobExecutionNotMostRecentException(Messages.format("CHAINLINK-006004.repository.not.most.recent.execution", jobExecutionId, jobInstanceId));
@@ -509,9 +509,9 @@ public class MongoExecutionRepository implements ExecutionRepository {
             case FAILED:
                 break;
             case COMPLETED:
-                throw new JobExecutionAlreadyCompleteException(Messages.format("CHAINLINK-006006.execution.repository.execution.already.complete", jobExecutionId));
+                throw new JobExecutionAlreadyCompleteException(Messages.format("CHAINLINK-006006.repository.execution.already.complete", jobExecutionId));
             default:
-                throw new JobRestartException(Messages.format("CHAINLINK-006007.execution.repository.execution.not.eligible.for.restart", jobExecution.getExecutionId(), STOPPED, FAILED, jobExecution.getBatchStatus()));
+                throw new JobRestartException(Messages.format("CHAINLINK-006007.repository.execution.not.eligible.for.restart", jobExecution.getExecutionId(), STOPPED, FAILED, jobExecution.getBatchStatus()));
         }
         return createJobExecution(
                 jobInstanceId,
@@ -540,7 +540,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         try (final MongoCursor<MongoStepExecution> cursor = stepExecutions.find("{" + Fields.STEP_EXECUTION_ID + ":#}", stepExecutionId)
                 .as(MongoStepExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
             }
             return cursor.next();
         }
@@ -561,7 +561,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
             }
         }
         if (currentStepExecutionCreateTime == null) {
-            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
         }
         ExtendedStepExecution latest = null;
         for (final ExtendedStepExecution candidate : candidates) {
@@ -582,7 +582,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
             }
         }
         if (latest == null) {
-            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.repository.no.step.named", jobExecutionId, stepName));
         }
         return latest;
     }
@@ -611,7 +611,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
             }
         }
         if (latest == null) {
-            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.execution.repository.no.step.named", jobExecutionId, stepName));
+            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006005.repository.no.step.named", jobExecutionId, stepName));
         }
         return latest;
     }
@@ -622,7 +622,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 .projection("{" + Fields.PREVIOUS_JOB_EXECUTION_IDS + ":1,_id:0}")
                 .map(new Handler<List<Long>>(Fields.PREVIOUS_JOB_EXECUTION_IDS))) {
             if (!c.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             while (c.hasNext()) {
                 jobExecutionIds.addAll(c.next());
@@ -640,7 +640,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         try (final MongoCursor<MongoStepExecution> sec = stepExecutions.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
                 .as(MongoStepExecution.class)) {
             if (!sec.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             while (sec.hasNext()) {
                 ret.add(sec.next());
@@ -720,7 +720,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 .find("{" + Fields.STEP_EXECUTION_ID + ":#," + Fields.BATCH_STATUS + ":{$in:[#,#,#,#,#]}}", stepExecutionId, FAILED, STOPPED, STOPPING, STARTED, STARTING)
                 .as(MongoPartitionExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.execution.repository.no.such.step.execution", stepExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
             }
             final PartitionExecution[] ret = new PartitionExecution[cursor.count()];
             for (int i = 0; i < cursor.count(); ++i) {
@@ -737,7 +737,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 .find("{" + Fields.PARTITION_EXECUTION_ID + ":#}", partitionExecutionId)
                 .as(MongoPartitionExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.execution.repository.no.such.partition.execution", partitionExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006008.repository.no.such.partition.execution", partitionExecutionId));
             }
             return cursor.next();
         }
@@ -748,7 +748,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
                 .projection("{" + Fields.JOB_INSTANCE_ID + ":1,_id:0}")
                 .map(new Handler<Long>(Fields.JOB_INSTANCE_ID))) {
             if (!jec.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             return jec.next();
         }
@@ -758,7 +758,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         try (final MongoCursor<MongoJobExecution> cursor = jobExecutions.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
                 .as(MongoJobExecution.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.execution.repository.no.such.job.execution", jobExecutionId));
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
             return cursor.next();
         }
@@ -768,7 +768,7 @@ public class MongoExecutionRepository implements ExecutionRepository {
         try (final MongoCursor<MongoJobInstance> cursor = jobInstances.find("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstanceId)
                 .as(MongoJobInstance.class)) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.execution.repository.no.such.job.instance", jobInstanceId));
+                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
             }
             return cursor.next();
         }

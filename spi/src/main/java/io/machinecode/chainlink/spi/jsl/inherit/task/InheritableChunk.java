@@ -1,13 +1,13 @@
 package io.machinecode.chainlink.spi.jsl.inherit.task;
 
 import io.machinecode.chainlink.spi.jsl.inherit.Mergeable;
+import io.machinecode.chainlink.spi.jsl.inherit.Rules;
 import io.machinecode.chainlink.spi.jsl.task.CheckpointAlgorithm;
 import io.machinecode.chainlink.spi.jsl.task.Chunk;
 import io.machinecode.chainlink.spi.jsl.task.ExceptionClassFilter;
 import io.machinecode.chainlink.spi.jsl.task.ItemProcessor;
 import io.machinecode.chainlink.spi.jsl.task.ItemReader;
 import io.machinecode.chainlink.spi.jsl.task.ItemWriter;
-import io.machinecode.chainlink.spi.jsl.inherit.Rules;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

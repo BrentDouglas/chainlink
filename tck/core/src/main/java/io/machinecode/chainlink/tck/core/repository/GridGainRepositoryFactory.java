@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.tck.core.repository;
 
-import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
+import io.machinecode.chainlink.repository.gridgain.GridGainRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import org.gridgain.grid.GridConfiguration;
 import org.gridgain.grid.GridException;
 import org.gridgain.grid.GridGain;
@@ -19,7 +19,7 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFactory {
+public class GridGainRepositoryFactory implements RepositoryFactory {
 
     public static final String CHAINLINK_TCK_GRID = "chainlink-tck-grid";
 
@@ -28,17 +28,17 @@ public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFa
         for (int i = 0; i < 11; ++i) {
             caches[i] = new GridCacheConfiguration();
         }
-        setCacheConf(caches[0], GridGainExecutionRepository.IDS);
-        setIndexeddCacheConf(caches[1], GridGainExecutionRepository.JOB_INSTANCES);
-        setIndexeddCacheConf(caches[2], GridGainExecutionRepository.JOB_EXECUTIONS);
-        setCacheConf(caches[3], GridGainExecutionRepository.STEP_EXECUTIONS);
-        setCacheConf(caches[4], GridGainExecutionRepository.PARTITION_EXECUTIONS);
-        setCacheConf(caches[5], GridGainExecutionRepository.JOB_INSTANCE_EXECUTIONS);
-        setCacheConf(caches[6], GridGainExecutionRepository.JOB_EXECUTION_INSTANCES);
-        setCacheConf(caches[7], GridGainExecutionRepository.JOB_EXECUTION_STEP_EXECUTIONS);
-        setCacheConf(caches[8], GridGainExecutionRepository.LATEST_JOB_EXECUTION_FOR_INSTANCE);
-        setCacheConf(caches[9], GridGainExecutionRepository.STEP_EXECUTION_PARTITION_EXECUTIONS);
-        setCacheConf(caches[10], GridGainExecutionRepository.JOB_EXECUTION_HISTORY);
+        setCacheConf(caches[0], GridGainRepository.IDS);
+        setIndexeddCacheConf(caches[1], GridGainRepository.JOB_INSTANCES);
+        setIndexeddCacheConf(caches[2], GridGainRepository.JOB_EXECUTIONS);
+        setCacheConf(caches[3], GridGainRepository.STEP_EXECUTIONS);
+        setCacheConf(caches[4], GridGainRepository.PARTITION_EXECUTIONS);
+        setCacheConf(caches[5], GridGainRepository.JOB_INSTANCE_EXECUTIONS);
+        setCacheConf(caches[6], GridGainRepository.JOB_EXECUTION_INSTANCES);
+        setCacheConf(caches[7], GridGainRepository.JOB_EXECUTION_STEP_EXECUTIONS);
+        setCacheConf(caches[8], GridGainRepository.LATEST_JOB_EXECUTION_FOR_INSTANCE);
+        setCacheConf(caches[9], GridGainRepository.STEP_EXECUTION_PARTITION_EXECUTIONS);
+        setCacheConf(caches[10], GridGainRepository.JOB_EXECUTION_HISTORY);
         final GridConfiguration configuration = new GridConfiguration();
         configuration.setCacheConfiguration(caches);
         configuration.setGridName(CHAINLINK_TCK_GRID);
@@ -69,8 +69,8 @@ public class GridGainExecutionRepositoryFactory implements ExecutionRepositoryFa
     }
 
     @Override
-    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-        return new GridGainExecutionRepository(
+    public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+        return new GridGainRepository(
                 dependencies.getMarshalling(),
                 GridGain.grid(CHAINLINK_TCK_GRID)
         );

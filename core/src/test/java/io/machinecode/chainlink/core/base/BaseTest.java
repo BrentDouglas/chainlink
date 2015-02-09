@@ -11,7 +11,7 @@ import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
-import io.machinecode.chainlink.core.repository.memory.MemoryExecutionRepositoryFactory;
+import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
@@ -21,7 +21,7 @@ import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.Repository;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,7 +39,7 @@ public abstract class BaseTest extends Assert {
 
     public static final Properties PARAMETERS = new Properties();
     protected Executor _executor;
-    protected ExecutionRepository _repository;
+    protected Repository _repository;
     protected ConfigurationImpl _configuration;
     protected TransactionManager _transactionManager;
     protected Marshalling _marshalling;
@@ -61,7 +61,7 @@ public abstract class BaseTest extends Assert {
             final ArtifactLoader loader = new ConfigurationArtifactLoader();
             this._transactionManager = op.getTransactionManager().get(_configuration, op.getRawProperties(), loader);
             this._registry = op.getRegistry().get(_configuration, op.getRawProperties(), loader);
-            this._repository = op.getExecutionRepository().get(_configuration, op.getRawProperties(), loader);
+            this._repository = op.getRepository().get(_configuration, op.getRawProperties(), loader);
             this._marshalling = op.getMarshalling().get(_configuration, op.getRawProperties(), loader);
             this._executor = op.getExecutor().get(_configuration, op.getRawProperties(), loader);
             // Make sure any factories get called
@@ -76,7 +76,7 @@ public abstract class BaseTest extends Assert {
         final JobOperatorModelImpl jobOperator = deployment.getJobOperator(Constants.DEFAULT);
         jobOperator.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(tccl));
         jobOperator.getTransactionManager().setDefaultFactory(new LocalTransactionManagerFactory());
-        jobOperator.getExecutionRepository().setDefaultFactory(new MemoryExecutionRepositoryFactory());
+        jobOperator.getRepository().setDefaultFactory(new MemoryRepositoryFactory());
         jobOperator.getMarshalling().setDefaultFactory(new MarshallingFactory() {
             @Override
             public Marshalling produce(final Dependencies dependencies, final Properties properties) throws Exception {
@@ -94,7 +94,7 @@ public abstract class BaseTest extends Assert {
 
     }
 
-    public ExecutionRepository repository() throws Exception {
+    public Repository repository() throws Exception {
         configuration();
         return _repository;
     }

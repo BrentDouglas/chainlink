@@ -72,8 +72,8 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
     @XmlElement(name = "security", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlDeclaration> securities = new ArrayList<>(0);
 
-    @XmlElement(name = "execution-repository", namespace = XmlChainlink.NAMESPACE, required = true)
-    private XmlDeclaration executionRepository;
+    @XmlElement(name = "repository", namespace = XmlChainlink.NAMESPACE, required = true)
+    private XmlDeclaration repository;
 
     @XmlElement(name = "registry", namespace = XmlChainlink.NAMESPACE, required = true)
     private XmlDeclaration registry;
@@ -188,13 +188,13 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
     }
 
     @Override
-    public XmlDeclaration getExecutionRepository() {
-        return executionRepository;
+    public XmlDeclaration getRepository() {
+        return repository;
     }
 
     @Override
-    public void setExecutionRepository(final XmlDeclaration executionRepository) {
-        this.executionRepository = executionRepository;
+    public void setRepository(final XmlDeclaration repository) {
+        this.repository = repository;
     }
 
     @Override
@@ -256,7 +256,7 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
         this.setTransactionManager(Transmute.item(this.getTransactionManager(), from.getTransactionManager(), creator, ops));
         this.setMarshalling(Transmute.item(this.getMarshalling(), from.getMarshalling(), creator, ops));
         this.setMBeanServer(Transmute.item(this.getMBeanServer(), from.getMBeanServer(), creator, ops));
-        this.setExecutionRepository(Transmute.item(this.getExecutionRepository(), from.getExecutionRepository(), creator, ops));
+        this.setRepository(Transmute.item(this.getRepository(), from.getRepository(), creator, ops));
         this.setRegistry(Transmute.item(this.getRegistry(), from.getRegistry(), creator, ops));
         this.setTransport(Transmute.item(this.getTransport(), from.getTransport(), creator, ops));
         this.setExecutor(Transmute.item(this.getExecutor(), from.getExecutor(), creator, ops));
@@ -297,8 +297,8 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
                     .setName(name(this.mBeanServer, JobOperatorModelImpl.MBEAN_SERVER))
                     .setRef(ref(this.mBeanServer));
         }
-        set(model.getExecutionRepository()
-                .setName(name(this.executionRepository, JobOperatorModelImpl.EXECUTION_REPOSITORY)), ref(this.executionRepository));
+        set(model.getRepository()
+                .setName(name(this.repository, JobOperatorModelImpl.EXECUTION_REPOSITORY)), ref(this.repository));
         set(model.getClassLoader()
                 .setName(name(this.classLoader, JobOperatorModelImpl.CLASS_LOADER)), ref(this.classLoader));
         set(model.getTransactionManager()

@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.test;
 
 import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
-import io.machinecode.chainlink.repository.jpa.JpaExecutionRepository;
+import io.machinecode.chainlink.repository.jpa.JpaRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.jboss.logging.Logger;
 import org.junit.After;
@@ -34,10 +34,10 @@ public class JpaRepositoryTest extends RepositoryTest {
 
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
-        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+        model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return _repository = new JpaExecutionRepository(new EntityManagerLookup() {
+            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new JpaRepository(new EntityManagerLookup() {
                     @Override
                     public EntityManagerFactory getEntityManagerFactory() {
                         return factory;

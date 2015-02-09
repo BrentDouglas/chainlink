@@ -4,7 +4,7 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.Task;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.then.api.Promise;
 
 import java.io.Serializable;
@@ -19,6 +19,6 @@ public interface TaskWork extends Task, Serializable {
 
     void cancel(final Configuration configuration, final ExecutionContext context);
 
-    void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final ExecutionRepositoryId executionRepositoryId,
+    void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final RepositoryId repositoryId,
              final ExecutionContext context, final int timeout) throws Throwable;
 }

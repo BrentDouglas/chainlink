@@ -4,7 +4,7 @@ import io.machinecode.chainlink.core.jsl.fluent.FluentProperties;
 import io.machinecode.chainlink.core.jsl.fluent.FluentPropertyReference;
 import io.machinecode.chainlink.core.jsl.fluent.transition.FluentTransition;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableDecision;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class FluentDecision extends FluentPropertyReference<FluentDecision> impl
     }
 
     @Override
-    public FluentDecision inherit(final JobRepository repository, final String defaultJobXml) {
+    public FluentDecision inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return DecisionTool.inherit(this, repository, defaultJobXml);
     }
 

@@ -218,37 +218,37 @@
                 <local-cache name="default">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.ids">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.ids">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobInstances">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.jobInstances">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobExecutions">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.jobExecutions">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.stepExecutions">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.stepExecutions">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.partitionExecutions">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.partitionExecutions">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobInstanceExecutions">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.jobInstanceExecutions">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobExecutionInstances">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.jobExecutionInstances">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobExecutionStepExecutions">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.jobExecutionStepExecutions">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.latestJobExecutionForInstance">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.latestJobExecutionForInstance">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.stepExecutionPartitionExecutions">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.stepExecutionPartitionExecutions">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
-                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanExecutionRepository.jobExecutionHistory">
+                <local-cache name="io.machinecode.chainlink.repository.infinispan.InfinispanRepository.jobExecutionHistory">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>
             </cache-container>

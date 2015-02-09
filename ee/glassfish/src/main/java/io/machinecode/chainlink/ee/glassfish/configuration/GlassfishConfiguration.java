@@ -78,8 +78,8 @@ public final class GlassfishConfiguration {
                     .setName(name(op.getMBeanServer(), JobOperatorModelImpl.MBEAN_SERVER))
                     .setRef(ref(op.getMBeanServer()));
         }
-        set(model.getExecutionRepository()
-                .setName(name(op.getExecutionRepository(), JobOperatorModelImpl.EXECUTION_REPOSITORY)), ref(op.getExecutionRepository()));
+        set(model.getRepository()
+                .setName(name(op.getRepository(), JobOperatorModelImpl.EXECUTION_REPOSITORY)), ref(op.getRepository()));
         set(model.getClassLoader()
                 .setName(name(op.getClassLoader(), JobOperatorModelImpl.CLASS_LOADER)), ref(op.getClassLoader()));
         set(model.getTransactionManager()

@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.jsl.fluent.execution;
 import io.machinecode.chainlink.core.jsl.fluent.FluentInheritable;
 import io.machinecode.chainlink.core.jsl.fluent.transition.FluentTransition;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableFlow;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,7 @@ public class FluentFlow extends FluentInheritable<FluentFlow> implements FluentE
     }
 
     @Override
-    public FluentFlow inherit(final JobRepository repository, final String defaultJobXml) {
+    public FluentFlow inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return FlowTool.inherit(FluentFlow.class, this, repository, defaultJobXml);
     }
 

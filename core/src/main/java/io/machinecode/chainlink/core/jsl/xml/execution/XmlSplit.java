@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.xml.execution;
 
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableSplit;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -67,7 +67,7 @@ public class XmlSplit implements XmlExecution<XmlSplit>, InheritableSplit<XmlSpl
     }
 
     @Override
-    public XmlSplit inherit(final JobRepository repository, final String defaultJobXml) {
+    public XmlSplit inherit(final InheritableJobLoader repository, final String defaultJobXml) {
         return SplitTool.inherit(this, repository, defaultJobXml);
     }
 

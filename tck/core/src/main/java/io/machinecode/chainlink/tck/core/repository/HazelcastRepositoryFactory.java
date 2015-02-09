@@ -2,10 +2,10 @@ package io.machinecode.chainlink.tck.core.repository;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import io.machinecode.chainlink.repository.hazelcast.HazelcastExecutonRepository;
+import io.machinecode.chainlink.repository.hazelcast.HazelcastRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 
 import java.util.Properties;
 
@@ -13,9 +13,9 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class HazelcastExecutionRepositoryFactory implements ExecutionRepositoryFactory {
+public class HazelcastRepositoryFactory implements RepositoryFactory {
     @Override
-    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
         final HazelcastInstance hazelcast = Hazelcast.newHazelcastInstance();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -23,7 +23,7 @@ public class HazelcastExecutionRepositoryFactory implements ExecutionRepositoryF
                 hazelcast.shutdown();
             }
         });
-        return new HazelcastExecutonRepository(
+        return new HazelcastRepository(
                 dependencies.getMarshalling(),
                 hazelcast
         );

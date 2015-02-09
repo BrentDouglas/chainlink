@@ -14,7 +14,7 @@ import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.security.Security;
 import io.machinecode.chainlink.spi.transport.Transport;
 
@@ -39,7 +39,7 @@ public class ConfigurationImpl implements Configuration {
     protected final Injector injector;
     protected final Security security;
     protected final InjectionContext injectionContext;
-    protected final ExecutionRepository executionRepository;
+    protected final Repository repository;
     protected final Transport transport;
     protected final Registry registry;
     protected final Executor executor;
@@ -58,7 +58,7 @@ public class ConfigurationImpl implements Configuration {
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader, this.injector);
         this.registry = nn(model.registry, loader);
         this.transport = nn(model.transport, loader);
-        this.executionRepository = nn(model.executionRepository, loader);
+        this.repository = nn(model.repository, loader);
         this.executor = nn(model.executor, loader);
     }
 
@@ -99,8 +99,8 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public ExecutionRepository getExecutionRepository() {
-        return this.executionRepository;
+    public Repository getRepository() {
+        return this.repository;
     }
 
     @Override

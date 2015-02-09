@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core.configuration;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.spi.configuration.SubSystemModel;
 
 import java.io.InputStream;

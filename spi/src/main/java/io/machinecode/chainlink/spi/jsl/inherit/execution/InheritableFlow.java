@@ -1,13 +1,13 @@
 package io.machinecode.chainlink.spi.jsl.inherit.execution;
 
-import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
-import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
 import io.machinecode.chainlink.spi.jsl.execution.Execution;
 import io.machinecode.chainlink.spi.jsl.execution.Flow;
-import io.machinecode.chainlink.spi.jsl.transition.Transition;
+import io.machinecode.chainlink.spi.jsl.inherit.Copyable;
+import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableBase;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.jsl.transition.Transition;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public interface InheritableFlow<T extends InheritableFlow<T, U, V>,
         public static <T extends InheritableFlow<T, U, V>,
                 U extends Inheritable & Execution,
                 V extends Copyable & Transition>
-        T inherit(final Class<T> clazz, final T _this, final JobRepository repository, final String defaultJobXml) {
+        T inherit(final Class<T> clazz, final T _this, final InheritableJobLoader repository, final String defaultJobXml) {
             final T copy = _this.copy();
             if (_this.getParent() != null) {
                 final T that = repository.findParent(clazz, copy, defaultJobXml);

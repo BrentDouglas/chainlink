@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.jdbc.DataSourceLookup;
-import io.machinecode.chainlink.repository.jdbc.JdbcExecutionRepository;
+import io.machinecode.chainlink.repository.jdbc.JdbcRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.tck.core.DummyDataSource;
 import org.jboss.logging.Logger;
 
@@ -18,9 +18,9 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class JdbcExecutionRepositoryFactory implements ExecutionRepositoryFactory {
+public class JdbcRepositoryFactory implements RepositoryFactory {
 
-    private static final Logger log = Logger.getLogger(JdbcExecutionRepositoryFactory.class);
+    private static final Logger log = Logger.getLogger(JdbcRepositoryFactory.class);
 
     private static DataSource dataSource;
     private static String username;
@@ -62,8 +62,8 @@ public class JdbcExecutionRepositoryFactory implements ExecutionRepositoryFactor
     }
 
     @Override
-    public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws SQLException {
-        return JdbcExecutionRepository.create(new DataSourceLookup() {
+    public Repository produce(final Dependencies dependencies, final Properties properties) throws SQLException {
+        return JdbcRepository.create(new DataSourceLookup() {
             @Override
             public DataSource getDataSource() {
                 return dataSource;

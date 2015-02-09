@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.spi.jsl.inherit.execution;
 
-import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
 import io.machinecode.chainlink.spi.jsl.execution.Flow;
 import io.machinecode.chainlink.spi.jsl.execution.Split;
+import io.machinecode.chainlink.spi.jsl.inherit.Inheritable;
 import io.machinecode.chainlink.spi.jsl.inherit.Rules;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public interface InheritableSplit<T extends InheritableSplit<T, F>,
 
         public static <T extends InheritableSplit<T, F>,
                 F extends Inheritable<F> & Flow>
-        T inherit(final T _this, final JobRepository repository, final String defaultJobXml) {
+        T inherit(final T _this, final InheritableJobLoader repository, final String defaultJobXml) {
             final T copy = _this.copy();
             copy.setId(_this.getId());
             copy.setNext(_this.getNext());

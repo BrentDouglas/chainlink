@@ -3,7 +3,7 @@ package io.machinecode.chainlink.repository.hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.core.repository.BaseMapExecutionRepository;
+import io.machinecode.chainlink.core.repository.BaseMapRepository;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -23,19 +23,19 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class HazelcastExecutonRepository extends BaseMapExecutionRepository {
+public class HazelcastRepository extends BaseMapRepository {
 
-    protected static final String IDS = HazelcastExecutonRepository.class.getCanonicalName() + ".ids";
-    protected static final String JOB_INSTANCES = HazelcastExecutonRepository.class.getCanonicalName() + ".jobInstances";
-    protected static final String JOB_EXECUTIONS = HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutions";
-    protected static final String STEP_EXECUTIONS = HazelcastExecutonRepository.class.getCanonicalName() + ".stepExecutions";
-    protected static final String PARTITION_EXECUTIONS = HazelcastExecutonRepository.class.getCanonicalName() + ".partitionExecutions";
-    protected static final String JOB_INSTANCE_EXECUTIONS = HazelcastExecutonRepository.class.getCanonicalName() + ".jobInstanceExecutions";
-    protected static final String JOB_EXECUTION_INSTANCES = HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionInstances";
-    protected static final String JOB_EXECUTION_STEP_EXECUTIONS = HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
-    protected static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = HazelcastExecutonRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
-    protected static final String STEP_EXECUTION_PARTITION_EXECUTIONS = HazelcastExecutonRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
-    protected static final String JOB_EXECUTION_HISTORY = HazelcastExecutonRepository.class.getCanonicalName() + ".jobExecutionHistory";
+    protected static final String IDS = HazelcastRepository.class.getCanonicalName() + ".ids";
+    protected static final String JOB_INSTANCES = HazelcastRepository.class.getCanonicalName() + ".jobInstances";
+    protected static final String JOB_EXECUTIONS = HazelcastRepository.class.getCanonicalName() + ".jobExecutions";
+    protected static final String STEP_EXECUTIONS = HazelcastRepository.class.getCanonicalName() + ".stepExecutions";
+    protected static final String PARTITION_EXECUTIONS = HazelcastRepository.class.getCanonicalName() + ".partitionExecutions";
+    protected static final String JOB_INSTANCE_EXECUTIONS = HazelcastRepository.class.getCanonicalName() + ".jobInstanceExecutions";
+    protected static final String JOB_EXECUTION_INSTANCES = HazelcastRepository.class.getCanonicalName() + ".jobExecutionInstances";
+    protected static final String JOB_EXECUTION_STEP_EXECUTIONS = HazelcastRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
+    protected static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = HazelcastRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
+    protected static final String STEP_EXECUTION_PARTITION_EXECUTIONS = HazelcastRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
+    protected static final String JOB_EXECUTION_HISTORY = HazelcastRepository.class.getCanonicalName() + ".jobExecutionHistory";
 
     protected final IMap<String, Long> ids;
     protected final IMap<Long, ExtendedJobInstance> jobInstances;
@@ -51,7 +51,7 @@ public class HazelcastExecutonRepository extends BaseMapExecutionRepository {
 
     final HazelcastInstance hazelcast;
 
-    public HazelcastExecutonRepository(final Marshalling marshalling, final HazelcastInstance hazelcast) {
+    public HazelcastRepository(final Marshalling marshalling, final HazelcastInstance hazelcast) {
         super(marshalling);
         this.hazelcast = hazelcast;
 

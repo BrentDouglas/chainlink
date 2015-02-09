@@ -11,7 +11,7 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.jsl.execution.Split;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.registry.SplitAccumulator;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
@@ -50,7 +50,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
     }
 
     @Override
-    public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                            final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021000.split.before"), context, this.id);
@@ -73,7 +73,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
                     callbackId,
                     flow,
                     flowContext,
-                    executionRepositoryId,
+                    repositoryId,
                     null
             );
         }
@@ -84,7 +84,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
     }
 
     @Override
-    public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                           final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                           final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021001.split.after"), context, this.id);
@@ -101,7 +101,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
         if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
             return configuration.getTransport().callback(parentId, context);
         }
-        return this.next(job, configuration, workerId, context, parentId, executionRepositoryId, this.next, null);
+        return this.next(job, configuration, workerId, context, parentId, repositoryId, this.next, null);
     }
 
     @Override

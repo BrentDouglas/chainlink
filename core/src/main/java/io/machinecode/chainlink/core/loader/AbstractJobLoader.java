@@ -11,8 +11,7 @@ import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableExecution;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableFlow;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableSplit;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
-import io.machinecode.chainlink.spi.loader.JobLoader;
-import io.machinecode.chainlink.spi.loader.JobRepository;
+import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
 
 import javax.batch.operations.NoSuchJobException;
 
@@ -20,7 +19,7 @@ import javax.batch.operations.NoSuchJobException;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public abstract class AbstractJobLoader implements JobLoader, JobRepository {
+public abstract class AbstractJobLoader implements InheritableJobLoader {
 
     @Override
     public InheritableJob<?,?,?,?> load(final String jslName) throws NoSuchJobException {

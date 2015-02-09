@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.test;
 
 import io.machinecode.chainlink.core.repository.MutableMetricImpl;
-import io.machinecode.chainlink.repository.redis.RedisExecutionRepository;
+import io.machinecode.chainlink.repository.redis.RedisRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.junit.After;
 import redis.clients.jedis.Jedis;
@@ -33,10 +33,10 @@ public class RedisRepositoryTest extends RepositoryTest {
 
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
-        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+        model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return _repository = new RedisExecutionRepository(
+            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new RedisRepository(
                         _info(),
                         MutableMetricImpl.class.getClassLoader(),
                         dependencies.getMarshalling()

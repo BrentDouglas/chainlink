@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.repository.ehcache;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.core.repository.BaseMapExecutionRepository;
+import io.machinecode.chainlink.core.repository.BaseMapRepository;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -30,19 +30,19 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class EhCacheExecutionRepository extends BaseMapExecutionRepository {
+public class EhCacheRepository extends BaseMapRepository {
 
-    protected static final String IDS = EhCacheExecutionRepository.class.getCanonicalName() + ".ids";
-    protected static final String JOB_INSTANCES = EhCacheExecutionRepository.class.getCanonicalName() + ".jobInstances";
-    protected static final String JOB_EXECUTIONS = EhCacheExecutionRepository.class.getCanonicalName() + ".jobExecutions";
-    protected static final String STEP_EXECUTIONS = EhCacheExecutionRepository.class.getCanonicalName() + ".stepExecutions";
-    protected static final String PARTITION_EXECUTIONS = EhCacheExecutionRepository.class.getCanonicalName() + ".partitionExecutions";
-    protected static final String JOB_INSTANCE_EXECUTIONS = EhCacheExecutionRepository.class.getCanonicalName() + ".jobInstanceExecutions";
-    protected static final String JOB_EXECUTION_INSTANCES = EhCacheExecutionRepository.class.getCanonicalName() + ".jobExecutionInstances";
-    protected static final String JOB_EXECUTION_STEP_EXECUTIONS = EhCacheExecutionRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
-    protected static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = EhCacheExecutionRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
-    protected static final String STEP_EXECUTION_PARTITION_EXECUTIONS = EhCacheExecutionRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
-    protected static final String JOB_EXECUTION_HISTORY = EhCacheExecutionRepository.class.getCanonicalName() + ".jobExecutionHistory";
+    protected static final String IDS = EhCacheRepository.class.getCanonicalName() + ".ids";
+    protected static final String JOB_INSTANCES = EhCacheRepository.class.getCanonicalName() + ".jobInstances";
+    protected static final String JOB_EXECUTIONS = EhCacheRepository.class.getCanonicalName() + ".jobExecutions";
+    protected static final String STEP_EXECUTIONS = EhCacheRepository.class.getCanonicalName() + ".stepExecutions";
+    protected static final String PARTITION_EXECUTIONS = EhCacheRepository.class.getCanonicalName() + ".partitionExecutions";
+    protected static final String JOB_INSTANCE_EXECUTIONS = EhCacheRepository.class.getCanonicalName() + ".jobInstanceExecutions";
+    protected static final String JOB_EXECUTION_INSTANCES = EhCacheRepository.class.getCanonicalName() + ".jobExecutionInstances";
+    protected static final String JOB_EXECUTION_STEP_EXECUTIONS = EhCacheRepository.class.getCanonicalName() + ".jobExecutionStepExecutions";
+    protected static final String LATEST_JOB_EXECUTION_FOR_INSTANCE = EhCacheRepository.class.getCanonicalName() + ".latestJobExecutionForInstance";
+    protected static final String STEP_EXECUTION_PARTITION_EXECUTIONS = EhCacheRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions";
+    protected static final String JOB_EXECUTION_HISTORY = EhCacheRepository.class.getCanonicalName() + ".jobExecutionHistory";
 
     protected final EhCacheMap<String, Long> ids;
     protected final EhCacheMap<Long, ExtendedJobInstance> jobInstances;
@@ -56,7 +56,7 @@ public class EhCacheExecutionRepository extends BaseMapExecutionRepository {
     protected final EhCacheMap<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions;
     protected final EhCacheMap<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory;
 
-    public EhCacheExecutionRepository(final Marshalling marshalling, final CacheManager manager) {
+    public EhCacheRepository(final Marshalling marshalling, final CacheManager manager) {
         super(marshalling);
 
         this.ids = EhCacheMap.with(manager.addCacheIfAbsent(IDS));

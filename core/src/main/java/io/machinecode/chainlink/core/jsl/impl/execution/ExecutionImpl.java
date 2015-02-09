@@ -10,7 +10,7 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.ExecutionRepositoryId;
+import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.ResolvedDeferred;
@@ -40,11 +40,11 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.jsl.
         return this.id;
     }
 
-    public abstract Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public abstract Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                                          final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
                                          final ExecutionContext context) throws Exception;
 
-    public abstract Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final ExecutionRepositoryId executionRepositoryId,
+    public abstract Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                                         final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
                                         final ExecutionContext childContext) throws Exception;
 
@@ -74,7 +74,7 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.jsl.
     }
 
     public Promise<Chain<?>,Throwable,?> next(final JobImpl job, final Configuration configuration, final WorkerId workerId, final ExecutionContext context,
-                         final ExecutableId parentId, final ExecutionRepositoryId executionRepositoryId, final String next,
+                         final ExecutableId parentId, final RepositoryId repositoryId, final String next,
                          final TransitionImpl transition) throws Exception {
         final MutableJobContext jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
@@ -83,24 +83,24 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.jsl.
         }
         if (transition != null && transition.getNext() != null) {
             log().debugf(Messages.get("CHAINLINK-009100.execution.transition"), context, id, transition.getNext());
-            return _runNextExecution(job, configuration, parentId, context, workerId, executionRepositoryId, transition.getNext());
+            return _runNextExecution(job, configuration, parentId, context, workerId, repositoryId, transition.getNext());
         } else if (next != null) {
             log().debugf(Messages.get("CHAINLINK-009100.execution.transition"), context, id, next);
-            return _runNextExecution(job, configuration, parentId, context, workerId, executionRepositoryId, next);
+            return _runNextExecution(job, configuration, parentId, context, workerId, repositoryId, next);
         } else {
             return configuration.getTransport().callback(parentId, context);
         }
     }
 
     private Promise<Chain<?>,Throwable,?> _runNextExecution(final JobImpl job, final Configuration configuration, final ExecutableId parentId, final ExecutionContext context,
-                                       final WorkerId workerId, final ExecutionRepositoryId executionRepositoryId, final String next) throws Exception {
+                                       final WorkerId workerId, final RepositoryId repositoryId, final String next) throws Exception {
         final ExecutionImpl execution = job.getNextExecution(next);
         return _resolve(configuration.getExecutor().execute(new ExecutionExecutable(
                 job,
                 parentId,
                 execution,
                 context,
-                executionRepositoryId,
+                repositoryId,
                 workerId
         )));
     }

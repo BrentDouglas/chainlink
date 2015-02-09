@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.tck.core.transport;
 
-import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
+import io.machinecode.chainlink.repository.gridgain.GridGainRepository;
+import io.machinecode.chainlink.repository.gridgain.GridGainRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.gridgain.GridGainTransport;
@@ -28,17 +29,17 @@ public class GridGainTransportFactory implements TransportFactory {
         for (int i = 0; i < 11; ++i) {
             caches[i] = new GridCacheConfiguration();
         }
-        setCacheConf(caches[0], GridGainExecutionRepository.IDS);
-        setIndexedCacheConf(caches[1], GridGainExecutionRepository.JOB_INSTANCES);
-        setIndexedCacheConf(caches[2], GridGainExecutionRepository.JOB_EXECUTIONS);
-        setCacheConf(caches[3], GridGainExecutionRepository.STEP_EXECUTIONS);
-        setCacheConf(caches[4], GridGainExecutionRepository.PARTITION_EXECUTIONS);
-        setCacheConf(caches[5], GridGainExecutionRepository.JOB_INSTANCE_EXECUTIONS);
-        setCacheConf(caches[6], GridGainExecutionRepository.JOB_EXECUTION_INSTANCES);
-        setCacheConf(caches[7], GridGainExecutionRepository.JOB_EXECUTION_STEP_EXECUTIONS);
-        setCacheConf(caches[8], GridGainExecutionRepository.LATEST_JOB_EXECUTION_FOR_INSTANCE);
-        setCacheConf(caches[9], GridGainExecutionRepository.STEP_EXECUTION_PARTITION_EXECUTIONS);
-        setCacheConf(caches[10], GridGainExecutionRepository.JOB_EXECUTION_HISTORY);
+        setCacheConf(caches[0], GridGainRepository.IDS);
+        setIndexedCacheConf(caches[1], GridGainRepository.JOB_INSTANCES);
+        setIndexedCacheConf(caches[2], GridGainRepository.JOB_EXECUTIONS);
+        setCacheConf(caches[3], GridGainRepository.STEP_EXECUTIONS);
+        setCacheConf(caches[4], GridGainRepository.PARTITION_EXECUTIONS);
+        setCacheConf(caches[5], GridGainRepository.JOB_INSTANCE_EXECUTIONS);
+        setCacheConf(caches[6], GridGainRepository.JOB_EXECUTION_INSTANCES);
+        setCacheConf(caches[7], GridGainRepository.JOB_EXECUTION_STEP_EXECUTIONS);
+        setCacheConf(caches[8], GridGainRepository.LATEST_JOB_EXECUTION_FOR_INSTANCE);
+        setCacheConf(caches[9], GridGainRepository.STEP_EXECUTION_PARTITION_EXECUTIONS);
+        setCacheConf(caches[10], GridGainRepository.JOB_EXECUTION_HISTORY);
         final GridConfiguration configuration = new GridConfiguration();
         configuration.setCacheConfiguration(caches);
         configuration.setGridName(CHAINLINK_TCK_GRID);

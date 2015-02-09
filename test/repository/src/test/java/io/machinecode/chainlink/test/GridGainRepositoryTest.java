@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.test;
 
-import io.machinecode.chainlink.repository.gridgain.GridGainExecutionRepository;
+import io.machinecode.chainlink.repository.gridgain.GridGainRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.configuration.factory.ExecutionRepositoryFactory;
-import io.machinecode.chainlink.spi.repository.ExecutionRepository;
+import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
+import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridConfiguration;
@@ -31,17 +31,17 @@ public class GridGainRepositoryTest extends RepositoryTest {
         for (int i = 0; i < 11; ++i) {
             caches[i] = new GridCacheConfiguration();
         }
-        setCacheConf(caches[0], GridGainExecutionRepository.IDS);
-        setIndexeddCacheConf(caches[1], GridGainExecutionRepository.JOB_INSTANCES);
-        setIndexeddCacheConf(caches[2], GridGainExecutionRepository.JOB_EXECUTIONS);
-        setCacheConf(caches[3], GridGainExecutionRepository.STEP_EXECUTIONS);
-        setCacheConf(caches[4], GridGainExecutionRepository.PARTITION_EXECUTIONS);
-        setCacheConf(caches[5], GridGainExecutionRepository.JOB_INSTANCE_EXECUTIONS);
-        setCacheConf(caches[6], GridGainExecutionRepository.JOB_EXECUTION_INSTANCES);
-        setCacheConf(caches[7], GridGainExecutionRepository.JOB_EXECUTION_STEP_EXECUTIONS);
-        setCacheConf(caches[8], GridGainExecutionRepository.LATEST_JOB_EXECUTION_FOR_INSTANCE);
-        setCacheConf(caches[9], GridGainExecutionRepository.STEP_EXECUTION_PARTITION_EXECUTIONS);
-        setCacheConf(caches[10], GridGainExecutionRepository.JOB_EXECUTION_HISTORY);
+        setCacheConf(caches[0], GridGainRepository.IDS);
+        setIndexeddCacheConf(caches[1], GridGainRepository.JOB_INSTANCES);
+        setIndexeddCacheConf(caches[2], GridGainRepository.JOB_EXECUTIONS);
+        setCacheConf(caches[3], GridGainRepository.STEP_EXECUTIONS);
+        setCacheConf(caches[4], GridGainRepository.PARTITION_EXECUTIONS);
+        setCacheConf(caches[5], GridGainRepository.JOB_INSTANCE_EXECUTIONS);
+        setCacheConf(caches[6], GridGainRepository.JOB_EXECUTION_INSTANCES);
+        setCacheConf(caches[7], GridGainRepository.JOB_EXECUTION_STEP_EXECUTIONS);
+        setCacheConf(caches[8], GridGainRepository.LATEST_JOB_EXECUTION_FOR_INSTANCE);
+        setCacheConf(caches[9], GridGainRepository.STEP_EXECUTION_PARTITION_EXECUTIONS);
+        setCacheConf(caches[10], GridGainRepository.JOB_EXECUTION_HISTORY);
         final GridConfiguration configuration = new GridConfiguration();
         configuration.setCacheConfiguration(caches);
         configuration.setGridName("test-grid");
@@ -71,10 +71,10 @@ public class GridGainRepositoryTest extends RepositoryTest {
 
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
-        model.getExecutionRepository().setFactory(new ExecutionRepositoryFactory() {
+        model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public ExecutionRepository produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return _repository = new GridGainExecutionRepository(
+            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return _repository = new GridGainRepository(
                         dependencies.getMarshalling(),
                         GridGain.grid("test-grid")
                 );
@@ -85,16 +85,16 @@ public class GridGainRepositoryTest extends RepositoryTest {
     @After
     public void after() throws Exception {
         final Grid grid = GridGain.grid("test-grid");
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".ids").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".jobInstances").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".jobExecutions").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".stepExecutions").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".partitionExecutions").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".jobInstanceExecutions").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".jobExecutionInstances").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".jobExecutionStepExecutions").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".latestJobExecutionForInstance").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions").clearAll();
-        grid.cache(GridGainExecutionRepository.class.getCanonicalName() + ".jobExecutionHistory").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".ids").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".jobInstances").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".jobExecutions").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".stepExecutions").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".partitionExecutions").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".jobInstanceExecutions").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".jobExecutionInstances").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".jobExecutionStepExecutions").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".latestJobExecutionForInstance").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".stepExecutionPartitionExecutions").clearAll();
+        grid.cache(GridGainRepository.class.getCanonicalName() + ".jobExecutionHistory").clearAll();
     }
 }
