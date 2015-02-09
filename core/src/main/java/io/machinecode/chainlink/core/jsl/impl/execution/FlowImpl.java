@@ -61,7 +61,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
                            final ExecutionContext context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020000.flow.before"), context, id);
         final ExecutionImpl execution = this.executions.get(0);
-        return _resolve(configuration.getExecutor().execute(new ExecutionExecutable(
+        return _resolve(JobImpl.execute(configuration, new ExecutionExecutable(
                 job,
                 callbackId,
                 execution,

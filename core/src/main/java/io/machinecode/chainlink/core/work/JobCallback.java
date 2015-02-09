@@ -39,7 +39,7 @@ public class JobCallback extends ExecutableImpl<JobImpl> {
 
     @Override
     protected void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
-                             final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
+                             final ExecutableId parentId, final ExecutionContext previous) throws Throwable {
         final MutableJobContext jobContext = context.getJobContext();
         Throwable throwable = null;
         try {

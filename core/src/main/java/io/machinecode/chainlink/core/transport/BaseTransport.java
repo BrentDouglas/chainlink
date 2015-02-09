@@ -87,26 +87,10 @@ public abstract class BaseTransport<A> implements Transport {
                 next.resolve(new AllChain<Executable>(chains));
             }
 
-            // If looking for remotes failed we fall back to using only local workers
             @Override
             public void reject(final Throwable that, final Deferred<Chain<?>, Throwable, Object> next) {
                 try {
-                    final List<Worker> ret = configuration.getExecutor().getWorkers(maxThreads);
-                    ListIterator<Worker> it = ret.listIterator();
-                    final Chain<?>[] chains = new Chain[executables.length];
-                    int i = 0;
-                    for (final Executable executable : executables) {
-                        if (!it.hasNext()) {
-                            it = ret.listIterator();
-                        }
-                        final Chain<?> chain = new ChainImpl<Void>();
-                        final ChainId chainId = new UUIDId(BaseTransport.this);
-                        registry.registerChain(executable.getContext().getJobExecutionId(), chainId, chain);
-                        final Worker worker = it.next();
-                        worker.execute(new ExecutableEventImpl(executable, chainId));
-                        chains[i++] = chain;
-                    }
-                    next.resolve(new AllChain<Executable>(chains));
+                    next.resolve(LocalTransport.localDistribute(configuration, maxThreads, executables));
                 } catch (final Exception e) {
                     e.addSuppressed(that);
                     next.reject(e);
@@ -130,7 +114,7 @@ public abstract class BaseTransport<A> implements Transport {
             @Override
             public void reject(final Throwable that, final Deferred<Chain<?>, Throwable, Object> next) {
                 try {
-                    next.resolve(configuration.getExecutor().callback(executableId, context));
+                    next.resolve(LocalTransport.localCallback(configuration, executableId, context));
                 } catch (final Exception e) {
                     e.addSuppressed(that);
                     next.reject(e);

@@ -3,20 +3,13 @@ package io.machinecode.chainlink.core.execution;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.Constants;
-import io.machinecode.chainlink.core.registry.UUIDId;
-import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.transport.WorkerState;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.execution.WorkerId;
-import io.machinecode.chainlink.spi.registry.ChainId;
-import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.Registry;
-import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Transport;
 import org.jboss.logging.Logger;
 
@@ -24,9 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -41,7 +31,6 @@ public class EventedExecutor implements Executor {
 
     protected final Registry registry;
     protected final Transport transport;
-    protected final ExecutorService cancellation;
     protected final ThreadFactory factory;
     protected final int threads;
     protected Configuration configuration;
@@ -54,7 +43,6 @@ public class EventedExecutor implements Executor {
         this.transport = dependencies.getTransport();
         this.threads = Integer.decode(properties.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));
         this.factory = factory;
-        this.cancellation = Executors.newSingleThreadExecutor(factory);
     }
 
     @Override
@@ -81,47 +69,13 @@ public class EventedExecutor implements Executor {
                 }
             }
         }
-        this.cancellation.shutdown();
         if (exception != null) {
             throw exception;
         }
     }
 
     @Override
-    public Chain<?> execute(final long jobExecutionId, final Executable executable) throws Exception {
-        final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = new UUIDId(transport);
-        registry.registerJob(jobExecutionId, chainId, chain);
-        _execute(executable, chainId);
-        return chain;
-    }
-
-    @Override
-    public Chain<?> execute(final Executable executable) throws Exception {
-        final Chain<?> chain = new ChainImpl<Void>();
-        final ChainId chainId = new UUIDId(transport);
-        registry.registerChain(executable.getContext().getJobExecutionId(), chainId, chain);
-        _execute(executable, chainId);
-        return chain;
-    }
-
-    private void _execute(final Executable executable, final ChainId chainId) throws Exception {
-        final WorkerId workerId = executable.getWorkerId();
-        final Worker worker;
-        if (workerId == null) {
-            worker = getWorker();
-        } else {
-            final Worker local = getWorker(workerId);
-            if (local != null) {
-                worker = local;
-            } else {
-                throw new Exception(); // TODO Message
-            }
-        }
-        worker.execute(new ExecutableEventImpl(executable, chainId));
-    }
-
-    private Worker getWorker() {
+    public Worker getWorker() {
         final TreeSet<EventedWorker> set = new TreeSet<>(WorkerState.COMPARATOR);
         workerLock.lock();
         try {
@@ -130,35 +84,6 @@ public class EventedExecutor implements Executor {
             workerLock.unlock();
         }
         return set.first();
-    }
-
-    @Override
-    public Chain<?> callback(final ExecutableId executableId, final ExecutionContext context) throws Exception {
-        final long jobExecutionId = context.getJobExecutionId();
-        final Executable executable = configuration.getRegistry().getExecutable(jobExecutionId, executableId);
-        if (executable == null) {
-            throw new Exception("No worker found with jobExecutionId=" + jobExecutionId + " and executableId" + executableId);
-        }
-        final WorkerId workerId = executable.getWorkerId();
-        final Worker worker = configuration.getExecutor().getWorker(workerId);
-        if (worker == null) {
-            throw new Exception("No worker found with workerId=" + workerId);
-        }
-        final UUIDId id = new UUIDId(configuration.getTransport());
-        final Chain<?> chain = new ChainImpl<>();
-        registry.registerChain(jobExecutionId, id, chain);
-        worker.callback(new CallbackEventImpl(jobExecutionId, executableId, id, context));
-        return chain;
-    }
-
-    @Override
-    public Future<?> cancel(final Future<?> promise) {
-        return cancellation.submit(new Runnable() {
-            @Override
-            public void run() {
-                promise.cancel(true);
-            }
-        });
     }
 
     @Override

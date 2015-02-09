@@ -33,7 +33,7 @@ public class ExecutionExecutable extends ExecutableImpl<ExecutionImpl> {
 
     @Override
     public void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId, final ExecutableId parentId,
-                                 final ExecutionContext childContext) throws Throwable {
+                                 final ExecutionContext previous) throws Throwable {
         final Registry registry = configuration.getRegistry();
         try {
             final Promise<Chain<?>,Throwable,?> next;

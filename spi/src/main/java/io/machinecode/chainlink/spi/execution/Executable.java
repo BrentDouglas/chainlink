@@ -28,5 +28,5 @@ public interface Executable {
 
     ExecutionContext getContext();
 
-    void execute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId, final ExecutionContext childContext);
+    void execute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId, final ExecutionContext previous);
 }

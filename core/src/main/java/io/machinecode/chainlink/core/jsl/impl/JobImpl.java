@@ -1,6 +1,9 @@
 package io.machinecode.chainlink.core.jsl.impl;
 
+import io.machinecode.chainlink.core.execution.ExecutableEventImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
+import io.machinecode.chainlink.core.registry.UUIDId;
+import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.core.util.Statuses;
 import io.machinecode.chainlink.core.validation.InvalidJobException;
@@ -10,12 +13,18 @@ import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.execution.Executor;
+import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.jsl.Job;
+import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
+import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
+import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.ResolvedDeferred;
 import org.jboss.logging.Logger;
@@ -161,7 +170,7 @@ public class JobImpl implements Job, Serializable {
     private Promise<Chain<?>,Throwable,?> _runNext(final Configuration configuration, final ExecutableId callbackId,
                                         final ExecutionContext context, final RepositoryId repositoryId,
                                         final ExecutionImpl next) throws Exception {
-        return new ResolvedDeferred<Chain<?>, Throwable, Object>(configuration.getExecutor().execute(new ExecutionExecutable(
+        return new ResolvedDeferred<Chain<?>, Throwable, Object>(execute(configuration, new ExecutionExecutable(
                 this,
                 callbackId,
                 next,
@@ -169,5 +178,23 @@ public class JobImpl implements Job, Serializable {
                 repositoryId,
                 null
         )));
+    }
+
+    public static Chain<?> execute(final Configuration configuration, final Executable executable) throws Exception {
+        final Transport transport = configuration.getTransport();
+        final Registry registry = configuration.getRegistry();
+        final Executor executor = configuration.getExecutor();
+        final Chain<?> chain = new ChainImpl<Void>();
+        final ChainId chainId = new UUIDId(transport);
+        registry.registerChain(executable.getContext().getJobExecutionId(), chainId, chain);
+        final WorkerId workerId = executable.getWorkerId();
+        final Worker worker;
+        if (workerId == null) {
+            worker = executor.getWorker();
+        } else {
+            worker = executor.getWorker(workerId);
+        }
+        worker.execute(new ExecutableEventImpl(executable, chainId));
+        return chain;
     }
 }

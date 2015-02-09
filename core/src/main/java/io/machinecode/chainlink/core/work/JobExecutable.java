@@ -31,7 +31,7 @@ public class JobExecutable extends ExecutableImpl<JobImpl> {
 
     @Override
     public void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
-                          final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
+                          final ExecutableId parentId, final ExecutionContext previous) throws Throwable {
         final Registry registry = configuration.getRegistry();
         final Transport transport = configuration.getTransport();
         try {

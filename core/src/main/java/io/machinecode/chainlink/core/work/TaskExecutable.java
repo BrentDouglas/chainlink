@@ -33,7 +33,7 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
 
     @Override
     public void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
-                          final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
+                          final ExecutableId parentId, final ExecutionContext previous) throws Throwable {
         //TODO Check ordering of this and check it is allowed to run in this thread
         chain.onCancel(new OnCancel() {
             @Override

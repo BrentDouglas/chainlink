@@ -3,12 +3,14 @@ package io.machinecode.chainlink.core.management;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
+import io.machinecode.chainlink.core.execution.ExecutableEventImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.registry.UUIDId;
 import io.machinecode.chainlink.core.repository.DelegateJobExecution;
 import io.machinecode.chainlink.core.repository.DelegateStepExecution;
+import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.core.work.JobExecutable;
@@ -18,12 +20,14 @@ import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.security.Security;
+import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
@@ -46,6 +50,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -62,6 +68,8 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     protected final Security security;
     protected final RepositoryId repositoryId;
 
+    protected final ExecutorService cancellation;
+
     public JobOperatorImpl(final Configuration configuration) {
         this.configuration = configuration;
         this.executor = configuration.getExecutor();
@@ -72,6 +80,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                 new UUIDId(transport),
                 configuration.getRepository()
         );
+        this.cancellation = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -87,6 +96,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         this.registry.unregisterRepository(this.repositoryId);
         this.registry.close();
         this.executor.close();
+        this.cancellation.shutdown();
     }
 
     @Override
@@ -238,16 +248,19 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                 null,
                 null
         );
-        final Promise<?,?,?> promise = executor.execute(jobExecutionId, new JobExecutable(
+        final Chain<?> chain = new ChainImpl<Void>();
+        final ChainId chainId = new UUIDId(transport);
+        registry.registerJob(jobExecutionId, chainId, chain);
+        executor.getWorker().execute(new ExecutableEventImpl(new JobExecutable(
                 null,
                 this.repositoryId,
                 job,
                 context
-        ));
+        ), chainId));
         log.tracef(Messages.get("CHAINLINK-001300.operator.started"), jobExecutionId, job.getId());
         return new JobOperationImpl(
                 jobExecutionId,
-                promise,
+                chain,
                 repository
         );
     }
@@ -322,16 +335,19 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                 lastExecution.getRestartElementId(),
                 null
         );
-        final Promise<?,?,?> promise = executor.execute(restartExecutionId, new JobExecutable(
+        final Chain<?> chain = new ChainImpl<Void>();
+        final ChainId chainId = new UUIDId(transport);
+        registry.registerJob(restartExecutionId, chainId, chain);
+        executor.getWorker().execute(new ExecutableEventImpl(new JobExecutable(
                 null,
                 this.repositoryId,
                 job,
                 context
-        ));
+        ), chainId));
         log.tracef(Messages.get("CHAINLINK-001301.operator.restarted"), jobExecutionId, job.getId());
         return new JobOperationImpl(
                 restartExecutionId,
-                promise,
+                chain,
                 repository
         );
     }
@@ -353,7 +369,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             if (promise == null) {
                 throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-001002.operator.not.running", jobExecutionId));
             }
-            executor.cancel(promise);
+            cancellation.execute(new Cancel(promise));
             log.tracef(Messages.get("CHAINLINK-001302.operator.stopped"), jobExecutionId, execution.getJobName());
             return promise;
         } catch (final NoSuchJobExecutionException | JobExecutionNotRunningException | JobSecurityException e) {
@@ -454,5 +470,18 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         final Repository repository = registry.getRepository(this.repositoryId);
         LocalRegistry.assertRepository(repository, repositoryId);
         return repository;
+    }
+
+    private static class Cancel implements Runnable {
+        private final Promise<?, Throwable, ?> promise;
+
+        public Cancel(final Promise<?, Throwable, ?> promise) {
+            this.promise = promise;
+        }
+
+        @Override
+        public void run() {
+            promise.cancel(true);
+        }
     }
 }

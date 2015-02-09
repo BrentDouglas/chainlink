@@ -36,13 +36,13 @@ public class ExecutionCallback extends ExecutableImpl<ExecutionImpl> {
 
     @Override
     public void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
-                          final ExecutableId parentId, final ExecutionContext childContext) throws Throwable {
+                          final ExecutableId parentId, final ExecutionContext previous) throws Throwable {
         Promise<Chain<?>,Throwable,?> next;
         try {
             if (chain.isCancelled()) {
                 context.getJobContext().setBatchStatus(BatchStatus.STOPPING);
             }
-            next = work.after(job, configuration, this.repositoryId, workerId, parentId, context, childContext);
+            next = work.after(job, configuration, this.repositoryId, workerId, parentId, context, previous);
             next.onResolve(new LinkAndResolveChain(chain))
                     .onReject(chain)
                     .onCancel(chain);

@@ -262,7 +262,8 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                     context.getRestartElementId(),
                     null
             );
-            return _resolve(configuration.getExecutor().execute(
+            return _resolve(JobImpl.execute(
+                    configuration,
                     new TaskExecutable(callbackId, this.task, clonedContext, repositoryId, timeout)
             ));
         } else {

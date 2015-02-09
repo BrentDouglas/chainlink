@@ -95,7 +95,7 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.jsl.
     private Promise<Chain<?>,Throwable,?> _runNextExecution(final JobImpl job, final Configuration configuration, final ExecutableId parentId, final ExecutionContext context,
                                        final WorkerId workerId, final RepositoryId repositoryId, final String next) throws Exception {
         final ExecutionImpl execution = job.getNextExecution(next);
-        return _resolve(configuration.getExecutor().execute(new ExecutionExecutable(
+        return _resolve(JobImpl.execute(configuration, new ExecutionExecutable(
                 job,
                 parentId,
                 execution,

@@ -11,7 +11,6 @@
     </Match>
     <Match>
         <Or>
-            <Class name="io.machinecode.chainlink.core.execution.EventedExecutor$1" />
             <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$1" />
             <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$2" />
             <Class name="io.machinecode.chainlink.ee.wildfly.service.JobOperatorService$3" />
@@ -97,6 +96,10 @@
     <Match>
         <Class name="io.machinecode.chainlink.server.chainlinkd.Chainlinkd"/>
         <Bug pattern="UW_UNCOND_WAIT"/>
+    </Match>
+    <Match>
+        <Class name="io.machinecode.chainlink.core.transport.LocalTransport" />
+        <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
     </Match>
     <Match>
         <Or>

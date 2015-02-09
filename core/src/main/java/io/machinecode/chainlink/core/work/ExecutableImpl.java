@@ -63,10 +63,10 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
 
     @Override
     public void execute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
-                        final ExecutionContext childContext) {
+                        final ExecutionContext previous) {
         try {
             log().tracef(Messages.get("CHAINLINK-015700.executable.execute"), this.context, this);
-            doExecute(configuration, chain, workerId, this.parentId, childContext);
+            doExecute(configuration, chain, workerId, this.parentId, previous);
         } catch (final Throwable e) {
             log().errorf(e, Messages.get("CHAINLINK-015701.executable.exception"), this.context, this);
         }
@@ -78,7 +78,7 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
     }
 
     protected abstract void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
-                                      final ExecutableId parentId, final ExecutionContext context) throws Throwable;
+                                      final ExecutableId parentId, final ExecutionContext previous) throws Throwable;
 
     protected abstract Logger log();
 }

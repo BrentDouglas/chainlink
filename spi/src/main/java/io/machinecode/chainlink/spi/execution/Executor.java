@@ -1,12 +1,8 @@
 package io.machinecode.chainlink.spi.execution;
 
 import io.machinecode.chainlink.spi.Lifecycle;
-import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.then.Chain;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -14,15 +10,9 @@ import java.util.concurrent.Future;
  */
 public interface Executor extends Lifecycle {
 
-    Chain<?> execute(final long jobExecutionId, final Executable executable) throws Exception;
-
-    Chain<?> execute(final Executable executable) throws Exception;
-
-    Chain<?> callback(final ExecutableId executableId, final ExecutionContext context) throws Exception;
-
-    Future<?> cancel(final Future<?> promise) throws Exception;
+    Worker getWorker() throws Exception;
 
     Worker getWorker(final WorkerId id) throws Exception;
 
-    List<Worker> getWorkers(final int required);
+    List<Worker> getWorkers(final int required) throws Exception;
 }
