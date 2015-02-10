@@ -6,5 +6,8 @@ package io.machinecode.chainlink.spi.transport;
  */
 public interface Addressed {
 
+    /**
+     * @return A unique identifier for a node.
+     */
     Object getAddress();
 }

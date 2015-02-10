@@ -88,6 +88,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         this.transport.open(configuration);
         this.registry.open(configuration);
         this.executor.open(configuration);
+        this.security.open(configuration);
     }
 
     @Override
@@ -403,7 +404,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     public ExtendedJobInstance getJobInstance(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         this.security.canAccessJobExecution(jobExecutionId);
         try {
-        final ExtendedJobInstance jobInstance = registry.getRepository(this.repositoryId).getJobInstanceForExecution(jobExecutionId);
+            final ExtendedJobInstance jobInstance = registry.getRepository(this.repositoryId).getJobInstanceForExecution(jobExecutionId);
             this.security.canAccessJobInstance(jobInstance.getInstanceId());
             return jobInstance;
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {

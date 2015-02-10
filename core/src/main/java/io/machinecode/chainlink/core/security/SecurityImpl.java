@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.security;
 
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.security.Security;
 
 import javax.batch.operations.JobSecurityException;
@@ -14,6 +15,20 @@ public class SecurityImpl implements Security {
 
     public SecurityImpl(final Security... securities) {
         this.securities = securities;
+    }
+
+    @Override
+    public void open(final Configuration configuration) throws Exception {
+        for (final Security security : securities) {
+            security.open(configuration);
+        }
+    }
+
+    @Override
+    public void close() throws Exception {
+        for (final Security security : securities) {
+            security.close();
+        }
     }
 
     @Override

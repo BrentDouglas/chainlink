@@ -8,5 +8,11 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
  */
 public interface Lifecycle extends AutoCloseable {
 
+    /**
+     * <p>Called after the entire configuration has been resolved.</p>
+     *
+     * @param configuration The configuration.
+     * @throws Exception On any implementation specific errors.
+     */
     void open(final Configuration configuration) throws Exception;
 }
