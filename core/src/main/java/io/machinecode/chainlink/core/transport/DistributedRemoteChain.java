@@ -21,14 +21,14 @@ public class DistributedRemoteChain extends ChainImpl<Void> {
 
     private static final Logger log = Logger.getLogger(DistributedRemoteChain.class);
 
-    protected final BaseTransport<?> transport;
+    protected final DistributedTransport<?> transport;
     protected final Object address;
     protected final long jobExecutionId;
     protected final ChainId chainId;
     protected final long timeout;
     protected final TimeUnit unit;
 
-    public DistributedRemoteChain(final BaseTransport<?> transport, final Object address, final long jobExecutionId, final ChainId chainId) {
+    public DistributedRemoteChain(final DistributedTransport<?> transport, final Object address, final long jobExecutionId, final ChainId chainId) {
         this.transport = transport;
         this.address = address;
         this.jobExecutionId = jobExecutionId;

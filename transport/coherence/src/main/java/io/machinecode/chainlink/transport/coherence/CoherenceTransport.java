@@ -16,8 +16,10 @@ import io.machinecode.then.api.Deferred;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.DeferredImpl;
 import io.machinecode.then.core.RejectedDeferred;
+import io.machinecode.then.core.SomeDeferred;
 import org.jboss.logging.Logger;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -66,8 +68,13 @@ public class CoherenceTransport extends DistributedTransport<Member> {
     }
 
     @Override
-    protected List<Member> getRemotes() {
-        return this.remotes;
+    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
+        final List<Member> remotes = this.remotes;
+        final List<Promise<T,Throwable,?>> promises = new ArrayList<>(remotes.size());
+        for (final Member remote : remotes) {
+            promises.add(invokeRemote(remote, command));
+        }
+        return new SomeDeferred<>(promises);
     }
 
     @Override

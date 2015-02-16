@@ -3,14 +3,15 @@ package io.machinecode.chainlink.transport.jgroups;
 import io.machinecode.chainlink.core.transport.DistributedTransport;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.core.transport.cmd.Command;
+import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.then.api.OnCancel;
 import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.OnReject;
 import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.DeferredImpl;
-import io.machinecode.then.core.FutureDeferred;
 import io.machinecode.then.core.RejectedDeferred;
+import io.machinecode.then.core.SomeDeferred;
 import org.jboss.logging.Logger;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -22,6 +23,8 @@ import org.jgroups.blocks.MessageDispatcher;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.Response;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Future;
@@ -38,14 +41,18 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     final JChannel channel;
     final MessageDispatcher dispatcher;
     final Address local;
+    protected final Marshalling marshalling;
+    protected final WeakReference<ClassLoader> loader;
     protected volatile List<Address> remotes;
 
     public JGroupsTransport(final Dependencies dependencies, final Properties properties, final JChannel channel) throws Exception {
         super(dependencies, properties);
-        this.channel = channel;
         if (!(channel.isConnected() || channel.isConnecting())) {
             throw new IllegalStateException("Must already have called JChannel#connect(...)"); //TODO Message
         }
+        this.channel = channel;
+        this.loader = new WeakReference<>(dependencies.getClassLoader());
+        this.marshalling = dependencies.getMarshalling();
         this.local = channel.getAddress();
         this.remotes = _remoteMembers(this.channel.getView().getMembers());
         this.dispatcher = new MessageDispatcher(channel, null, this);
@@ -65,8 +72,13 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     }
 
     @Override
-    protected List<Address> getRemotes() {
-        return remotes;
+    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
+        final List<Address> remotes = this.remotes;
+        final List<Promise<T,Throwable,?>> promises = new ArrayList<>(remotes.size());
+        for (final Address remote : remotes) {
+            promises.add(invokeRemote(remote, command));
+        }
+        return new SomeDeferred<>(promises);
     }
 
     @Override
@@ -113,14 +125,12 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
         final Address src = msg.src();
         final Command<?> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
         log.tracef("Starting async from %s: %s.", src, command);
-        final Future<?> future = invokeLocal(command, src);
-        final FutureDeferred<Object, Throwable> def = new FutureDeferred<>(future);
-        final Listener listener = new Listener(src, command, response, future, timeout, unit);
-        def.onResolve(listener)
-                .onReject(listener)
-                .onCancel(listener)
-                .onComplete(listener);
-        executor.execute(def.asRunnable());
+        try {
+            final Object ret = command.perform(configuration, src);
+            response.send(ret, false);
+        } catch (final Throwable e) { //Should throw a CancellationException
+            response.send(e, true);
+        }
     }
 
     @Override

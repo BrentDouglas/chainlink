@@ -25,7 +25,7 @@ public class DistributedLocalChain extends ChainImpl<Void> {
 
     private static final Logger log = Logger.getLogger(DistributedLocalChain.class);
 
-    protected final BaseTransport<?> transport;
+    protected final DistributedTransport<?> transport;
     protected final Object address;
     protected final long jobExecutionId;
     protected final ChainId chainId;
@@ -35,7 +35,7 @@ public class DistributedLocalChain extends ChainImpl<Void> {
     // This is to head off any delayed calls to #get after the job has finished and the registry has been cleaned
     volatile boolean waited = false;
 
-    public DistributedLocalChain(final BaseTransport<?> transport, final Object address, final long jobExecutionId, final ChainId chainId) {
+    public DistributedLocalChain(final DistributedTransport<?> transport, final Object address, final long jobExecutionId, final ChainId chainId) {
         this.transport = transport;
         this.address = address;
         this.jobExecutionId = jobExecutionId;
@@ -52,7 +52,7 @@ public class DistributedLocalChain extends ChainImpl<Void> {
     public boolean cancel(final boolean mayInterruptIfRunning) {
         boolean cancelled = false;
         try {
-            cancelled = transport.invokeRemote(address, this.<Boolean>command("cancel", mayInterruptIfRunning), this.timeout, this.unit)
+            cancelled = transport.invokeRemote(address, this.<Boolean>command("cancel", mayInterruptIfRunning))
                     .get(timeout, unit);
         } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
             log.warn("", e);

@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.core.transport.cmd;
 
 import io.machinecode.chainlink.core.registry.UUIDId;
-import io.machinecode.chainlink.core.transport.BaseTransport;
 import io.machinecode.chainlink.core.transport.DistributedRemoteChain;
+import io.machinecode.chainlink.core.transport.DistributedTransport;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
@@ -27,7 +27,7 @@ public class PushChainCommand implements Command<ChainId> {
     public ChainId perform(final Configuration configuration, final Object origin) throws Throwable {
         final Transport transport = configuration.getTransport();
         //TODO Fix this
-        final Chain<?> chain = new DistributedRemoteChain((BaseTransport<?>)transport, origin, jobExecutionId, chainId);
+        final Chain<?> chain = new DistributedRemoteChain((DistributedTransport<?>)transport, origin, jobExecutionId, chainId);
         final ChainId remoteId = new UUIDId(transport);
         configuration.getRegistry().registerChain(jobExecutionId, remoteId, chain);
         return remoteId;

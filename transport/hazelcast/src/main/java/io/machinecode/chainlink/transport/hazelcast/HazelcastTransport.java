@@ -23,7 +23,6 @@ import org.jboss.logging.Logger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -94,11 +93,6 @@ public class HazelcastTransport extends DistributedTransport<String> {
     }
 
     @Override
-    protected List<String> getRemotes() {
-        return _remoteUuids(this.remotes);
-    }
-
-    @Override
     public <T> Promise<T,Throwable,Object> invokeRemote(final Object address, final Command<T> command, final long timeout, final TimeUnit unit) {
         if (!(address instanceof String)) {
             return new RejectedDeferred<T, Throwable, Object>(new Exception("Expected " + String.class.getName() + ". Found " + address.getClass())); //TODO Message
@@ -125,7 +119,7 @@ public class HazelcastTransport extends DistributedTransport<String> {
     }
 
     @Override
-    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command, final long timeout, final TimeUnit unit) {
+    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
         log.tracef("Invoking %s on all remotes.", command);
         try {
             final Map<Member,Future<T>> map = this.executor.submitToMembers(
@@ -157,15 +151,6 @@ public class HazelcastTransport extends DistributedTransport<String> {
         final List<Member> that = new ArrayList<>(members);
         that.remove(this.local);
         return that;
-    }
-
-    protected List<String> _remoteUuids(final Collection<Member> all) {
-        final List<String> that = new ArrayList<>(all.size());
-        for (final Member member : all) {
-            that.add(member.getUuid());
-        }
-        that.remove(this.getAddress());
-        return Collections.unmodifiableList(that);
     }
 
     public static class Invocation<T> implements Callable<T>, Serializable, HazelcastInstanceAware {

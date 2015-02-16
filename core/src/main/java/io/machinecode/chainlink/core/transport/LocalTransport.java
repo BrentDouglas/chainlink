@@ -86,7 +86,7 @@ public class LocalTransport implements Transport {
         return new AllChain<Executable>(chains);
     }
 
-    protected static Chain<?> localCallback(final Configuration configuration, final ExecutableId executableId, final ExecutionContext context) throws Exception {
+    public static Chain<?> localCallback(final Configuration configuration, final ExecutableId executableId, final ExecutionContext context) throws Exception {
         final long jobExecutionId = context.getJobExecutionId();
         final Registry registry = configuration.getRegistry();
         final Transport transport = configuration.getTransport();

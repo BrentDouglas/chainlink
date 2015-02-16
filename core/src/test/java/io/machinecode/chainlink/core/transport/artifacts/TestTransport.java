@@ -6,9 +6,15 @@ import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.RejectedDeferred;
 import io.machinecode.then.core.ResolvedDeferred;
+import io.machinecode.then.core.SomeDeferred;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,9 +26,11 @@ public class TestTransport extends DistributedTransport<String> {
     final ConcurrentMap<String, TestTransport> transports;
     final String local;
     final List<String> remotes;
+    protected final ExecutorService executor;
 
     public TestTransport(final ConcurrentMap<String, TestTransport> transports, final String local, final List<String> remotes, final Dependencies dependencies, final java.util.Properties properties) throws Exception {
         super(dependencies, properties);
+        this.executor = Executors.newCachedThreadPool();
         this.transports = transports;
         this.local = local;
         this.remotes = remotes;
@@ -34,8 +42,13 @@ public class TestTransport extends DistributedTransport<String> {
     }
 
     @Override
-    protected List<String> getRemotes() {
-        return remotes;
+    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
+        final List<String> remotes = this.remotes;
+        final List<Promise<T,Throwable,?>> promises = new ArrayList<>(remotes.size());
+        for (final String remote : remotes) {
+            promises.add(invokeRemote(remote, command));
+        }
+        return new SomeDeferred<>(promises);
     }
 
     @Override
@@ -52,5 +65,19 @@ public class TestTransport extends DistributedTransport<String> {
         } catch (final Throwable e) {
             return new RejectedDeferred<>(e);
         }
+    }
+
+    public <T> Future<T> invokeLocal(final Command<T> command, final String origin) throws Exception {
+        final TestTransport self = this;
+        return executor.submit(new Callable<T>() {
+            @Override
+            public T call() throws Exception {
+                try {
+                    return command.perform(self.configuration, origin);
+                } catch (final Throwable e) {
+                    throw new Exception(e);
+                }
+            }
+        });
     }
 }

@@ -9,13 +9,9 @@ import io.machinecode.then.core.FutureDeferred;
 import io.machinecode.then.core.RejectedDeferred;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridFuture;
-import org.gridgain.grid.GridNode;
 import org.jboss.logging.Logger;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -38,15 +34,6 @@ public class GridGainTransport extends DistributedTransport<UUID> {
         log.infof("GridGainRegistry started on address: [%s]", this.local); //TODO Message
     }
 
-    protected List<UUID> _remoteMemberIdsFromNodes(final Collection<GridNode> all) {
-        final List<UUID> that = new ArrayList<>(all.size());
-        for (final GridNode node : all) {
-            that.add(node.id());
-        }
-        that.remove(this.getAddress());
-        return Collections.unmodifiableList(that);
-    }
-
     @Override
     public void open(final Configuration configuration) throws Exception {
         super.open(configuration);
@@ -62,11 +49,6 @@ public class GridGainTransport extends DistributedTransport<UUID> {
     @Override
     public UUID getAddress() {
         return local;
-    }
-
-    @Override
-    protected List<UUID> getRemotes() {
-        return _remoteMemberIdsFromNodes(this.grid.nodes());
     }
 
     @Override
@@ -88,7 +70,7 @@ public class GridGainTransport extends DistributedTransport<UUID> {
     }
 
     @Override
-    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command, final long timeout, final TimeUnit unit) {
+    protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
         log.tracef("Invoking %s on all remotes.", command);
         final GridFuture<Collection<T>> future = this.grid.forRemotes()
                 .compute()

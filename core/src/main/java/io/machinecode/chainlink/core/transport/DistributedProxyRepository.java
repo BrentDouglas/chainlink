@@ -27,13 +27,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class DistributedProxyRepository implements Repository {
 
-    protected final BaseTransport<?> transport;
+    protected final DistributedTransport<?> transport;
     protected final Object address;
     protected final RepositoryId repositoryId;
     protected final long timeout;
     protected final TimeUnit unit;
 
-    public DistributedProxyRepository(final BaseTransport<?> transport, final RepositoryId repositoryId) {
+    public DistributedProxyRepository(final DistributedTransport<?> transport, final RepositoryId repositoryId) {
         this.transport = transport;
         this.address = repositoryId.getAddress();
         this.repositoryId = repositoryId;
