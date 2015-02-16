@@ -33,7 +33,7 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
     }
 
     public ExecutableImpl(final ExecutableId parentId, final ExecutableImpl<T> executable, final WorkerId workerId) {
-        this(parentId, executable.getContext(), executable.work, executable.repositoryId, workerId);
+        this(parentId, executable.context, executable.work, executable.repositoryId, workerId);
     }
 
     @Override

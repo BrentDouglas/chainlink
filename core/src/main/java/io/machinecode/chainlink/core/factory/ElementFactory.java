@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.factory;
 
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.Element;
 
 /**

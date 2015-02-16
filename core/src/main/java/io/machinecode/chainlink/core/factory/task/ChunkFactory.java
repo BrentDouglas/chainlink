@@ -11,7 +11,7 @@ import io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassFilterImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ItemProcessorImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ItemReaderImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ItemWriterImpl;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.Chunk;
 
 /**

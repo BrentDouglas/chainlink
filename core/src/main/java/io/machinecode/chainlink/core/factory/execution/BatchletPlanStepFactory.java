@@ -15,7 +15,7 @@ import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PlanImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.BatchletImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.execution.Step;
 import io.machinecode.chainlink.spi.jsl.partition.Plan;
 import io.machinecode.chainlink.spi.jsl.task.Batchlet;

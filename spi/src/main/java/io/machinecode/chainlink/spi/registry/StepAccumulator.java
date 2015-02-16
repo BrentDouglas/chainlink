@@ -6,7 +6,9 @@ import javax.transaction.Transaction;
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public interface StepAccumulator extends Accumulator {;
+public interface StepAccumulator {;
+
+    long incrementAndGetCallbackCount();
 
     PartitionReducer.PartitionStatus getPartitionStatus();
 

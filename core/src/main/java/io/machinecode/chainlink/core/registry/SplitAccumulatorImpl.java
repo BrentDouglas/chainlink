@@ -7,9 +7,15 @@ import io.machinecode.chainlink.spi.registry.SplitAccumulator;
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public class SplitAccumulatorImpl extends AccumulatorImpl implements SplitAccumulator {
+public class SplitAccumulatorImpl implements SplitAccumulator {
 
+    private long count = 0;
     private final TLongSet priorStepExecutionIds = new TLongHashSet();
+
+    @Override
+    public long incrementAndGetCallbackCount() {
+        return ++count;
+    }
 
     @Override
     public long[] getPriorStepExecutionIds() {

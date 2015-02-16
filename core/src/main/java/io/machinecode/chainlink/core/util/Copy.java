@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.util;
 
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 
 import java.util.ArrayList;
 import java.util.Collections;

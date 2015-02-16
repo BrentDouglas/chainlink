@@ -7,7 +7,7 @@ import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.MapperImpl;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.partition.Mapper;
 
 /**

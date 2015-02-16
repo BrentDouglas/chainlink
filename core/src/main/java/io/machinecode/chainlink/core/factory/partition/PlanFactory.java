@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PlanImpl;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.Properties;
 import io.machinecode.chainlink.spi.jsl.partition.Plan;
 

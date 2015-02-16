@@ -8,10 +8,16 @@ import javax.transaction.Transaction;
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public class StepAccumulatorImpl extends AccumulatorImpl implements StepAccumulator {
+public class StepAccumulatorImpl implements StepAccumulator {
 
+    private long count = 0;
     private PartitionReducer.PartitionStatus partitionStatus;
     private Transaction transaction;
+
+    @Override
+    public long incrementAndGetCallbackCount() {
+        return ++count;
+    }
 
     @Override
     public PartitionReducer.PartitionStatus getPartitionStatus() {

@@ -7,7 +7,7 @@ import io.machinecode.chainlink.core.factory.transition.Transitions;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.FlowImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.execution.Flow;
 
 import java.util.List;

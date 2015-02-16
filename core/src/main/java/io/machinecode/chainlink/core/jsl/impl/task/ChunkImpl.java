@@ -11,7 +11,7 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
 import io.machinecode.chainlink.spi.context.MutableStepContext;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.Chunk;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.repository.BaseExecution;

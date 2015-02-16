@@ -7,7 +7,7 @@ import io.machinecode.chainlink.core.jsl.impl.partition.CollectorImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.MapperImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.ReducerImpl;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.partition.Mapper;
 import io.machinecode.chainlink.spi.jsl.partition.Partition;
 

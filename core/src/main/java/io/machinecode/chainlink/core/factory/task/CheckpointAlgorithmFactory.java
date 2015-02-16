@@ -7,7 +7,7 @@ import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.CheckpointAlgorithmImpl;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.CheckpointAlgorithm;
 
 /**

@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.jsl.impl.task;
 
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.Task;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.then.api.Promise;

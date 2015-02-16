@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassFilterImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassImpl;
 import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.ExceptionClass;
 import io.machinecode.chainlink.spi.jsl.task.ExceptionClassFilter;
 

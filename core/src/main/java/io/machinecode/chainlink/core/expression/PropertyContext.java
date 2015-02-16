@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.spi.expression;
+package io.machinecode.chainlink.core.expression;
 
 import io.machinecode.chainlink.spi.inject.ArtifactReference;
 

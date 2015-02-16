@@ -9,7 +9,7 @@ import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.BatchletImpl;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.Batchlet;
 
 /**

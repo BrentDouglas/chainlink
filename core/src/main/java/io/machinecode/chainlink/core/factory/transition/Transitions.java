@@ -8,7 +8,7 @@ import io.machinecode.chainlink.core.jsl.impl.transition.StopImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
 import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.transition.End;
 import io.machinecode.chainlink.spi.jsl.transition.Fail;
 import io.machinecode.chainlink.spi.jsl.transition.Next;

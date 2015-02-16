@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.jsl.impl.ListenerImpl;
 import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
 import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
-import io.machinecode.chainlink.spi.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.Listener;
 import io.machinecode.chainlink.spi.jsl.Listeners;
 
