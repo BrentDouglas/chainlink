@@ -35,12 +35,8 @@ public class DummyDataSource implements DataSource {
                 DriverManager.registerDriver(driver);
             }
             return driver.connect(url, new Properties());
-        } catch (final ClassNotFoundException cnfe) {
-            throw new SQLException(cnfe);
-        } catch (final InstantiationException ie) {
-            throw new SQLException(ie);
-        } catch (final IllegalAccessException iae) {
-            throw new SQLException(iae);
+        } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new SQLException(e);
         }
     }
 
@@ -58,12 +54,8 @@ public class DummyDataSource implements DataSource {
             properties.setProperty("user", username);
             properties.setProperty("password", password);
             return driver.connect(url, properties);
-        } catch (final ClassNotFoundException cnfe) {
-            throw new SQLException(cnfe);
-        } catch (final InstantiationException ie) {
-            throw new SQLException(ie);
-        } catch (final IllegalAccessException iae) {
-            throw new SQLException(iae);
+        } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new SQLException(e);
         }
     }
 
