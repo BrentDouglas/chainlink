@@ -68,6 +68,15 @@ public class EventedExecutor implements Executor {
         if (exception != null) {
             throw exception;
         }
+        outer: for (;;) {
+            for (final EventedWorker worker : workers.values()) {
+                if (!worker.finished) {
+                    Thread.sleep(10);
+                    continue outer;
+                }
+            }
+            break;
+        }
     }
 
     @Override

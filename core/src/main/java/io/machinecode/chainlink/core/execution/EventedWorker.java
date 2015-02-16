@@ -37,6 +37,7 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
     protected final Configuration configuration;
     protected volatile boolean started = true;
     protected volatile boolean stopped = false;
+    protected volatile boolean finished = false;
 
     public EventedWorker(final Configuration configuration) {
         this.configuration = configuration;
@@ -81,11 +82,12 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
     @Override
     public void run() {
         this.started = true;
-        boolean ran;
+        boolean empty;
         do {
             _awaitIfEmpty();
-            ran = _runExecutable();
-        } while (!stopped || ran);
+            empty = _runExecutable();
+        } while (!stopped || !empty);
+        this.finished = true;
     }
 
     private boolean _runExecutable() {
@@ -95,25 +97,20 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
         final CallbackEvent cb;
         final ExecutableEvent ex;
         synchronized (lock) {
-            cb = _nextCallback();
+            cb = callbacks.poll();
             if (cb == null) {
-                ex = _nextExecutable();
+                ex = executables.poll();
             } else {
                 ex = null;
             }
         }
         if (cb == null) {
-            try {
-                if (ex == null) {
-                    return false;
-                }
-                executable = ex.getExecutable();
-                previous = null;
-                chainId = ex.getChainId();
-            } catch (final Throwable e) {
-                log.errorf(e, Messages.get("CHAINLINK-024007.worker.fetch.exception"), this, ex);
-                return false;
+            if (ex == null) {
+                return true;
             }
+            executable = ex.getExecutable();
+            previous = null;
+            chainId = ex.getChainId();
         } else {
             try {
                 executable = configuration.getRegistry()
@@ -136,13 +133,13 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
         } catch (final Throwable e) {
             log.errorf(e, Messages.get("CHAINLINK-024004.worker.execute.exception"), context, this, executable);
         }
-        return true;
+        return false;
     }
 
     private void _awaitIfEmpty() {
         try {
             synchronized (lock) {
-                if (executables.isEmpty() && callbacks.isEmpty()) {
+                if (executables.isEmpty() && callbacks.isEmpty() && !stopped) {
                     log.tracef(Messages.get("CHAINLINK-024002.worker.waiting"), this);
                     lock.wait();
                     log.tracef(Messages.get("CHAINLINK-024003.worker.awake"), this);
@@ -153,16 +150,8 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
         }
     }
 
-    private ExecutableEvent _nextExecutable() {
-        return executables.poll();
-    }
-
-    private CallbackEvent _nextCallback() {
-        return callbacks.poll();
-    }
-
     @Override
-    public void close() {
+    public void close() throws InterruptedException {
         stopped = true;
         synchronized (lock) {
             lock.notifyAll();
