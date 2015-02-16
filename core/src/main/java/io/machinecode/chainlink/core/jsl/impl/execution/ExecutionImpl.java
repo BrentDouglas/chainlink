@@ -1,5 +1,7 @@
 package io.machinecode.chainlink.core.jsl.impl.execution;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
+import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
 import io.machinecode.chainlink.core.util.Statuses;
@@ -7,7 +9,6 @@ import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
@@ -42,13 +43,13 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.jsl.
 
     public abstract Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                                          final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
-                                         final ExecutionContext context) throws Exception;
+                                         final ExecutionContextImpl context) throws Exception;
 
     public abstract Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
-                                        final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                                        final WorkerId workerId, final ExecutableId parentId, final ExecutionContextImpl context,
                                         final ExecutionContext childContext) throws Exception;
 
-    public TransitionImpl transition(final ExecutionContext context, final List<? extends TransitionImpl> transitions,
+    public TransitionImpl transition(final ExecutionContextImpl context, final List<? extends TransitionImpl> transitions,
                                      final BatchStatus batchStatus, final String exitStatus) throws Exception {
         final String actualStatus = exitStatus == null ? batchStatus.name() : exitStatus;
         log().tracef(Messages.get("CHAINLINK-009103.execution.transition.statuses"), context, id, exitStatus);
@@ -56,7 +57,7 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.jsl.
             if (Statuses.matches(transition.getOn(), actualStatus)) {
                 log().tracef(Messages.get("CHAINLINK-009101.execution.transition.matched"), context, id, transition.element(), actualStatus, transition.getOn());
                 if (transition.isTerminating()) {
-                    final MutableJobContext jobContext = context.getJobContext();
+                    final JobContextImpl jobContext = context.getJobContext();
                     jobContext.setBatchStatus(transition.getBatchStatus());
                     final String transitionExitStatus = transition.getExitStatus();
                     if (transitionExitStatus != null) {
@@ -73,10 +74,10 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.jsl.
         return null;
     }
 
-    public Promise<Chain<?>,Throwable,?> next(final JobImpl job, final Configuration configuration, final WorkerId workerId, final ExecutionContext context,
+    public Promise<Chain<?>,Throwable,?> next(final JobImpl job, final Configuration configuration, final WorkerId workerId, final ExecutionContextImpl context,
                          final ExecutableId parentId, final RepositoryId repositoryId, final String next,
                          final TransitionImpl transition) throws Exception {
-        final MutableJobContext jobContext = context.getJobContext();
+        final JobContextImpl jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
         if (Statuses.isStopping(context) || Statuses.isFailed(batchStatus)) {
             return configuration.getTransport().callback(parentId, context);
@@ -92,7 +93,7 @@ public abstract class ExecutionImpl implements io.machinecode.chainlink.spi.jsl.
         }
     }
 
-    private Promise<Chain<?>,Throwable,?> _runNextExecution(final JobImpl job, final Configuration configuration, final ExecutableId parentId, final ExecutionContext context,
+    private Promise<Chain<?>,Throwable,?> _runNextExecution(final JobImpl job, final Configuration configuration, final ExecutableId parentId, final ExecutionContextImpl context,
                                        final WorkerId workerId, final RepositoryId repositoryId, final String next) throws Exception {
         final ExecutionImpl execution = job.getNextExecution(next);
         return _resolve(JobImpl.execute(configuration, new ExecutionExecutable(

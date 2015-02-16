@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.work;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.registry.UUIDId;
@@ -28,7 +29,7 @@ public class ExecutionExecutable extends ExecutableImpl<ExecutionImpl> {
 
     private final JobImpl job;
 
-    public ExecutionExecutable(final JobImpl job, final ExecutableId parentId, final ExecutionImpl work, final ExecutionContext context, final RepositoryId repositoryId, final WorkerId workerId) {
+    public ExecutionExecutable(final JobImpl job, final ExecutableId parentId, final ExecutionImpl work, final ExecutionContextImpl context, final RepositoryId repositoryId, final WorkerId workerId) {
         super(parentId, context, work, repositoryId, workerId);
         this.job = job;
     }

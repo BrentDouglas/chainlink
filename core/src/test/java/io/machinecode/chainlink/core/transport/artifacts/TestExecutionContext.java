@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.core.transport.artifacts;
 
+import io.machinecode.chainlink.core.context.JobContextImpl;
+import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
-import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.context.MutableStepContext;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -43,18 +43,13 @@ public class TestExecutionContext implements ExecutionContext {
     }
 
     @Override
-    public MutableJobContext getJobContext() {
+    public JobContextImpl getJobContext() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public MutableStepContext getStepContext() {
+    public StepContextImpl getStepContext() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setStepContext(final MutableStepContext stepContext) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -63,18 +58,8 @@ public class TestExecutionContext implements ExecutionContext {
     }
 
     @Override
-    public void setItems(final Item... items) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public String getRestartElementId() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setRestartElementId(final String restartElementId) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -83,17 +68,7 @@ public class TestExecutionContext implements ExecutionContext {
     }
 
     @Override
-    public void setLastStepExecutionId(final long lastStepExecutionId) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public long[] getPriorStepExecutionIds() {
         return new long[0];  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void setPriorStepExecutionId(final long[] priorStepExecutionId) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

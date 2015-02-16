@@ -2,12 +2,12 @@ package io.machinecode.chainlink.core.factory.partition;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.ReducerImpl;
-import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.partition.Reducer;
 
 /**

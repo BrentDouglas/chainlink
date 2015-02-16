@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.factory.task;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.core.factory.TaskFactory;
 import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
@@ -11,7 +12,6 @@ import io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassFilterImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ItemProcessorImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ItemReaderImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ItemWriterImpl;
-import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.Chunk;
 
 /**

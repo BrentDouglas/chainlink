@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.repository.jpa;
 
-import io.machinecode.chainlink.spi.context.MutableMetric;
+import io.machinecode.chainlink.core.context.MutableMetric;
 
 import javax.batch.runtime.Metric;
 import javax.persistence.Column;
@@ -75,7 +75,7 @@ public class JpaMetric implements MutableMetric, Serializable {
     }
 
     public static Map<MetricType, JpaMetric> empty() {
-        final Map<MetricType, JpaMetric> mets = new HashMap<MetricType, JpaMetric>(MetricType.values().length);
+        final Map<MetricType, JpaMetric> mets = new HashMap<>(MetricType.values().length);
         for (final MetricType type : MetricType.values()) {
             mets.put(type, new JpaMetric(type));
         }
@@ -83,7 +83,7 @@ public class JpaMetric implements MutableMetric, Serializable {
     }
 
     public static Map<MetricType, JpaMetric> copy(final Map<MetricType, JpaMetric> list) {
-        final Map<MetricType, JpaMetric> ret = new HashMap<MetricType, JpaMetric>(list.size());
+        final Map<MetricType, JpaMetric> ret = new HashMap<>(list.size());
         for (final Map.Entry<MetricType, JpaMetric> entry : list.entrySet()) {
             ret.put(entry.getKey(), new JpaMetric(entry.getValue()));
         }

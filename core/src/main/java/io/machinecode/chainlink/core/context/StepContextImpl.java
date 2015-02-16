@@ -5,8 +5,6 @@ import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.repository.MetricImpl;
 import io.machinecode.chainlink.core.repository.MutableMetricImpl;
 import io.machinecode.chainlink.spi.Messages;
-import io.machinecode.chainlink.spi.context.MutableMetric;
-import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.jsl.execution.Step;
 import org.jboss.logging.Logger;
 
@@ -21,7 +19,7 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class StepContextImpl implements MutableStepContext, Serializable {
+public class StepContextImpl implements StepContext, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(StepContextImpl.class);
@@ -118,7 +116,6 @@ public class StepContextImpl implements MutableStepContext, Serializable {
         return batchStatus;
     }
 
-    @Override
     public void setBatchStatus(final BatchStatus batchStatus) {
         log.debugf(Messages.get("CHAINLINK-028000.step.context.batch.status"), stepExecutionId, stepName, batchStatus);
         this.batchStatus = batchStatus;
@@ -140,7 +137,6 @@ public class StepContextImpl implements MutableStepContext, Serializable {
         return exception;
     }
 
-    @Override
     public void setException(final Exception exception) {
         this.exception = exception;
     }
@@ -150,10 +146,9 @@ public class StepContextImpl implements MutableStepContext, Serializable {
         return MetricImpl.copy(metrics);
     }
 
-    @Override
     public MutableMetric getMetric(final MetricType type) {
         if (this.metricMap == null) {
-            this.metricMap = new THashMap<MetricType, MutableMetric>();
+            this.metricMap = new THashMap<>();
             for (final MutableMetric metric : this.metrics) {
                 this.metricMap.put(metric.getType(), metric);
             }

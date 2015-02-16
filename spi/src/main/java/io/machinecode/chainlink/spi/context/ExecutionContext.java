@@ -1,5 +1,7 @@
 package io.machinecode.chainlink.spi.context;
 
+import javax.batch.runtime.context.JobContext;
+import javax.batch.runtime.context.StepContext;
 import java.io.Serializable;
 
 /**
@@ -18,25 +20,15 @@ public interface ExecutionContext extends Serializable {
 
     Long getPartitionExecutionId();
 
-    MutableJobContext getJobContext();
+    JobContext getJobContext();
 
-    MutableStepContext getStepContext();
-
-    void setStepContext(final MutableStepContext stepContext);
+    StepContext getStepContext();
 
     Item[] getItems();
 
-    void setItems(final Item... items);
-
     String getRestartElementId();
-
-    void setRestartElementId(final String restartElementId);
 
     Long getLastStepExecutionId();
 
-    void setLastStepExecutionId(final long lastStepExecutionId);
-
     long[] getPriorStepExecutionIds();
-
-    void setPriorStepExecutionId(final long[] priorStepExecutionId);
 }

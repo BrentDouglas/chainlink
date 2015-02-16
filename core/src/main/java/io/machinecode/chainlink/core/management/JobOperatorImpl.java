@@ -16,7 +16,6 @@ import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.core.work.JobExecutable;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
@@ -241,7 +240,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         final ExtendedJobInstance instance = repository.createJobInstance(job.getId(), jslName, new Date());
         final ExtendedJobExecution execution = repository.createJobExecution(instance.getInstanceId(), job.getId(), parameters, new Date());
         final long jobExecutionId = execution.getExecutionId();
-        final ExecutionContext context = new ExecutionContextImpl(
+        final ExecutionContextImpl context = new ExecutionContextImpl(
                 new JobContextImpl(instance, execution, PropertiesConverter.convert(job.getProperties())),
                 null,
                 jobExecutionId,
@@ -328,7 +327,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         if (!Boolean.parseBoolean(job.getRestartable())) {
             throw new JobRestartException(Messages.format("CHAINLINK-001100.operator.cant.restart.job", jobExecutionId, job.getId(), restartExecutionId));
         }
-        final ExecutionContext context = new ExecutionContextImpl(
+        final ExecutionContextImpl context = new ExecutionContextImpl(
                 new JobContextImpl(instance, execution, PropertiesConverter.convert(job.getProperties())),
                 null,
                 execution.getExecutionId(),

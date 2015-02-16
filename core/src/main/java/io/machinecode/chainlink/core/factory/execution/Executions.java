@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.factory.execution;
 
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.execution.DecisionImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.FlowImpl;
@@ -12,7 +13,6 @@ import io.machinecode.chainlink.core.jsl.impl.task.BatchletImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ChunkImpl;
 import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
-import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.execution.Decision;
 import io.machinecode.chainlink.spi.jsl.execution.Execution;
 import io.machinecode.chainlink.spi.jsl.execution.Flow;

@@ -1,13 +1,14 @@
 package io.machinecode.chainlink.core.work;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
+import io.machinecode.chainlink.core.context.JobContextImpl;
+import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.TaskWork;
 import io.machinecode.chainlink.core.then.LinkAndRejectChain;
 import io.machinecode.chainlink.core.then.LinkAndResolveChain;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
@@ -28,7 +29,7 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
 
     final int timeout;
 
-    public TaskExecutable(final ExecutableId parentId, final TaskWork work, final ExecutionContext context, final RepositoryId repositoryId, final int timeout) {
+    public TaskExecutable(final ExecutableId parentId, final TaskWork work, final ExecutionContextImpl context, final RepositoryId repositoryId, final int timeout) {
         super(parentId, context, work, repositoryId, null);
         this.timeout = timeout;
     }
@@ -45,8 +46,8 @@ public class TaskExecutable extends ExecutableImpl<TaskWork> {
                 return true;
             }
         });
-        final MutableStepContext stepContext = context.getStepContext();
-        final MutableJobContext jobContext = context.getJobContext();
+        final StepContextImpl stepContext = context.getStepContext();
+        final JobContextImpl jobContext = context.getJobContext();
         try {
             work.run(configuration, chain, this.repositoryId, this.context, timeout);
             final Promise<Chain<?>,Throwable,?> next = configuration.getTransport().callback(parentId, this.context);

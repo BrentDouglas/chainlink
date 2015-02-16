@@ -3,8 +3,6 @@ package io.machinecode.chainlink.core.context;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
-import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.context.MutableStepContext;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
@@ -20,9 +18,9 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
     private final long jobExecutionId;
     private final Long restartJobExecutionId;
     private final Long partitionExecutionId;
-    private final MutableJobContext jobContext;
+    private final JobContextImpl jobContext;
     private String restartElementId;
-    private MutableStepContext stepContext;
+    private StepContextImpl stepContext;
     private Long stepExecutionId;
     private Item[] items;
     private Long lastStepExecutionId;
@@ -30,7 +28,7 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
 
     private transient String logString;
 
-    private ExecutionContextImpl(final MutableJobContext jobContext, final long jobExecutionId,
+    private ExecutionContextImpl(final JobContextImpl jobContext, final long jobExecutionId,
                                  final Long restartJobExecutionId, final String restartElementId, final Long partitionExecutionId,
                                  final Item[] items) {
         this.jobExecutionId = jobExecutionId;
@@ -41,7 +39,7 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
         this.items = items;
     }
 
-    public ExecutionContextImpl(final MutableJobContext jobContext, final MutableStepContext stepContext,
+    public ExecutionContextImpl(final JobContextImpl jobContext, final StepContextImpl stepContext,
                                 final long jobExecutionId, final Long restartJobExecutionId, final String restartElementId,
                                 final Long partitionExecutionId) {
         this(
@@ -103,17 +101,16 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
     }
 
     @Override
-    public MutableJobContext getJobContext() {
+    public JobContextImpl getJobContext() {
         return jobContext;
     }
 
     @Override
-    public MutableStepContext getStepContext() {
+    public StepContextImpl getStepContext() {
         return stepContext;
     }
 
-    @Override
-    public void setStepContext(final MutableStepContext stepContext) {
+    public void setStepContext(final StepContextImpl stepContext) {
         this.stepContext = stepContext;
         this.stepExecutionId = stepContext == null ? null : stepContext.getStepExecutionId();
         _buildLogString();
@@ -124,8 +121,7 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
         return items;
     }
 
-    @Override
-    public void setItems(final Item[] items) {
+    public void setItems(final Item... items) {
         this.items = items;
     }
 
@@ -134,7 +130,6 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
         return restartElementId;
     }
 
-    @Override
     public void setRestartElementId(final String restartElementId) {
         this.restartElementId = restartElementId;
     }
@@ -144,7 +139,6 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
         return this.lastStepExecutionId;
     }
 
-    @Override
     public void setLastStepExecutionId(final long lastStepExecutionId) {
         this.lastStepExecutionId = lastStepExecutionId;
     }
@@ -154,7 +148,6 @@ public class ExecutionContextImpl implements ExecutionContext, Serializable {
         return priorStepExecutionIds;
     }
 
-    @Override
     public void setPriorStepExecutionId(final long[] priorStepExecutionId) {
         this.priorStepExecutionIds = priorStepExecutionId;
     }

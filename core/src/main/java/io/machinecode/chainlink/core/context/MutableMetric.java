@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.spi.context;
+package io.machinecode.chainlink.core.context;
 
 import javax.batch.runtime.Metric;
 

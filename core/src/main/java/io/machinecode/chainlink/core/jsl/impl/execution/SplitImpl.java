@@ -52,7 +52,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
     @Override
     public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
-                           final ExecutionContext context) throws Exception {
+                           final ExecutionContextImpl context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021000.split.before"), context, this.id);
         if (Statuses.isStopping(context) || Statuses.isComplete(context)) {
             return configuration.getTransport().callback(parentId, context);
@@ -60,7 +60,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
         final ExecutionExecutable[] flows = new ExecutionExecutable[this.flows.size()];
         for (int i = 0; i < flows.length; ++i) {
             final FlowImpl flow = this.flows.get(i);
-            final ExecutionContext flowContext = new ExecutionContextImpl(
+            final ExecutionContextImpl flowContext = new ExecutionContextImpl(
                     new JobContextImpl(context.getJobContext()),
                     null,
                     context.getJobExecutionId(),
@@ -85,7 +85,7 @@ public class SplitImpl extends ExecutionImpl implements Split {
 
     @Override
     public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
-                          final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                          final WorkerId workerId, final ExecutableId parentId, final ExecutionContextImpl context,
                           final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-021001.split.after"), context, this.id);
         final long jobExecutionId = context.getJobExecutionId();

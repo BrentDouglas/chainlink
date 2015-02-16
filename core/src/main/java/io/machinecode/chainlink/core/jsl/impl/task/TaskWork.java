@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.core.jsl.impl.task;
 
-import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.context.ExecutionContext;
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.jsl.task.Task;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.then.api.Promise;
@@ -17,8 +17,8 @@ public interface TaskWork extends Task, Serializable {
 
     TaskWork partition(PropertyContext context);
 
-    void cancel(final Configuration configuration, final ExecutionContext context);
+    void cancel(final Configuration configuration, final ExecutionContextImpl context);
 
     void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final RepositoryId repositoryId,
-             final ExecutionContext context, final int timeout) throws Throwable;
+             final ExecutionContextImpl context, final int timeout) throws Throwable;
 }

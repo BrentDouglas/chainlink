@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.work;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.registry.UUIDId;
 import io.machinecode.chainlink.core.then.LinkAndResolveChain;
@@ -26,7 +27,7 @@ public class JobExecutable extends ExecutableImpl<JobImpl> {
     private static final Logger log = Logger.getLogger(JobExecutable.class);
 
     public JobExecutable(final ExecutableId parentId, final RepositoryId repositoryId,
-                         final JobImpl work, final ExecutionContext context) {
+                         final JobImpl work, final ExecutionContextImpl context) {
         super(parentId, context, work, repositoryId, null);
     }
 

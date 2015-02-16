@@ -1,5 +1,7 @@
 package io.machinecode.chainlink.core.jsl.impl.execution;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
+import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
 import io.machinecode.chainlink.core.util.Statuses;
@@ -7,7 +9,6 @@ import io.machinecode.chainlink.core.work.ExecutionExecutable;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.jsl.execution.Flow;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -58,7 +59,7 @@ public class FlowImpl extends ExecutionImpl implements Flow {
     @Override
     public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                            final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
-                           final ExecutionContext context) throws Exception {
+                           final ExecutionContextImpl context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020000.flow.before"), context, id);
         final ExecutionImpl execution = this.executions.get(0);
         return _resolve(JobImpl.execute(configuration, new ExecutionExecutable(
@@ -73,10 +74,10 @@ public class FlowImpl extends ExecutionImpl implements Flow {
 
     @Override
     public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
-                             final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                             final WorkerId workerId, final ExecutableId parentId, final ExecutionContextImpl context,
                              final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-020001.flow.after"), context, id);
-        final MutableJobContext jobContext = context.getJobContext();
+        final JobContextImpl jobContext = context.getJobContext();
         final BatchStatus batchStatus = jobContext.getBatchStatus();
         if (Statuses.isStopping(batchStatus) || Statuses.isFailed(batchStatus)) {
             return configuration.getTransport().callback(parentId, context);

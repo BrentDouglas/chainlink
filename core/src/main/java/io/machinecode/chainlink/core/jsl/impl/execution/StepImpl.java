@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.jsl.impl.execution;
 
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
+import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.jsl.impl.ListenerImpl;
@@ -19,8 +20,6 @@ import io.machinecode.chainlink.core.work.TaskExecutable;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.MutableJobContext;
-import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.jsl.execution.Step;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -171,10 +170,10 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
     @Override
     public Promise<Chain<?>,Throwable,?> before(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
                               final WorkerId workerId, final ExecutableId callbackId, final ExecutableId parentId,
-                              final ExecutionContext context) throws Exception {
+                              final ExecutionContextImpl context) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010100.step.before"), context, this.id);
         final Repository repository = Repo.getRepository(configuration, repositoryId);
-        final MutableJobContext jobContext = context.getJobContext();
+        final JobContextImpl jobContext = context.getJobContext();
         final long jobExecutionId = jobContext.getExecutionId();
         StepExecution stepExecution;
         Serializable persistentData = null;
@@ -223,7 +222,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
         stepExecution = repository.createStepExecution(jobExecutionId, this.id, new Date());
 
         final long stepExecutionId = stepExecution.getStepExecutionId();
-        final MutableStepContext stepContext = new StepContextImpl(stepExecutionId, this, PropertiesConverter.convert(this.properties));
+        final StepContextImpl stepContext = new StepContextImpl(stepExecutionId, this, PropertiesConverter.convert(this.properties));
         context.setStepContext(stepContext);
         log.debugf(Messages.get("CHAINLINK-010203.step.create.step.context"), context);
         stepContext.setPersistentUserData(persistentData);
@@ -254,7 +253,7 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
 
         if (!isPartitioned()) {
             this._partitions = 1;
-            final ExecutionContext clonedContext = new ExecutionContextImpl(
+            final ExecutionContextImpl clonedContext = new ExecutionContextImpl(
                     context.getJobContext(),
                     context.getStepContext(),
                     context.getJobExecutionId(),
@@ -278,13 +277,13 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
 
     @Override
     public Promise<Chain<?>,Throwable,?> after(final JobImpl job, final Configuration configuration, final RepositoryId repositoryId,
-                          final WorkerId workerId, final ExecutableId parentId, final ExecutionContext context,
+                          final WorkerId workerId, final ExecutableId parentId, final ExecutionContextImpl context,
                           final ExecutionContext childContext) throws Exception {
         log.debugf(Messages.get("CHAINLINK-010101.step.after"), context, childContext);
         final long jobExecutionId = context.getJobExecutionId();
         final long stepExecutionId = context.getStepExecutionId();
         final Repository repository = Repo.getRepository(configuration, repositoryId);
-        final MutableStepContext stepContext = context.getStepContext();
+        final StepContextImpl stepContext = context.getStepContext();
         final StepAccumulator accumulator = configuration.getRegistry()
                 .getStepAccumulator(jobExecutionId, id);
         final long completed = accumulator.incrementAndGetCallbackCount();

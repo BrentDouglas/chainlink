@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.jsl.impl;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.execution.ExecutableEventImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.registry.UUIDId;
@@ -102,7 +103,7 @@ public class JobImpl implements Job, Serializable {
     }
 
     public Promise<Chain<?>,Throwable,?> before(final Configuration configuration, final RepositoryId repositoryId,
-                              final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
+                              final WorkerId workerId, final ExecutableId callbackId, final ExecutionContextImpl context) throws Exception {
         final Repository repository = Repo.getRepository(configuration, repositoryId);
         long jobExecutionId = context.getJobExecutionId();
         Repo.startedJob(repository, jobExecutionId);
@@ -168,7 +169,7 @@ public class JobImpl implements Job, Serializable {
     }
 
     private Promise<Chain<?>,Throwable,?> _runNext(final Configuration configuration, final ExecutableId callbackId,
-                                        final ExecutionContext context, final RepositoryId repositoryId,
+                                        final ExecutionContextImpl context, final RepositoryId repositoryId,
                                         final ExecutionImpl next) throws Exception {
         return new ResolvedDeferred<Chain<?>, Throwable, Object>(execute(configuration, new ExecutionExecutable(
                 this,

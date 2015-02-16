@@ -12,7 +12,6 @@ import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
-import io.machinecode.chainlink.spi.context.MutableStepContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.jsl.partition.Partition;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -71,14 +70,14 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
         return this.strategy;
     }
 
-    public PartitionPlan loadPartitionPlan(final Configuration configuration, final ExecutionContext context) throws Exception {
+    public PartitionPlan loadPartitionPlan(final Configuration configuration, final ExecutionContextImpl context) throws Exception {
         if (strategy == null) {
             return null;
         }
         return strategy.getPartitionPlan(configuration, context);
     }
 
-    public PartitionTarget map(final Configuration configuration, final RepositoryId repositoryId, final TaskWork task, final ExecutableId callbackId, final ExecutionContext context, final int timeout, final Long restartStepExecutionId) throws Exception {
+    public PartitionTarget map(final Configuration configuration, final RepositoryId repositoryId, final TaskWork task, final ExecutableId callbackId, final ExecutionContextImpl context, final int timeout, final Long restartStepExecutionId) throws Exception {
         final PartitionPlan plan = loadPartitionPlan(configuration, context);
         final boolean restarting = restartStepExecutionId != null;
         final boolean override = plan.getPartitionsOverride();
@@ -90,7 +89,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
             log.debugf(Messages.get("CHAINLINK-011300.partition.reducer.before.partitioned.step"), context);
             this.reducer.beginPartitionedStep(configuration, context);
         }
-        final MutableStepContext stepContext = context.getStepContext();
+        final StepContextImpl stepContext = context.getStepContext();
         final Repository repository = Repo.getRepository(configuration, repositoryId);
         final Properties[] properties = plan.getPartitionProperties();
         final Executable[] executables;
@@ -111,12 +110,12 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
                         new Date()
                 );
                 //TODO Which step execution should this be linked to?
-                final MutableStepContext partitionStepContext = new StepContextImpl(
+                final StepContextImpl partitionStepContext = new StepContextImpl(
                         stepContext,
                         execution.getMetrics(),
                         execution.getPersistentUserData()
                 );
-                final ExecutionContext partitionContext = new ExecutionContextImpl(
+                final ExecutionContextImpl partitionContext = new ExecutionContextImpl(
                         new JobContextImpl(context.getJobContext()),
                         partitionStepContext,
                         context.getJobExecutionId(),
@@ -147,7 +146,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
                         null,
                         new Date()
                 );
-                final ExecutionContext partitionContext = new ExecutionContextImpl(
+                final ExecutionContextImpl partitionContext = new ExecutionContextImpl(
                         new JobContextImpl(context.getJobContext()),
                         new StepContextImpl(context.getStepContext()),
                         context.getJobExecutionId(),

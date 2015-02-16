@@ -1,6 +1,9 @@
 package io.machinecode.chainlink.core.jsl.impl.task;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.ItemImpl;
+import io.machinecode.chainlink.core.context.StepContextImpl;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.core.factory.task.ChunkFactory;
 import io.machinecode.chainlink.core.jsl.impl.ListenerImpl;
 import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
@@ -10,8 +13,6 @@ import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
-import io.machinecode.chainlink.spi.context.MutableStepContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.task.Chunk;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.repository.BaseExecution;
@@ -185,9 +186,9 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
 
     @Override
     public void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final RepositoryId repositoryId,
-                    final ExecutionContext context, final int timeout) throws Throwable {
+                    final ExecutionContextImpl context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
-        final MutableStepContext stepContext = context.getStepContext();
+        final StepContextImpl stepContext = context.getStepContext();
         final State state;
         try {
             state = new State(
@@ -1051,9 +1052,9 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     }
 
     @Override
-    public synchronized void cancel(final Configuration configuration, final ExecutionContext context) {
+    public synchronized void cancel(final Configuration configuration, final ExecutionContextImpl context) {
         if (context != null) {
-            final MutableStepContext stepContext = context.getStepContext();
+            final StepContextImpl stepContext = context.getStepContext();
             if (stepContext != null) {
                 stepContext.setBatchStatus(BatchStatus.STOPPING);
             }
@@ -1081,7 +1082,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final Long partitionExecutionId;
         final TransactionManager transactionManager;
         final Repository repository;
-        final MutableStepContext stepContext;
+        final StepContextImpl stepContext;
         final ExecutionContext context;
         final Configuration configuration;
         final Promise<?,Throwable,?> promise;
@@ -1113,7 +1114,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
         final List<ListenerImpl> skipWriteListeners;
 
         private State(final ChunkImpl chunk, final Configuration configuration, final Promise<?,Throwable,?> promise,
-                      final RepositoryId repositoryId, final ExecutionContext context, final int timeout) throws Exception {
+                      final RepositoryId repositoryId, final ExecutionContextImpl context, final int timeout) throws Exception {
             this.jobExecutionId = context.getJobExecutionId();
             this.stepExecutionId = context.getStepExecutionId();
             this.partitionExecutionId = context.getPartitionExecutionId();

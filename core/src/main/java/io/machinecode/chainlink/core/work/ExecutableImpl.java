@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.work;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -21,9 +22,9 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
     protected final WorkerId workerId;
     protected final RepositoryId repositoryId;
     protected final ExecutableId parentId;
-    protected final ExecutionContext context;
+    protected final ExecutionContextImpl context;
 
-    public ExecutableImpl(final ExecutableId parentId, final ExecutionContext context,
+    public ExecutableImpl(final ExecutableId parentId, final ExecutionContextImpl context,
                           final T work, final RepositoryId repositoryId, final WorkerId workerId) {
         this.parentId = parentId;
         this.context = context;

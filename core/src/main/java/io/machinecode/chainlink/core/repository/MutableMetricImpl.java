@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.repository;
 
-import io.machinecode.chainlink.spi.context.MutableMetric;
+import io.machinecode.chainlink.core.context.MutableMetric;
 
 import javax.batch.runtime.Metric;
 import java.io.Serializable;

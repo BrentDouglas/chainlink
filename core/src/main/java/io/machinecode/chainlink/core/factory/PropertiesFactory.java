@@ -2,11 +2,11 @@ package io.machinecode.chainlink.core.factory;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertyImpl;
 import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Copy.ExpressionTransformer;
-import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.Properties;
 import io.machinecode.chainlink.spi.jsl.Property;
 

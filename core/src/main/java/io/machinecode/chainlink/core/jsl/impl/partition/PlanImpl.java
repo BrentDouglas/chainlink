@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.core.jsl.impl.partition;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.jsl.partition.Plan;
 import org.jboss.logging.Logger;
 
@@ -49,7 +49,7 @@ public class PlanImpl implements Plan, StrategyWork, Serializable {
     }
 
     @Override
-    public PartitionPlan getPartitionPlan(final Configuration configuration, final ExecutionContext context) {
+    public PartitionPlan getPartitionPlan(final Configuration configuration, final ExecutionContextImpl context) {
         int threads;
         try {
             threads = Integer.parseInt(this.threads);

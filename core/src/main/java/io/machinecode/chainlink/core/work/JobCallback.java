@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.core.work;
 
+import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.then.ResolvedChain;
 import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
-import io.machinecode.chainlink.spi.context.MutableJobContext;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.then.Chain;
@@ -40,7 +40,7 @@ public class JobCallback extends ExecutableImpl<JobImpl> {
     @Override
     protected void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,
                              final ExecutableId parentId, final ExecutionContext previous) throws Throwable {
-        final MutableJobContext jobContext = context.getJobContext();
+        final JobContextImpl jobContext = context.getJobContext();
         Throwable throwable = null;
         try {
             work.after(configuration, this.repositoryId, workerId, parentId, this.context);

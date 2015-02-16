@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.core.context;
 
 import io.machinecode.chainlink.spi.Messages;
-import io.machinecode.chainlink.spi.context.MutableJobContext;
 import org.jboss.logging.Logger;
 
 import javax.batch.runtime.BatchStatus;
@@ -15,7 +14,7 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class JobContextImpl implements MutableJobContext, Serializable {
+public class JobContextImpl implements JobContext, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final Logger log = Logger.getLogger(JobContextImpl.class);
@@ -81,7 +80,6 @@ public class JobContextImpl implements MutableJobContext, Serializable {
         return batchStatus;
     }
 
-    @Override
     public void setBatchStatus(final BatchStatus batchStatus) {
         log.debugf(Messages.get("CHAINLINK-029000.job.context.batch.status"), jobExecutionId, jobName, batchStatus);
         this.batchStatus = batchStatus;

@@ -1,6 +1,9 @@
 package io.machinecode.chainlink.core.jsl.impl.task;
 
+import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.ItemImpl;
+import io.machinecode.chainlink.core.context.StepContextImpl;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.core.factory.task.BatchletFactory;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertyReferenceImpl;
@@ -10,8 +13,6 @@ import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.context.Item;
-import io.machinecode.chainlink.spi.context.MutableStepContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.inject.ArtifactReference;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
@@ -43,9 +44,9 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
 
     @Override
     public void run(final Configuration configuration, final Promise<?,Throwable,?> promise, final RepositoryId repositoryId,
-                    final ExecutionContext context, final int timeout) throws Throwable {
+                    final ExecutionContextImpl context, final int timeout) throws Throwable {
         final Long partitionExecutionId = context.getPartitionExecutionId();
-        final MutableStepContext stepContext = context.getStepContext();
+        final StepContextImpl stepContext = context.getStepContext();
         final Repository repository = Repo.getRepository(configuration, repositoryId);
         stepContext.setBatchStatus(BatchStatus.STARTED);
         Throwable throwable = null;
@@ -131,14 +132,14 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
-    public void cancel(final Configuration configuration, final ExecutionContext context) {
+    public void cancel(final Configuration configuration, final ExecutionContextImpl context) {
         try {
             log.debugf(Messages.get("CHAINLINK-013103.batchlet.stop"), context, getRef());
             this.stop(configuration, context);
         } catch (final Exception e) {
             throw new BatchRuntimeException(Messages.format("CHAINLINK-013000.batchlet.stop.exception", context, getRef()), e);
         }
-        final MutableStepContext stepContext = context.getStepContext();
+        final StepContextImpl stepContext = context.getStepContext();
         if (stepContext != null) {
             stepContext.setBatchStatus(BatchStatus.STOPPING);
         }

@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.factory.execution;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
+import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.factory.StepListenersFactory;
@@ -15,7 +16,6 @@ import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PlanImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ChunkImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.TransitionImpl;
-import io.machinecode.chainlink.core.expression.PropertyContext;
 import io.machinecode.chainlink.spi.jsl.execution.Step;
 import io.machinecode.chainlink.spi.jsl.partition.Plan;
 import io.machinecode.chainlink.spi.jsl.task.Chunk;
