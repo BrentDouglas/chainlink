@@ -19,9 +19,23 @@
             <fileMode>644</fileMode>
             <filtered>true</filtered>
         </fileSet>
+        <fileSet>
+            <outputDirectory>doc</outputDirectory>
+            <directory>../doc/target/generated-docs</directory>
+            <directoryMode>644</directoryMode>
+            <fileMode>644</fileMode>
+            <excludes>
+                <exclude>*.pdf</exclude>
+                <exclude>*.pdfmarks</exclude>
+            </excludes>
+        </fileSet>
     </fileSets>
 
     <files>
+        <file>
+            <source>../doc/target/generated-docs/chainlink.pdf</source>
+            <outputDirectory>doc</outputDirectory>
+        </file>
         <file>
             <source>../README.md</source>
             <outputDirectory>/</outputDirectory>
