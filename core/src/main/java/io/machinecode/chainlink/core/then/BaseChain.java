@@ -77,19 +77,16 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
         final CancelListener listener = new CancelListener();
         ListenerException exception = null;
         final int state;
-        _lock();
-        try {
+        synchronized (_lock) {
             cancelling(listener);
             if (listener.exception != null) {
-                _signalAll();
+                _lock.notifyAll();
                 throw listener.exception;
             }
             if (setCancelled()) {
                 return isCancelled();
             }
             state = this.state;
-        } finally {
-            _unlock();
         }
         for (final OnCancel then : this.<OnCancel>_getEvents(ON_CANCEL)) {
             try {
@@ -113,11 +110,8 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
                 }
             }
         }
-        _lock();
-        try {
-            _signalAll();
-        } finally {
-            _unlock();
+        synchronized (_lock) {
+            _lock.notifyAll();
         }
         if (exception != null) {
             throw exception;
