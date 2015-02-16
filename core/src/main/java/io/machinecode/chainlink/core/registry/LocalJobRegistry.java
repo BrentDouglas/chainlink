@@ -1,7 +1,5 @@
 package io.machinecode.chainlink.core.registry;
 
-import gnu.trove.map.TMap;
-import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
@@ -9,7 +7,8 @@ import io.machinecode.chainlink.spi.registry.SplitAccumulator;
 import io.machinecode.chainlink.spi.registry.StepAccumulator;
 import io.machinecode.chainlink.spi.then.Chain;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -17,84 +16,42 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class LocalJobRegistry {
 
-    protected final TMap<ChainId, Chain<?>> chains;
-    protected final TMap<ExecutableId, Executable> executables;
-    protected final TMap<String, SplitAccumulator> splits;
-    protected final TMap<String, StepAccumulator> steps;
-
-    protected final AtomicBoolean chainLock = new AtomicBoolean(false);
-    protected final AtomicBoolean executableLock = new AtomicBoolean(false);
-    protected final AtomicBoolean splitLock = new AtomicBoolean(false);
-    protected final AtomicBoolean stepLock = new AtomicBoolean(false);
-
-    public LocalJobRegistry() {
-        this.chains = new THashMap<ChainId, Chain<?>>();
-        this.executables = new THashMap<ExecutableId, Executable>();
-        this.splits = new THashMap<String, SplitAccumulator>();
-        this.steps = new THashMap<String, StepAccumulator>();
-    }
+    protected final ConcurrentMap<ChainId, Chain<?>> chains = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<ExecutableId, Executable> executables = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<String, SplitAccumulator> splits = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<String, StepAccumulator> steps = new ConcurrentHashMap<>();
 
     public void registerChain(final ChainId id, final Chain<?> chain) {
-        while (!chainLock.compareAndSet(false, true)) {}
-        try {
-            this.chains.put(id, chain);
-        } finally {
-            chainLock.set(false);
-        }
+        this.chains.put(id, chain);
     }
 
     public Chain<?> getChain(final ChainId id) {
-        while (!chainLock.compareAndSet(false, true)) {}
-        try {
-            return this.chains.get(id);
-        } finally {
-            chainLock.set(false);
-        }
+        return this.chains.get(id);
     }
 
     public void registerExecutable(final ExecutableId id, final Executable executable) {
-        while (!executableLock.compareAndSet(false, true)) {}
-        try {
-            this.executables.put(id, executable);
-        } finally {
-            executableLock.set(false);
-        }
+        this.executables.put(id, executable);
     }
 
     public Executable getExecutable(final ExecutableId id) {
-        while (!executableLock.compareAndSet(false, true)) {}
-        try {
-            return this.executables.get(id);
-        } finally {
-            executableLock.set(false);
-        }
+        return this.executables.get(id);
     }
 
     public StepAccumulator getStepAccumulator(final String id) {
-        while (!stepLock.compareAndSet(false, true)) {}
-        try {
-            StepAccumulator step = steps.get(id);
-            if (step != null) {
-                return step;
-            }
-            steps.put(id, step = new StepAccumulatorImpl());
+        StepAccumulator step = steps.get(id);
+        if (step != null) {
             return step;
-        } finally {
-            stepLock.set(false);
         }
+        steps.put(id, step = new StepAccumulatorImpl());
+        return step;
     }
 
     public SplitAccumulator getSplitAccumulator(final String id) {
-        while (!splitLock.compareAndSet(false, true)) {}
-        try {
-            SplitAccumulator split = splits.get(id);
-            if (split != null) {
-                return split;
-            }
-            splits.put(id, split = new SplitAccumulatorImpl());
+        SplitAccumulator split = splits.get(id);
+        if (split != null) {
             return split;
-        } finally {
-            splitLock.set(false);
         }
+        splits.put(id, split = new SplitAccumulatorImpl());
+        return split;
     }
 }

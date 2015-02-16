@@ -44,8 +44,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -72,16 +73,16 @@ public class MemoryRepository implements Repository {
     protected final TLongObjectMap<TLongList> stepExecutionPartitionExecutions = new TLongObjectHashMap<TLongList>();
     protected final TLongObjectMap<TLongSet> jobExecutionHistory = new TLongObjectHashMap<TLongSet>();
 
-    protected final AtomicBoolean jobInstanceLock = new AtomicBoolean(false);
-    protected final AtomicBoolean jobExecutionLock = new AtomicBoolean(false);
-    protected final AtomicBoolean stepExecutionLock = new AtomicBoolean(false);
-    protected final AtomicBoolean partitionExecutionLock = new AtomicBoolean(false);
-    protected final AtomicBoolean jobInstanceExecutionLock = new AtomicBoolean(false);
-    protected final AtomicBoolean jobExecutionInstanceLock = new AtomicBoolean(false);
-    protected final AtomicBoolean jobExecutionStepExecutionLock = new AtomicBoolean(false);
-    protected final AtomicBoolean latestJobExecutionForInstanceLock = new AtomicBoolean(false);
-    protected final AtomicBoolean stepExecutionPartitionExecutionLock = new AtomicBoolean(false);
-    protected final AtomicBoolean jobExecutionHistoryLock = new AtomicBoolean(false);
+    protected final ReadWriteLock jobInstanceLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock jobExecutionLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock stepExecutionLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock partitionExecutionLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock jobInstanceExecutionLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock jobExecutionInstanceLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock jobExecutionStepExecutionLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock latestJobExecutionForInstanceLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock stepExecutionPartitionExecutionLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock jobExecutionHistoryLock = new ReentrantReadWriteLock();
 
     protected final Marshalling marshalling;
 
@@ -98,17 +99,17 @@ public class MemoryRepository implements Repository {
                 .setJslName(jslName)
                 .setCreateTime(timestamp)
                 .build();
-        while (!jobInstanceLock.compareAndSet(false, true)) {}
+        jobInstanceLock.writeLock().lock();
         try {
             jobInstances.put(id, instance);
         } finally {
-            jobInstanceLock.set(false);
+            jobInstanceLock.writeLock().unlock();
         }
-        while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
+        jobInstanceExecutionLock.writeLock().lock();
         try {
             jobInstanceExecutions.put(id, new TLongArrayList(0));
         } finally {
-            jobInstanceExecutionLock.set(false);
+            jobInstanceExecutionLock.writeLock().unlock();
         }
         return instance;
     }
@@ -116,7 +117,7 @@ public class MemoryRepository implements Repository {
     @Override
     public JobExecutionImpl createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws NoSuchJobInstanceException {
         final long jobExecutionId;
-        while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
+        jobInstanceExecutionLock.writeLock().lock();
         try {
             final TLongList executions = jobInstanceExecutions.get(jobInstanceId);
             if (executions == null) {
@@ -125,7 +126,7 @@ public class MemoryRepository implements Repository {
             jobExecutionId = jobExecutionIndex.getAndIncrement();
             executions.add(jobExecutionId);
         } finally {
-            jobInstanceExecutionLock.set(false);
+            jobInstanceExecutionLock.writeLock().unlock();
         }
         final JobExecutionImpl execution = new JobExecutionImpl.Builder()
                 .setJobInstanceId(jobInstanceId)
@@ -136,35 +137,35 @@ public class MemoryRepository implements Repository {
                 .setCreateTime(timestamp)
                 .setLastUpdatedTime(timestamp)
                 .build();
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.writeLock().lock();
         try {
             jobExecutions.put(jobExecutionId, execution);
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.writeLock().unlock();
         }
-        while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
+        jobExecutionInstanceLock.writeLock().lock();
         try {
             jobExecutionInstances.put(jobExecutionId, jobInstanceId);
         } finally {
-            jobExecutionInstanceLock.set(false);
+            jobExecutionInstanceLock.writeLock().unlock();
         }
-        while (!latestJobExecutionForInstanceLock.compareAndSet(false, true)) {}
+        latestJobExecutionForInstanceLock.writeLock().lock();
         try {
             latestJobExecutionForInstance.put(jobInstanceId, jobExecutionId);
         } finally {
-            latestJobExecutionForInstanceLock.set(false);
+            latestJobExecutionForInstanceLock.writeLock().unlock();
         }
-        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionStepExecutionLock.writeLock().lock();
         try {
             jobExecutionStepExecutions.put(jobExecutionId, new TLongHashSet(0));
         } finally {
-            jobExecutionStepExecutionLock.set(false);
+            jobExecutionStepExecutionLock.writeLock().unlock();
         }
-        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        jobExecutionHistoryLock.writeLock().lock();
         try {
             jobExecutionHistory.put(jobExecutionId, new TLongHashSet(0));
         } finally {
-            jobExecutionHistoryLock.set(false);
+            jobExecutionHistoryLock.writeLock().unlock();
         }
         return execution;
     }
@@ -172,7 +173,7 @@ public class MemoryRepository implements Repository {
     @Override
     public StepExecutionImpl createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception {
         final long stepExecutionId;
-        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionStepExecutionLock.writeLock().lock();
         try {
             final TLongSet executionIds = jobExecutionStepExecutions.get(jobExecutionId);
             if (executionIds == null) {
@@ -181,7 +182,7 @@ public class MemoryRepository implements Repository {
             stepExecutionId = stepExecutionIndex.getAndIncrement();
             executionIds.add(stepExecutionId);
         } finally {
-            jobExecutionStepExecutionLock.set(false);
+            jobExecutionStepExecutionLock.writeLock().unlock();
         }
         final StepExecutionImpl execution = new StepExecutionImpl.Builder()
                 .setJobExecutionId(jobExecutionId)
@@ -192,7 +193,7 @@ public class MemoryRepository implements Repository {
                 .setBatchStatus(BatchStatus.STARTING)
                 .setMetrics(MutableMetricImpl.empty())
                 .build();
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.writeLock().lock();
         try {
             stepExecutions.putIfAbsent(stepExecutionId, execution);
             //final StepExecution old = stepExecutions.putIfAbsent(id, execution);
@@ -200,13 +201,13 @@ public class MemoryRepository implements Repository {
             //    throw new StepAlreadyExistsException();
             //}
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.writeLock().unlock();
         }
-        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionPartitionExecutionLock.writeLock().lock();
         try {
             stepExecutionPartitionExecutions.put(stepExecutionId, new TLongArrayList());
         } finally {
-            stepExecutionPartitionExecutionLock.set(false);
+            stepExecutionPartitionExecutionLock.writeLock().unlock();
         }
         return execution;
     }
@@ -217,7 +218,7 @@ public class MemoryRepository implements Repository {
         final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
         final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
         final long id;
-        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionPartitionExecutionLock.writeLock().lock();
         try {
             TLongList partitions = stepExecutionPartitionExecutions.get(stepExecutionId);
             if (partitions == null) {
@@ -226,7 +227,7 @@ public class MemoryRepository implements Repository {
             id = partitionExecutionIndex.getAndIncrement();
             partitions.add(id);
         } finally {
-            stepExecutionPartitionExecutionLock.set(false);
+            stepExecutionPartitionExecutionLock.writeLock().unlock();
         }
         final PartitionExecutionImpl execution = new PartitionExecutionImpl.Builder()
                 .setPartitionExecutionId(id)
@@ -241,18 +242,18 @@ public class MemoryRepository implements Repository {
                 .setMetrics(MutableMetricImpl.empty())
                 .setBatchStatus(BatchStatus.STARTING)
                 .build();
-        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        partitionExecutionLock.writeLock().lock();
         try {
             partitionExecutions.put(id, execution);
         } finally {
-            partitionExecutionLock.set(false);
+            partitionExecutionLock.writeLock().unlock();
         }
         return execution;
     }
 
     @Override
     public void startJobExecution(final long jobExecutionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.writeLock().lock();
         try {
             final ExtendedJobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
@@ -265,13 +266,13 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.writeLock().unlock();
         }
     }
 
     @Override
     public void updateJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.writeLock().lock();
         try {
             final ExtendedJobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
@@ -283,13 +284,13 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.writeLock().unlock();
         }
     }
 
     @Override
     public void finishJobExecution(final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.writeLock().lock();
         try {
             final ExtendedJobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
@@ -304,7 +305,7 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.writeLock().unlock();
         }
     }
 
@@ -312,7 +313,7 @@ public class MemoryRepository implements Repository {
     public void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         final TLongSet jobExecutionIds;
         final TLongSet oldJobExecutionIds;
-        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        jobExecutionHistoryLock.writeLock().lock();
         try {
             oldJobExecutionIds = jobExecutionHistory.get(restartJobExecutionId);
             if (oldJobExecutionIds == null) {
@@ -325,13 +326,13 @@ public class MemoryRepository implements Repository {
             jobExecutionIds.add(restartJobExecutionId);
             jobExecutionIds.addAll(oldJobExecutionIds);
         } finally {
-            jobExecutionHistoryLock.set(false);
+            jobExecutionHistoryLock.writeLock().unlock();
         }
     }
 
     @Override
     public void startStepExecution(final long stepExecutionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.writeLock().lock();
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
             if (execution == null) {
@@ -344,14 +345,14 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.writeLock().unlock();
         }
     }
 
     @Override
     public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.writeLock().lock();
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
             if (execution == null) {
@@ -364,7 +365,7 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.writeLock().unlock();
         }
     }
 
@@ -373,7 +374,7 @@ public class MemoryRepository implements Repository {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
         final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.writeLock().lock();
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
             if (execution == null) {
@@ -388,13 +389,13 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.writeLock().unlock();
         }
     }
 
     @Override
     public void finishStepExecution(final long stepExecutionId, final Metric[] metrics, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.writeLock().lock();
         try {
             final ExtendedStepExecution execution = stepExecutions.get(stepExecutionId);
             if (execution == null) {
@@ -409,13 +410,13 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.writeLock().unlock();
         }
     }
 
     @Override
     public void startPartitionExecution(final long partitionExecutionId, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        partitionExecutionLock.writeLock().lock();
         try {
             final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
             if (partition == null) {
@@ -428,7 +429,7 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            partitionExecutionLock.set(false);
+            partitionExecutionLock.writeLock().unlock();
         }
     }
 
@@ -437,7 +438,7 @@ public class MemoryRepository implements Repository {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
         final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
-        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        partitionExecutionLock.writeLock().lock();
         try {
             final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
             if (partition == null) {
@@ -452,14 +453,14 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            partitionExecutionLock.set(false);
+            partitionExecutionLock.writeLock().unlock();
         }
     }
 
     @Override
     public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
-        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        partitionExecutionLock.writeLock().lock();
         try {
             final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
             if (partition == null) {
@@ -475,27 +476,27 @@ public class MemoryRepository implements Repository {
                     .build()
             );
         } finally {
-            partitionExecutionLock.set(false);
+            partitionExecutionLock.writeLock().unlock();
         }
     }
 
     @Override
     public Set<String> getJobNames() throws JobSecurityException {
         final Set<String> ret = new THashSet<String>();
-        while (!jobInstanceLock.compareAndSet(false, true)) {}
+        jobInstanceLock.readLock().lock();
         try {
             for (final JobInstance instance : jobInstances.valueCollection()) {
                 ret.add(instance.getJobName());
             }
         } finally {
-            jobInstanceLock.set(false);
+            jobInstanceLock.readLock().unlock();
         }
         return ret;
     }
 
     @Override
     public int getJobInstanceCount(final String jobName) throws NoSuchJobException, JobSecurityException {
-        while (!jobInstanceLock.compareAndSet(false, true)) {}
+        jobInstanceLock.readLock().lock();
         try {
             int ret = 0;
             for (final JobInstance instance : jobInstances.valueCollection()) {
@@ -508,14 +509,14 @@ public class MemoryRepository implements Repository {
             }
             return ret;
         } finally {
-            jobInstanceLock.set(false);
+            jobInstanceLock.readLock().unlock();
         }
     }
 
     @Override
     public List<JobInstance> getJobInstances(final String jobName, final int start, final int count) throws NoSuchJobException, JobSecurityException {
         final List<JobInstance> ret = new ArrayList<JobInstance>(count);
-        while (!jobInstanceLock.compareAndSet(false, true)) {}
+        jobInstanceLock.readLock().lock();
         try {
             for (final JobInstance instance : jobInstances.valueCollection()) {
                 if (jobName.equals(instance.getJobName())) {
@@ -523,7 +524,7 @@ public class MemoryRepository implements Repository {
                 }
             }
         } finally {
-            jobInstanceLock.set(false);
+            jobInstanceLock.readLock().unlock();
         }
         if (ret.isEmpty()) {
             throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
@@ -541,7 +542,7 @@ public class MemoryRepository implements Repository {
 
     @Override
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, JobSecurityException {
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.readLock().lock();
         try {
             boolean found = false;
             final List<Long> ids = new ArrayList<Long>();
@@ -560,13 +561,13 @@ public class MemoryRepository implements Repository {
             }
             return ids;
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.readLock().unlock();
         }
     }
 
     @Override
     public Properties getParameters(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.readLock().lock();
         try {
             final JobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
@@ -574,13 +575,13 @@ public class MemoryRepository implements Repository {
             }
             return execution.getJobParameters();
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.readLock().unlock();
         }
     }
 
     @Override
     public ExtendedJobInstance getJobInstance(final long jobInstanceId) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!jobInstanceLock.compareAndSet(false, true)) {}
+        jobInstanceLock.readLock().lock();
         try {
             final ExtendedJobInstance instance = jobInstances.get(jobInstanceId);
             if (instance == null) {
@@ -588,21 +589,21 @@ public class MemoryRepository implements Repository {
             }
             return instance;
         } finally {
-            jobInstanceLock.set(false);
+            jobInstanceLock.readLock().unlock();
         }
     }
 
     @Override
     public ExtendedJobInstance getJobInstanceForExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         final long instanceId;
-        while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
+        jobExecutionInstanceLock.readLock().lock();
         try {
             instanceId = jobExecutionInstances.get(jobExecutionId);
             if (instanceId == jobExecutionInstances.getNoEntryValue()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
         } finally {
-            jobExecutionInstanceLock.set(false);
+            jobExecutionInstanceLock.readLock().unlock();
         }
         return getJobInstance(instanceId);
     }
@@ -610,7 +611,7 @@ public class MemoryRepository implements Repository {
     @Override
     public List<JobExecution> getJobExecutions(final long jobInstanceId) throws NoSuchJobInstanceException, JobSecurityException {
         final TLongList jobExecutionIds = new TLongArrayList();
-        while (!jobInstanceExecutionLock.compareAndSet(false, true)) {}
+        jobInstanceExecutionLock.readLock().lock();
         try {
             final TLongList executions = jobInstanceExecutions.get(jobInstanceId);
             if (executions == null) {
@@ -618,9 +619,9 @@ public class MemoryRepository implements Repository {
             }
             jobExecutionIds.addAll(executions);
         } finally {
-            jobInstanceExecutionLock.set(false);
+            jobInstanceExecutionLock.readLock().unlock();
         }
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.readLock().lock();
         try {
             final List<JobExecution> executions = new ArrayList<JobExecution>(jobExecutionIds.size());
             for (final TLongIterator it = jobExecutionIds.iterator(); it.hasNext();) {
@@ -629,13 +630,13 @@ public class MemoryRepository implements Repository {
             }
             return executions;
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.readLock().unlock();
         }
     }
 
     @Override
     public ExtendedJobExecution getJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.readLock().lock();
         try {
             final ExtendedJobExecution execution = jobExecutions.get(jobExecutionId);
             if (execution == null) {
@@ -643,24 +644,24 @@ public class MemoryRepository implements Repository {
             }
             return execution;
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.readLock().unlock();
         }
     }
 
     @Override
     public ExtendedJobExecution restartJobExecution(final long jobExecutionId, final Properties parameters) throws JobRestartException, NoSuchJobExecutionException, NoSuchJobInstanceException, JobExecutionNotMostRecentException, JobSecurityException {
         final long jobInstanceId;
-        while (!jobExecutionInstanceLock.compareAndSet(false, true)) {}
+        jobExecutionInstanceLock.readLock().lock();
         try {
             jobInstanceId = jobExecutionInstances.get(jobExecutionId);
             if (jobInstanceId == jobExecutionInstances.getNoEntryValue()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
         } finally {
-            jobExecutionInstanceLock.set(false);
+            jobExecutionInstanceLock.readLock().unlock();
         }
         final long latest;
-        while (!latestJobExecutionForInstanceLock.compareAndSet(false, true)) {}
+        latestJobExecutionForInstanceLock.readLock().lock();
         try {
             latest = latestJobExecutionForInstance.get(jobInstanceId);
             if (latest == latestJobExecutionForInstance.getNoEntryValue()) {
@@ -670,9 +671,9 @@ public class MemoryRepository implements Repository {
                 throw new JobExecutionNotMostRecentException(Messages.format("CHAINLINK-006004.repository.not.most.recent.execution", jobExecutionId, jobInstanceId));
             }
         } finally {
-            latestJobExecutionForInstanceLock.set(false);
+            latestJobExecutionForInstanceLock.readLock().unlock();
         }
-        while (!jobExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionLock.readLock().lock();
         try {
             final JobExecution execution = jobExecutions.get(latest);
             if (execution == null) {
@@ -688,7 +689,7 @@ public class MemoryRepository implements Repository {
                     throw new JobRestartException(Messages.format("CHAINLINK-006007.repository.execution.not.eligible.for.restart", execution.getExecutionId(), BatchStatus.STOPPED, BatchStatus.FAILED, execution.getBatchStatus()));
             }
         } finally {
-            jobExecutionLock.set(false);
+            jobExecutionLock.readLock().unlock();
         }
         return createJobExecution(
                 jobInstanceId,
@@ -701,7 +702,7 @@ public class MemoryRepository implements Repository {
     @Override
     public List<StepExecution> getStepExecutionsForJobExecution(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         final TLongSet stepExecutionIds = new TLongHashSet();
-        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionStepExecutionLock.readLock().lock();
         try {
             final TLongSet executions = jobExecutionStepExecutions.get(jobExecutionId);
             if (executions == null) {
@@ -709,9 +710,9 @@ public class MemoryRepository implements Repository {
             }
             stepExecutionIds.addAll(executions);
         } finally {
-            jobExecutionStepExecutionLock.set(false);
+            jobExecutionStepExecutionLock.readLock().unlock();
         }
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.readLock().lock();
         try {
             final List<StepExecution> stepExecutions = new ArrayList<StepExecution>(stepExecutionIds.size());
             for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
@@ -719,7 +720,7 @@ public class MemoryRepository implements Repository {
             }
             return stepExecutions;
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.readLock().unlock();
         }
     }
 
@@ -728,7 +729,7 @@ public class MemoryRepository implements Repository {
         final TLongSet stepExecutionIds = _stepExecutionHistory(jobExecutionId);
         Date currentStepExecutionCreateTime = null;
         final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.readLock().lock();
         try {
             for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
                 final long id = it.next();
@@ -745,7 +746,7 @@ public class MemoryRepository implements Repository {
                 }
             }
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.readLock().unlock();
         }
         if (currentStepExecutionCreateTime == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
@@ -774,7 +775,7 @@ public class MemoryRepository implements Repository {
     public ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException {
         final TLongSet stepExecutionIds = _stepExecutionHistory(jobExecutionId);
         final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>();
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.readLock().lock();
         try {
             for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
                 final ExtendedStepExecution execution = stepExecutions.get(it.next());
@@ -783,7 +784,7 @@ public class MemoryRepository implements Repository {
                 }
             }
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.readLock().unlock();
         }
         ExtendedStepExecution latest = null;
         for (final ExtendedStepExecution candidate : candidates) {
@@ -803,7 +804,7 @@ public class MemoryRepository implements Repository {
 
     protected TLongSet _stepExecutionHistory(final long jobExecutionId) {
         final TLongSet historicJobExecutionIds = new TLongHashSet();
-        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        jobExecutionHistoryLock.readLock().lock();
         try {
             final TLongSet executions = jobExecutionHistory.get(jobExecutionId);
             if (executions == null) {
@@ -811,10 +812,10 @@ public class MemoryRepository implements Repository {
             }
             historicJobExecutionIds.addAll(executions);
         } finally {
-            jobExecutionHistoryLock.set(false);
+            jobExecutionHistoryLock.readLock().unlock();
         }
         final TLongSet stepExecutionIds = new TLongHashSet();
-        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionStepExecutionLock.readLock().lock();
         try {
             TLongSet executionIds = jobExecutionStepExecutions.get(jobExecutionId);
             if (executionIds == null) {
@@ -830,7 +831,7 @@ public class MemoryRepository implements Repository {
                 stepExecutionIds.addAll(executionIds);
             }
         } finally {
-            jobExecutionStepExecutionLock.set(false);
+            jobExecutionStepExecutionLock.readLock().unlock();
         }
         return stepExecutionIds;
     }
@@ -838,7 +839,7 @@ public class MemoryRepository implements Repository {
     @Override
     public int getStepExecutionCount(final long jobExecutionId, final String stepName) throws NoSuchJobExecutionException, JobSecurityException {
         final TLongSet historicJobExecutionIds = new TLongHashSet();
-        while (!jobExecutionHistoryLock.compareAndSet(false, true)) {}
+        jobExecutionHistoryLock.readLock().lock();
         try {
             final TLongSet executions = jobExecutionHistory.get(jobExecutionId);
             if (executions == null) {
@@ -846,10 +847,10 @@ public class MemoryRepository implements Repository {
             }
             historicJobExecutionIds.addAll(executions);
         } finally {
-            jobExecutionHistoryLock.set(false);
+            jobExecutionHistoryLock.readLock().unlock();
         }
         final TLongSet stepExecutionIds = new TLongHashSet();
-        while (!jobExecutionStepExecutionLock.compareAndSet(false, true)) {}
+        jobExecutionStepExecutionLock.readLock().lock();
         try {
             for (final TLongIterator it = historicJobExecutionIds.iterator(); it.hasNext();) {
                 final long historicJobExecutionId = it.next();
@@ -860,10 +861,10 @@ public class MemoryRepository implements Repository {
                 stepExecutionIds.addAll(executionIds);
             }
         } finally {
-            jobExecutionStepExecutionLock.set(false);
+            jobExecutionStepExecutionLock.readLock().unlock();
         }
         final List<ExtendedStepExecution> candidates = new ArrayList<ExtendedStepExecution>(stepExecutionIds.size());
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.readLock().lock();
         try {
             for (final TLongIterator it = stepExecutionIds.iterator(); it.hasNext();) {
                 final long stepExecutionId = it.next();
@@ -876,14 +877,14 @@ public class MemoryRepository implements Repository {
                 }
             }
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.readLock().unlock();
         }
         return candidates.size();
     }
 
     @Override
     public ExtendedStepExecution getStepExecution(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.readLock().lock();
         try {
             final ExtendedStepExecution stepExecution = stepExecutions.get(stepExecutionId);
             if (stepExecution == null) {
@@ -891,39 +892,39 @@ public class MemoryRepository implements Repository {
             }
             return stepExecution;
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.readLock().unlock();
         }
     }
 
     @Override
     public StepExecution[] getStepExecutions(final long[] stepExecutionIds) throws NoSuchJobExecutionException, JobSecurityException {
         final StepExecution[] executions = new StepExecution[stepExecutionIds.length];
-        while (!stepExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionLock.readLock().lock();
         try {
             for (int i = 0; i < stepExecutionIds.length; ++i) {
                 executions[i] = stepExecutions.get(stepExecutionIds[i]);
             }
             return executions;
         } finally {
-            stepExecutionLock.set(false);
+            stepExecutionLock.readLock().unlock();
         }
     }
 
     @Override
     public PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         final TLongList partitionIds;
-        while (!stepExecutionPartitionExecutionLock.compareAndSet(false, true)) {}
+        stepExecutionPartitionExecutionLock.readLock().lock();
         try {
             partitionIds = stepExecutionPartitionExecutions.get(stepExecutionId);
             if (partitionIds.isEmpty()) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
             }
         } finally {
-            stepExecutionPartitionExecutionLock.set(false);
+            stepExecutionPartitionExecutionLock.readLock().unlock();
         }
 
 
-        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        partitionExecutionLock.readLock().lock();
         try {
             final List<PartitionExecution> ret = new ArrayList<PartitionExecution>();
             for (final TLongIterator it = partitionIds.iterator(); it.hasNext();) {
@@ -946,13 +947,13 @@ public class MemoryRepository implements Repository {
             }
             return ret.toArray(new PartitionExecution[ret.size()]);
         } finally {
-            partitionExecutionLock.set(false);
+            partitionExecutionLock.readLock().unlock();
         }
     }
 
     @Override
     public PartitionExecution getPartitionExecution(final long partitionExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
-        while (!partitionExecutionLock.compareAndSet(false, true)) {}
+        partitionExecutionLock.readLock().lock();
         try {
             final PartitionExecution partition = partitionExecutions.get(partitionExecutionId);
             if (partition == null) {
@@ -960,7 +961,7 @@ public class MemoryRepository implements Repository {
             }
             return partition;
         } finally {
-            partitionExecutionLock.set(false);
+            partitionExecutionLock.readLock().unlock();
         }
     }
 }

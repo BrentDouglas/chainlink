@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -32,7 +30,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
     private SubSystemModelImpl model;
     private final ThreadFactoryLookup threadFactory;
-    private Lock lock = new ReentrantLock();
+    private Object lock = new Object();
     private final GlassfishSubSystem subSystem;
 
     public GlassfishEnvironment(final ThreadFactoryLookup threadFactory, final GlassfishSubSystem subSystem) {
@@ -72,8 +70,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
 
     @Override
     public void reload() throws Exception {
-        lock.lock();
-        try {
+        synchronized (lock) {
             if (this.model == null) {
                 throw new IllegalStateException();
             }
@@ -82,8 +79,6 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
             GlassfishConfiguration.configureSubSystem(model, subSystem, loader);
             //TODO This now need to reload operators
             this.model = model;
-        } finally {
-            lock.unlock();
         }
     }
 
@@ -99,25 +94,19 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
 
     public void addSubsystem(final ClassLoader loader, final GlassfishSubSystem subSystem) throws Exception {
         final SubSystemModelImpl model;
-        lock.lock();
-        try {
+        synchronized (lock) {
             model = this.model = new SubSystemModelImpl(loader);
-        } finally {
-            lock.unlock();
         }
         GlassfishConfiguration.configureSubSystem(model, subSystem, loader);
     }
 
     public void addApplication(final ApplicationInfo info) throws Exception {
         final SubSystemModelImpl model;
-        lock.lock();
-        try {
+        synchronized (lock) {
             if (this.model == null) {
                 throw new IllegalStateException(); //TODO Message
             }
             model = this.model;
-        } finally {
-            lock.unlock();
         }
         App app = this.operators.get(info.getName());
         final ClassLoader loader = info.getAppClassLoader();

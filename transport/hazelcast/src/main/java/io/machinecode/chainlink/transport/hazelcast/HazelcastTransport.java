@@ -30,8 +30,6 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -47,7 +45,7 @@ public class HazelcastTransport extends DistributedTransport<String> {
     final Member local;
     protected volatile List<Member> remotes;
     private final Map<String,Member> members = new THashMap<>();
-    private final Lock memberLock = new ReentrantLock();
+    private final Object memberLock = new Object();
     private final RemoteMemberSelector selector;
 
     public HazelcastTransport(final Dependencies dependencies, final Properties properties, final HazelcastInstance hazelcast, final IExecutorService executor) throws Exception {
@@ -107,11 +105,8 @@ public class HazelcastTransport extends DistributedTransport<String> {
         }
 
         final Member to;
-        memberLock.lock();
-        try {
+        synchronized (memberLock) {
             to = members.get(address);
-        } finally {
-            memberLock.unlock();
         }
         if (to == null) {
             return new RejectedDeferred<T, Throwable, Object>(new Exception("No member with UUID " + address)); //TODO Message
@@ -153,14 +148,11 @@ public class HazelcastTransport extends DistributedTransport<String> {
     }
 
     private List<Member> _calculateRemoteMembers(final Collection<Member> members) {
-        memberLock.lock();
-        try {
+        synchronized (memberLock) {
             this.members.clear();
             for (final Member member : members) {
                 this.members.put(member.getUuid(), member);
             }
-        } finally {
-            memberLock.unlock();
         }
         final List<Member> that = new ArrayList<>(members);
         that.remove(this.local);

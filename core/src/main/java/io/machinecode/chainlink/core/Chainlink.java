@@ -6,9 +6,6 @@ import io.machinecode.chainlink.spi.management.Environment;
 import org.jboss.logging.Logger;
 
 import java.util.List;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -19,25 +16,20 @@ public final class Chainlink {
     private static final Logger log = Logger.getLogger(Chainlink.class);
 
     private static volatile Environment environment;
-    private static final Lock lock = new ReentrantLock();
-    private static final Condition condition = lock.newCondition();
+    private static final Object lock = new Object();
 
     private Chainlink(){}
 
     public static void setEnvironment(final Environment environment) {
-        lock.lock();
-        try {
+        synchronized (lock) {
             Chainlink.environment = environment;
             log.debugf("Setting environment to: %s", environment); // TODO Message
-            condition.signalAll();
-        } finally {
-            lock.unlock();
+            lock.notifyAll();
         }
     }
 
     public static Environment getEnvironment() throws Exception {
-        lock.lock();
-        try {
+        synchronized (lock) {
             if (Chainlink.environment != null) {
                 return Chainlink.environment;
             }
@@ -55,14 +47,12 @@ public final class Chainlink {
             while (Chainlink.environment == null) {
                 try {
                     log.debugf("Waiting for environment to be set."); // TODO Message
-                    condition.await();
+                    lock.wait();
                 } catch (final InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
             return Chainlink.environment;
-        } finally {
-            lock.unlock();
         }
     }
 }

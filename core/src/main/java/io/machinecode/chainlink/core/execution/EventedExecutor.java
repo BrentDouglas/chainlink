@@ -1,7 +1,5 @@
 package io.machinecode.chainlink.core.execution;
 
-import gnu.trove.map.TMap;
-import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
@@ -16,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -34,8 +32,7 @@ public class EventedExecutor implements Executor {
     protected final int threads;
     protected Configuration configuration;
 
-    protected final Lock workerLock = new ReentrantLock();
-    protected final TMap<WorkerId, EventedWorker> workers = new THashMap<>();
+    protected final ConcurrentMap<WorkerId, EventedWorker> workers = new ConcurrentHashMap<>();
 
     public EventedExecutor(final Dependencies dependencies, final Properties properties, final ThreadFactory factory) {
         this.registry = dependencies.getRegistry();
@@ -75,35 +72,28 @@ public class EventedExecutor implements Executor {
 
     @Override
     public Worker getWorker() {
-        final TreeSet<EventedWorker> set = new TreeSet<>(EventedWorker.COMPARATOR);
-        workerLock.lock();
-        try {
-            set.addAll(workers.values());
-        } finally {
-            workerLock.unlock();
+        EventedWorker best = null;
+        for (final EventedWorker that : workers.values()) {
+            if (best == null) {
+                best = that;
+            } else {
+                if (EventedWorker.COMPARATOR.compare(that, best) < 0) {
+                    best = that;
+                }
+            }
         }
-        return set.first();
+        return best;
     }
 
     @Override
     public Worker getWorker(final WorkerId workerId) throws Exception {
-        workerLock.lock();
-        try {
-            return workers.get(workerId);
-        } finally {
-            workerLock.unlock();
-        }
+        return workers.get(workerId);
     }
 
     @Override
     public List<Worker> getWorkers(final int required) {
         final TreeSet<EventedWorker> set = new TreeSet<>(EventedWorker.COMPARATOR);
-        workerLock.lock();
-        try {
-            set.addAll(workers.values());
-        } finally {
-            workerLock.unlock();
-        }
+        set.addAll(workers.values());
         final List<Worker> ret = new ArrayList<>(required);
         EventedWorker state = set.first();
         for (int i = 0; i < required; ++i) {
