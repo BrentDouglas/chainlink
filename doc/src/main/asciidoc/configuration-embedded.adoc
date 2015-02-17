@@ -58,7 +58,7 @@ dependencies:
     <dependencies>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-inject-cdi</artifactId>
+            <artifactId>chainlink-ext-cdi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.weld.se</groupId>

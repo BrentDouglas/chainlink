@@ -40,12 +40,8 @@
     <modules>
         <module>api</module>
         <module>spi</module>
-        <module>jsl</module>
         <module>core</module>
-        <module>inject</module>
-        <module>marshalling</module>
-        <module>repository</module>
-        <module>transport</module>
+        <module>ext</module>
         <module>se</module>
         <module>ee</module>
         <module>server</module>
@@ -221,82 +217,87 @@
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-jsl-groovy</artifactId>
+                <artifactId>chainlink-ext-cdi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-inject-cdi</artifactId>
+                <artifactId>chainlink-ext-coherence</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-inject-guice</artifactId>
+                <artifactId>chainlink-ext-ehcache</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-inject-jndi</artifactId>
+                <artifactId>chainlink-ext-gridgain</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-inject-spring</artifactId>
+                <artifactId>chainlink-ext-groovy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-inject-seam</artifactId>
+                <artifactId>chainlink-ext-guice</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-marshalling-jboss</artifactId>
+                <artifactId>chainlink-ext-hazelcast</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-coherence</artifactId>
+                <artifactId>chainlink-ext-infinispan</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-ehcache</artifactId>
+                <artifactId>chainlink-ext-jboss-marshalling</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-gridgain</artifactId>
+                <artifactId>chainlink-ext-jdbc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-hazelcast</artifactId>
+                <artifactId>chainlink-ext-jgroups</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-infinispan</artifactId>
+                <artifactId>chainlink-ext-jndi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-jdbc</artifactId>
+                <artifactId>chainlink-ext-jpa</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-jpa</artifactId>
+                <artifactId>chainlink-ext-mongo</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-mongo</artifactId>
+                <artifactId>chainlink-ext-redis</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-repository-redis</artifactId>
+                <artifactId>chainlink-ext-seam</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.machinecode.chainlink</groupId>
+                <artifactId>chainlink-ext-spring</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -322,31 +323,6 @@
             <dependency>
                 <groupId>io.machinecode.chainlink</groupId>
                 <artifactId>chainlink-tck-seam</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-transport-coherence</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-transport-gridgain</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-transport-hazelcast</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-transport-infinispan</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.machinecode.chainlink</groupId>
-                <artifactId>chainlink-transport-jgroups</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

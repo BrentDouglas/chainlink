@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-inject-seam</artifactId>
+            <artifactId>chainlink-ext-seam</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

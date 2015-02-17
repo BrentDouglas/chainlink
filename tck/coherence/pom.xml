@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-coherence</artifactId>
+            <artifactId>chainlink-ext-coherence</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

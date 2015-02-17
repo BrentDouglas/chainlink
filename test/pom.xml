@@ -13,8 +13,6 @@
     <packaging>pom</packaging>
 
     <properties>
-        <database.driver>org.h2.Driver</database.driver>
-        <database.prefix>h2</database.prefix>
         <marshalling.factory.class>io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory</marshalling.factory.class>
 
         <container.debug>false</container.debug>
@@ -36,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-marshalling-jboss</artifactId>
+            <artifactId>chainlink-ext-jboss-marshalling</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -87,26 +85,6 @@
     </dependencies>
 
     <profiles>
-        <profile>
-            <id>coherence</id>
-            <activation>
-                <property><name>coherence</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>coherence</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>repository</id>
-            <activation>
-                <property><name>repository</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>repository</module>
-            </modules>
-        </profile>
         <profile>
             <id>db-mariadb</id>
             <activation>
@@ -199,27 +177,6 @@
                     <artifactId>maven-antrun-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>first-pass-persistence-xml</id>
-                            <phase>none</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <target>
-                                    <copy file="${project.basedir}/src/test/resources/META-INF/persistence.xml"
-                                          tofile="${project.build.directory}/persistence-xml/persistence.xml"
-                                          filtering="true"
-                                          overwrite="true">
-                                        <filterset>
-                                            <filter token="database.url" value="${database.prefix}.database.url" />
-                                            <filter token="database.user" value="${database.prefix}.database.user" />
-                                            <filter token="database.password" value="${database.prefix}.database.password" />
-                                        </filterset>
-                                    </copy>
-                                </target>
-                            </configuration>
-                        </execution>
-                        <execution>
                             <id>ensure-log4j-properties</id>
                             <phase>generate-test-resources</phase>
                         </execution>
@@ -229,22 +186,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <executions>
-                        <execution>
-                            <id>second-pass-persistence-xml</id>
-                            <phase>none</phase>
-                            <goals>
-                                <goal>copy-resources</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.testOutputDirectory}/META-INF</outputDirectory>
-                                <resources>
-                                    <resource>
-                                        <directory>${project.build.directory}/persistence-xml</directory>
-                                        <filtering>true</filtering>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
                         <execution>
                             <id>log4j-properties</id>
                             <phase>none</phase>
@@ -307,8 +248,6 @@
                     </includes>
                     <systemPropertiesFile>${root.dir}/test.properties</systemPropertiesFile>
                     <systemPropertyVariables>
-                        <database.driver>${database.driver}</database.driver>
-                        <database.prefix>${database.prefix}</database.prefix>
                         <marshalling.factory.class>${marshalling.factory.class}</marshalling.factory.class>
                     </systemPropertyVariables>
                 </configuration>

@@ -54,82 +54,67 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-inject-cdi</artifactId>
+            <artifactId>chainlink-ext-cdi</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-inject-guice</artifactId>
+            <artifactId>chainlink-ext-ehcache</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-inject-spring</artifactId>
+            <artifactId>chainlink-ext-guice</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-ehcache</artifactId>
+            <artifactId>chainlink-ext-gridgain</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-hazelcast</artifactId>
+            <artifactId>chainlink-ext-hazelcast</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-gridgain</artifactId>
+            <artifactId>chainlink-ext-infinispan</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-infinispan</artifactId>
+            <artifactId>chainlink-ext-jdbc</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-jdbc</artifactId>
+            <artifactId>chainlink-ext-jgroups</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-jpa</artifactId>
+            <artifactId>chainlink-ext-jpa</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-mongo</artifactId>
+            <artifactId>chainlink-ext-mongo</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-redis</artifactId>
+            <artifactId>chainlink-ext-redis</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-ext-spring</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-spi</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-gridgain</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-hazelcast</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-infinispan</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-jgroups</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

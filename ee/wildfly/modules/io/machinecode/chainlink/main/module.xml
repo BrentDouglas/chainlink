@@ -4,7 +4,7 @@
         <resource-root path="chainlink-spi-${project.version}.jar"/>
         <resource-root path="chainlink-core-${project.version}.jar"/>
         <resource-root path="chainlink-ee-wildfly-${project.version}.jar"/>
-        <resource-root path="chainlink-marshalling-jboss-${project.version}.jar"/>
+        <resource-root path="chainlink-ext-jboss-marshalling-${project.version}.jar"/>
     </resources>
 
     <dependencies>

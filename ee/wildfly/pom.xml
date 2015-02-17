@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-marshalling-jboss</artifactId>
+            <artifactId>chainlink-ext-jboss-marshalling</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -42,20 +42,20 @@ core() {
     "${apply}" "io.machinecode.then" "then-core" "${version_io_machinecode_then_then_core}" "io/machinecode/then"
     "${apply}" "io.machinecode.chainlink" "chainlink-api" "${version_io_machinecode_chainlink_chainlink_api}"
     "${apply}" "io.machinecode.chainlink" "chainlink-core" "${version_io_machinecode_chainlink_chainlink_core}" "io/machinecode/chainlink"
-    "${apply}" "io.machinecode.chainlink" "chainlink-inject-cdi" "${version_io_machinecode_chainlink_chainlink_inject_cdi}" "io/machinecode/chainlink/inject/cdi"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-cdi" "${version_io_machinecode_chainlink_chainlink_ext_cdi}" "io/machinecode/chainlink/ext/cdi"
     "${apply}" "io.machinecode.chainlink" "chainlink-spi" "${version_io_machinecode_chainlink_chainlink_spi}" "io/machinecode/chainlink"
     "${apply}" "net.sf.trove4j" "trove4j" "${version_net_sf_trove4j_trove4j}" "gnu/trove"
 }
 
 groovy() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-jsl-groovy" "${version_io_machinecode_chainlink_chainlink_jsl_groovy}" "io/machinecode/chainlink/jsl/groovy"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-groovy" "${version_io_machinecode_chainlink_chainlink_ext_groovy}" "io/machinecode/chainlink/ext/groovy"
     "${apply}" "org.codehaus.groovy" "groovy-all" "${version_org_codehaus_groovy_groovy_all}" "org/codehaus/groovy"
 }
 
 seam() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-inject-seam" "${version_io_machinecode_chainlink_chainlink_inject_seam}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-seam" "${version_io_machinecode_chainlink_chainlink_ext_seam}"
     "${apply}" "org.jboss.seam" "jboss-seam" "${version_org_jboss_seam_jboss_seam}"
     [ "${CONTAINER}" == "se" ] && {
         "${apply}" "javax.servlet" "servlet-api" "${version_javax_servlet_servlet_api}"
@@ -64,7 +64,7 @@ seam() {
 
 spring() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-inject-spring" "${version_io_machinecode_chainlink_chainlink_inject_spring}" "io/machinecode/chainlink/inject/spring"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-spring" "${version_io_machinecode_chainlink_chainlink_ext_spring}" "io/machinecode/chainlink/ext/spring"
     "${apply}" "org.springframework" "spring-beans" "${version_org_springframework_spring_beans}"
     "${apply}" "org.springframework" "spring-context" "${version_org_springframework_spring_context}"
     "${apply}" "org.springframework" "spring-core" "${version_org_springframework_spring_core}"
@@ -72,7 +72,7 @@ spring() {
 
 guice() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-inject-guice" "${version_io_machinecode_chainlink_chainlink_inject_guice}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-guice" "${version_io_machinecode_chainlink_chainlink_ext_guice}"
     "${apply}" "com.google.inject" "guice" "${version_com_google_inject_guice}"
 }
 
@@ -107,7 +107,7 @@ jboss-logging() {
 
 jboss-marshalling() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-marshalling-jboss" "${version_io_machinecode_chainlink_chainlink_marshalling_jboss}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-jboss-marshalling" "${version_io_machinecode_chainlink_chainlink_ext_jboss_marshalling}" "io/machinecode/chainlink"
     [ "${CONTAINER}" != "wildfly" ] && {
         "${apply}" "org.jboss.marshalling" "jboss-marshalling" "${version_org_jboss_marshalling_jboss_marshalling}"
         "${apply}" "org.jboss.marshalling" "jboss-marshalling-river" "${version_org_jboss_marshalling_jboss_marshalling_river}"
@@ -116,12 +116,12 @@ jboss-marshalling() {
 
 jdbc() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-jdbc" "${version_io_machinecode_chainlink_chainlink_repository_jdbc}" "io/machinecode/chainlink/repository/jdbc"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-jdbc" "${version_io_machinecode_chainlink_chainlink_ext_jdbc}" "io/machinecode/chainlink/ext/jdbc"
 }
 
 jpa() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-jpa" "${version_io_machinecode_chainlink_chainlink_repository_jpa}" "io/machinecode/chainlink/repository/jpa"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-jpa" "${version_io_machinecode_chainlink_chainlink_ext_jpa}" "io/machinecode/chainlink/ext/jpa"
     [ "${CONTAINER}" == "se" ] && {
         "${apply}" "org.hibernate" "hibernate-core" "${version_org_hibernate_hibernate_core}"
         "${apply}" "org.hibernate" "hibernate-entitymanager" "${version_org_hibernate_hibernate_entitymanager}"
@@ -130,8 +130,7 @@ jpa() {
 
 infinispan() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-infinispan" "${version_io_machinecode_chainlink_chainlink_repository_infinispan}" "io/machinecode/chainlink/repository/infinispan"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-infinispan" "${version_io_machinecode_chainlink_chainlink_transport_infinispan}" "io/machinecode/chainlink/transport/infinispan"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-infinispan" "${version_io_machinecode_chainlink_chainlink_ext_infinispan}" "io/machinecode/chainlink/ext/infinispan"
     [ "${CONTAINER}" != "wildfly" ] && {
         "${apply}" "org.infinispan" "infinispan-commons" "${version_org_infinispan_infinispan_commons}"
         "${apply}" "org.infinispan" "infinispan-core" "${version_org_infinispan_infinispan_core}"
@@ -140,7 +139,7 @@ infinispan() {
 
 jgroups() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-jgroups" "${version_io_machinecode_chainlink_chainlink_transport_jgroups}" "io/machinecode/chainlink/transport/jgroups"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-jgroups" "${version_io_machinecode_chainlink_chainlink_ext_jgroups}" "io/machinecode/chainlink/ext/jgroups"
     [ "${CONTAINER}" != "wildfly" ] && {
         "${apply}" "org.jgroups" "jgroups" "${version_org_jgroups_jgroups}"
     }
@@ -148,41 +147,38 @@ jgroups() {
 
 hazelcast() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-hazelcast" "${version_io_machinecode_chainlink_chainlink_repository_hazelcast}" "io/machinecode/chainlink/repository/hazelcast"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-hazelcast" "${version_io_machinecode_chainlink_chainlink_transport_hazelcast}" "io/machinecode/chainlink/transport/hazelcast"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-hazelcast" "${version_io_machinecode_chainlink_chainlink_ext_hazelcast}" "io/machinecode/chainlink/ext/hazelcast"
     "${apply}" "com.hazelcast" "hazelcast" "${version_com_hazelcast_hazelcast}" "com/hazelcast"
 }
 
 coherence() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-coherence" "${version_io_machinecode_chainlink_chainlink_repository_coherence}" "io/machinecode/chainlink/repository/coherence"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-coherence" "${version_io_machinecode_chainlink_chainlink_transport_coherence}" "io/machinecode/chainlink/transport/coherence"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-coherence" "${version_io_machinecode_chainlink_chainlink_ext_coherence}" "io/machinecode/chainlink/ext/coherence"
     "${apply}" "com.oracle.coherence" "coherence" "${version_com_oracle_coherence_coherence}" "com/oracle/coherence"
 }
 
 gridgain() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-gridgain" "${version_io_machinecode_chainlink_chainlink_repository_gridgain}" "io/machinecode/chainlink/repository/gridgain"
-    "${apply}" "io.machinecode.chainlink" "chainlink-transport-gridgain" "${version_io_machinecode_chainlink_chainlink_transport_gridgain}" "io/machinecode/chainlink/transport/gridgain"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-gridgain" "${version_io_machinecode_chainlink_chainlink_ext_gridgain}" "io/machinecode/chainlink/ext/gridgain"
     "${apply}" "org.gridgain" "gridgain-core" "${version_org_gridgain_gridgain_core}" "org/gridgain"
     "${apply}" "org.gridgain" "gridgain-indexing" "${version_org_gridgain_gridgain_indexing}" "org/gridgain"
 }
 
 ehcache() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-ehcache" "${version_io_machinecode_chainlink_chainlink_repository_ehcache}" "io/machinecode/chainlink/repository/ehcache"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-ehcache" "${version_io_machinecode_chainlink_chainlink_ext_ehcache}" "io/machinecode/chainlink/ext/ehcache"
     "${apply}" "net.sf.ehcache" "ehcache-core" "${version_net_sf_ehcache_ehcache_core}" "net/sf/ehcache"
 }
 
 redis() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-redis" "${version_io_machinecode_chainlink_chainlink_repository_redis}" "io/machinecode/chainlink/repository/redis"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-redis" "${version_io_machinecode_chainlink_chainlink_ext_redis}" "io/machinecode/chainlink/ext/redis"
     "${apply}" "redis.clients" "jedis" "${version_redis_clients_jedis}" "jedis"
 }
 
 mongo() {
     local apply="${1}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-repository-mongo" "${version_io_machinecode_chainlink_chainlink_repository_mongo}" "io/machinecode/chainlink/repository/mongo"
+    "${apply}" "io.machinecode.chainlink" "chainlink-ext-mongo" "${version_io_machinecode_chainlink_chainlink_ext_mongo}" "io/machinecode/chainlink/ext/mongo"
     "${apply}" "org.jongo" "jongo" "${version_org_jongo_jongo}" "org/jongo"
     "${apply}" "org.mongodb" "mongo-java-driver" "${version_org_mongodb_mongo_java_driver}" "org/jongo"
 }

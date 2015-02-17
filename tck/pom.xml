@@ -77,62 +77,47 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-ehcache</artifactId>
+            <artifactId>chainlink-ext-ehcache</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-gridgain</artifactId>
+            <artifactId>chainlink-ext-gridgain</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-hazelcast</artifactId>
+            <artifactId>chainlink-ext-hazelcast</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-infinispan</artifactId>
+            <artifactId>chainlink-ext-infinispan</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-jdbc</artifactId>
+            <artifactId>chainlink-ext-jdbc</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-jpa</artifactId>
+            <artifactId>chainlink-ext-jgroups</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-mongo</artifactId>
+            <artifactId>chainlink-ext-jpa</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-repository-redis</artifactId>
+            <artifactId>chainlink-ext-mongo</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-gridgain</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-hazelcast</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-infinispan</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-transport-jgroups</artifactId>
+            <artifactId>chainlink-ext-redis</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -295,7 +280,7 @@
             <dependencies>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
-                    <artifactId>chainlink-transport-coherence</artifactId>
+                    <artifactId>chainlink-ext-coherence</artifactId>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -362,7 +347,7 @@
             <dependencies>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
-                    <artifactId>chainlink-repository-coherence</artifactId>
+                    <artifactId>chainlink-ext-coherence</artifactId>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -469,7 +454,7 @@
             <dependencies>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
-                    <artifactId>chainlink-inject-cdi</artifactId>
+                    <artifactId>chainlink-ext-cdi</artifactId>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -492,7 +477,7 @@
             <dependencies>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
-                    <artifactId>chainlink-inject-guice</artifactId>
+                    <artifactId>chainlink-ext-guice</artifactId>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -536,7 +521,7 @@
                 </dependency>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
-                    <artifactId>chainlink-inject-seam</artifactId>
+                    <artifactId>chainlink-ext-seam</artifactId>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -601,7 +586,7 @@
             <dependencies>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
-                    <artifactId>chainlink-inject-spring</artifactId>
+                    <artifactId>chainlink-ext-spring</artifactId>
                     <scope>test</scope>
                 </dependency>
                 <dependency>

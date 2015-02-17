@@ -8,23 +8,23 @@ export version_io_machinecode_then_then_core="@version.io.machinecode.then.then-
 
 export version_io_machinecode_chainlink_chainlink_api="@version.io.machinecode.chainlink.chainlink-api@"
 export version_io_machinecode_chainlink_chainlink_core="@version.io.machinecode.chainlink.chainlink-core@"
-export version_io_machinecode_chainlink_chainlink_inject_cdi="@version.io.machinecode.chainlink.chainlink-inject-cdi@"
+export version_io_machinecode_chainlink_chainlink_ext_cdi="@version.io.machinecode.chainlink.chainlink-ext-cdi@"
 export version_io_machinecode_chainlink_chainlink_spi="@version.io.machinecode.chainlink.chainlink-spi@"
 export version_net_sf_trove4j_trove4j="@version.net.sf.trove4j.trove4j@"
 
-export version_io_machinecode_chainlink_chainlink_jsl_groovy="@version.io.machinecode.chainlink.chainlink-jsl-groovy@"
+export version_io_machinecode_chainlink_chainlink_ext_groovy="@version.io.machinecode.chainlink.chainlink-ext-groovy@"
 export version_org_codehaus_groovy_groovy_all="@version.org.codehaus.groovy.groovy-all@"
 
-export version_io_machinecode_chainlink_chainlink_inject_seam="@version.io.machinecode.chainlink.chainlink-inject-seam@"
+export version_io_machinecode_chainlink_chainlink_ext_seam="@version.io.machinecode.chainlink.chainlink-ext-seam@"
 export version_org_jboss_seam_jboss_seam="@version.org.jboss.seam.jboss-seam@"
 export version_javax_servlet_servlet_api="@version.javax.servlet.servlet-api@"
 
-export version_io_machinecode_chainlink_chainlink_inject_spring="@version.io.machinecode.chainlink.chainlink-inject-spring@"
+export version_io_machinecode_chainlink_chainlink_ext_spring="@version.io.machinecode.chainlink.chainlink-ext-spring@"
 export version_org_springframework_spring_beans="@version.org.springframework.spring-beans@"
 export version_org_springframework_spring_context="@version.org.springframework.spring-context@"
 export version_org_springframework_spring_core="@version.org.springframework.spring-core@"
 
-export version_io_machinecode_chainlink_chainlink_inject_guice="@version.io.machinecode.chainlink.chainlink-inject-guice@"
+export version_io_machinecode_chainlink_chainlink_ext_guice="@version.io.machinecode.chainlink.chainlink-ext-guice@"
 export version_com_google_inject_guice="@version.com.google.inject.guice@"
 
 export version_org_apache_derby_derby="@version.org.apache.derby.derby@"
@@ -37,44 +37,40 @@ export version_org_mariadb_jdbc_mariadb_java_client="@version.org.mariadb.jdbc.m
 
 export version_org_jboss_logging_jboss_logging="@version.org.jboss.logging.jboss-logging@"
 
-export version_io_machinecode_chainlink_chainlink_marshalling_jboss="@version.io.machinecode.chainlink.chainlink-marshalling-jboss@"
+export version_io_machinecode_chainlink_chainlink_ext_jboss_marshalling="@version.io.machinecode.chainlink.chainlink-ext-jboss-marshalling@"
 export version_org_jboss_marshalling_jboss_marshalling="@version.org.jboss.marshalling.jboss-marshalling@"
 export version_org_jboss_marshalling_jboss_marshalling_river="@version.org.jboss.marshalling.jboss-marshalling-river@"
 
-export version_io_machinecode_chainlink_chainlink_repository_jdbc="@version.io.machinecode.chainlink.chainlink-repository-jdbc@"
+export version_io_machinecode_chainlink_chainlink_ext_jdbc="@version.io.machinecode.chainlink.chainlink-ext-jdbc@"
 
-export version_io_machinecode_chainlink_chainlink_repository_jpa="@version.io.machinecode.chainlink.chainlink-repository-jpa@"
+export version_io_machinecode_chainlink_chainlink_ext_jpa="@version.io.machinecode.chainlink.chainlink-ext-jpa@"
 export version_org_hibernate_hibernate_core="@version.org.hibernate.hibernate-core@"
 export version_org_hibernate_hibernate_entitymanager="@version.org.hibernate.hibernate-entitymanager@"
 
-export version_io_machinecode_chainlink_chainlink_repository_infinispan="@version.io.machinecode.chainlink.chainlink-repository-infinispan@"
-export version_io_machinecode_chainlink_chainlink_transport_infinispan="@version.io.machinecode.chainlink.chainlink-transport-infinispan@"
+export version_io_machinecode_chainlink_chainlink_ext_infinispan="@version.io.machinecode.chainlink.chainlink-ext-infinispan@"
 export version_org_infinispan_infinispan_commons="@version.org.infinispan.infinispan-commons@"
 export version_org_infinispan_infinispan_core="@version.org.infinispan.infinispan-core@"
 
-export version_io_machinecode_chainlink_chainlink_transport_jgroups="@version.io.machinecode.chainlink.chainlink-transport-jgroups@"
+export version_io_machinecode_chainlink_chainlink_ext_jgroups="@version.io.machinecode.chainlink.chainlink-ext-jgroups@"
 export version_org_jgroups_jgroups="@version.org.jgroups.jgroups@"
 
-export version_io_machinecode_chainlink_chainlink_repository_hazelcast="@version.io.machinecode.chainlink.chainlink-repository-hazelcast@"
-export version_io_machinecode_chainlink_chainlink_transport_hazelcast="@version.io.machinecode.chainlink.chainlink-transport-hazelcast@"
+export version_io_machinecode_chainlink_chainlink_ext_hazelcast="@version.io.machinecode.chainlink.chainlink-ext-hazelcast@"
 export version_com_hazelcast_hazelcast="@version.com.hazelcast.hazelcast@"
 
-export version_io_machinecode_chainlink_chainlink_repository_coherence="@version.io.machinecode.chainlink.chainlink-repository-coherence@"
-export version_io_machinecode_chainlink_chainlink_transport_coherence="@version.io.machinecode.chainlink.chainlink-transport-coherence@"
+export version_io_machinecode_chainlink_chainlink_ext_coherence="@version.io.machinecode.chainlink.chainlink-ext-coherence@"
 export version_com_oracle_coherence_coherence="@version.com.oracle.coherence.coherence@"
 
-export version_io_machinecode_chainlink_chainlink_repository_gridgain="@version.io.machinecode.chainlink.chainlink-repository-gridgain@"
-export version_io_machinecode_chainlink_chainlink_transport_gridgain="@version.io.machinecode.chainlink.chainlink-transport-gridgain@"
+export version_io_machinecode_chainlink_chainlink_ext_gridgain="@version.io.machinecode.chainlink.chainlink-ext-gridgain@"
 export version_org_gridgain_gridgain_core="@version.org.gridgain.gridgain-core@"
 export version_org_gridgain_gridgain_indexing="@version.org.gridgain.gridgain-indexing@"
 
-export version_io_machinecode_chainlink_chainlink_repository_ehcache="@version.io.machinecode.chainlink.chainlink-repository-ehcache@"
+export version_io_machinecode_chainlink_chainlink_ext_ehcache="@version.io.machinecode.chainlink.chainlink-ext-ehcache@"
 export version_net_sf_ehcache_ehcache_core="@version.net.sf.ehcache.ehcache-core@"
 
-export version_io_machinecode_chainlink_chainlink_repository_redis="@version.io.machinecode.chainlink.chainlink-repository-redis@"
+export version_io_machinecode_chainlink_chainlink_ext_redis="@version.io.machinecode.chainlink.chainlink-ext-redis@"
 export version_redis_clients_jedis="@version.redis.clients.jedis@"
 
-export version_io_machinecode_chainlink_chainlink_repository_mongo="@version.io.machinecode.chainlink.chainlink-repository-mongo@"
+export version_io_machinecode_chainlink_chainlink_ext_mongo="@version.io.machinecode.chainlink.chainlink-ext-mongo@"
 export version_org_jongo_jongo="@version.org.jongo.jongo@"
 export version_org_mongodb_mongo_java_driver="@version.org.mongodb.mongo-java-driver@"
 
