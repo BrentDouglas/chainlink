@@ -48,7 +48,7 @@ must have a no-args constructor.
 
 [source,xml]
 ----
-include::{chainlinkd}/cnf/chainlink.xml[]
+include::{chainlinkd}/cfg/chainlink.xml[]
 ----
 
 The utility of the ref attribute may be increased by specifying

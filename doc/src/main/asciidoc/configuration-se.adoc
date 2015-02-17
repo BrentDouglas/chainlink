@@ -12,8 +12,8 @@ look like:
 java -server \
      -cp <colon separated jars in lib dir>:<colon separated jars in app dir> \
      io.machinecode.chainlink.server.chainlinkd.Chainlinkd \
-     --configuration cnf/chainlink.xml \
-     --properties cnf/chainlink.properties
+     --configuration cfg/chainlink.xml \
+     --properties cfg/chainlink.properties
 ----
 
 The `chainlink.xml` file behaves exactly as described earlier.

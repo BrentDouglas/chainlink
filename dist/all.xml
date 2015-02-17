@@ -130,8 +130,14 @@
             <fileMode>754</fileMode>
         </file>
         <file>
-            <source>../server/chainlinkd/cnf/chainlink.xml</source>
-            <outputDirectory>cnf</outputDirectory>
+            <source>../server/chainlinkd/cfg/chainlink.xml</source>
+            <outputDirectory>cfg</outputDirectory>
+            <fileMode>664</fileMode>
+        </file>
+        <file>
+            <source>../log4j.template.properties</source>
+            <destName>log4j.properties</destName>
+            <outputDirectory>cfg</outputDirectory>
             <fileMode>664</fileMode>
         </file>
         <file>

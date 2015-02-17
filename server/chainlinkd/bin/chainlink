@@ -29,8 +29,8 @@ RETVAL=0
 usage() {
 cat <<EOF
 Usage: chainlink [-c configuration_file_name] [-p properties_file_name] [-d] [-k] [-h]
-    -c  Set the configuration file to use. Must be found in ${CHAINLINK_HOME}/cnf
-    -p  Set the properties file to use. Must be found in ${CHAINLINK_HOME}/cnf
+    -c  Set the configuration file to use. Must be found in ${CHAINLINK_HOME}/cfg
+    -p  Set the properties file to use. Must be found in ${CHAINLINK_HOME}/cfg
     -d  Start Chainlink in daemon mode
     -k  Kill a running Chainlink daemon
     -h  Print usage
@@ -120,10 +120,10 @@ done
 
 CHAINLINK_ARGS=""
 [ -n "${CHAINLINK_CONFIG}" ] && {
-    CHAINLINK_ARGS="${CHAINLINK_ARGS} --configuration ${CHAINLINK_HOME}/cnf/${CHAINLINK_CONFIG}"
+    CHAINLINK_ARGS="${CHAINLINK_ARGS} --configuration ${CHAINLINK_HOME}/cfg/${CHAINLINK_CONFIG}"
 }
 [ -n "${CHAINLINK_PROPERTIES}" ] && {
-    CHAINLINK_ARGS="${CHAINLINK_ARGS} --properties ${CHAINLINK_HOME}/cnf/${CHAINLINK_PROPERTIES}"
+    CHAINLINK_ARGS="${CHAINLINK_ARGS} --properties ${CHAINLINK_HOME}/cfg/${CHAINLINK_PROPERTIES}"
 }
 
 CLASSPATH="$(find ${CHAINLINK_LIB_DIR} -regex '.*\.jar$' -type f -printf ${CHAINLINK_LIB_DIR}/%f:)$(find ${CHAINLINK_APP_DIR} -regex '.*\.jar$' -type f -printf ${CHAINLINK_APP_DIR}/%f:)"

@@ -166,11 +166,19 @@
                                     <arg value="-m"/><arg value="all"/>
                                 </exec>
                                 <copy file="${project.build.testOutputDirectory}/chainlink.xml"
-                                      tofile="${chainlink.dir}/cnf/chainlink-tck.xml"
+                                      tofile="${chainlink.dir}/cfg/chainlink-tck.xml"
                                       overwrite="true">
                                 </copy>
                                 <copy file="${project.basedir}/../chainlink-tck.properties"
-                                      tofile="${chainlink.dir}/cnf/chainlink-tck.properties"
+                                      tofile="${chainlink.dir}/cfg/chainlink-tck.properties"
+                                      overwrite="true"
+                                      filtering="true">
+                                    <filterset>
+                                        <filter token="container.dir" value="${container.dir}" />
+                                    </filterset>
+                                </copy>
+                                <copy file="${root.dir}/log4j.properties"
+                                      tofile="${chainlink.dir}/cfg/log4j.properties"
                                       overwrite="true">
                                 </copy>
                                 <mkdir dir="${chainlink.dir}/run" />
