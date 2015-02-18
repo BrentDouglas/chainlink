@@ -11,11 +11,11 @@ import io.machinecode.chainlink.spi.transport.Transport;
 import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -32,7 +32,7 @@ public class EventedExecutor implements Executor {
     protected final int threads;
     protected Configuration configuration;
 
-    protected final ConcurrentMap<WorkerId, EventedWorker> workers = new ConcurrentHashMap<>();
+    protected final Map<WorkerId, EventedWorker> workers = new HashMap<>();
 
     public EventedExecutor(final Dependencies dependencies, final Properties properties, final ThreadFactory factory) {
         this.registry = dependencies.getRegistry();
@@ -86,7 +86,7 @@ public class EventedExecutor implements Executor {
             if (best == null) {
                 best = that;
             } else {
-                if (EventedWorker.COMPARATOR.compare(that, best) < 0) {
+                if (best.compareTo(that) < 0) {
                     best = that;
                 }
             }
@@ -101,7 +101,7 @@ public class EventedExecutor implements Executor {
 
     @Override
     public List<Worker> getWorkers(final int required) {
-        final TreeSet<EventedWorker> set = new TreeSet<>(EventedWorker.COMPARATOR);
+        final TreeSet<EventedWorker> set = new TreeSet<>(); //TODO Remove this
         set.addAll(workers.values());
         final List<Worker> ret = new ArrayList<>(required);
         EventedWorker state = set.first();

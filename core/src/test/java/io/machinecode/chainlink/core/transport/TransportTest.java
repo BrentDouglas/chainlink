@@ -4,12 +4,22 @@ import io.machinecode.chainlink.core.base.BaseTest;
 import io.machinecode.chainlink.core.configuration.ConfigurationImpl;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.jsl.fluent.Jsl;
+import io.machinecode.chainlink.core.jsl.fluent.task.FluentBatchlet;
+import io.machinecode.chainlink.core.management.JobOperationImpl;
+import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.transport.Transport;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.batch.runtime.BatchStatus;
+import javax.batch.runtime.JobExecution;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -23,6 +33,10 @@ public abstract class TransportTest extends BaseTest {
 
     protected ConfigurationImpl _secondConfiguration;
     protected ConfigurationImpl _thirdConfiguration;
+
+    protected JobOperatorImpl firstOperator;
+    protected JobOperatorImpl secondOperator;
+    protected JobOperatorImpl thirdOperator;
 
     protected final Configuration secondConfiguration() throws Exception {
         if (this._secondConfiguration == null) {
@@ -70,36 +84,32 @@ public abstract class TransportTest extends BaseTest {
 
     @Before
     public void before() throws Exception {
-        configuration();
-        secondConfiguration();
-        thirdConfiguration();
-
-        configuration().getTransport().open(_configuration);
-        configuration().getRegistry().open(_configuration);
-        configuration().getExecutor().open(_configuration);
-
-        secondConfiguration().getTransport().open(_secondConfiguration);
-        secondConfiguration().getRegistry().open(_secondConfiguration);
-        secondConfiguration().getExecutor().open(_secondConfiguration);
-
-        thirdConfiguration().getTransport().open(_thirdConfiguration);
-        thirdConfiguration().getRegistry().open(_thirdConfiguration);
-        thirdConfiguration().getExecutor().open(_thirdConfiguration);
+        this.firstOperator = new JobOperatorImpl(configuration());
+        this.firstOperator.open(configuration());
+        this.secondOperator = new JobOperatorImpl(secondConfiguration());
+        this.secondOperator.open(secondConfiguration());
+        this.thirdOperator = new JobOperatorImpl(thirdConfiguration());
+        this.thirdOperator.open(thirdConfiguration());
     }
 
     @After
     public void after() throws Exception {
-        configuration().getTransport().close();
-        configuration().getRegistry().close();
-        configuration().getExecutor().close();
+        this.firstOperator.close();
+        this.secondOperator.close();
+        this.thirdOperator.close();
+    }
 
-        secondConfiguration().getTransport().close();
-        secondConfiguration().getRegistry().close();
-        secondConfiguration().getExecutor().close();
-
-        thirdConfiguration().getTransport().close();
-        thirdConfiguration().getRegistry().close();
-        thirdConfiguration().getExecutor().close();
+    @AfterClass
+    public static void afterClass() throws Exception {
+        if (firstFactory != null) {
+            firstFactory.close();
+        }
+        if (secondFactory != null) {
+            secondFactory.close();
+        }
+        if (thirdFactory != null) {
+            thirdFactory.close();
+        }
     }
 
     @Test
@@ -108,42 +118,38 @@ public abstract class TransportTest extends BaseTest {
         assertNotNull(transport.getAddress());
     }
 
-    /*
     @Test
-    public void getWorkerTest() throws Exception {
-        final Transport first = configuration().getTransport();
-        final Transport second = secondConfiguration().getTransport();
+    public void splitTest() throws Exception {
+        final FluentBatchlet batchlet = Jsl.batchlet("runBatchlet");
+        final JobOperationImpl op = firstOperator.startJob(Jsl.job("split-job").addExecution(
+                Jsl.split("split")
+                        .addFlow(Jsl.flow("f1")
+                                .addExecution(Jsl.step("s1").setBatchlet(batchlet)))
+                        .addFlow(Jsl.flow("f2")
+                                .addExecution(Jsl.step("s2").setBatchlet(batchlet)))
+                        .addFlow(Jsl.flow("f3")
+                                .addExecution(Jsl.step("s3").setBatchlet(batchlet)))
+        ), "split-job", new Properties());
 
-        final long jobExecutionId = 1;
-
-        final Executable e = new TestExecutable(1, "first", new TestExecutionContext(jobExecutionId));
-        configuration().getExecutor().execute(e);
-        configuration().getRegistry().registerExecutable(jobExecutionId, e);
-        final Promise<RemoteExecution, Throwable, Object> def = second.getWorker(jobExecutionId, e.getId());
-
-        assertNotNull(def.get(1, TimeUnit.SECONDS));
-        assertTrue(def.isResolved());
+        final JobExecution ex = op.get(5, TimeUnit.SECONDS);
+        assertNotNull(ex);
+        assertEquals(BatchStatus.COMPLETED, ex.getBatchStatus());
     }
 
     @Test
-    public void getWorkersTest() throws Exception {
-        final Transport first = configuration().getTransport();
-        final Transport second = secondConfiguration().getTransport();
+    public void partitionedStepTest() throws Exception {
+        final JobOperationImpl op = firstOperator.startJob(Jsl.job("partitioned-step-job").addExecution(
+                Jsl.step("step")
+                        .setPartition(Jsl.partition()
+                                .setPlan(Jsl.plan()
+                                        .setPartitions("4")
+                                        .setThreads("4"))
+                        )
+                        .setBatchlet(Jsl.batchlet("runBatchlet"))
+        ), "partitioned-step-job", new Properties());
 
-        final long jobExecutionId = 1;
-
-        final Executable e = new TestExecutable(1, "first", new TestExecutionContext(jobExecutionId));
-        configuration().getExecutor().execute(e);
-        configuration().getRegistry().registerExecutable(jobExecutionId, e);
-        final Promise<List<RemoteExecution>, Throwable, Object> def = second.getWorkers(3).onResolve(new OnResolve<List<RemoteExecution>>() {
-            @Override
-            public void resolve(final List<RemoteExecution> that) {
-                assertEquals(3, that.size());
-            }
-        });
-
-        assertNotNull(def.get(1, TimeUnit.SECONDS));
-        assertTrue(def.isResolved());
+        final JobExecution ex = op.get(5, TimeUnit.SECONDS);
+        assertNotNull(ex);
+        assertEquals(BatchStatus.COMPLETED, ex.getBatchStatus());
     }
-    */
 }

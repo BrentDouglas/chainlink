@@ -84,18 +84,19 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     @Override
     public void open(final Configuration configuration) throws Exception {
+        this.transport.open(configuration);
         this.registry.open(configuration);
         this.executor.open(configuration);
-        this.transport.open(configuration);
         this.security.open(configuration);
     }
 
     @Override
     public void close() throws Exception {
-        this.transport.close();
+        this.security.close();
         this.executor.close();
         this.registry.unregisterRepository(this.repositoryId);
         this.registry.close();
+        this.transport.close();
         this.cancellation.shutdown();
     }
 

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -38,8 +39,8 @@ public class HazelcastTransport extends DistributedTransport<String> {
 
     private static final Logger log = Logger.getLogger(HazelcastTransport.class);
 
-    final HazelcastInstance hazelcast;
-    final IExecutorService executor;
+    protected final HazelcastInstance hazelcast;
+    protected final IExecutorService executor;
 
     final Member local;
     protected volatile List<Member> remotes;
@@ -78,13 +79,19 @@ public class HazelcastTransport extends DistributedTransport<String> {
     public void open(final Configuration configuration) throws Exception {
         super.open(configuration);
         //TODO This needs to have some ID in it
-        this.hazelcast.getUserContext().put(Configuration.class.getCanonicalName(), configuration);
+        final String key = Configuration.class.getCanonicalName();
+        final ConcurrentMap<String, Object> context = this.hazelcast.getUserContext();
+        if (context.containsKey(key)) {
+            throw new IllegalStateException("A transport is already configured for this instance."); //TODO Message
+        }
+        context.put(key, configuration);
     }
 
     @Override
     public void close() throws Exception {
         log.infof("HazelcastRegistry is shutting down."); //TODO Message
         super.close();
+        this.hazelcast.getUserContext().remove(Configuration.class.getCanonicalName());
     }
 
     @Override

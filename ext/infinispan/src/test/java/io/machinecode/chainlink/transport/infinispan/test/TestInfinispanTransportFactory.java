@@ -1,11 +1,13 @@
 package io.machinecode.chainlink.transport.infinispan.test;
 
 import io.machinecode.chainlink.core.transport.TestTransportFactory;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
+import org.infinispan.factories.GlobalComponentRegistry;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
 import org.infinispan.transaction.LockingMode;
@@ -70,7 +72,14 @@ public class TestInfinispanTransportFactory implements TestTransportFactory {
                 manager,
                 30,
                 TimeUnit.SECONDS
-        );
+        ) {
+            @Override
+            public void open(final Configuration configuration) throws Exception {
+                this.configuration = configuration;
+                manager.getGlobalComponentRegistry().registerComponent(configuration, Configuration.class);
+                doOpen();
+            }
+        };
     }
 
     @Override

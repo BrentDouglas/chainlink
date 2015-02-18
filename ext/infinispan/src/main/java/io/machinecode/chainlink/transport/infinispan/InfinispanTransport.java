@@ -35,6 +35,8 @@ public class InfinispanTransport extends DistributedTransport<Address> {
 
     private static final Logger log = Logger.getLogger(InfinispanTransport.class);
 
+    private static final Configuration PLACEHOLDER = new DummyConfiguration();
+
     final EmbeddedCacheManager manager;
     RpcManager rpc;
     final Address local;
@@ -78,8 +80,15 @@ public class InfinispanTransport extends DistributedTransport<Address> {
     public void open(final Configuration configuration) throws Exception {
         super.open(configuration);
         final GlobalComponentRegistry gcr = manager.getGlobalComponentRegistry();
+        final Configuration existing = gcr.getComponent(Configuration.class);
+        if (existing != null && existing != PLACEHOLDER) {
+            throw new IllegalStateException("A transport is already configured for this cache manager."); //TODO Message
+        }
         gcr.registerComponent(configuration, Configuration.class); //TODO One Registry per config, this will be an issue
-        //TODO Have to register configuration before this
+        doOpen();
+    }
+
+    protected void doOpen() throws Exception {
         this.cache = manager.getCache(this.cacheName, true).getAdvancedCache();
         this.rpc = cache.getRpcManager();
         this.distributor = new DefaultExecutorService(cache);
@@ -95,6 +104,7 @@ public class InfinispanTransport extends DistributedTransport<Address> {
     @Override
     public void close() throws Exception {
         super.close();
+        manager.getGlobalComponentRegistry().registerComponent(PLACEHOLDER, Configuration.class);
     }
 
     @Override

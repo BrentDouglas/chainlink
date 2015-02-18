@@ -32,6 +32,8 @@ public class GridGainCallable<T> implements Callable<T>, Serializable {
         try {
             final Configuration configuration = this.grid.<String, Configuration>nodeLocalMap().get(Configuration.class.getName());
             return command.perform(configuration, origin);
+        } catch (final Exception e) {
+            throw e;
         } catch (final Throwable e) {
             throw new Exception(e);
         }

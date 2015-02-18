@@ -75,7 +75,7 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[workerId=" + workerId + ",work=" + work + "]";
+        return getClass().getSimpleName() + "{workerId=" + workerId + ",work=" + work + "}";
     }
 
     protected abstract void doExecute(final Configuration configuration, final Chain<?> chain, final WorkerId workerId,

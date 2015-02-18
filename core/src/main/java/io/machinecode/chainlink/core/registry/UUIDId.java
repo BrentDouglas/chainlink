@@ -48,6 +48,6 @@ public class UUIDId implements RepositoryId, ExecutableId, ChainId, WorkerId {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[address=" + address + ",uuid=" + uuid + "]";
+        return getClass().getSimpleName() + "{address=" + address + ",uuid=" + uuid + "}]";
     }
 }

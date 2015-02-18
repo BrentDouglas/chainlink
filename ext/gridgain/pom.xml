@@ -37,6 +37,9 @@
     <build>
         <testResources>
             <testResource>
+                <directory>${project.basedir}/src/test/resources</directory>
+            </testResource>
+            <testResource>
                 <directory>${root.dir}</directory>
                 <includes>
                     <include>log4j.properties</include>

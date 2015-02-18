@@ -2,7 +2,6 @@ package io.machinecode.chainlink.core.execution;
 
 import io.machinecode.chainlink.core.registry.LocalRegistry;
 import io.machinecode.chainlink.core.registry.UUIDId;
-import io.machinecode.chainlink.core.then.Notify;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
@@ -15,26 +14,22 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.then.Chain;
 import org.jboss.logging.Logger;
 
-import java.io.Serializable;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public class EventedWorker implements Worker, Runnable, AutoCloseable {
+public class EventedWorker implements Worker, Runnable, AutoCloseable, Comparable<EventedWorker> {
 
     private static final Logger log = Logger.getLogger(EventedWorker.class);
-
-    static DepthComparator COMPARATOR = new DepthComparator();
 
     protected final WorkerId workerId;
     protected final Object lock;
     protected final Queue<ExecutableEvent> executables = new LinkedList<>();
     protected final Queue<CallbackEvent> callbacks = new LinkedList<>();
-    protected final Notify notify;
     protected final Configuration configuration;
+    protected volatile boolean inCall = false;
     protected volatile boolean started = true;
     protected volatile boolean stopped = false;
     protected volatile boolean finished = false;
@@ -48,7 +43,6 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
                 return "lock-" + workerId;
             }
         };
-        notify = new Notify(lock);
     }
 
     @Override
@@ -57,15 +51,15 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
     }
 
     public boolean isActive() {
-        return started && !stopped;
+        return started && !finished;
     }
 
     @Override
     public void execute(final ExecutableEvent event) {
         final Executable executable = event.getExecutable();
         synchronized (lock) {
-            log.debugf(Messages.get("CHAINLINK-024005.worker.add.executable"), executable.getContext(), this, event);
             executables.add(event);
+            log.debugf(Messages.get("CHAINLINK-024005.worker.add.executable"), executable.getContext(), this, event);
             lock.notifyAll();
         }
     }
@@ -73,8 +67,8 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
     @Override
     public void callback(final CallbackEvent event) {
         synchronized (lock) {
-            log.debugf(Messages.get("CHAINLINK-024006.worker.add.callback"), event.getContext(), this, event);
             callbacks.add(event);
+            log.debugf(Messages.get("CHAINLINK-024006.worker.add.callback"), event.getContext(), this, event);
             lock.notifyAll();
         }
     }
@@ -82,18 +76,17 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
     @Override
     public void run() {
         this.started = true;
+        log.infof(Messages.get("CHAINLINK-024012.worker.started"), this);
         boolean empty;
         do {
             _awaitIfEmpty();
             empty = _runExecutable();
         } while (!stopped || !empty);
         this.finished = true;
+        log.infof(Messages.get("CHAINLINK-024011.worker.stopped"), this);
     }
 
     private boolean _runExecutable() {
-        final ExecutionContext previous;
-        final Executable executable;
-        final ChainId chainId;
         final CallbackEvent cb;
         final ExecutableEvent ex;
         synchronized (lock) {
@@ -104,8 +97,13 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
                 ex = null;
             }
         }
+        this.inCall = true; //TODO Is this the right spot to switch
+        final ExecutionContext previous;
+        final Executable executable;
+        final ChainId chainId;
         if (cb == null) {
             if (ex == null) {
+                this.inCall = false;
                 return true;
             }
             executable = ex.getExecutable();
@@ -120,6 +118,7 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
                 chainId = cb.getChainId();
             } catch (final Throwable e) {
                 log.errorf(e, Messages.get("CHAINLINK-024007.worker.fetch.exception"), this, cb);
+                this.inCall = false;
                 return false;
             }
         }
@@ -128,11 +127,13 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
             final Chain<?> chain = configuration.getRegistry()
                     .getChain(context.getJobExecutionId(), chainId);
             LocalRegistry.assertChain(chain, context.getJobExecutionId(), chainId);
-            chain.onComplete(notify);
+            log.tracef(Messages.get("CHAINLINK-024008.worker.start.execution"), context, this, executable);
             executable.execute(configuration, chain, workerId, previous);
+            log.tracef(Messages.get("CHAINLINK-024009.worker.finish.execution"), context, this, executable);
         } catch (final Throwable e) {
-            log.errorf(e, Messages.get("CHAINLINK-024004.worker.execute.exception"), context, this, executable);
+            log.errorf(e, Messages.get("CHAINLINK-024004.worker.failed.execution"), context, this, executable);
         }
+        this.inCall = false;
         return false;
     }
 
@@ -153,6 +154,7 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
     @Override
     public void close() throws InterruptedException {
         stopped = true;
+        log.infof(Messages.get("CHAINLINK-024010.worker.stopping"), this);
         synchronized (lock) {
             lock.notifyAll();
         }
@@ -160,27 +162,42 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[workerId=" + workerId + ",executables=" + executables.size() + ",callbacks=" + callbacks.size() + ",running=" + isActive() + "]";
+        return getClass().getSimpleName() + "{workerId=" + workerId + ",executables=" + executables.size() + ",callbacks=" + callbacks.size() + ",running=" + isActive() + "}";
     }
 
-    int getExecutions() {
-        return executables.size();
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final EventedWorker that = (EventedWorker) o;
+        return workerId.equals(that.workerId);
     }
 
-    int getCallbacks() {
-        return callbacks.size();
+    @Override
+    public int hashCode() {
+        return workerId.hashCode();
     }
 
-    static class DepthComparator implements Comparator<EventedWorker>, Serializable {
-        private static final long serialVersionUID = 0L;
-
-        @Override
-        public int compare(final EventedWorker a, final EventedWorker b) {
-            int ret = Integer.compare(a.getExecutions(), b.getExecutions());
-            if (ret != 0) {
-                return ret;
+    @Override
+    public int compareTo(final EventedWorker that) {
+        if (this.equals(that)) {
+            return 0;
+        }
+        int ret = Integer.compare(this.executables.size(), that.executables.size());
+        if (ret != 0) {
+            return ret;
+        }
+        ret =  Integer.compare(this.callbacks.size(), that.callbacks.size());
+        if (ret != 0) {
+            return ret;
+        }
+        if (this.inCall) {
+            if (that.inCall) {
+                return 0;
             }
-            return Integer.compare(a.getCallbacks(), b.getCallbacks());
+            return 1;
+        } else {
+            return -1;
         }
     }
 }

@@ -6,6 +6,7 @@ import io.machinecode.chainlink.spi.then.OnLink;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -27,6 +28,10 @@ public class AllChain<T> extends BaseChain<T> {
             that.previous(this);
         }
         resolve(null);
+    }
+
+    public AllChain(final Collection<? extends Chain<?>> link) {
+        this(link.toArray(new Chain[link.size()]));
     }
 
     @Override

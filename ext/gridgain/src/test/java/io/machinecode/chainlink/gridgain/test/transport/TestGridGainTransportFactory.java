@@ -1,6 +1,8 @@
 package io.machinecode.chainlink.gridgain.test.transport;
 
+import io.machinecode.chainlink.core.transport.DistributedTransport;
 import io.machinecode.chainlink.core.transport.TestTransportFactory;
+import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.transport.gridgain.GridGainTransport;
 import org.gridgain.grid.Grid;
@@ -49,7 +51,13 @@ public class TestGridGainTransportFactory implements TestTransportFactory {
                 dependencies,
                 properties,
                 grid
-        );
+        ) {
+            @Override
+            public void open(final Configuration configuration) throws Exception {
+                this.configuration = configuration;
+                grid.nodeLocalMap().put(Configuration.class.getName(), configuration);
+            }
+        };
     }
 
     @Override

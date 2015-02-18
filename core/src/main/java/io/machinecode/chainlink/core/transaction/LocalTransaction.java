@@ -145,7 +145,7 @@ public class LocalTransaction implements Transaction {
 
     @Override
     public String toString() {
-        return "LocalTransaction[status=" + _status(status) + ",timeout=" + timeout + ",syncs=" + (syncs == null ? 0 : syncs.size()) + "]";
+        return "LocalTransaction{status=" + _status(status) + ",timeout=" + timeout + ",syncs=" + (syncs == null ? 0 : syncs.size()) + "}";
     }
 
     private static String _status(final int status) {

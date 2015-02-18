@@ -120,7 +120,11 @@ public abstract class DistributedTransport<A> implements Transport {
 
     @Override
     public Promise<Chain<?>,Throwable,Object> distribute(final int maxThreads, final Executable... executables) throws Exception {
-        return _getWorkers(maxThreads).then(new Reject<List<RemoteExecution>, Throwable, Chain<?>, Throwable, Object>() {
+        if (executables.length == 0) {
+            throw new IllegalArgumentException(); //TODO Message
+        }
+        final long jobExecutionId = executables[0].getContext().getJobExecutionId();
+        return _getWorkers(jobExecutionId, maxThreads).then(new Reject<List<RemoteExecution>, Throwable, Chain<?>, Throwable, Object>() {
             @Override
             public void resolve(final List<RemoteExecution> that, final Deferred<Chain<?>, Throwable, Object> next) {
                 ListIterator<RemoteExecution> it = that.listIterator();
@@ -132,7 +136,6 @@ public abstract class DistributedTransport<A> implements Transport {
                     }
                     final RemoteExecution remote = it.next();
                     final int index = i++;
-                    final long jobExecutionId = executable.getContext().getJobExecutionId();
                     chains[index] = remote.getChain();
                     registry.registerChain(jobExecutionId, remote.getLocalId(), remote.getChain());
                     final Worker worker = remote.getWorker();
@@ -245,26 +248,31 @@ public abstract class DistributedTransport<A> implements Transport {
         });
     }
 
-    protected Promise<List<RemoteExecution>,Throwable,Object> _getWorkers(final int required) {
+    protected Promise<List<RemoteExecution>,Throwable,Object> _getWorkers(final long jobExecutionId, final int required) {
         return invokeEverywhere(new GetWorkerIdsCommand(required)).then(new Resolve<Iterable<Iterable<WorkerId>>, List<RemoteExecution>, Throwable, Object>() {
             @Override
             public void resolve(final Iterable<Iterable<WorkerId>> that, final Deferred<List<RemoteExecution>, Throwable, Object> next) {
-                final List<RemoteExecution> ret = new ArrayList<>(required);
                 int i = 0;
-                while (i < required) {
+                final List<Promise<RemoteExecution, Throwable, ?>> promises = new ArrayList<>(required);
+                loop: while (i < required) {
                     for (final Iterable<WorkerId> node : that) {
                         for (final WorkerId workerId : node) {
-                            final UUIDId id = new UUIDId(DistributedTransport.this);
-                            ret.add(new RemoteExecution(new DistributedWorker(DistributedTransport.this, workerId), id, id, new ChainImpl<Void>()));
+                            promises.add(getRemoteChainAndIds(workerId, jobExecutionId));
                             ++i;
+                            if (i >= required) {
+                                break loop;
+                            }
                         }
                     }
-                    if (ret.isEmpty()) {
+                    if (i == 0) {
                         next.reject(new Exception("No remote workers found"));
                         return;
                     }
                 }
-                next.resolve(ret);
+                When.all(promises)
+                        .onResolve(next)
+                        .onReject(next)
+                        .onCancel(next);
             }
         });
     }

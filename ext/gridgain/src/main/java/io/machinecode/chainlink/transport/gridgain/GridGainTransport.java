@@ -1,14 +1,12 @@
 package io.machinecode.chainlink.transport.gridgain;
 
 import io.machinecode.chainlink.core.transport.DistributedTransport;
+import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.FutureDeferred;
 import io.machinecode.then.core.RejectedDeferred;
 import org.gridgain.grid.Grid;
-import org.gridgain.grid.GridFuture;
 import org.jboss.logging.Logger;
 
 import java.util.Collection;
@@ -31,19 +29,22 @@ public class GridGainTransport extends DistributedTransport<UUID> {
         super(dependencies, properties);
         this.grid = grid;
         this.local = grid.localNode().id();
-        log.infof("GridGainRegistry started on address: [%s]", this.local); //TODO Message
     }
 
     @Override
     public void open(final Configuration configuration) throws Exception {
         super.open(configuration);
-        grid.nodeLocalMap().addIfAbsent(Configuration.class.getName(), configuration);
+        if (grid.nodeLocalMap().putIfAbsent(Configuration.class.getName(), configuration) != null) {
+            throw new IllegalStateException("A transport is already configured for this grid"); //TODO Message
+        }
+        log.infof("GridGainTransport %s started.", this.local); //TODO Message
     }
 
     @Override
     public void close() throws Exception {
-        log.infof("GridGainRegistry is shutting down."); //TODO Message
+        log.infof("GridGainTransport %s is shutting down.", this.local); //TODO Message
         super.close();
+        grid.nodeLocalMap().remove(Configuration.class.getName());
     }
 
     @Override
@@ -58,25 +59,31 @@ public class GridGainTransport extends DistributedTransport<UUID> {
             return new RejectedDeferred<T, Throwable, Object>(new Exception("Expected " + UUID.class.getName() + ". Found " + address.getClass())); //TODO Message
         }
         final UUID uuid = (UUID) address;
+        final GridGainDeferred<T> ret = new GridGainDeferred<>(timeout, unit);
         try {
             log.tracef("Invoking %s on %s.", command, address);
-            final GridFuture<T> future = this.grid.forNodeId(uuid)
+            this.grid.forNodeId(uuid)
                     .compute()
-                    .call(new GridGainCallable<>(command, getAddress()));
-            return new FutureDeferred<>(new GridGainFuture<>(future), timeout, unit);
+                    .call(new GridGainCallable<>(command, getAddress()))
+                    .listenAsync(ret);
         } catch (final Throwable e) {
-            return new RejectedDeferred<>(e);
+            ret.reject(e);
         }
+        return ret;
     }
 
     @Override
     protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
         log.tracef("Invoking %s on all remotes.", command);
-        final GridFuture<Collection<T>> future = this.grid.forRemotes()
-                .compute()
-                .broadcast(new GridGainCallable<>(command, getAddress()));
-        final FutureDeferred<Collection<T>,Object> run = new FutureDeferred<>(new GridGainFuture<>(future), timeout, unit);
-        network.execute(run);
-        return run;
+        final GridGainDeferred<Collection<T>> ret = new GridGainDeferred<>(timeout, unit);
+        try {
+            this.grid.forRemotes()
+                    .compute()
+                    .broadcast(new GridGainCallable<>(command, getAddress()))
+                    .listenAsync(ret);
+        } catch (final Throwable e) {
+            ret.reject(e);
+        }
+        return ret;
     }
 }
