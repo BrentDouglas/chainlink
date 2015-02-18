@@ -188,27 +188,6 @@
     </dependencies>
 
     <profiles>
-        <profile>
-            <id>coherence</id>
-            <activation>
-                <property><name>debug</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>coherence</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>seam</id>
-            <activation>
-                <property><name>seam</name></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>seam</module>
-            </modules>
-        </profile>
-
         <!-- Containers -->
         <profile>
             <id>se</id>
@@ -272,15 +251,18 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <transport.factory.class>io.machinecode.chainlink.tck.coherence.transport.CoherenceTransportFactory</transport.factory.class>
+                <transport.factory.class>io.machinecode.chainlink.coherence.tck.transport.CoherenceTransportFactory</transport.factory.class>
             </properties>
-            <modules>
-                <module>coherence</module>
-            </modules>
             <dependencies>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
                     <artifactId>chainlink-ext-coherence</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-ext-coherence</artifactId>
+                    <type>test-jar</type>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -341,13 +323,16 @@
             <properties>
                 <repository.factory.class>io.machinecode.chainlink.repository.coherence.CoherenceRepositoryFactory</repository.factory.class>
             </properties>
-            <modules>
-                <module>coherence</module>
-            </modules>
             <dependencies>
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
                     <artifactId>chainlink-ext-coherence</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-ext-coherence</artifactId>
+                    <type>test-jar</type>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
@@ -509,7 +494,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <artifact.loader.factory.class>io.machinecode.chainlink.tck.seam.SeamArtifactLoaderFactory</artifact.loader.factory.class>
+                <artifact.loader.factory.class>io.machinecode.chainlink.seam.tck.SeamArtifactLoaderFactory</artifact.loader.factory.class>
                 <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
                 <injector.configuration.source.file>META-INF/components.xml</injector.configuration.source.file>
             </properties>
@@ -522,6 +507,12 @@
                 <dependency>
                     <groupId>io.machinecode.chainlink</groupId>
                     <artifactId>chainlink-ext-seam</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.machinecode.chainlink</groupId>
+                    <artifactId>chainlink-ext-seam</artifactId>
+                    <type>test-jar</type>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
