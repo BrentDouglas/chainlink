@@ -22,6 +22,7 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -115,7 +116,9 @@ public class JmxClientTest extends OperatorTest {
         final List<Long> stop = client.getRunningExecutions("stop");
         assertEquals(1, stop.size());
         client.stop(operation.getJobExecutionId());
-        operation.get(5, TimeUnit.SECONDS);
+        try {
+            operation.get(5, TimeUnit.SECONDS);
+        } catch (final CancellationException e) {}
     }
 
     @Test
@@ -177,7 +180,9 @@ public class JmxClientTest extends OperatorTest {
         StopBatchlet.reset();
         final JobOperationImpl operation = operator.startJob("stop", PARAMETERS);
         client.stop(operation.getJobExecutionId());
-        operation.get(5, TimeUnit.SECONDS);
+        try {
+            operation.get(5, TimeUnit.SECONDS);
+        } catch (final CancellationException e) {}
     }
 
     @Test
