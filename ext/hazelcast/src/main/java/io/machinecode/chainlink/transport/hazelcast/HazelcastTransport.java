@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +43,7 @@ public class HazelcastTransport extends DistributedTransport<String> {
 
     protected final HazelcastInstance hazelcast;
     protected final IExecutorService executor;
+    protected final Executor network;
 
     final Member local;
     protected volatile List<Member> remotes;
@@ -52,6 +55,7 @@ public class HazelcastTransport extends DistributedTransport<String> {
         super(dependencies, properties);
         this.hazelcast = hazelcast;
         this.executor = executor;
+        this.network= Executors.newCachedThreadPool();
 
         final Cluster cluster = hazelcast.getCluster();
         this.local = cluster.getLocalMember();

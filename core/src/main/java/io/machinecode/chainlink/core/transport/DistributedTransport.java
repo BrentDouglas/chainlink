@@ -10,7 +10,7 @@ import io.machinecode.chainlink.core.then.AllChain;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.transport.cmd.CleanupCommand;
 import io.machinecode.chainlink.core.transport.cmd.Command;
-import io.machinecode.chainlink.core.transport.cmd.FindWorkerIdForExecutionCommand;
+import io.machinecode.chainlink.core.transport.cmd.GetWorkerIdAndPushChainCommand;
 import io.machinecode.chainlink.core.transport.cmd.GetWorkerIdsCommand;
 import io.machinecode.chainlink.core.transport.cmd.PushChainCommand;
 import io.machinecode.chainlink.spi.Messages;
@@ -59,7 +59,6 @@ public abstract class DistributedTransport<A> implements Transport {
 
     protected Configuration configuration;
 
-    protected final Executor network;
     protected final Executor reaper;
 
     final TLongObjectMap<List<A>> remoteExecutions = new TLongObjectHashMap<>();
@@ -70,7 +69,6 @@ public abstract class DistributedTransport<A> implements Transport {
     public DistributedTransport(final Dependencies dependencies, final Properties properties) throws Exception {
         this.registry = dependencies.getRegistry();
 
-        this.network= Executors.newCachedThreadPool();
         this.reaper = Executors.newSingleThreadExecutor();
 
         this.timeout = Long.parseLong(properties.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
@@ -159,7 +157,7 @@ public abstract class DistributedTransport<A> implements Transport {
     @Override
     public Promise<Chain<?>,Throwable,Object> callback(final ExecutableId executableId, final ExecutionContext context) throws Exception {
         final long jobExecutionId = context.getJobExecutionId();
-        return fetchWorker(jobExecutionId, executableId).then(new Reject<RemoteExecution, Throwable, Chain<?>, Throwable, Object>() {
+        return _getWorker(jobExecutionId, executableId).then(new Reject<RemoteExecution, Throwable, Chain<?>, Throwable, Object>() {
             @Override
             public void resolve(final RemoteExecution that, final Deferred<Chain<?>,Throwable,Object> next) {
                 final Worker worker = that.getWorker();
@@ -189,7 +187,7 @@ public abstract class DistributedTransport<A> implements Transport {
         return new DistributedProxyRepository(this, id);
     }
 
-    protected Promise<RemoteExecution,? extends Throwable,Object> fetchWorker(final long jobExecutionId, final ExecutableId executableId) throws Exception {
+    protected Promise<RemoteExecution,? extends Throwable,Object> _getWorker(final long jobExecutionId, final ExecutableId executableId) throws Exception {
         final Executable executable = configuration.getRegistry().getExecutable(jobExecutionId, executableId);
         if (executable != null) {
             final Worker worker = configuration.getExecutor().getWorker(executable.getWorkerId());
@@ -199,14 +197,25 @@ public abstract class DistributedTransport<A> implements Transport {
             final UUIDId id = new UUIDId(this);
             return When.resolved(new RemoteExecution(worker, id, id, new ChainImpl<Void>()));
         }
-        return _getWorker(jobExecutionId, executableId);
+        final ChainId localId = new UUIDId(this);
+        return invokeRemote(executableId.getAddress(), new GetWorkerIdAndPushChainCommand(jobExecutionId, executableId, localId)).then(new Resolve<RemoteWorkerAndChain, RemoteExecution, Throwable, Object>() {
+            @Override
+            public void resolve(final RemoteWorkerAndChain that, final Deferred<RemoteExecution, Throwable, Object> next) {
+                if (that != null) {
+                    next.resolve(
+                            new RemoteExecution(
+                                    new DistributedWorker(DistributedTransport.this, that.getWorkerId()),
+                                    localId,
+                                    that.getChainId(),
+                                    new DistributedLocalChain(DistributedTransport.this, that.getWorkerId().getAddress(), jobExecutionId, that.getChainId())
+                            )
+                    );
+                } else {
+                    next.reject(new Exception("No remote worker for executable id " + executableId + " found"));
+                }
+            }
+        });
     }
-
-    protected final <T> Promise<T, Throwable, Object> invokeRemote(final Object address, final Command<T> command) {
-        return invokeRemote(address, command, timeout, unit);
-    }
-
-    protected abstract <T> Promise<T,Throwable,Object> invokeRemote(final Object address, final Command<T> command, final long timeout, final TimeUnit unit);
 
     private Promise<RemoteExecution,Throwable,?> getRemoteChainAndIds(final WorkerId workerId, final long jobExecutionId) {
         final ChainId localId = new UUIDId(this);
@@ -226,24 +235,6 @@ public abstract class DistributedTransport<A> implements Transport {
                                 new DistributedLocalChain(DistributedTransport.this, workerId.getAddress(), jobExecutionId, remoteId)
                         )
                 );
-            }
-        });
-    }
-
-    protected Promise<RemoteExecution,Throwable,Object> _getWorker(final long jobExecutionId, final ExecutableId executableId) {
-        return invokeEverywhere(new FindWorkerIdForExecutionCommand(jobExecutionId, executableId)).then(new Resolve<Iterable<WorkerId>, RemoteExecution, Throwable, Object>() {
-            @Override
-            public void resolve(final Iterable<WorkerId> that, final Deferred<RemoteExecution, Throwable, Object> next) {
-                for (final WorkerId id : that) {
-                    if (id != null) {
-                        getRemoteChainAndIds(id, jobExecutionId)
-                                .onResolve(next)
-                                .onReject(next)
-                                .onCancel(next);
-                        return;
-                    }
-                }
-                next.reject(null);
             }
         });
     }
@@ -278,6 +269,12 @@ public abstract class DistributedTransport<A> implements Transport {
     }
 
     public abstract A getAddress();
+
+    protected final <T> Promise<T, Throwable, Object> invokeRemote(final Object address, final Command<T> command) {
+        return invokeRemote(address, command, timeout, unit);
+    }
+
+    protected abstract <T> Promise<T,Throwable,Object> invokeRemote(final Object address, final Command<T> command, final long timeout, final TimeUnit unit);
 
     protected abstract <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command);
 

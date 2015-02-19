@@ -64,7 +64,7 @@ public class GridGainTransport extends DistributedTransport<UUID> {
             log.tracef("Invoking %s on %s.", command, address);
             this.grid.forNodeId(uuid)
                     .compute()
-                    .call(new GridGainCallable<>(command, getAddress()))
+                    .call(new GridGainCallable<>(command, local))
                     .listenAsync(ret);
         } catch (final Throwable e) {
             ret.reject(e);
@@ -79,7 +79,7 @@ public class GridGainTransport extends DistributedTransport<UUID> {
         try {
             this.grid.forRemotes()
                     .compute()
-                    .broadcast(new GridGainCallable<>(command, getAddress()))
+                    .broadcast(new GridGainCallable<>(command, local))
                     .listenAsync(ret);
         } catch (final Throwable e) {
             ret.reject(e);

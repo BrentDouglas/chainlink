@@ -9,9 +9,7 @@ import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.OnReject;
 import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.api.Promise;
-import io.machinecode.then.core.DeferredImpl;
 import io.machinecode.then.core.RejectedDeferred;
-import io.machinecode.then.core.SomeDeferred;
 import org.jboss.logging.Logger;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -24,7 +22,6 @@ import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.Response;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Future;
@@ -57,13 +54,15 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
         this.remotes = _remoteMembers(this.channel.getView().getMembers());
         this.dispatcher = new MessageDispatcher(channel, null, this);
         this.dispatcher.setRequestHandler(this);
-        log.infof("JGroupsRegistry started on address: [%s]", this.local); //TODO Message
+        log.infof("JGroupsTransport %s has started.", this.local); //TODO Message
     }
 
     @Override
     public void close() throws Exception {
-        log.infof("JGroupsRegistry is shutting down."); //TODO Message
+        log.infof("JGroupsTransport %s is shutting down.", this.local); //TODO Message
         super.close();
+        this.dispatcher.setRequestHandler(null);
+        this.channel.removeChannelListener(this.dispatcher);
     }
 
     @Override
@@ -74,11 +73,21 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     @Override
     protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
         final List<Address> remotes = this.remotes;
-        final List<Promise<T,Throwable,?>> promises = new ArrayList<>(remotes.size());
-        for (final Address remote : remotes) {
-            promises.add(invokeRemote(remote, command));
+        final JGroupsAnycastListener<T,Object> deferred = new JGroupsAnycastListener<>(this.local, command, timeout, unit);
+        try {
+            log.tracef("Sending from %s to all remotes: %s.", this.local, command);
+            this.dispatcher.castMessageWithFuture(
+                    remotes,
+                    new Message(null, marshalling.marshall(command)),
+                    RequestOptions.SYNC()
+                            .setExclusionList(this.local)
+                            .setTimeout(unit.toMillis(timeout)),
+                    deferred
+            );
+        } catch (final Throwable e) {
+            deferred.reject(e);
         }
-        return new SomeDeferred<>(promises);
+        return deferred;
     }
 
     @Override
@@ -88,15 +97,15 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
             return new RejectedDeferred<T,Throwable,Object>(new Exception("Expected " + Address.class.getName() + ". Found " + address.getClass())); //TODO Message
         }
         final Address addr = (Address)address;
-        final DeferredImpl<T,Throwable,Object> deferred = new DeferredImpl<>();
+        final JGroupsListener<T,Object> deferred = new JGroupsListener<>(this.local, addr, command, timeout, unit);
         try {
-            log.tracef("Sending to %s: %s.", address, command);
+            log.tracef("Node %s sending to %s: %s.", this.local, address, command);
             this.dispatcher.sendMessageWithFuture(
                     new Message(addr, marshalling.marshall(command)),
                     RequestOptions.SYNC()
                             .setExclusionList(this.local)
                             .setTimeout(unit.toMillis(timeout)),
-                    new JGroupsFutureListener<>(addr, command, this.network, deferred, timeout, unit)
+                    deferred
             );
         } catch (final Throwable e) {
             deferred.reject(e);
@@ -109,9 +118,9 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
         try {
             final Address src = msg.src();
             final Command<?> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
-            log.tracef("Starting from %s: %s.", src, command);
+            log.tracef("Node %s starting from %s: %s.", local, src, command);
             final Object ret = command.perform(this.configuration, src);
-            log.tracef("Finished from %s: %s with %s.", src, command, ret);
+            log.tracef("Node %s finished from %s: %s with %s.", local, src, command, ret);
             return ret;
         } catch (final Exception e) {
             throw e;
@@ -124,13 +133,14 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     public void handle(final Message msg, final Response response) throws Exception {
         final Address src = msg.src();
         final Command<?> command = marshalling.unmarshall(msg.getBuffer(), Command.class, this.loader.get());
-        log.tracef("Starting async from %s: %s.", src, command);
+        log.tracef("Node %s starting async from %s: %s.", local, src, command);
         try {
-            final Object ret = command.perform(configuration, src);
+            final Object ret = command.perform(configuration, src); //TODO Actually run this async
             response.send(ret, false);
         } catch (final Throwable e) { //Should throw a CancellationException
             response.send(e, true);
         }
+        log.tracef("Node %s finished async from %s: %s.", local, src, command);
     }
 
     @Override
@@ -158,6 +168,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
 
     public static class Listener implements OnResolve<Object>, OnReject<Throwable>, OnCancel, OnComplete {
 
+        final Address local;
         final Address origin;
         final Command<?> command;
 
@@ -166,7 +177,8 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
         final long timeout;
         final TimeUnit unit;
 
-        public Listener(final Address origin, final Command<?> command, final Response response, final Future<?> future, final long timeout, final TimeUnit unit) {
+        public Listener(final Address local, final Address origin, final Command<?> command, final Response response, final Future<?> future, final long timeout, final TimeUnit unit) {
+            this.local = local;
             this.origin = origin;
             this.command = command;
             this.response = response;
@@ -197,7 +209,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
 
         @Override
         public void complete(final int state) {
-            log.tracef("Finished from %s: %s.", origin, command);
+            log.tracef("Node %s finished from %s: %s.", local, origin, command);
         }
     }
 }
