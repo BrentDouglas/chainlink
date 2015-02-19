@@ -36,9 +36,9 @@ public class AllChain<T> extends BaseChain<T> {
 
     @Override
     public void previous(final Chain<?> that) {
-        synchronized (this) {
+        synchronized (lock) {
             this.previous = that;
-            this.notifyAll();
+            lock.notifyAll();
         }
         that.notifyLinked();
     }

@@ -25,6 +25,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
 
     protected static final byte ON_LINK = 106;
 
+    protected final Object _linkLock = new Object();
     protected volatile Chain<?> previous;
 
     @Override
@@ -41,7 +42,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
 
     @Override
     public void previous(final Chain<?> that) {
-        synchronized (this) {
+        synchronized (_linkLock) {
             this.previous = that;
         }
     }
@@ -49,8 +50,8 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
     @Override
     public void notifyLinked() {
         final boolean set;
-        synchronized (this) {
-            this.notifyAll();
+        synchronized (_linkLock) {
+            _linkLock.notifyAll();
             set = this.previous != null;
         }
         if (set) {
@@ -76,21 +77,25 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
         log().tracef(getCancelLogMessage());
         final CancelListener listener = new CancelListener();
         ListenerException exception = null;
+        final Iterable<OnCancel> onCancels;
+        final Iterable<OnComplete> onCompletes;
         final int state;
-        synchronized (_lock) {
+        synchronized (lock) {
             cancelling(listener);
             if (listener.exception != null) {
-                _lock.notifyAll();
+                lock.notifyAll();
                 throw listener.exception;
             }
             if (setCancelled()) {
                 return isCancelled();
             }
             state = this.state;
+            onCancels = this.getEvents(ON_CANCEL);
+            onCompletes = this.getEvents(ON_COMPLETE);
         }
-        for (final OnCancel then : this.<OnCancel>_getEvents(ON_CANCEL)) {
+        for (final OnCancel on : onCancels) {
             try {
-                then.cancel(interrupt);
+                on.cancel(interrupt);
             } catch (final Throwable e) {
                 if (exception == null) {
                     exception = new ListenerException(io.machinecode.then.core.Messages.format("THEN-000013.promise.cancel.exception"), e);
@@ -99,7 +104,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
                 }
             }
         }
-        for (final OnComplete on : this.<OnComplete>_getEvents(ON_COMPLETE)) {
+        for (OnComplete on : onCompletes) {
             try {
                 on.complete(state);
             } catch (final Throwable e) {
@@ -110,8 +115,8 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
                 }
             }
         }
-        synchronized (_lock) {
-            _lock.notifyAll();
+        synchronized (lock) {
+            lock.notifyAll();
         }
         if (exception != null) {
             throw exception;

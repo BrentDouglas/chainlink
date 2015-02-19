@@ -25,12 +25,17 @@ public class ChainImpl<T> extends BaseChain<T> {
         if (that == null) {
             throw new IllegalArgumentException(Messages.format("CHAINLINK-004200.chain.argument.required", "link"));
         }
-        synchronized (this) {
+        final Iterable<OnLink> onLinks;
+        synchronized (_linkLock) {
             this.link = that;
             that.previous(this);
+            synchronized (lock) {
+                onLinks = getEvents(ON_LINK);
+            }
         }
         RuntimeException exception = null;
-        for (final OnLink on : this.<OnLink>_getEvents(ON_LINK)) {
+
+        for (final OnLink on : onLinks) {
             try {
                 on.link(that);
             } catch (final Throwable e) {
@@ -53,7 +58,7 @@ public class ChainImpl<T> extends BaseChain<T> {
         if (then == null) {
             throw new IllegalArgumentException(Messages.format("CHAINLINK-004200.chain.argument.required", "onLink"));
         }
-        synchronized (this) {
+        synchronized (_linkLock) {
             if (this.link != null) {
                 try {
                     then.link(this.link);
@@ -63,7 +68,9 @@ public class ChainImpl<T> extends BaseChain<T> {
                     throw exception;
                 }
             } else {
-                _addEvent(ON_LINK, then);
+                synchronized (lock) {
+                    addEvent(ON_LINK, then);
+                }
             }
         }
         return this;
@@ -71,9 +78,9 @@ public class ChainImpl<T> extends BaseChain<T> {
 
     @Override
     public void awaitLink() throws InterruptedException, ExecutionException {
-        synchronized (this) {
+        synchronized (_linkLock) {
             while (this.link == null) {
-                this.wait();
+                _linkLock.wait();
             }
         }
         try {
@@ -86,9 +93,9 @@ public class ChainImpl<T> extends BaseChain<T> {
     @Override
     public void awaitLink(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
         final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-        synchronized (this) {
+        synchronized (_linkLock) {
             while (this.link == null) {
-                this.wait(_tryTimeout(end));
+                _linkLock.wait(_tryTimeout(end));
             }
         }
         try {

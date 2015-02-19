@@ -72,7 +72,6 @@ public class HazelcastTransport extends DistributedTransport<String> {
             public void memberAttributeChanged(final MemberAttributeEvent memberAttributeEvent) {
             }
         });
-        log.infof("HazelcastRegistry started on address: [%s]", this.local); //TODO Message
     }
 
     @Override
@@ -85,11 +84,12 @@ public class HazelcastTransport extends DistributedTransport<String> {
             throw new IllegalStateException("A transport is already configured for this instance."); //TODO Message
         }
         context.put(key, configuration);
+        log.infof("HazelcastTransport %s has started.", this.local); //TODO Message
     }
 
     @Override
     public void close() throws Exception {
-        log.infof("HazelcastRegistry is shutting down."); //TODO Message
+        log.infof("HazelcastTransport %s is shutting down.", this.local); //TODO Message
         super.close();
         this.hazelcast.getUserContext().remove(Configuration.class.getCanonicalName());
     }
@@ -113,21 +113,21 @@ public class HazelcastTransport extends DistributedTransport<String> {
             return new RejectedDeferred<T, Throwable, Object>(new Exception("No member with UUID " + address)); //TODO Message
         }
         try {
-            log.tracef("Invoking %s on %s.", command, address);
+            log.tracef("Invoking %s on %s.", command, address); //TODO Message
             final FutureDeferred<T, Object> run = new FutureDeferred<>(this.executor.<T>submitToMember(
                     new Invocation<>(command, this.local),
                     to
             ), timeout, unit);
             network.execute(run);
             return run;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return new RejectedDeferred<T, Throwable, Object>(e);
         }
     }
 
     @Override
     protected <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
-        log.tracef("Invoking %s on all remotes.", command);
+        log.tracef("Invoking %s on all remotes.", command); //TODO Message
         try {
             final Map<Member,Future<T>> map = this.executor.submitToMembers(
                     new Invocation<>(command, this.local),
