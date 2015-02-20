@@ -1,9 +1,6 @@
 package io.machinecode.chainlink.transport.jgroups;
 
 import io.machinecode.chainlink.core.transport.cmd.Command;
-import io.machinecode.then.api.OnCancel;
-import io.machinecode.then.api.OnReject;
-import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.core.DeferredImpl;
 import io.machinecode.then.core.FutureDeferred;
 import org.jboss.logging.Logger;
@@ -17,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class JGroupsListener<T,P> extends DeferredImpl<T,Throwable,P> implements FutureListener<T>, OnReject<Throwable>, OnResolve<T>, OnCancel {
+public class JGroupsListener<T,P> extends DeferredImpl<T,Throwable,P> implements FutureListener<T> {
     private static final Logger log = Logger.getLogger(JGroupsListener.class);
 
     final Address local;

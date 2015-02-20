@@ -14,7 +14,6 @@ import com.google.inject.spi.TypeListener;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.core.inject.Injector;
-import io.machinecode.chainlink.core.inject.LoadProviders;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
@@ -25,10 +24,7 @@ import javax.batch.api.BatchProperty;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 /**

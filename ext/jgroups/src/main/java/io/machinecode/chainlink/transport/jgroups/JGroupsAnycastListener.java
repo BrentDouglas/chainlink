@@ -1,9 +1,6 @@
 package io.machinecode.chainlink.transport.jgroups;
 
 import io.machinecode.chainlink.core.transport.cmd.Command;
-import io.machinecode.then.api.OnCancel;
-import io.machinecode.then.api.OnReject;
-import io.machinecode.then.api.OnResolve;
 import io.machinecode.then.core.DeferredImpl;
 import org.jboss.logging.Logger;
 import org.jgroups.Address;
@@ -21,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class JGroupsAnycastListener<T,P> extends DeferredImpl<List<T>,Throwable,P> implements FutureListener<RspList<T>>, OnReject<Throwable>, OnResolve<List<T>>, OnCancel {
+public class JGroupsAnycastListener<T,P> extends DeferredImpl<List<T>,Throwable,P> implements FutureListener<RspList<T>> {
     private static final Logger log = Logger.getLogger(JGroupsAnycastListener.class);
 
     final Address local;
