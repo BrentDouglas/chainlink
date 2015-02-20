@@ -6,12 +6,12 @@ import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSub
 import io.machinecode.chainlink.spi.schema.DeploymentSchema;
 import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
 import io.machinecode.chainlink.spi.schema.SubSystemSchema;
+import org.apache.commons.codec.binary.Base64;
 import org.glassfish.api.Param;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Base64;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -25,6 +25,8 @@ public abstract class SetCommand extends BaseCommand {
     @Param(name = "base64", shortName = "b", optional = true)
     protected String base64;
 
+    protected final Base64 decoder = new Base64(true);
+
     protected InputStream stream() throws Exception {
         if (file != null) {
             if (base64 != null) {
@@ -33,7 +35,7 @@ public abstract class SetCommand extends BaseCommand {
             return new FileInputStream(file);
         }
         if (base64 != null) {
-            return new ByteArrayInputStream(Base64.getUrlDecoder().decode(base64));
+            return new ByteArrayInputStream(decoder.decode(base64));
         }
         throw new Exception("One of the arguments file or base64 must be provided.");
     }
