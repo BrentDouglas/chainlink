@@ -30,8 +30,6 @@ public class InfinispanTransportFactory implements TransportFactory {
                         .globalJmxStatistics()
                         .jmxDomain("io.machinecode.chainlink.test")
                         .allowDuplicateDomains(true)
-                        .asyncListenerExecutor()
-                        .addProperty("maxThreads", "1")
                         .build(),
                 new ConfigurationBuilder()
                         .deadlockDetection()
