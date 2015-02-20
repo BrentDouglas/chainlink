@@ -24,8 +24,6 @@ public interface JobOperatorSchema<Dec extends DeclarationSchema, Prop extends P
 
     List<Dec> getArtifactLoaders();
 
-    List<Dec> getInjectors();
-
     List<Dec> getSecurities();
 
     Dec getRepository();

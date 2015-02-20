@@ -4,14 +4,15 @@
            xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink/subsystem http://machinecode.io/xml/ns/chainlink/chainlink-subsystem_1_0.xsd"
            ref="theSubSystemConfiguration">
 
-    <artifact-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiArtifactLoaderFactory"/>
+    <configuration-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory"/>
 
     <job-operator name="global">
-        <injector name="injector" ref="theInjector"/>
+        <security name="security" ref="theSecurity"/>
     </job-operator>
 
     <deployment name="default">
-        <artifact-loader name="jndi" ref="io.machinecode.chainlink.inject.jndi.JndiArtifactLoader"/>
+        <configuration-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory"/>
+        <!-- TODO <artifact-loader name="jndi" ref="io.machinecode.chainlink.inject.jndi.JndiArtifactLoader"/>-->
 
         <job-operator name="default" ref="theJobOperatorConfiguration">
             <transaction-manager name="tx" ref="java:comp/TransactionManager"/>
@@ -20,7 +21,7 @@
 
     <deployment name="someDeploymentName" ref="theDeploymentConfiguration">
         <job-operator name="default">
-            <injector name="injector" ref="otherInjector"/>
+            <security name="security" ref="otherSecurity"/>
         </job-operator>
     </deployment>
 </subsystem>

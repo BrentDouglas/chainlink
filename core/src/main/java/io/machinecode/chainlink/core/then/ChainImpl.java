@@ -40,7 +40,7 @@ public class ChainImpl<T> extends BaseChain<T> {
                 on.link(that);
             } catch (final Throwable e) {
                 if (exception == null) {
-                    exception = new RuntimeException(Messages.format("CHAINLINK-004005.chain.get.exception"), e);
+                    exception = new RuntimeException(Messages.format("CHAINLINK-004002.chain.get.exception"), e);
                 } else {
                     exception.addSuppressed(e);
                 }
@@ -48,7 +48,7 @@ public class ChainImpl<T> extends BaseChain<T> {
         }
         this.notifyLinked();
         if (exception != null) {
-            log().warnf(exception, Messages.format("CHAINLINK-004005.chain.get.exception"));
+            log().warnf(exception, Messages.format("CHAINLINK-004002.chain.get.exception"));
             throw exception;
         }
     }
@@ -63,8 +63,8 @@ public class ChainImpl<T> extends BaseChain<T> {
                 try {
                     then.link(this.link);
                 } catch (final Throwable e) {
-                    final RuntimeException exception = new RuntimeException(Messages.format("CHAINLINK-004200.chain.link.exception"), e);
-                    log().warnf(exception, Messages.format("CHAINLINK-004200.chain.link.exception"));
+                    final RuntimeException exception = new RuntimeException(Messages.format("CHAINLINK-004004.chain.link.exception"), e);
+                    log().warnf(exception, Messages.format("CHAINLINK-004004.chain.link.exception"));
                     throw exception;
                 }
             } else {

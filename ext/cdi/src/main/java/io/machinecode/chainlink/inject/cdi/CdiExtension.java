@@ -27,6 +27,6 @@ public class CdiExtension implements Extension {
     }
 
     void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery event, final BeanManager beanManager) {
-        event.addAnnotatedType(beanManager.createAnnotatedType(CdiInjector.class));
+        event.addAnnotatedType(beanManager.createAnnotatedType(CdiArtifactLoader.class));
     }
 }

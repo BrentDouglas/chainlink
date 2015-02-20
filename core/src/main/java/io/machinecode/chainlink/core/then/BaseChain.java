@@ -169,12 +169,12 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
 
     @Override
     protected String getTimeoutExceptionMessage() {
-        return Messages.get("CHAINLINK-004003.chain.timeout");
+        return Messages.get("CHAINLINK-004000.chain.timeout");
     }
 
     @Override
     protected String getInterruptedExceptionMessage() {
-        return Messages.get("CHAINLINK-004004.chain.interrupted");
+        return Messages.get("CHAINLINK-004001.chain.interrupted");
     }
 
     private static final class CancelListener implements OnLink, Serializable {
@@ -188,7 +188,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
                 that.cancel(true);
             } catch (final Throwable e) {
                 if (exception == null) {
-                    exception = new RuntimeException(Messages.format("CHAINLINK-004006.chain.cancel.exception"), e);
+                    exception = new RuntimeException(Messages.format("CHAINLINK-004003.chain.cancel.exception"), e);
                 } else {
                     exception.addSuppressed(e);
                 }

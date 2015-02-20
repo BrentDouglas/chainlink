@@ -54,7 +54,7 @@ public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<X
         if (this.ref != null) {
             final DeploymentConfiguration configuration;
             try {
-                configuration = model.getConfigurationArtifactLoader().load(this.ref, DeploymentConfiguration.class, classLoader);
+                configuration = model.getConfigurationLoader().load(this.ref, DeploymentConfiguration.class, classLoader);
             } catch (final Exception e) {
                 throw new ConfigurationException("attribute 'ref' must be an injectable " + DeploymentConfiguration.class.getName(), e); //TODO Message
             }
@@ -89,7 +89,7 @@ public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<X
     public void accept(final DeploymentSchema<?,?,?> from, final Op... ops) throws Exception {
         this.setName(from.getName());
         this.setRef(from.getRef());
-        Transmute.list(this.getArtifactLoaders(), from.getArtifactLoaders(), new CreateXmlDeclaration(), ops);
+        Transmute.list(this.getConfigurationLoaders(), from.getConfigurationLoaders(), new CreateXmlDeclaration(), ops);
         Transmute.<JobOperatorSchema<?,?>, XmlJobOperator>list(this.getJobOperators(), from.getJobOperators(), new CreateXmlJobOperator(), ops);
     }
 }

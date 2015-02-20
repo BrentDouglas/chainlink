@@ -66,9 +66,6 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
     @XmlElement(name = "artifact-loader", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlDeclaration> artifactLoaders = new ArrayList<>(0);
 
-    @XmlElement(name = "injector", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> injectors = new ArrayList<>(0);
-
     @XmlElement(name = "security", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlDeclaration> securities = new ArrayList<>(0);
 
@@ -168,16 +165,6 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
     }
 
     @Override
-    public List<XmlDeclaration> getInjectors() {
-        return injectors;
-    }
-
-    @Override
-    public void setInjectors(final List<XmlDeclaration> injectors) {
-        this.injectors = injectors;
-    }
-
-    @Override
     public List<XmlDeclaration> getSecurities() {
         return securities;
     }
@@ -248,7 +235,6 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
         this.setRef(from.getRef());
         final Creator<XmlDeclaration> creator = new CreateXmlDeclaration();
         Transmute.list(this.getArtifactLoaders(), from.getArtifactLoaders(), creator, ops);
-        Transmute.list(this.getInjectors(), from.getInjectors(), creator, ops);
         Transmute.list(this.getSecurities(), from.getSecurities(), creator, ops);
         Transmute.list(this.getJobLoaders(), from.getJobLoaders(), creator, ops);
 
@@ -311,10 +297,6 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
             model.getArtifactLoader(resource.getName())
                     .setRef(ref(resource));
         }
-        for (final XmlDeclaration resource : this.injectors) {
-            model.getInjector(resource.getName())
-                    .setRef(ref(resource));
-        }
         for (final XmlDeclaration resource : this.securities) {
             model.getSecurity(resource.getName())
                     .setRef(ref(resource));
@@ -322,7 +304,7 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
         if (this.ref != null) {
             final JobOperatorConfiguration configuration;
             try {
-                configuration = scope.getConfigurationArtifactLoader().load(this.ref, JobOperatorConfiguration.class, classLoader);
+                configuration = scope.getConfigurationLoader().load(this.ref, JobOperatorConfiguration.class, classLoader);
             } catch (final ArtifactOfWrongTypeException e) {
                 throw new ConfigurationException("attribute 'ref' must be the fqcn of a class extending " + JobOperatorConfiguration.class.getName(), e); //TODO Message
             }

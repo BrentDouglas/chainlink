@@ -17,9 +17,9 @@ public class TheJobOperatorConfiguration implements JobOperatorConfiguration {
     public void configureJobOperator(final JobOperatorModel model) throws Exception {
         model.getProperties().setProperty("foo", "bar");
         model.getMBeanServer().setValue(ManagementFactory.getPlatformMBeanServer());
-        //This is changing the value set in xml from 'theInjector' to 'otherInjector'
-        model.getInjector("injector").setRef("otherInjector");
-        //Re-add 'theInjector' after 'otherInjector'
-        model.getInjector("secondInjector").setRef("theInjector");
+        //This is changing the value set in xml from 'theSecurity' to 'otherSecurity'
+        model.getSecurity("security").setRef("otherSecurity");
+        //Re-add 'theSecurity' after 'otherSecurity'
+        model.getSecurity("secondSecurity").setRef("theSecurity");
     }
 }

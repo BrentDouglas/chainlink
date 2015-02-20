@@ -20,7 +20,7 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="artifact-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="configuration-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="job-operator" type="cl:JobOperatorType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
@@ -60,7 +60,6 @@
                     <xs:element name="mbean-server" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="job-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="artifact-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="injector" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="security" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="repository" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="registry" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>

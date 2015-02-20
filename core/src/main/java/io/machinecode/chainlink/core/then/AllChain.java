@@ -66,14 +66,14 @@ public class AllChain<T> extends BaseChain<T> {
                 then.link(that);
             } catch (final Throwable e) {
                 if (exception == null) {
-                    exception = new RuntimeException(Messages.format("CHAINLINK-004005.chain.get.exception"), e);
+                    exception = new RuntimeException(Messages.format("CHAINLINK-004002.chain.get.exception"), e);
                 } else {
                     exception.addSuppressed(e);
                 }
             }
         }
         if (exception != null) {
-            log().warnf(exception, Messages.format("CHAINLINK-004005.chain.get.exception"));
+            log().warnf(exception, Messages.format("CHAINLINK-004002.chain.get.exception"));
             throw exception;
         }
         return this;

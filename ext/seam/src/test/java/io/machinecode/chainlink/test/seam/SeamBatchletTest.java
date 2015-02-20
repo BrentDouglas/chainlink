@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.test.seam;
 
-import io.machinecode.chainlink.core.inject.VetoInjector;
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.core.execution.batchlet.BatchletTest;
@@ -22,7 +21,6 @@ public class SeamBatchletTest extends BatchletTest {
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         model.getArtifactLoader("artifactFactory").setValue(SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class));
-        model.getInjector("injector").setValue(new VetoInjector());
     }
 
     @BeforeClass

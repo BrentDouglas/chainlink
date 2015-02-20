@@ -103,7 +103,7 @@ public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemS
         if (this.ref != null) {
             final SubSystemConfiguration configuration;
             try {
-                configuration = model.getConfigurationArtifactLoader().load(this.ref, SubSystemConfiguration.class, classLoader);
+                configuration = model.getConfigurationLoader().load(this.ref, SubSystemConfiguration.class, classLoader);
             } catch (final Exception e) {
                 throw new ConfigurationException("attribute 'ref' must be an injectable " + SubSystemConfiguration.class.getName(), e); //TODO Message
             }
@@ -140,7 +140,7 @@ public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemS
     @Override
     public void accept(final SubSystemSchema<?,?,?,?> from, final Op... ops) throws Exception {
         this.setRef(from.getRef());
-        Transmute.list(this.getArtifactLoaders(), from.getArtifactLoaders(), new CreateXmlDeclaration(), ops);
+        Transmute.list(this.getConfigurationLoaders(), from.getConfigurationLoaders(), new CreateXmlDeclaration(), ops);
         Transmute.<DeploymentSchema<?,?,?>, XmlDeployment>list(this.getDeployments(), from.getDeployments(), new CreateXmlDeployment(), ops);
         Transmute.<JobOperatorSchema<?,?>, XmlJobOperator>list(this.getJobOperators(), from.getJobOperators(), new CreateXmlJobOperator(), ops);
     }

@@ -11,7 +11,7 @@ public interface MutableScopeSchema<Dec extends MutableDeclarationSchema, Prop e
 
     void setRef(final String ref);
 
-    void setArtifactLoaders(final List<Dec> artifactLoaders);
+    void setConfigurationLoaders(final List<Dec> artifactLoaders);
 
     void setJobOperators(final List<Job> jobOperators);
 

@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.test.cdi;
 
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
-import io.machinecode.chainlink.inject.cdi.CdiInjector;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.core.execution.chunk.RetrySkipChunkTest;
 import org.jboss.weld.environment.se.Weld;
@@ -22,7 +21,6 @@ public class CdiRetrySkipChunkTest extends RetrySkipChunkTest {
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         super.visitJobOperatorModel(model);
         model.getArtifactLoader("artifactLoader").setValue(new CdiArtifactLoader(container.getBeanManager()));
-        model.getInjector("injector").setValue(new CdiInjector());
     }
 
     @BeforeClass

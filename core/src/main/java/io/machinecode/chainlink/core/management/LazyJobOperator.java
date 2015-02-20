@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.management;
 
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
-import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
@@ -38,13 +38,13 @@ public class LazyJobOperator implements ExtendedJobOperator {
 
     private JobOperatorImpl delegate;
     private JobOperatorModelImpl model;
-    private ArtifactLoader loader;
+    private ConfigurationLoader loader;
 
     public LazyJobOperator(final JobOperatorModelImpl model) {
         this(model, null);
     }
 
-    public LazyJobOperator(final JobOperatorModelImpl model, final ArtifactLoader loader) {
+    public LazyJobOperator(final JobOperatorModelImpl model, final ConfigurationLoader loader) {
         this.model = model;
         this.loader = loader;
     }

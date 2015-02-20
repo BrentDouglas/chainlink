@@ -4,9 +4,9 @@
            xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd"
            ref="example.TheDeploymentConfiguration">
 
-    <artifact-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiArtifactLoaderFactory"/>
+    <configuration-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory"/>
 
     <job-operator name="default" ref="theJobOperatorConfiguration">
-        <injector name="injector" ref="theInjector"/>
+        <security name="security" ref="theSecurity"/>
     </job-operator>
 </chainlink>

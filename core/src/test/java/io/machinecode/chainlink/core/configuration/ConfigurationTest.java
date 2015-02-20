@@ -9,8 +9,8 @@ import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
-import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
-import io.machinecode.chainlink.spi.inject.Injector;
+import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
+import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,21 +51,21 @@ public class ConfigurationTest extends Assert {
 
         final AtomicBoolean firstInjected = new AtomicBoolean();
         final AtomicBoolean secondInjected = new AtomicBoolean();
-        op.getInjector("first-injector").setValue(new Injector() {
+        op.getArtifactLoader("first-artifact-loader").setValue(new ArtifactLoader() {
             @Override
-            public boolean inject(final Object bean) throws Exception {
+            public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                 firstInjected.set(true);
-                return false;
+                return null;
             }
         });
-        op.getInjector("second-injector").setFactory(new InjectorFactory() {
+        op.getArtifactLoader("second-artifact-loader").setFactory(new ArtifactLoaderFactory() {
             @Override
-            public Injector produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return new Injector() {
+            public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return new ArtifactLoader() {
                     @Override
-                    public boolean inject(final Object bean) throws Exception {
+                    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                         secondInjected.set(true);
-                        return false;
+                        return null;
                     }
                 };
             }
@@ -84,8 +84,7 @@ public class ConfigurationTest extends Assert {
         assertNotNull(otherBatchlet);
         assertTrue(otherBatchlet instanceof TestBatchlet);
 
-        conf.getInjector().inject(new Object());
-
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
         // Check setting by value works
         assertTrue(firstInjected.get());
 
@@ -98,21 +97,20 @@ public class ConfigurationTest extends Assert {
         final JobOperatorModelImpl op = op();
 
         final AtomicBoolean valueInjected = new AtomicBoolean();
-        op.getInjector("first-injector").setValue(new Injector() {
+        op.getArtifactLoader("first-artifact-loader").setValue(new ArtifactLoader() {
             @Override
-            public boolean inject(final Object bean) throws Exception {
+            public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                 valueInjected.set(true);
-                return false;
+                return null;
             }
         });
-        op.getInjector("first-injector").setValueClass(ClassInjector.class);
+        op.getArtifactLoader("first-artifact-loader").setValueClass(ClassArtifactLoader.class);
         final ConfigurationImpl conf = op.getConfiguration();
 
-        conf.getInjector().inject(new Object());
-
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
         // Check value overrides factory
         assertTrue(valueInjected.get());
-        assertFalse(ClassInjector.injected.get());
+        assertFalse(ClassArtifactLoader.injected.get());
     }
 
     @Test
@@ -120,25 +118,24 @@ public class ConfigurationTest extends Assert {
         final JobOperatorModelImpl op = op();
 
         final AtomicBoolean factoryInjected = new AtomicBoolean();
-        op.getInjector("first-injector").setValueClass(ClassInjector.class);
-        op.getInjector("first-injector").setFactory(new InjectorFactory() {
+        op.getArtifactLoader("first-artifact-loader").setValueClass(ClassArtifactLoader.class);
+        op.getArtifactLoader("first-artifact-loader").setFactory(new ArtifactLoaderFactory() {
             @Override
-            public Injector produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return new Injector() {
+            public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return new ArtifactLoader() {
                     @Override
-                    public boolean inject(final Object bean) throws Exception {
+                    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                         factoryInjected.set(true);
-                        return false;
+                        return null;
                     }
                 };
             }
         });
         final ConfigurationImpl conf = op.getConfiguration();
 
-        conf.getInjector().inject(new Object());
-
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
         // Check value overrides factory
-        assertTrue(ClassInjector.injected.get());
+        assertTrue(ClassArtifactLoader.injected.get());
         assertFalse(factoryInjected.get());
     }
 
@@ -147,89 +144,87 @@ public class ConfigurationTest extends Assert {
         final JobOperatorModelImpl op = op();
 
         final AtomicBoolean factoryInjected = new AtomicBoolean();
-        op.getInjector("first-injector").setFactory(new InjectorFactory() {
+        op.getArtifactLoader("first-artifact-loader").setFactory(new ArtifactLoaderFactory() {
             @Override
-            public Injector produce(final Dependencies dependencies, final Properties properties) throws Exception {
-                return new Injector() {
+            public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+                return new ArtifactLoader() {
                     @Override
-                    public boolean inject(final Object bean) throws Exception {
+                    public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                         factoryInjected.set(true);
-                        return false;
+                        return null;
                     }
                 };
             }
         });
-        op.getInjector("first-injector").setFactoryClass(ClassInjectorFactory.class);
+        op.getArtifactLoader("first-artifact-loader").setFactoryClass(ClassArtifactLoaderFactory.class);
 
         final ConfigurationImpl conf = op.getConfiguration();
 
-        conf.getInjector().inject(new Object());
-
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
         // Check factory overrides factory class
         assertTrue(factoryInjected.get());
-        assertFalse(ClassInjectorFactory.injected.get());
+        assertFalse(ClassArtifactLoaderFactory.injected.get());
     }
 
     @Test
     public void factoryClassOverRefTest() throws Exception {
         final JobOperatorModelImpl op = op();
-        op.getInjector("first-injector").setFactoryClass(ClassInjectorFactory.class);
-        op.getInjector("first-injector").setRef(RefInjectorFactory.class.getName());
+        op.getArtifactLoader("first-artifact-loader").setFactoryClass(ClassArtifactLoaderFactory.class);
+        op.getArtifactLoader("first-artifact-loader").setRef(RefArtifactLoaderFactory.class.getName());
 
         final ConfigurationImpl conf = op.getConfiguration();
 
-        conf.getInjector().inject(new Object());
-
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
         // Check factory overrides factory class
-        assertTrue(ClassInjectorFactory.injected.get());
-        assertFalse(RefInjectorFactory.injected.get());
+        assertTrue(ClassArtifactLoaderFactory.injected.get());
+        assertFalse(RefArtifactLoaderFactory.injected.get());
     }
 
     @Before
     public void before() throws Exception {
-        ClassInjector.injected.set(false);
-        ClassInjectorFactory.injected.set(false);
-        RefInjectorFactory.injected.set(false);
+        ClassArtifactLoader.injected.set(false);
+        ClassArtifactLoaderFactory.injected.set(false);
+        RefArtifactLoaderFactory.injected.set(false);
     }
 
-    public static class ClassInjector implements Injector {
+    public static class ClassArtifactLoader implements ArtifactLoader {
 
         static final AtomicBoolean injected = new AtomicBoolean();
 
         @Override
-        public boolean inject(final Object bean) throws Exception {
+        public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
             injected.set(true);
-            return false;
+            return null;
         }
     }
 
-    public static class ClassInjectorFactory implements InjectorFactory {
+    public static class ClassArtifactLoaderFactory implements ArtifactLoaderFactory {
 
         static final AtomicBoolean injected = new AtomicBoolean();
 
         @Override
-        public Injector produce(final Dependencies dependencies, final Properties properties) throws Exception {
-            return new Injector() {
+        public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+            return new ArtifactLoader() {
                 @Override
-                public boolean inject(final Object bean) throws Exception {
+                public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                     injected.set(true);
-                    return false;
+                    return null;
                 }
             };
         }
     }
 
-    public static class RefInjectorFactory implements InjectorFactory {
+    public static class RefArtifactLoaderFactory implements ArtifactLoaderFactory {
 
         static final AtomicBoolean injected = new AtomicBoolean();
 
         @Override
-        public Injector produce(final Dependencies dependencies, final Properties properties) throws Exception {
-            return new Injector() {
+        public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+            return new ArtifactLoader() {
                 @Override
-                public boolean inject(final Object bean) throws Exception {
+                public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                     injected.set(true);
-                    return false;
+                    return null;
                 }
             };
         }

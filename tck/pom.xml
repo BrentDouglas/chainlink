@@ -35,7 +35,6 @@
         <cdi.injector.configuration.destination>WEB-INF</cdi.injector.configuration.destination>
 
         <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.NoOpArtifactLoaderFactory</artifact.loader.factory.class>
-        <injector.factory.class>io.machinecode.chainlink.tck.core.inject.NoOpInjectorFactory</injector.factory.class>
 
         <cdi.artifact.loader.factory.class>io.machinecode.chainlink.inject.cdi.JndiCdiArtifactLoaderFactory</cdi.artifact.loader.factory.class>
 
@@ -432,7 +431,6 @@
             </activation>
             <properties>
                 <artifact.loader.factory.class>${cdi.artifact.loader.factory.class}</artifact.loader.factory.class>
-                <injector.factory.class>io.machinecode.chainlink.inject.cdi.CdiInjectorFactory</injector.factory.class>
                 <injector.configuration.source.file>META-INF/beans.xml</injector.configuration.source.file>
                 <injector.configuration.destination.file>${cdi.injector.configuration.destination}/beans.xml</injector.configuration.destination.file>
             </properties>
@@ -457,7 +455,6 @@
             </activation>
             <properties>
                 <artifact.loader.factory.class>io.machinecode.chainlink.tck.core.loader.GuiceArtifactLoaderFactory</artifact.loader.factory.class>
-                <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
             </properties>
             <dependencies>
                 <dependency>
@@ -495,7 +492,6 @@
             </activation>
             <properties>
                 <artifact.loader.factory.class>io.machinecode.chainlink.seam.tck.SeamArtifactLoaderFactory</artifact.loader.factory.class>
-                <injector.factory.class>io.machinecode.chainlink.tck.core.inject.VetoInjectorFactory</injector.factory.class>
                 <injector.configuration.source.file>META-INF/components.xml</injector.configuration.source.file>
             </properties>
             <dependencies>
@@ -762,14 +758,6 @@
                                             <filter token="executor.factory.class" value="${executor.factory.class}" />
                                         </filterset>
                                     </copy>
-                                    <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.InjectorFactory"
-                                          tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.InjectorFactory"
-                                          filtering="true"
-                                          overwrite="true">
-                                        <filterset>
-                                            <filter token="injector.factory.class" value="${injector.factory.class}" />
-                                        </filterset>
-                                    </copy>
                                     <copy file="${project.basedir}/../core/src/test/resources/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory"
                                           tofile="${project.build.testOutputDirectory}/META-INF/services/io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory"
                                           filtering="true"
@@ -836,7 +824,6 @@
                                             <filter token="executor.factory.class" value="${executor.factory.class}" />
                                             <filter token="transport.factory.class" value="${transport.factory.class}" />
                                             <filter token="registry.factory.class" value="${registry.factory.class}" />
-                                            <filter token="injector.factory.class" value="${injector.factory.class}" />
                                             <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
                                             <filter token="security.factory.class" value="${security.factory.class}" />
                                             <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />

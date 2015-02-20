@@ -27,8 +27,6 @@ public interface MutableJobOperatorSchema<Dec extends MutableDeclarationSchema, 
 
     void setArtifactLoaders(final List<Dec> artifactLoaders);
 
-    void setInjectors(final List<Dec> injectors);
-
     void setSecurities(final List<Dec> securities);
 
     void setRepository(final Dec repository);

@@ -75,11 +75,6 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
 
     void setArtifactLoader(final List<GlassfishDeclaration> artifactLoaders);
 
-    @Element("injector")
-    List<GlassfishDeclaration> getInjector();
-
-    void setInjector(final List<GlassfishDeclaration> injectors);
-
     @Element("security")
     List<GlassfishDeclaration> getSecurity();
 
@@ -155,14 +150,6 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
             that.setArtifactLoader(artifactLoaders);
         }
 
-        public static List<GlassfishDeclaration> getInjectors(final GlassfishJobOperator that) {
-            return that.getInjector();
-        }
-
-        public static void setInjectors(final GlassfishJobOperator that, final List<GlassfishDeclaration> injectors) {
-            that.setInjector(injectors);
-        }
-
         public static List<GlassfishDeclaration> getSecurities(final GlassfishJobOperator that) {
             return that.getSecurity();
         }
@@ -203,7 +190,6 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
                 }
             };
             to.setArtifactLoaders(GlassfishTransmute.list(to.getArtifactLoaders(), from.getArtifactLoaders(), creator, ops));
-            to.setInjectors(GlassfishTransmute.list(to.getInjectors(), from.getInjectors(), creator, ops));
             to.setSecurities(GlassfishTransmute.list(to.getSecurities(), from.getSecurities(), creator, ops));
             to.setJobLoaders(GlassfishTransmute.list(to.getJobLoaders(), from.getJobLoaders(), creator, ops));
 

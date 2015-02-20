@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.core.configuration;
 
+import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.Factory;
 import io.machinecode.chainlink.spi.exception.UnresolvableResourceException;
-import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
 import java.lang.ref.WeakReference;
@@ -131,7 +131,7 @@ public class DeclarationImpl<T> implements Declaration<T> {
         return this;
     }
 
-    public T get(final Dependencies dependencies, final Properties properties, final ArtifactLoader artifactLoader) {
+    public T get(final Dependencies dependencies, final Properties properties, final ConfigurationLoader configurationLoader) {
         if (cache != null) {
             return cache;
         }
@@ -151,13 +151,13 @@ public class DeclarationImpl<T> implements Declaration<T> {
                     throw new UnresolvableResourceException(); //TODO Message
                 }
                 try {
-                    final Factory<? extends T> factory = artifactLoader.load(ref, factoryInterface, classLoader);
+                    final Factory<? extends T> factory = configurationLoader.load(ref, factoryInterface, classLoader);
                     if (factory == null) {
                         throw new UnresolvableResourceException("No configuration found for node with name=" + name + ",clazz=" + valueInterface.getSimpleName()); //TODO
                     }
                     return cache = factory.produce(dependencies, properties);
                 } catch (final ArtifactOfWrongTypeException e) {
-                    return cache = artifactLoader.load(ref, valueInterface, classLoader);
+                    return cache = configurationLoader.load(ref, valueInterface, classLoader);
                 }
             } else if (defaultFactory != null) {
                 return cache = defaultFactory.produce(dependencies, properties);

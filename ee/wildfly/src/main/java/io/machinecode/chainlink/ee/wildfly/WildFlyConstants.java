@@ -32,7 +32,6 @@ public interface WildFlyConstants {
     String MBEAN_SERVER = "mbean-server";
     String JOB_LOADER = "job-loader";
     String ARTIFACT_LOADER = "artifact-loader";
-    String INJECTOR = "injector";
     String SECURITY = "security";
 
     String REF = "ref";

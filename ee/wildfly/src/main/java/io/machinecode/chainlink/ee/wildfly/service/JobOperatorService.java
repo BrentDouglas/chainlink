@@ -10,7 +10,7 @@ import io.machinecode.chainlink.ee.wildfly.WildFlyConstants;
 import io.machinecode.chainlink.ee.wildfly.WildFlyEnvironment;
 import io.machinecode.chainlink.ee.wildfly.configuration.WildFlyConfigurationDefaults;
 import io.machinecode.chainlink.core.Constants;
-import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
@@ -96,12 +96,6 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
                     return operator.getArtifactLoader(name);
                 }
             });
-            addListNode(model.get(WildFlyConstants.INJECTOR), new Target() {
-                @Override
-                public DeclarationImpl target(final String name) {
-                    return operator.getInjector(name);
-                }
-            });
             addListNode(model.get(WildFlyConstants.SECURITY), new Target() {
                 @Override
                 public DeclarationImpl target(final String name) {
@@ -113,7 +107,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
             new WildFlyConfigurationDefaults(loader, transactionManager.getValue())
                     .configureJobOperator(operator);
 
-            final ArtifactLoader art = new WildFlyArtifactLoader(beanManager.getOptionalValue());
+            final ConfigurationLoader art = new WildFlyConfigurationLoader(beanManager.getOptionalValue());
 
             final JobOperatorModelImpl model;
             if (!global) {

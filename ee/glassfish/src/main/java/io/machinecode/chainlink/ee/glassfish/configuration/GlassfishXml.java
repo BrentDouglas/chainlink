@@ -19,8 +19,8 @@ public final class GlassfishXml {
 
     public static XmlChainlinkSubSystem xmlSubSystem(final GlassfishSubSystem subSystem) throws Exception {
         final XmlChainlinkSubSystem model = new XmlChainlinkSubSystem();
-        for (final GlassfishDeclaration dec : subSystem.getArtifactLoaders()) {
-            model.getArtifactLoaders().add(xmlDec(dec));
+        for (final GlassfishDeclaration dec : subSystem.getConfigurationLoaders()) {
+            model.getConfigurationLoaders().add(xmlDec(dec));
         }
         for (final GlassfishJobOperator dec : subSystem.getJobOperators()) {
             model.getJobOperators().add(xmlJobOperator(dec));
@@ -35,8 +35,8 @@ public final class GlassfishXml {
     public static XmlDeployment xmlDeployment(final GlassfishDeployment deployment) throws Exception {
         final XmlDeployment model = new XmlDeployment();
         model.setName(deployment.getName());
-        for (final GlassfishDeclaration dec : deployment.getArtifactLoaders()) {
-            model.getArtifactLoaders().add(xmlDec(dec));
+        for (final GlassfishDeclaration dec : deployment.getConfigurationLoaders()) {
+            model.getConfigurationLoaders().add(xmlDec(dec));
         }
         for (final GlassfishJobOperator dec : deployment.getJobOperators()) {
             model.getJobOperators().add(xmlJobOperator(dec));
@@ -62,9 +62,6 @@ public final class GlassfishXml {
         }
         for (final GlassfishDeclaration resource : op.getArtifactLoaders()) {
             model.getArtifactLoaders().add(xmlDec(resource));
-        }
-        for (final GlassfishDeclaration resource : op.getInjectors()) {
-            model.getInjectors().add(xmlDec(resource));
         }
         for (final GlassfishDeclaration resource : op.getSecurities()) {
             model.getSecurities().add(xmlDec(resource));

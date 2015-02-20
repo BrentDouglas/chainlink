@@ -10,7 +10,7 @@ public interface ScopeSchema<Dec extends DeclarationSchema, Prop extends Propert
 
     String getRef();
 
-    List<Dec> getArtifactLoaders();
+    List<Dec> getConfigurationLoaders();
 
     List<Job> getJobOperators();
 

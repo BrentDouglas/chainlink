@@ -278,7 +278,6 @@
                                         <filter token="artifact.loader.factory.class" value="${artifact.loader.factory.class}" />
                                         <filter token="repository.factory.class" value="${repository.factory.class}" />
                                         <filter token="executor.factory.class" value="${executor.factory.class}" />
-                                        <filter token="injector.factory.class" value="${injector.factory.class}" />
                                         <filter token="job.loader.factory.class" value="${job.loader.factory.class}" />
                                         <filter token="security.factory.class" value="${security.factory.class}" />
                                         <filter token="transaction.manager.factory.class" value="${transaction.manager.factory.class}" />

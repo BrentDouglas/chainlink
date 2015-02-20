@@ -1,16 +1,26 @@
 package io.machinecode.chainlink.inject.cdi;
 
+import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
+import io.machinecode.chainlink.core.inject.Injector;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import org.jboss.logging.Logger;
 
+import javax.batch.api.BatchProperty;
+import javax.batch.runtime.context.JobContext;
+import javax.batch.runtime.context.StepContext;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Default;
+import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.util.AnnotationLiteral;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Member;
 import java.util.Set;
 
 /**
@@ -25,13 +35,24 @@ public class CdiArtifactLoader implements ArtifactLoader {
     private final BeanManagerLookup lookup;
     private BeanManager beanManager;
 
-    public CdiArtifactLoader(final BeanManagerLookup lookup) {
+    private final InjectablesProvider provider;
+
+    private CdiArtifactLoader(final BeanManagerLookup lookup, final BeanManager beanManager) {
         this.lookup = lookup;
+        this.beanManager = beanManager;
+        this.provider = ArtifactLoaderImpl.loadProvider();
+    }
+
+    public CdiArtifactLoader(final BeanManagerLookup lookup) {
+        this(lookup, null);
     }
 
     public CdiArtifactLoader(final BeanManager beanManager) {
-        this.beanManager = beanManager;
-        this.lookup = null;
+        this(null, beanManager);
+    }
+
+    public CdiArtifactLoader() {
+        this(null, null);
     }
 
     @Override
@@ -39,14 +60,49 @@ public class CdiArtifactLoader implements ArtifactLoader {
         if (this.beanManager == null) {
             this.beanManager = lookup.lookupBeanManager();
         }
-        return _inject(beanManager, as, id, new NamedLiteral(id));
+        final T that = _inject(beanManager, as, id, new NamedLiteral(id));
+        if (that == null) {
+            return null;
+        }
+        final String name = that.getClass().getName();
+        if (!name.contains("_$$_Weld")) { //TODO Also check OWB
+            Injector.inject(provider, that);
+        }
+        return that;
+    }
+
+    @Produces
+    @Dependent
+    @BatchProperty
+    public String getBatchProperty(final InjectionPoint injectionPoint) {
+        final BatchProperty batchProperty = injectionPoint.getAnnotated().getAnnotation(BatchProperty.class);
+        final Member field = injectionPoint.getMember();
+        final String property = Injector.property(batchProperty.name(), field.getName(), provider.getInjectables().getProperties());
+        if (property == null || "".equals(property)) {
+            return null;
+        }
+        return property;
+    }
+
+    @Produces
+    @Dependent
+    @Default
+    public JobContext getJobContext() {
+        return provider.getInjectables().getJobContext();
+    }
+
+    @Produces
+    @Dependent
+    @Default
+    public StepContext getStepContext() {
+        return provider.getInjectables().getStepContext();
     }
 
     public static <T> T inject(final BeanManager beanManager, final Class<T> as) {
         return _inject(beanManager, as, null, DEFAULT_ANNOTATION_LITERAL);
     }
 
-    private static <T> T _inject(final BeanManager beanManager, final Class<T> as, final String id, final Annotation... annotation) {
+    static <T> T _inject(final BeanManager beanManager, final Class<T> as, final String id, final Annotation... annotation) {
         final Set<Bean<?>> beans = beanManager.getBeans(as, annotation);
         final Bean<?> bean = beanManager.resolve(beans);
         if (bean == null) {

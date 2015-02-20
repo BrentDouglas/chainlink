@@ -25,8 +25,8 @@ public class XmlScope implements MutableScopeSchema<XmlDeclaration, XmlProperty,
     @XmlAttribute(name = "ref", required = false)
     protected String ref;
 
-    @XmlElement(name = "artifact-loader", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> artifactLoaders = new ArrayList<>(0);
+    @XmlElement(name = "configuration-loader", namespace = XmlChainlink.NAMESPACE, required = false)
+    private List<XmlDeclaration> configurationLoaders = new ArrayList<>(0);
 
     @XmlElement(name = "job-operator", namespace = XmlChainlink.NAMESPACE, required = false)
     protected List<XmlJobOperator> jobOperators = new ArrayList<>(0);
@@ -42,13 +42,13 @@ public class XmlScope implements MutableScopeSchema<XmlDeclaration, XmlProperty,
     }
 
     @Override
-    public List<XmlDeclaration> getArtifactLoaders() {
-        return artifactLoaders;
+    public List<XmlDeclaration> getConfigurationLoaders() {
+        return configurationLoaders;
     }
 
     @Override
-    public void setArtifactLoaders(final List<XmlDeclaration> artifactLoaders) {
-        this.artifactLoaders = artifactLoaders;
+    public void setConfigurationLoaders(final List<XmlDeclaration> configurationLoaders) {
+        this.configurationLoaders = configurationLoaders;
     }
 
     @Override
@@ -95,8 +95,8 @@ public class XmlScope implements MutableScopeSchema<XmlDeclaration, XmlProperty,
     }
 
     public void configureScope(final ScopeModelImpl model, final ClassLoader classLoader) throws Exception {
-        for (final XmlDeclaration resource : this.artifactLoaders) {
-            model.getArtifactLoader(resource.getName())
+        for (final XmlDeclaration resource : this.configurationLoaders) {
+            model.getConfigurationLoader(resource.getName())
                     .setRef(XmlJobOperator.ref(resource));
         }
         for (final XmlJobOperator operator : this.jobOperators) {

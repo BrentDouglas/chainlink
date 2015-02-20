@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.base;
 
 import io.machinecode.chainlink.core.configuration.ClassLoaderFactoryImpl;
-import io.machinecode.chainlink.core.configuration.ConfigurationArtifactLoader;
+import io.machinecode.chainlink.core.configuration.ConfigurationLoaderImpl;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
@@ -14,11 +14,11 @@ import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
-import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.Repository;
@@ -58,7 +58,7 @@ public abstract class BaseTest extends Assert {
             this.visitJobOperatorModel(op);
             this._configuration = deployment.getConfiguration(Constants.DEFAULT);
 
-            final ArtifactLoader loader = new ConfigurationArtifactLoader();
+            final ConfigurationLoader loader = new ConfigurationLoaderImpl();
             this._transactionManager = op.getTransactionManager().get(_configuration, op.getRawProperties(), loader);
             this._registry = op.getRegistry().get(_configuration, op.getRawProperties(), loader);
             this._repository = op.getRepository().get(_configuration, op.getRawProperties(), loader);

@@ -1,9 +1,7 @@
 package io.machinecode.chainlink.core.inject;
 
-import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
-import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.util.Pair;
 
 import javax.batch.api.BatchProperty;
@@ -14,35 +12,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.ServiceLoader;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class DefaultInjector implements Injector {
+public class Injector {
 
-    private final InjectablesProvider provider;
-
-    public DefaultInjector() {
-        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new LoadProviders());
-        final Iterator<InjectablesProvider> iterator = providers.iterator();
-        if (iterator.hasNext()) {
-            provider = iterator.next();
-        } else {
-            throw new IllegalStateException(Messages.format("CHAINLINK-000000.injector.provider.unavailable"));
-        }
-    }
-
-    @Override
-    public boolean inject(final Object bean) throws Exception {
-        return doInject(provider, bean);
-    }
-
-    public static  boolean doInject(final InjectablesProvider provider, final Object bean) throws Exception {
+    public static  boolean inject(final InjectablesProvider provider, final Object bean) throws Exception {
         Class<?> clazz = bean.getClass();
         final Injectables injectables = provider.getInjectables();
         do {

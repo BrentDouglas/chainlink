@@ -137,12 +137,12 @@ it afterwards. If the maven process is killed before shutting down the
 second process you might need to shut it down manually, which you can
 do by running `./tck/se/target/chainlink-<version>/bin/chainlink -k`.
 
-To run the TCK you must select an injector via a maven profile (there is
-no default) and you may select an alternate  repository (an in memory
+To run the TCK you must select an artifact loader via a maven profile (there is
+no default) and you may select an alternate repository (an in memory
 repository will be used by default) and/or an alternate transport.
 
 Run `mvn verify -Ptck,se,in-x,re-x,tr-x,ma-x` where the
-in-x, re-x and tr-x are the profiles of injector, repository, transport
+in-x, re-x and tr-x are the profiles of artifact loader, repository, transport
 and marshaller you wish to use. You can see the available tck profiles
 in [the tck modules pom](tck/pom.xml).
 
@@ -201,7 +201,7 @@ java.net.preferIPv4Stack=true
 ```
 
 Failsafe should also be provided the same properties. To execute the
-tests you can run something like this (though any injector and
+tests you can run something like this (though any artifact loader and
 repository profile can be used):
 
 `mvn clean install -Ptck,se,tr-infinispan`
@@ -231,7 +231,7 @@ _Coherence Transport_
   configured correctly distribution will fail for a similar reason to
   the Hazelcast and JGroups transports.
 
-_Guice Injector_
+_Guice ArtifactLoader
 
 - @javax.inject.Inject does not allow null injection of batch properties
 - Module provider system probably won't work with a real Guice project

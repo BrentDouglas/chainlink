@@ -46,10 +46,10 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
     void setJobOperator(final List<GlassfishJobOperator> jobOperators);
 
     @DuckTyped
-    List<GlassfishDeclaration> getArtifactLoaders();
+    List<GlassfishDeclaration> getConfigurationLoaders();
 
     @DuckTyped
-    void setArtifactLoaders(final List<GlassfishDeclaration> artifactLoaders);
+    void setConfigurationLoaders(final List<GlassfishDeclaration> artifactLoaders);
 
     @DuckTyped
     List<GlassfishJobOperator> getJobOperators();
@@ -94,7 +94,7 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
         }
 
         public static GlassfishDeclaration getArtifactLoader(final GlassfishDeployment self, final String name) {
-            for (final GlassfishDeclaration dep : self.getArtifactLoaders()) {
+            for (final GlassfishDeclaration dep : self.getConfigurationLoaders()) {
                 if (name.equals(dep.getName())) {
                     return dep;
                 }
@@ -143,7 +143,7 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
         public void accept(final DeploymentSchema<?,?,?> from, final Op... ops) throws Exception {
             to.setName(from.getName());
             to.setRef(from.getRef());
-            to.setArtifactLoaders(GlassfishTransmute.list(to.getArtifactLoaders(), from.getArtifactLoaders(), new Creator<GlassfishDeclaration>() {
+            to.setConfigurationLoaders(GlassfishTransmute.list(to.getConfigurationLoaders(), from.getConfigurationLoaders(), new Creator<GlassfishDeclaration>() {
                 @Override
                 public GlassfishDeclaration create() throws Exception {
                     return to.createChild(GlassfishDeclaration.class);

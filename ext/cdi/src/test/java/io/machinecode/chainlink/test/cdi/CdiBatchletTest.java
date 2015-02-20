@@ -4,7 +4,6 @@ import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
-import io.machinecode.chainlink.inject.cdi.CdiInjector;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.core.execution.batchlet.BatchletTest;
@@ -31,7 +30,6 @@ public class CdiBatchletTest extends BatchletTest {
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         super.visitJobOperatorModel(model);
         model.getArtifactLoader("artifactLoader").setValue(new CdiArtifactLoader(container.getBeanManager()));
-        model.getInjector("injector").setValue(new CdiInjector());
     }
 
     @BeforeClass

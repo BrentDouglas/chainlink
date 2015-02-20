@@ -60,7 +60,6 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
     protected static final Element MBEAN_SERVER = declaration(WildFlyConstants.MBEAN_SERVER);
     protected static final Element JOB_LOADER = declaration(WildFlyConstants.JOB_LOADER);
     protected static final Element ARTIFACT_LOADER = declaration(WildFlyConstants.ARTIFACT_LOADER);
-    protected static final Element INJECTOR = declaration(WildFlyConstants.INJECTOR);
     protected static final Element SECURITY = declaration(WildFlyConstants.SECURITY);
 
     @Override
@@ -81,7 +80,6 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
                 MBEAN_SERVER,
                 JOB_LOADER,
                 ARTIFACT_LOADER,
-                INJECTOR,
                 SECURITY,
                 PropertyDefinition.INSTANCE
         );

@@ -1,11 +1,16 @@
 package io.machinecode.chainlink.core.inject;
 
 import gnu.trove.set.hash.TLinkedHashSet;
+import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
+import java.security.AccessController;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -13,21 +18,21 @@ import java.util.Collections;
  */
 public class ArtifactLoaderImpl implements ArtifactLoader {
 
-    private final JarBatchArtifactLoader jarBatchLoader;
-    private final WarBatchArtifactLoader warBatchLoader;
+    private final BatchArtifactLoader jarBatchLoader;
+    private final BatchArtifactLoader warBatchLoader;
     private final TcclArtifactLoader tcclLoader;
     private final ClassLoaderArtifactLoader configuredLoader;
     private final TLinkedHashSet<ArtifactLoader> loaders;
 
     public ArtifactLoaderImpl(final ClassLoader classLoader, final ArtifactLoader... artifactLoaders) throws JAXBException, IOException {
-        this.jarBatchLoader = new JarBatchArtifactLoader(classLoader);
-        this.warBatchLoader = new WarBatchArtifactLoader(classLoader);
-        this.configuredLoader = new ClassLoaderArtifactLoader();
-        this.tcclLoader = new TcclArtifactLoader();
+        final InjectablesProvider provider = loadProvider();
+        this.jarBatchLoader = new BatchArtifactLoader("META-INF/", classLoader, provider);
+        this.warBatchLoader = new BatchArtifactLoader("WEB-INF/classes/META-INF/", classLoader, provider);
+        this.configuredLoader = new ClassLoaderArtifactLoader(provider);
+        this.tcclLoader = new TcclArtifactLoader(provider);
         this.loaders = new TLinkedHashSet<>();
         Collections.addAll(this.loaders, artifactLoaders);
     }
-
 
     @Override
     public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
@@ -53,5 +58,15 @@ public class ArtifactLoaderImpl implements ArtifactLoader {
         }
         // 3. Tccl Loader
         return this.tcclLoader.load(id, as, loader);
+    }
+
+    public static InjectablesProvider loadProvider() {
+        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new LoadProviders());
+        final Iterator<InjectablesProvider> iterator = providers.iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        } else {
+            throw new IllegalStateException(Messages.format("CHAINLINK-000000.injectables.provider.unavailable"));
+        }
     }
 }

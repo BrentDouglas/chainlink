@@ -6,7 +6,6 @@ import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
-import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
@@ -30,7 +29,6 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
         List<TransactionManagerFactory> transactionManagers = null;
-        List<InjectorFactory> injectors = null;
         List<ArtifactLoaderFactory> artifactLoaders = null;
         List<JobLoaderFactory> jobLoaders = null;
         List<SecurityFactory> securitys = null;
@@ -40,9 +38,6 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
         //These will throw if the properties aren't set but they aren't all required
         try {
             transactionManagers = new ResolvableService<>(TransactionManagerFactory.class).resolve(tccl);
-        } catch (final ServiceConfigurationError e) {}
-        try {
-            injectors = new ResolvableService<>(InjectorFactory.class).resolve(tccl);
         } catch (final ServiceConfigurationError e) {}
         try {
             artifactLoaders = new ResolvableService<>(ArtifactLoaderFactory.class).resolve(tccl);
@@ -69,11 +64,6 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
         if (artifactLoaders != null) {
             for (final ArtifactLoaderFactory factory : artifactLoaders) {
                 model.getArtifactLoader(factory.getClass().getSimpleName()).setFactory(factory);
-            }
-        }
-        if (injectors != null) {
-            for (final InjectorFactory factory : injectors) {
-                model.getInjector(factory.getClass().getSimpleName()).setFactory(factory);
             }
         }
         if (securitys != null) {

@@ -50,10 +50,10 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
     void setDeployment(final List<GlassfishDeployment> deployments);
 
     @DuckTyped
-    List<GlassfishDeclaration> getArtifactLoaders();
+    List<GlassfishDeclaration> getConfigurationLoaders();
 
     @DuckTyped
-    void setArtifactLoaders(final List<GlassfishDeclaration> artifactLoaders);
+    void setConfigurationLoaders(final List<GlassfishDeclaration> artifactLoaders);
 
     @DuckTyped
     List<GlassfishJobOperator> getJobOperators();
@@ -189,7 +189,7 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         @Override
         public void accept(final SubSystemSchema<?,?,?,?> from, final Op... ops) throws Exception {
             to.setRef(from.getRef());
-            to.setArtifactLoaders(GlassfishTransmute.list(to.getArtifactLoaders(), from.getArtifactLoaders(), new Creator<GlassfishDeclaration>() {
+            to.setConfigurationLoaders(GlassfishTransmute.list(to.getConfigurationLoaders(), from.getConfigurationLoaders(), new Creator<GlassfishDeclaration>() {
                 @Override
                 public GlassfishDeclaration create() throws Exception {
                     return to.createChild(GlassfishDeclaration.class);
@@ -220,13 +220,13 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         }
 
         @Override
-        public List<GlassfishDeclaration> getArtifactLoaders() {
-            return to.getArtifactLoaders();
+        public List<GlassfishDeclaration> getConfigurationLoaders() {
+            return to.getConfigurationLoaders();
         }
 
         @Override
-        public void setArtifactLoaders(final List<GlassfishDeclaration> artifactLoaders) {
-            to.setArtifactLoaders(artifactLoaders);
+        public void setConfigurationLoaders(final List<GlassfishDeclaration> artifactLoaders) {
+            to.setConfigurationLoaders(artifactLoaders);
         }
 
         @Override

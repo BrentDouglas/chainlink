@@ -4,7 +4,6 @@ import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoaderFactory;
-import io.machinecode.chainlink.inject.cdi.CdiInjectorFactory;
 import io.machinecode.chainlink.core.Constants;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
@@ -33,7 +32,6 @@ public class WeldConfiguration {
         final JobOperatorModelImpl op = ManualConfiguration.setDefaults(model, tccl);
 
         op.getArtifactLoader("weld").setDefaultFactory(new CdiArtifactLoaderFactory(container.getBeanManager()));
-        op.getInjector("weld").setDefaultFactory(new CdiInjectorFactory());
 
         ManualConfiguration.configureAndInstall(model, op, tccl);
 

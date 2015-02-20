@@ -17,5 +17,4 @@ public class JndiCdiArtifactLoaderFactory implements ArtifactLoaderFactory, Exte
     public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
         return new CdiArtifactLoader(new JndiBeanManagerLookup());
     }
-
 }

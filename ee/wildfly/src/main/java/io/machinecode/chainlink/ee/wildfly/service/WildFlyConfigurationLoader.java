@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.ee.wildfly.service;
 
+import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
-import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
 import javax.enterprise.inject.spi.BeanManager;
@@ -10,11 +10,11 @@ import javax.enterprise.inject.spi.BeanManager;
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 * @since 1.0
 */
-class WildFlyArtifactLoader implements ArtifactLoader {
+class WildFlyConfigurationLoader implements ConfigurationLoader {
 
     private final BeanManager beanManager;
 
-    WildFlyArtifactLoader(final BeanManager manager) {
+    WildFlyConfigurationLoader(final BeanManager manager) {
         beanManager = manager;
     }
 

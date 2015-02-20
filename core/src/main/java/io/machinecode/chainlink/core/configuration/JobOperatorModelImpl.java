@@ -4,13 +4,13 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.management.LazyJobOperator;
+import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.PropertyModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.Factory;
-import io.machinecode.chainlink.spi.configuration.factory.InjectorFactory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
@@ -21,7 +21,6 @@ import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFact
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
-import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
@@ -65,7 +64,6 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     DeclarationImpl<MBeanServer> mBeanServer;
     final LinkedHashMap<String, DeclarationImpl<JobLoader>> jobLoaders = new LinkedHashMap<>();
     final LinkedHashMap<String, DeclarationImpl<ArtifactLoader>> artifactLoaders = new LinkedHashMap<>();
-    final LinkedHashMap<String, DeclarationImpl<Injector>> injectors = new LinkedHashMap<>();
     final LinkedHashMap<String, DeclarationImpl<Security>> securities = new LinkedHashMap<>();
     Properties properties;
 
@@ -91,7 +89,6 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         this.mBeanServer = _copyDec(that.mBeanServer);
         _copyAllDecs(this.jobLoaders, that.jobLoaders);
         _copyAllDecs(this.artifactLoaders, that.artifactLoaders);
-        _copyAllDecs(this.injectors, that.injectors);
         _copyAllDecs(this.securities, that.securities);
     }
 
@@ -213,16 +210,6 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     }
 
     @Override
-    public DeclarationImpl<Injector> getInjector(final String name) {
-        DeclarationImpl<Injector> injector = injectors.get(name);
-        if (injector != null) {
-            return injector;
-        }
-        injectors.put(name, injector = createValue(name, Injector.class, InjectorFactory.class));
-        return injector;
-    }
-
-    @Override
     public DeclarationImpl<Security> getSecurity(final String name) {
         DeclarationImpl<Security> security = securities.get(name);
         if (security != null) {
@@ -243,7 +230,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
                 : this.properties;
     }
 
-    public JobOperatorImpl createJobOperator(final ArtifactLoader loader) throws Exception {
+    public JobOperatorImpl createJobOperator(final ConfigurationLoader loader) throws Exception {
         final ConfigurationImpl configuration = scope.getConfiguration(name, loader);
         final JobOperatorImpl op = new JobOperatorImpl(configuration);
         op.open(configuration);
@@ -257,7 +244,7 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         return op;
     }
 
-    public LazyJobOperator createLazyJobOperator(final ArtifactLoader loader) throws Exception {
+    public LazyJobOperator createLazyJobOperator(final ConfigurationLoader loader) throws Exception {
         return new LazyJobOperator(this, loader);
     }
 

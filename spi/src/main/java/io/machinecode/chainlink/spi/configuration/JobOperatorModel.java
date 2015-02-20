@@ -2,7 +2,6 @@ package io.machinecode.chainlink.spi.configuration;
 
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
-import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
@@ -34,8 +33,6 @@ public interface JobOperatorModel {
     Declaration<JobLoader> getJobLoader(final String name);
 
     Declaration<ArtifactLoader> getArtifactLoader(final String name);
-
-    Declaration<Injector> getInjector(final String name);
 
     Declaration<Security> getSecurity(final String name);
 

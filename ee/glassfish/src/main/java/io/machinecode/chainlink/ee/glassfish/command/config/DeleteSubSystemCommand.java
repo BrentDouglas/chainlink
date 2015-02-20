@@ -63,7 +63,7 @@ public class DeleteSubSystemCommand extends BaseCommand {
             context.getActionReport().setMessage(GlassfishXml.writeSubSystem(xml));
             subSystem.setRef(null);
             subSystem.setDeployments(Collections.<GlassfishDeployment>emptyList());
-            subSystem.setArtifactLoaders(Collections.<GlassfishDeclaration>emptyList());
+            subSystem.setConfigurationLoaders(Collections.<GlassfishDeclaration>emptyList());
             subSystem.setJobOperators(Collections.<GlassfishJobOperator>emptyList());
             return null;
         }

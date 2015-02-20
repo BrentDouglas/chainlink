@@ -3,9 +3,9 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd">
 
-    <artifact-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiArtifactLoaderFactory"/>
+    <configuration-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory"/>
 
     <job-operator name="default">
-        <injector name="injector" ref="theInjector"/>
+        <security name="security" ref="theSecurity"/>
     </job-operator>
 </chainlink>

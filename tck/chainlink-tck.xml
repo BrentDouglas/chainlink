@@ -7,7 +7,6 @@
         <marshalling name="marshalling" ref="@marshalling.factory.class@"/>
         <mbean-server name="mbean-server" ref="@mbean.server.factory.class@"/>
         <artifact-loader name="artifact-loader" ref="@artifact.loader.factory.class@"/>
-        <injector name="injector" ref="@injector.factory.class@"/>
         <repository name="repository" ref="@repository.factory.class@"/>
         <registry name="registry" ref="@registry.factory.class@"/>
         <transport name="transport" ref="@transport.factory.class@"/>

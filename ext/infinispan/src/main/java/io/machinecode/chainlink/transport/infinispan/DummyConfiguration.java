@@ -3,7 +3,6 @@ package io.machinecode.chainlink.transport.infinispan;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
-import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
@@ -51,11 +50,6 @@ class DummyConfiguration implements Configuration {
 
     @Override
     public ArtifactLoader getArtifactLoader() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Injector getInjector() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

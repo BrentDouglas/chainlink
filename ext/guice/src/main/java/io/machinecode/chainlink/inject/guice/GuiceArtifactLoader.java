@@ -2,7 +2,6 @@ package io.machinecode.chainlink.inject.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.MembersInjector;
 import com.google.inject.Provider;
@@ -13,7 +12,8 @@ import com.google.inject.name.Names;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import gnu.trove.set.hash.THashSet;
-import io.machinecode.chainlink.core.inject.DefaultInjector;
+import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
+import io.machinecode.chainlink.core.inject.Injector;
 import io.machinecode.chainlink.core.inject.LoadProviders;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
@@ -40,18 +40,12 @@ public class GuiceArtifactLoader implements ArtifactLoader {
     private static final Logger log = Logger.getLogger(GuiceArtifactLoader.class);
 
     private final InjectablesProvider provider;
-    final Injector injector;
+    final com.google.inject.Injector injector;
 
     public GuiceArtifactLoader(final BindingProvider binding) {
-        final ServiceLoader<InjectablesProvider> providers = AccessController.doPrivileged(new LoadProviders());
-        final Iterator<InjectablesProvider> iterator = providers.iterator();
-        if (iterator.hasNext()) {
-            provider = iterator.next();
-        } else {
-            throw new IllegalStateException(Messages.format("CHAINLINK-000000.injector.provider.unavailable"));
-        }
+        this.provider = ArtifactLoaderImpl.loadProvider();
         final List<BindingProvider.Binding> bindings = binding.getBindings();
-        final Set<BatchProperty> props = new THashSet<BatchProperty>();
+        final Set<BatchProperty> props = new THashSet<>();
         this.injector = Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
@@ -115,7 +109,7 @@ public class GuiceArtifactLoader implements ArtifactLoader {
         @Override
         public String get() {
             //TODO Skip field part as this can be for multiple bindings. Field needs to get set by the type listener
-            final String property = DefaultInjector.property(batchProperty.name(), batchProperty.name(), provider.getInjectables().getProperties());
+            final String property = Injector.property(batchProperty.name(), batchProperty.name(), provider.getInjectables().getProperties());
             return property == null ? "" : property;
         }
     }
@@ -132,9 +126,9 @@ public class GuiceArtifactLoader implements ArtifactLoader {
 
         @Override
         public void injectMembers(final T instance) {
-            final String proprety = DefaultInjector.property(batchProperty.name(), field.getName(), provider.getInjectables().getProperties());
+            final String proprety = Injector.property(batchProperty.name(), field.getName(), provider.getInjectables().getProperties());
             try {
-                DefaultInjector.set(field, instance, proprety);
+                Injector.set(field, instance, proprety);
             } catch (final Exception e) {
                 throw new RuntimeException(e);
             }

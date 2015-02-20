@@ -21,11 +21,7 @@ public class ArtifactReferenceImpl implements ArtifactReference, Serializable {
 
     public <T> T load(final Class<T> clazz, final InjectionContext injectionContext, final ExecutionContext context) throws Exception {
         final ClassLoader classLoader = injectionContext.getClassLoader();
-        final T that = injectionContext.getArtifactLoader().load(this.ref, clazz, classLoader);
-        if (that != null) {
-            injectionContext.getInjector().inject(that);
-        }
-        return that;
+        return injectionContext.getArtifactLoader().load(this.ref, clazz, classLoader);
     }
 
     @Override

@@ -11,7 +11,7 @@ public class OtherArtifactLoader implements ArtifactLoader {
     @Override
     public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws ArtifactOfWrongTypeException {
         switch (id) {
-            case "otherBatchlet": return TestArtifactLoader.item(as, new TestBatchlet());
+            case "otherBatchlet": return TestConfigurationLoader.item(as, new TestBatchlet());
         }
         return null;
     }

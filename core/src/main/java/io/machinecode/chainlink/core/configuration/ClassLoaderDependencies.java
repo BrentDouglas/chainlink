@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
-import io.machinecode.chainlink.spi.inject.Injector;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.chainlink.spi.registry.Registry;
@@ -54,11 +53,6 @@ public class ClassLoaderDependencies implements Dependencies {
 
     @Override
     public ArtifactLoader getArtifactLoader() {
-        return null;
-    }
-
-    @Override
-    public Injector getInjector() {
         return null;
     }
 

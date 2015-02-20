@@ -22,8 +22,8 @@ import java.util.List;
 public final class GlassfishConfiguration {
 
     public static void configureSubSystem(final SubSystemModelImpl model, final GlassfishSubSystem subSystem, final ClassLoader classLoader) throws Exception {
-        for (final GlassfishDeclaration dec : subSystem.getArtifactLoaders()) {
-            model.getArtifactLoader(dec.getName()).setRef(dec.getRef());
+        for (final GlassfishDeclaration dec : subSystem.getConfigurationLoaders()) {
+            model.getConfigurationLoader(dec.getName()).setRef(dec.getRef());
         }
         for (final GlassfishJobOperator dec : subSystem.getJobOperators()) {
             configureScope(model, dec, classLoader);
@@ -34,7 +34,7 @@ public final class GlassfishConfiguration {
         if (subSystem.getRef() != null) {
             final SubSystemConfiguration configuration;
             try {
-                configuration = model.getConfigurationArtifactLoader().load(subSystem.getRef(), SubSystemConfiguration.class, classLoader);
+                configuration = model.getConfigurationLoader().load(subSystem.getRef(), SubSystemConfiguration.class, classLoader);
             } catch (final Exception e) {
                 throw new ConfigurationException("attribute 'ref' must be an injectable " + SubSystemConfiguration.class.getName(), e); //TODO Message
             }
@@ -43,8 +43,8 @@ public final class GlassfishConfiguration {
     }
 
     private static void configureDeployment(final DeploymentModelImpl model, final GlassfishDeployment deployment, final ClassLoader classLoader) throws Exception {
-        for (final GlassfishDeclaration dec : deployment.getArtifactLoaders()) {
-            model.getArtifactLoader(dec.getName()).setRef(dec.getRef());
+        for (final GlassfishDeclaration dec : deployment.getConfigurationLoaders()) {
+            model.getConfigurationLoader(dec.getName()).setRef(dec.getRef());
         }
         for (final GlassfishJobOperator dec : deployment.getJobOperators()) {
             configureScope(model, dec, classLoader);
@@ -52,7 +52,7 @@ public final class GlassfishConfiguration {
         if (deployment.getRef() != null) {
             final DeploymentConfiguration configuration;
             try {
-                configuration = model.getConfigurationArtifactLoader().load(deployment.getRef(), DeploymentConfiguration.class, classLoader);
+                configuration = model.getConfigurationLoader().load(deployment.getRef(), DeploymentConfiguration.class, classLoader);
             } catch (final Exception e) {
                 throw new ConfigurationException("attribute 'ref' must be an injectable " + DeploymentConfiguration.class.getName(), e); //TODO Message
             }
@@ -92,10 +92,6 @@ public final class GlassfishConfiguration {
             model.getArtifactLoader(resource.getName())
                     .setRef(ref(resource));
         }
-        for (final GlassfishDeclaration resource : op.getInjectors()) {
-            model.getInjector(resource.getName())
-                    .setRef(ref(resource));
-        }
         for (final GlassfishDeclaration resource : op.getSecurities()) {
             model.getSecurity(resource.getName())
                     .setRef(ref(resource));
@@ -103,7 +99,7 @@ public final class GlassfishConfiguration {
         if (op.getRef() != null) {
             final JobOperatorConfiguration configuration;
             try {
-                configuration = scope.getConfigurationArtifactLoader().load(op.getRef(), JobOperatorConfiguration.class, classLoader);
+                configuration = scope.getConfigurationLoader().load(op.getRef(), JobOperatorConfiguration.class, classLoader);
             } catch (final ArtifactOfWrongTypeException e) {
                 throw new ConfigurationException("attribute 'ref' must be the fqcn of a class extending " + JobOperatorConfiguration.class.getName(), e); //TODO Message
             }

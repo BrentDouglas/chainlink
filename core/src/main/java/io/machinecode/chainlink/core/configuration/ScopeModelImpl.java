@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.core.configuration;
 
 import gnu.trove.map.hash.THashMap;
+import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.ScopeModel;
-import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
-import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.configuration.factory.ConfigurationLoaderFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
@@ -20,15 +20,15 @@ public class ScopeModelImpl implements ScopeModel {
 
     final WeakReference<ClassLoader> loader;
 
-    final LinkedHashMap<String, DeclarationImpl<ArtifactLoader>> artifactLoaders = new LinkedHashMap<>();
+    final LinkedHashMap<String, DeclarationImpl<ConfigurationLoader>> configurationLoaders = new LinkedHashMap<>();
     final Map<String, JobOperatorModelImpl> jobOperators = new THashMap<>();
     final Map<String, ConfigurationImpl> configurations = new THashMap<>();
     final Set<String> names;
     final ScopeModelImpl parent;
     boolean loadedConfigurations = false;
     final ClassLoaderDependencies _dependencies;
-    private transient ArtifactLoader _artifactLoader;
-    private transient ArtifactLoader[] _artifactLoaders;
+    private transient ConfigurationLoader _configurationLoader;
+    private transient ConfigurationLoader[] _configurationLoaders;
 
     public ScopeModelImpl(final WeakReference<ClassLoader> loader, final Set<String> names) {
         this(loader, names, null);
@@ -46,19 +46,19 @@ public class ScopeModelImpl implements ScopeModel {
     }
 
     @Override
-    public Declaration<ArtifactLoader> getArtifactLoader(final String name) {
-        DeclarationImpl<ArtifactLoader> artifactLoader = artifactLoaders.get(name);
-        if (artifactLoader != null) {
-            return artifactLoader;
+    public Declaration<ConfigurationLoader> getConfigurationLoader(final String name) {
+        DeclarationImpl<ConfigurationLoader> configurationLoader = configurationLoaders.get(name);
+        if (configurationLoader != null) {
+            return configurationLoader;
         }
         if (names.contains(name)) {
             throw new IllegalStateException("Resource already declared for name: " + name); //TODO Message and better exception
         }
-        artifactLoader = new DeclarationImpl<>(loader, names, new THashMap<String, DeclarationImpl<?>>(), ArtifactLoader.class, ArtifactLoaderFactory.class, name);
-        _artifactLoader = null;
-        _artifactLoaders = null;
-        artifactLoaders.put(name, artifactLoader);
-        return artifactLoader;
+        configurationLoader = new DeclarationImpl<>(loader, names, new THashMap<String, DeclarationImpl<?>>(), ConfigurationLoader.class, ConfigurationLoaderFactory.class, name);
+        _configurationLoader = null;
+        _configurationLoaders = null;
+        configurationLoaders.put(name, configurationLoader);
+        return configurationLoader;
     }
 
     @Override
@@ -85,53 +85,53 @@ public class ScopeModelImpl implements ScopeModel {
         return getConfiguration(name, null);
     }
 
-    public ConfigurationImpl getConfiguration(final String name, final ArtifactLoader loader) throws Exception {
+    public ConfigurationImpl getConfiguration(final String name, final ConfigurationLoader loader) throws Exception {
         if (!loadedConfigurations) {
-            final ArtifactLoader artifactLoader = loader == null
-                    ? getConfigurationArtifactLoader()
-                    : getConfigurationArtifactLoader(loader);
+            final ConfigurationLoader configurationLoader = loader == null
+                    ? getConfigurationLoader()
+                    : getConfigurationLoader(loader);
             for (final Map.Entry<String, JobOperatorModelImpl> entry : jobOperators.entrySet()) {
-                this.configurations.put(entry.getKey(), new ConfigurationImpl(entry.getValue(), artifactLoader));
+                this.configurations.put(entry.getKey(), new ConfigurationImpl(entry.getValue(), configurationLoader));
             }
             this.loadedConfigurations = true;
         }
         return this.configurations.get(name);
     }
 
-    public ArtifactLoader getConfigurationArtifactLoader() {
-        if (this._artifactLoader == null) {
-            this._artifactLoader = new ConfigurationArtifactLoader(this._artifactLoaders());
+    public ConfigurationLoader getConfigurationLoader() {
+        if (this._configurationLoader == null) {
+            this._configurationLoader = new ConfigurationLoaderImpl(this._configurationLoaders());
         }
-        return this._artifactLoader;
+        return this._configurationLoader;
     }
 
-    public ArtifactLoader getConfigurationArtifactLoader(final ArtifactLoader loader) {
-        if (this._artifactLoader == null) {
-            this._artifactLoader = new ConfigurationArtifactLoader(loader, this._artifactLoaders());
+    public ConfigurationLoader getConfigurationLoader(final ConfigurationLoader loader) {
+        if (this._configurationLoader == null) {
+            this._configurationLoader = new ConfigurationLoaderImpl(loader, this._configurationLoaders());
         }
-        return this._artifactLoader;
+        return this._configurationLoader;
     }
 
-    ArtifactLoader[] _artifactLoaders() {
-        if (this._artifactLoaders != null) {
-            return this._artifactLoaders;
+    ConfigurationLoader[] _configurationLoaders() {
+        if (this._configurationLoaders != null) {
+            return this._configurationLoaders;
         }
-        final ArtifactLoader init;
+        final ConfigurationLoader init;
         int i = 0;
         if (parent == null) {
-            init = new ConfigurationArtifactLoader();
-            this._artifactLoaders = new ArtifactLoader[this.artifactLoaders.size()];
+            init = new ConfigurationLoaderImpl();
+            this._configurationLoaders = new ConfigurationLoader[this.configurationLoaders.size()];
         } else {
-            final ArtifactLoader[] pal = this.parent._artifactLoaders();
-            init = parent.getConfigurationArtifactLoader();
-            this._artifactLoaders = new ArtifactLoader[pal.length + this.artifactLoaders.size()];
-            System.arraycopy(pal, 0, this._artifactLoaders, 0, pal.length);
+            final ConfigurationLoader[] pal = this.parent._configurationLoaders();
+            init = parent.getConfigurationLoader();
+            this._configurationLoaders = new ConfigurationLoader[pal.length + this.configurationLoaders.size()];
+            System.arraycopy(pal, 0, this._configurationLoaders, 0, pal.length);
             i = pal.length;
         }
         final Properties properties = new Properties();
-        for (final DeclarationImpl<ArtifactLoader> dec : this.artifactLoaders.values()) {
-            this._artifactLoaders[i++] = dec.get(_dependencies, properties, init);
+        for (final DeclarationImpl<ConfigurationLoader> dec : this.configurationLoaders.values()) {
+            this._configurationLoaders[i++] = dec.get(_dependencies, properties, init);
         }
-        return this._artifactLoaders;
+        return this._configurationLoaders;
     }
 }

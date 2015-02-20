@@ -53,8 +53,6 @@ public class ChainlinkParser_1_0 implements XMLElementReader<List<ModelNode>>, X
                         .addAttributes(JobOperatorDefinition.JOB_LOADER.getRawAttributes())
                 ).addChild(builder(JobOperatorDefinition.ARTIFACT_LOADER)
                         .addAttributes(JobOperatorDefinition.ARTIFACT_LOADER.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.INJECTOR)
-                        .addAttributes(JobOperatorDefinition.INJECTOR.getRawAttributes())
                 ).addChild(builder(JobOperatorDefinition.SECURITY)
                         .addAttributes(JobOperatorDefinition.SECURITY.getRawAttributes())
                 ).addChild(builder(PropertyDefinition.INSTANCE)

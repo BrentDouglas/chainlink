@@ -59,7 +59,7 @@ or ArtifactLoaderFactory with no-arg constructor) but now the
 `job-operator` elements and their children will attempt to use the
 specified loader as well. Hereafter a reference able to be loaded by
 either the default rules or a provided loader will be referred to as an
-injectable reference. Here is an example loading an Injector (that
+injectable reference. Here is an example loading an ArtifactLoader (that
 doesn't do anything) using CDI.
 
 [source,xml]
@@ -69,7 +69,7 @@ include::{resource}/chainlink-loader.xml[]
 
 [source,java]
 ----
-include::{example}/TheInjector.java[]
+include::{example}/TheArtifactLoader.java[]
 ----
 
 Sometimes this may not be sufficiently flexible and it may be desirable
@@ -123,13 +123,13 @@ default values.
 All the values not specified by name in the JobOperatorConfiguration
 interface are required other than the MBeanServer. Those specified by
 name indicates a collection which is provided to the operator in the
-order they are added. In the example we saw the injector defined in
-xml moved after a second injector. In this case 'otherInjector' would
-be called first and 'theInjector' second. The ordering may or may not
+order they are added. In the example we saw the security defined in
+xml moved after a second security. In this case 'otherSecurity' would
+be called first and 'theSecurity' second. The ordering may or may not
 be important and you should check the javadoc to determine how they
-are called. For example, specified Injector's are called one at a time
-until on returns true, the ArtifactLoader's are called one at a time
-until one return an artifact or throws an exception, while different
+are called. For example, specified JobLoader's are called one at a time
+until on returns a job, the ArtifactLoader's are called one at a time
+until one return an artifact or throws an undeclared exception, while different
 parts of the Security interface are either called one at a time (the
 filter* methods) or until one throws (the can* methods). Note that the
 javadoc is the source of truth on how these methods are called, not the
