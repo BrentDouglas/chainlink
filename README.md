@@ -1,78 +1,43 @@
 # Chainlink
 [![Build Status](https://travis-ci.org/machinecode-io/chainlink.svg)](https://travis-ci.org/machinecode-io/chainlink)
 
-An implementation of JSR-352.
-
-## Aims
-
-Chainlink aims to implement JSR-352 in a modular and easily extensible
-fashion. Each of the major components of the system should be user
-replaceable without requiring an in depth knowledge of the specification
-if possible. It also aims to provide reasonable default implementations
-of these components for a wide range of external libraries.
+An implementation of JSR-352 that allows jobs to be distributed using existing
+clustering frameworks.
 
 ## Features
 
-Dependency injection frameworks:
+### Dependency injection frameworks
 - CDI
 - Spring
 - Seam 2
 
-Execution repositories:
+### Repositories
 - Memory
 - MongoDB
 - JPA
-- JDBC (though it has only been tested against H2, PostgreSQL and
-  MariaDB)
+- JDBC (though it has only been tested against H2, PostgreSQL and MariaDB)
 - Redis
 - Infinispan
-- Coherence
+- EHCache
 - Hazelcast
 - GridGain
 
-Transports:
-- Local JVM
+### Transports
 - Infinispan
+- Hazelcast
 - GridGain
 
-Job loaders that support the job inheritance proposal and a simple api
-and utilities to allow user defined loaders to also support job
-inheritance. Built in loaders support:
+### Job loaders
 - XML
 - Java
 - Groovy DSL
 
-JMX job management.
+These built in loaders all support the job inheritance proposal. A simple spi
+and utilities to allow user defined loaders to also support job inheritance
+are provided.
 
-## Installing coherence
-
-Chainlink has support for running on top of Coherence. Unfortunately
-installing Coherence is a bit of a pain as Oracle is to cool to just
-upload the jars to central.
-
-First you need to sign up for an account on [oracles site](http://www.oracle.com).
-Once you have one you need to [download the coherence installer](http://www.oracle.com/technetwork/middleware/coherence/downloads/coherence-archive-165749.html)
-by selecting 'Coherence Stand-Alone Install'. Run the installer with
-`java -jar /path/to/download/coherence_version.jar` and follow the
-prompts. Now you need to install the coherence jar into your local
-maven repository:
-
-```shell
-mvn install:install-file  \
-      -DgroupId=com.oracle.coherence  \
-      -DartifactId=coherence  \
-      -Dversion=<version> \
-      -Dfile=${ORACLE_HOME}/coherence/lib/coherence.jar  \
-      -Dpackaging=jar \
-      -DgeneratePom=true
-```
-
-Where `ORACLE_HOME` is where you set it in the installer and `<version>`
-is the version of coherence you are installing (which should match the
-version in [pom.xml](pom.xml).
-
-Using the build profile `coherence` or the test profiles `tr-coherence`
-and `re-coherence` will not work if coherence is not installed.
+### Job Management
+- JMX
 
 ## Building
 
@@ -99,15 +64,20 @@ Copy [log4j.template.properties](log4j.template.properties)
 to `log4j.properties`. You will probably want so set the root logger
 to INFO and both the chainlink and then loggers to TRACE.
 
-To run the full suite of tests available under the `-Ptest` profile you
-will need to have redis and mongodb running. If using the
-`-Pdb-postgresql` or `-Pdb-mariadb` profiles you will also require
-postgresql and mariadb running respectively. Connection settings for
-these are configured in `test.properties`.
+Repository tests requiring a dependency to be installed are protected by the
+`-Prepository` profile, though enabling will activate all of them current this
+means you should have mongodb and redis installed and ready
+to accept connections as per the properties you configured in `test.properties`.
+. If using the `-Pdb-postgresql` or `-Pdb-mariadb` profiles you will also require
+postgresql and mariadb running respectively
 
-Run the tests with `mvn test -Ptest,<profiles>` or better
-`./testsuite` for a more comprehensive run. Several options are
-available, run `./testsuite -h` to see them.
+Container tests are available under the `-Ptest` profile and can be run with
+`mvn integration-test -Ptest,<other profiles>`.
+
+There is also a utility script `./testsuite` for running the tests. Run
+`./testsuite -h` to see it's options or have a look in [.travis.yml](.travis.yml)
+for some examples (note, the travis ones are laid out as they are primarily to
+increase parallelism and avoid the job time limit).
 
 ## Running the SE TCK Tests
 
@@ -153,10 +123,11 @@ An example minimum command to run the TCK is `mvn verify -Ptck,se`.
 No extra setup is required to run the EE TCK tests. You will have to add
 the relevant profile for the container you wish to run them in, e.g.
 `mvn verify -Ptck,se,glassfish,tomee,wildfly` will run them in all
-the supported containers. Note that currently the `tr-X` profiles won't
-work, and most of the extensions probably won't work in wildfly yet.
+the supported containers. Note that currently the `tr-X` profiles will only
+work against the `se` profile, and most of the extensions probably won't
+work in wildfly yet.
 
-## Remote transports
+## Remote transport tests
 
 Some transports are designed to run on multiple JVM's, one owned by
 failsafe and one other chainlink process. You can configure the second
@@ -168,7 +139,7 @@ enable debugging on both the first and the second process you could
 use:
 
 ```shell
-CHAINLINK_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006" \
+CHAINLINK_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009" \
     mvn clean install \
         -Ptck,se,tr-<x> \
         -Dmaven.failsafe.debug
@@ -177,19 +148,15 @@ CHAINLINK_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,ad
 Properties specified in the file `chainlink-tck.properties` will also
 be provided to the chainlink daemon.
 
-Most/all of the remote transports can be configured for multicast
-discovery in which case you will need to ensure your network is
-correctly configured for it.
+## Infinispan and JGroups Tests
 
-You will also need to add this route:
+You will need to add this route:
 
 `sudo route add -net 224.0.0.0 netmask 240.0.0.0 dev lo`
 
 And allow traffic through iptables:
 
 `sudo iptables -A INPUT -i lo -d 224.0.0.0/4 -j ACCEPT`
-
-## Infinispan and JGroups Tests
 
 The background process should have the following properties passed to
 it, either through the `CHAINLINK_OPTS` environment variable or
@@ -208,33 +175,57 @@ repository profile can be used):
 
 ## Known issues
 
-_MariaDB_
+### MariaDB
 
 - MariaDB may not work correctly with both the JDBC and JPA repositories
   due to the `create_time` field only having second resolution. This may
   or may not be a problem depending on the workload (i.e. if your steps
   run for over 1 second it will be fine).
 
-# Work in progress components
+## Work in progress components
 
-_JGroups Transport_
+### JGroups Transport
 
-- Distribution doesn't actually work
+- Distribution doesn't actually work.
 
-_Hazelcast Transport_
+### Coherence Transport
 
-- Distribution doesn't actually work
+- Need to look into how to correctly configure Coherence.
 
-_Coherence Transport_
+### Coherence Repository
 
-- I can't work out how to configure Coherence but it's likely that when
-  configured correctly distribution will fail for a similar reason to
-  the Hazelcast and JGroups transports.
+- Has some issues, see above
 
-_Guice ArtifactLoader
+### Guice ArtifactLoader
 
 - @javax.inject.Inject does not allow null injection of batch properties
 - Module provider system probably won't work with a real Guice project
+
+## Installing coherence
+
+First you need to sign up for an account on [oracles site](http://www.oracle.com).
+Once you have one you need to [download the coherence installer](http://www.oracle.com/technetwork/middleware/coherence/downloads/coherence-archive-165749.html)
+by selecting 'Coherence Stand-Alone Install'. Run the installer with
+`java -jar /path/to/download/coherence_version.jar` and follow the
+prompts. Now you need to install the coherence jar into your local
+maven repository:
+
+```shell
+mvn install:install-file  \
+      -DgroupId=com.oracle.coherence  \
+      -DartifactId=coherence  \
+      -Dversion=<version> \
+      -Dfile=${ORACLE_HOME}/coherence/lib/coherence.jar  \
+      -Dpackaging=jar \
+      -DgeneratePom=true
+```
+
+Where `ORACLE_HOME` is where you set it in the installer and `<version>`
+is the version of coherence you are installing (which should match the
+version in [pom.xml](pom.xml).
+
+Using the build profile `coherence` or the test profiles `tr-coherence`
+and `re-coherence` will not work if coherence is not installed.
 
 ## License
 

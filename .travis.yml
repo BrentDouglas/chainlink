@@ -10,6 +10,7 @@ env:
   global:
     - MAVEN_OPTS="-Xms512m -Xmx512m"
     - JAVA_OPTS="-Xms512m -Xmx512m"
+    - JBOSS_OPTS="-Xms1024m -Xmx1024m"
   matrix:
     # Integration tests
     - BUILD_ARGS="-T -l -d h2"
@@ -39,7 +40,8 @@ env:
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee"
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly"
-    - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c wildfly"
+    # Need to wait until there is a distribution using 7.0.2.Final
+    # - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c wildfly"
 
 services:
   - mongodb
