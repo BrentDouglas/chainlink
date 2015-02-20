@@ -74,8 +74,7 @@ export version_io_machinecode_chainlink_chainlink_ext_mongo="@version.io.machine
 export version_org_jongo_jongo="@version.org.jongo.jongo@"
 export version_org_mongodb_mongo_java_driver="@version.org.mongodb.mongo-java-driver@"
 
-export version_io_machinecode_chainlink_chainlink_se="@version.io.machinecode.chainlink.chainlink-se@"
-export version_io_machinecode_chainlink_chainlink_server_chainlinkd="@version.io.machinecode.chainlink.chainlink-server-chainlinkd@"
+export version_io_machinecode_chainlink_chainlink_rt_se="@version.io.machinecode.chainlink.chainlink-rt-se@"
 export version_gnu_getopt_java_getopt="@version.gnu.getopt.java-getopt@"
 export version_javax_enterprise_cdi_api="@version.javax.enterprise.cdi-api@"
 export version_javax_inject_javax_inject="@version.javax.inject.javax.inject@"
@@ -83,6 +82,9 @@ export version_log4j_log4j="@version.log4j.log4j@"
 export version_org_jboss_spec_javax_transaction_jboss_transaction_api_1_1_spec="@version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec@"
 export version_org_jboss_weld_se_weld_se="@version.org.jboss.weld.se.weld-se@"
 
-export version_io_machinecode_chainlink_chainlink_ee_glassfish="@version.io.machinecode.chainlink.chainlink-ee-glassfish@"
-export version_io_machinecode_chainlink_chainlink_ee_tomee="@version.io.machinecode.chainlink.chainlink-ee-tomee@"
-export version_io_machinecode_chainlink_chainlink_ee_wildfly="@version.io.machinecode.chainlink.chainlink-ee-wildfly@"
+export version_commons_codec="@version.commons-codec@"
+export version_io_machinecode_chainlink_chainlink_rt_glassfish="@version.io.machinecode.chainlink.chainlink-rt-glassfish@"
+
+export version_io_machinecode_chainlink_chainlink_rt_tomee="@version.io.machinecode.chainlink.chainlink-rt-tomee@"
+
+export version_io_machinecode_chainlink_chainlink_rt_wildfly="@version.io.machinecode.chainlink.chainlink-rt-wildfly@"

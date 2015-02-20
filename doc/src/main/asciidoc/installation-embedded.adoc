@@ -44,7 +44,7 @@ available on the applications classpath.
         <!-- Optional but recommended -->
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-se</artifactId>
+            <artifactId>chainlink-rt-se</artifactId>
             <version>${version.io.machinecode.chainlink}</version>
         </dependency>
     </dependencies>
@@ -65,7 +65,7 @@ available on the applications classpath.
     </dependency>
     <dependency>
         <groupId>io.machinecode.chainlink</groupId>
-        <artifactId>chainlink-se</artifactId>
+        <artifactId>chainlink-rt-se</artifactId>
         <optional>true</optional>
     </dependency>
 </dependencies>

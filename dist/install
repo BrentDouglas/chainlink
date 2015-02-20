@@ -200,8 +200,7 @@ all() {
 se() {
     local apply="${1}"
 
-    "${apply}" "io.machinecode.chainlink" "chainlink-se" "${version_io_machinecode_chainlink_chainlink_se}"
-    "${apply}" "io.machinecode.chainlink" "chainlink-server-chainlinkd" "${version_io_machinecode_chainlink_chainlink_server_chainlinkd}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-rt-se" "${version_io_machinecode_chainlink_chainlink_rt_se}"
     "${apply}" "gnu.getopt" "java-getopt" "${version_gnu_getopt_java_getopt}"
     "${apply}" "javax.enterprise" "cdi-api" "${version_javax_enterprise_cdi_api}"
     "${apply}" "javax.inject" "javax.inject" "${version_javax_inject_javax_inject}"
@@ -251,7 +250,8 @@ se-uninstall() {
 glassfish() {
     local apply="${1}"
 
-    "${apply}" "io.machinecode.chainlink" "chainlink-ee-glassfish" "${version_io_machinecode_chainlink_chainlink_ee_glassfish}"
+    "${apply}" "commons-codec" "commons-codec" "${version_commons_codec}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-rt-glassfish" "${version_io_machinecode_chainlink_chainlink_rt_glassfish}"
 
     for module in "${MODULES[@]}"; do
         "${module}" "${apply}"
@@ -297,7 +297,7 @@ glassfish-uninstall() {
 tomee() {
     local apply="${1}"
 
-    "${apply}" "io.machinecode.chainlink" "chainlink-ee-tomee" "${version_io_machinecode_chainlink_chainlink_ee_tomee}"
+    "${apply}" "io.machinecode.chainlink" "chainlink-rt-tomee" "${version_io_machinecode_chainlink_chainlink_rt_tomee}"
 
     for module in "${MODULES[@]}"; do
         "${module}" "${apply}"
@@ -340,7 +340,7 @@ tomee-uninstall() {
 wildfly() {
     local apply="${1}"
 
-    "${apply}" "io.machinecode.chainlink" "chainlink-ee-wildfly" "${version_io_machinecode_chainlink_chainlink_ee_wildfly}" "io/machinecode/chainlink"
+    "${apply}" "io.machinecode.chainlink" "chainlink-rt-wildfly" "${version_io_machinecode_chainlink_chainlink_rt_wildfly}" "io/machinecode/chainlink"
 
     for module in "${MODULES[@]}"; do
         "${module}" "${apply}"

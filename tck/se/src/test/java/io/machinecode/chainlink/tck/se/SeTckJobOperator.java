@@ -2,7 +2,7 @@ package io.machinecode.chainlink.tck.se;
 
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.management.JobOperatorView;
-import io.machinecode.chainlink.se.SeEnvironment;
+import io.machinecode.chainlink.rt.se.SeEnvironment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 
 /**

@@ -16,9 +16,6 @@
             <includes>
                 <include>io.machinecode.chainlink:chainlink-api</include>
                 <include>io.machinecode.chainlink:chainlink-core</include>
-                <include>io.machinecode.chainlink:chainlink-ee-glassfish</include>
-                <include>io.machinecode.chainlink:chainlink-ee-tomee</include>
-                <include>io.machinecode.chainlink:chainlink-ee-wildfly</include>
                 <include>io.machinecode.chainlink:chainlink-ext-cdi</include>
                 <include>io.machinecode.chainlink:chainlink-ext-coherence</include>
                 <include>io.machinecode.chainlink:chainlink-ext-ehcache</include>
@@ -36,10 +33,13 @@
                 <include>io.machinecode.chainlink:chainlink-ext-seam</include>
                 <include>io.machinecode.chainlink:chainlink-ext-spring</include>
                 <include>io.machinecode.chainlink:chainlink-ext-redis</include>
-                <include>io.machinecode.chainlink:chainlink-se</include>
-                <include>io.machinecode.chainlink:chainlink-server-chainlinkd</include>
+                <include>io.machinecode.chainlink:chainlink-rt-glassfish</include>
+                <include>io.machinecode.chainlink:chainlink-rt-tomee</include>
+                <include>io.machinecode.chainlink:chainlink-rt-wildfly</include>
+                <include>io.machinecode.chainlink:chainlink-rt-se</include>
                 <include>io.machinecode.chainlink:chainlink-spi</include>
 
+                <include>commons-codec:commons-codec</include>
                 <include>com.google.inject:guice</include>
                 <include>com.h2database:h2</include>
                 <include>com.hazelcast:hazelcast</include>
@@ -85,7 +85,7 @@
     <fileSets>
         <fileSet>
             <outputDirectory>modules</outputDirectory>
-            <directory>../ee/wildfly/modules</directory>
+            <directory>../rt/wildfly/modules</directory>
             <directoryMode>755</directoryMode>
             <fileMode>644</fileMode>
             <filtered>true</filtered>
@@ -116,17 +116,17 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>../server/chainlinkd/bin/chainlink</source>
+            <source>../rt/se/bin/chainlink</source>
             <outputDirectory>bin</outputDirectory>
             <fileMode>754</fileMode>
         </file>
         <file>
-            <source>../server/chainlinkd/bin/chainlinkd</source>
+            <source>../rt/se/bin/chainlinkd</source>
             <outputDirectory>bin</outputDirectory>
             <fileMode>754</fileMode>
         </file>
         <file>
-            <source>../server/chainlinkd/cfg/chainlink.xml</source>
+            <source>../rt/se/cfg/chainlink.xml</source>
             <outputDirectory>cfg</outputDirectory>
             <fileMode>664</fileMode>
         </file>

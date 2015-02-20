@@ -19,7 +19,7 @@
         <asciidoc.dir>${project.basedir}/src/main/asciidoc</asciidoc.dir>
         <java.dir>${project.basedir}/src/main/java</java.dir>
         <resource.dir>${project.basedir}/src/main/resources</resource.dir>
-        <chainlinkd.dir>${root.dir}/server/chainlinkd</chainlinkd.dir>
+        <chainlinkd.dir>${root.dir}/rt/se</chainlinkd.dir>
     </properties>
 
     <dependencies>
@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-se</artifactId>
+            <artifactId>chainlink-rt-se</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.weld.se</groupId>

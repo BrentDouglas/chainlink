@@ -2,10 +2,10 @@
 :example: {javaDir}/example
 
 Embedded usage of chainlink requires manually configuring chainlink.
-We will cover configuring chainlink both with the `chainlink-se` jar
+We will cover configuring chainlink both with the `chainlink-rt-se` jar
 and without it.
 
-With the `chainlink-se` jar configuration is fairly straightforward as
+With the `chainlink-rt-se` jar configuration is fairly straightforward as
 can be seen in the following snipped.
 
 
@@ -32,7 +32,7 @@ until `Chainlink.setEnvironment()` has been called so calling
 will result in a blocked thread.
 
 Because that was so straightforward we'll now give it a go without the
-benefit of the `chainlink-se` jar. Essentially the same steps will need
+benefit of the `chainlink-rt-se` jar. Essentially the same steps will need
 to be done.
 
 1. We must call `Chainlink.setEnvironment()` with an environment before

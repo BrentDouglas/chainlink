@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-ee-tomee</artifactId>
+            <artifactId>chainlink-rt-tomee</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

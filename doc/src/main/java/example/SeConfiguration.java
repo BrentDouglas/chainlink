@@ -1,7 +1,7 @@
 package example;
 
 import io.machinecode.chainlink.core.Chainlink;
-import io.machinecode.chainlink.se.SeEnvironment;
+import io.machinecode.chainlink.rt.se.SeEnvironment;
 
 import javax.batch.runtime.BatchRuntime;
 import java.util.Properties;

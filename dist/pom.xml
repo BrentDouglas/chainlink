@@ -23,18 +23,6 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-ee-glassfish</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-ee-tomee</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-ee-wildfly</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.machinecode.chainlink</groupId>
             <artifactId>chainlink-ext-cdi</artifactId>
         </dependency>
         <dependency>
@@ -95,11 +83,19 @@
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-se</artifactId>
+            <artifactId>chainlink-rt-glassfish</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
-            <artifactId>chainlink-server-chainlinkd</artifactId>
+            <artifactId>chainlink-rt-tomee</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-rt-wildfly</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.machinecode.chainlink</groupId>
+            <artifactId>chainlink-rt-se</artifactId>
         </dependency>
         <dependency>
             <groupId>io.machinecode.chainlink</groupId>
@@ -299,6 +295,7 @@
                                     <filterset>
                                         <filter token="project.version" value="${project.version}" />
 
+                                        <filter token="version.commons-codec" value="${version.commons-codec}" />
                                         <filter token="version.com.google.inject.guice" value="${version.com.google.inject.guice}" />
                                         <filter token="version.com.h2database.h2" value="${version.com.h2database.h2}" />
                                         <filter token="version.com.hazelcast.hazelcast" value="${version.com.hazelcast.hazelcast}" />
