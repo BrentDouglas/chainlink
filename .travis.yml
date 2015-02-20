@@ -52,7 +52,7 @@ addons:
 
 before_script:
   - psql -c 'create database chainlink;' -U postgres
-  - cat "${TRAVIS_BUILD_DIR}/repository/schema-postgresql.sql" | psql -U postgres -d chainlink
+  - cat "${TRAVIS_BUILD_DIR}/ext/schema-postgresql.sql" | psql -U postgres -d chainlink
 
 script: ./testsuite ${BUILD_ARGS}
 
