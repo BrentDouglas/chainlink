@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.transport;
 
+import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.execution.CallbackEventImpl;
 import io.machinecode.chainlink.core.execution.ExecutableEventImpl;
 import io.machinecode.chainlink.core.registry.UUIDId;
@@ -33,8 +34,13 @@ import java.util.concurrent.TimeUnit;
 public class LocalTransport implements Transport {
 
     protected Configuration configuration;
+    protected final long timeout;
+    protected final TimeUnit unit;
 
     public LocalTransport(final Dependencies dependencies, final Properties properties) {
+        this.timeout = Long.parseLong(properties.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
+        this.unit = TimeUnit.valueOf(properties.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
+
     }
 
     @Override
@@ -118,11 +124,11 @@ public class LocalTransport implements Transport {
 
     @Override
     public long getTimeout() {
-        return 0;
+        return timeout;
     }
 
     @Override
     public TimeUnit getTimeUnit() {
-        return TimeUnit.MILLISECONDS;
+        return unit;
     }
 }

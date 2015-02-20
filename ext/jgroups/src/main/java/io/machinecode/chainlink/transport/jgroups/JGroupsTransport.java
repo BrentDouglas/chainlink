@@ -78,7 +78,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
             log.tracef("Sending from %s to all remotes: %s.", this.local, command);
             this.dispatcher.castMessageWithFuture(
                     remotes,
-                    new Message(null, marshalling.marshall(command)),
+                    new Message(null, local, marshalling.marshall(command)),
                     RequestOptions.SYNC()
                             .setExclusionList(this.local)
                             .setTimeout(unit.toMillis(timeout)),
@@ -101,7 +101,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
         try {
             log.tracef("Node %s sending to %s: %s.", this.local, address, command);
             this.dispatcher.sendMessageWithFuture(
-                    new Message(addr, marshalling.marshall(command)),
+                    new Message(addr, local, marshalling.marshall(command)),
                     RequestOptions.SYNC()
                             .setExclusionList(this.local)
                             .setTimeout(unit.toMillis(timeout)),

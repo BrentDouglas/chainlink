@@ -1,8 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan;
 
 import io.machinecode.then.api.Deferred;
-import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.core.FutureDeferred;
 import org.infinispan.commons.util.concurrent.FutureListener;
 import org.infinispan.commons.util.concurrent.NotifyingNotifiableFuture;
 import org.infinispan.remoting.responses.ExceptionResponse;
@@ -23,62 +21,51 @@ import java.util.concurrent.TimeoutException;
 */
 public class InfinispanMultiFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
-    private final InfinispanTransport transport;
     private final Deferred<Iterable<U>,Throwable,?> deferred;
     private final List<Address> addresses;
-    private final long start;
     private Future<T> io;
 
-    public InfinispanMultiFuture(final InfinispanTransport transport, final Deferred<Iterable<U>,Throwable,?> deferred, final List<Address> addresses, final long start) {
-        this.transport = transport;
+    public InfinispanMultiFuture(final Deferred<Iterable<U>,Throwable,?> deferred, final List<Address> addresses) {
         this.deferred = deferred;
         this.addresses = addresses;
-        this.start = start;
     }
 
     @Override
-    public void notifyDone() {
-        final FutureDeferred<T,Throwable> def = new FutureDeferred<>(
-                io,
-                System.currentTimeMillis() - start + transport.options.timeUnit().toMillis(transport.options.timeout()),
-                TimeUnit.MILLISECONDS
-        );
-        def.onResolve(new OnResolve<T>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public void resolve(final T ret) {
-                try {
-                    if (ret == null || !(ret instanceof Map)) {
+    public void notifyDone(final T ret) {
+        try {
+            if (ret == null || !(ret instanceof Map)) {
+                deferred.reject(new IllegalStateException()); //TODO Message
+                return;
+            }
+            final List<U> list = new ArrayList<>();
+            for (final Address address : addresses) {
+                final Response response = ((Map<Address, Response>) ret).get(address);
+                if (response == null) {
+                    list.add(null);
+                } else if (response.isSuccessful()) {
+                    list.add((U) ((SuccessfulResponse) response).getResponseValue());
+                } else {
+                    if (response instanceof ExceptionResponse) {
+                        deferred.reject(((ExceptionResponse) response).getException());
+                    } else {
                         deferred.reject(new IllegalStateException()); //TODO Message
-                        return;
                     }
-                    final List<U> list = new ArrayList<>();
-                    for (final Address address : addresses) {
-                        final Response response = ((Map<Address, Response>) ret).get(address);
-                        if (response == null) {
-                            list.add(null);
-                        } else if (response.isSuccessful()) {
-                            list.add((U) ((SuccessfulResponse) response).getResponseValue());
-                        } else {
-                            if (response instanceof ExceptionResponse) {
-                                deferred.reject(((ExceptionResponse) response).getException());
-                            } else {
-                                deferred.reject(new IllegalStateException()); //TODO Message
-                            }
-                            return;
-                        }
-                    }
-                    deferred.resolve(list);
-                } catch (final Throwable e) {
-                    deferred.reject(e);
+                    return;
                 }
             }
-        }).onReject(this.deferred);
-        transport.network.execute(def);
+            deferred.resolve(list);
+        } catch (final Throwable e) {
+            deferred.reject(e);
+        }
     }
 
     @Override
-    public void setNetworkFuture(final Future<T> future) {
+    public void notifyException(final Throwable throwable) {
+        deferred.reject(throwable);
+    }
+
+    @Override
+    public void setFuture(final Future<T> future) {
         this.io = future;
     }
 

@@ -25,7 +25,7 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable, Comparabl
     private static final Logger log = Logger.getLogger(EventedWorker.class);
 
     protected final WorkerId workerId;
-    protected final Object lock;
+    protected final Object lock = new Object();
     protected final Queue<ExecutableEvent> executables = new LinkedList<>();
     protected final Queue<CallbackEvent> callbacks = new LinkedList<>();
     protected final Configuration configuration;
@@ -37,12 +37,6 @@ public class EventedWorker implements Worker, Runnable, AutoCloseable, Comparabl
     public EventedWorker(final Configuration configuration) {
         this.configuration = configuration;
         this.workerId = new UUIDId(configuration.getTransport());
-        lock = new Object() {
-            @Override
-            public String toString() {
-                return "lock-" + workerId;
-            }
-        };
     }
 
     @Override

@@ -12,19 +12,11 @@ import java.io.Serializable;
 public class RemoteWorkerAndChain implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final WorkerId workerId;
-    private final ChainId chainId;
+    public final WorkerId workerId;
+    public final ChainId chainId;
 
     public RemoteWorkerAndChain(final WorkerId workerId, final ChainId chainId) {
         this.workerId = workerId;
         this.chainId = chainId;
-    }
-
-    public WorkerId getWorkerId() {
-        return workerId;
-    }
-
-    public ChainId getChainId() {
-        return chainId;
     }
 }

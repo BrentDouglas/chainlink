@@ -11,12 +11,14 @@ import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.transport.Transport;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  */
 public class GetWorkerIdAndPushChainCommand implements Command<RemoteWorkerAndChain> {
     private static final long serialVersionUID = 1L;
+    private static final Logger log = Logger.getLogger(GetWorkerIdAndPushChainCommand.class);
 
     final long jobExecutionId;
     final ExecutableId executableId;
@@ -30,12 +32,13 @@ public class GetWorkerIdAndPushChainCommand implements Command<RemoteWorkerAndCh
 
     @Override
     public RemoteWorkerAndChain perform(final Configuration configuration, final Object origin) throws Throwable {
+        log.tracef("Called perform with %s %s %s", jobExecutionId, executableId, chainId);
         final Worker worker = getLocalWorker(configuration, jobExecutionId, executableId);
         if (worker == null) {
             return null;
         }
         final Transport transport = configuration.getTransport();
-        //TODO Fix this
+        //TODO Remove need for cast
         final Chain<?> chain = new DistributedRemoteChain((DistributedTransport<?>)transport, origin, jobExecutionId, chainId);
         final ChainId remoteId = new UUIDId(transport);
         configuration.getRegistry().registerChain(jobExecutionId, remoteId, chain);

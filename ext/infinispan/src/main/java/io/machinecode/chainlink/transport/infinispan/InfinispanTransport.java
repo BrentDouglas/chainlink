@@ -20,6 +20,7 @@ import org.infinispan.remoting.rpc.RpcOptionsBuilder;
 import org.infinispan.remoting.transport.Address;
 import org.jboss.logging.Logger;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -120,22 +121,23 @@ public class InfinispanTransport extends DistributedTransport<Address> {
         final DeferredImpl<T,Throwable,Object> deferred = new DeferredImpl<>();
         rpc.invokeRemotelyInFuture(
                 Collections.singleton(addr),
-                new CommandAdapter(cacheName, command, getAddress()),
+                new CommandAdapter(cacheName, command, local),
                 new RpcOptionsBuilder(options).timeout(timeout, unit).build(),
-                new InfinispanFuture<>(this, deferred, addr, System.currentTimeMillis())
+                new InfinispanFuture<>(deferred, addr)
         );
         return deferred;
     }
 
     @Override
     public <T> Promise<? extends Iterable<T>,Throwable,Object> invokeEverywhere(final Command<T> command) {
-        final List<Address> remotes = rpc.getMembers();
+        final List<Address> remotes = new ArrayList<>(rpc.getMembers());
+        remotes.remove(local);
         final DeferredImpl<Iterable<T>,Throwable,Object> deferred = new DeferredImpl<>();
         rpc.invokeRemotelyInFuture(
                 remotes,
-                new CommandAdapter(cacheName, command, getAddress()),
+                new CommandAdapter(cacheName, command, local),
                 new RpcOptionsBuilder(options).timeout(timeout, unit).build(),
-                new InfinispanMultiFuture<>(this, deferred, remotes, System.currentTimeMillis())
+                new InfinispanMultiFuture<>(deferred, remotes)
         );
         return deferred;
     }

@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.execution;
 
 import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.util.Timeout;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -65,17 +67,27 @@ public class EventedExecutor implements Executor {
                 }
             }
         }
+        final long end = Timeout.end(transport.getTimeout(), transport.getTimeUnit());
+        try {
+            outer: for (;;) {
+                for (final EventedWorker worker : workers.values()) {
+                    if (!worker.finished) {
+                        Timeout.after(end);
+                        Thread.sleep(10);
+                        continue outer;
+                    }
+                }
+                break;
+            }
+        } catch (final TimeoutException e) {
+            if (exception == null) {
+                exception = e;
+            } else {
+                exception.addSuppressed(e);
+            }
+        }
         if (exception != null) {
             throw exception;
-        }
-        outer: for (;;) {
-            for (final EventedWorker worker : workers.values()) {
-                if (!worker.finished) {
-                    Thread.sleep(10);
-                    continue outer;
-                }
-            }
-            break;
         }
     }
 

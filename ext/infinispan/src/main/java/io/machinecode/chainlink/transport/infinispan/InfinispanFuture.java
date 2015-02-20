@@ -1,8 +1,6 @@
 package io.machinecode.chainlink.transport.infinispan;
 
 import io.machinecode.then.api.Deferred;
-import io.machinecode.then.api.OnResolve;
-import io.machinecode.then.core.FutureDeferred;
 import org.infinispan.commons.util.concurrent.FutureListener;
 import org.infinispan.commons.util.concurrent.NotifyingNotifiableFuture;
 import org.infinispan.remoting.responses.ExceptionResponse;
@@ -21,57 +19,46 @@ import java.util.concurrent.TimeoutException;
 */
 public class InfinispanFuture<T,U> implements NotifyingNotifiableFuture<T> {
 
-    private final InfinispanTransport transport;
     private final Deferred<U,Throwable,?> deferred;
     private final Address address;
-    private final long start;
     private Future<T> io;
 
-    public InfinispanFuture(final InfinispanTransport transport, final Deferred<U,Throwable,?> deferred, final Address address, final long start) {
-        this.transport = transport;
+    public InfinispanFuture(final Deferred<U,Throwable,?> deferred, final Address address) {
         this.deferred = deferred;
         this.address = address;
-        this.start = start;
     }
 
     @Override
-    public void notifyDone() {
-        final FutureDeferred<T,Throwable> def = new FutureDeferred<>(
-                io,
-                System.currentTimeMillis() - start + transport.options.timeUnit().toMillis(transport.options.timeout()),
-                TimeUnit.MILLISECONDS
-        );
-        def.onResolve(new OnResolve<T>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public void resolve(final T ret) {
-                try {
-                    if (ret == null || !(ret instanceof Map)) {
-                        deferred.reject(new IllegalStateException()); //TODO Message
-                        return;
-                    }
-                    final Response response = ((Map<Address, Response>) ret).get(address);
-                    if (response == null) {
-                        deferred.resolve(null);
-                    } else if (response.isSuccessful()) {
-                        deferred.resolve((U) ((SuccessfulResponse) response).getResponseValue());
-                    } else {
-                        if (response instanceof ExceptionResponse) {
-                            deferred.reject(((ExceptionResponse) response).getException());
-                        } else {
-                            deferred.reject(new IllegalStateException()); //TODO Message
-                        }
-                    }
-                } catch (final Throwable e) {
-                    deferred.reject(e);
+    public void notifyDone(T ret) {
+        try {
+            if (ret == null || !(ret instanceof Map)) {
+                deferred.reject(new IllegalStateException()); //TODO Message
+                return;
+            }
+            final Response response = ((Map<Address, Response>) ret).get(address);
+            if (response == null) {
+                deferred.resolve(null);
+            } else if (response.isSuccessful()) {
+                deferred.resolve((U) ((SuccessfulResponse) response).getResponseValue());
+            } else {
+                if (response instanceof ExceptionResponse) {
+                    deferred.reject(((ExceptionResponse) response).getException());
+                } else {
+                    deferred.reject(new IllegalStateException()); //TODO Message
                 }
             }
-        }).onReject(deferred);
-        transport.network.execute(def);
+        } catch (final Throwable e) {
+            deferred.reject(e);
+        }
     }
 
     @Override
-    public void setNetworkFuture(final Future<T> future) {
+    public void notifyException(final Throwable throwable) {
+        deferred.reject(throwable);
+    }
+
+    @Override
+    public void setFuture(final Future<T> future) {
         this.io = future;
     }
 

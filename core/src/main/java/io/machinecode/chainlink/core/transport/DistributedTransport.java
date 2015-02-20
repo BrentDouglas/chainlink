@@ -122,36 +122,37 @@ public abstract class DistributedTransport<A> implements Transport {
             throw new IllegalArgumentException(); //TODO Message
         }
         final long jobExecutionId = executables[0].getContext().getJobExecutionId();
-        return _getWorkers(jobExecutionId, maxThreads).then(new Reject<List<RemoteExecution>, Throwable, Chain<?>, Throwable, Object>() {
-            @Override
-            public void resolve(final List<RemoteExecution> that, final Deferred<Chain<?>, Throwable, Object> next) {
-                ListIterator<RemoteExecution> it = that.listIterator();
-                final Chain<?>[] chains = new Chain[executables.length];
-                int i = 0;
-                for (final Executable executable : executables) {
-                    if (!it.hasNext()) {
-                        it = that.listIterator();
+        return _getWorkers(jobExecutionId, maxThreads)
+                .then(new Reject<List<RemoteExecution>, Throwable, Chain<?>, Throwable, Object>() {
+                    @Override
+                    public void resolve(final List<RemoteExecution> that, final Deferred<Chain<?>, Throwable, Object> next) {
+                        ListIterator<RemoteExecution> it = that.listIterator();
+                        final Chain<?>[] chains = new Chain[executables.length];
+                        int i = 0;
+                        for (final Executable executable : executables) {
+                            if (!it.hasNext()) {
+                                it = that.listIterator();
+                            }
+                            final RemoteExecution remote = it.next();
+                            final int index = i++;
+                            chains[index] = remote.getChain();
+                            registry.registerChain(jobExecutionId, remote.getLocalId(), remote.getChain());
+                            final Worker worker = remote.getWorker();
+                            worker.execute(new ExecutableEventImpl(executable, remote.getRemoteId()));
+                        }
+                        next.resolve(new AllChain<Executable>(chains));
                     }
-                    final RemoteExecution remote = it.next();
-                    final int index = i++;
-                    chains[index] = remote.getChain();
-                    registry.registerChain(jobExecutionId, remote.getLocalId(), remote.getChain());
-                    final Worker worker = remote.getWorker();
-                    worker.execute(new ExecutableEventImpl(executable, remote.getRemoteId()));
-                }
-                next.resolve(new AllChain<Executable>(chains));
-            }
 
-            @Override
-            public void reject(final Throwable that, final Deferred<Chain<?>, Throwable, Object> next) {
-                try {
-                    next.resolve(LocalTransport.localDistribute(configuration, maxThreads, executables));
-                } catch (final Exception e) {
-                    e.addSuppressed(that);
-                    next.reject(e);
-                }
-            }
-        });
+                    @Override
+                    public void reject(final Throwable that, final Deferred<Chain<?>, Throwable, Object> next) {
+                        try {
+                            next.resolve(LocalTransport.localDistribute(configuration, maxThreads, executables));
+                        } catch (final Exception e) {
+                            e.addSuppressed(that);
+                            next.reject(e);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -198,23 +199,24 @@ public abstract class DistributedTransport<A> implements Transport {
             return When.resolved(new RemoteExecution(worker, id, id, new ChainImpl<Void>()));
         }
         final ChainId localId = new UUIDId(this);
-        return invokeRemote(executableId.getAddress(), new GetWorkerIdAndPushChainCommand(jobExecutionId, executableId, localId)).then(new Resolve<RemoteWorkerAndChain, RemoteExecution, Throwable, Object>() {
-            @Override
-            public void resolve(final RemoteWorkerAndChain that, final Deferred<RemoteExecution, Throwable, Object> next) {
-                if (that != null) {
-                    next.resolve(
-                            new RemoteExecution(
-                                    new DistributedWorker(DistributedTransport.this, that.getWorkerId()),
-                                    localId,
-                                    that.getChainId(),
-                                    new DistributedLocalChain(DistributedTransport.this, that.getWorkerId().getAddress(), jobExecutionId, that.getChainId())
-                            )
-                    );
-                } else {
-                    next.reject(new Exception("No remote worker for executable id " + executableId + " found"));
-                }
-            }
-        });
+        return invokeRemote(executableId.getAddress(), new GetWorkerIdAndPushChainCommand(jobExecutionId, executableId, localId))
+                .then(new Resolve<RemoteWorkerAndChain, RemoteExecution, Throwable, Object>() {
+                    @Override
+                    public void resolve(final RemoteWorkerAndChain remote, final Deferred<RemoteExecution, Throwable, Object> next) {
+                        if (remote != null) {
+                            next.resolve(
+                                    new RemoteExecution(
+                                            new DistributedWorker(DistributedTransport.this, remote.workerId),
+                                            localId,
+                                            remote.chainId,
+                                            new DistributedLocalChain(DistributedTransport.this, remote.workerId.getAddress(), jobExecutionId, remote.chainId)
+                                    )
+                            );
+                        } else {
+                            next.reject(new Exception("No remote worker for executable id " + executableId + " found"));
+                        }
+                    }
+                });
     }
 
     private Promise<RemoteExecution,Throwable,?> getRemoteChainAndIds(final WorkerId workerId, final long jobExecutionId) {

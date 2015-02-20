@@ -92,12 +92,52 @@ public class JobOperatorImpl implements ExtendedJobOperator {
 
     @Override
     public void close() throws Exception {
-        this.security.close();
-        this.executor.close();
-        this.registry.unregisterRepository(this.repositoryId);
-        this.registry.close();
-        this.transport.close();
-        this.cancellation.shutdown();
+        Exception exception = null;
+        try {
+            this.security.close();
+        } catch (final Exception e) {
+            exception = e;
+        }
+        try {
+            this.executor.close();
+        } catch (final Exception e) {
+            if (exception == null) {
+                exception = e;
+            } else {
+                exception.addSuppressed(e);
+            }
+        }
+        try {
+            this.registry.unregisterRepository(this.repositoryId);
+            this.registry.close();
+        } catch (final Exception e) {
+            if (exception == null) {
+                exception = e;
+            } else {
+                exception.addSuppressed(e);
+            }
+        }
+        try {
+            this.transport.close();
+        } catch (final Exception e) {
+            if (exception == null) {
+                exception = e;
+            } else {
+                exception.addSuppressed(e);
+            }
+        }
+        try {
+            this.cancellation.shutdown();
+        } catch (final Exception e) {
+            if (exception == null) {
+                exception = e;
+            } else {
+                exception.addSuppressed(e);
+            }
+        }
+        if (exception != null) {
+            throw exception;
+        }
     }
 
     @Override
