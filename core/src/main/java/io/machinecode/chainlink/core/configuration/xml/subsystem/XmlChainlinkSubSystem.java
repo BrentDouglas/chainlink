@@ -13,12 +13,12 @@ import io.machinecode.chainlink.spi.configuration.SubSystemConfiguration;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.management.Mutable;
 import io.machinecode.chainlink.spi.management.Op;
-import io.machinecode.chainlink.spi.schema.DeploymentSchema;
-import io.machinecode.chainlink.spi.schema.DeploymentWithNameExistsException;
-import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
-import io.machinecode.chainlink.spi.schema.MutableSubSystemSchema;
-import io.machinecode.chainlink.spi.schema.NoDeploymentWithNameException;
-import io.machinecode.chainlink.spi.schema.SubSystemSchema;
+import io.machinecode.chainlink.core.schema.DeploymentSchema;
+import io.machinecode.chainlink.core.schema.DeploymentWithNameExistsException;
+import io.machinecode.chainlink.core.schema.JobOperatorSchema;
+import io.machinecode.chainlink.core.schema.MutableSubSystemSchema;
+import io.machinecode.chainlink.core.schema.NoDeploymentWithNameException;
+import io.machinecode.chainlink.core.schema.SubSystemSchema;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;

@@ -43,7 +43,7 @@
         <module>core</module>
         <module>ext</module>
         <module>rt</module>
-        <module>web</module>
+        <module>ui</module>
         <module>doc</module>
         <module>bom</module>
         <module>dist</module>

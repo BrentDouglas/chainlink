@@ -11,7 +11,7 @@ import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishJobOperator;
 import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
 import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishXml;
 import io.machinecode.chainlink.spi.management.Op;
-import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
+import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import org.glassfish.api.Param;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;

@@ -1,6 +1,8 @@
 package example;
 
 import io.machinecode.chainlink.core.Chainlink;
+import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.Environment;
 import io.machinecode.chainlink.core.configuration.ClassLoaderFactoryImpl;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
@@ -10,14 +12,12 @@ import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
 import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
+import io.machinecode.chainlink.core.schema.Configure;
+import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
-import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
-import io.machinecode.chainlink.spi.management.Configure;
-import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
-import io.machinecode.chainlink.spi.schema.SubSystemSchema;
 
 import javax.batch.runtime.BatchRuntime;
 import java.util.Properties;
@@ -56,7 +56,7 @@ public class ManualConfiguration {
         Chainlink.setEnvironment(new Environment() {
             @Override
             public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
-                throw new IllegalStateException("Not implemented");
+                throw new UnsupportedOperationException("Not implemented");
             }
 
             @Override
@@ -69,17 +69,17 @@ public class ManualConfiguration {
 
             @Override
             public SubSystemSchema<?,?,?,?> getConfiguration() {
-                throw new IllegalStateException("Not implemented");
+                throw new UnsupportedOperationException("Not implemented");
             }
 
             @Override
             public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
-                throw new IllegalStateException("Not implemented");
+                throw new UnsupportedOperationException("Not implemented");
             }
 
             @Override
             public void reload() throws Exception {
-                throw new IllegalStateException("Not implemented");
+                throw new UnsupportedOperationException("Not implemented");
             }
         });
     }

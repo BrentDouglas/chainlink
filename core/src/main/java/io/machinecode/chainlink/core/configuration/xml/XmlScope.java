@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.core.configuration.xml;
 
 import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
-import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
-import io.machinecode.chainlink.spi.schema.JobOperatorWithNameExistsException;
-import io.machinecode.chainlink.spi.schema.MutableScopeSchema;
-import io.machinecode.chainlink.spi.schema.NoJobOperatorWithNameException;
+import io.machinecode.chainlink.core.schema.JobOperatorSchema;
+import io.machinecode.chainlink.core.schema.JobOperatorWithNameExistsException;
+import io.machinecode.chainlink.core.schema.MutableScopeSchema;
+import io.machinecode.chainlink.core.schema.NoJobOperatorWithNameException;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

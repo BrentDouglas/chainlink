@@ -2,8 +2,8 @@ package io.machinecode.chainlink.core.configuration.xml;
 
 import io.machinecode.chainlink.spi.management.Mutable;
 import io.machinecode.chainlink.spi.management.Op;
-import io.machinecode.chainlink.spi.schema.DeclarationSchema;
-import io.machinecode.chainlink.spi.schema.MutableDeclarationSchema;
+import io.machinecode.chainlink.core.schema.DeclarationSchema;
+import io.machinecode.chainlink.core.schema.MutableDeclarationSchema;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

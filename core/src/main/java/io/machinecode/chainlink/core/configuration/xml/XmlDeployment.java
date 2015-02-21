@@ -7,9 +7,9 @@ import io.machinecode.chainlink.spi.configuration.DeploymentConfiguration;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.management.Mutable;
 import io.machinecode.chainlink.spi.management.Op;
-import io.machinecode.chainlink.spi.schema.DeploymentSchema;
-import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
-import io.machinecode.chainlink.spi.schema.MutableDeploymentSchema;
+import io.machinecode.chainlink.core.schema.DeploymentSchema;
+import io.machinecode.chainlink.core.schema.JobOperatorSchema;
+import io.machinecode.chainlink.core.schema.MutableDeploymentSchema;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;

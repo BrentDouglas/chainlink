@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.spi.schema;
+package io.machinecode.chainlink.core.schema;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

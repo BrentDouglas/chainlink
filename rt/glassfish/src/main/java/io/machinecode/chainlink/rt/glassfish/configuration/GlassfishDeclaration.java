@@ -2,8 +2,8 @@ package io.machinecode.chainlink.rt.glassfish.configuration;
 
 import io.machinecode.chainlink.spi.management.Mutable;
 import io.machinecode.chainlink.spi.management.Op;
-import io.machinecode.chainlink.spi.schema.DeclarationSchema;
-import io.machinecode.chainlink.spi.schema.MutableDeclarationSchema;
+import io.machinecode.chainlink.core.schema.DeclarationSchema;
+import io.machinecode.chainlink.core.schema.MutableDeclarationSchema;
 import org.jvnet.hk2.config.Attribute;
 import org.jvnet.hk2.config.ConfigBeanProxy;
 import org.jvnet.hk2.config.Configured;

@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.spi.schema;
+package io.machinecode.chainlink.core.schema;
 
 import java.util.List;
 

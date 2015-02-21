@@ -1,6 +1,4 @@
-package io.machinecode.chainlink.spi.management;
-
-import io.machinecode.chainlink.spi.schema.MutableSubSystemSchema;
+package io.machinecode.chainlink.core.schema;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

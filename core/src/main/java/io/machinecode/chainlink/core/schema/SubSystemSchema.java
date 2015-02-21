@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.spi.schema;
+package io.machinecode.chainlink.core.schema;
 
 import java.util.List;
 
@@ -11,9 +11,5 @@ public interface SubSystemSchema<Dep extends DeploymentSchema<Dec,Prop,Job>, Dec
 
     List<Dep> getDeployments();
 
-    void setDeployments(final List<Dep> deployments);
-
     Dep getDeployment(final String name);
-
-    Dep removeDeployment(final String name) throws NoDeploymentWithNameException;
 }

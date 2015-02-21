@@ -10,7 +10,7 @@ import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishDeployment;
 import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
 import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishXml;
 import io.machinecode.chainlink.spi.management.Op;
-import io.machinecode.chainlink.spi.schema.DeploymentSchema;
+import io.machinecode.chainlink.core.schema.DeploymentSchema;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
 import org.glassfish.api.admin.ExecuteOn;

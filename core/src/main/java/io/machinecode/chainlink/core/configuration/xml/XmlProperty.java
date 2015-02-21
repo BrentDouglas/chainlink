@@ -3,8 +3,8 @@ package io.machinecode.chainlink.core.configuration.xml;
 import io.machinecode.chainlink.spi.configuration.PropertyModel;
 import io.machinecode.chainlink.spi.management.Mutable;
 import io.machinecode.chainlink.spi.management.Op;
-import io.machinecode.chainlink.spi.schema.MutablePropertySchema;
-import io.machinecode.chainlink.spi.schema.PropertySchema;
+import io.machinecode.chainlink.core.schema.MutablePropertySchema;
+import io.machinecode.chainlink.core.schema.PropertySchema;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

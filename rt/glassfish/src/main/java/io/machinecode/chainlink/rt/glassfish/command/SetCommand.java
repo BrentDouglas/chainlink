@@ -3,9 +3,9 @@ package io.machinecode.chainlink.rt.glassfish.command;
 import io.machinecode.chainlink.core.configuration.xml.XmlDeployment;
 import io.machinecode.chainlink.core.configuration.xml.XmlJobOperator;
 import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
-import io.machinecode.chainlink.spi.schema.DeploymentSchema;
-import io.machinecode.chainlink.spi.schema.JobOperatorSchema;
-import io.machinecode.chainlink.spi.schema.SubSystemSchema;
+import io.machinecode.chainlink.core.schema.DeploymentSchema;
+import io.machinecode.chainlink.core.schema.JobOperatorSchema;
+import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import org.apache.commons.codec.binary.Base64;
 import org.glassfish.api.Param;
 

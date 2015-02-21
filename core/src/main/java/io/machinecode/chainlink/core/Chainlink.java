@@ -2,7 +2,6 @@ package io.machinecode.chainlink.core;
 
 import io.machinecode.chainlink.core.util.ResolvableService;
 import io.machinecode.chainlink.spi.Messages;
-import io.machinecode.chainlink.spi.management.Environment;
 import org.jboss.logging.Logger;
 
 import java.util.List;

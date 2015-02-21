@@ -1,7 +1,9 @@
-package io.machinecode.chainlink.spi.management;
+package io.machinecode.chainlink.core;
 
+import io.machinecode.chainlink.core.schema.Configure;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
-import io.machinecode.chainlink.spi.schema.SubSystemSchema;
+import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
+import io.machinecode.chainlink.core.schema.SubSystemSchema;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -11,7 +13,7 @@ public interface Environment {
 
     /**
      * @param name The name of the operator to find.
-     * @return A subsystem scoped {@link ExtendedJobOperator};
+     * @return A subsystem scoped {@link io.machinecode.chainlink.spi.management.ExtendedJobOperator};
      * @throws NoConfigurationWithIdException If there is no subsystem scoped operator
      * configured with the name {@param name}.
      */
@@ -38,7 +40,7 @@ public interface Environment {
      *                  to this method though are not visible to {@link #getJobOperator(String)}
      *                  and {@link #getSubsystemJobOperator(String)} until {@link #reload()} is called.
      *
-     *                  If an Exception is thrown while running {@link Configure#configure(io.machinecode.chainlink.spi.schema.MutableSubSystemSchema)}
+     *                  If an Exception is thrown while running {@link Configure#configure(io.machinecode.chainlink.core.schema.MutableSubSystemSchema)}
      *                  no changes will be visible to any methods.
      * @return An immutable view of the Chainlink configuration before {@param configure} was applied.
      */

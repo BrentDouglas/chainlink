@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.spi.schema;
+package io.machinecode.chainlink.core.schema;
 
 import io.machinecode.chainlink.spi.management.Mutable;
 

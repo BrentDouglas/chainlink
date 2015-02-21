@@ -10,6 +10,7 @@ import org.jboss.logging.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import static java.lang.System.out;
 
@@ -17,7 +18,7 @@ import static java.lang.System.out;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class Chainlinkd {
+public class Chainlinkd implements AutoCloseable, Callable<Void> {
 
     private static final Logger log = Logger.getLogger(Chainlinkd.class);
 
@@ -47,7 +48,6 @@ public class Chainlinkd {
                         return;
                 }
             }
-
             if (props != null) {
                 final File propertiesFile = new File(props);
                 if (propertiesFile.exists()) {
@@ -61,18 +61,7 @@ public class Chainlinkd {
                     System.setProperties(properties);
                 }
             }
-            try (final SeEnvironment environment = new SeEnvironment(config)) {
-                //TODO Should be able to configure eager or lazy start
-                environment.loadConfiguration();
-                Chainlink.setEnvironment(environment);
-                log.info(Messages.get("CHAINLINK-032000.chainlinkd.started"));
-                final Object lock = new Object();
-                while (true) {
-                    synchronized (lock) {
-                        lock.wait();
-                    }
-                }
-            }
+            new Chainlinkd(config).call();
         } catch (final Throwable e) {
             log.fatalf(e, Messages.get("CHAINLINK-032001.chainlinkd.exception"));
             System.exit(1);
@@ -81,5 +70,38 @@ public class Chainlinkd {
 
     private static void _usage() {
         out.println("Usage: chainlinkd -c|--configuration config_file_name -p|--properties properties_file_name -h|--help");
+    }
+
+    public Chainlinkd(final String config) {
+        this.config = config;
+    }
+
+    private final String config;
+    private final Object lock = new Object();
+
+    private volatile boolean running = true;
+
+    @Override
+    public Void call() throws Exception {
+        try (final SeEnvironment environment = new SeEnvironment(config)) {
+            //TODO Should be able to configure eager or lazy start
+            environment.loadConfiguration();
+            Chainlink.setEnvironment(environment);
+            log.info(Messages.get("CHAINLINK-032000.chainlinkd.started"));
+            while (running) {
+                synchronized (lock) {
+                    lock.wait();
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void close() throws Exception {
+        running = false;
+        synchronized (lock) {
+            lock.notifyAll();
+        }
     }
 }

@@ -1,17 +1,17 @@
 package io.machinecode.chainlink.rt.se;
 
 import gnu.trove.map.hash.THashMap;
+import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.Environment;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
-import io.machinecode.chainlink.core.Constants;
-import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
-import io.machinecode.chainlink.spi.management.Configure;
-import io.machinecode.chainlink.spi.management.Environment;
-import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
-import io.machinecode.chainlink.spi.schema.SubSystemSchema;
+import io.machinecode.chainlink.core.schema.Configure;
+import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
+import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.jboss.logging.Logger;
 
 import java.io.File;

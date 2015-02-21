@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.spi.schema;
+package io.machinecode.chainlink.core.schema;
 
 import io.machinecode.chainlink.spi.management.Mutable;
 
@@ -11,11 +11,7 @@ import java.util.List;
 public interface MutableSubSystemSchema<Dep extends MutableDeploymentSchema<Dec,Prop,Job>, Dec extends MutableDeclarationSchema, Prop extends MutablePropertySchema, Job extends MutableJobOperatorSchema<Dec, Prop>>
         extends SubSystemSchema<Dep,Dec,Prop,Job>, MutableScopeSchema<Dec, Prop, Job>, Mutable<SubSystemSchema<?,?,?,?>> {
 
-    List<Dep> getDeployments();
-
     void setDeployments(final List<Dep> deployments);
-
-    Dep getDeployment(final String name);
 
     Dep removeDeployment(final String name) throws NoDeploymentWithNameException;
 

@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.rt.wildfly;
 
+import io.machinecode.chainlink.core.Environment;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
+import io.machinecode.chainlink.core.schema.Configure;
+import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
-import io.machinecode.chainlink.spi.management.Configure;
-import io.machinecode.chainlink.spi.management.Environment;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
-import io.machinecode.chainlink.spi.schema.SubSystemSchema;
 import org.jboss.msc.service.ServiceName;
 
 import java.lang.ref.WeakReference;
