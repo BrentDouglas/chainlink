@@ -35,10 +35,10 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
 
     void setRef(final String ref);
 
-    @Element("artifact-loader")
-    List<GlassfishDeclaration> getArtifactLoader();
+    @Element("configuration-loader")
+    List<GlassfishDeclaration> getConfigurationLoader();
 
-    void setArtifactLoader(final List<GlassfishDeclaration> artifactLoaders);
+    void setConfigurationLoader(final List<GlassfishDeclaration> configurationLoader);
 
     @Element("job-operator")
     List<GlassfishJobOperator> getJobOperator();
@@ -58,7 +58,7 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
     void setJobOperators(final List<GlassfishJobOperator> jobOperators);
 
     @DuckTyped
-    GlassfishDeclaration getArtifactLoader(final String name);
+    GlassfishDeclaration getConfigurationLoader(final String name);
 
     @DuckTyped
     GlassfishJobOperator getJobOperator(final String name);
@@ -77,12 +77,12 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
             this.to = to;
         }
 
-        public static List<GlassfishDeclaration> getArtifactLoaders(final GlassfishDeployment that) {
-            return that.getArtifactLoader();
+        public static List<GlassfishDeclaration> getConfigurationLoaders(final GlassfishDeployment that) {
+            return that.getConfigurationLoader();
         }
 
-        public static void setArtifactLoaders(final GlassfishDeployment that, final List<GlassfishDeclaration> artifactLoaders) {
-            that.setArtifactLoader(artifactLoaders);
+        public static void setConfigurationLoaders(final GlassfishDeployment that, final List<GlassfishDeclaration> artifactLoaders) {
+            that.setConfigurationLoader(artifactLoaders);
         }
 
         public static List<GlassfishJobOperator> getJobOperators(final GlassfishDeployment that) {
@@ -93,7 +93,7 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
             that.setJobOperator(jobOperators);
         }
 
-        public static GlassfishDeclaration getArtifactLoader(final GlassfishDeployment self, final String name) {
+        public static GlassfishDeclaration getConfigurationLoader(final GlassfishDeployment self, final String name) {
             for (final GlassfishDeclaration dep : self.getConfigurationLoaders()) {
                 if (name.equals(dep.getName())) {
                     return dep;

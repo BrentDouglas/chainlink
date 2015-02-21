@@ -339,7 +339,6 @@ curl -X GET \
 curl -X DELETE \
         -H "Accept: application/xml" \
         -H "X-Requested-By: GlassFish REST HTML interface" \
-        -d "job-operator=default" \
-        http://localhost:4848/management/domain/delete-chainlink-job-operator \
+        http://localhost:4848/management/domain/delete-chainlink-job-operator?job-operator=default \
     | xmllint --format -
 ----

@@ -49,8 +49,34 @@ public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemS
     public static final String SCHEMA_URL = "http://machinecode.io/xml/ns/chainlink/subsystem/chainlink-subsystem_1_0.xsd";
     public static final String NAMESPACE = "http://machinecode.io/xml/ns/chainlink/subsystem";
 
+    @XmlElement(name = "configuration-loader", namespace = XmlChainlinkSubSystem.NAMESPACE, required = false)
+    private List<XmlDeclaration> configurationLoaders = new ArrayList<>(0);
+
+    @XmlElement(name = "job-operator", namespace = XmlChainlinkSubSystem.NAMESPACE, required = false)
+    protected List<XmlJobOperator> jobOperators = new ArrayList<>(0);
+
     @XmlElement(name = "deployment", namespace = XmlChainlinkSubSystem.NAMESPACE, required = false)
     private List<XmlDeployment> deployments = new ArrayList<>(0);
+
+    @Override
+    public List<XmlDeclaration> getConfigurationLoaders() {
+        return configurationLoaders;
+    }
+
+    @Override
+    public void setConfigurationLoaders(final List<XmlDeclaration> configurationLoaders) {
+        this.configurationLoaders = configurationLoaders;
+    }
+
+    @Override
+    public List<XmlJobOperator> getJobOperators() {
+        return jobOperators;
+    }
+
+    @Override
+    public void setJobOperators(final List<XmlJobOperator> jobOperators) {
+        this.jobOperators = jobOperators;
+    }
 
     @Override
     public List<XmlDeployment> getDeployments() {

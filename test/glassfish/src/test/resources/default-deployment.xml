@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment name="default">
+    <job-operator name="default">
+        <property name="p5" value="v5"/>
+    </job-operator>
+</deployment>

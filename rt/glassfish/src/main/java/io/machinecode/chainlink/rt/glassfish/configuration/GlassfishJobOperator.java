@@ -103,12 +103,6 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
     void setArtifactLoaders(final List<GlassfishDeclaration> artifactLoaders);
 
     @DuckTyped
-    List<GlassfishDeclaration> getInjectors();
-
-    @DuckTyped
-    void setInjectors(final List<GlassfishDeclaration> injectors);
-
-    @DuckTyped
     List<GlassfishDeclaration> getSecurities();
 
     @DuckTyped

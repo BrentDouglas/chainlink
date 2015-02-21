@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<subsystem xmlns="http://machinecode.io/xml/ns/chainlink/subsystem"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink/subsystem http://machinecode.io/xml/ns/chainlink/chainlink-subsystem_1_0.xsd">
+
+    <job-operator name="global">
+        <property name="p1" value="v1"/>
+    </job-operator>
+
+    <deployment name="default">
+        <job-operator name="default">
+            <property name="p2" value="v2"/>
+        </job-operator>
+    </deployment>
+
+    <deployment name="other">
+        <job-operator name="default">
+            <property name="p3" value="v3"/>
+        </job-operator>
+    </deployment>
+</subsystem>

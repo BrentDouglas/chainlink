@@ -20,6 +20,9 @@ public class XmlConfigurationTest extends Assert {
     public void subsystemTest() throws Exception {
         final XmlChainlinkSubSystem that = XmlChainlinkSubSystem.read(new FileInputStream("src/test/resources/chainlink-subsystem.xml"));
         assertNotNull(that);
+        assertEquals(1, that.getConfigurationLoaders().size());
+        assertEquals(1, that.getJobOperators().size());
+        assertEquals(2, that.getDeployments().size());
         that.write(new ByteArrayOutputStream());
     }
 
@@ -27,6 +30,8 @@ public class XmlConfigurationTest extends Assert {
     public void chainlinkTest() throws Exception {
         final XmlChainlink that = XmlChainlink.read(new FileInputStream("src/test/resources/test-chainlink.xml"));
         assertNotNull(that);
+        assertEquals(1, that.getConfigurationLoaders().size());
+        assertEquals(1, that.getJobOperators().size());
         that.write(new ByteArrayOutputStream());
     }
 
@@ -34,6 +39,7 @@ public class XmlConfigurationTest extends Assert {
     public void deploymentTest() throws Exception {
         final XmlDeployment that = XmlDeployment.read(new FileInputStream("src/test/resources/deployment.xml"));
         assertNotNull(that);
+        assertEquals(1, that.getJobOperators().size());
         that.write(new ByteArrayOutputStream());
     }
 

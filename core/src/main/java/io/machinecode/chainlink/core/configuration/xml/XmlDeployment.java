@@ -16,6 +16,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLInputFactory;
@@ -24,6 +25,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
@@ -39,6 +42,12 @@ public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<X
     @XmlAttribute(name = "name", required = false)
     protected String name;
 
+    @XmlElement(name = "configuration-loader", namespace = XmlChainlink.NAMESPACE, required = false)
+    private List<XmlDeclaration> configurationLoaders = new ArrayList<>(0);
+
+    @XmlElement(name = "job-operator", namespace = XmlChainlink.NAMESPACE, required = false)
+    protected List<XmlJobOperator> jobOperators = new ArrayList<>(0);
+
     @Override
     public String getName() {
         return name;
@@ -47,6 +56,26 @@ public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<X
     @Override
     public void setName(final String name) {
         this.name = name;
+    }
+
+    @Override
+    public List<XmlDeclaration> getConfigurationLoaders() {
+        return configurationLoaders;
+    }
+
+    @Override
+    public void setConfigurationLoaders(final List<XmlDeclaration> configurationLoaders) {
+        this.configurationLoaders = configurationLoaders;
+    }
+
+    @Override
+    public List<XmlJobOperator> getJobOperators() {
+        return jobOperators;
+    }
+
+    @Override
+    public void setJobOperators(final List<XmlJobOperator> jobOperators) {
+        this.jobOperators = jobOperators;
     }
 
     public void configureDeployment(final DeploymentModelImpl model, final ClassLoader classLoader) throws Exception {

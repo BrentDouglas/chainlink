@@ -34,10 +34,10 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
 
     void setRef(final String ref);
 
-    @Element("artifact-loader")
-    List<GlassfishDeclaration> getArtifactLoader();
+    @Element("configuration-loader")
+    List<GlassfishDeclaration> getConfigurationLoader();
 
-    void setArtifactLoader(final List<GlassfishDeclaration> artifactLoaders);
+    void setConfigurationLoader(final List<GlassfishDeclaration> configurationLoaders);
 
     @Element("job-operator")
     List<GlassfishJobOperator> getJobOperator();
@@ -53,7 +53,7 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
     List<GlassfishDeclaration> getConfigurationLoaders();
 
     @DuckTyped
-    void setConfigurationLoaders(final List<GlassfishDeclaration> artifactLoaders);
+    void setConfigurationLoaders(final List<GlassfishDeclaration> configurationLoaders);
 
     @DuckTyped
     List<GlassfishJobOperator> getJobOperators();
@@ -93,12 +93,12 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
             this.to = to;
         }
 
-        public static List<GlassfishDeclaration> getArtifactLoaders(final GlassfishSubSystem that) {
-            return that.getArtifactLoader();
+        public static List<GlassfishDeclaration> getConfigurationLoaders(final GlassfishSubSystem that) {
+            return that.getConfigurationLoader();
         }
 
-        public static void setArtifactLoaders(final GlassfishSubSystem that, final List<GlassfishDeclaration> artifactLoaders) {
-            that.setArtifactLoader(artifactLoaders);
+        public static void setConfigurationLoaders(final GlassfishSubSystem that, final List<GlassfishDeclaration> configurationLoaders) {
+            that.setConfigurationLoader(configurationLoaders);
         }
 
         public static List<GlassfishJobOperator> getJobOperators(final GlassfishSubSystem that) {
@@ -225,8 +225,8 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         }
 
         @Override
-        public void setConfigurationLoaders(final List<GlassfishDeclaration> artifactLoaders) {
-            to.setConfigurationLoaders(artifactLoaders);
+        public void setConfigurationLoaders(final List<GlassfishDeclaration> configurationLoaders) {
+            to.setConfigurationLoaders(configurationLoaders);
         }
 
         @Override
