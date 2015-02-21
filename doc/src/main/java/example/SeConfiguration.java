@@ -16,6 +16,8 @@ public class SeConfiguration {
             Chainlink.setEnvironment(environment);
             // Run code here e.g.
             BatchRuntime.getJobOperator().start("a_job", new Properties());
+        } finally {
+            Chainlink.setEnvironment(null);
         }
     }
 }

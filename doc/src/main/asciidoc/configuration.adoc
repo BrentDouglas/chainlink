@@ -182,10 +182,10 @@ container the *Configuration classes would have to be available to the
 classloader of the Chainlink module, rather than in a deployment. A
 BeanManager would have to be available to the module, a
 TransactionManager would have to be available under
-"java:comp/TransactionManager" and moreover the "java:comp" context
-would also have to be available. Whether these conditions hold is
-dependent on the container integration and should be carefully
-considered when configuring Chainlink.
+"java:appserver/TransactionManager" and moreover the "java:appserver" context
+would also have to be available (this example is from Glassfish). Whether
+these conditions hold is dependent on the container integration and should
+be carefully considered when configuring Chainlink.
 
 include::configuration-embedded.adoc[]
 

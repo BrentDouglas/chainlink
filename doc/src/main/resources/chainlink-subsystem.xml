@@ -12,10 +12,9 @@
 
     <deployment name="default">
         <configuration-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory"/>
-        <!-- TODO <artifact-loader name="jndi" ref="io.machinecode.chainlink.inject.jndi.JndiArtifactLoader"/>-->
 
         <job-operator name="default" ref="theJobOperatorConfiguration">
-            <transaction-manager name="tx" ref="java:comp/TransactionManager"/>
+            <transaction-manager name="tx" ref="java:appserver/TransactionManager"/>
         </job-operator>
     </deployment>
 

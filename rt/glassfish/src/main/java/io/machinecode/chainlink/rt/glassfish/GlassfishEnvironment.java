@@ -39,11 +39,6 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     }
 
     @Override
-    public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
-        throw new IllegalStateException("Not implemented yet");
-    }
-
-    @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
@@ -60,19 +55,19 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
 
     @Override
     public SubSystemSchema<?,?,?,?> getConfiguration() {
-        throw new IllegalStateException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
-        throw new IllegalStateException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void reload() throws Exception {
         synchronized (lock) {
             if (this.model == null) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(); //TODO Message
             }
             final ClassLoader loader = this.model.getClassLoader();
             final SubSystemModelImpl model = new SubSystemModelImpl(loader);

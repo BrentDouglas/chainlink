@@ -14,7 +14,7 @@
         <configuration-loader name="jndi" ref="asdf"/>
 
         <job-operator name="default" ref="theJobOperatorConfiguration">
-            <transaction-manager name="tx" ref="java:comp/TransactionManager"/>
+            <transaction-manager name="tx" ref="java:appserver/TransactionManager"/>
         </job-operator>
     </deployment>
 

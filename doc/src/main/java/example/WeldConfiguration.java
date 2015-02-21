@@ -1,5 +1,6 @@
 package example;
 
+import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
@@ -11,6 +12,9 @@ import org.jboss.weld.environment.se.WeldContainer;
 import javax.batch.runtime.BatchRuntime;
 import java.util.Properties;
 
+import static example.ManualConfiguration.TheEnvironment;
+import static example.ManualConfiguration.configureEnvironment;
+
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
@@ -19,12 +23,6 @@ public class WeldConfiguration {
     public static void main(final String... args) throws Throwable {
         final Weld weld = new Weld();
         final WeldContainer container = weld.initialize();
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                weld.shutdown();
-            }
-        }));
 
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         final DeploymentModelImpl model = new SubSystemModelImpl(tccl).getDeployment(Constants.DEFAULT);
@@ -33,8 +31,12 @@ public class WeldConfiguration {
 
         op.getArtifactLoader("weld").setDefaultFactory(new CdiArtifactLoaderFactory(container.getBeanManager()));
 
-        ManualConfiguration.configureAndInstall(model, op, tccl);
-
-        BatchRuntime.getJobOperator().start("a_job", new Properties());
+        try (final TheEnvironment environment = configureEnvironment(model, op, tccl)) {
+            Chainlink.setEnvironment(environment);
+            BatchRuntime.getJobOperator().start("a_job", new Properties());
+        } finally {
+            Chainlink.setEnvironment(null);
+            weld.shutdown();
+        }
     }
 }

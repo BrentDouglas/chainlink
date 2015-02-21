@@ -47,11 +47,6 @@ public class TomEEEnvironment implements Environment {
     }
 
     @Override
-    public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
-        throw new IllegalStateException("Not implemented yet");
-    }
-
-    @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (final App app : operators.values()) {
@@ -68,17 +63,17 @@ public class TomEEEnvironment implements Environment {
 
     @Override
     public SubSystemSchema<?,?,?,?> getConfiguration() {
-        throw new IllegalStateException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
-        throw new IllegalStateException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void reload() {
-        throw new IllegalStateException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     public Map<String, JobOperatorImpl> getJobOperators() {

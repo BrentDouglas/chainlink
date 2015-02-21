@@ -17,7 +17,6 @@ import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
-import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 
 import javax.batch.runtime.BatchRuntime;
 import java.util.Properties;
@@ -31,8 +30,12 @@ public class ManualConfiguration {
         final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         final DeploymentModelImpl model = new SubSystemModelImpl(tccl).getDeployment(Constants.DEFAULT);
         final JobOperatorModelImpl op = setDefaults(model, tccl);
-        configureAndInstall(model, op, tccl);
-        BatchRuntime.getJobOperator().start("a_job", new Properties());
+        try (final TheEnvironment environment = configureEnvironment(model, op, tccl)) {
+            Chainlink.setEnvironment(environment);
+            BatchRuntime.getJobOperator().start("a_job", new Properties());
+        } finally {
+            Chainlink.setEnvironment(null);
+        }
     }
 
     public static JobOperatorModelImpl setDefaults(final DeploymentModelImpl model, final ClassLoader tccl) {
@@ -48,39 +51,48 @@ public class ManualConfiguration {
         return op;
     }
 
-    public static void configureAndInstall(final DeploymentModelImpl model, final JobOperatorModelImpl op, final ClassLoader tccl) throws Exception {
+    public static TheEnvironment configureEnvironment(final DeploymentModelImpl model, final JobOperatorModelImpl op, final ClassLoader tccl) throws Exception {
         // Configure from "chainlink.xml" in root of classpath
         model.loadChainlinkXml();
 
         final JobOperatorImpl operator = op.createJobOperator();
-        Chainlink.setEnvironment(new Environment() {
-            @Override
-            public ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException {
-                throw new UnsupportedOperationException("Not implemented");
-            }
 
-            @Override
-            public JobOperatorImpl getJobOperator(final String name) throws NoConfigurationWithIdException {
-                if (Constants.DEFAULT.equals(name)) {
-                    return operator;
-                }
-                throw new NoConfigurationWithIdException("No operator for name " + name);
-            }
+        return new TheEnvironment(operator);
+    }
 
-            @Override
-            public SubSystemSchema<?,?,?,?> getConfiguration() {
-                throw new UnsupportedOperationException("Not implemented");
-            }
+    public static class TheEnvironment implements Environment, AutoCloseable {
+        final JobOperatorImpl operator;
 
-            @Override
-            public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
-                throw new UnsupportedOperationException("Not implemented");
-            }
+        TheEnvironment(final JobOperatorImpl operator) {
+            this.operator = operator;
+        }
 
-            @Override
-            public void reload() throws Exception {
-                throw new UnsupportedOperationException("Not implemented");
+        @Override
+        public JobOperatorImpl getJobOperator(final String name) throws NoConfigurationWithIdException {
+            if (Constants.DEFAULT.equals(name)) {
+                return operator;
             }
-        });
+            throw new NoConfigurationWithIdException("No operator for name " + name);
+        }
+
+        @Override
+        public SubSystemSchema<?,?,?,?> getConfiguration() {
+            throw new UnsupportedOperationException("Not implemented");
+        }
+
+        @Override
+        public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
+            throw new UnsupportedOperationException("Not implemented");
+        }
+
+        @Override
+        public void reload() throws Exception {
+            throw new UnsupportedOperationException("Not implemented");
+        }
+
+        @Override
+        public void close() throws Exception {
+            operator.close();
+        }
     }
 }

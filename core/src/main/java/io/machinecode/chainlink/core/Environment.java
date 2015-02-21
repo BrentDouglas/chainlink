@@ -13,14 +13,6 @@ public interface Environment {
 
     /**
      * @param name The name of the operator to find.
-     * @return A subsystem scoped {@link io.machinecode.chainlink.spi.management.ExtendedJobOperator};
-     * @throws NoConfigurationWithIdException If there is no subsystem scoped operator
-     * configured with the name {@param name}.
-     */
-    ExtendedJobOperator getSubsystemJobOperator(final String name) throws NoConfigurationWithIdException;
-
-    /**
-     * @param name The name of the operator to find.
      * @return A deployment scoped scoped {@link ExtendedJobOperator} if one can be found, if not
      * a subsystem scoped {@link ExtendedJobOperator}.
      * @throws NoConfigurationWithIdException If there is no deployment or subsystem scoped
@@ -38,7 +30,7 @@ public interface Environment {
      *                  applied here will are stored in an implementation specific manner and are
      *                  immediately available to {@link #getConfiguration()} and subsequent calls
      *                  to this method though are not visible to {@link #getJobOperator(String)}
-     *                  and {@link #getSubsystemJobOperator(String)} until {@link #reload()} is called.
+     *                  until {@link #reload()} is called.
      *
      *                  If an Exception is thrown while running {@link Configure#configure(io.machinecode.chainlink.core.schema.MutableSubSystemSchema)}
      *                  no changes will be visible to any methods.
@@ -47,8 +39,8 @@ public interface Environment {
     SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure);
 
     /**
-     * Make the currently stored configuration available to accessors
-     * {@link #getJobOperator(String)} and {@link #getSubsystemJobOperator(String)}.
+     * Make the currently stored configuration available to
+     * {@link #getJobOperator(String)}.
      * @throws Exception On an implementation specific error.
      */
     void reload() throws Exception;
