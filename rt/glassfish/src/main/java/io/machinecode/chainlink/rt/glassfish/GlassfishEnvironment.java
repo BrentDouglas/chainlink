@@ -30,7 +30,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     private final ConcurrentMap<String, App> operators = new ConcurrentHashMap<>();
     private SubSystemModelImpl model;
     private final ThreadFactoryLookup threadFactory;
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private final GlassfishSubSystem subSystem;
 
     public GlassfishEnvironment(final ThreadFactoryLookup threadFactory, final GlassfishSubSystem subSystem) {
