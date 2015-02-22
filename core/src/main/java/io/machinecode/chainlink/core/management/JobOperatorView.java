@@ -9,6 +9,7 @@ import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
 import org.jboss.logging.Logger;
 
+import javax.batch.operations.BatchRuntimeException;
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -42,11 +43,7 @@ public class JobOperatorView implements ExtendedJobOperator {
     }
 
     public JobOperatorView(final String id) {
-        this(lookupOperator(id));
-    }
-
-    public JobOperatorView(final ExtendedJobOperator delegate) {
-        this.delegate = delegate;
+        this.delegate = lookupOperator(id);
     }
 
     private static ExtendedJobOperator lookupOperator(final String id) {
@@ -57,7 +54,7 @@ public class JobOperatorView implements ExtendedJobOperator {
             throw e;
         } catch (final Exception e) {
             log.error("Failed to locate the required ExtendedJobOperator", e); //TODO Message
-            throw new RuntimeException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
