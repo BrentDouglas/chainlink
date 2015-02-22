@@ -1,16 +1,16 @@
-package io.machinecode.chainlink.core.configuration.xml;
+package io.machinecode.chainlink.core.schema.xml;
 
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
-import io.machinecode.chainlink.core.configuration.op.Creator;
-import io.machinecode.chainlink.core.configuration.op.Transmute;
+import io.machinecode.chainlink.core.util.Creator;
+import io.machinecode.chainlink.core.util.Transmute;
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
-import io.machinecode.chainlink.spi.management.Mutable;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.core.util.Mutable;
+import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.MutableJobOperatorSchema;
 
@@ -222,6 +222,20 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
     @Override
     public void setProperties(final List<XmlProperty> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public void setProperty(final String name, final String value) {
+        for (final XmlProperty property : this.properties) {
+            if (property.getName().equals(name)) {
+                property.setValue(value);
+                return;
+            }
+        }
+        final XmlProperty property = new XmlProperty();
+        property.setName(name);
+        property.setValue(value);
+        this.properties.add(property);
     }
 
     @Override

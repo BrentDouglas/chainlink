@@ -1,8 +1,8 @@
 package io.machinecode.chainlink.rt.glassfish.command;
 
-import io.machinecode.chainlink.core.configuration.xml.XmlDeployment;
-import io.machinecode.chainlink.core.configuration.xml.XmlJobOperator;
-import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
+import io.machinecode.chainlink.core.schema.xml.XmlDeployment;
+import io.machinecode.chainlink.core.schema.xml.XmlJobOperator;
+import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.schema.DeploymentSchema;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;

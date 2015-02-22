@@ -2,14 +2,14 @@ package io.machinecode.chainlink.rt.glassfish.command.config;
 
 import com.sun.enterprise.config.serverbeans.Config;
 import com.sun.enterprise.config.serverbeans.Domain;
-import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
+import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.rt.glassfish.command.BaseCommand;
 import io.machinecode.chainlink.rt.glassfish.command.Code;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishDeclaration;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishDeployment;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishJobOperator;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishXml;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishDeclaration;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishDeployment;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishJobOperator;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
+import io.machinecode.chainlink.core.schema.xml.XmlSchema;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
 import org.glassfish.api.admin.ExecuteOn;
@@ -59,8 +59,8 @@ public class DeleteSubSystemCommand extends BaseCommand {
 
         @Override
         public Object code(final GlassfishSubSystem subSystem) throws Exception {
-            final XmlChainlinkSubSystem xml = GlassfishXml.xmlSubSystem(subSystem);
-            context.getActionReport().setMessage(GlassfishXml.writeSubSystem(xml));
+            final XmlChainlinkSubSystem xml = XmlSchema.xmlSubSystem(subSystem);
+            context.getActionReport().setMessage(XmlSchema.writeSubSystem(xml));
             subSystem.setRef(null);
             subSystem.setDeployments(Collections.<GlassfishDeployment>emptyList());
             subSystem.setConfigurationLoaders(Collections.<GlassfishDeclaration>emptyList());

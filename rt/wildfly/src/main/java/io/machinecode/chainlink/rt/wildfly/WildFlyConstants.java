@@ -27,7 +27,7 @@ public interface WildFlyConstants {
     String TRANSPORT = "transport";
     String REGISTRY = "registry";
     String MARSHALLING = "marshalling";
-    String EXECUTION_REPOSITORY = "repository";
+    String REPOSITORY = "repository";
     String TRANSACTION_MANAGER = "transaction-manager";
     String MBEAN_SERVER = "mbean-server";
     String JOB_LOADER = "job-loader";

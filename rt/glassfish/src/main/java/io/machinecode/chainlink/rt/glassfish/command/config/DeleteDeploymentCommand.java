@@ -2,12 +2,12 @@ package io.machinecode.chainlink.rt.glassfish.command.config;
 
 import com.sun.enterprise.config.serverbeans.Config;
 import com.sun.enterprise.config.serverbeans.Domain;
-import io.machinecode.chainlink.core.configuration.xml.XmlDeployment;
+import io.machinecode.chainlink.core.schema.xml.XmlDeployment;
 import io.machinecode.chainlink.rt.glassfish.command.BaseCommand;
 import io.machinecode.chainlink.rt.glassfish.command.Code;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishDeployment;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishXml;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishDeployment;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
+import io.machinecode.chainlink.core.schema.xml.XmlSchema;
 import org.glassfish.api.Param;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
@@ -60,8 +60,8 @@ public class DeleteDeploymentCommand extends BaseCommand {
         @Override
         public Object code(final GlassfishSubSystem subSystem) throws Exception {
             final GlassfishDeployment that = subSystem.removeDeployment(deployment);
-            final XmlDeployment xml = GlassfishXml.xmlDeployment(that);
-            context.getActionReport().setMessage(GlassfishXml.writeDeployment(xml));
+            final XmlDeployment xml = XmlSchema.xmlDeployment(that);
+            context.getActionReport().setMessage(XmlSchema.writeDeployment(xml));
             return null;
         }
     }

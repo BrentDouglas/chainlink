@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.rt.wildfly.processor;
 
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
+import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.rt.wildfly.WildFlyConstants;
 import io.machinecode.chainlink.rt.wildfly.WildFlyEnvironment;
 import io.machinecode.chainlink.rt.wildfly.service.ChainlinkService;
@@ -14,7 +15,6 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.as.txn.service.TxnServices;
-import org.jboss.dmr.ModelNode;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
@@ -31,12 +31,12 @@ public class JobOperatorProcessor implements DeploymentUnitProcessor {
 
     final boolean global;
     final String name;
-    final ModelNode model;
+    final JobOperatorSchema<?,?> schema;
 
-    public JobOperatorProcessor(final boolean global, final String name, final ModelNode model) {
+    public JobOperatorProcessor(final boolean global, final String name, final JobOperatorSchema<?,?> schema) {
         this.global = global;
         this.name = name;
-        this.model = model;
+        this.schema = schema;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class JobOperatorProcessor implements DeploymentUnitProcessor {
         final ClassLoader loader = module.getClassLoader();
         final ServiceName serviceName = deploymentUnit.getServiceName();
 
-        final JobOperatorService service = new JobOperatorService(serviceName, loader, this.name, this.global, this.model);
+        final JobOperatorService service = new JobOperatorService(serviceName, loader, this.name, this.global, this.schema);
 
         final ServiceBuilder<ExtendedJobOperator> builder = deploymentPhaseContext.getServiceTarget()
                 .addService(serviceName.append(WildFlyConstants.JOB_OPERATOR).append(this.name), service)

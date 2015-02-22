@@ -6,7 +6,7 @@ import io.machinecode.chainlink.core.Environment;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
-import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
+import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.schema.Configure;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;

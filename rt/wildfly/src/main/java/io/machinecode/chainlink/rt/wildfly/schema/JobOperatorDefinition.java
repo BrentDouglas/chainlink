@@ -55,7 +55,7 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
     protected static final Element TRANSPORT = declaration(WildFlyConstants.TRANSPORT);
     protected static final Element REGISTRY = declaration(WildFlyConstants.REGISTRY);
     protected static final Element MARSHALLING = declaration(WildFlyConstants.MARSHALLING);
-    protected static final Element EXECUTION_REPOSITORY = declaration(WildFlyConstants.EXECUTION_REPOSITORY);
+    protected static final Element EXECUTION_REPOSITORY = declaration(WildFlyConstants.REPOSITORY);
     protected static final Element TRANSACTION_MANAGER = declaration(WildFlyConstants.TRANSACTION_MANAGER);
     protected static final Element MBEAN_SERVER = declaration(WildFlyConstants.MBEAN_SERVER);
     protected static final Element JOB_LOADER = declaration(WildFlyConstants.JOB_LOADER);

@@ -63,14 +63,17 @@ public class ScopeModelImpl implements ScopeModel {
 
     @Override
     public JobOperatorModelImpl getJobOperator(final String name) {
-        JobOperatorModelImpl scope = jobOperators.get(name);
-        if (scope == null) {
+        if (name == null) {
+            throw new IllegalArgumentException(); //TODO Message
+        }
+        JobOperatorModelImpl operator = jobOperators.get(name);
+        if (operator == null) {
             if (names.contains(name)) {
                 throw new RuntimeException("operator " + name + " already declared."); //TODO Message, better exception
             }
-            jobOperators.put(name, scope = new JobOperatorModelImpl(name, this, loader));
+            jobOperators.put(name, operator = new JobOperatorModelImpl(name, this, loader));
         }
-        return scope;
+        return operator;
     }
 
     public ClassLoader getClassLoader() {

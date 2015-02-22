@@ -2,14 +2,14 @@ package io.machinecode.chainlink.rt.glassfish.command.config;
 
 import com.sun.enterprise.config.serverbeans.Config;
 import com.sun.enterprise.config.serverbeans.Domain;
-import io.machinecode.chainlink.core.configuration.xml.XmlJobOperator;
+import io.machinecode.chainlink.core.schema.xml.XmlJobOperator;
 import io.machinecode.chainlink.rt.glassfish.command.BaseCommand;
 import io.machinecode.chainlink.rt.glassfish.command.Code;
 import io.machinecode.chainlink.rt.glassfish.command.SetCommand;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishJobOperator;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishXml;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishJobOperator;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
+import io.machinecode.chainlink.core.schema.xml.XmlSchema;
+import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
@@ -47,9 +47,9 @@ public class SetSubSystemJobOperatorCommand extends SetCommand {
         if (op == null) {
             locked(subSystem, new CreateSubSystemJobOperator(that));
         } else {
-            final XmlJobOperator xml = GlassfishXml.xmlJobOperator(op);
+            final XmlJobOperator xml = XmlSchema.xmlJobOperator(op);
             BaseCommand.<JobOperatorSchema<?,?>,GlassfishJobOperator>lockedUpdate(op, that, Op.values());
-            context.getActionReport().setMessage(GlassfishXml.writeJobOperator(xml));
+            context.getActionReport().setMessage(XmlSchema.writeJobOperator(xml));
         }
     }
 

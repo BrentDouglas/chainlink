@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.schema;
 
-import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.core.util.Mutable;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

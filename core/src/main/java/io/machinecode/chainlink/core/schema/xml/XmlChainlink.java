@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.core.configuration.xml;
+package io.machinecode.chainlink.core.schema.xml;
 
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 

@@ -1,8 +1,8 @@
-package io.machinecode.chainlink.rt.glassfish.configuration;
+package io.machinecode.chainlink.rt.glassfish.schema;
 
-import io.machinecode.chainlink.core.configuration.op.Creator;
-import io.machinecode.chainlink.spi.management.Mutable;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.core.util.Creator;
+import io.machinecode.chainlink.core.util.Mutable;
+import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.DeploymentSchema;
 import io.machinecode.chainlink.core.schema.DeploymentWithNameExistsException;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;

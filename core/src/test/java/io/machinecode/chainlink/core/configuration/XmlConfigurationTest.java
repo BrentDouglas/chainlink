@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.core.configuration;
 
-import io.machinecode.chainlink.core.configuration.xml.XmlChainlink;
-import io.machinecode.chainlink.core.configuration.xml.XmlDeployment;
-import io.machinecode.chainlink.core.configuration.xml.XmlJobOperator;
-import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.core.schema.xml.XmlChainlink;
+import io.machinecode.chainlink.core.schema.xml.XmlDeployment;
+import io.machinecode.chainlink.core.schema.xml.XmlJobOperator;
+import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
+import io.machinecode.chainlink.core.util.Op;
 import org.junit.Assert;
 import org.junit.Test;
 

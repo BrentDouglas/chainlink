@@ -1,8 +1,8 @@
-package io.machinecode.chainlink.rt.glassfish.configuration;
+package io.machinecode.chainlink.rt.glassfish.schema;
 
-import io.machinecode.chainlink.core.configuration.op.Creator;
+import io.machinecode.chainlink.core.util.Creator;
 import io.machinecode.chainlink.rt.glassfish.command.BaseCommand;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.core.util.Op;
 import org.jvnet.hk2.config.ConfigBeanProxy;
 
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
-package io.machinecode.chainlink.rt.glassfish.configuration;
+package io.machinecode.chainlink.rt.glassfish.schema;
 
-import io.machinecode.chainlink.core.configuration.op.Creator;
-import io.machinecode.chainlink.spi.management.Mutable;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.core.util.Creator;
+import io.machinecode.chainlink.core.util.Mutable;
+import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.MutableJobOperatorSchema;
 import org.jvnet.hk2.config.Attribute;
@@ -10,6 +10,7 @@ import org.jvnet.hk2.config.ConfigBeanProxy;
 import org.jvnet.hk2.config.Configured;
 import org.jvnet.hk2.config.DuckTyped;
 import org.jvnet.hk2.config.Element;
+import org.jvnet.hk2.config.TransactionFailure;
 
 import java.util.List;
 
@@ -120,6 +121,9 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
     @DuckTyped
     void setProperties(final List<GlassfishProperty> properties);
 
+    @DuckTyped
+    void setProperty(final String name, final String value);
+
     class Duck implements Mutable<JobOperatorSchema<?,?>> {
 
         private final GlassfishJobOperator to;
@@ -166,6 +170,24 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
 
         public static void setProperties(final GlassfishJobOperator that, final List<GlassfishProperty> properties) {
             that.setProperty(properties);
+        }
+
+        public static void setProperty(final GlassfishJobOperator that, final String name, final String value) {
+            for (final GlassfishProperty property : that.getProperties()) {
+                if (property.getName().equals(name)) {
+                    property.setValue(value);
+                    return;
+                }
+            }
+            final GlassfishProperty property;
+            try {
+                property = that.createChild(GlassfishProperty.class);
+            } catch (final TransactionFailure e) {
+                throw new RuntimeException(e);
+            }
+            property.setName(name);
+            property.setValue(value);
+            that.getProperties().add(property);
         }
 
         @Override

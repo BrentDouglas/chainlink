@@ -1,7 +1,7 @@
-package io.machinecode.chainlink.rt.glassfish.configuration;
+package io.machinecode.chainlink.rt.glassfish.schema;
 
-import io.machinecode.chainlink.spi.management.Mutable;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.core.util.Mutable;
+import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.MutablePropertySchema;
 import io.machinecode.chainlink.core.schema.PropertySchema;
 import org.jvnet.hk2.config.Attribute;

@@ -2,13 +2,13 @@ package io.machinecode.chainlink.rt.glassfish.command.config;
 
 import com.sun.enterprise.config.serverbeans.Config;
 import com.sun.enterprise.config.serverbeans.Domain;
-import io.machinecode.chainlink.core.configuration.xml.subsystem.XmlChainlinkSubSystem;
+import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.rt.glassfish.command.BaseCommand;
 import io.machinecode.chainlink.rt.glassfish.command.Code;
 import io.machinecode.chainlink.rt.glassfish.command.SetCommand;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishXml;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
+import io.machinecode.chainlink.core.schema.xml.XmlSchema;
+import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
@@ -45,9 +45,9 @@ public class SetSubSystemCommand extends SetCommand {
         if (subSystem == null) {
             locked(config, new CreateSubSystem(that));
         } else {
-            final XmlChainlinkSubSystem xml = GlassfishXml.xmlSubSystem(subSystem);
+            final XmlChainlinkSubSystem xml = XmlSchema.xmlSubSystem(subSystem);
             BaseCommand.<SubSystemSchema<?,?,?,?>,GlassfishSubSystem>lockedUpdate(subSystem, that, Op.values());
-            context.getActionReport().setMessage(GlassfishXml.writeSubSystem(xml));
+            context.getActionReport().setMessage(XmlSchema.writeSubSystem(xml));
         }
     }
 

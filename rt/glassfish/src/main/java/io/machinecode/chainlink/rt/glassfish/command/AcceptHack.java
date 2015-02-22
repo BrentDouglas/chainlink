@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.rt.glassfish.command;
 
-import io.machinecode.chainlink.rt.glassfish.configuration.Hack;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.rt.glassfish.schema.Hack;
+import io.machinecode.chainlink.core.util.Op;
 import org.jvnet.hk2.config.ConfigBeanProxy;
 import org.jvnet.hk2.config.SingleConfigCode;
 import org.jvnet.hk2.config.TransactionFailure;

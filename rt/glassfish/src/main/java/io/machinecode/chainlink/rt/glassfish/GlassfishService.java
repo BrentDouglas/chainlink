@@ -2,7 +2,7 @@ package io.machinecode.chainlink.rt.glassfish;
 
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.PropertyLookup;
 import org.glassfish.api.StartupRunLevel;

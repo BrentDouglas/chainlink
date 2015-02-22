@@ -2,14 +2,14 @@ package io.machinecode.chainlink.rt.glassfish.command.config;
 
 import com.sun.enterprise.config.serverbeans.Config;
 import com.sun.enterprise.config.serverbeans.Domain;
-import io.machinecode.chainlink.core.configuration.xml.XmlDeployment;
+import io.machinecode.chainlink.core.schema.xml.XmlDeployment;
 import io.machinecode.chainlink.rt.glassfish.command.BaseCommand;
 import io.machinecode.chainlink.rt.glassfish.command.Code;
 import io.machinecode.chainlink.rt.glassfish.command.SetCommand;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishDeployment;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishXml;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishDeployment;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
+import io.machinecode.chainlink.core.schema.xml.XmlSchema;
+import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.DeploymentSchema;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
@@ -47,9 +47,9 @@ public class SetDeploymentCommand extends SetCommand {
         if (dep == null) {
             locked(subSystem, new CreateDeployment(that));
         } else {
-            final XmlDeployment xml = GlassfishXml.xmlDeployment(dep);
+            final XmlDeployment xml = XmlSchema.xmlDeployment(dep);
             BaseCommand.<DeploymentSchema<?,?,?>,GlassfishDeployment>lockedUpdate(dep, that, Op.values());
-            context.getActionReport().setMessage(GlassfishXml.writeDeployment(xml));
+            context.getActionReport().setMessage(XmlSchema.writeDeployment(xml));
         }
     }
 

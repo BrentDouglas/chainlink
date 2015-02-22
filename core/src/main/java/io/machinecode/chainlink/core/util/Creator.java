@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.core.configuration.op;
+package io.machinecode.chainlink.core.util;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

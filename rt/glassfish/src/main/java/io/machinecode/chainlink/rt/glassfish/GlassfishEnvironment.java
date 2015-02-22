@@ -9,8 +9,8 @@ import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
 import io.machinecode.chainlink.core.management.LazyJobOperator;
 import io.machinecode.chainlink.core.schema.Configure;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishConfiguration;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
+import io.machinecode.chainlink.core.configuration.Model;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.glassfish.internal.data.ApplicationInfo;
@@ -71,7 +71,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
             }
             final ClassLoader loader = this.model.getClassLoader();
             final SubSystemModelImpl model = new SubSystemModelImpl(loader);
-            GlassfishConfiguration.configureSubSystem(model, subSystem, loader);
+            Model.configureSubSystem(model, subSystem, loader);
             //TODO This now need to reload operators
             this.model = model;
         }
@@ -92,7 +92,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
         synchronized (lock) {
             model = this.model = new SubSystemModelImpl(loader);
         }
-        GlassfishConfiguration.configureSubSystem(model, subSystem, loader);
+        Model.configureSubSystem(model, subSystem, loader);
     }
 
     public void addApplication(final ApplicationInfo info) throws Exception {

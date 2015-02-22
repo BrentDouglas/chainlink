@@ -1,7 +1,7 @@
-package io.machinecode.chainlink.core.configuration.xml;
+package io.machinecode.chainlink.core.schema.xml;
 
-import io.machinecode.chainlink.spi.management.Mutable;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.core.util.Mutable;
+import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.DeclarationSchema;
 import io.machinecode.chainlink.core.schema.MutableDeclarationSchema;
 

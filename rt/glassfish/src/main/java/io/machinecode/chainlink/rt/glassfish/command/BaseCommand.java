@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.rt.glassfish.command;
 
 import com.sun.enterprise.config.serverbeans.Config;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishDeployment;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishJobOperator;
-import io.machinecode.chainlink.rt.glassfish.configuration.GlassfishSubSystem;
-import io.machinecode.chainlink.rt.glassfish.configuration.Hack;
-import io.machinecode.chainlink.spi.management.Op;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishDeployment;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishJobOperator;
+import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
+import io.machinecode.chainlink.rt.glassfish.schema.Hack;
+import io.machinecode.chainlink.core.util.Op;
 import org.glassfish.api.ActionReport;
 import org.glassfish.api.Param;
 import org.glassfish.api.admin.AdminCommand;

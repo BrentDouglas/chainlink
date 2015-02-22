@@ -1,6 +1,6 @@
-package io.machinecode.chainlink.core.configuration.xml;
+package io.machinecode.chainlink.core.schema.xml;
 
-import io.machinecode.chainlink.core.configuration.op.Creator;
+import io.machinecode.chainlink.core.util.Creator;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.schema;
 
-import io.machinecode.chainlink.spi.management.Mutable;
+import io.machinecode.chainlink.core.util.Mutable;
 
 import java.util.List;
 
@@ -38,4 +38,6 @@ public interface MutableJobOperatorSchema<Dec extends MutableDeclarationSchema, 
     void setExecutor(final Dec executor);
 
     void setProperties(final List<Prop> properties);
+
+    void setProperty(final String name, final String value);
 }

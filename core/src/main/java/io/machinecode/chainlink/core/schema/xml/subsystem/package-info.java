@@ -4,7 +4,7 @@
         elementFormDefault = QUALIFIED,
         attributeFormDefault = UNQUALIFIED
 )
-package io.machinecode.chainlink.core.configuration.xml.subsystem;
+package io.machinecode.chainlink.core.schema.xml.subsystem;
 
 import javax.xml.bind.annotation.XmlSchema;
 
