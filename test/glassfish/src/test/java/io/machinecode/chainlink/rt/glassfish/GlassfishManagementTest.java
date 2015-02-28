@@ -13,6 +13,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,11 +49,11 @@ public class GlassfishManagementTest extends Assert {
         return base64.encodeAsString(out.toByteArray());
     }
 
-    private static InputStream asStream(final JsonNode stream) throws IOException {
+    private static InputStream asStream(final JsonNode stream) throws IOException, JSONException {
         return new ByteArrayInputStream(asString(stream).getBytes(StandardCharsets.UTF_8));
     }
 
-    private static String asString(final JsonNode stream) throws IOException {
+    private static String asString(final JsonNode stream) throws IOException, JSONException {
         return stream.getObject().getString("message");
     }
 
