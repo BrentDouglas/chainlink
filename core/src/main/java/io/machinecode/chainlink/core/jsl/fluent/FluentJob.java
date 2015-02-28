@@ -1,10 +1,6 @@
 package io.machinecode.chainlink.core.jsl.fluent;
 
-import io.machinecode.chainlink.core.jsl.fluent.execution.FluentDecision;
 import io.machinecode.chainlink.core.jsl.fluent.execution.FluentExecution;
-import io.machinecode.chainlink.core.jsl.fluent.execution.FluentFlow;
-import io.machinecode.chainlink.core.jsl.fluent.execution.FluentSplit;
-import io.machinecode.chainlink.core.jsl.fluent.execution.FluentStep;
 import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
 import io.machinecode.chainlink.spi.loader.InheritableJobLoader;
@@ -105,26 +101,6 @@ public class FluentJob extends FluentInheritable<FluentJob> implements Inheritab
     }
 
     public FluentJob addExecution(final FluentExecution execution) {
-        this.executions.add(execution);
-        return this;
-    }
-
-    public FluentJob addStep(final FluentStep execution) {
-        this.executions.add(execution);
-        return this;
-    }
-
-    public FluentJob addFlow(final FluentFlow execution) {
-        this.executions.add(execution);
-        return this;
-    }
-
-    public FluentJob addSplit(final FluentSplit execution) {
-        this.executions.add(execution);
-        return this;
-    }
-
-    public FluentJob addDecision(final FluentDecision execution) {
         this.executions.add(execution);
         return this;
     }
