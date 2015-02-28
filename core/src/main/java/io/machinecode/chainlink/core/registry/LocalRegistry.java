@@ -152,15 +152,7 @@ public class LocalRegistry implements Registry {
     @Override
     public void registerChain(final long jobExecutionId, final ChainId id, final Chain<?> chain) {
         log.debugf("[je=%s] Registering chain with chainId=%s, chain=%s", jobExecutionId, id, chain); //TODO Message
-        LocalJobRegistry job = _getJobRegistry(jobExecutionId);
-        if (job == null) {
-            jobLock.writeLock().lock();
-            try {
-                this.jobRegistries.put(jobExecutionId, job = _createJobRegistry(jobExecutionId));
-            } finally {
-                jobLock.writeLock().unlock();
-            }
-        }
+        final LocalJobRegistry job = _getOrCreateJobRegistry(jobExecutionId);
         job.registerChain(id, chain);
     }
 
@@ -176,15 +168,7 @@ public class LocalRegistry implements Registry {
     @Override
     public void registerExecutable(final long jobExecutionId, final Executable executable) {
         final ExecutableId id = executable.getId();
-        LocalJobRegistry job = _getJobRegistry(jobExecutionId);
-        if (job == null) {
-            jobLock.writeLock().lock();
-            try {
-                this.jobRegistries.put(jobExecutionId, job = _createJobRegistry(jobExecutionId));
-            } finally {
-                jobLock.writeLock().unlock();
-            }
-        }
+        final LocalJobRegistry job = _getOrCreateJobRegistry(jobExecutionId);
         job.registerExecutable(id, executable);
     }
 
@@ -247,6 +231,19 @@ public class LocalRegistry implements Registry {
         } finally {
             jobLock.readLock().unlock();
         }
+    }
+
+    private LocalJobRegistry _getOrCreateJobRegistry(final long jobExecutionId) {
+        LocalJobRegistry job = _getJobRegistry(jobExecutionId);
+        if (job == null) {
+            jobLock.writeLock().lock();
+            try {
+                this.jobRegistries.put(jobExecutionId, job = _createJobRegistry(jobExecutionId));
+            } finally {
+                jobLock.writeLock().unlock();
+            }
+        }
+        return job;
     }
 
     public static Chain<?> assertChain(final Chain<?> chain, final long jobExecutionId, final ChainId id) {
