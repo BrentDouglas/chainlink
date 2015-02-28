@@ -12,10 +12,13 @@ import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
 import org.infinispan.transaction.LockingMode;
 import org.infinispan.transaction.TransactionMode;
 import org.infinispan.transaction.lookup.TransactionManagerLookup;
 import org.infinispan.util.concurrent.IsolationLevel;
+import org.jgroups.JChannel;
+import org.jgroups.util.Util;
 import org.junit.After;
 
 import javax.transaction.TransactionManager;
@@ -40,8 +43,11 @@ public class InfinispanRepositoryTest extends RepositoryTest {
                         cacheManager = new DefaultCacheManager(
                                 new GlobalConfigurationBuilder()
                                         .clusteredDefault()
+                                        .transport()
+                                        .clusterName("chainlink-test-repository-cluster")
+                                        .transport(new JGroupsTransport(new JChannel(Util.getTestStack())))
                                         .globalJmxStatistics()
-                                        .jmxDomain("io.machinecode.chainlink.test")
+                                        .jmxDomain("io.machinecode.chainlink.infinispan.test.repository")
                                         .allowDuplicateDomains(true)
                                         .build(),
                                 new ConfigurationBuilder()

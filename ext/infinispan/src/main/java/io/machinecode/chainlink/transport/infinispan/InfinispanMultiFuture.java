@@ -31,8 +31,9 @@ public class InfinispanMultiFuture<T,U> implements NotifyingNotifiableFuture<T> 
     }
 
     @Override
-    public void notifyDone(final T ret) {
+    public void notifyDone() {
         try {
+            final T ret = io.get();
             if (ret == null || !(ret instanceof Map)) {
                 deferred.reject(new IllegalStateException()); //TODO Message
                 return;
@@ -60,12 +61,7 @@ public class InfinispanMultiFuture<T,U> implements NotifyingNotifiableFuture<T> 
     }
 
     @Override
-    public void notifyException(final Throwable throwable) {
-        deferred.reject(throwable);
-    }
-
-    @Override
-    public void setFuture(final Future<T> future) {
+    public void setNetworkFuture(final Future<T> future) {
         this.io = future;
     }
 

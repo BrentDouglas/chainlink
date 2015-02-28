@@ -36,10 +36,10 @@ public class TestInfinispanTransportFactory implements TestTransportFactory {
                 new GlobalConfigurationBuilder()
                         .clusteredDefault()
                         .transport()
-                        .clusterName("chainlink-test-cluster")
+                        .clusterName("chainlink-test-transport-cluster")
                         .transport(new JGroupsTransport(channel = new JChannel(Util.getTestStack())))
                         .globalJmxStatistics()
-                        .jmxDomain("io.machinecode.chainlink.test")
+                        .jmxDomain("io.machinecode.chainlink.infinispan.test.transport")
                         .allowDuplicateDomains(true)
                         .build(),
                 new ConfigurationBuilder()
