@@ -36,7 +36,7 @@ public class TestCoherenceTransportFactory implements TestTransportFactory {
             );
         } finally {
             ct.setContextClassLoader(tccl);
-            System.setProperty("tangosol.coherence.cacheconfig", null);
+            System.clearProperty("tangosol.coherence.cacheconfig");
         }
     }
 

@@ -8,7 +8,6 @@ import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
 import org.junit.After;
-import org.junit.Ignore;
 
 import java.util.Properties;
 
@@ -16,7 +15,6 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-@Ignore // TODO This is broken
 public class CoherenceRepositoryTest extends RepositoryTest {
 
     @Override

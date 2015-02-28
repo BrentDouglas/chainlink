@@ -1,8 +1,7 @@
 # Things that need adding/fixing
 
-- Make JGroups transport work
+- Make JGroups, Coherence and Infinispan transport work
 - Add a Shoal transport for Glassfish
-- The Coherence repo and transport are broken
 - All the //TODO Messages refs need an actual message made for them in
   the Messages bundle.
 - Add a JobLoader than uses ServiceLoader to pick up job's declared in

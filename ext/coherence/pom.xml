@@ -39,11 +39,9 @@
 
     <build>
         <testResources>
-            <!--
             <testResource>
                 <directory>${project.basedir}/src/test/resources</directory>
             </testResource>
-            -->
             <testResource>
                 <directory>${root.dir}/tck/core/src/test/resources</directory>
                 <includes>

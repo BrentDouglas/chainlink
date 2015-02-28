@@ -3,14 +3,10 @@ package io.machinecode.chainlink.repository.coherence;
 import com.tangosol.util.InvocableMap;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Set;
-
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
-public class RunningJobExecutionIdProcessor implements InvocableMap.EntryProcessor, Serializable {
+public class RunningJobExecutionIdProcessor extends BaseProcessor {
     private static final long serialVersionUID = 1L;
 
     final String jobName;
@@ -28,11 +24,6 @@ public class RunningJobExecutionIdProcessor implements InvocableMap.EntryProcess
                     return jobExecution.getExecutionId();
             }
         }
-        return null;
-    }
-
-    @Override
-    public Map processAll(final Set set) {
         return null;
     }
 }

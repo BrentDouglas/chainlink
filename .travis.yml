@@ -19,13 +19,16 @@ env:
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c se"
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c se"
     - BUILD_ARGS="-I -t local      -i spring -r memory     -c se"
-    - BUILD_ARGS="-I -t infinispan -i batch  -r memory     -c se"
+    #- BUILD_ARGS="-I -t coherence  -i batch  -r memory     -c se"
+    #- BUILD_ARGS="-I -t infinispan -i batch  -r memory     -c se"
+    #- BUILD_ARGS="-I -t jgroups    -i batch  -r memory     -c se"
     - BUILD_ARGS="-I -t gridgain   -i batch  -r memory     -c se"
     - BUILD_ARGS="-I -t hazelcast  -i batch  -r memory     -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r gridgain   -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r hazelcast  -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r ehcache    -c se"
+    - BUILD_ARGS="-I -t local      -i batch  -r coherence  -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se -d postgresql"
@@ -40,8 +43,7 @@ env:
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee"
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c wildfly"
-    # Need to wait until there is a distribution using 7.0.2.Final
-    # - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c wildfly"
+    - BUILD_ARGS="-I -t local      -i batch  -r infinispan -c wildfly"
 
 services:
   - mongodb
