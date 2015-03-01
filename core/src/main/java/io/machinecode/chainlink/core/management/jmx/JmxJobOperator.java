@@ -26,7 +26,6 @@ import javax.management.MBeanException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.OpenDataException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -176,7 +175,7 @@ public class JmxJobOperator implements ExtendedJobOperator {
     public List<StepExecution> getStepExecutions(final long jobExecutionId) throws NoSuchJobExecutionException, JobSecurityException {
         try {
             return JmxUtils.readStepExecutions(client.getStepExecutions(jobExecutionId), configuration.getMarshalling(), configuration.getClassLoader());
-        } catch (final ClassNotFoundException | IOException | OpenDataException | MBeanException | ReflectionException | InstanceNotFoundException e) {
+        } catch (final Exception e) {
             throw new BatchRuntimeException(e);
         }
     }

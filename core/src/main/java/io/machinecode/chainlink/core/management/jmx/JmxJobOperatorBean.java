@@ -134,7 +134,7 @@ public class JmxJobOperatorBean implements JmxJobOperatorBeanMBean, AutoCloseabl
     }
 
     @Override
-    public TabularData getStepExecutions(final long jobExecutionId) throws OpenDataException, IOException {
+    public TabularData getStepExecutions(final long jobExecutionId) throws Exception {
         final List<StepExecution> stepExecutions = operator.getStepExecutions(jobExecutionId);
         final TabularData data = new TabularDataSupport(JmxUtils.LIST_STEP_EXECUTION);
         for (final StepExecution stepExecution : stepExecutions) {

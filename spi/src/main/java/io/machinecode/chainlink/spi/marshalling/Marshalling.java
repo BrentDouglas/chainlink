@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.spi.marshalling;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -17,28 +16,27 @@ public interface Marshalling {
      * @param that The value to copy.
      * @param <T> The value type.
      * @return A value that is {@link #equals(Object)} to the parameter but not is not the same object.
-     * @throws ClassNotFoundException
-     * @throws IOException
+     * @throws Exception
      */
-    <T> T clone(final T that) throws ClassNotFoundException, IOException;
+    <T> T clone(final T that) throws Exception;
 
     /**
      * <p>Write the value to a byte array.</p>
      *
      * @param that The value to write.
      * @return The serialized data.
-     * @throws IOException
+     * @throws Exception
      */
-    byte[] marshall(final Serializable that) throws IOException;
+    byte[] marshallLong(final long that) throws Exception;
 
     /**
-     * <p>Write each value to a byte array.</p>
+     * <p>Write the value to a byte array.</p>
      *
-     * @param that The values to write.
-     * @return The serialized data of each value.
-     * @throws IOException
+     * @param that The value to write.
+     * @return The serialized data.
+     * @throws Exception
      */
-    byte[] marshall(final Serializable... that) throws IOException;
+    byte[] marshall(final Serializable that) throws Exception;
 
     /**
      * <p>Read an object from a byte array.</p>
@@ -47,9 +45,20 @@ public interface Marshalling {
      * @param loader The classloader to load classes from.
      * @return The deserialized object.
      * @throws ClassNotFoundException If the object is of a type that is not available to the provided classloader.
-     * @throws IOException
+     * @throws Exception
      */
-    Serializable unmarshall(final byte[] that, final ClassLoader loader) throws ClassNotFoundException, IOException;
+    Serializable unmarshall(final byte[] that, final ClassLoader loader) throws Exception;
+
+    /**
+     * <p>Read a long from a byte array.</p>
+     *
+     * @param that The bytes to read from.
+     * @param loader The classloader to load classes from.
+     * @return The deserialized long.
+     * @throws ClassNotFoundException If the object is of a type that is not available to the provided classloader.
+     * @throws Exception
+     */
+    long unmarshallLong(final byte[] that, final ClassLoader loader) throws Exception;
 
     /**
      * <p>Read a typed object from a byte array.</p>
@@ -60,7 +69,7 @@ public interface Marshalling {
      * @param <T> The object type.
      * @return The deserialized object.
      * @throws ClassNotFoundException If the object is of a type that is not available to the provided classloader.
-     * @throws IOException
+     * @throws Exception
      */
-    <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz, final ClassLoader loader) throws ClassNotFoundException, IOException;
+    <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz, final ClassLoader loader) throws Exception;
 }

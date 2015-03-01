@@ -36,7 +36,6 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -350,7 +349,7 @@ public class MemoryRepository implements Repository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
+    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Date timestamp) throws Exception {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         stepExecutionLock.writeLock().lock();
         try {
@@ -370,7 +369,7 @@ public class MemoryRepository implements Repository {
     }
 
     @Override
-    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
+    public void updateStepExecution(final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
         final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
@@ -434,7 +433,7 @@ public class MemoryRepository implements Repository {
     }
 
     @Override
-    public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
+    public void updatePartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
         final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
@@ -458,7 +457,7 @@ public class MemoryRepository implements Repository {
     }
 
     @Override
-    public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws NoSuchJobExecutionException, JobSecurityException, ClassNotFoundException, IOException {
+    public void finishPartitionExecution(final long partitionExecutionId, final Metric[] metrics, final Serializable persistentUserData, final BatchStatus batchStatus, final String exitStatus, final Date timestamp) throws Exception {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         partitionExecutionLock.writeLock().lock();
         try {

@@ -24,7 +24,6 @@ import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -141,7 +140,7 @@ public class JmxUtils {
         return list;
     }
 
-    static List<StepExecution> readStepExecutions(final TabularData data, final Marshalling marshalling, final ClassLoader loader) throws OpenDataException, IOException, ClassNotFoundException {
+    static List<StepExecution> readStepExecutions(final TabularData data, final Marshalling marshalling, final ClassLoader loader) throws Exception {
         if (data == null) {
             return Collections.emptyList();
         }
@@ -184,7 +183,7 @@ public class JmxUtils {
                 .build();
     }
 
-    static ExtendedStepExecution readExtendedStepExecution(final CompositeData data, final Marshalling marshalling, final ClassLoader loader) throws OpenDataException, IOException, ClassNotFoundException {
+    static ExtendedStepExecution readExtendedStepExecution(final CompositeData data, final Marshalling marshalling, final ClassLoader loader) throws Exception {
         if (data == null) {
             return null;
         }
@@ -271,7 +270,7 @@ public class JmxUtils {
         });
     }
 
-    static CompositeDataSupport writeStepExecution(final StepExecution stepExecution, final Marshalling marshalling) throws OpenDataException, IOException {
+    static CompositeDataSupport writeStepExecution(final StepExecution stepExecution, final Marshalling marshalling) throws Exception {
         if (stepExecution instanceof ExtendedStepExecution) {
             return writeExtendedStepExecution((ExtendedStepExecution) stepExecution, marshalling);
         }
@@ -295,7 +294,7 @@ public class JmxUtils {
         return new CompositeDataSupport(STEP_EXECUTION, STEP_EXECUTION_ATTRIBUTES, values);
     }
 
-    static CompositeDataSupport writeExtendedStepExecution(final ExtendedStepExecution stepExecution, final Marshalling marshalling) throws OpenDataException, IOException {
+    static CompositeDataSupport writeExtendedStepExecution(final ExtendedStepExecution stepExecution, final Marshalling marshalling) throws Exception {
         final Object[] values = new Object[]{
                 stepExecution.getJobExecutionId(),
                 stepExecution.getStepExecutionId(),

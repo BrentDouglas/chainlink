@@ -31,6 +31,18 @@ public class JbossMarshalling implements Marshalling {
     }
 
     @Override
+    public byte[] marshallLong(final long that) throws IOException {
+        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        final org.jboss.marshalling.Marshaller marshaller = marshallerFactory.createMarshaller(marshallingConfiguration);
+        marshaller.start(new OutputStreamByteOutput(stream));
+        marshaller.writeLong(that);
+        marshaller.finish();
+        marshaller.flush();
+        marshaller.close();
+        return stream.toByteArray();
+    }
+
+    @Override
     public byte[] marshall(final Serializable that) throws IOException {
         if (that == null) {
             return null;
@@ -46,28 +58,25 @@ public class JbossMarshalling implements Marshalling {
     }
 
     @Override
-    public byte[] marshall(final Serializable... that) throws IOException {
-        if (that == null) {
-            return null;
-        }
-        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        final org.jboss.marshalling.Marshaller marshaller = marshallerFactory.createMarshaller(marshallingConfiguration);
-        marshaller.start(new OutputStreamByteOutput(stream));
-        for (final Serializable value : that) {
-            marshaller.writeObject(value);
-        }
-        marshaller.finish();
-        marshaller.flush();
-        marshaller.close();
-        return stream.toByteArray();
-    }
-
-    @Override
     public Serializable unmarshall(final byte[] that, final ClassLoader loader) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
         return unmarshall(that, Serializable.class, loader);
+    }
+
+    @Override
+    public long unmarshallLong(final byte[] that, final ClassLoader loader) throws ClassNotFoundException, IOException {
+        if (that == null) {
+            throw new IllegalArgumentException(); //TODO Message
+        }
+        //TODO Read out of loader
+        final org.jboss.marshalling.Unmarshaller unmarshaller = marshallerFactory.createUnmarshaller(marshallingConfiguration);
+        unmarshaller.start(new ByteBufferInput(ByteBuffer.wrap(that)));
+        final long ret = unmarshaller.readLong();
+        unmarshaller.finish();
+        unmarshaller.close();
+        return ret;
     }
 
     @Override

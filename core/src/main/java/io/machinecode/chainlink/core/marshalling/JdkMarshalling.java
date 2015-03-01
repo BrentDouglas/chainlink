@@ -27,41 +27,24 @@ import java.util.HashMap;
 public class JdkMarshalling implements Marshalling {
 
     @Override
-    public byte[] marshall(final Serializable that) throws IOException {
-        if (that == null) {
-            return null;
-        }
+    public byte[] marshallLong(final long that) throws IOException {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ObjectOutputStream marshaller = null;
-        try {
-            marshaller = new ObjectOutputStream(stream);
-            marshaller.writeObject(that);
+        try (final ObjectOutputStream marshaller = new ObjectOutputStream(stream)) {
+            marshaller.writeLong(that);
             marshaller.flush();
-        } finally {
-            if (marshaller != null) {
-                marshaller.close();
-            }
         }
         return stream.toByteArray();
     }
 
     @Override
-    public byte[] marshall(final Serializable... that) throws IOException {
+    public byte[] marshall(final Serializable that) throws IOException {
         if (that == null) {
             return null;
         }
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ObjectOutputStream marshaller = null;
-        try {
-            marshaller = new ObjectOutputStream(stream);
-            for (final Serializable value : that) {
-                marshaller.writeObject(value);
-            }
+        try (final ObjectOutputStream marshaller = new ObjectOutputStream(stream)) {
+            marshaller.writeObject(that);
             marshaller.flush();
-        } finally {
-            if (marshaller != null) {
-                marshaller.close();
-            }
         }
         return stream.toByteArray();
     }
@@ -75,55 +58,75 @@ public class JdkMarshalling implements Marshalling {
     }
 
     @Override
+    public long unmarshallLong(final byte[] that, final ClassLoader loader) throws ClassNotFoundException, IOException {
+        if (that == null) {
+            throw new IllegalArgumentException(); //TODO Message
+        }
+        try (final ObjectInputStream unmarshaller = new ClassLoaderObjectInputStream(loader, new ByteArrayInputStream(that))) {
+            return unmarshaller.readLong();
+        }
+    }
+
+    @Override
     public <T extends Serializable> T unmarshall(final byte[] that, final Class<T> clazz, final ClassLoader loader) throws ClassNotFoundException, IOException {
         if (that == null) {
             return null;
         }
-        ObjectInputStream unmarshaller = null;
-        try {
-            unmarshaller = new ClassLoaderObjectInputStream(loader, new ByteArrayInputStream(that));
+        try (final ObjectInputStream unmarshaller = new ClassLoaderObjectInputStream(loader, new ByteArrayInputStream(that))) {
             final Object ret = unmarshaller.readObject();
             return clazz.cast(ret);
-        } finally {
-            if (unmarshaller != null) {
-                unmarshaller.close();
-            }
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T clone(final T that) throws ClassNotFoundException, IOException {
+    public <T> T clone(final T that) throws Exception {
         if (that == null) {
             return null;
         }
         if (that instanceof Serializable) {
             return (T) unmarshall(marshall((Serializable)that), that.getClass().getClassLoader());
         } else if (that instanceof Cloneable) {
-            final Method clone = AccessController.doPrivileged(new GetCloneMethod());
-            try {
-                return (T)clone.invoke(that);
-            } catch (final IllegalAccessException e) {
-                throw new InvalidClassException("Can't access #clone() on " + that.getClass().getName());
-            } catch (final InvocationTargetException e) {
-                throw new InvalidObjectException("Failed calling #clone() on " + that);
+            final InvokeCloneMethod<T> invoke = new InvokeCloneMethod<>(that);
+            final T clone = AccessController.doPrivileged(invoke);
+            if (invoke.exception != null) {
+                throw invoke.exception;
             }
+            return clone;
         }
         throw new IllegalStateException(); //TODO Message
     }
 
-    private static class GetCloneMethod implements PrivilegedAction<Method> {
+    private static class InvokeCloneMethod<T> implements PrivilegedAction<T> {
+        final T that;
+        Exception exception;
+
+        private InvokeCloneMethod(final T that) {
+            this.that = that;
+        }
+
         @Override
-        public Method run() {
+        public T run() {
             final Method method;
             try {
                 method = Object.class.getDeclaredMethod("clone");
             } catch (final NoSuchMethodException e) {
-                throw new IllegalStateException(e);
+                exception = new IllegalStateException(e);
+                return null;
             }
-            //TODO Relook at this
-            method.setAccessible(true);
-            return method;
+            final boolean accessible = method.isAccessible();
+            try {
+                method.setAccessible(true);
+                return (T)method.invoke(that);
+            } catch (final IllegalAccessException e) {
+                exception = new InvalidClassException("Can't access #clone() on " + that.getClass().getName());
+                return null;
+            } catch (final InvocationTargetException e) {
+                exception = new InvalidObjectException("Failed calling #clone() on " + that);
+                return null;
+            } finally {
+                method.setAccessible(accessible);
+            }
         }
     }
 
@@ -160,22 +163,25 @@ public class JdkMarshalling implements Marshalling {
                 } while (name.startsWith("[", pos));
 
                 final int len = name.length() - pos;
-                if (len == 0) {
-                    throw new ClassNotFoundException("Malformed class name: " + desc.getName());
-                }
-                switch (name.charAt(0)) {
-                    case 'B': return byte.class;
-                    case 'C': return char.class;
-                    case 'D': return double.class;
-                    case 'F': return float.class;
-                    case 'I': return int.class;
-                    case 'J': return long.class;
-                    case 'S': return short.class;
-                    case 'Z': return boolean.class;
-                    default:
-                        if (len < 3) {
-                            throw new ClassNotFoundException("Malformed class name: " + desc.getName());
+                switch (len) {
+                    case 0:
+                        throw new ClassNotFoundException("Malformed class name: " + desc.getName());
+                    case 1:
+                        switch (name.charAt(pos)) {
+                            case 'B': return byte[].class;
+                            case 'C': return char[].class;
+                            case 'D': return double[].class;
+                            case 'F': return float[].class;
+                            case 'I': return int[].class;
+                            case 'J': return long[].class;
+                            case 'S': return short[].class;
+                            case 'Z': return boolean[].class;
+                            default:
+                                throw new ClassNotFoundException("Malformed class name: " + desc.getName());
                         }
+                    case 2:
+                        throw new ClassNotFoundException("Malformed class name: " + desc.getName());
+                    default:
                         final Class<?> clazz = loader.loadClass(name.substring(pos + 1, name.length()-1));
                         if (pos == 1) {
                             return Array.newInstance(clazz, pos).getClass();
