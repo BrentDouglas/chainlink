@@ -15,4 +15,8 @@ public class FailBatchlet extends javax.batch.api.AbstractBatchlet {
         hasRun.set(true);
         throw new FailProcessException();
     }
+
+    public static void reset() {
+        hasRun.set(false);
+    }
 }

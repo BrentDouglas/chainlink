@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.execution.chunk.artifact.processor;
 
-import io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent;
+import io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent;
 import io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderAccumulator;
 import io.machinecode.chainlink.core.execution.chunk.artifact.exception.FailProcessException;
 
@@ -16,7 +16,7 @@ public class OnceFailEventOrderProcessor implements ItemProcessor {
 
     @Override
     public Object processItem(final Object item) throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.PROCESS);
+        EventOrderAccumulator._order.add(OrderEvent.PROCESS);
         if (count == 1) {
             ++count;
             throw new FailProcessException();

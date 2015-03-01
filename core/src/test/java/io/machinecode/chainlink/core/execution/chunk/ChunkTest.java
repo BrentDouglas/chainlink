@@ -3,36 +3,36 @@ package io.machinecode.chainlink.core.execution.chunk;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.jsl.Job;
-import io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent;
+import io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent;
 import io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderAccumulator;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.batch.runtime.BatchStatus;
 
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_CHUNK;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_JOB;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_PROCESS;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_READ;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_STEP;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_WRITE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_CHUNK;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_JOB;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_PROCESS;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_READ;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_STEP;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_WRITE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEGIN_TRANSACTION;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.COMMIT_TRANSACTION;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.PROCESS;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.READ;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.READER_CHECKPOINT;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.READER_CLOSE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.READER_OPEN;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.WRITE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.WRITER_CHECKPOINT;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.WRITER_CLOSE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.WRITER_OPEN;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_CHUNK;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_JOB;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_PROCESS;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_READ;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_STEP;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_WRITE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_CHUNK;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_JOB;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_PROCESS;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_READ;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_STEP;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_WRITE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEGIN_TRANSACTION;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.COMMIT_TRANSACTION;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.PROCESS;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.READ;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.READER_CHECKPOINT;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.READER_CLOSE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.READER_OPEN;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.WRITE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.WRITER_CHECKPOINT;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.WRITER_CLOSE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.WRITER_OPEN;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -57,7 +57,7 @@ public class ChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-item", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -97,7 +97,7 @@ public class ChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "one-item", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -141,7 +141,7 @@ public class ChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "one-item-one-count", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -190,7 +190,7 @@ public class ChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -244,7 +244,7 @@ public class ChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items-two-count", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -318,7 +318,7 @@ public class ChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items-four-count", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -379,7 +379,7 @@ public class ChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "six-items-six-count", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,

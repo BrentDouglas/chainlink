@@ -5,6 +5,7 @@ import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.chainlink.spi.then.OnLink;
 import org.jboss.logging.Logger;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -77,7 +78,7 @@ public class ChainImpl<T> extends BaseChain<T> {
     }
 
     @Override
-    public void awaitLink() throws InterruptedException, ExecutionException {
+    public void awaitLink() throws InterruptedException, ExecutionException, CancellationException {
         synchronized (_linkLock) {
             while (this.link == null) {
                 _linkLock.wait();
@@ -85,13 +86,15 @@ public class ChainImpl<T> extends BaseChain<T> {
         }
         try {
             this.link.get();
+        } catch (final ExecutionException | CancellationException e) {
+            throw e;
         } catch (final Exception e) {
-            log.warn("", e); //TODO Message
+            throw new ExecutionException(e);
         }
     }
 
     @Override
-    public void awaitLink(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
+    public void awaitLink(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException, CancellationException {
         final long end = System.currentTimeMillis() + unit.toMillis(timeout);
         synchronized (_linkLock) {
             while (this.link == null) {
@@ -100,8 +103,10 @@ public class ChainImpl<T> extends BaseChain<T> {
         }
         try {
             this.link.get(_tryTimeout(end), MILLISECONDS);
+        } catch (final ExecutionException | CancellationException e) {
+            throw e;
         } catch (final Exception e) {
-            log.warn("", e); //TODO Message
+            throw new ExecutionException(e);
         }
     }
 

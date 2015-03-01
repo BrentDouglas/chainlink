@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.execution.chunk.artifact.writer;
 
-import io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent;
+import io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent;
 import io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderAccumulator;
 
 import javax.batch.api.chunk.ItemWriter;
@@ -15,22 +15,22 @@ public class EventOrderWriter implements ItemWriter {
 
     @Override
     public void open(final Serializable checkpoint) throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.WRITER_OPEN);
+        EventOrderAccumulator._order.add(OrderEvent.WRITER_OPEN);
     }
 
     @Override
     public void close() throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.WRITER_CLOSE);
+        EventOrderAccumulator._order.add(OrderEvent.WRITER_CLOSE);
     }
 
     @Override
     public void writeItems(final List<Object> items) throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.WRITE);
+        EventOrderAccumulator._order.add(OrderEvent.WRITE);
     }
 
     @Override
     public Serializable checkpointInfo() throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.WRITER_CHECKPOINT);
+        EventOrderAccumulator._order.add(OrderEvent.WRITER_CHECKPOINT);
         return null;
     }
 }

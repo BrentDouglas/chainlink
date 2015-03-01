@@ -41,4 +41,8 @@
     <ref id="failWriteEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailWriteEventOrderWriter"/>
     <ref id="onceFailCheckpointEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.OnceFailCheckpointEventOrderWriter"/>
     <ref id="onceFailWriteEventOrderWriter" class="io.machinecode.chainlink.core.execution.chunk.artifact.writer.OnceFailWriteEventOrderWriter"/>
+
+    <ref id="failBeforeJobListener" class="io.machinecode.chainlink.core.execution.listener.artifact.FailBeforeJobListener"/>
+    <ref id="failAfterJobListener" class="io.machinecode.chainlink.core.execution.listener.artifact.FailAfterJobListener"/>
+    <ref id="countListener" class="io.machinecode.chainlink.core.execution.listener.artifact.CountListener"/>
 </batch-artifacts>

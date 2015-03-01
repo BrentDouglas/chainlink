@@ -7,9 +7,9 @@ import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
-import javax.batch.operations.JobSecurityException;
-import javax.batch.operations.NoSuchJobExecutionException;
+import javax.batch.operations.BatchRuntimeException;
 import javax.batch.runtime.JobExecution;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -60,10 +60,10 @@ public class JobOperationImpl implements JobOperation {
             final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId);
             log.tracef(Messages.get("CHAINLINK-033000.operation.get"), jobExecutionId, execution);
             return execution;
-        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
+        } catch (final BatchRuntimeException e) {
             throw e;
-        } catch (Exception e) {
-            throw new ExecutionException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -76,10 +76,59 @@ public class JobOperationImpl implements JobOperation {
             final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId);
             log.tracef(Messages.get("CHAINLINK-033000.operation.get"), jobExecutionId, execution);
             return execution;
-        } catch (final NoSuchJobExecutionException | JobSecurityException e) {
+        } catch (final BatchRuntimeException e) {
             throw e;
-        } catch (Exception e) {
-            throw new ExecutionException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return The {@link JobExecution} once the job has terminated.
+     * @throws BatchRuntimeException On an error fetching the {@link JobExecution} for the job.
+     */
+    public JobExecution safeGet() throws InterruptedException {
+        if (promise != null) {
+            try {
+                promise.get();
+            } catch (final ExecutionException | CancellationException e) {
+                //
+            }
+        }
+        try {
+            final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId);
+            log.tracef(Messages.get("CHAINLINK-033000.operation.get"), jobExecutionId, execution);
+            return execution;
+        } catch (final BatchRuntimeException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
+        }
+    }
+
+    /**
+     * Similar to {@link #get(long, java.util.concurrent.TimeUnit)} but guaranteed not to throw a
+     * {@link java.util.concurrent.CancellationException} or a {@link java.util.concurrent.ExecutionException}.
+     * @return The {@link JobExecution} once the job has terminated.
+     * @throws BatchRuntimeException On an error fetching the {@link JobExecution} for the job.
+     */
+    public JobExecution safeGet(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
+        if (promise != null) {
+            try {
+                promise.get(timeout, unit);
+            } catch (final ExecutionException | CancellationException e) {
+                //
+            }
+        }
+        try {
+            final ExtendedJobExecution execution = repository.getJobExecution(jobExecutionId);
+            log.tracef(Messages.get("CHAINLINK-033000.operation.get"), jobExecutionId, execution);
+            return execution;
+        } catch (final BatchRuntimeException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 }

@@ -21,19 +21,19 @@ public class EventOrderTransactionManager extends LocalTransactionManager {
 
     @Override
     public void begin() throws NotSupportedException, SystemException {
-        EventOrderAccumulator._order.add(ChunkEvent.BEGIN_TRANSACTION);
+        EventOrderAccumulator._order.add(OrderEvent.BEGIN_TRANSACTION);
         super.begin();
     }
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
-        EventOrderAccumulator._order.add(ChunkEvent.COMMIT_TRANSACTION);
+        EventOrderAccumulator._order.add(OrderEvent.COMMIT_TRANSACTION);
         super.commit();
     }
 
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
-        EventOrderAccumulator._order.add(ChunkEvent.ROLLBACK_TRANSACTION);
+        EventOrderAccumulator._order.add(OrderEvent.ROLLBACK_TRANSACTION);
         super.rollback();
     }
 }

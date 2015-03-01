@@ -1,6 +1,4 @@
-package io.machinecode.chainlink.core.execution.chunk.artifact.listener;
-
-import io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent;
+package io.machinecode.chainlink.core.execution.listener.artifact;
 
 import javax.batch.api.chunk.listener.ChunkListener;
 import javax.batch.api.chunk.listener.ItemProcessListener;
@@ -15,124 +13,133 @@ import javax.batch.api.chunk.listener.SkipWriteListener;
 import javax.batch.api.listener.JobListener;
 import javax.batch.api.listener.StepListener;
 import java.util.List;
-
-import static io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderAccumulator._order;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class EventOrderListener implements JobListener, StepListener, ChunkListener, ItemReadListener, ItemWriteListener,
+public class CountListener implements JobListener, StepListener, ChunkListener, ItemReadListener, ItemWriteListener,
                                            ItemProcessListener , RetryReadListener, RetryWriteListener, RetryProcessListener,
                                            SkipReadListener, SkipWriteListener, SkipProcessListener {
 
+    public static final AtomicInteger count = new AtomicInteger(0);
+
+    public static void reset() {
+        count.set(0);
+    }
+
+    public static int get() {
+        return count.get();
+    }
+
     @Override
     public void beforeChunk() throws Exception {
-        _order.add(OrderEvent.BEFORE_CHUNK);
+        count.incrementAndGet();
     }
 
     @Override
     public void onError(final Exception exception) throws Exception {
-        _order.add(OrderEvent.ON_CHUNK_ERROR);
+        count.incrementAndGet();
     }
 
     @Override
     public void afterChunk() throws Exception {
-        _order.add(OrderEvent.AFTER_CHUNK);
+        count.incrementAndGet();
     }
 
     @Override
     public void beforeStep() throws Exception {
-        _order.add(OrderEvent.BEFORE_STEP);
+        count.incrementAndGet();
     }
 
     @Override
     public void afterStep() throws Exception {
-        _order.add(OrderEvent.AFTER_STEP);
+        count.incrementAndGet();
     }
 
     @Override
     public void beforeJob() throws Exception {
-        _order.add(OrderEvent.BEFORE_JOB);
+        count.incrementAndGet();
     }
 
     @Override
     public void afterJob() throws Exception {
-        _order.add(OrderEvent.AFTER_JOB);
+        count.incrementAndGet();
     }
 
     @Override
     public void beforeProcess(final Object item) throws Exception {
-        _order.add(OrderEvent.BEFORE_PROCESS);
+        count.incrementAndGet();
     }
 
     @Override
     public void afterProcess(final Object item, final Object result) throws Exception {
-        _order.add(OrderEvent.AFTER_PROCESS);
+        count.incrementAndGet();
     }
 
     @Override
     public void onProcessError(final Object item, final Exception exception) throws Exception {
-        _order.add(OrderEvent.ON_PROCESS_ERROR);
+        count.incrementAndGet();
     }
 
     @Override
     public void beforeRead() throws Exception {
-        _order.add(OrderEvent.BEFORE_READ);
+        count.incrementAndGet();
     }
 
     @Override
     public void afterRead(final Object item) throws Exception {
-        _order.add(OrderEvent.AFTER_READ);
+        count.incrementAndGet();
     }
 
     @Override
     public void onReadError(final Exception exception) throws Exception {
-        _order.add(OrderEvent.ON_READ_ERROR);
+        count.incrementAndGet();
     }
 
     @Override
     public void beforeWrite(final List<Object> items) throws Exception {
-        _order.add(OrderEvent.BEFORE_WRITE);
+        count.incrementAndGet();
     }
 
     @Override
     public void afterWrite(final List<Object> items) throws Exception {
-        _order.add(OrderEvent.AFTER_WRITE);
+        count.incrementAndGet();
     }
 
     @Override
     public void onWriteError(final List<Object> items, final Exception exception) throws Exception {
-        _order.add(OrderEvent.ON_WRITE_ERROR);
+        count.incrementAndGet();
     }
 
     @Override
     public void onRetryProcessException(final Object item, final Exception exception) throws Exception {
-        _order.add(OrderEvent.RETRY_PROCESS_EXCEPTION);
+        count.incrementAndGet();
     }
 
     @Override
     public void onRetryReadException(final Exception exception) throws Exception {
-        _order.add(OrderEvent.RETRY_READ_EXCEPTION);
+        count.incrementAndGet();
     }
 
     @Override
     public void onRetryWriteException(final List<Object> items, final Exception exception) throws Exception {
-        _order.add(OrderEvent.RETRY_WRITE_EXCEPTION);
+        count.incrementAndGet();
     }
 
     @Override
     public void onSkipProcessItem(final Object item, final Exception exception) throws Exception {
-        _order.add(OrderEvent.SKIP_PROCESS);
+        count.incrementAndGet();
     }
 
     @Override
     public void onSkipReadItem(final Exception exception) throws Exception {
-        _order.add(OrderEvent.SKIP_READ);
+        count.incrementAndGet();
     }
 
     @Override
     public void onSkipWriteItem(final List<Object> items, final Exception exception) throws Exception {
-        _order.add(OrderEvent.SKIP_WRITE);
+        count.incrementAndGet();
     }
 }

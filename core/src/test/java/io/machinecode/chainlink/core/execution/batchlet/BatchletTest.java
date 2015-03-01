@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import javax.batch.runtime.BatchStatus;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 import static javax.batch.runtime.BatchStatus.COMPLETED;
 import static javax.batch.runtime.BatchStatus.FAILED;
@@ -98,7 +99,12 @@ public class BatchletTest extends OperatorTest {
                                 )
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-job", PARAMETERS);
-        operation.get();
+        try {
+            operation.get();
+            fail();
+        } catch (final ExecutionException e){
+            //
+        }
         Assert.assertTrue("FailBatchlet hasn't run yet", FailBatchlet.hasRun.get());
         assertStepFinishedWith(operation, FAILED);
         assertJobFinishedWith(operation, FAILED);

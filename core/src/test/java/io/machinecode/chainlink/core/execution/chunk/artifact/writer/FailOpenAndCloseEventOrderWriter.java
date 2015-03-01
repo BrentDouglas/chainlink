@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.execution.chunk.artifact.writer;
 
-import io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent;
+import io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent;
 import io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderAccumulator;
 import io.machinecode.chainlink.core.execution.chunk.artifact.exception.FailWriteCloseException;
 import io.machinecode.chainlink.core.execution.chunk.artifact.exception.FailWriteOpenException;
@@ -18,13 +18,13 @@ public class FailOpenAndCloseEventOrderWriter implements ItemWriter {
 
     @Override
     public void open(final Serializable checkpoint) throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.WRITER_OPEN);
+        EventOrderAccumulator._order.add(OrderEvent.WRITER_OPEN);
         throw new FailWriteOpenException();
     }
 
     @Override
     public void close() throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.WRITER_CLOSE);
+        EventOrderAccumulator._order.add(OrderEvent.WRITER_CLOSE);
         throw new FailWriteCloseException();
     }
 

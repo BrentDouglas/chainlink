@@ -7,6 +7,7 @@ import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
 import java.util.Collection;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -80,25 +81,77 @@ public class AllChain<T> extends BaseChain<T> {
     }
 
     @Override
-    public void awaitLink() throws InterruptedException, ExecutionException {
+    public void awaitLink() throws InterruptedException, ExecutionException, CancellationException {
+        CancellationException ce = null;
+        ExecutionException ee = null;
         for (final Chain<?> chain : link) {
             try {
                 chain.get();
+            } catch (final ExecutionException e) {
+                if (ee == null) {
+                    ee = e;
+                } else {
+                    ee.addSuppressed(e);
+                }
+            } catch (final CancellationException e) {
+                if (ce == null) {
+                    ce = e;
+                } else {
+                    ce.addSuppressed(e);
+                }
             } catch (final Exception e) {
-                log.warn("", e); //TODO Message
+                if (ee == null) {
+                    ee = new ExecutionException(e);
+                } else {
+                    ee.addSuppressed(e);
+                }
             }
+        }
+        if (ee != null) {
+            if (ce != null) {
+                ee.addSuppressed(ce);
+            }
+            throw ee;
+        } else if (ce != null) {
+            throw ce;
         }
     }
 
     @Override
     public void awaitLink(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException, ExecutionException {
         final long end = System.currentTimeMillis() + unit.toMillis(timeout);
+        CancellationException ce = null;
+        ExecutionException ee = null;
         for (final Chain<?> chain : link) {
             try {
                 chain.get(_tryTimeout(end), MILLISECONDS);
+            } catch (final ExecutionException e) {
+                if (ee == null) {
+                    ee = e;
+                } else {
+                    ee.addSuppressed(e);
+                }
+            } catch (final CancellationException e) {
+                if (ce == null) {
+                    ce = e;
+                } else {
+                    ce.addSuppressed(e);
+                }
             } catch (final Exception e) {
-                log.warn("", e); //TODO Message
+                if (ee == null) {
+                    ee = new ExecutionException(e);
+                } else {
+                    ee.addSuppressed(e);
+                }
             }
+        }
+        if (ee != null) {
+            if (ce != null) {
+                ee.addSuppressed(ce);
+            }
+            throw ee;
+        } else if (ce != null) {
+            throw ce;
         }
     }
 

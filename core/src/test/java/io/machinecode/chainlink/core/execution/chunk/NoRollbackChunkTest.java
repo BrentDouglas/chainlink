@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.execution.chunk;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.jsl.Job;
-import io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent;
+import io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent;
 import io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderAccumulator;
 import io.machinecode.chainlink.core.execution.chunk.artifact.exception.FailProcessException;
 import io.machinecode.chainlink.core.execution.chunk.artifact.exception.FailReadCheckpointException;
@@ -15,37 +15,39 @@ import org.junit.Test;
 
 import javax.batch.runtime.BatchStatus;
 
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_CHUNK;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_JOB;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_PROCESS;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_READ;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_STEP;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.AFTER_WRITE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_CHUNK;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_JOB;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_PROCESS;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_READ;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_STEP;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEFORE_WRITE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.BEGIN_TRANSACTION;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.COMMIT_TRANSACTION;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.ON_CHUNK_ERROR;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.ON_PROCESS_ERROR;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.ON_READ_ERROR;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.ON_WRITE_ERROR;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.PROCESS;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.READ;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.READER_CHECKPOINT;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.READER_CLOSE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.READER_OPEN;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.RETRY_PROCESS_EXCEPTION;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.RETRY_READ_EXCEPTION;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.RETRY_WRITE_EXCEPTION;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.ROLLBACK_TRANSACTION;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.WRITE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.WRITER_CHECKPOINT;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.WRITER_CLOSE;
-import static io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent.WRITER_OPEN;
+import java.util.concurrent.ExecutionException;
+
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_CHUNK;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_JOB;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_PROCESS;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_READ;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_STEP;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.AFTER_WRITE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_CHUNK;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_JOB;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_PROCESS;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_READ;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_STEP;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEFORE_WRITE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.BEGIN_TRANSACTION;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.COMMIT_TRANSACTION;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.ON_CHUNK_ERROR;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.ON_PROCESS_ERROR;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.ON_READ_ERROR;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.ON_WRITE_ERROR;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.PROCESS;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.READ;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.READER_CHECKPOINT;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.READER_CLOSE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.READER_OPEN;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.RETRY_PROCESS_EXCEPTION;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.RETRY_READ_EXCEPTION;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.RETRY_WRITE_EXCEPTION;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.ROLLBACK_TRANSACTION;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.WRITE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.WRITER_CHECKPOINT;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.WRITER_CLOSE;
+import static io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent.WRITER_OPEN;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -76,8 +78,13 @@ public class NoRollbackChunkTest extends EventOrderTest {
                                 ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-supertype", PARAMETERS);
-        operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        try {
+            operation.get();
+            fail();
+        } catch (final ExecutionException e){
+            //
+        }
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -124,8 +131,13 @@ public class NoRollbackChunkTest extends EventOrderTest {
                                 ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-limit-read-item", PARAMETERS);
-        operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        try {
+            operation.get();
+            fail();
+        } catch (final ExecutionException e){
+            //
+        }
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -174,7 +186,7 @@ public class NoRollbackChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-once-read-item", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -225,7 +237,7 @@ public class NoRollbackChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-once-read-checkpoint", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -291,8 +303,13 @@ public class NoRollbackChunkTest extends EventOrderTest {
                                 ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-limit-read-checkpoint", PARAMETERS);
-        operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        try {
+            operation.get();
+            fail();
+        } catch (final ExecutionException e){
+            //
+        }
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -341,8 +358,13 @@ public class NoRollbackChunkTest extends EventOrderTest {
                                 ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-limit-process-item", PARAMETERS);
-        operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        try {
+            operation.get();
+            fail();
+        } catch (final ExecutionException e){
+            //
+        }
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -392,7 +414,7 @@ public class NoRollbackChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-once-process-item", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -453,8 +475,13 @@ public class NoRollbackChunkTest extends EventOrderTest {
                                 ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-limit-write-item", PARAMETERS);
-        operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        try {
+            operation.get();
+            fail();
+        } catch (final ExecutionException e){
+            //
+        }
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -513,7 +540,7 @@ public class NoRollbackChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-once-write-item", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -594,7 +621,7 @@ public class NoRollbackChunkTest extends EventOrderTest {
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-once-write-checkpoint", PARAMETERS);
         operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,
@@ -675,8 +702,13 @@ public class NoRollbackChunkTest extends EventOrderTest {
                                 ).addListener(Jsl.listener("eventOrderListener"))
                 );
         final JobOperationImpl operation = operator.startJob(job, "no-rollback-limit-write-checkpoint", PARAMETERS);
-        operation.get();
-        Assert.assertArrayEquals(new ChunkEvent[]{
+        try {
+            operation.get();
+            fail();
+        } catch (final ExecutionException e){
+            //
+        }
+        Assert.assertArrayEquals(new OrderEvent[]{
                 BEFORE_JOB,
                 BEFORE_STEP,
                 BEGIN_TRANSACTION,

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,7 +58,12 @@ public class JmxClientTest extends OperatorTest {
             this.restart = ro.getJobExecutionId();
             fo.get();
             so.get();
-            ro.get();
+            try {
+                ro.get();
+                fail();
+            } catch (final ExecutionException e){
+                //
+            }
         }
     }
 
@@ -188,7 +194,7 @@ public class JmxClientTest extends OperatorTest {
     @Test
     public void testAbandon() throws Exception {
         final long abandon = operator.startJob("abandon", PARAMETERS)
-                .get(10, TimeUnit.SECONDS)
+                .safeGet(10, TimeUnit.SECONDS)
                 .getExecutionId();
         client.abandon(abandon);
         assertEquals(BatchStatus.ABANDONED, operator.getJobExecution(abandon).getBatchStatus());

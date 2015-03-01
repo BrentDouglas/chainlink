@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.execution.chunk.artifact.reader;
 
-import io.machinecode.chainlink.core.execution.chunk.artifact.ChunkEvent;
+import io.machinecode.chainlink.core.execution.chunk.artifact.OrderEvent;
 import io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderAccumulator;
 import io.machinecode.chainlink.core.execution.chunk.artifact.exception.FailReadCloseException;
 
@@ -17,18 +17,18 @@ public class FailCloseEventOrderReader implements ItemReader {
 
     @Override
     public void open(final Serializable checkpoint) throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.READER_OPEN);
+        EventOrderAccumulator._order.add(OrderEvent.READER_OPEN);
     }
 
     @Override
     public void close() throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.READER_CLOSE);
+        EventOrderAccumulator._order.add(OrderEvent.READER_CLOSE);
         throw new FailReadCloseException();
     }
 
     @Override
     public Object readItem() throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.READ);
+        EventOrderAccumulator._order.add(OrderEvent.READ);
         if (count == 1) {
             return null;
         } else {
@@ -39,7 +39,7 @@ public class FailCloseEventOrderReader implements ItemReader {
 
     @Override
     public Serializable checkpointInfo() throws Exception {
-        EventOrderAccumulator._order.add(ChunkEvent.READER_CHECKPOINT);
+        EventOrderAccumulator._order.add(OrderEvent.READER_CHECKPOINT);
         return null;
     }
 }

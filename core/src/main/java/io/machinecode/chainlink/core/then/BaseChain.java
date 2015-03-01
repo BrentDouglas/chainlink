@@ -10,6 +10,7 @@ import io.machinecode.then.core.DeferredImpl;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -133,7 +134,16 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
         if (Thread.interrupted()) {
             throw new InterruptedException(getInterruptedExceptionMessage());
         }
-        awaitLink();
+        try {
+            awaitLink();
+        } catch (final CancellationException | ExecutionException e) {
+            try {
+                super.get();
+            } catch (final Exception n) {
+                e.addSuppressed(n);
+            }
+            throw e;
+        }
         return super.get();
     }
 
@@ -143,7 +153,16 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
             throw new InterruptedException(getInterruptedExceptionMessage());
         }
         final long end = System.currentTimeMillis() + unit.toMillis(timeout);
-        awaitLink(_tryTimeout(end), MILLISECONDS);
+        try {
+            awaitLink(_tryTimeout(end), MILLISECONDS);
+        } catch (final CancellationException | ExecutionException e) {
+            try {
+                super.get(_tryTimeout(end), MILLISECONDS);
+            } catch (final Exception n) {
+                e.addSuppressed(n);
+            }
+            throw e;
+        }
         return super.get(_tryTimeout(end), MILLISECONDS);
     }
 

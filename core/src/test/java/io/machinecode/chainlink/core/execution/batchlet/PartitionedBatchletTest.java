@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import javax.batch.runtime.BatchStatus;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -84,7 +85,12 @@ public class PartitionedBatchletTest extends OperatorTest {
                                 )
                 );
         final JobOperationImpl operation = operator.startJob(job, "fail-job", PARAMETERS);
-        operation.get();
+        try {
+            operation.get();
+            fail();
+        } catch (final ExecutionException e){
+            //
+        }
         Assert.assertTrue("FailBatchlet hasn't run yet", FailBatchlet.hasRun.get());
         assertJobFinishedWith(operation, BatchStatus.FAILED);
     }

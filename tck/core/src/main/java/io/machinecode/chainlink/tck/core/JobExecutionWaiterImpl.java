@@ -9,6 +9,7 @@ import javax.batch.operations.JobExecutionNotRunningException;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.JobExecution;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -35,6 +36,8 @@ public class JobExecutionWaiterImpl implements JobExecutionWaiter {
         } catch (final JobExecutionNotRunningException e) {
             return operator.getJobExecution(executionId);
         } catch (final CancellationException e) {
+            return operator.getJobExecution(executionId);
+        } catch (final ExecutionException e) {
             return operator.getJobExecution(executionId);
         } catch (final TimeoutException e) {
             throw new JobExecutionTimeoutException(e);
