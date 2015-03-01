@@ -39,9 +39,9 @@ public class Executions {
         @Override
         public ExecutionImpl transform(final Execution that, final JobPropertyContext context) {
             if (that instanceof Flow) {
-                return FlowFactory.INSTANCE.produceExecution((Flow) that,  context);
+                return FlowFactory.produceExecution((Flow) that,  context);
             } else if (that instanceof Split) {
-                return SplitFactory.INSTANCE.produceExecution((Split) that, context);
+                return SplitFactory.produceExecution((Split) that, context);
             } else if (that instanceof Step) {
                 final Task task = ((Step) that).getTask();
                 final Partition partition = ((Step) that).getPartition();
@@ -49,19 +49,19 @@ public class Executions {
                 //There is no real reason for these selections on null values
                 if (task == null || task instanceof Batchlet) {
                     if (strategy == null || strategy instanceof Mapper) {
-                        return BatchletMapperStepFactory.INSTANCE.produceExecution((Step<Batchlet, Mapper>) that,  context);
+                        return BatchletMapperStepFactory.produceExecution((Step<Batchlet, Mapper>) that,  context);
                     } else if (strategy instanceof Plan) {
-                        return BatchletPlanStepFactory.INSTANCE.produceExecution((Step<Batchlet, Plan>) that, context);
+                        return BatchletPlanStepFactory.produceExecution((Step<Batchlet, Plan>) that, context);
                     }
                 } else if (task instanceof Chunk) {
                     if (strategy == null || strategy instanceof Mapper) {
-                        return ChunkMapperStepFactory.INSTANCE.produceExecution((Step<Chunk, Mapper>) that,  context);
+                        return ChunkMapperStepFactory.produceExecution((Step<Chunk, Mapper>) that,  context);
                     } else if (strategy instanceof Plan) {
-                        return ChunkPlanStepFactory.INSTANCE.produceExecution((Step<Chunk, Plan>) that, context);
+                        return ChunkPlanStepFactory.produceExecution((Step<Chunk, Plan>) that, context);
                     }
                 }
             } else if (that instanceof Decision) {
-                return DecisionFactory.INSTANCE.produceExecution((Decision) that, context);
+                return DecisionFactory.produceExecution((Decision) that, context);
             }
             return null;
         }
@@ -72,9 +72,9 @@ public class Executions {
         @Override
         public ExecutionImpl transform(final ExecutionImpl that, final PropertyContext context) {
             if (that instanceof FlowImpl) {
-                return FlowFactory.INSTANCE.producePartitioned((FlowImpl) that, context);
+                return FlowFactory.producePartitioned((FlowImpl) that, context);
             } else if (that instanceof SplitImpl) {
-                return SplitFactory.INSTANCE.producePartitioned((SplitImpl) that, context);
+                return SplitFactory.producePartitioned((SplitImpl) that, context);
             } else if (that instanceof StepImpl) {
                 final Task task = ((StepImpl) that).getTask();
                 final Partition partition = ((StepImpl) that).getPartition();
@@ -82,19 +82,19 @@ public class Executions {
                 //There is no real reason for these selections on null values
                 if (task == null || task instanceof Batchlet) {
                     if (strategy == null || strategy instanceof Mapper) {
-                        return BatchletMapperStepFactory.INSTANCE.producePartitioned((StepImpl<BatchletImpl, MapperImpl>) that, context);
+                        return BatchletMapperStepFactory.producePartitioned((StepImpl<BatchletImpl, MapperImpl>) that, context);
                     } else if (strategy instanceof Plan) {
-                        return BatchletPlanStepFactory.INSTANCE.producePartitioned((StepImpl<BatchletImpl, PlanImpl>) that, context);
+                        return BatchletPlanStepFactory.producePartitioned((StepImpl<BatchletImpl, PlanImpl>) that, context);
                     }
                 } else if (task instanceof Chunk) {
                     if (strategy == null || strategy instanceof Mapper) {
-                        return ChunkMapperStepFactory.INSTANCE.producePartitioned((StepImpl<ChunkImpl, MapperImpl>) that, context);
+                        return ChunkMapperStepFactory.producePartitioned((StepImpl<ChunkImpl, MapperImpl>) that, context);
                     } else if (strategy instanceof Plan) {
-                        return ChunkPlanStepFactory.INSTANCE.producePartitioned((StepImpl<ChunkImpl, PlanImpl>) that, context);
+                        return ChunkPlanStepFactory.producePartitioned((StepImpl<ChunkImpl, PlanImpl>) that, context);
                     }
                 }
             } else if (that instanceof DecisionImpl) {
-                return DecisionFactory.INSTANCE.producePartitioned((DecisionImpl) that, context);
+                return DecisionFactory.producePartitioned((DecisionImpl) that, context);
             }
             return null;
         }

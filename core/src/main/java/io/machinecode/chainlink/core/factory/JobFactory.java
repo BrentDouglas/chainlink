@@ -21,13 +21,11 @@ import java.util.Properties;
  */
 public class JobFactory {
 
-    public static final JobFactory INSTANCE = new JobFactory();
-
     public static JobImpl produce(final Job that, final Properties parameters) throws InvalidJobException {
-        return INSTANCE.produceExecution(that, parameters);
+        return produceExecution(that, parameters);
     }
 
-    private JobImpl produceExecution(final Job that, final Properties parameters) throws InvalidJobException {
+    private static JobImpl produceExecution(final Job that, final Properties parameters) throws InvalidJobException {
         final VisitorNode before = JobValidator.INSTANCE.visit(that);
         if (JobValidator.hasFailed(before)) {
             throw new InvalidJobException(before);
@@ -37,8 +35,8 @@ public class JobFactory {
         final String id = Expression.resolveExecutionProperty(that.getId(), context);
         final String version = Expression.resolveExecutionProperty(that.getVersion(), context);
         final String restartable = Expression.resolveExecutionProperty(that.getRestartable(), context);
-        final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
-        final ListenersImpl listeners = JobListenersFactory.INSTANCE.produceExecution(that.getListeners(), context);
+        final PropertiesImpl properties = PropertiesFactory.produceExecution(that.getProperties(), context);
+        final ListenersImpl listeners = JobListenersFactory.produceExecution(that.getListeners(), context);
         final List<ExecutionImpl> executions = Executions.immutableCopyExecutionsDescriptor(that.getExecutions(), context);
         return new JobImpl(
                 id,

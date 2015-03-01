@@ -128,7 +128,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
 
     @Override
     public TaskWork partition(final PropertyContext context) {
-        return BatchletFactory.INSTANCE.producePartitioned(this, null, this.partition, context);
+        return BatchletFactory.producePartitioned(this, this.partition, context);
     }
 
     @Override

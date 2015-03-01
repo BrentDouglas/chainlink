@@ -181,7 +181,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
 
     @Override
     public TaskWork partition(final PropertyContext context) {
-        return ChunkFactory.INSTANCE.producePartitioned(this, this.listeners, this.partition, context);
+        return ChunkFactory.producePartitioned(this, this.listeners, this.partition, context);
     }
 
     @Override

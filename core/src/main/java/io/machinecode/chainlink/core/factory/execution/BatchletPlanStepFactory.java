@@ -3,7 +3,6 @@ package io.machinecode.chainlink.core.factory.execution;
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
 import io.machinecode.chainlink.core.expression.PropertyContext;
-import io.machinecode.chainlink.core.factory.ElementFactory;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.factory.StepListenersFactory;
 import io.machinecode.chainlink.core.factory.partition.PlanPartitionFactory;
@@ -26,21 +25,18 @@ import java.util.List;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class BatchletPlanStepFactory implements ElementFactory<Step<? extends Batchlet, ? extends Plan>, StepImpl<BatchletImpl, PlanImpl>> {
+public class BatchletPlanStepFactory {
 
-    public static final BatchletPlanStepFactory INSTANCE = new BatchletPlanStepFactory();
-
-    @Override
-    public StepImpl<BatchletImpl, PlanImpl> produceExecution(final Step<? extends Batchlet, ? extends Plan> that, final JobPropertyContext context) {
+    public static StepImpl<BatchletImpl, PlanImpl> produceExecution(final Step<? extends Batchlet, ? extends Plan> that, final JobPropertyContext context) {
         final String id = Expression.resolveExecutionProperty(that.getId(), context);
         final String next = Expression.resolveExecutionProperty(that.getNext(), context);
         final String startLimit = Expression.resolveExecutionProperty(that.getStartLimit(), context);
         final String allowStartIfComplete = Expression.resolveExecutionProperty(that.getAllowStartIfComplete(), context);
-        final PropertiesImpl properties = PropertiesFactory.INSTANCE.produceExecution(that.getProperties(), context);
-        final ListenersImpl listeners = StepListenersFactory.INSTANCE.produceExecution(that.getListeners(), context);
+        final PropertiesImpl properties = PropertiesFactory.produceExecution(that.getProperties(), context);
+        final ListenersImpl listeners = StepListenersFactory.produceExecution(that.getListeners(), context);
         final List<TransitionImpl> transitions = Transitions.immutableCopyTransitionsDescriptor(that.getTransitions(), context);
-        final PartitionImpl<PlanImpl> partition = that.getPartition() == null ? null : PlanPartitionFactory.INSTANCE.produceExecution(that.getPartition(), context);
-        final BatchletImpl task = that.getTask() == null ? null : BatchletFactory.INSTANCE.produceExecution(that.getTask(), listeners, partition, context);
+        final PartitionImpl<PlanImpl> partition = that.getPartition() == null ? null : PlanPartitionFactory.produceExecution(that.getPartition(), context);
+        final BatchletImpl task = that.getTask() == null ? null : BatchletFactory.produceExecution(that.getTask(), partition, context);
         return new StepImpl<BatchletImpl, PlanImpl>(
                 id,
                 next,
@@ -54,17 +50,16 @@ public class BatchletPlanStepFactory implements ElementFactory<Step<? extends Ba
         );
     }
 
-    @Override
-    public StepImpl<BatchletImpl, PlanImpl> producePartitioned(final StepImpl<BatchletImpl, PlanImpl> that, final PropertyContext context) {
+    public static StepImpl<BatchletImpl, PlanImpl> producePartitioned(final StepImpl<BatchletImpl, PlanImpl> that, final PropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String next = Expression.resolvePartitionProperty(that.getNext(), context);
         final String startLimit = Expression.resolvePartitionProperty(that.getStartLimit(), context);
         final String allowStartIfComplete = Expression.resolvePartitionProperty(that.getAllowStartIfComplete(), context);
-        final PropertiesImpl properties = PropertiesFactory.INSTANCE.producePartitioned(that.getProperties(), context);
-        final ListenersImpl listeners = StepListenersFactory.INSTANCE.producePartitioned(that.getListeners(), context);
+        final PropertiesImpl properties = PropertiesFactory.producePartitioned(that.getProperties(), context);
+        final ListenersImpl listeners = StepListenersFactory.producePartitioned(that.getListeners(), context);
         final List<TransitionImpl> transitions = Transitions.immutableCopyTransitionsPartition(that.getTransitions(), context);
-        final PartitionImpl<PlanImpl> partition = that.getPartition() == null ? null : PlanPartitionFactory.INSTANCE.producePartitioned(that.getPartition(), context);
-        final BatchletImpl task = that.getTask() == null ? null : BatchletFactory.INSTANCE.producePartitioned(that.getTask(), listeners, partition, context);
+        final PartitionImpl<PlanImpl> partition = that.getPartition() == null ? null : PlanPartitionFactory.producePartitioned(that.getPartition(), context);
+        final BatchletImpl task = that.getTask() == null ? null : BatchletFactory.producePartitioned(that.getTask(), partition, context);
         return new StepImpl<BatchletImpl, PlanImpl>(
                 id,
                 next,

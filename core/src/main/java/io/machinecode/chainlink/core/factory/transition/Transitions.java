@@ -27,13 +27,13 @@ public class Transitions {
         @Override
         public TransitionImpl transform(final Transition that, final JobPropertyContext context) {
             if (that instanceof End) {
-                return EndFactory.INSTANCE.produceExecution((End) that, context);
+                return EndFactory.produceExecution((End) that, context);
             } else if (that instanceof Fail) {
-                return FailFactory.INSTANCE.produceExecution((Fail) that, context);
+                return FailFactory.produceExecution((Fail) that, context);
             } else if (that instanceof Next) {
-                return NextFactory.INSTANCE.produceExecution((Next) that, context);
+                return NextFactory.produceExecution((Next) that, context);
             } else if (that instanceof Stop) {
-                return StopFactory.INSTANCE.produceExecution((Stop) that, context);
+                return StopFactory.produceExecution((Stop) that, context);
             }
             return null;
         }
@@ -43,13 +43,13 @@ public class Transitions {
         @Override
         public TransitionImpl transform(final TransitionImpl that, final PropertyContext context) {
             if (that instanceof EndImpl) {
-                return EndFactory.INSTANCE.producePartitioned((EndImpl) that, context);
+                return EndFactory.producePartitioned((EndImpl) that, context);
             } else if (that instanceof FailImpl) {
-                return FailFactory.INSTANCE.producePartitioned((FailImpl) that, context);
+                return FailFactory.producePartitioned((FailImpl) that, context);
             } else if (that instanceof NextImpl) {
-                return NextFactory.INSTANCE.producePartitioned((NextImpl) that, context);
+                return NextFactory.producePartitioned((NextImpl) that, context);
             } else if (that instanceof StopImpl) {
-                return StopFactory.INSTANCE.producePartitioned((StopImpl) that, context);
+                return StopFactory.producePartitioned((StopImpl) that, context);
             }
             return null;
         }
