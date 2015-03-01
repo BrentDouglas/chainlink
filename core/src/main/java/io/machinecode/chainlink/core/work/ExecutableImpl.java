@@ -43,11 +43,6 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
     }
 
     @Override
-    public ExecutableId getParentId() {
-        return parentId;
-    }
-
-    @Override
     public ExecutionContext getContext() {
         return context;
     }
@@ -55,11 +50,6 @@ public abstract class ExecutableImpl<T> implements Executable, Serializable {
     @Override
     public WorkerId getWorkerId() {
         return workerId;
-    }
-
-    @Override
-    public RepositoryId getRepositoryId() {
-        return repositoryId;
     }
 
     @Override

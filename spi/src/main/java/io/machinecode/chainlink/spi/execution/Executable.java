@@ -3,7 +3,6 @@ package io.machinecode.chainlink.spi.execution;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.then.Chain;
 
 /**
@@ -20,21 +19,10 @@ public interface Executable {
     ExecutableId getId();
 
     /**
-     * @return The id of the {@link Executable} that spawned this executable.
-     */
-    ExecutableId getParentId();
-
-    /**
      * @return The id of the {@link Worker} that this executable needs to run
      *         or {@code null} if it can be run by any worker.
      */
     WorkerId getWorkerId();
-
-    /**
-     * @return The id of the {@link io.machinecode.chainlink.spi.repository.Repository} that update
-     *         will be sent to.
-     */
-    RepositoryId getRepositoryId();
 
     /**
      * @return

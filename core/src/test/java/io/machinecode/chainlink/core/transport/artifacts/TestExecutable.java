@@ -4,7 +4,6 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
-import io.machinecode.chainlink.spi.registry.RepositoryId;
 import io.machinecode.chainlink.spi.execution.WorkerId;
 import io.machinecode.chainlink.spi.then.Chain;
 
@@ -29,18 +28,8 @@ public class TestExecutable implements Executable {
     }
 
     @Override
-    public ExecutableId getParentId() {
-        return null;
-    }
-
-    @Override
     public WorkerId getWorkerId() {
         return workerId;
-    }
-
-    @Override
-    public RepositoryId getRepositoryId() {
-        return null;
     }
 
     @Override

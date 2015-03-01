@@ -48,38 +48,37 @@ public class JobCallback extends ExecutableImpl<JobImpl> {
             log.errorf(e, Messages.format("CHAINLINK-023003.work.job.after.exception", context));
             jobContext.setBatchStatus(BatchStatus.FAILED);
             throwable = e;
-        } finally {
-            final BatchStatus batchStatus = jobContext.getBatchStatus();
-            if (BatchStatus.FAILED.equals(batchStatus)) {
-                Repo.failedJob(
-                        Repo.getRepository(configuration, this.repositoryId),
-                        context.getJobExecutionId(),
-                        jobContext.getExitStatus()
-                );
-            } else if (BatchStatus.STOPPING.equals(batchStatus)) {
-                Repo.finishJob(
-                        Repo.getRepository(configuration, this.repositoryId),
-                        context.getJobExecutionId(),
-                        BatchStatus.STOPPED,
-                        jobContext.getExitStatus(),
-                        context.getRestartElementId()
-                );
-            } else {
-                Repo.completedJob(
-                        Repo.getRepository(configuration, this.repositoryId),
-                        context.getJobExecutionId(),
-                        jobContext.getExitStatus()
-                );
-            }
-            final Promise<?,?,?> promise = configuration.getRegistry().unregisterJob(context.getJobExecutionId());
-            if (throwable == null) {
-                chain.linkAndResolve(null, new ResolvedChain<Void>(null));
-            } else {
-                chain.linkAndReject(throwable, new ResolvedChain<Void>(null));
-            }
-            final Transport transport = configuration.getTransport();
-            promise.get(transport.getTimeout(), transport.getTimeUnit());
         }
+        final BatchStatus batchStatus = jobContext.getBatchStatus();
+        if (BatchStatus.FAILED.equals(batchStatus)) {
+            Repo.failedJob(
+                    Repo.getRepository(configuration, this.repositoryId),
+                    context.getJobExecutionId(),
+                    jobContext.getExitStatus()
+            );
+        } else if (BatchStatus.STOPPING.equals(batchStatus)) {
+            Repo.finishJob(
+                    Repo.getRepository(configuration, this.repositoryId),
+                    context.getJobExecutionId(),
+                    BatchStatus.STOPPED,
+                    jobContext.getExitStatus(),
+                    context.getRestartElementId()
+            );
+        } else {
+            Repo.completedJob(
+                    Repo.getRepository(configuration, this.repositoryId),
+                    context.getJobExecutionId(),
+                    jobContext.getExitStatus()
+            );
+        }
+        final Promise<?,?,?> promise = configuration.getRegistry().unregisterJob(context.getJobExecutionId());
+        if (throwable == null) {
+            chain.linkAndResolve(null, new ResolvedChain<Void>(null));
+        } else {
+            chain.linkAndReject(throwable, new ResolvedChain<Void>(null));
+        }
+        final Transport transport = configuration.getTransport();
+        promise.get(transport.getTimeout(), transport.getTimeUnit());
     }
 
     @Override
