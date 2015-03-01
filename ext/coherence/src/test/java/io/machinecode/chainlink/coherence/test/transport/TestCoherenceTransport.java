@@ -81,7 +81,6 @@ public class TestCoherenceTransport implements Transport {
 
     @Override
     public Repository getRepository(final RepositoryId id) throws Exception {
-
         final Thread ct = Thread.currentThread();
         final ClassLoader tccl = ct.getContextClassLoader();
         ct.setContextClassLoader(loader);

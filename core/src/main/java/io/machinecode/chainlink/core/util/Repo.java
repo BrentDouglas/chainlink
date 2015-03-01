@@ -21,6 +21,10 @@ public class Repo {
     private static final Logger log = Logger.getLogger(Repo.class);
 
     public static Repository getRepository(final Configuration configuration, final RepositoryId id) throws Exception {
+        final Repository ours = configuration.getRegistry().getRepository(id);
+        if (ours != null) {
+            return ours;
+        }
         return configuration.getTransport().getRepository(id);
     }
 

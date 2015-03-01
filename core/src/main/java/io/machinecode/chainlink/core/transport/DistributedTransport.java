@@ -181,10 +181,6 @@ public abstract class DistributedTransport<A> implements Transport {
 
     @Override
     public Repository getRepository(final RepositoryId id) throws Exception {
-        final Repository ours = configuration.getRegistry().getRepository(id);
-        if (ours != null) {
-            return ours;
-        }
         return new DistributedProxyRepository(this, id);
     }
 

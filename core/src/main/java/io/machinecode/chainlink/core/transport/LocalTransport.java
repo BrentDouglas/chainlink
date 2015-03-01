@@ -114,6 +114,7 @@ public class LocalTransport implements Transport {
 
     @Override
     public Repository getRepository(final RepositoryId id) throws Exception {
+        // This should never be called.
         return configuration.getRegistry().getRepository(id);
     }
 
