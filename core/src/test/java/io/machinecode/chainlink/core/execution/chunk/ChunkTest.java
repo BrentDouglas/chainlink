@@ -77,7 +77,7 @@ public class ChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class ChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
     }
 
     @Test
@@ -170,7 +170,7 @@ public class ChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
     }
 
     @Test
@@ -223,7 +223,7 @@ public class ChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
     }
 
     @Test
@@ -297,7 +297,7 @@ public class ChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
     }
 
     @Test
@@ -358,7 +358,7 @@ public class ChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
     }
 
     @Test
@@ -418,6 +418,6 @@ public class ChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
     }
 }

@@ -6,6 +6,9 @@
     <ref id="stopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet"/>
     <ref id="failBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet"/>
     <ref id="injectedBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet"/>
+    <ref id="overrideBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.OverrideBatchlet"/>
+    <ref id="failStopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet"/>
+    <ref id="failProcessBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet"/>
 
     <ref id="eventOrderListener" class="io.machinecode.chainlink.core.execution.chunk.artifact.listener.EventOrderListener"/>
     <ref id="expectFailReadOpenExceptionEventOrderListener" class="io.machinecode.chainlink.core.execution.chunk.artifact.listener.ExpectFailReadOpenExceptionEventOrderListener"/>

@@ -30,4 +30,7 @@
     <component name="stopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet" />
     <component name="failBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet" />
     <component name="injectedBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet" />
+    <component name="overrideBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.OverrideBatchlet"/>
+    <component name="failStopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet"/>
+    <component name="failProcessBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet"/>
 </components>

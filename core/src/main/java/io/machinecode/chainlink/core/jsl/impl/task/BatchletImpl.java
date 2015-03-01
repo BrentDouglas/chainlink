@@ -140,9 +140,8 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             throw new BatchRuntimeException(Messages.format("CHAINLINK-013000.batchlet.stop.exception", context, getRef()), e);
         }
         final StepContextImpl stepContext = context.getStepContext();
-        if (stepContext != null) {
-            stepContext.setBatchStatus(BatchStatus.STOPPING);
-        }
+        assert stepContext != null; //TODO Message
+        stepContext.setBatchStatus(BatchStatus.STOPPING);
     }
 
     public String process(final Configuration configuration, final ExecutionContext context) throws Exception {
@@ -166,28 +165,4 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
             provider.setInjectables(null);
         }
     }
-
-    /*
-    private class Delegate extends ChainImpl<ExecutionContext> {
-        @Override
-        protected String getResolveLogMessage() {
-            return Messages.format("CHAINLINK-013200.batchlet.resolve", BatchletImpl.this._context, BatchletImpl.this.getRef());
-        }
-
-        @Override
-        protected String getRejectLogMessage() {
-            return Messages.format("CHAINLINK-013201.batchlet.reject", BatchletImpl.this._context, BatchletImpl.this.getRef());
-        }
-
-        @Override
-        protected String getCancelLogMessage() {
-            return Messages.format("CHAINLINK-013202.batchlet.cancel", BatchletImpl.this._context, BatchletImpl.this.getRef());
-        }
-
-        @Override
-        protected String getTimeoutExceptionMessage() {
-            return Messages.format("CHAINLINK-013001.batchlet.timeout", BatchletImpl.this._context, BatchletImpl.this.getRef());
-        }
-    }
-    */
 }

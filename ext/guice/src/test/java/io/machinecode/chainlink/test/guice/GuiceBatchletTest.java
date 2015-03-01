@@ -1,5 +1,8 @@
 package io.machinecode.chainlink.test.guice;
 
+import io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet;
+import io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet;
+import io.machinecode.chainlink.core.execution.batchlet.artifact.OverrideBatchlet;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
@@ -32,6 +35,9 @@ public class GuiceBatchletTest extends BatchletTest {
                     add(Binding.of(Batchlet.class, "runBatchlet", RunBatchlet.class));
                     add(Binding.of(Batchlet.class, "injectedBatchlet", InjectedBatchlet.class));
                     add(Binding.of(Batchlet.class, "stopBatchlet", StopBatchlet.class));
+                    add(Binding.of(Batchlet.class, "overrideBatchlet", OverrideBatchlet.class));
+                    add(Binding.of(Batchlet.class, "failStopBatchlet", FailStopBatchlet.class));
+                    add(Binding.of(Batchlet.class, "failProcessBatchlet", FailProcessBatchlet.class));
                 }};
             }
         }));

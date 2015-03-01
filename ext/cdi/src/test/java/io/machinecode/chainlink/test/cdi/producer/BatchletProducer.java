@@ -1,7 +1,10 @@
 package io.machinecode.chainlink.test.cdi.producer;
 
 import io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet;
+import io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet;
+import io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet;
 import io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet;
+import io.machinecode.chainlink.core.execution.batchlet.artifact.OverrideBatchlet;
 import io.machinecode.chainlink.core.execution.batchlet.artifact.RunBatchlet;
 import io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet;
 
@@ -34,6 +37,18 @@ public class BatchletProducer {
     }
 
     @Produces
+    @Named("failStopBatchlet")
+    public javax.batch.api.Batchlet batchlet(@New FailStopBatchlet batchlet) {
+        return batchlet;
+    }
+
+    @Produces
+    @Named("failProcessBatchlet")
+    public javax.batch.api.Batchlet batchlet(@New FailProcessBatchlet batchlet) {
+        return batchlet;
+    }
+
+    @Produces
     @Named("stopBatchlet")
     public javax.batch.api.Batchlet batchlet(@New StopBatchlet batchlet) {
         return batchlet;
@@ -42,6 +57,12 @@ public class BatchletProducer {
     @Produces
     @Named("runBatchlet")
     public javax.batch.api.Batchlet batchlet(@New RunBatchlet batchlet) {
+        return batchlet;
+    }
+
+    @Produces
+    @Named("overrideBatchlet")
+    public javax.batch.api.Batchlet batchlet(@New OverrideBatchlet batchlet) {
         return batchlet;
     }
 }

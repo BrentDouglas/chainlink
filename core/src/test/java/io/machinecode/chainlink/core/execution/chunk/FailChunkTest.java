@@ -82,7 +82,7 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     // Checkpoint
@@ -220,7 +220,7 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -272,7 +272,7 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     // Open
@@ -304,7 +304,7 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -334,7 +334,7 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     // Close
@@ -379,7 +379,7 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -419,6 +419,6 @@ public class FailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 }

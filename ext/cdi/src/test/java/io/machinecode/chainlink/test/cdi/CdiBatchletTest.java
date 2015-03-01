@@ -58,6 +58,7 @@ public class CdiBatchletTest extends BatchletTest {
         final JobOperationImpl operation = operator.startJob(job, "unmanaged-injected-job", PARAMETERS);
         operation.get();
         Assert.assertTrue(InjectedBatchlet.hasRun.get());
-        assertFinishedWith(BatchStatus.COMPLETED, operation.getJobExecutionId());
+        assertStepFinishedWith(operation, BatchStatus.COMPLETED);
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
     }
 }

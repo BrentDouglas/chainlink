@@ -98,7 +98,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
                 on.cancel(interrupt);
             } catch (final Throwable e) {
                 if (exception == null) {
-                    exception = new ListenerException(io.machinecode.then.core.Messages.format("THEN-000013.promise.cancel.exception"), e);
+                    exception = new ListenerException(io.machinecode.then.core.Messages.format("THEN-000302.promise.on.cancel.exception"), e);
                 } else {
                     exception.addSuppressed(e);
                 }
@@ -109,7 +109,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
                 on.complete(state);
             } catch (final Throwable e) {
                 if (exception == null) {
-                    exception = new ListenerException(io.machinecode.then.core.Messages.format("THEN-000013.promise.cancel.exception"), e);
+                    exception = new ListenerException(io.machinecode.then.core.Messages.format("THEN-000303.promise.on.complete.exception"), e);
                 } else {
                     exception.addSuppressed(e);
                 }

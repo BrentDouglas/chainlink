@@ -27,6 +27,10 @@ public class FluentPlan implements FluentStrategy<FluentPlan>, InheritablePlan<F
         return this;
     }
 
+    public FluentPlan setPartitions(final int partitions) {
+        return this.setPartitions(Integer.toString(partitions));
+    }
+
     @Override
     public String getThreads() {
         return this.threads;
@@ -35,6 +39,10 @@ public class FluentPlan implements FluentStrategy<FluentPlan>, InheritablePlan<F
     public FluentPlan setThreads(final String threads) {
         this.threads = threads;
         return this;
+    }
+
+    public FluentPlan setThreads(final int threads) {
+        return this.setThreads(Integer.toString(threads));
     }
 
     @Override

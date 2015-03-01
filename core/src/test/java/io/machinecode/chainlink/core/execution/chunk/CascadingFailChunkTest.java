@@ -84,7 +84,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -165,7 +165,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -206,7 +206,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -258,7 +258,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -310,7 +310,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     // Checkpoint
@@ -355,7 +355,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -400,7 +400,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -452,7 +452,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -504,7 +504,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     // Open and Close
@@ -536,7 +536,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -566,7 +566,7 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 
     @Test
@@ -596,6 +596,6 @@ public class CascadingFailChunkTest extends EventOrderTest {
                 AFTER_STEP,
                 AFTER_JOB
         }, EventOrderAccumulator.order());
-        assertFinishedWith(BatchStatus.FAILED, operation.getJobExecutionId());
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 }

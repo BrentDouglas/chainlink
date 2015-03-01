@@ -9,4 +9,7 @@
     <bean id="stopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet" />
     <bean id="failBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet" />
     <bean id="injectedBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet" />
+    <bean id="overrideBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.OverrideBatchlet"/>
+    <bean id="failStopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet"/>
+    <bean id="failProcessBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet"/>
 </beans>
