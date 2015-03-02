@@ -3,6 +3,8 @@ package io.machinecode.chainlink.test.cdi.producer;
 import io.machinecode.chainlink.core.execution.artifact.listener.EventOrderListener;
 import io.machinecode.chainlink.core.execution.artifact.listener.ExpectFailReadOpenExceptionEventOrderListener;
 import io.machinecode.chainlink.core.execution.artifact.listener.ExpectFailWriteOpenExceptionEventOrderListener;
+import io.machinecode.chainlink.core.execution.artifact.partition.TestCollector;
+import io.machinecode.chainlink.core.execution.artifact.partition.FailTestCollector;
 import io.machinecode.chainlink.core.execution.artifact.processor.AlwaysEventOrderProcessor;
 import io.machinecode.chainlink.core.execution.artifact.processor.FailEventOrderProcessor;
 import io.machinecode.chainlink.core.execution.artifact.processor.NeverEventOrderProcessor;
@@ -275,6 +277,6 @@ public class ChunkProducer {
     @Produces @Named("failAfterJobListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailAfterJobListener failAfterJobListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailAfterJobListener that) { return that; }
     @Produces @Named("countListener") public io.machinecode.chainlink.core.execution.artifact.listener.CountListener countListener(@New io.machinecode.chainlink.core.execution.artifact.listener.CountListener that) { return that; }
 
-    @Produces @Named("eventOrderCollector") public io.machinecode.chainlink.core.execution.artifact.collector.EventOrderCollector eventOrderCollector(@New io.machinecode.chainlink.core.execution.artifact.collector.EventOrderCollector that) { return that; }
-    @Produces @Named("failEventOrderCollector") public io.machinecode.chainlink.core.execution.artifact.collector.FailEventOrderCollector failEventOrderCollector(@New io.machinecode.chainlink.core.execution.artifact.collector.FailEventOrderCollector that) { return that; }
+    @Produces @Named("eventOrderCollector") public TestCollector eventOrderCollector(@New TestCollector that) { return that; }
+    @Produces @Named("failEventOrderCollector") public FailTestCollector failEventOrderCollector(@New FailTestCollector that) { return that; }
 }

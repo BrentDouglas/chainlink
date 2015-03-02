@@ -44,6 +44,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
     private final T strategy;
 
     public PartitionImpl(final CollectorImpl collector, final AnalyserImpl analyser, final ReducerImpl reducer, final T strategy) {
+        assert strategy != null;
         this.collector = collector;
         this.analyser = analyser;
         this.reducer = reducer;
@@ -70,15 +71,8 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
         return this.strategy;
     }
 
-    public PartitionPlan loadPartitionPlan(final Configuration configuration, final ExecutionContextImpl context) throws Exception {
-        if (strategy == null) {
-            return null;
-        }
-        return strategy.getPartitionPlan(configuration, context);
-    }
-
     public PartitionTarget map(final Configuration configuration, final RepositoryId repositoryId, final TaskWork task, final ExecutableId callbackId, final ExecutionContextImpl context, final int timeout, final Long restartStepExecutionId) throws Exception {
-        final PartitionPlan plan = loadPartitionPlan(configuration, context);
+        final PartitionPlan plan = strategy.getPartitionPlan(configuration, context);
         final boolean restarting = restartStepExecutionId != null;
         final boolean override = plan.getPartitionsOverride();
         if (this.reducer != null) {
@@ -185,29 +179,28 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
         return new ItemImpl(null, batchStatus, exitStatus);
     }
 
-    public PartitionStatus analyse(final Configuration configuration, final ExecutionContext context, final Item... items) throws Exception {
-        PartitionStatus partitionStatus = PartitionStatus.COMMIT;
+    public void analyse(final Configuration configuration, final ExecutionContext context, final Item... items) throws Exception {
+        if (items == null || this.analyser == null) {
+            return;
+        }
         final TransactionManager transactionManager = configuration.getTransactionManager();
-        if (items != null && this.analyser != null) {
-            try {
-                if (this.collector != null) {
-                    for (final Item that : items) {
-                        log.debugf(Messages.get("CHAINLINK-011200.partition.analyse.collector.data"), context, this.analyser.getRef());
-                        this.analyser.analyzeCollectorData(configuration, context, that.getData());
-                    }
-                }
-                for (final Item item : items) {
-                    this.analyser.analyzeStatus(configuration, context, item.getBatchStatus(), item.getExitStatus());
-                }
-            } catch (final Exception e) {
-                log.infof(e, Messages.get("CHAINLINK-011201.partition.analyser.caught"), context, this.analyser.getRef());
-                partitionStatus = PartitionStatus.ROLLBACK;
-                if (transactionManager.getStatus() == Status.STATUS_ACTIVE) {
-                    transactionManager.setRollbackOnly();
+        try {
+            if (this.collector != null) { //TODO Is this right?
+                for (final Item that : items) {
+                    log.debugf(Messages.get("CHAINLINK-011200.partition.analyse.collector.data"), context, this.analyser.getRef());
+                    this.analyser.analyzeCollectorData(configuration, context, that.getData());
                 }
             }
+            for (final Item item : items) {
+                this.analyser.analyzeStatus(configuration, context, item.getBatchStatus(), item.getExitStatus());
+            }
+        } catch (final Exception e) {
+            log.infof(e, Messages.get("CHAINLINK-011201.partition.analyser.caught"), context, this.analyser.getRef());
+            if (transactionManager.getStatus() == Status.STATUS_ACTIVE) {
+                transactionManager.setRollbackOnly();
+            }
+            throw e;
         }
-        return partitionStatus;
     }
 
     public void reduce(final Configuration configuration, final PartitionStatus partitionStatus, final ExecutionContext context) throws Exception {
@@ -222,7 +215,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
                         }
                         transactionManager.commit();
                     } catch (final Exception e) {
-                        log.warnf(e, Messages.get("CHAINLINK-011304.partition.reducer.caught"), context, this.reducer.getRef()); //TODO NPE logic?
+                        log.warnf(e, Messages.get("CHAINLINK-011304.partition.reducer.caught"), context, this.reducer == null ? null : this.reducer.getRef());
                         transactionManager.rollback();
                     }
                     break;

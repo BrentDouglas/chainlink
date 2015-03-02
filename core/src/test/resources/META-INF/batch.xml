@@ -81,6 +81,12 @@
     <ref id="failAfterJobListener" class="io.machinecode.chainlink.core.execution.artifact.listener.FailAfterJobListener"/>
     <ref id="countListener" class="io.machinecode.chainlink.core.execution.artifact.listener.CountListener"/>
 
-    <ref id="eventOrderCollector" class="io.machinecode.chainlink.core.execution.artifact.collector.EventOrderCollector"/>
-    <ref id="failEventOrderCollector" class="io.machinecode.chainlink.core.execution.artifact.collector.FailEventOrderCollector"/>
+    <ref id="testAnalyzer" class="io.machinecode.chainlink.core.execution.artifact.partition.TestAnalyzer"/>
+    <ref id="testCollector" class="io.machinecode.chainlink.core.execution.artifact.partition.TestCollector"/>
+    <ref id="testMapper" class="io.machinecode.chainlink.core.execution.artifact.partition.TestMapper"/>
+    <ref id="notEnoughPropsTestMapper" class="io.machinecode.chainlink.core.execution.artifact.partition.NotEnoughPropsTestMapper"/>
+    <ref id="testReducer" class="io.machinecode.chainlink.core.execution.artifact.partition.TestReducer"/>
+    <ref id="failTestCollector" class="io.machinecode.chainlink.core.execution.artifact.partition.FailTestCollector"/>
+    <ref id="failDataTestAnalyzer" class="io.machinecode.chainlink.core.execution.artifact.partition.FailDataTestAnalyzer"/>
+    <ref id="failStatusTestAnalyzer" class="io.machinecode.chainlink.core.execution.artifact.partition.FailStatusTestAnalyzer"/>
 </batch-artifacts>

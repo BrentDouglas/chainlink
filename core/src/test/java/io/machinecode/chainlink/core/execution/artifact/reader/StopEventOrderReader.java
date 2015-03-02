@@ -29,7 +29,7 @@ public class StopEventOrderReader implements ItemReader {
     public static void await() throws InterruptedException {
         synchronized (hasStopped) {
             while (hasStopped.get()) {
-                hasStopped.wait();
+                hasStopped.wait(1000);
             }
         }
     }
@@ -40,7 +40,7 @@ public class StopEventOrderReader implements ItemReader {
         synchronized (hasStopped) {
             while (!hasStopped.get()) {
                 hasStopped.notifyAll();
-                hasStopped.wait();
+                hasStopped.wait(1000);
             }
         }
         if (!read) {

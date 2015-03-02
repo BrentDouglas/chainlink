@@ -42,8 +42,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import static javax.batch.api.partition.PartitionReducer.PartitionStatus;
-import static javax.batch.api.partition.PartitionReducer.PartitionStatus.COMMIT;
 import static javax.batch.api.partition.PartitionReducer.PartitionStatus.ROLLBACK;
 import static javax.batch.runtime.BatchStatus.COMPLETED;
 import static javax.batch.runtime.BatchStatus.FAILED;
@@ -291,14 +289,11 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             final TransactionManager transactionManager = configuration.getTransactionManager();
             if (this.isPartitioned()) {
                 if (completed == 1) {
-                    accumulator.setPartitionStatus(COMMIT);
                     int timeout = _timeout(context);
                     log.debugf(Messages.get("CHAINLINK-010208.step.set.transaction.timeout"), childContext, timeout);
                     transactionManager.setTransactionTimeout(timeout);
                     log.debugf(Messages.get("CHAINLINK-010210.step.begin.transaction"), childContext);
                     transactionManager.begin();
-                } else if (accumulator.getPartitionStatus() == ROLLBACK) {
-                    return new ResolvedDeferred<Chain<?>, Throwable, Object>(null);
                 } else {
                     final Transaction transaction = accumulator.getTransaction();
                     log.debugf(Messages.get("CHAINLINK-010212.step.resume.transaction"), childContext, transaction);
@@ -315,15 +310,12 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                             }
                             break;
                     }
-                    final PartitionStatus partitionStatus = this.partition.analyse(configuration, context, childContext.getItems());
-                    accumulator.setPartitionStatus(
-                            accumulator.getPartitionStatus() == ROLLBACK
-                                    ? ROLLBACK
-                                    : partitionStatus
-                    );
+                    this.partition.analyse(configuration, context, childContext.getItems());
                 } catch (final Exception e) {
                     log.infof(e, Messages.get("CHAINLINK-010209.step.analyse.exception"), childContext);
-                    accumulator.setPartitionStatus(ROLLBACK);
+                    accumulator.setPartitionStatusRollback();
+                    stepContext.setBatchStatus(FAILED);
+                    accumulator.addException(e);
                 }
                 if (completed < this._partitions) {
                     final Transaction transaction = transactionManager.suspend();
@@ -335,21 +327,16 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
             }
         } catch (final Throwable e) {
             log.debugf(e, Messages.get("CHAINLINK-010205.step.after.caught.exception"), context);
-            accumulator.setPartitionStatus(ROLLBACK);
+            accumulator.setPartitionStatusRollback();
             context.getJobContext().setBatchStatus(FAILED);
         }
         try {
-            Exception exception = null;
             for (final ListenerImpl listener : this._listeners(configuration, context)) {
                 try {
                     log.debugf(Messages.get("CHAINLINK-010201.step.listener.after.step"), context);
                     listener.afterStep(configuration, context);
                 } catch (final Exception e) {
-                    if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
-                    }
+                    accumulator.addException(e);
                 }
             }
             try {
@@ -362,12 +349,9 @@ public class StepImpl<T extends TaskWork, U extends StrategyWork> extends Execut
                         stepContext.getPersistentUserData()
                 );
             } catch (final Exception e) {
-                if (exception == null) {
-                    exception = e;
-                } else {
-                    exception.addSuppressed(e);
-                }
+                accumulator.addException(e);
             }
+            final Exception exception = accumulator.getException();
             if (exception != null) {
                 stepContext.setException(exception);
                 stepContext.setBatchStatus(FAILED);

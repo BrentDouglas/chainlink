@@ -12,9 +12,13 @@ public interface StepAccumulator {;
 
     PartitionReducer.PartitionStatus getPartitionStatus();
 
-    void setPartitionStatus(final PartitionReducer.PartitionStatus partitionStatus);
+    void setPartitionStatusRollback();
 
     Transaction getTransaction();
 
     void setTransaction(final Transaction transaction);
+
+    Exception getException();
+
+    void addException(final Exception exception);
 }

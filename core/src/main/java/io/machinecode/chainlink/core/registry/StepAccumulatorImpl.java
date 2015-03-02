@@ -11,8 +11,9 @@ import javax.transaction.Transaction;
 public class StepAccumulatorImpl implements StepAccumulator {
 
     private long count = 0;
-    private PartitionReducer.PartitionStatus partitionStatus;
+    private PartitionReducer.PartitionStatus partitionStatus = PartitionReducer.PartitionStatus.COMMIT;
     private Transaction transaction;
+    private Exception exception;
 
     @Override
     public long incrementAndGetCallbackCount() {
@@ -25,8 +26,8 @@ public class StepAccumulatorImpl implements StepAccumulator {
     }
 
     @Override
-    public void setPartitionStatus(final PartitionReducer.PartitionStatus partitionStatus) {
-        this.partitionStatus = partitionStatus;
+    public void setPartitionStatusRollback() {
+        this.partitionStatus = PartitionReducer.PartitionStatus.ROLLBACK;
     }
 
     @Override
@@ -37,5 +38,19 @@ public class StepAccumulatorImpl implements StepAccumulator {
     @Override
     public void setTransaction(final Transaction transaction) {
         this.transaction = transaction;
+    }
+
+    @Override
+    public Exception getException() {
+        return exception;
+    }
+
+    @Override
+    public void addException(final Exception exception) {
+        if (this.exception == null) {
+            this.exception = exception;
+        } else {
+            this.exception.addSuppressed(exception);
+        }
     }
 }

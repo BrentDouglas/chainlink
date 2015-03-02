@@ -135,7 +135,7 @@ public class PartitionedChunkTest extends EventOrderTest {
                                 .setPartition(Jsl.partition().setStrategy(Jsl.plan()
                                         .setPartitions(2)
                                         .setThreads(2))
-                                        .setCollector(Jsl.collector("eventOrderCollector"))
+                                        .setCollector(Jsl.collector("testCollector"))
                                 )
                                 .setTask(
                                         Jsl.chunk()
@@ -147,5 +147,159 @@ public class PartitionedChunkTest extends EventOrderTest {
         final JobOperationImpl operation = operator.startJob(job, "collect-one-item", PARAMETERS);
         operation.get();
         assertJobFinishedWith(operation, BatchStatus.COMPLETED);
+    }
+
+    @Test
+    public void everythingChunkTest() throws Exception {
+        printMethodName();
+        EventOrderAccumulator.reset();
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
+                .addExecution(
+                        Jsl.step("step")
+                                .setPartition(Jsl.partition()
+                                        .setStrategy(Jsl.mapper("testMapper"))
+                                        .setAnalyzer(Jsl.analyser("testAnalyzer"))
+                                        .setCollector(Jsl.collector("testCollector"))
+                                        .setReducer(Jsl.reducer("testReducer"))
+                                )
+                                .setTask(
+                                        Jsl.chunk()
+                                                .setReader(Jsl.reader("oneEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                )
+                );
+        final JobOperationImpl operation = operator.startJob(job, "everything", PARAMETERS);
+        operation.get();
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
+    }
+
+    @Test
+    public void notEnoughPropsChunkTest() throws Exception {
+        printMethodName();
+        EventOrderAccumulator.reset();
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
+                .addExecution(
+                        Jsl.step("step")
+                                .setPartition(Jsl.partition()
+                                        .setStrategy(Jsl.mapper("notEnoughPropsTestMapper"))
+                                )
+                                .setTask(
+                                        Jsl.chunk()
+                                                .setReader(Jsl.reader("oneEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                )
+                );
+        final JobOperationImpl operation = operator.startJob(job, "not-enough-props", PARAMETERS);
+        operation.get();
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
+    }
+
+    @Test
+    public void analyzerNoCollectorChunkTest() throws Exception {
+        printMethodName();
+        EventOrderAccumulator.reset();
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
+                .addExecution(
+                        Jsl.step("step")
+                                .setPartition(Jsl.partition()
+                                        .setStrategy(Jsl.plan()
+                                                .setPartitions(2)
+                                                .setThreads(2))
+                                        .setAnalyzer(Jsl.analyser("testAnalyzer"))
+                                )
+                                .setTask(
+                                        Jsl.chunk()
+                                                .setReader(Jsl.reader("oneEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                )
+                );
+        final JobOperationImpl operation = operator.startJob(job, "analyzer-no-collector", PARAMETERS);
+        operation.get();
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
+    }
+
+    @Test
+    public void analyzerNoItemsChunkTest() throws Exception {
+        printMethodName();
+        EventOrderAccumulator.reset();
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
+                .addExecution(
+                        Jsl.step("step")
+                                .setPartition(Jsl.partition()
+                                        .setStrategy(Jsl.plan()
+                                                .setPartitions(2)
+                                                .setThreads(2))
+                                        .setAnalyzer(Jsl.analyser("testAnalyzer"))
+                                )
+                                .setTask(
+                                        Jsl.chunk()
+                                                .setReader(Jsl.reader("oneEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("alwaysEventOrderProcessor"))
+                                )
+                );
+        final JobOperationImpl operation = operator.startJob(job, "analyzer-no-items", PARAMETERS);
+        operation.get();
+        assertJobFinishedWith(operation, BatchStatus.COMPLETED);
+    }
+
+    @Test
+    public void failAnalyzeDataChunkTest() throws Exception {
+        printMethodName();
+        EventOrderAccumulator.reset();
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
+                .addExecution(
+                        Jsl.step("step")
+                                .setPartition(Jsl.partition()
+                                        .setStrategy(Jsl.plan()
+                                                .setPartitions(2)
+                                                .setThreads(2))
+                                        .setAnalyzer(Jsl.analyser("failDataTestAnalyzer"))
+                                        .setCollector(Jsl.collector("testCollector"))
+                                )
+                                .setTask(
+                                        Jsl.chunk()
+                                                .setReader(Jsl.reader("oneEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                )
+                );
+        final JobOperationImpl operation = operator.startJob(job, "fail-analyze-data", PARAMETERS);
+        operation.get();
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
+    }
+
+    @Test
+    public void failAnalyzeStatusChunkTest() throws Exception {
+        printMethodName();
+        EventOrderAccumulator.reset();
+        final Job job = Jsl.job("job")
+                .addListener(Jsl.listener("eventOrderListener"))
+                .addExecution(
+                        Jsl.step("step")
+                                .setPartition(Jsl.partition()
+                                        .setStrategy(Jsl.plan()
+                                                .setPartitions(2)
+                                                .setThreads(2))
+                                        .setAnalyzer(Jsl.analyser("failStatusTestAnalyzer"))
+                                )
+                                .setTask(
+                                        Jsl.chunk()
+                                                .setReader(Jsl.reader("oneEventOrderReader"))
+                                                .setWriter(Jsl.writer("eventOrderWriter"))
+                                                .setProcessor(Jsl.processor("neverEventOrderProcessor"))
+                                )
+                );
+        final JobOperationImpl operation = operator.startJob(job, "fail-analyze-data", PARAMETERS);
+        operation.get();
+        assertJobFinishedWith(operation, BatchStatus.FAILED);
     }
 }
