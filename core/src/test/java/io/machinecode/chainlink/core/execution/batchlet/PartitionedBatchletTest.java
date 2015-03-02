@@ -1,12 +1,12 @@
 package io.machinecode.chainlink.core.execution.batchlet;
 
 import io.machinecode.chainlink.core.base.OperatorTest;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.RunBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailProcessBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailStopBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.InjectedBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.RunBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.StopBatchlet;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.spi.jsl.Job;

@@ -1,12 +1,13 @@
 package io.machinecode.chainlink.test.cdi.producer;
 
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.OverrideBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.RunBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.ErrorBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailProcessBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailStopBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.InjectedBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.OverrideBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.RunBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.StopBatchlet;
 
 import javax.enterprise.inject.New;
 import javax.enterprise.inject.Produces;
@@ -33,6 +34,12 @@ public class BatchletProducer {
     @Produces
     @Named("failBatchlet")
     public javax.batch.api.Batchlet batchlet(@New FailBatchlet batchlet) {
+        return batchlet;
+    }
+
+    @Produces
+    @Named("errorBatchlet")
+    public javax.batch.api.Batchlet batchlet(@New ErrorBatchlet batchlet) {
         return batchlet;
     }
 

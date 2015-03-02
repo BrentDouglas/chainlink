@@ -1,36 +1,36 @@
 package io.machinecode.chainlink.test.cdi.producer;
 
-import io.machinecode.chainlink.core.execution.chunk.artifact.listener.EventOrderListener;
-import io.machinecode.chainlink.core.execution.chunk.artifact.listener.ExpectFailReadOpenExceptionEventOrderListener;
-import io.machinecode.chainlink.core.execution.chunk.artifact.listener.ExpectFailWriteOpenExceptionEventOrderListener;
-import io.machinecode.chainlink.core.execution.chunk.artifact.processor.AlwaysEventOrderProcessor;
-import io.machinecode.chainlink.core.execution.chunk.artifact.processor.FailEventOrderProcessor;
-import io.machinecode.chainlink.core.execution.chunk.artifact.processor.NeverEventOrderProcessor;
-import io.machinecode.chainlink.core.execution.chunk.artifact.processor.OnceFailEventOrderProcessor;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailCheckpointAndCloseEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailCheckpointEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailCloseAlwaysEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailCloseEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailOpenAndCloseEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailOpenEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailReadAndCloseEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailReadEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.FailTwiceTwiceReadEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.NeverEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.OnceFailCheckpointEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.OnceFailReadEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.OneEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.reader.SixEventOrderReader;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.EventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailCheckpointAndCloseEventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailCheckpointEventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailCloseEventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailOpenAndCloseEventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailOpenEventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailWriteAndCloseEventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.FailWriteEventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.OnceFailCheckpointEventOrderWriter;
-import io.machinecode.chainlink.core.execution.chunk.artifact.writer.OnceFailWriteEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.listener.EventOrderListener;
+import io.machinecode.chainlink.core.execution.artifact.listener.ExpectFailReadOpenExceptionEventOrderListener;
+import io.machinecode.chainlink.core.execution.artifact.listener.ExpectFailWriteOpenExceptionEventOrderListener;
+import io.machinecode.chainlink.core.execution.artifact.processor.AlwaysEventOrderProcessor;
+import io.machinecode.chainlink.core.execution.artifact.processor.FailEventOrderProcessor;
+import io.machinecode.chainlink.core.execution.artifact.processor.NeverEventOrderProcessor;
+import io.machinecode.chainlink.core.execution.artifact.processor.OnceFailEventOrderProcessor;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailCheckpointAndCloseEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailCheckpointEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailCloseAlwaysEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailCloseEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailOpenAndCloseEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailOpenEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailReadAndCloseEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailReadEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.FailTwiceTwiceReadEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.NeverEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.OnceFailCheckpointEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.OnceFailReadEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.OneEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.reader.SixEventOrderReader;
+import io.machinecode.chainlink.core.execution.artifact.writer.EventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.FailCheckpointAndCloseEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.FailCheckpointEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.FailCloseEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.FailOpenAndCloseEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.FailOpenEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.FailWriteAndCloseEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.FailWriteEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.OnceFailCheckpointEventOrderWriter;
+import io.machinecode.chainlink.core.execution.artifact.writer.OnceFailWriteEventOrderWriter;
 
 import javax.enterprise.inject.New;
 import javax.enterprise.inject.Produces;
@@ -235,4 +235,46 @@ public class ChunkProducer {
     public ExpectFailWriteOpenExceptionEventOrderListener expectFailWriteExceptionEventOrderListener(@New ExpectFailWriteOpenExceptionEventOrderListener that) {
         return that;
     }
+
+    @Produces @Named("failTripleTwiceEventOrderProcessor") public io.machinecode.chainlink.core.execution.artifact.processor.FailTripleTwiceEventOrderProcessor failTripleTwiceEventOrderProcessor(@New io.machinecode.chainlink.core.execution.artifact.processor.FailTripleTwiceEventOrderProcessor that) { return that; }
+    @Produces @Named("failTripleTwiceReadEventOrderReader") public io.machinecode.chainlink.core.execution.artifact.reader.FailTripleTwiceReadEventOrderReader failTripleTwiceReadEventOrderReader(@New io.machinecode.chainlink.core.execution.artifact.reader.FailTripleTwiceReadEventOrderReader that) { return that; }
+    @Produces @Named("stopEventOrderReader") public io.machinecode.chainlink.core.execution.artifact.reader.StopEventOrderReader stopEventOrderReader(@New io.machinecode.chainlink.core.execution.artifact.reader.StopEventOrderReader that) { return that; }
+    @Produces @Named("failTripleTwiceEventOrderWriter") public io.machinecode.chainlink.core.execution.artifact.writer.FailTripleTwiceEventOrderWriter failTripleTwiceEventOrderWriter(@New io.machinecode.chainlink.core.execution.artifact.writer.FailTripleTwiceEventOrderWriter that) { return that; }
+
+    @Produces @Named("errorEventOrderProcessor") public io.machinecode.chainlink.core.execution.artifact.processor.ErrorEventOrderProcessor errorEventOrderProcessor(@New io.machinecode.chainlink.core.execution.artifact.processor.ErrorEventOrderProcessor that) { return that; }
+    @Produces @Named("errorCheckpointEventOrderReader") public io.machinecode.chainlink.core.execution.artifact.reader.ErrorCheckpointEventOrderReader errorCheckpointEventOrderReader(@New io.machinecode.chainlink.core.execution.artifact.reader.ErrorCheckpointEventOrderReader that) { return that; }
+    @Produces @Named("errorCloseEventOrderReader") public io.machinecode.chainlink.core.execution.artifact.reader.ErrorCloseEventOrderReader errorCloseEventOrderReader(@New io.machinecode.chainlink.core.execution.artifact.reader.ErrorCloseEventOrderReader that) { return that; }
+    @Produces @Named("errorOpenEventOrderReader") public io.machinecode.chainlink.core.execution.artifact.reader.ErrorOpenEventOrderReader errorOpenEventOrderReader(@New io.machinecode.chainlink.core.execution.artifact.reader.ErrorOpenEventOrderReader that) { return that; }
+    @Produces @Named("errorReadEventOrderReader") public io.machinecode.chainlink.core.execution.artifact.reader.ErrorReadEventOrderReader errorReadEventOrderReader(@New io.machinecode.chainlink.core.execution.artifact.reader.ErrorReadEventOrderReader that) { return that; }
+    @Produces @Named("errorCloseEventOrderWriter") public io.machinecode.chainlink.core.execution.artifact.writer.ErrorCloseEventOrderWriter errorCloseEventOrderWriter(@New io.machinecode.chainlink.core.execution.artifact.writer.ErrorCloseEventOrderWriter that) { return that; }
+    @Produces @Named("errorOpenEventOrderWriter") public io.machinecode.chainlink.core.execution.artifact.writer.ErrorOpenEventOrderWriter errorOpenEventOrderWriter(@New io.machinecode.chainlink.core.execution.artifact.writer.ErrorOpenEventOrderWriter that) { return that; }
+    @Produces @Named("errorWriteEventOrderWriter") public io.machinecode.chainlink.core.execution.artifact.writer.ErrorWriteEventOrderWriter errorWriteEventOrderWriter(@New io.machinecode.chainlink.core.execution.artifact.writer.ErrorWriteEventOrderWriter that) { return that; }
+    @Produces @Named("errorCheckpointEventOrderWriter") public io.machinecode.chainlink.core.execution.artifact.writer.ErrorCheckpointEventOrderWriter errorCheckpointEventOrderWriter(@New io.machinecode.chainlink.core.execution.artifact.writer.ErrorCheckpointEventOrderWriter that) { return that; }
+
+    @Produces @Named("failBeforeChunkListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeChunkListener failBeforeChunkListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeChunkListener that) { return that; }
+    @Produces @Named("failOnErrorListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailOnErrorListener failOnErrorListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailOnErrorListener that) { return that; }
+    @Produces @Named("failAfterChunkListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailAfterChunkListener failAfterChunkListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailAfterChunkListener that) { return that; }
+    @Produces @Named("failBeforeReadListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeReadListener failBeforeReadListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeReadListener that) { return that; }
+    @Produces @Named("failOnReadErrorListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailOnReadErrorListener failOnReadErrorListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailOnReadErrorListener that) { return that; }
+    @Produces @Named("failAfterReadListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailAfterReadListener failAfterReadListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailAfterReadListener that) { return that; }
+    @Produces @Named("failBeforeProcessListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeProcessListener failBeforeProcessListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeProcessListener that) { return that; }
+    @Produces @Named("failOnProcessErrorListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailOnProcessErrorListener failOnProcessErrorListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailOnProcessErrorListener that) { return that; }
+    @Produces @Named("failAfterProcessListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailAfterProcessListener failAfterProcessListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailAfterProcessListener that) { return that; }
+    @Produces @Named("failBeforeWriteListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeWriteListener failBeforeWriteListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeWriteListener that) { return that; }
+    @Produces @Named("failOnWriteErrorListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailOnWriteErrorListener failOnWriteErrorListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailOnWriteErrorListener that) { return that; }
+    @Produces @Named("failAfterWriteListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailAfterWriteListener failAfterWriteListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailAfterWriteListener that) { return that; }
+
+    @Produces @Named("failSkipReadListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailSkipReadListener failSkipReadListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailSkipReadListener that) { return that; }
+    @Produces @Named("failSkipProcessListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailSkipProcessListener failSkipProcessListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailSkipProcessListener that) { return that; }
+    @Produces @Named("failSkipWriteListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailSkipWriteListener failSkipWriteListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailSkipWriteListener that) { return that; }
+    @Produces @Named("failRetryReadListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailRetryReadListener failRetryReadListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailRetryReadListener that) { return that; }
+    @Produces @Named("failRetryProcessListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailRetryProcessListener failRetryProcessListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailRetryProcessListener that) { return that; }
+    @Produces @Named("failRetryWriteListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailRetryWriteListener failRetryWriteListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailRetryWriteListener that) { return that; }
+
+    @Produces @Named("failBeforeJobListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeJobListener failBeforeJobListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailBeforeJobListener that) { return that; }
+    @Produces @Named("failAfterJobListener") public io.machinecode.chainlink.core.execution.artifact.listener.FailAfterJobListener failAfterJobListener(@New io.machinecode.chainlink.core.execution.artifact.listener.FailAfterJobListener that) { return that; }
+    @Produces @Named("countListener") public io.machinecode.chainlink.core.execution.artifact.listener.CountListener countListener(@New io.machinecode.chainlink.core.execution.artifact.listener.CountListener that) { return that; }
+
+    @Produces @Named("eventOrderCollector") public io.machinecode.chainlink.core.execution.artifact.collector.EventOrderCollector eventOrderCollector(@New io.machinecode.chainlink.core.execution.artifact.collector.EventOrderCollector that) { return that; }
+    @Produces @Named("failEventOrderCollector") public io.machinecode.chainlink.core.execution.artifact.collector.FailEventOrderCollector failEventOrderCollector(@New io.machinecode.chainlink.core.execution.artifact.collector.FailEventOrderCollector that) { return that; }
 }

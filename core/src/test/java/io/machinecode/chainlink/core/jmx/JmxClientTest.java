@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jmx;
 
 import io.machinecode.chainlink.core.base.OperatorTest;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.StopBatchlet;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.core.jsl.fluent.execution.FluentStep;
 import io.machinecode.chainlink.core.loader.FluentJobLoader;

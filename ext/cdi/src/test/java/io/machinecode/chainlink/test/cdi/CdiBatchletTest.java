@@ -7,7 +7,7 @@ import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.core.execution.batchlet.BatchletTest;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.InjectedBatchlet;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.AfterClass;

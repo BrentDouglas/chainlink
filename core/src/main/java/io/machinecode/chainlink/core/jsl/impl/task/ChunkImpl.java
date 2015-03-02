@@ -212,123 +212,121 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             }
             throw e;
         }
-        try {
-            state.stepContext.setBatchStatus(BatchStatus.STARTED);
-            if (partitionExecutionId != null) {
-                state.repository.startPartitionExecution(
-                        partitionExecutionId,
-                        new Date()
-                );
-            }
+        state.stepContext.setBatchStatus(BatchStatus.STARTED);
+        if (partitionExecutionId != null) {
+            state.repository.startPartitionExecution(
+                    partitionExecutionId,
+                    new Date()
+            );
+        }
 
-            try {
-                log.debugf(Messages.get("CHAINLINK-014100.chunk.transaction.timeout"), state.context, timeout);
-                state.transactionManager.setTransactionTimeout(timeout);
-                log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
-                state.transactionManager.begin();
-                _openReader(state);
-                if (state.isFailed()) {
+        try {
+            log.debugf(Messages.get("CHAINLINK-014100.chunk.transaction.timeout"), state.context, timeout);
+            state.transactionManager.setTransactionTimeout(timeout);
+            log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
+            state.transactionManager.begin();
+            _openReader(state);
+            if (state.isFailed()) {
+                _closeReader(state);
+                log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
+                _runErrorListeners(state, state._exception);
+                state.transactionManager.rollback();
+            } else {
+                _openWriter(state);
+                if (!state.isFailed()) {
+                    log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
+                    state.transactionManager.commit();
+                } else {
+                    _closeWriter(state);
                     _closeReader(state);
                     log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
                     _runErrorListeners(state, state._exception);
                     state.transactionManager.rollback();
-                } else {
-                    _openWriter(state);
-                    if (!state.isFailed()) {
-                        log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
-                        state.transactionManager.commit();
-                    } else {
-                        _closeWriter(state);
-                        _closeReader(state);
-                        log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-                        _runErrorListeners(state, state._exception);
-                        state.transactionManager.rollback();
-                    }
                 }
-            } catch (final Exception e) {
-                _handleException(state, e);
-            } catch (final Throwable e) {
-                state.setThrowable(e);
-            } finally {
-                _cleanupTx(state);
             }
-
-            if (state.isFailed()) {
-                if (partitionExecutionId != null) {
-                    state.repository.finishPartitionExecution(
-                            partitionExecutionId,
-                            stepContext.getMetrics(),
-                            stepContext.getPersistentUserData(),
-                            BatchStatus.FAILED,
-                            stepContext.getExitStatus(),
-                            new Date()
-                    );
-                }
-                throw state.getFailure();
-            }
-
-            try {
-                while (_loop(state)) {
-                    //
-                }
-            } catch (final Exception e) {
-                _handleException(state, e);
-            } catch (final Throwable e) {
-                state.setThrowable(e);
-            } finally {
-                _cleanupTx(state);
-            }
-
-            try {
-                log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
-                final Exception e = state.takeException();
-                final Throwable f = state.takeFailure();
-                try {
-                    state.transactionManager.begin();
-                    _closeWriter(state);
-                    _closeReader(state);
-                    if (!state.isFailed()) {
-                        log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
-                        state.transactionManager.commit();
-                        //_collect(state, context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
-                    } else {
-                        log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
-                        _runErrorListeners(state, state._exception);
-                        state.transactionManager.rollback();
-                    }
-                } finally {
-                    state.give(e, f);
-                }
-            } catch (final Exception e) {
-                _handleException(state, e);
-            } catch (final Throwable e) {
-                state.setThrowable(e);
-            } finally {
-                context.setItems(state.items.toArray(new Item[state.items.size()]));
-                _cleanupTx(state);
-            }
-            if (state.isFailed()) {
-                throw state.getFailure();
-            }
+        } catch (final Exception e) {
+            _handleException(state, e);
+        } catch (final Throwable e) {
+            state.setThrowable(e);
         } finally {
-            final BatchStatus batchStatus;
-            if (promise.isCancelled()) {
-                state.stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
-            } else if (state.isFailed()) {
-                batchStatus = BatchStatus.FAILED;
-            } else {
-                batchStatus = BatchStatus.COMPLETED;
-            }
+            _cleanupTx(state);
+        }
+
+        if (state.isFailed()) {
             if (partitionExecutionId != null) {
                 state.repository.finishPartitionExecution(
                         partitionExecutionId,
                         stepContext.getMetrics(),
                         stepContext.getPersistentUserData(),
-                        batchStatus,
+                        BatchStatus.FAILED,
                         stepContext.getExitStatus(),
                         new Date()
                 );
             }
+            throw state.getFailure();
+        }
+
+        try {
+            while (_loop(state)) {
+                //
+            }
+        } catch (final Exception e) {
+            _handleException(state, e);
+        } catch (final Throwable e) {
+            state.setThrowable(e);
+        } finally {
+            _cleanupTx(state);
+        }
+
+        try {
+            log.debugf(Messages.get("CHAINLINK-014101.chunk.transaction.begin"), state.context);
+            final Exception e = state.takeException();
+            final Throwable f = state.takeFailure();
+            try {
+                state.transactionManager.begin();
+                _closeWriter(state);
+                _closeReader(state);
+                if (!state.isFailed()) {
+                    log.debugf(Messages.get("CHAINLINK-014102.chunk.transaction.commit"), state.context);
+                    state.transactionManager.commit();
+                    //_collect(state, context, state.stepContext.getBatchStatus(), state.stepContext.getExitStatus());
+                } else {
+                    log.debugf(Messages.get("CHAINLINK-014103.chunk.transaction.rollback"), state.context);
+                    _runErrorListeners(state, state._exception);
+                    state.transactionManager.rollback();
+                }
+            } finally {
+                state.give(e, f);
+            }
+        } catch (final Exception e) {
+            _handleException(state, e);
+        } catch (final Throwable e) {
+            state.setThrowable(e);
+        } finally {
+            context.setItems(state.items.toArray(new Item[state.items.size()]));
+            _cleanupTx(state);
+        }
+
+        final BatchStatus batchStatus;
+        if (promise.isCancelled()) {
+            state.stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
+        } else if (state.isFailed()) {
+            batchStatus = BatchStatus.FAILED;
+        } else {
+            batchStatus = BatchStatus.COMPLETED;
+        }
+        if (partitionExecutionId != null) {
+            state.repository.finishPartitionExecution(
+                    partitionExecutionId,
+                    stepContext.getMetrics(),
+                    stepContext.getPersistentUserData(),
+                    batchStatus,
+                    stepContext.getExitStatus(),
+                    new Date()
+            );
+        }
+        if (state.isFailed()) {
+            throw state.getFailure();
         }
     }
 
@@ -586,6 +584,9 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                 log.debugf(Messages.get("CHAINLINK-014412.chunk.reader.finished"), state.context);
                 state.finished = true;
                 state.next(state.objects.isEmpty() ? AFTER : WRITE);
+                if (exception != null) {
+                    throw exception;
+                }
                 return;
             }
             state.stepContext.getMetric(READ_COUNT).increment();
@@ -689,12 +690,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             }
             log.debugf(Messages.get("CHAINLINK-014501.chunk.processor.process"), state.context, this.processor.getRef());
             final Object processed = this.processor.processItem(state.configuration, state.context, read);
-            if (processed == null) {
-                state.stepContext.getMetric(FILTER_COUNT).increment();
-                log.debugf(Messages.get("CHAINLINK-014510.chunk.processor.filter"), state.context);
-                state.next(state.isReadyToCheckpoint() ? WRITE : READ);
-                return;
-            }
             for (final ListenerImpl listener : state.itemProcessListeners) {
                 try {
                     log.debugf(Messages.get("CHAINLINK-014502.chunk.processor.after"), state.context);
@@ -706,6 +701,15 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
                         exception.addSuppressed(e);
                     }
                 }
+            }
+            if (processed == null) {
+                state.stepContext.getMetric(FILTER_COUNT).increment();
+                if (exception != null) {
+                    throw exception;
+                }
+                log.debugf(Messages.get("CHAINLINK-014510.chunk.processor.filter"), state.context);
+                state.next(state.isReadyToCheckpoint() ? WRITE : READ);
+                return;
             }
             if (exception != null) {
                 throw exception;
@@ -901,25 +905,26 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     }
 
     private Match _tryMatchException(final State state, final Exception e) throws Exception {
+        final ClassLoader loader = state.configuration.getClassLoader();
         if (state.retrying) {
-            if (state.isSkipAllowed() && getSkippableExceptionClasses().matches(e)) {
+            if (state.isSkipAllowed() && getSkippableExceptionClasses().matches(e, loader)) {
                 return Match.SKIP;
             }
-            if (state.isRetryAllowed() && getRetryableExceptionClasses().matches(e)) {
-                if (getNoRollbackExceptionClasses().matches(e)) {
+            if (state.isRetryAllowed() && getRetryableExceptionClasses().matches(e, loader)) {
+                if (getNoRollbackExceptionClasses().matches(e, loader)) {
                     return Match.NO_ROLLBACK;
                 }
                 return Match.RETRY;
             }
             return Match.NONE;
         } else {
-            if (state.isRetryAllowed() && getRetryableExceptionClasses().matches(e)) {
-                if (getNoRollbackExceptionClasses().matches(e)) {
+            if (state.isRetryAllowed() && getRetryableExceptionClasses().matches(e, loader)) {
+                if (getNoRollbackExceptionClasses().matches(e, loader)) {
                     return Match.NO_ROLLBACK;
                 }
                 return Match.RETRY;
             }
-            if (state.isSkipAllowed() && getSkippableExceptionClasses().matches(e)) {
+            if (state.isSkipAllowed() && getSkippableExceptionClasses().matches(e, loader)) {
                 return Match.SKIP;
             }
             return Match.NONE;
@@ -1053,12 +1058,9 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
 
     @Override
     public synchronized void cancel(final Configuration configuration, final ExecutionContextImpl context) {
-        if (context != null) {
-            final StepContextImpl stepContext = context.getStepContext();
-            if (stepContext != null) {
-                stepContext.setBatchStatus(BatchStatus.STOPPING);
-            }
-        }
+        final StepContextImpl stepContext = context.getStepContext();
+        assert stepContext != null;
+        stepContext.setBatchStatus(BatchStatus.STOPPING);
     }
 
     private enum Match { NONE, SKIP, RETRY, NO_ROLLBACK }
@@ -1145,13 +1147,6 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
             this.objects = chunk.checkpointAlgorithm == null
                     ? new LinkedList<>()
                     : new ArrayList<>(this.itemCount);
-
-            if (chunk.reader == null) {
-                throw new IllegalStateException(Messages.format("CHAINLINK-014002.chunk.reader.null", context));
-            }
-            if (chunk.writer == null) {
-                throw new IllegalStateException(Messages.format("CHAINLINK-014003.chunk.writer.null", context));
-            }
             if (CheckpointPolicy.ITEM.equalsIgnoreCase(chunk.checkpointPolicy) || chunk.checkpointAlgorithm == null) {
                 this._checkpointAlgorithm = new ItemCheckpointAlgorithm(timeout, this.itemCount);
             } else {

@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.execution.chunk;
 
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.core.base.OperatorTest;
-import io.machinecode.chainlink.core.execution.chunk.artifact.EventOrderTransactionManager;
+import io.machinecode.chainlink.core.execution.artifact.EventOrderTransactionManager;
 
 import java.util.concurrent.TimeUnit;
 

@@ -1,16 +1,17 @@
 package io.machinecode.chainlink.test.guice;
 
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.OverrideBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.ErrorBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailProcessBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailStopBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.OverrideBatchlet;
 import io.machinecode.chainlink.inject.guice.BindingProvider;
 import io.machinecode.chainlink.inject.guice.GuiceArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.core.execution.batchlet.BatchletTest;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.RunBatchlet;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.FailBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.InjectedBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.RunBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.StopBatchlet;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -32,6 +33,7 @@ public class GuiceBatchletTest extends BatchletTest {
             public List<Binding> getBindings() {
                 return new ArrayList<Binding>() {{
                     add(Binding.of(Batchlet.class, "failBatchlet", FailBatchlet.class));
+                    add(Binding.of(Batchlet.class, "errorBatchlet", ErrorBatchlet.class));
                     add(Binding.of(Batchlet.class, "runBatchlet", RunBatchlet.class));
                     add(Binding.of(Batchlet.class, "injectedBatchlet", InjectedBatchlet.class));
                     add(Binding.of(Batchlet.class, "stopBatchlet", StopBatchlet.class));

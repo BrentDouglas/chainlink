@@ -35,9 +35,8 @@ public class ExceptionClassFilterImpl implements ExceptionClassFilter, Serializa
         return this.excludes;
     }
 
-    public boolean matches(final Exception exception) throws ClassNotFoundException {
+    public boolean matches(final Exception exception, final ClassLoader loader) throws ClassNotFoundException {
         final Class<?> clazz = exception.getClass();
-        final ClassLoader loader = clazz.getClassLoader();
         for (final ExceptionClassImpl that : excludes) {
             try {
                 if (that.matches(clazz, loader)) {

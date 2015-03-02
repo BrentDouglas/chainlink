@@ -1,14 +1,13 @@
 package io.machinecode.chainlink.core.jmx;
 
 import io.machinecode.chainlink.core.base.OperatorTest;
-import io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet;
+import io.machinecode.chainlink.core.execution.artifact.batchlet.StopBatchlet;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.core.jsl.fluent.execution.FluentStep;
 import io.machinecode.chainlink.core.loader.FluentJobLoader;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.core.management.jmx.JmxJobOperator;
 import io.machinecode.chainlink.core.management.jmx.JmxJobOperatorBean;
-import io.machinecode.chainlink.core.management.jmx.JmxJobOperatorClient;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.repository.ExtendedJobExecution;
 import io.machinecode.chainlink.spi.repository.ExtendedJobInstance;
@@ -21,8 +20,6 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.StepExecution;
 import javax.management.MBeanServer;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.TabularData;
 import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Properties;

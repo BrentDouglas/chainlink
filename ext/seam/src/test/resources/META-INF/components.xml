@@ -26,11 +26,12 @@
         </core:interceptors>
      </core:init>
 
-    <component name="runBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.RunBatchlet" />
-    <component name="stopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.StopBatchlet" />
-    <component name="failBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailBatchlet" />
-    <component name="injectedBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.InjectedBatchlet" />
-    <component name="overrideBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.OverrideBatchlet"/>
-    <component name="failStopBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailStopBatchlet"/>
-    <component name="failProcessBatchlet" class="io.machinecode.chainlink.core.execution.batchlet.artifact.FailProcessBatchlet"/>
+    <component name="runBatchlet" class="io.machinecode.chainlink.core.execution.artifact.batchlet.RunBatchlet" />
+    <component name="stopBatchlet" class="io.machinecode.chainlink.core.execution.artifact.batchlet.StopBatchlet" />
+    <component name="failBatchlet" class="io.machinecode.chainlink.core.execution.artifact.batchlet.FailBatchlet" />
+    <component name="errorBatchlet" class="io.machinecode.chainlink.core.execution.artifact.batchlet.ErrorBatchlet" />
+    <component name="injectedBatchlet" class="io.machinecode.chainlink.core.execution.artifact.batchlet.InjectedBatchlet" />
+    <component name="overrideBatchlet" class="io.machinecode.chainlink.core.execution.artifact.batchlet.OverrideBatchlet"/>
+    <component name="failStopBatchlet" class="io.machinecode.chainlink.core.execution.artifact.batchlet.FailStopBatchlet"/>
+    <component name="failProcessBatchlet" class="io.machinecode.chainlink.core.execution.artifact.batchlet.FailProcessBatchlet"/>
 </components>

@@ -49,80 +49,78 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         final StepContextImpl stepContext = context.getStepContext();
         final Repository repository = Repo.getRepository(configuration, repositoryId);
         stepContext.setBatchStatus(BatchStatus.STARTED);
+        if (partitionExecutionId != null) {
+            repository.startPartitionExecution(
+                    partitionExecutionId,
+                    new Date()
+            );
+        }
+        synchronized (this) {
+            if (promise.isCancelled()) {
+                log.debugf(Messages.get("CHAINLINK-013100.batchlet.cancelled"), context, getRef());
+                stepContext.setBatchStatus(BatchStatus.STOPPING);
+                if (partitionExecutionId != null) {
+                    repository.finishPartitionExecution(
+                            partitionExecutionId,
+                            stepContext.getMetrics(),
+                            stepContext.getPersistentUserData(),
+                            BatchStatus.STOPPED,
+                            stepContext.getExitStatus(),
+                            new Date()
+                    );
+                }
+                return;
+            }
+        }
         Throwable throwable = null;
         try {
-            if (partitionExecutionId != null) {
-                repository.startPartitionExecution(
-                        partitionExecutionId,
-                        new Date()
-                );
+            log.debugf(Messages.get("CHAINLINK-013101.batchlet.process"), context, getRef());
+            final String exitStatus = this.process(configuration, context);
+            log.debugf(Messages.get("CHAINLINK-013102.batchlet.status"), context, getRef(), exitStatus);
+            if (stepContext.getExitStatus() == null) {
+                // TODO The RI doesn't set this until after running step listeners
+                stepContext.setExitStatus(exitStatus);
             }
-            synchronized (this) {
-                if (promise.isCancelled()) {
-                    log.debugf(Messages.get("CHAINLINK-013100.batchlet.cancelled"), context, getRef());
-                    stepContext.setBatchStatus(BatchStatus.STOPPING);
-                    if (partitionExecutionId != null) {
-                        repository.finishPartitionExecution(
-                                partitionExecutionId,
-                                stepContext.getMetrics(),
-                                stepContext.getPersistentUserData(),
-                                BatchStatus.STOPPED,
-                                stepContext.getExitStatus(),
-                                new Date()
-                        );
-                    }
-                    return;
-                }
+        } catch (final Exception e) {
+            stepContext.setException(e);
+            stepContext.setBatchStatus(BatchStatus.FAILED);
+            throwable = e;
+        } catch (final Throwable e) {
+            stepContext.setBatchStatus(BatchStatus.FAILED);
+            throwable = e;
+        }
+        if (promise.isCancelled()) {
+            if (stepContext.getBatchStatus() != BatchStatus.FAILED) {
+                stepContext.setBatchStatus(BatchStatus.STOPPING);
             }
-            try {
-                log.debugf(Messages.get("CHAINLINK-013101.batchlet.process"), context, getRef());
-                final String exitStatus = this.process(configuration, context);
-                log.debugf(Messages.get("CHAINLINK-013102.batchlet.status"), context, getRef(), exitStatus);
-                if (stepContext.getExitStatus() == null) {
-                    // TODO The RI doesn't set this until after running step listeners
-                    stepContext.setExitStatus(exitStatus);
-                }
-            } catch (final Throwable e) {
-                if (e instanceof Exception) {
-                    stepContext.setException((Exception)e);
-                }
-                stepContext.setBatchStatus(BatchStatus.FAILED);
-                throwable = e;
-            }
-            if (promise.isCancelled()) {
-                if (stepContext.getBatchStatus() != BatchStatus.FAILED) {
-                    stepContext.setBatchStatus(BatchStatus.STOPPING);
-                }
-            }
-            final Item item;
-            if (this.partition != null) {
-                item = this.partition.collect(configuration, context, stepContext.getBatchStatus(), stepContext.getExitStatus());
-            } else {
-                item = new ItemImpl(null, stepContext.getBatchStatus(), stepContext.getExitStatus());
-            }
-            context.setItems(item);
-            if (throwable != null) {
-                throw throwable;
-            }
-        } finally {
-            final BatchStatus batchStatus;
-            if (promise.isCancelled()) {
-                stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
-            } else if (throwable != null) {
-                batchStatus = BatchStatus.FAILED;
-            } else {
-                batchStatus = BatchStatus.COMPLETED;
-            }
-            if (partitionExecutionId != null) {
-                repository.finishPartitionExecution(
-                        partitionExecutionId,
-                        stepContext.getMetrics(),
-                        stepContext.getPersistentUserData(),
-                        batchStatus,
-                        stepContext.getExitStatus(),
-                        new Date()
-                );
-            }
+        }
+        final Item item;
+        if (this.partition != null) {
+            item = this.partition.collect(configuration, context, stepContext.getBatchStatus(), stepContext.getExitStatus());
+        } else {
+            item = new ItemImpl(null, stepContext.getBatchStatus(), stepContext.getExitStatus());
+        }
+        context.setItems(item);
+        final BatchStatus batchStatus;
+        if (promise.isCancelled()) {
+            stepContext.setBatchStatus(batchStatus = BatchStatus.STOPPING);
+        } else if (throwable != null) {
+            batchStatus = BatchStatus.FAILED;
+        } else {
+            batchStatus = BatchStatus.COMPLETED;
+        }
+        if (partitionExecutionId != null) {
+            repository.finishPartitionExecution(
+                    partitionExecutionId,
+                    stepContext.getMetrics(),
+                    stepContext.getPersistentUserData(),
+                    batchStatus,
+                    stepContext.getExitStatus(),
+                    new Date()
+            );
+        }
+        if (throwable != null) {
+            throw throwable;
         }
     }
 
