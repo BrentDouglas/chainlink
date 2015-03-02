@@ -22,7 +22,9 @@ public class BytesDeserializer extends JsonDeserializer<Serializable> {
     public Serializable deserialize(final JsonParser parser, final DeserializationContext context) throws IOException {
         try {
             return unmarshaller.unmarshall(parser.getBinaryValue(), Thread.currentThread().getContextClassLoader());
-        } catch (final ClassNotFoundException e) {
+        } catch (final IOException e) {
+            throw e;
+        } catch (final Exception e) {
             throw new IOException(e);
         }
     }

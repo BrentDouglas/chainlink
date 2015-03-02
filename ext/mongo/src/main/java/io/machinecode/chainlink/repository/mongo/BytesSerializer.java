@@ -20,6 +20,12 @@ public class BytesSerializer extends JsonSerializer<Serializable> {
 
     @Override
     public void serialize(final Serializable value, final JsonGenerator generator, final SerializerProvider provider) throws IOException {
-        generator.writeBinary(marshalling.marshall(value));
+        try {
+            generator.writeBinary(marshalling.marshall(value));
+        } catch (final IOException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new IOException(e);
+        }
     }
 }
