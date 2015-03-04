@@ -1,6 +1,5 @@
-package io.machinecode.chainlink.tck.core.repository;
+package io.machinecode.chainlink.redis.repository;
 
-import io.machinecode.chainlink.repository.redis.RedisRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.repository.Repository;
@@ -17,8 +16,8 @@ public class RedisRepositoryFactory implements RepositoryFactory {
     public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
         return new RedisRepository(
                 new JedisShardInfo(
-                        System.getProperty("redis.host"),
-                        Integer.parseInt(System.getProperty("redis.port"))
+                        properties.getProperty("io.machinecode.chainlink.redis.host"),
+                        Integer.parseInt(properties.getProperty("io.machinecode.chainlink.redis.port"))
                 ),
                 dependencies.getClassLoader(),
                 dependencies.getMarshalling()

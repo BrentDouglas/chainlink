@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.redis.test.repository;
 
 import io.machinecode.chainlink.core.repository.MutableMetricImpl;
-import io.machinecode.chainlink.repository.redis.RedisRepository;
+import io.machinecode.chainlink.redis.repository.RedisRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;

@@ -29,7 +29,7 @@
             <Class name="io.machinecode.chainlink.core.jsl.impl.execution.StepImpl" />
             <Class name="io.machinecode.chainlink.repository.infinispan.RunningJobExecutionIdCallable" />
             <Class name="io.machinecode.chainlink.core.repository.memory.MemoryRepository" />
-            <Class name="io.machinecode.chainlink.repository.redis.RedisRepository" />
+            <Class name="io.machinecode.chainlink.redis.repository.RedisRepository" />
         </Or>
         <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
     </Match>

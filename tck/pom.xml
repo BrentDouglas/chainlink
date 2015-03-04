@@ -418,7 +418,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.RedisRepositoryFactory</repository.factory.class>
+                <repository.factory.class>io.machinecode.chainlink.tck.core.repository.TckRedisRepositoryFactory</repository.factory.class>
             </properties>
         </profile>
 

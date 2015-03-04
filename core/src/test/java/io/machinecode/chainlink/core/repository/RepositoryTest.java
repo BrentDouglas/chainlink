@@ -1665,6 +1665,20 @@ public class RepositoryTest extends BaseTest {
     @Test
     public void getJobInstanceForExecutionTest() throws Exception {
         printMethodName();
+
+        final Properties parameters = new Properties();
+        final JobImpl job = _job();
+        final ExtendedJobInstance jobInstance = repository().createJobInstance(job.getId(), "jsl", new Date());
+        final ExtendedJobExecution jobExecution = repository().createJobExecution(
+                jobInstance.getInstanceId(),
+                jobInstance.getJobName(),
+                parameters,
+                new Date()
+        );
+
+        final ExtendedJobInstance out = repository().getJobInstanceForExecution(jobExecution.getExecutionId());
+        assertEquals(jobInstance.getInstanceId(), out.getInstanceId());
+
         //TODO
     }
 

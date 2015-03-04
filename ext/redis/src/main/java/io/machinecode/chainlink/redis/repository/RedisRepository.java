@@ -1,4 +1,4 @@
-package io.machinecode.chainlink.repository.redis;
+package io.machinecode.chainlink.redis.repository;
 
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.repository.JobExecutionImpl;
@@ -28,6 +28,7 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import javax.batch.runtime.Metric;
 import javax.batch.runtime.StepExecution;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -140,17 +141,18 @@ public class RedisRepository implements Repository {
                 .setLastUpdatedTime(timestamp)
                 .build();
         jedis.set(bytes(JOB_EXECUTION_PREFIX, jobExecutionId), marshalling.marshall(execution));
+        final byte[] jobExecutionIdBytes = marshalling.marshallLong(jobExecutionId);
         jedis.set(
                 bytes(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, jobInstanceId),
-                marshalling.marshallLong(jobExecutionId)
+                jobExecutionIdBytes
         );
         jedis.rpush(
                 bytes(JOB_INSTANCE_EXECUTIONS_PREFIX, jobInstanceId),
-                marshalling.marshallLong(jobExecutionId)
+                jobExecutionIdBytes
         );
         jedis.rpush(
-                bytes(JOB_NAME_JOB_EXECUTIONS_PREFIX, jobInstanceId),
-                marshalling.marshallLong(jobExecutionId)
+                bytes(JOB_NAME_JOB_EXECUTIONS_PREFIX, jobName),
+                jobExecutionIdBytes
         );
         return execution;
     }
@@ -295,16 +297,16 @@ public class RedisRepository implements Repository {
         Jedis jedis = null;
         try {
             jedis = _open();
-            List<byte[]> oldJobExecutionIds = _list(jedis, JOB_EXECUTION_HISTORY_PREFIX, restartJobExecutionId);
-            if (oldJobExecutionIds == null) {
-                oldJobExecutionIds = Collections.emptyList();
-            }
-            List<byte[]> jobExecutionIds = _list(jedis, JOB_EXECUTION_HISTORY_PREFIX, jobExecutionId);
-            if (jobExecutionIds == null) {
-                jobExecutionIds = new ArrayList<>();
+            final List<byte[]> jobExecutionIds = new ArrayList<>();
+            final List<byte[]> current = _list(jedis, JOB_EXECUTION_HISTORY_PREFIX, jobExecutionId);
+            if (current != null) {
+                jobExecutionIds.addAll(current);
             }
             jobExecutionIds.add(marshalling.marshallLong(restartJobExecutionId));
-            jobExecutionIds.addAll(oldJobExecutionIds);
+            final List<byte[]> oldJobExecutionIds = _list(jedis, JOB_EXECUTION_HISTORY_PREFIX, restartJobExecutionId);
+            if (oldJobExecutionIds != null) {
+                jobExecutionIds.addAll(oldJobExecutionIds);
+            }
             jedis.rpush(
                     bytes(JOB_EXECUTION_HISTORY_PREFIX, jobExecutionId),
                     jobExecutionIds.toArray(new byte[jobExecutionIds.size()][])
@@ -569,14 +571,11 @@ public class RedisRepository implements Repository {
             final List<byte[]> values = _list(jedis, JOB_NAME_JOB_EXECUTIONS_PREFIX, jobName);
             for (final byte[] value : values) {
                 final ExtendedJobExecution jobExecution = _je(jedis, value);
-                if (jobName.equals(jobExecution.getJobName())) {
-                    switch (jobExecution.getBatchStatus()) {
-                        case STARTING:
-                        case STARTED:
-                            ids.add(jobExecution.getExecutionId());
-                    }
+                switch (jobExecution.getBatchStatus()) {
+                    case STARTING:
+                    case STARTED:
+                        ids.add(jobExecution.getExecutionId());
                 }
-                ids.add(jobExecution.getExecutionId());
             }
             if (ids.isEmpty()) {
                 throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
@@ -690,8 +689,10 @@ public class RedisRepository implements Repository {
             if (jobExecution == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
-            final Long latest = (Long) marshalling.unmarshall(jedis.get(bytes(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, jobExecution.getJobInstanceId())), this.loader.get());
-            if (latest == null) {
+            final long latest;
+            try {
+                latest = marshalling.unmarshallLong(jedis.get(bytes(LATEST_JOB_EXECUTION_FOR_INSTANCE_PREFIX, jobExecution.getJobInstanceId())), this.loader.get());
+            } catch (final IllegalAccessException | IOException e) {
                 throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobExecutionId));
             }
             if (latest != jobExecutionId) {
@@ -1013,16 +1014,24 @@ public class RedisRepository implements Repository {
 
     private List<byte[]> _list(final BinaryJedisCommands jedis, final String prefix, final long id) {
         final byte[] key = bytes(prefix, id);
-        return jedis.lrange(key, 0, jedis.llen(key));
+        return _list(jedis, key);
     }
 
     private List<byte[]> _list(final BinaryJedisCommands jedis, final String prefix, final String id) {
         final byte[] key = bytes(prefix, id);
-        return jedis.lrange(key, 0, jedis.llen(key));
+        return _list(jedis, key);
     }
 
     private List<byte[]> _list(final BinaryJedisCommands jedis, final String prefix, final byte[] id) throws Exception {
         final byte[] key = bytes(prefix, marshalling.unmarshallLong(id, this.loader.get()));
-        return jedis.lrange(key, 0, jedis.llen(key));
+        return _list(jedis, key);
+    }
+
+    private List<byte[]> _list(final BinaryJedisCommands jedis, final byte[] key) {
+        final long len = jedis.llen(key);
+        if (len == 0) {
+            return Collections.emptyList();
+        }
+        return jedis.lrange(key, 0, len);
     }
 }
