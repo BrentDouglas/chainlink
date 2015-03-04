@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.jsl.impl.task;
 
-import io.machinecode.chainlink.core.util.ResolvableClass;
 import io.machinecode.chainlink.spi.jsl.task.ExceptionClass;
 
 import java.io.Serializable;
@@ -12,19 +11,27 @@ import java.io.Serializable;
 public class ExceptionClassImpl implements ExceptionClass, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final ResolvableClass<? extends Throwable> clazz;
+    private final String fqcn;
+    private transient Class<?> clazz;
 
     public ExceptionClassImpl(final String fqcn) {
-        this.clazz = new ResolvableClass<>(fqcn);
+        this.fqcn = fqcn;
     }
 
     @Override
     public String getClassName() {
-        return this.clazz.fqcn();
+        return this.fqcn;
     }
 
     public boolean matches(final Class<?> theirs, final ClassLoader loader) throws ClassNotFoundException {
         return theirs.getCanonicalName().equals(getClassName())
-                || this.clazz.resolve(loader).isAssignableFrom(theirs);
+                || this._load(loader).isAssignableFrom(theirs);
+    }
+
+    private Class<?> _load(final ClassLoader loader) throws ClassNotFoundException {
+        if (clazz == null) {
+            clazz = loader.loadClass(this.fqcn);
+        }
+        return clazz;
     }
 }

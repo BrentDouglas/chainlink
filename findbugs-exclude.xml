@@ -51,7 +51,7 @@
             <Class name="io.machinecode.chainlink.core.jsl.impl.JobImpl" />
             <Class name="io.machinecode.chainlink.core.jsl.impl.ListenerImpl" />
             <Class name="io.machinecode.chainlink.core.jsl.impl.execution.StepImpl" />
-            <Class name="io.machinecode.chainlink.core.util.ResolvableClass" />
+            <Class name="io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassImpl" />
             <Class name="io.machinecode.chainlink.inject.seam.SeamInjectionInterceptor" />
         </Or>
         <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED"/>

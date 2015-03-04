@@ -11,3 +11,4 @@
   thread factory.
 - Hook progress up
 - Look at thread safety in extensions
+- Find out why using MariaDB is so slow

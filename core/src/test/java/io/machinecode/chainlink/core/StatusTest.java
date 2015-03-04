@@ -39,6 +39,7 @@ public class StatusTest {
         Assert.assertTrue(Statuses.matches("STOP*PI*NG", "STOPPING"));
         Assert.assertTrue(Statuses.matches("STOP*PI?G", "STOPPING"));
     }
+
     @Test
     public void testBatchStatus() {
         Assert.assertTrue(Statuses.matches("STARTING", BatchStatus.STARTING));
@@ -48,5 +49,16 @@ public class StatusTest {
         Assert.assertTrue(Statuses.matches("ABANDONED", BatchStatus.ABANDONED));
         Assert.assertTrue(Statuses.matches("STOPPED", BatchStatus.STOPPED));
         Assert.assertTrue(Statuses.matches("STOPPING", BatchStatus.STOPPING));
+    }
+
+    @Test
+    public void testComplete() {
+        Assert.assertFalse(Statuses.isComplete(BatchStatus.STARTING));
+        Assert.assertFalse(Statuses.isComplete(BatchStatus.STARTED));
+        Assert.assertTrue(Statuses.isComplete(BatchStatus.COMPLETED));
+        Assert.assertTrue(Statuses.isComplete(BatchStatus.FAILED));
+        Assert.assertTrue(Statuses.isComplete(BatchStatus.ABANDONED));
+        Assert.assertTrue(Statuses.isComplete(BatchStatus.STOPPED));
+        Assert.assertFalse(Statuses.isComplete(BatchStatus.STOPPING));
     }
 }

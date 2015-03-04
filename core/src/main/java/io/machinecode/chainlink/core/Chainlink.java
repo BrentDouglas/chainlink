@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core;
 
-import io.machinecode.chainlink.core.util.ResolvableService;
+import io.machinecode.chainlink.core.util.Services;
 import io.machinecode.chainlink.spi.Messages;
 import org.jboss.logging.Logger;
 
@@ -34,8 +34,7 @@ public final class Chainlink {
             }
             try {
                 final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-                final List<Environment> environments = new ResolvableService<>(Constants.ENVIRONMENT, Environment.class)
-                        .resolve(tccl);
+                final List<Environment> environments = Services.load(Constants.ENVIRONMENT, Environment.class, tccl);
                 if (!environments.isEmpty()) {
                     Chainlink.environment = environments.get(0);
                     return Chainlink.environment;

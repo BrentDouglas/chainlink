@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.tck.core;
 
 import io.machinecode.chainlink.core.Constants;
-import io.machinecode.chainlink.core.util.ResolvableService;
+import io.machinecode.chainlink.core.util.Services;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
@@ -37,27 +37,27 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
 
         //These will throw if the properties aren't set but they aren't all required
         try {
-            transactionManagers = new ResolvableService<>(TransactionManagerFactory.class).resolve(tccl);
+            transactionManagers = Services.load(TransactionManagerFactory.class, tccl);
         } catch (final ServiceConfigurationError e) {}
         try {
-            artifactLoaders = new ResolvableService<>(ArtifactLoaderFactory.class).resolve(tccl);
+            artifactLoaders = Services.load(ArtifactLoaderFactory.class, tccl);
         } catch (final ServiceConfigurationError e) {}
         try {
-            jobLoaders = new ResolvableService<>(JobLoaderFactory.class).resolve(tccl);
+            jobLoaders = Services.load(JobLoaderFactory.class, tccl);
         } catch (final ServiceConfigurationError e) {}
         try {
-            securitys = new ResolvableService<>(SecurityFactory.class).resolve(tccl);
+            securitys = Services.load(SecurityFactory.class, tccl);
         } catch (final ServiceConfigurationError e) {}
         try {
-            mBeanServer = new ResolvableService<>(MBeanServerFactory.class).resolve(tccl);
+            mBeanServer = Services.load(MBeanServerFactory.class, tccl);
         } catch (final ServiceConfigurationError e) {}
         try {
-            marshallingFactory = new ResolvableService<>(MarshallingFactory.class).resolve(tccl);
+            marshallingFactory = Services.load(MarshallingFactory.class, tccl);
         } catch (final ServiceConfigurationError e) {}
-        List<RepositoryFactory> executionRepositories = new ResolvableService<>(RepositoryFactory.class).resolve(tccl);
-        List<ExecutorFactory> executors = new ResolvableService<>(ExecutorFactory.class).resolve(tccl);
-        List<RegistryFactory> registries = new ResolvableService<>(RegistryFactory.class).resolve(tccl);
-        List<TransportFactory> transports = new ResolvableService<>(TransportFactory.class).resolve(tccl);
+        List<RepositoryFactory> executionRepositories = Services.load(RepositoryFactory.class, tccl);
+        List<ExecutorFactory> executors = Services.load(ExecutorFactory.class, tccl);
+        List<RegistryFactory> registries = Services.load(RegistryFactory.class, tccl);
+        List<TransportFactory> transports = Services.load(TransportFactory.class, tccl);
 
         model.getProperties().setProperty(Constants.THREAD_POOL_SIZE, "8");
         model.getTransactionManager().setFactory(transactionManagers == null || transactionManagers.isEmpty() ? null : transactionManagers.get(0));
