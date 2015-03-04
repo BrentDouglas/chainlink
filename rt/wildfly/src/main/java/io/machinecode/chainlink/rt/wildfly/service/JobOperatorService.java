@@ -1,16 +1,24 @@
 package io.machinecode.chainlink.rt.wildfly.service;
 
+import io.machinecode.chainlink.core.configuration.ClassLoaderFactoryImpl;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
+import io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory;
+import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
+import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.configuration.Model;
+import io.machinecode.chainlink.core.transaction.ReferenceTransactionManagerFactory;
+import io.machinecode.chainlink.core.transport.LocalTransportFactory;
+import io.machinecode.chainlink.marshalling.jboss.JbossMarshallingFactory;
 import io.machinecode.chainlink.rt.wildfly.WildFlyEnvironment;
-import io.machinecode.chainlink.rt.wildfly.configuration.WildFlyConfigurationDefaults;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
@@ -72,8 +80,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
 
             final JobOperatorModelImpl operator = scope.getJobOperator(name);
 
-            new WildFlyConfigurationDefaults(loader, transactionManager.getValue())
-                    .configureJobOperator(operator);
+            configureJobOperator(operator, loader, transactionManager.getValue());
 
             Model.configureJobOperator(scope, this.schema, classLoader);
 
@@ -138,5 +145,16 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
 
     public InjectedValue<BeanManager> getBeanManager() {
         return beanManager;
+    }
+
+    private static void configureJobOperator(final JobOperatorModel model, final WeakReference<ClassLoader> loader, final TransactionManager transactionManager) throws Exception {
+        model.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(loader));
+        model.getTransactionManager().setDefaultFactory(new ReferenceTransactionManagerFactory(transactionManager));
+        model.getRepository().setDefaultFactory(new MemoryRepositoryFactory());
+        model.getMarshalling().setDefaultFactory(new JbossMarshallingFactory());
+        model.getMBeanServer().setDefaultFactory(new PlatformMBeanServerFactory());
+        model.getTransport().setDefaultFactory(new LocalTransportFactory());
+        model.getRegistry().setDefaultFactory(new LocalRegistryFactory());
+        model.getExecutor().setDefaultFactory(new EventedExecutorFactory());
     }
 }

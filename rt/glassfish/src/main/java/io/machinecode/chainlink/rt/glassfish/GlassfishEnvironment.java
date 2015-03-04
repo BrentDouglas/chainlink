@@ -2,16 +2,25 @@ package io.machinecode.chainlink.rt.glassfish;
 
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.Environment;
+import io.machinecode.chainlink.core.configuration.ClassLoaderFactoryImpl;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
+import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
 import io.machinecode.chainlink.core.management.LazyJobOperator;
+import io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory;
+import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
+import io.machinecode.chainlink.core.registry.LocalRegistryFactory;
+import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.core.schema.Configure;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import io.machinecode.chainlink.core.configuration.Model;
+import io.machinecode.chainlink.core.transaction.JndiTransactionManagerFactory;
+import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
+import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.glassfish.internal.data.ApplicationInfo;
@@ -114,11 +123,10 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
 
         deployment.loadChainlinkXml();
 
-        final GlassfishConfigurationDefaults defaults = new GlassfishConfigurationDefaults(loader, threadFactory);
         boolean haveDefault = false;
         for (final Map.Entry<String, JobOperatorModelImpl> entry : deployment.getJobOperators().entrySet()) {
             final JobOperatorModelImpl jobOperatorModel = entry.getValue();
-            defaults.configureJobOperator(jobOperatorModel);
+            configureJobOperator(jobOperatorModel, loader, threadFactory);
             if (Constants.DEFAULT.equals(entry.getKey())) {
                 haveDefault = true;
             }
@@ -130,7 +138,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
         }
         if (!haveDefault) {
             final JobOperatorModelImpl defaultModel = deployment.getJobOperator(Constants.DEFAULT);
-            defaults.configureJobOperator(defaultModel);
+            configureJobOperator(defaultModel, loader, threadFactory);
             final LazyJobOperator op = defaultModel.createLazyJobOperator();
             app.ops.put(
                     Constants.DEFAULT,
@@ -163,6 +171,17 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     @Override
     public void close() throws Exception {
         // TODO
+    }
+
+    private static void configureJobOperator(final JobOperatorModel model, final ClassLoader loader, final ThreadFactoryLookup threadFactory) throws Exception {
+        model.getClassLoader().setDefaultFactory(new ClassLoaderFactoryImpl(loader));
+        model.getTransactionManager().setDefaultFactory(new JndiTransactionManagerFactory("java:appserver/TransactionManager"));
+        model.getRepository().setDefaultFactory(new MemoryRepositoryFactory());
+        model.getMarshalling().setDefaultFactory(new JdkMarshallingFactory());
+        model.getMBeanServer().setDefaultFactory(new PlatformMBeanServerFactory());
+        model.getTransport().setDefaultFactory(new LocalTransportFactory());
+        model.getRegistry().setDefaultFactory(new LocalRegistryFactory());
+        model.getExecutor().setDefaultFactory(new EventedExecutorFactory(threadFactory));
     }
 
     private static class App {
