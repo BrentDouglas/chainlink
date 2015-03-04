@@ -193,7 +193,7 @@
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                                 <manifestEntries>
                                     <Dependencies>
-                                        io.machinecode.chainlink.repository.infinispan,
+                                        io.machinecode.chainlink.ext.infinispan,
                                         javaee.api,
                                         org.infinispan
                                     </Dependencies>

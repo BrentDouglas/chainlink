@@ -214,7 +214,7 @@
             <buffer-pool name="default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:infinispan:3.0">
-            <cache-container name="chainlink" default-cache="default" module="io.machinecode.chainlink.repository.infinispan" start="EAGER">
+            <cache-container name="chainlink" default-cache="default" module="io.machinecode.chainlink.ext.infinispan" start="EAGER">
                 <local-cache name="default">
                     <transaction mode="BATCH" locking="PESSIMISTIC"/>
                 </local-cache>

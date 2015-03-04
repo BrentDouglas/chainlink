@@ -22,7 +22,7 @@ public class ChainlinkDependencyProcessor implements DeploymentUnitProcessor {
 
     private final ModuleIdentifier javax_batch_api = ModuleIdentifier.create("javax.batch.api");
     private final ModuleIdentifier io_machinecode_chainlink = ModuleIdentifier.create("io.machinecode.chainlink");
-    private final ModuleIdentifier io_machinecode_chainlink_inject_cdi = ModuleIdentifier.create("io.machinecode.chainlink.inject.cdi");
+    private final ModuleIdentifier io_machinecode_chainlink_ext_cdi = ModuleIdentifier.create("io.machinecode.chainlink.ext.cdi");
 
     @Override
     public void deploy(final DeploymentPhaseContext deploymentPhaseContext) throws DeploymentUnitProcessingException {
@@ -34,7 +34,7 @@ public class ChainlinkDependencyProcessor implements DeploymentUnitProcessor {
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, io_machinecode_chainlink, false, false, true, false));
 
         if (WeldDeploymentMarker.isPartOfWeldDeployment(deploymentUnit)) {
-            moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, io_machinecode_chainlink_inject_cdi, false, false, true, false));
+            moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, io_machinecode_chainlink_ext_cdi, false, false, true, false));
         }
     }
 
