@@ -38,6 +38,9 @@ env:
     - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se -d postgresql"
     - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se -d postgresql"
+    # For some reason the mariadb driver is extremely slow. Needs investigating.
+    #- BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se -d mariadb"
+    #- BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se -d mariadb"
     - BUILD_ARGS="-I -t local      -i batch  -r redis      -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r mongo      -c se"
     # TCK EE
@@ -58,6 +61,8 @@ addons:
   postgresql: "9.2"
 
 before_script:
+  - mysql -e 'create database chainlink;' -u root
+  - cat "${TRAVIS_BUILD_DIR}/ext/schema-mariadb.sql" | mysql -u root chainlink
   - psql -c 'create database chainlink;' -U postgres
   - cat "${TRAVIS_BUILD_DIR}/ext/schema-postgresql.sql" | psql -U postgres -d chainlink
 

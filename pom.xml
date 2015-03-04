@@ -91,7 +91,7 @@
         <version.org.jboss.spec.jboss-javaee-6.0>2.0.0.Final</version.org.jboss.spec.jboss-javaee-6.0>
         <version.org.jgroups.jgroups>3.6.1.Final</version.org.jgroups.jgroups>
         <version.org.jongo.jongo>1.1</version.org.jongo.jongo>
-        <version.org.mariadb.jdbc.mariadb-java-client>1.1.7</version.org.mariadb.jdbc.mariadb-java-client>
+        <version.org.mariadb.jdbc.mariadb-java-client>1.1.8</version.org.mariadb.jdbc.mariadb-java-client>
         <version.org.mongodb.mongo-java-driver>2.12.3</version.org.mongodb.mongo-java-driver>
         <version.org.ow2.asm.asm>5.0.3</version.org.ow2.asm.asm>
         <version.org.springframework>3.1.1.RELEASE</version.org.springframework>
