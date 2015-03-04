@@ -33,8 +33,10 @@ import io.machinecode.then.api.OnComplete;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.api.Reject;
 import io.machinecode.then.api.Resolve;
+import io.machinecode.then.core.AllDeferred;
 import io.machinecode.then.core.FutureDeferred;
-import io.machinecode.then.core.When;
+import io.machinecode.then.core.RejectedDeferred;
+import io.machinecode.then.core.ResolvedDeferred;
 import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
@@ -189,10 +191,10 @@ public abstract class DistributedTransport<A> implements Transport {
         if (executable != null) {
             final Worker worker = configuration.getExecutor().getWorker(executable.getWorkerId());
             if (worker == null) {
-                return When.rejected(new Exception("No worker found with jobExecutionId=" + jobExecutionId + " and executableId" + executableId));
+                return new RejectedDeferred<RemoteExecution,Throwable,Object>(new Exception("No worker found with jobExecutionId=" + jobExecutionId + " and executableId" + executableId));
             }
             final UUIDId id = new UUIDId(this);
-            return When.resolved(new RemoteExecution(worker, id, id, new ChainImpl<Void>()));
+            return new ResolvedDeferred<>(new RemoteExecution(worker, id, id, new ChainImpl<Void>()));
         }
         final ChainId localId = new UUIDId(this);
         return invokeRemote(executableId.getAddress(), new GetWorkerIdAndPushChainCommand(jobExecutionId, executableId, localId))
@@ -258,7 +260,7 @@ public abstract class DistributedTransport<A> implements Transport {
                         return;
                     }
                 }
-                When.all(promises)
+                new AllDeferred<>(promises)
                         .onResolve(next)
                         .onReject(next)
                         .onCancel(next);

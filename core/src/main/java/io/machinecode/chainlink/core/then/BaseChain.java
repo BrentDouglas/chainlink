@@ -105,7 +105,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
                 }
             }
         }
-        for (OnComplete on : onCompletes) {
+        for (final OnComplete on : onCompletes) {
             try {
                 on.complete(state);
             } catch (final Throwable e) {
