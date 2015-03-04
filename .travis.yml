@@ -28,7 +28,7 @@ env:
     - BUILD_ARGS="-I -t local      -i batch  -r gridgain   -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r hazelcast  -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r ehcache    -c se"
-    - BUILD_ARGS="-I -t local      -i batch  -r coherence  -c se"
+    #- BUILD_ARGS="-I -t local      -i batch  -r coherence  -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jpa        -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r jdbc       -c se -d postgresql"
