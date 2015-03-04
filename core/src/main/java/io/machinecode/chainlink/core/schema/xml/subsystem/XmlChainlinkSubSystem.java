@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.schema.xml.subsystem;
 
-import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.util.Transmute;
 import io.machinecode.chainlink.core.schema.xml.CreateXmlDeclaration;
 import io.machinecode.chainlink.core.schema.xml.CreateXmlJobOperator;
@@ -9,8 +8,6 @@ import io.machinecode.chainlink.core.schema.xml.XmlDeployment;
 import io.machinecode.chainlink.core.schema.xml.XmlJobOperator;
 import io.machinecode.chainlink.core.schema.xml.XmlProperty;
 import io.machinecode.chainlink.core.schema.xml.XmlScope;
-import io.machinecode.chainlink.spi.configuration.SubSystemConfiguration;
-import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.core.util.Mutable;
 import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.DeploymentSchema;
@@ -121,26 +118,6 @@ public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemS
         this.deployments.add(op);
     }
 
-    public void configureSubSystem(final SubSystemModelImpl model, final ClassLoader classLoader) throws Exception {
-        configureScope(model, classLoader);
-        for (final XmlDeployment deployment : this.deployments) {
-            deployment.configureDeployment(model.getDeployment(deployment.getName()), classLoader);
-        }
-        if (this.ref != null) {
-            final SubSystemConfiguration configuration;
-            try {
-                configuration = model.getConfigurationLoader().load(this.ref, SubSystemConfiguration.class, classLoader);
-            } catch (final Exception e) {
-                throw new ConfigurationException("attribute 'ref' must be an injectable " + SubSystemConfiguration.class.getName(), e); //TODO Message
-            }
-            configuration.configureSubSystem(model);
-        }
-    }
-
-    public static void configureSubSystemFromStream(final SubSystemModelImpl model, final ClassLoader loader, final InputStream stream) throws Exception {
-        read(stream).configureSubSystem(model, loader);
-    }
-
     public static XmlChainlinkSubSystem read(final InputStream stream) throws Exception {
         try {
             final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlinkSubSystem.class);
@@ -170,5 +147,4 @@ public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemS
         Transmute.<DeploymentSchema<?,?,?>, XmlDeployment>list(this.getDeployments(), from.getDeployments(), new CreateXmlDeployment(), ops);
         Transmute.<JobOperatorSchema<?,?>, XmlJobOperator>list(this.getJobOperators(), from.getJobOperators(), new CreateXmlJobOperator(), ops);
     }
-
 }

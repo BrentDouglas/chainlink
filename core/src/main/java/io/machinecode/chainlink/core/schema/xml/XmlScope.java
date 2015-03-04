@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.schema.xml;
 
-import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.JobOperatorWithNameExistsException;
 import io.machinecode.chainlink.core.schema.MutableScopeSchema;
@@ -63,15 +62,5 @@ public abstract class XmlScope implements MutableScopeSchema<XmlDeclaration, Xml
         final XmlJobOperator op = new XmlJobOperator();
         op.accept(jobOperator);
         getJobOperators().add(op);
-    }
-
-    public void configureScope(final ScopeModelImpl model, final ClassLoader classLoader) throws Exception {
-        for (final XmlDeclaration resource : this.getConfigurationLoaders()) {
-            model.getConfigurationLoader(resource.getName())
-                    .setRef(XmlJobOperator.ref(resource));
-        }
-        for (final XmlJobOperator operator : this.getJobOperators()) {
-            operator.configureScope(model, classLoader);
-        }
     }
 }

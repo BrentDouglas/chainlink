@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.schema.DeclarationSchema;
 import io.machinecode.chainlink.core.schema.DeploymentSchema;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.PropertySchema;
+import io.machinecode.chainlink.core.schema.ScopeSchema;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.DeploymentConfiguration;
@@ -25,12 +26,7 @@ import java.util.List;
 public final class Model {
 
     public static void configureSubSystem(final SubSystemModelImpl model, final SubSystemSchema<?, ?, ?, ?> subSystem, final ClassLoader classLoader) throws Exception {
-        for (final DeclarationSchema dec : subSystem.getConfigurationLoaders()) {
-            model.getConfigurationLoader(dec.getName()).setRef(dec.getRef());
-        }
-        for (final JobOperatorSchema<?, ?> dec : subSystem.getJobOperators()) {
-            configureJobOperator(model, dec, classLoader);
-        }
+        configureScope(model, subSystem, classLoader);
         for (final DeploymentSchema<?, ?, ?> dec : subSystem.getDeployments()) {
             configureDeployment(model.getDeployment(dec.getName()), dec, classLoader);
         }
@@ -41,17 +37,15 @@ public final class Model {
             } catch (final Exception e) {
                 throw new ConfigurationException("attribute 'ref' must be an injectable " + SubSystemConfiguration.class.getName(), e); //TODO Message
             }
+            if (configuration == null) {
+                throw new ConfigurationException("No " + SubSystemConfiguration.class.getName() + " with ref " + subSystem.getRef()); //TODO Message
+            }
             configuration.configureSubSystem(model);
         }
     }
 
     public static void configureDeployment(final DeploymentModelImpl model, final DeploymentSchema<?, ?, ?> deployment, final ClassLoader classLoader) throws Exception {
-        for (final DeclarationSchema dec : deployment.getConfigurationLoaders()) {
-            model.getConfigurationLoader(dec.getName()).setRef(dec.getRef());
-        }
-        for (final JobOperatorSchema<?,?> dec : deployment.getJobOperators()) {
-            configureJobOperator(model, dec, classLoader);
-        }
+        configureScope(model, deployment, classLoader);
         if (deployment.getRef() != null) {
             final DeploymentConfiguration configuration;
             try {
@@ -59,7 +53,19 @@ public final class Model {
             } catch (final Exception e) {
                 throw new ConfigurationException("attribute 'ref' must be an injectable " + DeploymentConfiguration.class.getName(), e); //TODO Message
             }
+            if (configuration == null) {
+                throw new ConfigurationException("No " + DeploymentConfiguration.class.getName() + " with ref " + deployment.getRef()); //TODO Message
+            }
             configuration.configureDeployment(model);
+        }
+    }
+
+    private static void configureScope(final ScopeModelImpl model, final ScopeSchema<?,?,?> schema, final ClassLoader classLoader) throws Exception {
+        for (final DeclarationSchema dec : schema.getConfigurationLoaders()) {
+            model.getConfigurationLoader(dec.getName()).setRef(dec.getRef());
+        }
+        for (final JobOperatorSchema<?,?> dec : schema.getJobOperators()) {
+            configureJobOperator(model, dec, classLoader);
         }
     }
 
@@ -98,6 +104,9 @@ public final class Model {
                 configuration = scope.getConfigurationLoader().load(op.getRef(), JobOperatorConfiguration.class, classLoader);
             } catch (final ArtifactOfWrongTypeException e) {
                 throw new ConfigurationException("attribute 'ref' must be the fqcn of a class extending " + JobOperatorConfiguration.class.getName(), e); //TODO Message
+            }
+            if (configuration == null) {
+                throw new ConfigurationException("No " + JobOperatorConfiguration.class.getName() + " with ref " + op.getRef()); //TODO Message
             }
             configuration.configureJobOperator(model);
         }

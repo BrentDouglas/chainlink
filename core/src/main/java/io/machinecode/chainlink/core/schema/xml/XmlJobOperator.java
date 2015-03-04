@@ -1,14 +1,7 @@
 package io.machinecode.chainlink.core.schema.xml;
 
-import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
-import io.machinecode.chainlink.core.configuration.ScopeModelImpl;
 import io.machinecode.chainlink.core.util.Creator;
 import io.machinecode.chainlink.core.util.Transmute;
-import io.machinecode.chainlink.spi.configuration.Declaration;
-import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
-import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
-import io.machinecode.chainlink.spi.exception.ConfigurationException;
-import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.core.util.Mutable;
 import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
@@ -264,68 +257,6 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
         Transmute.list(this.getProperties(), from.getProperties(), new CreateXmlProperty(), ops);
     }
 
-    private static String name(final XmlDeclaration dec, final String def) {
-        return dec == null ? def : dec.getName();
-    }
-
-    static String ref(final XmlDeclaration dec) {
-        return dec == null ? null : dec.getRef();
-    }
-
-    private static void set(final Declaration<?> dec, final String ref) {
-        if (ref == null || ref.trim().isEmpty()) {
-            return;
-        }
-        dec.setRef(ref);
-    }
-
-    public void configureScope(final ScopeModelImpl scope, final ClassLoader classLoader) throws Exception {
-        final JobOperatorModel model = scope.getJobOperator(this.name);
-
-        XmlProperty.convert(this.properties, model.getProperties());
-
-        set(model.getExecutor()
-                .setName(name(this.executor, JobOperatorModelImpl.EXECUTOR)), ref(this.executor));
-        set(model.getTransport()
-                .setName(name(this.transport, JobOperatorModelImpl.TRANSPORT)), ref(this.transport));
-        set(model.getMarshalling()
-                .setName(name(this.marshalling, JobOperatorModelImpl.MARSHALLING)), ref(this.marshalling));
-        set(model.getRegistry()
-                .setName(name(this.registry, JobOperatorModelImpl.REGISTRY)), ref(this.registry));
-        if (this.mBeanServer != null) {
-            model.getMBeanServer() //This is nullable, calling getMBeanServer() will add it to the model
-                    .setName(name(this.mBeanServer, JobOperatorModelImpl.MBEAN_SERVER))
-                    .setRef(ref(this.mBeanServer));
-        }
-        set(model.getRepository()
-                .setName(name(this.repository, JobOperatorModelImpl.EXECUTION_REPOSITORY)), ref(this.repository));
-        set(model.getClassLoader()
-                .setName(name(this.classLoader, JobOperatorModelImpl.CLASS_LOADER)), ref(this.classLoader));
-        set(model.getTransactionManager()
-                .setName(name(this.transactionManager, JobOperatorModelImpl.TRANSACTION_MANAGER)), ref(this.transactionManager));
-        for (final XmlDeclaration resource : this.jobLoaders) {
-            model.getJobLoader(resource.getName())
-                    .setRef(ref(resource));
-        }
-        for (final XmlDeclaration resource : this.artifactLoaders) {
-            model.getArtifactLoader(resource.getName())
-                    .setRef(ref(resource));
-        }
-        for (final XmlDeclaration resource : this.securities) {
-            model.getSecurity(resource.getName())
-                    .setRef(ref(resource));
-        }
-        if (this.ref != null) {
-            final JobOperatorConfiguration configuration;
-            try {
-                configuration = scope.getConfigurationLoader().load(this.ref, JobOperatorConfiguration.class, classLoader);
-            } catch (final ArtifactOfWrongTypeException e) {
-                throw new ConfigurationException("attribute 'ref' must be the fqcn of a class extending " + JobOperatorConfiguration.class.getName(), e); //TODO Message
-            }
-            configuration.configureJobOperator(model);
-        }
-    }
-
     public static XmlJobOperator read(final InputStream stream) throws Exception {
         try {
             final JAXBContext jaxb = JAXBContext.newInstance(XmlChainlink.class);
@@ -343,5 +274,4 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
         final XMLStreamWriter writer = XMLOutputFactory.newFactory().createXMLStreamWriter(stream);
         marshaller.marshal(this, writer);
     }
-
 }

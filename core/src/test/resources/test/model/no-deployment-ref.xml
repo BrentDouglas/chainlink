@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<subsystem xmlns="http://machinecode.io/xml/ns/chainlink/subsystem"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink/subsystem http://machinecode.io/xml/ns/chainlink/chainlink-subsystem_1_0.xsd">
+
+    <deployment name="default" ref="not-a-thing"/>
+</subsystem>

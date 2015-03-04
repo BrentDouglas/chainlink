@@ -6,6 +6,7 @@ import io.machinecode.chainlink.core.Environment;
 import io.machinecode.chainlink.core.configuration.ClassLoaderFactoryImpl;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
+import io.machinecode.chainlink.core.configuration.Model;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.execution.EventedExecutorFactory;
 import io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory;
@@ -107,12 +108,11 @@ public class TomEEEnvironment implements Environment {
     public void postCreateSubsystem(@Observes final ContainerSystemPostCreate event) throws Exception {
         final SubSystemModelImpl model = ensureModel();
         final SystemInstance system = SystemInstance.get();
-        final ClassLoader loader = system.getClassLoader();
         final String subsystemXml = system.getProperty(Constants.CHAINLINK_SUBSYSTEM_XML, Constants.Defaults.CHAINLINK_SUBSYSTEM_XML);
         final File conf = system.getConf(subsystemXml);
         if (conf != null && conf.isFile()) {
             try (final InputStream stream = new FileInputStream(conf)) {
-                XmlChainlinkSubSystem.configureSubSystemFromStream(model, loader, stream);
+                model.loadChainlinkSubsystemXml(stream);
             }
         }
     }

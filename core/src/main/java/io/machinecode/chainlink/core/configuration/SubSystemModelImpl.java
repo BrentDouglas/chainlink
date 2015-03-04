@@ -43,7 +43,7 @@ public class SubSystemModelImpl extends ScopeModelImpl implements SubSystemModel
     }
 
     public SubSystemModel loadChainlinkSubsystemXml(final InputStream stream) throws Exception {
-        XmlChainlinkSubSystem.configureSubSystemFromStream(this, loader.get(), stream);
+        Model.configureSubSystem(this, XmlChainlinkSubSystem.read(stream), loader.get());
         return this;
     }
 }

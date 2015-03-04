@@ -1,7 +1,5 @@
 package io.machinecode.chainlink.core.schema.xml;
 
-import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -22,10 +20,6 @@ public class XmlChainlink extends XmlDeployment {
 
     public static final String SCHEMA_URL = "http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd";
     public static final String NAMESPACE = "http://machinecode.io/xml/ns/chainlink";
-
-    public static void configureDeploymentFromStream(final DeploymentModelImpl model, final ClassLoader loader, final InputStream stream) throws Exception {
-        read(stream).configureDeployment(model, loader);
-    }
 
     public static XmlChainlink read(final InputStream stream) throws Exception {
         try {

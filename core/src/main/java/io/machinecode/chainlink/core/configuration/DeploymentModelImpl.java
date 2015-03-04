@@ -38,13 +38,13 @@ public class DeploymentModelImpl extends ScopeModelImpl implements DeploymentMod
         final String chainlinkXml = System.getProperty(Constants.CHAINLINK_XML, Constants.Defaults.CHAINLINK_XML);
         final InputStream stream = loader.getResourceAsStream(chainlinkXml);
         if (stream != null) {
-            XmlChainlink.configureDeploymentFromStream(this, loader, stream);
+            Model.configureDeployment(this, XmlChainlink.read(stream), loader);
         }
         return this;
     }
 
     public DeploymentModel loadChainlinkXml(final InputStream stream) throws Exception {
-        XmlChainlink.configureDeploymentFromStream(this, loader.get(), stream);
+        Model.configureDeployment(this, XmlChainlink.read(stream), loader.get());
         return this;
     }
 }

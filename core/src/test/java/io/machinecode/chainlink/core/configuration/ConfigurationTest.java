@@ -40,8 +40,8 @@ public class ConfigurationTest extends Assert {
         final ClassLoader tccl = Tccl.get();
         final SubSystemModelImpl model = new SubSystemModelImpl(tccl);
         final DeploymentModelImpl deployment = model.getDeployment(Constants.DEFAULT);
-        deployment.loadChainlinkXml(tccl.getResourceAsStream("test-chainlink.xml"));
-        final JobOperatorModelImpl op = deployment.getJobOperator("default");
+        deployment.loadChainlinkXml(tccl.getResourceAsStream("test/configuration/chainlink.xml"));
+        final JobOperatorModelImpl op = deployment.getJobOperator(Constants.DEFAULT);
         defaults(tccl, op);
         return op;
     }

@@ -1,10 +1,7 @@
 package io.machinecode.chainlink.core.schema.xml;
 
-import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.util.Transmute;
 import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
-import io.machinecode.chainlink.spi.configuration.DeploymentConfiguration;
-import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.core.util.Mutable;
 import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.DeploymentSchema;
@@ -76,19 +73,6 @@ public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<X
     @Override
     public void setJobOperators(final List<XmlJobOperator> jobOperators) {
         this.jobOperators = jobOperators;
-    }
-
-    public void configureDeployment(final DeploymentModelImpl model, final ClassLoader classLoader) throws Exception {
-        configureScope(model, classLoader);
-        if (this.ref != null) {
-            final DeploymentConfiguration configuration;
-            try {
-                configuration = model.getConfigurationLoader().load(this.ref, DeploymentConfiguration.class, classLoader);
-            } catch (final Exception e) {
-                throw new ConfigurationException("attribute 'ref' must be an injectable " + DeploymentConfiguration.class.getName(), e); //TODO Message
-            }
-            configuration.configureDeployment(model);
-        }
     }
 
     public static XmlDeployment read(final InputStream stream) throws Exception {
