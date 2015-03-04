@@ -10,6 +10,7 @@ import io.machinecode.chainlink.core.management.LazyJobOperator;
 import io.machinecode.chainlink.core.schema.Configure;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import io.machinecode.chainlink.core.configuration.Model;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
@@ -40,7 +41,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
 
     @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
                 final LazyJobOperator op = app.ops.get(name);
@@ -78,7 +79,7 @@ public class GlassfishEnvironment implements Environment, AutoCloseable {
     }
 
     public Map<String, LazyJobOperator> getJobOperators() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
                 return Collections.unmodifiableMap(app.ops);

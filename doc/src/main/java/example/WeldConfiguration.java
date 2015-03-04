@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.configuration.DeploymentModelImpl;
 import io.machinecode.chainlink.core.configuration.JobOperatorModelImpl;
 import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoaderFactory;
 import io.machinecode.chainlink.core.Constants;
 import org.jboss.weld.environment.se.Weld;
@@ -24,7 +25,7 @@ public class WeldConfiguration {
         final Weld weld = new Weld();
         final WeldContainer container = weld.initialize();
 
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         final DeploymentModelImpl model = new SubSystemModelImpl(tccl).getDeployment(Constants.DEFAULT);
 
         final JobOperatorModelImpl op = ManualConfiguration.setDefaults(model, tccl);

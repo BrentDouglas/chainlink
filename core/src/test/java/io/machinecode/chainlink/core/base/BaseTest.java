@@ -13,6 +13,7 @@ import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
@@ -52,7 +53,7 @@ public abstract class BaseTest extends Assert {
 
     protected final Configuration configuration() throws Exception {
         if (this._configuration == null) {
-            final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+            final ClassLoader tccl = Tccl.get();
             final DeploymentModelImpl deployment = _configure(tccl);
             final JobOperatorModelImpl op = deployment.getJobOperator(Constants.DEFAULT);
             this.visitJobOperatorModel(op);

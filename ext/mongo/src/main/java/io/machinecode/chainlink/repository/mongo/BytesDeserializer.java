@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import io.machinecode.chainlink.core.marshalling.JdkMarshalling;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class BytesDeserializer extends JsonDeserializer<Serializable> {
     @Override
     public Serializable deserialize(final JsonParser parser, final DeserializationContext context) throws IOException {
         try {
-            return unmarshaller.unmarshall(parser.getBinaryValue(), Thread.currentThread().getContextClassLoader());
+            return unmarshaller.unmarshall(parser.getBinaryValue(), Tccl.get());
         } catch (final IOException e) {
             throw e;
         } catch (final Exception e) {

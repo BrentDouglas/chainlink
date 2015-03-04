@@ -2,6 +2,7 @@ package io.machinecode.chainlink.rt.glassfish;
 
 import io.machinecode.chainlink.core.Chainlink;
 import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.spi.configuration.PropertyLookup;
@@ -60,7 +61,7 @@ public class GlassfishService implements PostConstruct, EventListener {
     public void event(final Event event) {
         try {
             if (event.is(EventTypes.SERVER_READY)) {
-                environment.addSubsystem(Thread.currentThread().getContextClassLoader(), subSystem);
+                environment.addSubsystem(Tccl.get(), subSystem);
             } else if (event.is(Deployment.APPLICATION_STARTED)) {
                 if (event.hook() != null) {
                     environment.addApplication((ApplicationInfo) event.hook());

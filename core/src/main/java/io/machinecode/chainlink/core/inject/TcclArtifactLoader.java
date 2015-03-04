@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.inject;
 
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
@@ -24,7 +25,7 @@ public class TcclArtifactLoader implements ArtifactLoader {
     public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
         final T bean;
         try {
-            final Class<?> that = Thread.currentThread().getContextClassLoader().loadClass(id);
+            final Class<?> that = Tccl.get().loadClass(id);
             if (as.isAssignableFrom(that)) {
                 bean = as.cast(that.newInstance());
             } else {

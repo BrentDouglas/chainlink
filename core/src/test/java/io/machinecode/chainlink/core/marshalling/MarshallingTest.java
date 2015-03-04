@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.marshalling;
 
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,7 +28,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final String in = "asdf";
             final byte[] bytes = marshalling.marshall(in);
@@ -70,7 +71,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testByteArrayMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final byte[] in = "asdf".getBytes(StandardCharsets.UTF_8);
             final byte[] bytes = marshalling.marshall(in);
@@ -82,7 +83,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testShortArrayMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final short[] in = new short[]{1,2,3};
             final byte[] bytes = marshalling.marshall(in);
@@ -94,7 +95,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testCharArrayMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final char[] in = new char[]{1,2,3};
             final byte[] bytes = marshalling.marshall(in);
@@ -106,7 +107,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testIntArrayMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final int[] in = new int[]{1,2,3};
             final byte[] bytes = marshalling.marshall(in);
@@ -118,7 +119,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testLongArrayMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final long[] in = new long[]{1,2,3};
             final byte[] bytes = marshalling.marshall(in);
@@ -130,7 +131,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testFloatArrayMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final float[] in = new float[]{1,2,3};
             final byte[] bytes = marshalling.marshall(in);
@@ -142,7 +143,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testDoubleArrayMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final double[] in = new double[]{1,2,3};
             final byte[] bytes = marshalling.marshall(in);
@@ -154,7 +155,7 @@ public class MarshallingTest extends Assert {
 
     @Test
     public void testBooleanArrayMarshalling() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         {
             final boolean[] in = new boolean[]{true,false,true};
             final byte[] bytes = marshalling.marshall(in);

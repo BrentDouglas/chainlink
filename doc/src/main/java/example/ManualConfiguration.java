@@ -16,6 +16,7 @@ import io.machinecode.chainlink.core.schema.Configure;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 
 import javax.batch.runtime.BatchRuntime;
@@ -27,7 +28,7 @@ import java.util.Properties;
  */
 public class ManualConfiguration {
     public static void main(final String... args) throws Throwable {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         final DeploymentModelImpl model = new SubSystemModelImpl(tccl).getDeployment(Constants.DEFAULT);
         final JobOperatorModelImpl op = setDefaults(model, tccl);
         try (final TheEnvironment environment = configureEnvironment(model, op, tccl)) {

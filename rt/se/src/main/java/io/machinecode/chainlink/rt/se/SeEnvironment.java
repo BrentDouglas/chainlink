@@ -9,6 +9,7 @@ import io.machinecode.chainlink.core.configuration.SubSystemModelImpl;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.schema.Configure;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import org.jboss.logging.Logger;
@@ -78,7 +79,7 @@ public class SeEnvironment implements Environment, AutoCloseable {
     }
 
     private void _loadConfiguration() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         final DeploymentModelImpl model = new SubSystemModelImpl(tccl).findDeployment(Constants.DEFAULT);
         model.getJobOperator(Constants.DEFAULT);
         try {

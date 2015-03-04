@@ -7,6 +7,7 @@ import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
 import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
@@ -36,7 +37,7 @@ public class ConfigurationTest extends Assert {
     }
 
     private JobOperatorModelImpl op() throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         final SubSystemModelImpl model = new SubSystemModelImpl(tccl);
         final DeploymentModelImpl deployment = model.getDeployment(Constants.DEFAULT);
         deployment.loadChainlinkXml(tccl.getResourceAsStream("test-chainlink.xml"));
@@ -71,7 +72,7 @@ public class ConfigurationTest extends Assert {
             }
         });
         final ConfigurationImpl conf = op.getConfiguration();
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
 
         // Check an artifact can be loaded by it's factory fqcn
         // Also check an artifact can be loaded by an arbitrary ref if the loader supports it
@@ -84,7 +85,7 @@ public class ConfigurationTest extends Assert {
         assertNotNull(otherBatchlet);
         assertTrue(otherBatchlet instanceof TestBatchlet);
 
-        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Tccl.get());
         // Check setting by value works
         assertTrue(firstInjected.get());
 
@@ -107,7 +108,7 @@ public class ConfigurationTest extends Assert {
         op.getArtifactLoader("first-artifact-loader").setValueClass(ClassArtifactLoader.class);
         final ConfigurationImpl conf = op.getConfiguration();
 
-        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Tccl.get());
         // Check value overrides factory
         assertTrue(valueInjected.get());
         assertFalse(ClassArtifactLoader.injected.get());
@@ -133,7 +134,7 @@ public class ConfigurationTest extends Assert {
         });
         final ConfigurationImpl conf = op.getConfiguration();
 
-        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Tccl.get());
         // Check value overrides factory
         assertTrue(ClassArtifactLoader.injected.get());
         assertFalse(factoryInjected.get());
@@ -160,7 +161,7 @@ public class ConfigurationTest extends Assert {
 
         final ConfigurationImpl conf = op.getConfiguration();
 
-        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Tccl.get());
         // Check factory overrides factory class
         assertTrue(factoryInjected.get());
         assertFalse(ClassArtifactLoaderFactory.injected.get());
@@ -174,7 +175,7 @@ public class ConfigurationTest extends Assert {
 
         final ConfigurationImpl conf = op.getConfiguration();
 
-        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Thread.currentThread().getContextClassLoader());
+        conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Tccl.get());
         // Check factory overrides factory class
         assertTrue(ClassArtifactLoaderFactory.injected.get());
         assertFalse(RefArtifactLoaderFactory.injected.get());

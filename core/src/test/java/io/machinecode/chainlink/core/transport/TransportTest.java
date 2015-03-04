@@ -8,6 +8,7 @@ import io.machinecode.chainlink.core.jsl.fluent.Jsl;
 import io.machinecode.chainlink.core.jsl.fluent.task.FluentBatchlet;
 import io.machinecode.chainlink.core.management.JobOperationImpl;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.transport.Transport;
@@ -40,7 +41,7 @@ public abstract class TransportTest extends BaseTest {
 
     protected final Configuration secondConfiguration() throws Exception {
         if (this._secondConfiguration == null) {
-            final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+            final ClassLoader tccl = Tccl.get();
             final DeploymentModelImpl deployment = _configure(tccl);
             visitSecondJobOperatorModel(deployment.getJobOperator(Constants.DEFAULT));
             this._secondConfiguration = deployment.getConfiguration(Constants.DEFAULT);
@@ -50,7 +51,7 @@ public abstract class TransportTest extends BaseTest {
 
     protected final Configuration thirdConfiguration() throws Exception {
         if (this._thirdConfiguration == null) {
-            final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+            final ClassLoader tccl = Tccl.get();
             final DeploymentModelImpl deployment = _configure(tccl);
             visitThirdJobOperatorModel(deployment.getJobOperator(Constants.DEFAULT));
             this._thirdConfiguration = deployment.getConfiguration(Constants.DEFAULT);

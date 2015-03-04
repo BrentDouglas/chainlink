@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.core.inject;
 
 import io.machinecode.chainlink.core.base.BaseTest;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.core.execution.artifact.batchlet.RunBatchlet;
@@ -19,7 +20,7 @@ public class ArtifactLoaderTest extends BaseTest {
     @Test
     public void testInject() throws Exception {
         final ArtifactLoader loader = configuration().getArtifactLoader();
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader cl = Tccl.get();
 
         final Batchlet fromId = loader.load("runBatchlet", Batchlet.class, cl);
         Assert.assertNotNull(fromId);

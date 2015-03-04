@@ -6,6 +6,9 @@ package io.machinecode.chainlink.core.util;
  */
 public class Tccl {
 
+    /**
+     * @return The context class loader of the thread calling this method.
+     */
     public static ClassLoader get() {
         return Thread.currentThread().getContextClassLoader();
     }

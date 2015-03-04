@@ -2,6 +2,7 @@ package io.machinecode.chainlink.tck.core;
 
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.util.Services;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
@@ -26,7 +27,7 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
 
     @Override
     public void configureJobOperator(final JobOperatorModel model) throws Exception {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
 
         List<TransactionManagerFactory> transactionManagers = null;
         List<ArtifactLoaderFactory> artifactLoaders = null;

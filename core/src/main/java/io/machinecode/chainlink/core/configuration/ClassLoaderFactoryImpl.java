@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.configuration;
 
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 
@@ -15,7 +16,7 @@ public class ClassLoaderFactoryImpl implements ClassLoaderFactory {
     final WeakReference<ClassLoader> classLoader;
 
     public ClassLoaderFactoryImpl() {
-        this(Thread.currentThread().getContextClassLoader());
+        this(Tccl.get());
     }
 
     public ClassLoaderFactoryImpl(final ClassLoader classLoader) {

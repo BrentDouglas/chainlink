@@ -7,6 +7,7 @@ import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory;
 import io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 
@@ -16,7 +17,7 @@ import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 */
 public class SeConfigurationDefaults implements JobOperatorConfiguration {
 
-    final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    final ClassLoader tccl = Tccl.get();
 
     @Override
     public void configureJobOperator(final JobOperatorModel model) throws Exception {

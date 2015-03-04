@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.Environment;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.schema.Configure;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
+import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.exception.NoConfigurationWithIdException;
 import io.machinecode.chainlink.spi.management.ExtendedJobOperator;
 import org.jboss.msc.service.ServiceName;
@@ -25,7 +26,7 @@ public class WildFlyEnvironment implements Environment {
 
     @Override
     public ExtendedJobOperator getJobOperator(final String name) throws NoConfigurationWithIdException {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
                 final JobOperatorImpl op = app.ops.get(name);
@@ -54,7 +55,7 @@ public class WildFlyEnvironment implements Environment {
     }
 
     public Map<String, JobOperatorImpl> getJobOperators() {
-        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        final ClassLoader tccl = Tccl.get();
         for (final App app : operators.values()) {
             if (tccl.equals(app.loader.get())) {
                 return Collections.unmodifiableMap(app.ops);
