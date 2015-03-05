@@ -16,6 +16,7 @@ import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.PartitionExecution;
 import io.machinecode.chainlink.spi.repository.Repository;
 
+import javax.batch.operations.BatchRuntimeException;
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
 import javax.batch.operations.JobRestartException;
@@ -156,6 +157,8 @@ public class JdbcRepository implements Repository {
                 }
                 jobExecutionId = result.getLong(1);
             }
+        } catch (final SQLException e) {
+            throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId), e);
         }
         if (parameters != null) {
             for (final String key : parameters.stringPropertyNames()) {
@@ -217,6 +220,8 @@ public class JdbcRepository implements Repository {
                     }
                     stepExecutionId = result.getLong(1);
                 }
+            } catch (final SQLException e) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId), e);
             }
             for (final Metric.MetricType type : Metric.MetricType.values()) {
                 final long metricId;
@@ -295,6 +300,8 @@ public class JdbcRepository implements Repository {
                     }
                     partitionExecutionId = result.getLong(1);
                 }
+            } catch (final SQLException e) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId), e);
             }
             if (properties != null) {
                 for (final String key : properties.stringPropertyNames()) {
@@ -384,7 +391,7 @@ public class JdbcRepository implements Repository {
                 statement.setTimestamp(3, ts);
                 statement.setLong(4, jobExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
                 }
             }
         } finally {
@@ -459,6 +466,8 @@ public class JdbcRepository implements Repository {
                 if (main.executeUpdate() == 0) {
                     throw new IllegalStateException(); //TODO
                 }
+            } catch (final SQLException e) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", restartJobExecutionId), e);
             }
             for (final TLongIterator it = ids.iterator(); it.hasNext(); ) {
                 try (final PreparedStatement ps = connection.prepareStatement(insertJobExecutionHistory())) {
@@ -467,6 +476,8 @@ public class JdbcRepository implements Repository {
                     if (ps.executeUpdate() == 0) {
                         throw new IllegalStateException(); //TODO
                     }
+                } catch (final SQLException e) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId), e);
                 }
             }
             connection.commit();
@@ -494,7 +505,7 @@ public class JdbcRepository implements Repository {
                 statement.setTimestamp(3, ts);
                 statement.setLong(4, stepExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
                 }
             }
         } finally {
@@ -560,7 +571,7 @@ public class JdbcRepository implements Repository {
                 statement.setTimestamp(4, ts);
                 statement.setLong(5, stepExecutionId);
                 if (statement.executeUpdate() == 0) {
-                    throw new IllegalStateException(); //TODO
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
                 }
             }
             for (final Metric metric : metrics) {
@@ -764,7 +775,7 @@ public class JdbcRepository implements Repository {
                 statement.setString(1, jobName);
                 try (final ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
-                        throw new IllegalStateException(); //TODO
+                        throw new BatchRuntimeException(); //TODO
                     }
                     count = result.getInt(1);
                 }
@@ -831,8 +842,19 @@ public class JdbcRepository implements Repository {
                         ids.add(result.getLong(1));
                     }
                 }
-                if (ids.isEmpty()) {
-                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
+                if (!ids.isEmpty()) {
+                    return ids;
+                }
+            }
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobNameCount())) {
+                statement.setString(1, jobName);
+                try (final ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        throw new BatchRuntimeException(); //TODO Message
+                    }
+                    if (result.getLong(1) == 0) {
+                        throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
+                    }
                 }
             }
             return ids;
@@ -935,14 +957,22 @@ public class JdbcRepository implements Repository {
             try (final PreparedStatement statement = connection.prepareStatement(queryJobExecutionsForJobInstance())) {
                 statement.setLong(1, jobInstanceId);
                 try (final ResultSet result = statement.executeQuery()) {
+                    if (result.next()) {
+                        final List<JobExecutionImpl> ret = new ArrayList<>();
+                        do {
+                            ret.add(_je(connection, result));
+                        } while (result.next());
+                        return ret;
+                    }
+                }
+            }
+            try (final PreparedStatement statement = connection.prepareStatement(queryJobInstance())) {
+                statement.setLong(1, jobInstanceId);
+                try (final ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
                     }
-                    final List<JobExecutionImpl> ret = new ArrayList<>();
-                    do {
-                        ret.add(_je(connection, result));
-                    } while (result.next());
-                    return ret;
+                    return Collections.emptyList();
                 }
             }
         } finally {
@@ -1374,7 +1404,7 @@ public class JdbcRepository implements Repository {
     }
 
     protected String queryJobInstanceCount() {
-        return "select count(i.*) from job_instance i where i.job_name = ?;";
+        return "select count(*) from job_instance i where i.job_name = ?;";
     }
 
     protected String queryJobInstances() {
@@ -1382,7 +1412,11 @@ public class JdbcRepository implements Repository {
     }
 
     protected String queryRunningExecutions() {
-        return "select j.id from job_execution j where j.job_name = ? order by j.create_time desc;";
+        return "select j.id from job_execution j where j.job_name = ? and j.batch_status = 'STARTED' order by j.create_time desc;";
+    }
+
+    protected String queryJobNameCount() {
+        return "select count(*) from job_instance i where i.job_name = ?;";
     }
 
     protected String queryJobExecutionParameters() {

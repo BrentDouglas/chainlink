@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.repository;
 import io.machinecode.chainlink.spi.repository.ExtendedStepExecution;
 import io.machinecode.chainlink.spi.repository.Repository;
 
+import javax.batch.operations.BatchRuntimeException;
 import javax.batch.operations.JobSecurityException;
 import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.runtime.BatchStatus;
@@ -42,8 +43,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getBatchStatus();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -53,8 +54,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getCreateTime();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -64,8 +65,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getStartTime();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -75,8 +76,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getUpdatedTime();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -86,8 +87,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getEndTime();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -97,8 +98,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getExitStatus();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -108,8 +109,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getPersistentUserData();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -119,8 +120,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getMetrics();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -131,8 +132,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getReaderCheckpoint();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -143,8 +144,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getWriterCheckpoint();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -154,8 +155,8 @@ public class DelegateStepExecution implements ExtendedStepExecution {
             return repository.getStepExecution(executionId).getJobExecutionId();
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new BatchRuntimeException(e);
         }
     }
 }

@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Future;
 
 /**
@@ -49,12 +47,12 @@ public class InfinispanRepository extends BaseMapRepository {
     protected final AdvancedCache<Long, ExtendedJobExecution> jobExecutions;
     protected final AdvancedCache<Long, ExtendedStepExecution> stepExecutions;
     protected final AdvancedCache<Long, PartitionExecution> partitionExecutions;
-    protected final AdvancedCache<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions;
+    protected final AdvancedCache<Long, List<Long>> jobInstanceExecutions;
     protected final AdvancedCache<Long, Long> jobExecutionInstances;
-    protected final AdvancedCache<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions;
+    protected final AdvancedCache<Long, Set<Long>> jobExecutionStepExecutions;
     protected final AdvancedCache<Long, Long> latestJobExecutionForInstance;
-    protected final AdvancedCache<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions;
-    protected final AdvancedCache<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory;
+    protected final AdvancedCache<Long, List<Long>> stepExecutionPartitionExecutions;
+    protected final AdvancedCache<Long, Set<Long>> jobExecutionHistory;
 
     protected final DistributedExecutorService jobInstanceExecutor;
     protected final DistributedExecutorService jobExecutionExecutor;
@@ -128,7 +126,7 @@ public class InfinispanRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions() {
+    protected Map<Long, List<Long>> jobInstanceExecutions() {
         return this.jobInstanceExecutions;
     }
 
@@ -138,7 +136,7 @@ public class InfinispanRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions() {
+    protected Map<Long, Set<Long>> jobExecutionStepExecutions() {
         return this.jobExecutionStepExecutions;
     }
 
@@ -148,12 +146,12 @@ public class InfinispanRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions() {
+    protected Map<Long, List<Long>> stepExecutionPartitionExecutions() {
         return this.stepExecutionPartitionExecutions;
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory() {
+    protected Map<Long, Set<Long>> jobExecutionHistory() {
         return this.jobExecutionHistory;
     }
 

@@ -20,8 +20,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -46,12 +44,12 @@ public class GridGainRepository extends BaseMapRepository {
     protected final GridGainMap<Long, ExtendedJobExecution> jobExecutions;
     protected final GridGainMap<Long, ExtendedStepExecution> stepExecutions;
     protected final GridGainMap<Long, PartitionExecution> partitionExecutions;
-    protected final GridGainMap<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions;
+    protected final GridGainMap<Long, List<Long>> jobInstanceExecutions;
     protected final GridGainMap<Long, Long> jobExecutionInstances;
-    protected final GridGainMap<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions;
+    protected final GridGainMap<Long, Set<Long>> jobExecutionStepExecutions;
     protected final GridGainMap<Long, Long> latestJobExecutionForInstance;
-    protected final GridGainMap<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions;
-    protected final GridGainMap<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory;
+    protected final GridGainMap<Long, List<Long>> stepExecutionPartitionExecutions;
+    protected final GridGainMap<Long, Set<Long>> jobExecutionHistory;
 
     protected final Grid grid;
     protected final boolean transactional;
@@ -66,12 +64,12 @@ public class GridGainRepository extends BaseMapRepository {
         this.jobExecutions = GridGainMap.with(grid.<Long,ExtendedJobExecution>cache(JOB_EXECUTIONS));
         this.stepExecutions = GridGainMap.with(grid.<Long, ExtendedStepExecution>cache(STEP_EXECUTIONS));
         this.partitionExecutions = GridGainMap.with(grid.<Long,PartitionExecution>cache(PARTITION_EXECUTIONS));
-        this.jobInstanceExecutions = GridGainMap.with(grid.<Long, CopyOnWriteArrayList<Long>>cache(JOB_INSTANCE_EXECUTIONS));
+        this.jobInstanceExecutions = GridGainMap.with(grid.<Long, List<Long>>cache(JOB_INSTANCE_EXECUTIONS));
         this.jobExecutionInstances = GridGainMap.with(grid.<Long,Long>cache(JOB_EXECUTION_INSTANCES));
-        this.jobExecutionStepExecutions = GridGainMap.with(grid.<Long, CopyOnWriteArraySet<Long>>cache(JOB_EXECUTION_STEP_EXECUTIONS));
+        this.jobExecutionStepExecutions = GridGainMap.with(grid.<Long, Set<Long>>cache(JOB_EXECUTION_STEP_EXECUTIONS));
         this.latestJobExecutionForInstance = GridGainMap.with(grid.<Long,Long>cache(LATEST_JOB_EXECUTION_FOR_INSTANCE));
-        this.stepExecutionPartitionExecutions = GridGainMap.with(grid.<Long, CopyOnWriteArrayList<Long>>cache(STEP_EXECUTION_PARTITION_EXECUTIONS));
-        this.jobExecutionHistory = GridGainMap.with(grid.<Long,CopyOnWriteArraySet<Long>>cache(JOB_EXECUTION_HISTORY));
+        this.stepExecutionPartitionExecutions = GridGainMap.with(grid.<Long, List<Long>>cache(STEP_EXECUTION_PARTITION_EXECUTIONS));
+        this.jobExecutionHistory = GridGainMap.with(grid.<Long,Set<Long>>cache(JOB_EXECUTION_HISTORY));
     }
 
     @Override
@@ -100,7 +98,7 @@ public class GridGainRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions() {
+    protected Map<Long, List<Long>> jobInstanceExecutions() {
         return this.jobInstanceExecutions;
     }
 
@@ -110,7 +108,7 @@ public class GridGainRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions() {
+    protected Map<Long, Set<Long>> jobExecutionStepExecutions() {
         return this.jobExecutionStepExecutions;
     }
 
@@ -120,12 +118,12 @@ public class GridGainRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions() {
+    protected Map<Long, List<Long>> stepExecutionPartitionExecutions() {
         return this.stepExecutionPartitionExecutions;
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory() {
+    protected Map<Long, Set<Long>> jobExecutionHistory() {
         return this.jobExecutionHistory;
     }
 
@@ -193,8 +191,8 @@ public class GridGainRepository extends BaseMapRepository {
     @Override
     protected List<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
         final GridCacheQueryFuture<List<?>> results = this.jobExecutions.cache.queries()
-                .createSqlFieldsQuery("select jobExecutionId from GridGainJobExecution where jobName = ? and ( batchStatus = ? or batchStatus = ? )")
-                .execute(jobName, BatchStatus.STARTED, BatchStatus.STARTING);
+                .createSqlFieldsQuery("select jobExecutionId from GridGainJobExecution where jobName = ? and batchStatus = ?")
+                .execute(jobName, BatchStatus.STARTED);
         final Collection<List<?>> values = results.get();
         final List<Long> ret = new ArrayList<>(values.size());
         for (final List<?> list : values) {

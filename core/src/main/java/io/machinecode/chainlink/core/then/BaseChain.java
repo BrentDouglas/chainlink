@@ -76,17 +76,19 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
     @Override
     public boolean cancel(final boolean interrupt) {
         log().tracef(getCancelLogMessage());
-        final CancelListener listener = new CancelListener();
         ListenerException exception = null;
         final Iterable<OnCancel> onCancels;
         final Iterable<OnComplete> onCompletes;
         final int state;
-        synchronized (lock) {
-            cancelling(listener);
-            if (listener.exception != null) {
-                lock.notifyAll();
-                throw listener.exception;
+        final CancelListener listener = new CancelListener();
+        onLink(listener);
+        if (listener.exception != null) {
+            synchronized (lock) {
+                lock.notifyAll(); //TODO Why?
             }
+            throw listener.exception;
+        }
+        synchronized (lock) {
             if (setCancelled()) {
                 return isCancelled();
             }
@@ -123,10 +125,6 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
             throw exception;
         }
         return true;
-    }
-
-    protected void cancelling(final OnLink on) {
-        onLink(on);
     }
 
     @Override

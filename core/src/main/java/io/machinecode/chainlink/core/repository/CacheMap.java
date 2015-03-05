@@ -10,26 +10,20 @@ import java.util.Set;
 public abstract class CacheMap<K,V> implements Map<K,V> {
 
     @Override
-    public int size() { throw new IllegalStateException(); }
+    public int size() { throw new UnsupportedOperationException(); }
 
     @Override
-    public boolean isEmpty() { throw new IllegalStateException(); }
+    public boolean isEmpty() { throw new UnsupportedOperationException(); }
 
     @Override
-    public boolean containsKey(final Object key) { throw new IllegalStateException(); }
+    public void clear() { throw new UnsupportedOperationException(); }
 
     @Override
-    public boolean containsValue(final Object value) { throw new IllegalStateException(); }
+    public Set<K> keySet() { throw new UnsupportedOperationException(); }
 
     @Override
-    public void clear() { throw new IllegalStateException(); }
+    public Collection<V> values() { throw new UnsupportedOperationException(); }
 
     @Override
-    public Set<K> keySet() { throw new IllegalStateException(); }
-
-    @Override
-    public Collection<V> values() { throw new IllegalStateException(); }
-
-    @Override
-    public Set<Entry<K, V>> entrySet() { throw new IllegalStateException(); }
+    public Set<Entry<K, V>> entrySet() { throw new UnsupportedOperationException(); }
 }

@@ -548,7 +548,6 @@ public class MemoryRepository implements Repository {
             for (final JobExecution jobExecution : jobExecutions.valueCollection()) {
                 if (jobName.equals(jobExecution.getJobName())) {
                     switch (jobExecution.getBatchStatus()) {
-                        case STARTING:
                         case STARTED:
                             ids.add(jobExecution.getExecutionId());
                     }
@@ -901,7 +900,11 @@ public class MemoryRepository implements Repository {
         stepExecutionLock.readLock().lock();
         try {
             for (int i = 0; i < stepExecutionIds.length; ++i) {
-                executions[i] = stepExecutions.get(stepExecutionIds[i]);
+                final ExtendedStepExecution x = stepExecutions.get(stepExecutionIds[i]);
+                if (x == null) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionIds[i]));
+                }
+                executions[i] = x;
             }
             return executions;
         } finally {

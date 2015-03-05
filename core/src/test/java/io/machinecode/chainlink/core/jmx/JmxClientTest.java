@@ -119,6 +119,7 @@ public class JmxClientTest extends OperatorTest {
         assertTrue(first.isEmpty());
         StopBatchlet.reset();
         final JobOperationImpl operation = operator.startJob("stop", PARAMETERS);
+        Thread.sleep(100);
         final List<Long> stop = client.getRunningExecutions("stop");
         assertEquals(1, stop.size());
         client.stop(operation.getJobExecutionId());

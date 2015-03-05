@@ -29,7 +29,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -96,7 +98,10 @@ public class MongoRepository implements Repository {
     }
 
     @Override
-    public ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) {
+    public ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws IOException {
+        if (!_hasJobInstance(jobInstanceId)) {
+            throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
+        }
         final long jobExecutionId = _id(JOB_EXECUTION_ID);
         final MongoJobExecution execution = new MongoJobExecution.Builder()
                 .setJobInstanceId(jobInstanceId)
@@ -120,7 +125,10 @@ public class MongoRepository implements Repository {
     }
 
     @Override
-    public ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) {
+    public ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws IOException {
+        if (!_hasJobExecution(jobExecutionId)) {
+            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
+        }
         final long stepExecutionId = _id(STEP_EXECUTION_ID);
         final MongoStepExecution execution = new MongoStepExecution.Builder()
                 .setJobExecutionId(jobExecutionId)
@@ -139,6 +147,9 @@ public class MongoRepository implements Repository {
 
     @Override
     public PartitionExecution createPartitionExecution(final long stepExecutionId, final int partitionId, final Properties properties, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint, final Date timestamp) throws Exception {
+        if (!_hasStepExecution(stepExecutionId)) {
+            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
+        }
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
         final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
@@ -421,11 +432,14 @@ public class MongoRepository implements Repository {
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, IOException {
         final MongoCollection jobExecutions = jongo.getCollection(JOB_EXECUTIONS);
         final List<Long> ret = new ArrayList<>();
-        try (final MongoCursor<Long> cursor = jobExecutions.find("{" + Fields.JOB_NAME + ":#," + Fields.BATCH_STATUS + ":{$in:[#,#]}}", jobName, STARTING, STARTED)
+        try (final MongoCursor<Long> cursor = jobExecutions.find("{" + Fields.JOB_NAME + ":#," + Fields.BATCH_STATUS + ":#}", jobName, STARTED)
                 .projection("{" + Fields.JOB_EXECUTION_ID + ":1,_id:0}")
                 .map(new Handler<Long>(Fields.JOB_EXECUTION_ID))) {
             if (!cursor.hasNext()) {
-                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
+                if (!_hasJobInstance(jobName)) {
+                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
+                }
+                return Collections.emptyList();
             }
             while (cursor.hasNext()) {
                 ret.add(cursor.next());
@@ -464,9 +478,10 @@ public class MongoRepository implements Repository {
         try (final MongoCursor<MongoJobExecution> cursor = jobExecutions.find("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstanceId)
                 .as(MongoJobExecution.class)) {
             if (!cursor.hasNext()) {
-                //TODO Wrong exception maybe
-                throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
-                //throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
+                if (!_hasJobInstance(jobInstanceId)) {
+                    throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
+                }
+                return Collections.emptyList();
             }
             final List<MongoJobExecution> ret = new ArrayList<>(cursor.count());
             for (final MongoJobExecution that : cursor) {
@@ -526,6 +541,12 @@ public class MongoRepository implements Repository {
         final MongoCollection stepExecutions = jongo.getCollection(STEP_EXECUTIONS);
         try (final MongoCursor<MongoStepExecution> cursor = stepExecutions.find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
                 .as(MongoStepExecution.class)) {
+            if (!cursor.hasNext()) {
+                if (!_hasJobExecution(jobExecutionId)) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
+                }
+                return Collections.emptyList();
+            }
             final List<MongoStepExecution> ret = new ArrayList<>(cursor.count());
             for (final MongoStepExecution that : cursor) {
                 ret.add(that);
@@ -705,9 +726,17 @@ public class MongoRepository implements Repository {
         query.append("]}}");
         final MongoCollection stepExecutions = jongo.getCollection(STEP_EXECUTIONS);
         try (final MongoCursor<MongoStepExecution> cursor = stepExecutions.find(query.toString(), params).as(MongoStepExecution.class)) {
+            final Map<Long, MongoStepExecution> map = new HashMap<>(cursor.count(), 1f);
+            for (final MongoStepExecution value : cursor) {
+                map.put(value.getStepExecutionId(), value);
+            }
             final StepExecution[] ret = new StepExecution[cursor.count()];
-            for (int i = 0; i < cursor.count(); ++i) {
-                ret[i] = cursor.next();
+            for (int i = 0; i < stepExecutionIds.length; ++i) {
+                final MongoStepExecution value = map.get(stepExecutionIds[i]);
+                if (value == null) {
+                    throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionIds[i]));
+                }
+                ret[i] = value;
             }
             return ret;
         }
@@ -771,6 +800,42 @@ public class MongoRepository implements Repository {
                 throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
             }
             return cursor.next();
+        }
+    }
+
+    public boolean _hasJobInstance(final long jobInstanceId) throws IOException {
+        try (final MongoCursor<Long> cursor = jongo.getCollection(JOB_INSTANCES)
+                .find("{" + Fields.JOB_INSTANCE_ID + ":#}", jobInstanceId)
+                .projection("{" + Fields.JOB_INSTANCE_ID + ":1,_id:0}")
+                .map(new Handler<Long>(Fields.JOB_INSTANCE_ID))) {
+            return cursor.hasNext();
+        }
+    }
+
+    public boolean _hasJobInstance(final String jobName) throws IOException {
+        try (final MongoCursor<Long> cursor = jongo.getCollection(JOB_INSTANCES)
+                .find("{" + Fields.JOB_NAME + ":#}", jobName)
+                .projection("{" + Fields.JOB_INSTANCE_ID + ":1,_id:0}")
+                .map(new Handler<Long>(Fields.JOB_INSTANCE_ID))) {
+            return cursor.hasNext();
+        }
+    }
+
+    public boolean _hasJobExecution(final long jobExecutionId) throws IOException {
+        try (final MongoCursor<Long> cursor = jongo.getCollection(JOB_EXECUTIONS)
+                .find("{" + Fields.JOB_EXECUTION_ID + ":#}", jobExecutionId)
+                .projection("{" + Fields.JOB_INSTANCE_ID + ":1,_id:0}")
+                .map(new Handler<Long>(Fields.JOB_EXECUTION_ID))) {
+            return cursor.hasNext();
+        }
+    }
+
+    public boolean _hasStepExecution(final long stepExecutionId) throws IOException {
+        try (final MongoCursor<Long> cursor = jongo.getCollection(STEP_EXECUTIONS)
+                .find("{" + Fields.STEP_EXECUTION_ID + ":#}", stepExecutionId)
+                .projection("{" + Fields.STEP_EXECUTION_ID + ":1,_id:0}")
+                .map(new Handler<Long>(Fields.STEP_EXECUTION_ID))) {
+            return cursor.hasNext();
         }
     }
 }

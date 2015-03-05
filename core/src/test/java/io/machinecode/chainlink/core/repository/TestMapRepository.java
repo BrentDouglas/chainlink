@@ -14,8 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -28,12 +26,12 @@ class TestMapRepository extends BaseMapRepository {
     protected final Map<Long, ExtendedJobExecution> jobExecutions;
     protected final Map<Long, ExtendedStepExecution> stepExecutions;
     protected final Map<Long, PartitionExecution> partitionExecutions;
-    protected final Map<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions;
+    protected final Map<Long, List<Long>> jobInstanceExecutions;
     protected final Map<Long, Long> jobExecutionInstances;
-    protected final Map<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions;
+    protected final Map<Long, Set<Long>> jobExecutionStepExecutions;
     protected final Map<Long, Long> latestJobExecutionForInstance;
-    protected final Map<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions;
-    protected final Map<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory;
+    protected final Map<Long, List<Long>> stepExecutionPartitionExecutions;
+    protected final Map<Long, Set<Long>> jobExecutionHistory;
 
     public TestMapRepository(final Marshalling marshalling) {
         super(marshalling);
@@ -77,7 +75,7 @@ class TestMapRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions() {
+    protected Map<Long, List<Long>> jobInstanceExecutions() {
         return this.jobInstanceExecutions;
     }
 
@@ -87,7 +85,7 @@ class TestMapRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions() {
+    protected Map<Long, Set<Long>> jobExecutionStepExecutions() {
         return this.jobExecutionStepExecutions;
     }
 
@@ -97,12 +95,12 @@ class TestMapRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions() {
+    protected Map<Long, List<Long>> stepExecutionPartitionExecutions() {
         return this.stepExecutionPartitionExecutions;
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory() {
+    protected Map<Long, Set<Long>> jobExecutionHistory() {
         return this.jobExecutionHistory;
     }
 
@@ -156,7 +154,6 @@ class TestMapRepository extends BaseMapRepository {
             if (value.getJobName().equals(jobName)) {
                 switch (value.getBatchStatus()) {
                     case STARTED:
-                    case STARTING:
                         ret.add(value.getExecutionId());
                 }
             }

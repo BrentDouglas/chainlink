@@ -622,12 +622,15 @@ public class JpaRepository implements Repository {
             if (!transaction.isResourceLocal()) {
                 em.joinTransaction();
             }
-            //TODO Batch Status
-            final List<Long> ids = em.createNamedQuery("JpaJobExecution.jobExecutionIdsWithJobName", Long.class)
+            final List<Long> ids = em.createNamedQuery("JpaJobExecution.runningJobExecutionIds", Long.class)
                     .setParameter("jobName", jobName)
                     .getResultList();
             if (ids.isEmpty()) {
-                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
+                if (em.createNamedQuery("JpaJobExecution.countWithJobName", Long.class)
+                    .setParameter("jobName", jobName)
+                    .getSingleResult() == 0) {
+                    throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
+                }
             }
             transaction.commit();
             return ids;
@@ -651,10 +654,10 @@ public class JpaRepository implements Repository {
                 em.joinTransaction();
             }
             final JpaJobExecution jobExecution = em.find(JpaJobExecution.class, jobExecutionId);
-            transaction.commit();
             if (jobExecution == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
             }
+            transaction.commit();
             return jobExecution.getJobParameters();
         } catch (final Exception e) {
             transaction.rollback();

@@ -13,18 +13,14 @@ import net.sf.ehcache.search.Results;
 import net.sf.ehcache.search.aggregator.Aggregators;
 import net.sf.ehcache.search.expression.AlwaysMatch;
 import net.sf.ehcache.search.expression.EqualTo;
-import net.sf.ehcache.search.expression.InCollection;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -49,12 +45,12 @@ public class EhCacheRepository extends BaseMapRepository {
     protected final EhCacheMap<Long, ExtendedJobExecution> jobExecutions;
     protected final EhCacheMap<Long, ExtendedStepExecution> stepExecutions;
     protected final EhCacheMap<Long, PartitionExecution> partitionExecutions;
-    protected final EhCacheMap<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions;
+    protected final EhCacheMap<Long, List<Long>> jobInstanceExecutions;
     protected final EhCacheMap<Long, Long> jobExecutionInstances;
-    protected final EhCacheMap<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions;
+    protected final EhCacheMap<Long, Set<Long>> jobExecutionStepExecutions;
     protected final EhCacheMap<Long, Long> latestJobExecutionForInstance;
-    protected final EhCacheMap<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions;
-    protected final EhCacheMap<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory;
+    protected final EhCacheMap<Long, List<Long>> stepExecutionPartitionExecutions;
+    protected final EhCacheMap<Long, Set<Long>> jobExecutionHistory;
 
     public EhCacheRepository(final Marshalling marshalling, final CacheManager manager) {
         super(marshalling);
@@ -98,7 +94,7 @@ public class EhCacheRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions() {
+    protected Map<Long, List<Long>> jobInstanceExecutions() {
         return this.jobInstanceExecutions;
     }
 
@@ -108,7 +104,7 @@ public class EhCacheRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions() {
+    protected Map<Long, Set<Long>> jobExecutionStepExecutions() {
         return this.jobExecutionStepExecutions;
     }
 
@@ -118,12 +114,12 @@ public class EhCacheRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions() {
+    protected Map<Long, List<Long>> stepExecutionPartitionExecutions() {
         return this.stepExecutionPartitionExecutions;
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory() {
+    protected Map<Long, Set<Long>> jobExecutionHistory() {
         return this.jobExecutionHistory;
     }
 
@@ -186,7 +182,7 @@ public class EhCacheRepository extends BaseMapRepository {
     protected List<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
         final Results results = this.jobExecutions.cache.createQuery()
                 .addCriteria(new EqualTo("job_name", jobName))
-                .addCriteria(new InCollection("batch_status", Arrays.asList(BatchStatus.STARTED, BatchStatus.STARTING)))
+                .addCriteria(new EqualTo("batch_status", BatchStatus.STARTED))
                 .includeValues()
                 .execute();
         final List<Long> ret = new ArrayList<>(results.size());

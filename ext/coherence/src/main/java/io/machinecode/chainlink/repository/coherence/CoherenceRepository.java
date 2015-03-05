@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -92,7 +90,7 @@ public class CoherenceRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions() {
+    protected Map<Long, List<Long>> jobInstanceExecutions() {
         return this.jobInstanceExecutions;
     }
 
@@ -102,7 +100,7 @@ public class CoherenceRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions() {
+    protected Map<Long, Set<Long>> jobExecutionStepExecutions() {
         return this.jobExecutionStepExecutions;
     }
 
@@ -112,12 +110,12 @@ public class CoherenceRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions() {
+    protected Map<Long, List<Long>> stepExecutionPartitionExecutions() {
         return this.stepExecutionPartitionExecutions;
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory() {
+    protected Map<Long, Set<Long>> jobExecutionHistory() {
         return this.jobExecutionHistory;
     }
 

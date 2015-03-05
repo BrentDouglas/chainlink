@@ -18,6 +18,17 @@ public class EhCacheMap<K,V> extends CacheMap<K,V> {
     }
 
     @Override
+    public boolean containsKey(final Object key) {
+        return this.cache.isKeyInCache(key);
+    }
+
+    @Override
+    public boolean containsValue(final Object value) {
+        return this.cache.isValueInCache(value);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public V get(final Object key) {
         final Element element = this.cache.get(key);
         return element == null ? null : (V) element.getObjectValue();
@@ -43,6 +54,6 @@ public class EhCacheMap<K,V> extends CacheMap<K,V> {
     }
 
     public static <K,V> EhCacheMap<K,V> with(final Ehcache cache) {
-        return new EhCacheMap<K, V>(cache);
+        return new EhCacheMap<>(cache);
     }
 }

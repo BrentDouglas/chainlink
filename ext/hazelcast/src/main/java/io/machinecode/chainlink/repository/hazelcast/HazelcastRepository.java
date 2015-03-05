@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -42,12 +40,12 @@ public class HazelcastRepository extends BaseMapRepository {
     protected final IMap<Long, ExtendedJobExecution> jobExecutions;
     protected final IMap<Long, ExtendedStepExecution> stepExecutions;
     protected final IMap<Long, PartitionExecution> partitionExecutions;
-    protected final IMap<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions;
+    protected final IMap<Long, List<Long>> jobInstanceExecutions;
     protected final IMap<Long, Long> jobExecutionInstances;
-    protected final IMap<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions;
+    protected final IMap<Long, Set<Long>> jobExecutionStepExecutions;
     protected final IMap<Long, Long> latestJobExecutionForInstance;
-    protected final IMap<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions;
-    protected final IMap<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory;
+    protected final IMap<Long, List<Long>> stepExecutionPartitionExecutions;
+    protected final IMap<Long, Set<Long>> jobExecutionHistory;
 
     final HazelcastInstance hazelcast;
 
@@ -94,7 +92,7 @@ public class HazelcastRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions() {
+    protected Map<Long, List<Long>> jobInstanceExecutions() {
         return this.jobInstanceExecutions;
     }
 
@@ -104,7 +102,7 @@ public class HazelcastRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions() {
+    protected Map<Long, Set<Long>> jobExecutionStepExecutions() {
         return this.jobExecutionStepExecutions;
     }
 
@@ -114,12 +112,12 @@ public class HazelcastRepository extends BaseMapRepository {
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions() {
+    protected Map<Long, List<Long>> stepExecutionPartitionExecutions() {
         return this.stepExecutionPartitionExecutions;
     }
 
     @Override
-    protected Map<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory() {
+    protected Map<Long, Set<Long>> jobExecutionHistory() {
         return this.jobExecutionHistory;
     }
 

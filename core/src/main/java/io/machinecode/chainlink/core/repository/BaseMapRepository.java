@@ -56,12 +56,12 @@ public abstract class BaseMapRepository implements Repository {
     protected abstract Map<Long, ExtendedJobExecution> jobExecutions();
     protected abstract Map<Long, ExtendedStepExecution> stepExecutions();
     protected abstract Map<Long, PartitionExecution> partitionExecutions();
-    protected abstract Map<Long, CopyOnWriteArrayList<Long>> jobInstanceExecutions();
+    protected abstract Map<Long, List<Long>> jobInstanceExecutions();
     protected abstract Map<Long, Long> jobExecutionInstances();
-    protected abstract Map<Long, CopyOnWriteArraySet<Long>> jobExecutionStepExecutions();
+    protected abstract Map<Long, Set<Long>> jobExecutionStepExecutions();
     protected abstract Map<Long, Long> latestJobExecutionForInstance();
-    protected abstract Map<Long, CopyOnWriteArrayList<Long>> stepExecutionPartitionExecutions();
-    protected abstract Map<Long, CopyOnWriteArraySet<Long>> jobExecutionHistory();
+    protected abstract Map<Long, List<Long>> stepExecutionPartitionExecutions();
+    protected abstract Map<Long, Set<Long>> jobExecutionHistory();
 
     protected abstract long _id(final String key) throws Exception;
 
@@ -87,7 +87,7 @@ public abstract class BaseMapRepository implements Repository {
 
     @Override
     public synchronized ExtendedJobExecution createJobExecution(final long jobInstanceId, final String jobName, final Properties parameters, final Date timestamp) throws Exception {
-        final CopyOnWriteArrayList<Long> executions = jobInstanceExecutions().get(jobInstanceId);
+        final List<Long> executions = jobInstanceExecutions().get(jobInstanceId);
         if (executions == null) {
             throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
         }
@@ -113,7 +113,7 @@ public abstract class BaseMapRepository implements Repository {
 
     @Override
     public synchronized ExtendedStepExecution createStepExecution(final long jobExecutionId, final String stepName, final Date timestamp) throws Exception {
-        final CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions().get(jobExecutionId);
+        final Set<Long> executionIds = jobExecutionStepExecutions().get(jobExecutionId);
         if (executionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
         }
@@ -139,7 +139,7 @@ public abstract class BaseMapRepository implements Repository {
         final Serializable clonedPersistentUserData = marshalling.clone(persistentUserData);
         final Serializable clonedReaderCheckpoint = marshalling.clone(readerCheckpoint);
         final Serializable clonedWriterCheckpoint = marshalling.clone(writerCheckpoint);
-        final CopyOnWriteArrayList<Long> partitions = stepExecutionPartitionExecutions().get(stepExecutionId);
+        final List<Long> partitions = stepExecutionPartitionExecutions().get(stepExecutionId);
         if (partitions == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
         }
@@ -208,11 +208,11 @@ public abstract class BaseMapRepository implements Repository {
 
     @Override
     public synchronized void linkJobExecutions(final long jobExecutionId, final long restartJobExecutionId) throws Exception {
-        final CopyOnWriteArraySet<Long> oldJobExecutionIds = jobExecutionHistory().get(restartJobExecutionId);
+        final Set<Long> oldJobExecutionIds = jobExecutionHistory().get(restartJobExecutionId);
         if (oldJobExecutionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", restartJobExecutionId));
         }
-        final CopyOnWriteArraySet<Long> jobExecutionIds = jobExecutionHistory().get(jobExecutionId);
+        final Set<Long> jobExecutionIds = jobExecutionHistory().get(jobExecutionId);
         if (jobExecutionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
         }
@@ -375,7 +375,9 @@ public abstract class BaseMapRepository implements Repository {
         final Collection<Long> values = fetchRunningJobExecutionIds(jobName);
         ids.addAll(values);
         if (ids.isEmpty()) {
-            throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
+            if (fetchJobInstanceCount(jobName) == 0) { //TODO Better way to do this
+                throw new NoSuchJobException(Messages.format("CHAINLINK-006000.repository.no.such.job", jobName));
+            }
         }
         return ids;
     }
@@ -412,7 +414,7 @@ public abstract class BaseMapRepository implements Repository {
         final List<JobExecution> executions = new ArrayList<>();
         final Collection<JobExecution> values = fetchJobExecutionsForJobInstance(jobInstanceId);
         executions.addAll(values);
-        if (executions.isEmpty()) {
+        if (executions.isEmpty() && !jobInstances().containsKey(jobInstanceId)) {
             throw new NoSuchJobInstanceException(Messages.format("CHAINLINK-006001.repository.no.such.job.instance", jobInstanceId));
         }
         return executions;
@@ -460,7 +462,7 @@ public abstract class BaseMapRepository implements Repository {
 
     @Override
     public List<StepExecution> getStepExecutionsForJobExecution(final long jobExecutionId) throws Exception {
-        final CopyOnWriteArraySet<Long> stepExecutionIds = jobExecutionStepExecutions().get(jobExecutionId);
+        final Set<Long> stepExecutionIds = jobExecutionStepExecutions().get(jobExecutionId);
         if (stepExecutionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
         }
@@ -473,12 +475,12 @@ public abstract class BaseMapRepository implements Repository {
 
     @Override
     public synchronized ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws Exception {
-        final CopyOnWriteArraySet<Long> historicJobExecutionIds = jobExecutionHistory().get(jobExecutionId);
+        final Set<Long> historicJobExecutionIds = jobExecutionHistory().get(jobExecutionId);
         if (historicJobExecutionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
         }
         final TLongSet stepExecutionIds = new TLongHashSet();
-        CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions().get(jobExecutionId);
+        Set<Long> executionIds = jobExecutionStepExecutions().get(jobExecutionId);
         if (executionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
         }
@@ -532,13 +534,13 @@ public abstract class BaseMapRepository implements Repository {
     @Override
     public synchronized ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws Exception {
         final TLongSet historicJobExecutionIds = new TLongHashSet();
-        final CopyOnWriteArraySet<Long> executions = jobExecutionHistory().get(jobExecutionId);
+        final Set<Long> executions = jobExecutionHistory().get(jobExecutionId);
         if (executions == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
         }
         historicJobExecutionIds.addAll(executions);
         final TLongSet stepExecutionIds = new TLongHashSet();
-        CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions().get(jobExecutionId);
+        Set<Long> executionIds = jobExecutionStepExecutions().get(jobExecutionId);
         if (executionIds == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
         }
@@ -577,7 +579,7 @@ public abstract class BaseMapRepository implements Repository {
     @Override
     public synchronized int getStepExecutionCount(final long jobExecutionId, final String stepName) throws Exception {
         final TLongSet historicJobExecutionIds = new TLongHashSet();
-        final CopyOnWriteArraySet<Long> executions = jobExecutionHistory().get(jobExecutionId);
+        final Set<Long> executions = jobExecutionHistory().get(jobExecutionId);
         if (executions == null) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", jobExecutionId));
         }
@@ -585,7 +587,7 @@ public abstract class BaseMapRepository implements Repository {
         final TLongSet stepExecutionIds = new TLongHashSet();
         for (final TLongIterator it = historicJobExecutionIds.iterator(); it.hasNext();) {
             final long historicJobExecutionId = it.next();
-            CopyOnWriteArraySet<Long> executionIds = jobExecutionStepExecutions().get(historicJobExecutionId);
+            Set<Long> executionIds = jobExecutionStepExecutions().get(historicJobExecutionId);
             if (executionIds == null) {
                 throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006002.repository.no.such.job.execution", historicJobExecutionId));
             }
@@ -607,21 +609,29 @@ public abstract class BaseMapRepository implements Repository {
 
     @Override
     public ExtendedStepExecution getStepExecution(final long stepExecutionId) throws Exception {
-        return stepExecutions().get(stepExecutionId);
+        final ExtendedStepExecution stepExecution = stepExecutions().get(stepExecutionId);
+        if (stepExecution == null) {
+            throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
+        }
+        return stepExecution;
     }
 
     @Override
     public synchronized StepExecution[] getStepExecutions(final long[] stepExecutionIds) throws Exception {
         final StepExecution[] executions = new StepExecution[stepExecutionIds.length];
         for (int i = 0; i < stepExecutionIds.length; ++i) {
-            executions[i] = stepExecutions().get(stepExecutionIds[i]);
+            final ExtendedStepExecution x = stepExecutions().get(stepExecutionIds[i]);
+            if (x == null) {
+                throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionIds[i]));
+            }
+            executions[i] = x;
         }
         return executions;
     }
 
     @Override
     public synchronized PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws Exception {
-        final CopyOnWriteArrayList<Long> partitionIds = stepExecutionPartitionExecutions().get(stepExecutionId);
+        final List<Long> partitionIds = stepExecutionPartitionExecutions().get(stepExecutionId);
         if (partitionIds.isEmpty()) {
             throw new NoSuchJobExecutionException(Messages.format("CHAINLINK-006003.repository.no.such.step.execution", stepExecutionId));
         }

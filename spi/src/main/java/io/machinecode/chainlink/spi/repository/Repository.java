@@ -224,8 +224,7 @@ public interface Repository {
      * @param jobExecutionId The id of the later {@link ExtendedJobExecution}.
      * @param restartJobExecutionId The id of the earlier {@link ExtendedJobExecution}.
      * @throws javax.batch.operations.NoSuchJobExecutionException If this repository does not contain a resource
-     * identified by {@code jobExecutionId}
-     *         or {@code restartJobExecutionId}.
+     * identified by {@code jobExecutionId} or {@code restartJobExecutionId}.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */
@@ -601,7 +600,7 @@ public interface Repository {
     ExtendedStepExecution getStepExecution(final long stepExecutionId) throws Exception;
 
     /**
-     * @param jobExecutionId The id on the {@link JobExecution} to search.
+     * @param jobExecutionId The id of the {@link JobExecution} to search.
      * @param stepExecutionId The id of the step execution currently running.
      * @param stepName The name of the step to find.
      * @return The latest step execution before the one currently running.
@@ -612,7 +611,7 @@ public interface Repository {
     ExtendedStepExecution getPreviousStepExecution(final long jobExecutionId, final long stepExecutionId, final String stepName) throws Exception;
 
     /**
-     * @param jobExecutionId The id on the {@link JobExecution} to search.
+     * @param jobExecutionId The id of the {@link JobExecution} to search.
      * @param stepName The name of the step to find.
      * @return
      * @throws javax.batch.operations.NoSuchJobExecutionException
@@ -622,7 +621,7 @@ public interface Repository {
     ExtendedStepExecution getLatestStepExecution(final long jobExecutionId, final String stepName) throws Exception;
 
     /**
-     * @param jobExecutionId The id on the {@link JobExecution} to search.
+     * @param jobExecutionId The id of the {@link JobExecution} to search.
      * @param stepName The name of the step to find.
      * @return The number of {@link StepExecution}'s with {@code stepName} in the sequence on job executions
      *         headed by {@code jobExecutionId} as described in the javadoc of {@link #linkJobExecutions(long, long)}.
@@ -633,10 +632,12 @@ public interface Repository {
     int getStepExecutionCount(final long jobExecutionId, final String stepName) throws Exception;
 
     /**
-     *
-     * @param stepExecutionIds
-     * @return
-     * @throws javax.batch.operations.NoSuchJobExecutionException
+     * @param stepExecutionIds The ids of the {@link StepExecution}'s to search for.
+     * @return An array of {@link StepExecution}'s identified by {@code stepExecutionIds} ordered such that calling
+     *         {@link javax.batch.runtime.StepExecution#getStepExecutionId()} on the returned array at index {@code i}
+     *         will equal the value of {@code stepExecutionIds} at index {@code i}. MUST not return null.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If any of the values in {@code stepExecutionIds} do
+     *         not identify a {@link ExtendedStepExecution} stored in this repository.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */
@@ -653,10 +654,11 @@ public interface Repository {
     PartitionExecution[] getUnfinishedPartitionExecutions(final long stepExecutionId) throws Exception;
 
     /**
-     *
-     * @param partitionExecutionId
-     * @return
-     * @throws javax.batch.operations.NoSuchJobExecutionException
+     * @param partitionExecutionId The id of the {@link PartitionExecution} to search for.
+     * @return A {@link PartitionExecution} where calling {@link io.machinecode.chainlink.spi.repository.PartitionExecution#getPartitionExecutionId()}
+     *         will equal {@code partitionExecutionId}.
+     * @throws javax.batch.operations.NoSuchJobExecutionException If the repository does not contain a
+     *         {@link PartitionExecution} identified by {@code partitionExecutionId}.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.
      * @throws Exception For implementation specific issues.
      */
