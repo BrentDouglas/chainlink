@@ -4,6 +4,7 @@ import io.machinecode.chainlink.repository.jpa.EntityManagerLookup;
 import io.machinecode.chainlink.repository.jpa.JpaRepository;
 import io.machinecode.chainlink.repository.jpa.ResourceLocalTransactionManagerLookup;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.repository.Repository;
 
@@ -11,7 +12,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -45,7 +45,7 @@ public class JpaRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
-    public Repository produce(final Dependencies dependencies, final Properties properties) {
+    public Repository produce(final Dependencies dependencies, final PropertyLookup properties) {
         return new JpaRepository(new EntityManagerLookup() {
             @Override
             public EntityManagerFactory getEntityManagerFactory() {

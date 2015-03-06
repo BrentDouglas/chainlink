@@ -7,6 +7,9 @@ import io.machinecode.chainlink.core.schema.NoJobOperatorWithNameException;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
@@ -21,6 +24,9 @@ public abstract class XmlScope implements MutableScopeSchema<XmlDeclaration, Xml
     @XmlAttribute(name = "ref", required = false)
     protected String ref;
 
+    @XmlElement(name = "property", namespace = XmlChainlink.NAMESPACE, required = false)
+    private List<XmlProperty> properties = new ArrayList<>(0);
+
     @Override
     public String getRef() {
         return ref;
@@ -29,6 +35,16 @@ public abstract class XmlScope implements MutableScopeSchema<XmlDeclaration, Xml
     @Override
     public void setRef(final String ref) {
         this.ref = ref;
+    }
+
+    @Override
+    public void setProperties(final List<XmlProperty> properties) {
+        this.properties = properties;
+    }
+
+    @Override
+    public List<XmlProperty> getProperties() {
+        return this.properties;
     }
 
     @Override

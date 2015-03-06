@@ -2,6 +2,7 @@ package io.machinecode.chainlink.core.jsl;
 
 import io.machinecode.chainlink.core.ExpressionTest;
 import io.machinecode.chainlink.core.factory.JobFactory;
+import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.spi.jsl.inherit.InheritableJob;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableFlow;
 import io.machinecode.chainlink.spi.jsl.inherit.execution.InheritableStep;
@@ -379,7 +380,6 @@ public abstract class InheritanceJobTest {
     }
 
     public static void testDefaults(final Job job) {
-        JobFactory.validate(job);
         Assert.assertEquals("1.0", job.getVersion());
         Assert.assertEquals("true", job.getRestartable());
 

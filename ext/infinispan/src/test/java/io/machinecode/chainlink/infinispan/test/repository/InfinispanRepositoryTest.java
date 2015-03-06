@@ -3,6 +3,7 @@ package io.machinecode.chainlink.infinispan.test.repository;
 import io.machinecode.chainlink.repository.infinispan.InfinispanRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
@@ -22,7 +23,6 @@ import org.jgroups.util.Util;
 import org.junit.After;
 
 import javax.transaction.TransactionManager;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,7 +37,7 @@ public class InfinispanRepositoryTest extends RepositoryTest {
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+            public Repository produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return _repository = new InfinispanRepository(
                         dependencies.getMarshalling(),
                         cacheManager = new DefaultCacheManager(

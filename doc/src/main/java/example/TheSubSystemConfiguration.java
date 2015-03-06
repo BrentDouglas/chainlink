@@ -16,7 +16,6 @@ public class TheSubSystemConfiguration implements SubSystemConfiguration {
     public void configureSubSystem(final SubSystemModel model) throws Exception {
         model.getDeployment(Constants.DEFAULT)
                 .getJobOperator(Constants.DEFAULT)
-                .getProperties()
                 .setProperty("bar", "baz");
     }
 }

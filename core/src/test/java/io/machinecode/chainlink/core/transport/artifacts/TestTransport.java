@@ -3,6 +3,7 @@ package io.machinecode.chainlink.core.transport.artifacts;
 import io.machinecode.chainlink.core.transport.DistributedTransport;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.core.transport.cmd.Command;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.RejectedDeferred;
 import io.machinecode.then.core.ResolvedDeferred;
@@ -28,7 +29,7 @@ public class TestTransport extends DistributedTransport<String> {
     final List<String> remotes;
     protected final ExecutorService executor;
 
-    public TestTransport(final ConcurrentMap<String, TestTransport> transports, final String local, final List<String> remotes, final Dependencies dependencies, final java.util.Properties properties) throws Exception {
+    public TestTransport(final ConcurrentMap<String, TestTransport> transports, final String local, final List<String> remotes, final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         super(dependencies, properties);
         this.executor = Executors.newCachedThreadPool();
         this.transports = transports;

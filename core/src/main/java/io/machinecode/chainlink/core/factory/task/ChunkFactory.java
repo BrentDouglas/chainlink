@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.task;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PartitionImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.CheckpointAlgorithmImpl;
@@ -54,7 +54,7 @@ public class ChunkFactory {
         );
     }
 
-    public static ChunkImpl producePartitioned(final ChunkImpl that, final ListenersImpl listeners, final PartitionImpl<?> partition, final PropertyContext context) {
+    public static ChunkImpl producePartitioned(final ChunkImpl that, final ListenersImpl listeners, final PartitionImpl<?> partition, final PartitionPropertyContext context) {
         final String checkpointPolicy = Expression.resolvePartitionProperty(that.getCheckpointPolicy(), context);
         final String itemCount = Expression.resolvePartitionProperty(that.getItemCount(), context);
         final String timeLimit = Expression.resolvePartitionProperty(that.getTimeLimit(), context);

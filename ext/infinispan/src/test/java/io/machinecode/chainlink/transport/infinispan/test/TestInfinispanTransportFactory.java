@@ -3,11 +3,11 @@ package io.machinecode.chainlink.transport.infinispan.test;
 import io.machinecode.chainlink.core.transport.TestTransportFactory;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
-import org.infinispan.factories.GlobalComponentRegistry;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
 import org.infinispan.transaction.LockingMode;
@@ -18,7 +18,6 @@ import org.jgroups.JChannel;
 import org.jgroups.util.Util;
 
 import javax.transaction.TransactionManager;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,7 +30,7 @@ public class TestInfinispanTransportFactory implements TestTransportFactory {
     JChannel channel;
 
     @Override
-    public InfinispanTransport produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public InfinispanTransport produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         manager = new DefaultCacheManager(
                 new GlobalConfigurationBuilder()
                         .clusteredDefault()

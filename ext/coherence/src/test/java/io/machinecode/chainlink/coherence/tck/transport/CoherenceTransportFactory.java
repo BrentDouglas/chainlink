@@ -2,10 +2,9 @@ package io.machinecode.chainlink.coherence.tck.transport;
 
 import com.tangosol.net.CacheFactory;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.coherence.CoherenceTransport;
-
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -13,7 +12,7 @@ import java.util.Properties;
 public class CoherenceTransportFactory implements TransportFactory {
 
     @Override
-    public CoherenceTransport produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public CoherenceTransport produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {

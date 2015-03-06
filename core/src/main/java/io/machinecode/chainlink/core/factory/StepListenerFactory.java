@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.jsl.impl.ListenerImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
@@ -23,7 +23,7 @@ public class StepListenerFactory {
         );
     }
 
-    public static ListenerImpl producePartitioned(final ListenerImpl that, final PropertyContext context) {
+    public static ListenerImpl producePartitioned(final ListenerImpl that, final PartitionPropertyContext context) {
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.producePartitioned(that.getProperties(), context);
         return new ListenerImpl(

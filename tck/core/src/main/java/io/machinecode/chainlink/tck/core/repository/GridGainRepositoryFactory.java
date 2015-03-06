@@ -2,6 +2,7 @@ package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.gridgain.GridGainRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.repository.Repository;
 import org.gridgain.grid.GridConfiguration;
@@ -12,8 +13,6 @@ import org.gridgain.grid.cache.GridCacheAtomicityMode;
 import org.gridgain.grid.cache.GridCacheConfiguration;
 import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMulticastIpFinder;
-
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -69,7 +68,7 @@ public class GridGainRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
-    public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public Repository produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         return new GridGainRepository(
                 dependencies.getMarshalling(),
                 GridGain.grid(CHAINLINK_TCK_GRID)

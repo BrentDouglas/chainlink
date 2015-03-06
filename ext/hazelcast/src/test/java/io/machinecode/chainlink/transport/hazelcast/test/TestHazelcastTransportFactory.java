@@ -6,10 +6,8 @@ import com.hazelcast.core.IExecutorService;
 import io.machinecode.chainlink.core.transport.TestTransportFactory;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.transport.hazelcast.HazelcastTransport;
-
-import java.util.Properties;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -26,7 +24,7 @@ public class TestHazelcastTransportFactory implements TestTransportFactory {
     }
 
     @Override
-    public HazelcastTransport produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public HazelcastTransport produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         return new HazelcastTransport(
                 dependencies,
                 properties,

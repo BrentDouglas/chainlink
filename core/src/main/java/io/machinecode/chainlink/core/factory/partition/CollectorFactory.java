@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.partition;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
@@ -24,7 +24,7 @@ public class CollectorFactory {
         );
     }
 
-    public static CollectorImpl producePartitioned(final CollectorImpl that, final PropertyContext context) {
+    public static CollectorImpl producePartitioned(final CollectorImpl that, final PartitionPropertyContext context) {
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.producePartitioned(that.getProperties(), context);
         return new CollectorImpl(

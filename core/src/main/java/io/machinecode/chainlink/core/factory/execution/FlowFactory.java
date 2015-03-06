@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.execution;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.factory.transition.Transitions;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.FlowImpl;
@@ -30,7 +30,7 @@ public class FlowFactory {
         );
     }
 
-    public static FlowImpl producePartitioned(final FlowImpl that, final PropertyContext context) {
+    public static FlowImpl producePartitioned(final FlowImpl that, final PartitionPropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String next = Expression.resolvePartitionProperty(that.getNext(), context);
         final List<ExecutionImpl> executions = Executions.immutableCopyExecutionsPartition(that.getExecutions(), context);

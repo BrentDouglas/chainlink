@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.factory.transition;
 
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.transition.EndImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.FailImpl;
 import io.machinecode.chainlink.core.jsl.impl.transition.NextImpl;
@@ -39,9 +39,9 @@ public class Transitions {
         }
     };
 
-    private static final ExpressionTransformer<TransitionImpl, TransitionImpl, PropertyContext> TRANSITION_PARTITION_TRANSFORMER = new ExpressionTransformer<TransitionImpl, TransitionImpl, PropertyContext>() {
+    private static final ExpressionTransformer<TransitionImpl, TransitionImpl, PartitionPropertyContext> TRANSITION_PARTITION_TRANSFORMER = new ExpressionTransformer<TransitionImpl, TransitionImpl, PartitionPropertyContext>() {
         @Override
-        public TransitionImpl transform(final TransitionImpl that, final PropertyContext context) {
+        public TransitionImpl transform(final TransitionImpl that, final PartitionPropertyContext context) {
             if (that instanceof EndImpl) {
                 return EndFactory.producePartitioned((EndImpl) that, context);
             } else if (that instanceof FailImpl) {
@@ -60,7 +60,7 @@ public class Transitions {
         return Copy.immutableCopy(that, context, TRANSITION_EXECUTION_TRANSFORMER);
     }
 
-    public static List<TransitionImpl> immutableCopyTransitionsPartition(final List<TransitionImpl> that, final PropertyContext context) {
+    public static List<TransitionImpl> immutableCopyTransitionsPartition(final List<TransitionImpl> that, final PartitionPropertyContext context) {
         return Copy.immutableCopy(that, context, TRANSITION_PARTITION_TRANSFORMER);
     }
 }

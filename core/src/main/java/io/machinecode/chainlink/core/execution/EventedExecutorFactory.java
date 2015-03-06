@@ -1,11 +1,9 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.core.configuration.PropertyLookupImpl;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
-
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -24,7 +22,7 @@ public class EventedExecutorFactory implements ExecutorFactory {
     }
 
     @Override
-    public Executor produce(final Dependencies dependencies, final Properties properties) throws Exception {
-        return new EventedExecutor(dependencies, properties, this.threadFactory.lookupThreadFactory(new PropertyLookupImpl(properties)));
+    public Executor produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
+        return new EventedExecutor(dependencies, properties, this.threadFactory.lookupThreadFactory(properties));
     }
 }

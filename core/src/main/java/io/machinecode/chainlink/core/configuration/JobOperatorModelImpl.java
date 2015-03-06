@@ -4,9 +4,11 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.management.JobOperatorImpl;
 import io.machinecode.chainlink.core.management.LazyJobOperator;
+import io.machinecode.chainlink.core.property.ArrayPropertyLookup;
+import io.machinecode.chainlink.core.property.SystemPropertyLookup;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
-import io.machinecode.chainlink.spi.configuration.PropertyModel;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
@@ -33,14 +35,13 @@ import javax.transaction.TransactionManager;
 import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class JobOperatorModelImpl implements JobOperatorModel {
+public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperatorModel {
 
     public static final String CLASS_LOADER = "class-loader";
     public static final String MARSHALLING = "marshalling";
@@ -65,7 +66,9 @@ public class JobOperatorModelImpl implements JobOperatorModel {
     final LinkedHashMap<String, DeclarationImpl<JobLoader>> jobLoaders = new LinkedHashMap<>();
     final LinkedHashMap<String, DeclarationImpl<ArtifactLoader>> artifactLoaders = new LinkedHashMap<>();
     final LinkedHashMap<String, DeclarationImpl<Security>> securities = new LinkedHashMap<>();
-    Properties properties;
+
+    final PropertyLookup configuredProperties;
+    final SystemPropertyLookup systemProperties;
 
     final WeakReference<ClassLoader> loader;
     final Map<String, DeclarationImpl<?>> values = new THashMap<>();
@@ -74,6 +77,13 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         this.loader = loader;
         this.scope = scope;
         this.name = name;
+        if (scope.parent == null) {
+            this.configuredProperties = new ArrayPropertyLookup(this.properties, scope.properties);
+        } else {
+            //TODO Maybe make this more generic
+            this.configuredProperties = new ArrayPropertyLookup(this.properties, scope.properties, scope.parent.properties);
+        }
+        this.systemProperties = new SystemPropertyLookup(this.configuredProperties);
     }
 
     private JobOperatorModelImpl(final JobOperatorModelImpl that, final ScopeModelImpl scope) {
@@ -219,27 +229,20 @@ public class JobOperatorModelImpl implements JobOperatorModel {
         return security;
     }
 
-    @Override
-    public PropertyModel getProperties() {
-        return new PropertyModelImpl(this.getRawProperties());
-    }
-
-    public Properties getRawProperties() {
-        return this.properties == null
-                ? this.properties = new Properties()
-                : this.properties;
+    public PropertyLookup getProperties() {
+        return configuredProperties;
     }
 
     public JobOperatorImpl createJobOperator(final ConfigurationLoader loader) throws Exception {
         final ConfigurationImpl configuration = scope.getConfiguration(name, loader);
-        final JobOperatorImpl op = new JobOperatorImpl(configuration);
+        final JobOperatorImpl op = new JobOperatorImpl(configuration, this.systemProperties);
         op.open(configuration);
         return op;
     }
 
     public JobOperatorImpl createJobOperator() throws Exception {
         final ConfigurationImpl configuration = scope.getConfiguration(name);
-        final JobOperatorImpl op = new JobOperatorImpl(configuration);
+        final JobOperatorImpl op = new JobOperatorImpl(configuration, this.systemProperties);
         op.open(configuration);
         return op;
     }

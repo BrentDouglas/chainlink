@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.factory;
 
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.ListenerImpl;
 import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
 import io.machinecode.chainlink.core.util.Copy;
@@ -25,9 +25,9 @@ public class StepListenersFactory {
         }
     };
 
-    private static final ExpressionTransformer<ListenerImpl, ListenerImpl, PropertyContext> STEP_LISTENER_PARTITION_TRANSFORMER = new ExpressionTransformer<ListenerImpl, ListenerImpl, PropertyContext>() {
+    private static final ExpressionTransformer<ListenerImpl, ListenerImpl, PartitionPropertyContext> STEP_LISTENER_PARTITION_TRANSFORMER = new ExpressionTransformer<ListenerImpl, ListenerImpl, PartitionPropertyContext>() {
         @Override
-        public ListenerImpl transform(final ListenerImpl that, final PropertyContext context) {
+        public ListenerImpl transform(final ListenerImpl that, final PartitionPropertyContext context) {
             return StepListenerFactory.producePartitioned(that, context);
         }
     };
@@ -41,7 +41,7 @@ public class StepListenersFactory {
         );
     }
 
-    public static ListenersImpl producePartitioned(final ListenersImpl that, final PropertyContext context) {
+    public static ListenersImpl producePartitioned(final ListenersImpl that, final PartitionPropertyContext context) {
         return new ListenersImpl(
                 Copy.immutableCopy(that.getListeners(), context, STEP_LISTENER_PARTITION_TRANSFORMER)
         );

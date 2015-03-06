@@ -1,6 +1,7 @@
 package io.machinecode.chainlink.tck.core.transport;
 
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.TransportFactory;
 import io.machinecode.chainlink.transport.infinispan.InfinispanTransport;
 import org.infinispan.configuration.cache.CacheMode;
@@ -13,7 +14,6 @@ import org.infinispan.transaction.lookup.TransactionManagerLookup;
 import org.infinispan.util.concurrent.IsolationLevel;
 
 import javax.transaction.TransactionManager;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class InfinispanTransportFactory implements TransportFactory {
 
     @Override
-    public InfinispanTransport produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public InfinispanTransport produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         final DefaultCacheManager manager = new DefaultCacheManager(
                 new GlobalConfigurationBuilder()
                         .clusteredDefault()

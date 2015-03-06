@@ -22,6 +22,7 @@
         <xs:sequence>
             <xs:element name="configuration-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="job-operator" type="cl:JobOperatorType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="property" type="cl:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 

@@ -7,9 +7,9 @@ import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
+import io.machinecode.chainlink.core.property.SystemPropertyLookup;
 import io.machinecode.chainlink.core.validation.InvalidJobException;
 import io.machinecode.chainlink.core.validation.JobValidator;
-import io.machinecode.chainlink.core.validation.visitor.VisitorNode;
 import io.machinecode.chainlink.spi.jsl.Job;
 
 import java.util.List;
@@ -22,15 +22,12 @@ import java.util.Properties;
 public class JobFactory {
 
     public static JobImpl produce(final Job that, final Properties parameters) throws InvalidJobException {
-        return produceExecution(that, parameters);
+        return produce(that, parameters, SystemPropertyLookup.INSTANCE);
     }
 
-    private static JobImpl produceExecution(final Job that, final Properties parameters) throws InvalidJobException {
-        final VisitorNode before = JobValidator.INSTANCE.visit(that);
-        if (JobValidator.hasFailed(before)) {
-            throw new InvalidJobException(before);
-        }
-        final JobPropertyContext context = new JobPropertyContext(parameters);
+    public static JobImpl produce(final Job that, final Properties parameters, final SystemPropertyLookup lookup) throws InvalidJobException {
+        JobValidator.assertValid(that);
+        final JobPropertyContext context = new JobPropertyContext(parameters, lookup);
 
         final String id = Expression.resolveExecutionProperty(that.getId(), context);
         final String version = Expression.resolveExecutionProperty(that.getVersion(), context);
@@ -46,14 +43,5 @@ public class JobFactory {
                 listeners,
                 executions
         );
-    }
-
-    public static VisitorNode validate(final Job job) {
-        final VisitorNode node = JobValidator.INSTANCE.visit(job);
-        boolean failed = JobValidator.findProblems(node);
-        if (failed) {
-            throw new InvalidJobException(node);
-        }
-        return node;
     }
 }

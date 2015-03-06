@@ -1,10 +1,10 @@
 package io.machinecode.chainlink.core.transaction;
 
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.TransactionManagerFactory;
 
 import javax.transaction.TransactionManager;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,7 +25,7 @@ public class LocalTransactionManagerFactory implements TransactionManagerFactory
     }
 
     @Override
-    public TransactionManager produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public TransactionManager produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         return new LocalTransactionManager(timeout, unit);
     }
 }

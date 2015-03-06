@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.partition;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.PlanImpl;
@@ -28,7 +28,7 @@ public class PlanFactory {
         return new PlanImpl(partitions, threads, properties);
     }
 
-    public static PlanImpl producePartitioned(final PlanImpl that, final PropertyContext context) {
+    public static PlanImpl producePartitioned(final PlanImpl that, final PartitionPropertyContext context) {
         final String partitions = Expression.resolvePartitionProperty(that.getPartitions(), context);
         final String threads = Expression.resolvePartitionProperty(that.getThreads(), context);
         final List<PropertiesImpl> properties = new ArrayList<PropertiesImpl>(that.getProperties().size());

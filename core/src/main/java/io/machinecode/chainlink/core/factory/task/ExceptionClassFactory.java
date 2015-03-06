@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.task;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassImpl;
 import io.machinecode.chainlink.spi.jsl.task.ExceptionClass;
 
@@ -17,7 +17,7 @@ public class ExceptionClassFactory {
         return new ExceptionClassImpl(className);
     }
 
-    public static ExceptionClassImpl producePartitioned(final ExceptionClassImpl that, final PropertyContext context) {
+    public static ExceptionClassImpl producePartitioned(final ExceptionClassImpl that, final PartitionPropertyContext context) {
         final String className = Expression.resolvePartitionProperty(that.getClassName(), context);
         return new ExceptionClassImpl(className);
     }

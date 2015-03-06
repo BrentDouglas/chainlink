@@ -2,6 +2,10 @@ package io.machinecode.chainlink.core;
 
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.jsl.fluent.Jsl;
+import io.machinecode.chainlink.core.property.ArrayPropertyLookup;
+import io.machinecode.chainlink.core.property.SinglePropertyLookup;
+import io.machinecode.chainlink.core.property.SystemPropertyLookup;
+import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.jsl.execution.Step;
 import junit.framework.Assert;
@@ -27,7 +31,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['job-prop']}")
                 ).addExecution(Jsl.step("step3")
                 ), PARAMETERS);
-        JobFactory.validate(job);
+        JobValidator.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3", step.getNext());
@@ -43,7 +47,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['job-prop']}?:step2;")
                 ).addExecution(Jsl.step("step3")
                 ), PARAMETERS);
-        JobFactory.validate(job);
+        JobValidator.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3", step.getNext());
@@ -59,7 +63,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['job-prop']}?:step2")
                 ).addExecution(Jsl.step("step3?:step2") //Stop throwing validation exception
                 ), PARAMETERS);
-        JobFactory.validate(job);
+        JobValidator.validate(job);
 
         final Step step = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step3?:step2", step.getNext());
@@ -75,7 +79,7 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not-a-property']}?:step2;")
                 ).addExecution(Jsl.step("step2")
                 ), PARAMETERS);
-        JobFactory.validate(job);
+        JobValidator.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -91,7 +95,6 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not-a-property']}?:step2")
                 ).addExecution(Jsl.step("?:step2")
                 ), PARAMETERS);
-        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("?:step2", step1.getNext());
@@ -109,7 +112,6 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not-a-property']}#{jobProperties['prop1']}?:#{jobProperties['prop2']}#{jobProperties['prop3']};")
                 ).addExecution(Jsl.step("step2")
                 ), PARAMETERS);
-        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -126,7 +128,6 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not']}#{jobProperties['not']}?:#{jobProperties['prop1']}#{jobProperties['not']}#{jobProperties['prop2']}#{jobProperties['not']};")
                 ).addExecution(Jsl.step("step2")
                 ), PARAMETERS);
-        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -143,7 +144,6 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not']} #{jobProperties['not']}?:#{jobProperties['prop1']}#{jobProperties['not']}#{jobProperties['prop2']}#{jobProperties['not']};")
                 ).addExecution(Jsl.step(" ")
                 ), PARAMETERS);
-        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals(" ", step1.getNext());
@@ -160,7 +160,6 @@ public class ExpressionTest {
                         .setNext("#{jobProperties['not']}#{jobProperties['not']}?:#{jobProperties['prop1']}blah#{jobProperties['not']};")
                 ).addExecution(Jsl.step("stepblah")
                 ), PARAMETERS);
-        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("stepblah", step1.getNext());
@@ -177,7 +176,6 @@ public class ExpressionTest {
                         .setNext("?:step2;")
                 ).addExecution(Jsl.step("step2")
                 ), PARAMETERS);
-        JobFactory.validate(job);
 
         final Step step1 = (Step)job.getExecutions().get(0);
         Assert.assertEquals("step2", step1.getNext());
@@ -195,7 +193,6 @@ public class ExpressionTest {
                         .setNext("blah?:default; not invalid apparently")
                 ).addExecution(Jsl.step("blah not invalid apparently")
                 ), PARAMETERS);
-        JobFactory.validate(job);
     }
 
     @Test
@@ -218,7 +215,6 @@ public class ExpressionTest {
                 ).addExecution(Jsl.step("/myfile2.txt")
                 ).addExecution(Jsl.step("/test/testfile1.txt")
                 ) , parameters);
-        JobFactory.validate(job);
 
         System.clearProperty("file.name.junit");
 
@@ -226,5 +222,53 @@ public class ExpressionTest {
         final Step step2 = (Step)job.getExecutions().get(1);
         Assert.assertEquals("/myfile2.txt", step1.getNext());
         Assert.assertEquals("/test/testfile1.txt", step2.getNext());
+    }
+
+    @Test
+    public void withConfigPropertyTest() {
+        final Properties config = new Properties();
+        config.setProperty("foo", "config");
+        config.setProperty("bar", "config");
+        System.setProperty("foo", "system");
+        try {
+            final Job job = JobFactory.produce(Jsl.job("i1")
+                    .setRestartable("false")
+                    .setVersion("1.0")
+                    .addProperty("foo", "local")
+                    .addExecution(Jsl.step("#{systemProperties['foo']}#{systemProperties['bar']}")
+                    ), PARAMETERS, new SystemPropertyLookup(new SinglePropertyLookup(config)));
+
+            final Step step1 = (Step)job.getExecutions().get(0);
+            Assert.assertEquals("systemconfig", step1.getId());
+        } finally {
+            System.clearProperty("foo");
+        }
+    }
+
+    @Test
+    public void withMultipleConfigPropertyTest() {
+        final Properties parent = new Properties();
+        parent.setProperty("foo", "parent");
+        parent.setProperty("bar", "parent");
+        parent.setProperty("baz", "parent");
+
+        final Properties config = new Properties();
+        config.setProperty("foo", "config");
+        config.setProperty("bar", "config");
+
+        System.setProperty("foo", "system");
+        try {
+            final Job job = JobFactory.produce(Jsl.job("i1")
+                    .setRestartable("false")
+                    .setVersion("1.0")
+                    .addProperty("foo", "local")
+                    .addExecution(Jsl.step("#{systemProperties['foo']}#{systemProperties['bar']}#{systemProperties['baz']}")
+                    ), PARAMETERS, new SystemPropertyLookup(new ArrayPropertyLookup(config, parent)));
+
+            final Step step1 = (Step)job.getExecutions().get(0);
+            Assert.assertEquals("systemconfigparent", step1.getId());
+        } finally {
+            System.clearProperty("foo");
+        }
     }
 }

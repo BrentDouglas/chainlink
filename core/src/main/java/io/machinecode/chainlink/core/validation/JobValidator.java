@@ -14,10 +14,25 @@ import io.machinecode.chainlink.spi.jsl.execution.Execution;
  */
 public class JobValidator extends ValidatingVisitor<Job> {
 
-    public static final JobValidator INSTANCE = new JobValidator();
+    private static final JobValidator INSTANCE = new JobValidator();
 
     protected JobValidator() {
         super(Job.ELEMENT);
+    }
+
+    public static VisitorNode validate(final Job job) {
+        final VisitorNode node = INSTANCE.visit(job);
+        if (JobValidator.hasCycleOrInvalidTransition(node)) {
+            throw new InvalidJobException(node);
+        }
+        return node;
+    }
+
+    public static void assertValid(final Job job) {
+        final VisitorNode node = INSTANCE.visit(job);
+        if (JobValidator.isInvalid(node)) {
+            throw new InvalidJobException(node);
+        }
     }
 
     @Override

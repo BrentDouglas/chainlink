@@ -1,6 +1,6 @@
 package io.machinecode.chainlink.core.execution;
 
-import io.machinecode.chainlink.spi.configuration.PropertyLookup;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 
 import java.util.concurrent.ThreadFactory;
 

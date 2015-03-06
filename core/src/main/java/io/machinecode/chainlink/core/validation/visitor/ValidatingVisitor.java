@@ -17,18 +17,18 @@ public abstract class ValidatingVisitor<T extends Element> extends Visitor<T> {
         super(element);
     }
 
-    public static boolean findProblems(final VisitorNode node) {
+    public static boolean hasCycleOrInvalidTransition(final VisitorNode node) {
         boolean ret = false;
         //Root node is a job
         for (final VisitorNode execution : node.children) {
             final VisitorNode.Cycle cycle = new VisitorNode.Cycle();
             final Set<String> trail = new THashSet<>();
-            ret = _findProblems(execution, cycle, trail) || ret;
+            ret = _hasCycleOrInvalidTransition(execution, cycle, trail) || ret;
         }
         return ret;
     }
 
-    private static boolean _findProblems(final VisitorNode node, final VisitorNode.Cycle cycle, final Set<String> trail) {
+    private static boolean _hasCycleOrInvalidTransition(final VisitorNode node, final VisitorNode.Cycle cycle, final Set<String> trail) {
         boolean ret = false;
         if (node.id != null) {
             if (!trail.add(node.id)) {
@@ -55,7 +55,7 @@ public abstract class ValidatingVisitor<T extends Element> extends Visitor<T> {
                     final VisitorNode.Cycle subCycle = new VisitorNode.Cycle(cycle);
                     final THashSet<String> subTrail = new THashSet<String>(trail);
                     subCycle.add(ImmutablePair.of(transition, node));
-                    ret = _findProblems(
+                    ret = _hasCycleOrInvalidTransition(
                             execution,
                             subCycle,
                             subTrail
@@ -64,17 +64,17 @@ public abstract class ValidatingVisitor<T extends Element> extends Visitor<T> {
             }
         }
         for (final VisitorNode execution : node.children) {
-            ret = _findProblems(execution, new VisitorNode.Cycle(), new THashSet<String>()) || ret;
+            ret = _hasCycleOrInvalidTransition(execution, new VisitorNode.Cycle(), new THashSet<String>()) || ret;
         }
         return ret;
     }
 
-    public static boolean hasFailed(final VisitorNode node) {
+    public static boolean isInvalid(final VisitorNode node) {
         if (node.failed) {
             return true;
         }
         for (final VisitorNode child : node.children) {
-            if (hasFailed(child)) {
+            if (isInvalid(child)) {
                 return true;
             }
         }

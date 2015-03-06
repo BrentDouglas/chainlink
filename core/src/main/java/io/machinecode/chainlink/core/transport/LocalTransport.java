@@ -8,6 +8,7 @@ import io.machinecode.chainlink.core.then.AllChain;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
@@ -25,7 +26,6 @@ import io.machinecode.then.core.ResolvedDeferred;
 
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,7 +37,7 @@ public class LocalTransport implements Transport {
     protected final long timeout;
     protected final TimeUnit unit;
 
-    public LocalTransport(final Dependencies dependencies, final Properties properties) {
+    public LocalTransport(final Dependencies dependencies, final PropertyLookup properties) {
         this.timeout = Long.parseLong(properties.getProperty(Constants.TIMEOUT, Constants.Defaults.NETWORK_TIMEOUT));
         this.unit = TimeUnit.valueOf(properties.getProperty(Constants.TIMEOUT_UNIT, Constants.Defaults.NETWORK_TIMEOUT_UNIT));
 

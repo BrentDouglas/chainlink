@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.execution;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.factory.StepListenersFactory;
 import io.machinecode.chainlink.core.factory.partition.PlanPartitionFactory;
@@ -50,7 +50,7 @@ public class BatchletPlanStepFactory {
         );
     }
 
-    public static StepImpl<BatchletImpl, PlanImpl> producePartitioned(final StepImpl<BatchletImpl, PlanImpl> that, final PropertyContext context) {
+    public static StepImpl<BatchletImpl, PlanImpl> producePartitioned(final StepImpl<BatchletImpl, PlanImpl> that, final PartitionPropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String next = Expression.resolvePartitionProperty(that.getNext(), context);
         final String startLimit = Expression.resolvePartitionProperty(that.getStartLimit(), context);

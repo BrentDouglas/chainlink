@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.transition;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.transition.StopImpl;
 import io.machinecode.chainlink.spi.jsl.transition.Stop;
 
@@ -19,7 +19,7 @@ public class StopFactory {
         return new StopImpl(on, exitStatus, restart);
     }
 
-    public static StopImpl producePartitioned(final StopImpl that, final PropertyContext context) {
+    public static StopImpl producePartitioned(final StopImpl that, final PartitionPropertyContext context) {
         final String on = Expression.resolvePartitionProperty(that.getOn(), context);
         final String exitStatus = Expression.resolvePartitionProperty(that.getExitStatus(), context);
         final String restart = Expression.resolvePartitionProperty(that.getRestart(), context);

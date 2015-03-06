@@ -2,10 +2,10 @@ package io.machinecode.chainlink.core.configuration;
 
 import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 
 import java.lang.ref.WeakReference;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -28,7 +28,7 @@ public class ClassLoaderFactoryImpl implements ClassLoaderFactory {
     }
 
     @Override
-    public ClassLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public ClassLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         return classLoader.get();
     }
 }

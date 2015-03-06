@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.transport.DistributedTransport;
 import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.DeferredImpl;
 import io.machinecode.then.core.RejectedDeferred;
@@ -23,7 +24,6 @@ import org.jboss.logging.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +48,7 @@ public class InfinispanTransport extends DistributedTransport<Address> {
     final Executor network;
     final Executor reaper;
 
-    public InfinispanTransport(final Dependencies configuration, final Properties properties, final EmbeddedCacheManager manager,
+    public InfinispanTransport(final Dependencies configuration, final PropertyLookup properties, final EmbeddedCacheManager manager,
                                final long timeout, final TimeUnit unit) throws Exception {
         super(configuration, properties);
 

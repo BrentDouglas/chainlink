@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.factory.execution;
 
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.execution.DecisionImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.ExecutionImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.FlowImpl;
@@ -68,9 +68,9 @@ public class Executions {
     };
 
     @SuppressWarnings("unchecked")
-    private static final ExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext> EXECUTION_PARTITION_TRANSFORMER = new ExpressionTransformer<ExecutionImpl, ExecutionImpl, PropertyContext>() {
+    private static final ExpressionTransformer<ExecutionImpl, ExecutionImpl, PartitionPropertyContext> EXECUTION_PARTITION_TRANSFORMER = new ExpressionTransformer<ExecutionImpl, ExecutionImpl, PartitionPropertyContext>() {
         @Override
-        public ExecutionImpl transform(final ExecutionImpl that, final PropertyContext context) {
+        public ExecutionImpl transform(final ExecutionImpl that, final PartitionPropertyContext context) {
             if (that instanceof FlowImpl) {
                 return FlowFactory.producePartitioned((FlowImpl) that, context);
             } else if (that instanceof SplitImpl) {
@@ -105,7 +105,7 @@ public class Executions {
         return Copy.immutableCopy(that, context, EXECUTION_BUILD_TRANSFORMER);
     }
 
-    public static List<ExecutionImpl> immutableCopyExecutionsPartition(final List<ExecutionImpl> that, final PropertyContext context) {
+    public static List<ExecutionImpl> immutableCopyExecutionsPartition(final List<ExecutionImpl> that, final PartitionPropertyContext context) {
         return Copy.immutableCopy(that, context, EXECUTION_PARTITION_TRANSFORMER);
     }
 }

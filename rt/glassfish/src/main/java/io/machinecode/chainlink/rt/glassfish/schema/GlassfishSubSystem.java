@@ -62,6 +62,12 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
     void setJobOperators(final List<GlassfishJobOperator> jobOperators);
 
     @DuckTyped
+    void setProperties(final List<GlassfishProperty> properties);
+
+    @DuckTyped
+    List<GlassfishProperty> getProperties();
+
+    @DuckTyped
     List<GlassfishDeployment> getDeployments();
 
     @DuckTyped
@@ -107,6 +113,14 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
 
         public static void setJobOperators(final GlassfishSubSystem that, final List<GlassfishJobOperator> jobOperators) {
             that.setJobOperator(jobOperators);
+        }
+
+        public static void setProperties(final GlassfishSubSystem that, final List<GlassfishProperty> properties) {
+            that.setProperties(properties);
+        }
+
+        public static List<GlassfishProperty> getProperties(final GlassfishSubSystem that) {
+            return that.getProperties();
         }
 
         public static List<GlassfishDeployment> getDeployments(final GlassfishSubSystem that) {
@@ -235,8 +249,18 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         }
 
         @Override
+        public List<GlassfishProperty> getProperties() {
+            return to.getProperties();
+        }
+
+        @Override
         public void setJobOperators(final List<GlassfishJobOperator> jobOperators) {
             to.setJobOperators(jobOperators);
+        }
+
+        @Override
+        public void setProperties(final List<GlassfishProperty> properties) {
+            to.setProperties(properties);
         }
 
         @Override

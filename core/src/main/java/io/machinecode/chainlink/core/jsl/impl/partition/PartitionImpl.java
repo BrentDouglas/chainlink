@@ -4,7 +4,7 @@ import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.ItemImpl;
 import io.machinecode.chainlink.core.context.JobContextImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
-import io.machinecode.chainlink.core.expression.PropertyContextImpl;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.task.TaskWork;
 import io.machinecode.chainlink.core.util.Repo;
 import io.machinecode.chainlink.core.work.TaskExecutable;
@@ -120,7 +120,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
                 final Properties props = partitionId >= properties.length ? null : properties[partitionId];
                 executables[id] = new TaskExecutable(
                         callbackId,
-                        task.partition(new PropertyContextImpl(props)),
+                        task.partition(new PartitionPropertyContext(props)),
                         partitionContext,
                         repositoryId,
                         timeout
@@ -154,7 +154,7 @@ public class PartitionImpl<T extends StrategyWork> implements Partition<T>, Seri
                 //TODO Not really sure if this is how properties are meant to be distributed
                 executables[partitionId] = new TaskExecutable(
                         callbackId,
-                        task.partition(new PropertyContextImpl(partitionProperties)),
+                        task.partition(new PartitionPropertyContext(partitionProperties)),
                         partitionContext,
                         repositoryId,
                         timeout

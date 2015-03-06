@@ -13,6 +13,7 @@ import io.machinecode.chainlink.core.repository.DelegateStepExecution;
 import io.machinecode.chainlink.core.then.ChainImpl;
 import io.machinecode.chainlink.core.util.PropertiesConverter;
 import io.machinecode.chainlink.core.util.Repo;
+import io.machinecode.chainlink.core.property.SystemPropertyLookup;
 import io.machinecode.chainlink.core.work.JobExecutable;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
@@ -66,10 +67,15 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     protected final Registry registry;
     protected final Security security;
     protected final RepositoryId repositoryId;
+    protected final SystemPropertyLookup properties;
 
     protected final ExecutorService cancellation;
 
     public JobOperatorImpl(final Configuration configuration) {
+        this(configuration, SystemPropertyLookup.INSTANCE);
+    }
+
+    public JobOperatorImpl(final Configuration configuration, final SystemPropertyLookup properties) {
         this.configuration = configuration;
         this.executor = configuration.getExecutor();
         this.transport = configuration.getTransport();
@@ -80,7 +86,9 @@ public class JobOperatorImpl implements ExtendedJobOperator {
                 configuration.getRepository()
         );
         this.cancellation = Executors.newSingleThreadExecutor();
+        this.properties = properties;
     }
+
 
     @Override
     public void open(final Configuration configuration) throws Exception {
@@ -237,7 +245,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         this.security.canStartJob(jslName);
         try {
             final Job theirs = configuration.getJobLoader().load(jslName);
-            final JobImpl job = JobFactory.produce(theirs, parameters);
+            final JobImpl job = JobFactory.produce(theirs, parameters, properties);
             return _startJob(job, jslName, parameters).getJobExecutionId();
         } catch (final JobStartException | JobSecurityException e) {
             throw e;
@@ -252,7 +260,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         this.security.canStartJob(jslName);
         try {
             final Job theirs = configuration.getJobLoader().load(jslName);
-            final JobImpl job = JobFactory.produce(theirs, parameters);
+            final JobImpl job = JobFactory.produce(theirs, parameters, properties);
             return _startJob(job, jslName, parameters);
         } catch (final JobStartException | JobSecurityException e) {
             throw e;
@@ -265,7 +273,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         log.tracef(Messages.get("CHAINLINK-001200.operator.start"), jslName);
         this.security.canStartJob(jslName);
         try {
-            final JobImpl job = JobFactory.produce(theirs, parameters);
+            final JobImpl job = JobFactory.produce(theirs, parameters, properties);
             return _startJob(job, jslName, parameters);
         } catch (final JobStartException | JobSecurityException e) {
             throw e;
@@ -275,8 +283,6 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     }
 
     private JobOperationImpl _startJob(final JobImpl job, final String jslName, final Properties parameters) throws Exception {
-        JobFactory.validate(job);
-
         final Repository repository = repository();
         final ExtendedJobInstance instance = repository.createJobInstance(job.getId(), jslName, new Date());
         final ExtendedJobExecution execution = repository.createJobExecution(instance.getInstanceId(), job.getId(), parameters, new Date());
@@ -331,7 +337,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             final Repository repository = repository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
             final Job theirs = configuration.getJobLoader().load(instance.getJslName());
-            final JobImpl job = JobFactory.produce(theirs, parameters);
+            final JobImpl job = JobFactory.produce(theirs, parameters, properties);
             return _restart(job, jobExecutionId, instance, parameters).getJobExecutionId();
         } catch (final JobExecutionAlreadyCompleteException | NoSuchJobExecutionException
                 | JobExecutionNotMostRecentException | JobRestartException | JobSecurityException e) {
@@ -349,7 +355,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
             final Repository repository = repository();
             final ExtendedJobInstance instance = repository.getJobInstanceForExecution(jobExecutionId);
             final Job theirs = configuration.getJobLoader().load(instance.getJslName());
-            final JobImpl job = JobFactory.produce(theirs, parameters);
+            final JobImpl job = JobFactory.produce(theirs, parameters, properties);
             return _restart(job, jobExecutionId, instance, parameters);
         } catch (final JobExecutionAlreadyCompleteException | NoSuchJobExecutionException
                 | JobExecutionNotMostRecentException | JobRestartException | JobSecurityException e) {
@@ -360,7 +366,6 @@ public class JobOperatorImpl implements ExtendedJobOperator {
     }
 
     private JobOperationImpl _restart(final JobImpl job, final long jobExecutionId, final JobInstance instance, final Properties parameters) throws Exception {
-        JobFactory.validate(job);
         final Repository repository = repository();
         final ExtendedJobExecution lastExecution = repository.getJobExecution(jobExecutionId);
         final ExtendedJobExecution execution = repository.restartJobExecution(jobExecutionId, parameters);

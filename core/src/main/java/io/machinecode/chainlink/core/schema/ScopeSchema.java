@@ -14,5 +14,7 @@ public interface ScopeSchema<Dec extends DeclarationSchema, Prop extends Propert
 
     List<Job> getJobOperators();
 
+    List<Prop> getProperties();
+
     Job getJobOperator(final String name);
 }

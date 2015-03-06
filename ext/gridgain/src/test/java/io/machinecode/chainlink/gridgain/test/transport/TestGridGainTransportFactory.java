@@ -1,9 +1,9 @@
 package io.machinecode.chainlink.gridgain.test.transport;
 
-import io.machinecode.chainlink.core.transport.DistributedTransport;
 import io.machinecode.chainlink.core.transport.TestTransportFactory;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.transport.gridgain.GridGainTransport;
 import org.gridgain.grid.Grid;
 import org.gridgain.grid.GridConfiguration;
@@ -15,7 +15,6 @@ import org.gridgain.grid.spi.discovery.tcp.GridTcpDiscoverySpi;
 import org.gridgain.grid.spi.discovery.tcp.ipfinder.vm.GridTcpDiscoveryVmIpFinder;
 
 import java.util.Arrays;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -46,7 +45,7 @@ public class TestGridGainTransportFactory implements TestTransportFactory {
     }
 
     @Override
-    public GridGainTransport produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public GridGainTransport produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         return new GridGainTransport(
                 dependencies,
                 properties,

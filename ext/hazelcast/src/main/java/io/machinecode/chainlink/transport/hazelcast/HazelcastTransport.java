@@ -11,9 +11,10 @@ import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
 import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.transport.DistributedTransport;
+import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-import io.machinecode.chainlink.core.transport.cmd.Command;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.FutureDeferred;
 import io.machinecode.then.core.RejectedDeferred;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
@@ -51,7 +51,7 @@ public class HazelcastTransport extends DistributedTransport<String> {
     private final Object memberLock = new Object();
     private final RemoteMemberSelector selector;
 
-    public HazelcastTransport(final Dependencies dependencies, final Properties properties, final HazelcastInstance hazelcast, final IExecutorService executor) throws Exception {
+    public HazelcastTransport(final Dependencies dependencies, final PropertyLookup properties, final HazelcastInstance hazelcast, final IExecutorService executor) throws Exception {
         super(dependencies, properties);
         this.hazelcast = hazelcast;
         this.executor = executor;

@@ -3,6 +3,7 @@ package io.machinecode.chainlink.gridgain.test.repository;
 import io.machinecode.chainlink.repository.gridgain.GridGainRepository;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.core.repository.RepositoryTest;
@@ -17,8 +18,6 @@ import org.gridgain.grid.spi.discovery.tcp.ipfinder.multicast.GridTcpDiscoveryMu
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
-
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -74,7 +73,7 @@ public class GridGainRepositoryTest extends RepositoryTest {
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         model.getRepository().setFactory(new RepositoryFactory() {
             @Override
-            public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+            public Repository produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return _repository = new GridGainRepository(
                         dependencies.getMarshalling(),
                         GridGain.grid("test-grid")

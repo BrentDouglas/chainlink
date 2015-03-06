@@ -3,6 +3,7 @@ package io.machinecode.chainlink.transport.jgroups;
 import io.machinecode.chainlink.core.transport.DistributedTransport;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.core.transport.cmd.Command;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
 import io.machinecode.then.api.OnCancel;
 import io.machinecode.then.api.OnComplete;
@@ -23,7 +24,6 @@ import org.jgroups.blocks.Response;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +42,7 @@ public class JGroupsTransport extends DistributedTransport<Address> implements A
     protected final WeakReference<ClassLoader> loader;
     protected volatile List<Address> remotes;
 
-    public JGroupsTransport(final Dependencies dependencies, final Properties properties, final JChannel channel) throws Exception {
+    public JGroupsTransport(final Dependencies dependencies, final PropertyLookup properties, final JChannel channel) throws Exception {
         super(dependencies, properties);
         if (!(channel.isConnected() || channel.isConnecting())) {
             throw new IllegalStateException("Must already have called JChannel#connect(...)"); //TODO Message

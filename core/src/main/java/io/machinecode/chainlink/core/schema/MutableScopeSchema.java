@@ -15,6 +15,8 @@ public interface MutableScopeSchema<Dec extends MutableDeclarationSchema, Prop e
 
     void setJobOperators(final List<Job> jobOperators);
 
+    void setProperties(final List<Prop> properties);
+
     Job removeJobOperator(final String name) throws NoJobOperatorWithNameException;
 
     /**

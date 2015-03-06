@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.jsl.impl.task;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.ItemImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.factory.task.ChunkFactory;
 import io.machinecode.chainlink.core.jsl.impl.ListenerImpl;
 import io.machinecode.chainlink.core.jsl.impl.ListenersImpl;
@@ -180,7 +180,7 @@ public class ChunkImpl implements Chunk, TaskWork, Serializable {
     }
 
     @Override
-    public TaskWork partition(final PropertyContext context) {
+    public TaskWork partition(final PartitionPropertyContext context) {
         return ChunkFactory.producePartitioned(this, this.listeners, this.partition, context);
     }
 

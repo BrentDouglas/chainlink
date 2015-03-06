@@ -62,7 +62,7 @@ public class JobImpl implements Job, Serializable {
         this.properties = properties;
         this.listeners = listeners;
         this.executions = executions;
-        this.traversal = new JobTraversal(id, JobValidator.INSTANCE.visit(this));
+        this.traversal = new JobTraversal(id, JobValidator.validate(this));
     }
 
     @Override

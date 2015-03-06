@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.execution;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.execution.FlowImpl;
 import io.machinecode.chainlink.core.jsl.impl.execution.SplitImpl;
 import io.machinecode.chainlink.core.util.Copy;
@@ -24,9 +24,9 @@ public class SplitFactory {
             return FlowFactory.produceExecution(that, context);
         }
     };
-    private static final ExpressionTransformer<FlowImpl, FlowImpl, PropertyContext> FLOW_PARTITION_TRANSFORMER = new ExpressionTransformer<FlowImpl, FlowImpl, PropertyContext>() {
+    private static final ExpressionTransformer<FlowImpl, FlowImpl, PartitionPropertyContext> FLOW_PARTITION_TRANSFORMER = new ExpressionTransformer<FlowImpl, FlowImpl, PartitionPropertyContext>() {
         @Override
-        public FlowImpl transform(final FlowImpl that, final PropertyContext context) {
+        public FlowImpl transform(final FlowImpl that, final PartitionPropertyContext context) {
             return FlowFactory.producePartitioned(that, context);
         }
     };
@@ -38,7 +38,7 @@ public class SplitFactory {
         return new SplitImpl(id, next, flows);
     }
 
-    public static SplitImpl producePartitioned(final SplitImpl that, final PropertyContext context) {
+    public static SplitImpl producePartitioned(final SplitImpl that, final PartitionPropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String next = Expression.resolvePartitionProperty(that.getNext(), context);
         final List<FlowImpl> flows = Copy.immutableCopy(that.getFlows(), context, FLOW_PARTITION_TRANSFORMER);

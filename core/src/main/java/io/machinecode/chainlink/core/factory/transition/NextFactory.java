@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.transition;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.transition.NextImpl;
 import io.machinecode.chainlink.spi.jsl.transition.Next;
 
@@ -18,7 +18,7 @@ public class NextFactory {
         return new NextImpl(on, to);
     }
 
-    public static NextImpl producePartitioned(final NextImpl that, final PropertyContext context) {
+    public static NextImpl producePartitioned(final NextImpl that, final PartitionPropertyContext context) {
         final String on = Expression.resolvePartitionProperty(that.getOn(), context);
         final String to = Expression.resolvePartitionProperty(that.getTo(), context);
         return new NextImpl(on, to);

@@ -16,6 +16,7 @@ import io.machinecode.chainlink.core.transport.cmd.PushChainCommand;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
 import io.machinecode.chainlink.spi.execution.Worker;
@@ -44,7 +45,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +68,7 @@ public abstract class DistributedTransport<A> implements Transport {
     protected final long timeout;
     protected final TimeUnit unit;
 
-    public DistributedTransport(final Dependencies dependencies, final Properties properties) throws Exception {
+    public DistributedTransport(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         this.registry = dependencies.getRegistry();
 
         this.reaper = Executors.newSingleThreadExecutor();

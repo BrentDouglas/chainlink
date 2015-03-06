@@ -16,7 +16,7 @@ import javax.transaction.TransactionManager;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface JobOperatorModel {
+public interface JobOperatorModel extends PropertyModel {
 
     Declaration<ClassLoader> getClassLoader();
 
@@ -39,6 +39,4 @@ public interface JobOperatorModel {
     Declaration<Executor> getExecutor();
 
     Declaration<MBeanServer> getMBeanServer();
-
-    PropertyModel getProperties();
 }

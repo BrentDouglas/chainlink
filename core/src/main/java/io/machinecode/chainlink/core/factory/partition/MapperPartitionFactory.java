@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.factory.partition;
 
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.partition.AnalyserImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.CollectorImpl;
 import io.machinecode.chainlink.core.jsl.impl.partition.MapperImpl;
@@ -29,7 +29,7 @@ public class MapperPartitionFactory {
         );
     }
 
-    public static PartitionImpl<MapperImpl> producePartitioned(final PartitionImpl<MapperImpl> that, final PropertyContext context) {
+    public static PartitionImpl<MapperImpl> producePartitioned(final PartitionImpl<MapperImpl> that, final PartitionPropertyContext context) {
         final CollectorImpl collector = that.getCollector() == null ? null : CollectorFactory.producePartitioned(that.getCollector(), context);
         final AnalyserImpl analyser = that.getAnalyzer() == null ? null : AnalyserFactory.producePartitioned(that.getAnalyzer(), context);
         final ReducerImpl reducer = that.getReducer() == null ? null : ReducerFactory.producePartitioned(that.getReducer(), context);

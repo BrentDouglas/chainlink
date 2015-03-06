@@ -2,6 +2,7 @@ package io.machinecode.chainlink.tck.core.repository;
 
 import io.machinecode.chainlink.repository.infinispan.InfinispanRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.repository.Repository;
 import org.infinispan.configuration.cache.CacheMode;
@@ -14,7 +15,6 @@ import org.infinispan.transaction.lookup.TransactionManagerLookup;
 import org.infinispan.util.concurrent.IsolationLevel;
 
 import javax.transaction.TransactionManager;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class InfinispanRepositoryFactory implements RepositoryFactory {
     @Override
-    public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public Repository produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         return new InfinispanRepository(
                 dependencies.getMarshalling(),
                 new DefaultCacheManager(

@@ -3,13 +3,13 @@ package io.machinecode.chainlink.core.configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.Factory;
 import io.machinecode.chainlink.spi.exception.UnresolvableResourceException;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -131,7 +131,7 @@ public class DeclarationImpl<T> implements Declaration<T> {
         return this;
     }
 
-    public T get(final Dependencies dependencies, final Properties properties, final ConfigurationLoader configurationLoader) {
+    public T get(final Dependencies dependencies, final PropertyLookup properties, final ConfigurationLoader configurationLoader) {
         if (cache != null) {
             return cache;
         }

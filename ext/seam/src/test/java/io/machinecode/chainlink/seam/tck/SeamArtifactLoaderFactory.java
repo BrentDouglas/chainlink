@@ -2,6 +2,7 @@ package io.machinecode.chainlink.seam.tck;
 
 import io.machinecode.chainlink.inject.seam.SeamArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import org.jboss.seam.contexts.ServletLifecycle;
@@ -9,7 +10,6 @@ import org.jboss.seam.init.Initialization;
 import org.jboss.seam.mock.MockServletContext;
 
 import javax.servlet.ServletContext;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -30,7 +30,7 @@ public class SeamArtifactLoaderFactory implements ArtifactLoaderFactory {
     }
 
     @Override
-    public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) {
+    public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) {
         return SeamArtifactLoader.inject("seamArtifactLoader", SeamArtifactLoader.class);
     }
 }

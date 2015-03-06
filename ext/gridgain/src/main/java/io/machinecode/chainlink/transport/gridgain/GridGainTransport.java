@@ -4,13 +4,13 @@ import io.machinecode.chainlink.core.transport.DistributedTransport;
 import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.RejectedDeferred;
 import org.gridgain.grid.Grid;
 import org.jboss.logging.Logger;
 
 import java.util.Collection;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +25,7 @@ public class GridGainTransport extends DistributedTransport<UUID> {
     final Grid grid;
     final UUID local;
 
-    public GridGainTransport(final Dependencies dependencies, final Properties properties, final Grid grid) throws Exception {
+    public GridGainTransport(final Dependencies dependencies, final PropertyLookup properties, final Grid grid) throws Exception {
         super(dependencies, properties);
         this.grid = grid;
         this.local = grid.localNode().id();

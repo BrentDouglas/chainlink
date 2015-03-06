@@ -1,8 +1,7 @@
 package io.machinecode.chainlink.spi.configuration.factory;
 
 import io.machinecode.chainlink.spi.configuration.Dependencies;
-
-import java.util.Properties;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -10,5 +9,5 @@ import java.util.Properties;
  */
 public interface Factory<T> {
 
-    T produce(final Dependencies dependencies, final Properties properties) throws Exception;
+    T produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception;
 }

@@ -1,11 +1,11 @@
 package io.machinecode.chainlink.core.management.jmx;
 
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 
 import javax.management.MBeanServer;
 import java.lang.management.ManagementFactory;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -14,7 +14,7 @@ import java.util.Properties;
 public class PlatformMBeanServerFactory implements MBeanServerFactory {
 
     @Override
-    public MBeanServer produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public MBeanServer produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         return ManagementFactory.getPlatformMBeanServer();
     }
 }

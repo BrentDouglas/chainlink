@@ -6,6 +6,7 @@ import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.core.security.SecurityImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
@@ -21,7 +22,6 @@ import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
 import java.lang.reflect.Array;
 import java.util.Collection;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -41,10 +41,10 @@ public class ConfigurationImpl implements Configuration {
     protected final Transport transport;
     protected final Registry registry;
     protected final Executor executor;
-    protected final Properties properties;
+    protected final PropertyLookup properties;
 
     public ConfigurationImpl(final JobOperatorModelImpl model, final ConfigurationLoader loader) throws Exception {
-        this.properties = model.getRawProperties();
+        this.properties = model.getProperties();
         this.classLoader = nn(model.classLoader, loader);
         this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, _array(ArtifactLoader.class, model.artifactLoaders.values(), loader));
         this.transactionManager = nn(model.transactionManager, loader);

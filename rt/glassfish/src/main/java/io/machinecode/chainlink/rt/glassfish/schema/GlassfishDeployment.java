@@ -58,6 +58,12 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
     void setJobOperators(final List<GlassfishJobOperator> jobOperators);
 
     @DuckTyped
+    void setProperties(final List<GlassfishProperty> properties);
+
+    @DuckTyped
+    List<GlassfishProperty> getProperties();
+
+    @DuckTyped
     GlassfishDeclaration getConfigurationLoader(final String name);
 
     @DuckTyped
@@ -91,6 +97,14 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
 
         public static void setJobOperators(final GlassfishDeployment that, final List<GlassfishJobOperator> jobOperators) {
             that.setJobOperator(jobOperators);
+        }
+
+        public static void setProperties(final GlassfishDeployment that, final List<GlassfishProperty> properties) {
+            that.setProperties(properties);
+        }
+
+        public static List<GlassfishProperty> getProperties(final GlassfishDeployment that) {
+            return that.getProperties();
         }
 
         public static GlassfishDeclaration getConfigurationLoader(final GlassfishDeployment self, final String name) {

@@ -10,6 +10,7 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import org.junit.Assert;
@@ -17,7 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.batch.api.Batchlet;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -61,7 +61,7 @@ public class ConfigurationTest extends Assert {
         });
         op.getArtifactLoader("second-artifact-loader").setFactory(new ArtifactLoaderFactory() {
             @Override
-            public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+            public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return new ArtifactLoader() {
                     @Override
                     public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
@@ -122,7 +122,7 @@ public class ConfigurationTest extends Assert {
         op.getArtifactLoader("first-artifact-loader").setValueClass(ClassArtifactLoader.class);
         op.getArtifactLoader("first-artifact-loader").setFactory(new ArtifactLoaderFactory() {
             @Override
-            public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+            public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return new ArtifactLoader() {
                     @Override
                     public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
@@ -147,7 +147,7 @@ public class ConfigurationTest extends Assert {
         final AtomicBoolean factoryInjected = new AtomicBoolean();
         op.getArtifactLoader("first-artifact-loader").setFactory(new ArtifactLoaderFactory() {
             @Override
-            public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+            public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return new ArtifactLoader() {
                     @Override
                     public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
@@ -204,7 +204,7 @@ public class ConfigurationTest extends Assert {
         static final AtomicBoolean injected = new AtomicBoolean();
 
         @Override
-        public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+        public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
             return new ArtifactLoader() {
                 @Override
                 public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
@@ -220,7 +220,7 @@ public class ConfigurationTest extends Assert {
         static final AtomicBoolean injected = new AtomicBoolean();
 
         @Override
-        public ArtifactLoader produce(final Dependencies dependencies, final Properties properties) throws Exception {
+        public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
             return new ArtifactLoader() {
                 @Override
                 public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {

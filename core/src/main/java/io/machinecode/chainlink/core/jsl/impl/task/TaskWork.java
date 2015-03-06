@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.jsl.impl.task;
 
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.jsl.task.Task;
 import io.machinecode.chainlink.spi.registry.RepositoryId;
@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 public interface TaskWork extends Task, Serializable {
 
-    TaskWork partition(PropertyContext context);
+    TaskWork partition(final PartitionPropertyContext context);
 
     void cancel(final Configuration configuration, final ExecutionContextImpl context);
 

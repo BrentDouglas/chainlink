@@ -3,11 +3,10 @@ package io.machinecode.chainlink.tck.core.repository;
 import com.mongodb.MongoClient;
 import io.machinecode.chainlink.repository.mongo.MongoRepository;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.RepositoryFactory;
 import io.machinecode.chainlink.spi.repository.Repository;
 import org.jongo.Jongo;
-
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -15,7 +14,7 @@ import java.util.Properties;
  */
 public class MongoRepositoryFactory implements RepositoryFactory {
     @Override
-    public Repository produce(final Dependencies dependencies, final Properties properties) throws Exception {
+    public Repository produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
         final String host = System.getProperty("mongo.host");
         final int port = Integer.parseInt(System.getProperty("mongo.port"));
         final String database = System.getProperty("mongo.database");

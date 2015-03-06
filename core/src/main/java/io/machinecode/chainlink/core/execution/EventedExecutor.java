@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.util.Timeout;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.execution.Worker;
 import io.machinecode.chainlink.spi.execution.WorkerId;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeoutException;
@@ -36,7 +36,7 @@ public class EventedExecutor implements Executor {
 
     protected final Map<WorkerId, EventedWorker> workers = new HashMap<>();
 
-    public EventedExecutor(final Dependencies dependencies, final Properties properties, final ThreadFactory factory) {
+    public EventedExecutor(final Dependencies dependencies, final PropertyLookup properties, final ThreadFactory factory) {
         this.registry = dependencies.getRegistry();
         this.transport = dependencies.getTransport();
         this.threads = Integer.decode(properties.getProperty(Constants.THREAD_POOL_SIZE, Constants.Defaults.THREAD_POOL_SIZE));

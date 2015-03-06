@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.ExpressionTest;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.jsl.InheritanceJobTest;
+import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.spi.jsl.Job;
 import io.machinecode.chainlink.spi.jsl.task.Chunk.CheckpointPolicy;
 import junit.framework.Assert;
@@ -182,7 +183,6 @@ public class FluentJobTest {
                                 )
                         )
                 ), ExpressionTest.PARAMETERS);
-        JobFactory.validate(job);
 
         Assert.assertEquals("i1", job.getId());
     }
@@ -257,6 +257,5 @@ public class FluentJobTest {
                 ).addExecution(Jsl.step("step2")
                 );
         final JobImpl impl = JobFactory.produce(job, ExpressionTest.PARAMETERS);
-        JobFactory.validate(impl);
     }
 }

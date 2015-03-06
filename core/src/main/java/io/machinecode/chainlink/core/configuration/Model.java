@@ -61,6 +61,7 @@ public final class Model {
     }
 
     private static void configureScope(final ScopeModelImpl model, final ScopeSchema<?,?,?> schema, final ClassLoader classLoader) throws Exception {
+        properties(schema.getProperties(), model);
         for (final DeclarationSchema dec : schema.getConfigurationLoaders()) {
             model.getConfigurationLoader(dec.getName()).setRef(dec.getRef());
         }
@@ -72,7 +73,7 @@ public final class Model {
     public static void configureJobOperator(final ScopeModelImpl scope, final JobOperatorSchema<?, ?> op, final ClassLoader classLoader) throws Exception {
         final JobOperatorModel model = scope.getJobOperator(op.getName());
 
-        properties(op.getProperties(), model.getProperties());
+        properties(op.getProperties(), model);
 
         set(model.getExecutor(), name(op.getExecutor(), JobOperatorModelImpl.EXECUTOR), ref(op.getExecutor()));
         set(model.getTransport(), name(op.getTransport(), JobOperatorModelImpl.TRANSPORT), ref(op.getTransport()));

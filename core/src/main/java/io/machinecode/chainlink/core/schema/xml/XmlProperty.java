@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.schema.xml;
 
-import io.machinecode.chainlink.spi.configuration.PropertyModel;
 import io.machinecode.chainlink.core.util.Mutable;
 import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.MutablePropertySchema;
@@ -8,7 +7,6 @@ import io.machinecode.chainlink.core.schema.PropertySchema;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import java.util.List;
 
 import static javax.xml.bind.annotation.XmlAccessType.NONE;
 
@@ -45,12 +43,6 @@ public class XmlProperty implements MutablePropertySchema, Mutable<PropertySchem
     @Override
     public void setValue(final String value) {
         this.value = value;
-    }
-
-    public static void convert(final List<XmlProperty> properties, final PropertyModel target) {
-        for (final XmlProperty property : properties) {
-            target.setProperty(property.getName(), property.getValue());
-        }
     }
 
     @Override

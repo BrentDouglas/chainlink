@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.PropertyImpl;
 import io.machinecode.chainlink.spi.jsl.Property;
 
@@ -20,7 +20,7 @@ public class PropertyFactory {
         return property;
     }
 
-    public static PropertyImpl producePartitioned(final PropertyImpl that, final PropertyContext context) {
+    public static PropertyImpl producePartitioned(final PropertyImpl that, final PartitionPropertyContext context) {
         final String name = Expression.resolvePartitionProperty(that.getName(), context);
         final String value = Expression.resolvePartitionProperty(that.getValue(), context);
         return new PropertyImpl(name, value);

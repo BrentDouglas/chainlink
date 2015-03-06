@@ -10,10 +10,14 @@ import java.util.Properties;
  */
 public class PropertyModelImpl implements PropertyModel {
 
-    private final Properties properties;
+    protected final Properties properties;
 
     public PropertyModelImpl(final Properties properties) {
         this.properties = properties;
+    }
+
+    public PropertyModelImpl() {
+        this(new Properties());
     }
 
     @Override

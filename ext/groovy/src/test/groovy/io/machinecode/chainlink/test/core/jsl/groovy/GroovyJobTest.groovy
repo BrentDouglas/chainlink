@@ -2,6 +2,7 @@ package io.machinecode.chainlink.test.core.jsl.groovy
 
 import io.machinecode.chainlink.core.jsl.impl.JobImpl
 import io.machinecode.chainlink.core.factory.JobFactory
+import io.machinecode.chainlink.core.validation.JobValidator
 import io.machinecode.chainlink.jsl.groovy.Dsl
 import io.machinecode.chainlink.spi.jsl.Job
 import io.machinecode.chainlink.spi.jsl.task.Chunk.CheckpointPolicy
@@ -248,7 +249,6 @@ public class GroovyJobTest {
             }
         }
         final Job x = JobFactory.produce j, ExpressionTest.PARAMETERS
-        JobFactory.validate(x);
 
         Assert.assertEquals("i1", x.getId());
     }
@@ -360,6 +360,5 @@ public class GroovyJobTest {
             }
         }
         final JobImpl impl = JobFactory.produce j, ExpressionTest.PARAMETERS
-        JobFactory.validate(impl);
     }
 }

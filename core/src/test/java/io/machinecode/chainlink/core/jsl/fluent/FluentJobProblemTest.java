@@ -4,6 +4,7 @@ import io.machinecode.chainlink.core.ExpressionTest;
 import io.machinecode.chainlink.core.jsl.impl.JobImpl;
 import io.machinecode.chainlink.core.factory.JobFactory;
 import io.machinecode.chainlink.core.validation.InvalidJobException;
+import io.machinecode.chainlink.core.validation.JobValidator;
 import io.machinecode.chainlink.spi.jsl.Job;
 import org.junit.Test;
 
@@ -23,7 +24,6 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.step("step1")
                 );
         final JobImpl impl = JobFactory.produce(job, ExpressionTest.PARAMETERS);
-        JobFactory.validate(impl);
     }
 
     @Test(expected = InvalidJobException.class)
@@ -37,7 +37,6 @@ public class FluentJobProblemTest {
                         .setNext("step1")
                 );
         final JobImpl impl = JobFactory.produce(job, ExpressionTest.PARAMETERS);
-        JobFactory.validate(impl);
     }
 
     @Test(expected = InvalidJobException.class)
@@ -56,7 +55,6 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.step("step2")
                 );
         final JobImpl impl = JobFactory.produce(job, ExpressionTest.PARAMETERS);
-        JobFactory.validate(impl);
     }
 
     @Test(expected = InvalidJobException.class)
@@ -76,6 +74,5 @@ public class FluentJobProblemTest {
                 ).addExecution(Jsl.step("s3")
                         .setTask(Jsl.batchlet("asdf"))
                 ), ExpressionTest.PARAMETERS);
-        JobFactory.validate(job);
     }
 }

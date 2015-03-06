@@ -3,7 +3,7 @@ package io.machinecode.chainlink.core.jsl.impl.task;
 import io.machinecode.chainlink.core.context.ExecutionContextImpl;
 import io.machinecode.chainlink.core.context.ItemImpl;
 import io.machinecode.chainlink.core.context.StepContextImpl;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.factory.task.BatchletFactory;
 import io.machinecode.chainlink.core.jsl.impl.PropertiesImpl;
 import io.machinecode.chainlink.core.jsl.impl.PropertyReferenceImpl;
@@ -125,7 +125,7 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
     }
 
     @Override
-    public TaskWork partition(final PropertyContext context) {
+    public TaskWork partition(final PartitionPropertyContext context) {
         return BatchletFactory.producePartitioned(this, this.partition, context);
     }
 

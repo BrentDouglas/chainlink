@@ -5,7 +5,7 @@ import io.machinecode.chainlink.core.execution.ThreadFactoryLookup;
 import io.machinecode.chainlink.core.util.Tccl;
 import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
 import io.machinecode.chainlink.core.Constants;
-import io.machinecode.chainlink.spi.configuration.PropertyLookup;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import org.glassfish.api.StartupRunLevel;
 import org.glassfish.api.admin.ServerEnvironment;
 import org.glassfish.api.event.EventListener;

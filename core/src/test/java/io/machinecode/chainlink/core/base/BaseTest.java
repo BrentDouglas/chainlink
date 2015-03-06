@@ -18,6 +18,7 @@ import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
 import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
@@ -60,11 +61,11 @@ public abstract class BaseTest extends Assert {
             this._configuration = deployment.getConfiguration(Constants.DEFAULT);
 
             final ConfigurationLoader loader = new ConfigurationLoaderImpl();
-            this._transactionManager = op.getTransactionManager().get(_configuration, op.getRawProperties(), loader);
-            this._registry = op.getRegistry().get(_configuration, op.getRawProperties(), loader);
-            this._repository = op.getRepository().get(_configuration, op.getRawProperties(), loader);
-            this._marshalling = op.getMarshalling().get(_configuration, op.getRawProperties(), loader);
-            this._executor = op.getExecutor().get(_configuration, op.getRawProperties(), loader);
+            this._transactionManager = op.getTransactionManager().get(_configuration, op.getProperties(), loader);
+            this._registry = op.getRegistry().get(_configuration, op.getProperties(), loader);
+            this._repository = op.getRepository().get(_configuration, op.getProperties(), loader);
+            this._marshalling = op.getMarshalling().get(_configuration, op.getProperties(), loader);
+            this._executor = op.getExecutor().get(_configuration, op.getProperties(), loader);
             // Make sure any factories get called
             op.getConfiguration();
         }
@@ -80,7 +81,7 @@ public abstract class BaseTest extends Assert {
         jobOperator.getRepository().setDefaultFactory(new MemoryRepositoryFactory());
         jobOperator.getMarshalling().setDefaultFactory(new MarshallingFactory() {
             @Override
-            public Marshalling produce(final Dependencies dependencies, final Properties properties) throws Exception {
+            public Marshalling produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return ((MarshallingFactory) Class.forName(System.getProperty("marshalling.factory.class", JdkMarshallingFactory.class.getName())).newInstance())
                         .produce(dependencies, properties);
             }

@@ -1,22 +1,24 @@
 package io.machinecode.chainlink.core.configuration;
 
 import gnu.trove.map.hash.THashMap;
+import io.machinecode.chainlink.core.property.ArrayPropertyLookup;
+import io.machinecode.chainlink.core.property.SinglePropertyLookup;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.Declaration;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.ScopeModel;
 import io.machinecode.chainlink.spi.configuration.factory.ConfigurationLoaderFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class ScopeModelImpl implements ScopeModel {
+public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
 
     final WeakReference<ClassLoader> loader;
 
@@ -29,6 +31,7 @@ public class ScopeModelImpl implements ScopeModel {
     final ClassLoaderDependencies _dependencies;
     private transient ConfigurationLoader _configurationLoader;
     private transient ConfigurationLoader[] _configurationLoaders;
+    private transient PropertyLookup _lookup;
 
     public ScopeModelImpl(final WeakReference<ClassLoader> loader, final Set<String> names) {
         this(loader, names, null);
@@ -131,9 +134,16 @@ public class ScopeModelImpl implements ScopeModel {
             System.arraycopy(pal, 0, this._configurationLoaders, 0, pal.length);
             i = pal.length;
         }
-        final Properties properties = new Properties();
+        if (this._lookup == null) {
+            if (this.parent == null) {
+                this._lookup = new SinglePropertyLookup(this.properties);
+            } else {
+                //TODO Maybe make this more generic
+                this._lookup = new ArrayPropertyLookup(this.properties, this.parent.properties);
+            }
+        }
         for (final DeclarationImpl<ConfigurationLoader> dec : this.configurationLoaders.values()) {
-            this._configurationLoaders[i++] = dec.get(_dependencies, properties, init);
+            this._configurationLoaders[i++] = dec.get(_dependencies, this._lookup, init);
         }
         return this._configurationLoaders;
     }

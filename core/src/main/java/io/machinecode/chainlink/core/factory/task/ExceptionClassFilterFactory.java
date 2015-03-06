@@ -1,7 +1,7 @@
 package io.machinecode.chainlink.core.factory.task;
 
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassFilterImpl;
 import io.machinecode.chainlink.core.jsl.impl.task.ExceptionClassImpl;
 import io.machinecode.chainlink.core.util.Copy;
@@ -25,9 +25,9 @@ public class ExceptionClassFilterFactory {
         }
     };
 
-    private static final ExpressionTransformer<ExceptionClassImpl, ExceptionClassImpl, PropertyContext> EXCEPTION_CLASS_PARTITION_TRANSFORMER = new ExpressionTransformer<ExceptionClassImpl, ExceptionClassImpl, PropertyContext>() {
+    private static final ExpressionTransformer<ExceptionClassImpl, ExceptionClassImpl, PartitionPropertyContext> EXCEPTION_CLASS_PARTITION_TRANSFORMER = new ExpressionTransformer<ExceptionClassImpl, ExceptionClassImpl, PartitionPropertyContext>() {
         @Override
-        public ExceptionClassImpl transform(final ExceptionClassImpl that, final PropertyContext context) {
+        public ExceptionClassImpl transform(final ExceptionClassImpl that, final PartitionPropertyContext context) {
             return ExceptionClassFactory.producePartitioned(that, context);
         }
     };
@@ -38,7 +38,7 @@ public class ExceptionClassFilterFactory {
         return new ExceptionClassFilterImpl(includes, excludes);
     }
 
-    public static ExceptionClassFilterImpl producePartitioned(final ExceptionClassFilterImpl that, final PropertyContext context) {
+    public static ExceptionClassFilterImpl producePartitioned(final ExceptionClassFilterImpl that, final PartitionPropertyContext context) {
         final List<ExceptionClassImpl> includes = Copy.immutableCopy(that.getIncludes(), context, EXCEPTION_CLASS_PARTITION_TRANSFORMER);
         final List<ExceptionClassImpl> excludes = Copy.immutableCopy(that.getExcludes(), context, EXCEPTION_CLASS_PARTITION_TRANSFORMER);
         return new ExceptionClassFilterImpl(includes, excludes);

@@ -2,7 +2,7 @@ package io.machinecode.chainlink.core.factory.execution;
 
 import io.machinecode.chainlink.core.expression.Expression;
 import io.machinecode.chainlink.core.expression.JobPropertyContext;
-import io.machinecode.chainlink.core.expression.PropertyContext;
+import io.machinecode.chainlink.core.expression.PartitionPropertyContext;
 import io.machinecode.chainlink.core.factory.PropertiesFactory;
 import io.machinecode.chainlink.core.factory.transition.Transitions;
 import io.machinecode.chainlink.core.inject.ArtifactReferenceImpl;
@@ -32,7 +32,7 @@ public class DecisionFactory {
         );
     }
 
-    public static DecisionImpl producePartitioned(final DecisionImpl that, final PropertyContext context) {
+    public static DecisionImpl producePartitioned(final DecisionImpl that, final PartitionPropertyContext context) {
         final String id = Expression.resolvePartitionProperty(that.getId(), context);
         final String ref = Expression.resolvePartitionProperty(that.getRef(), context);
         final PropertiesImpl properties = PropertiesFactory.producePartitioned(that.getProperties(), context);

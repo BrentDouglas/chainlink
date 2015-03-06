@@ -15,7 +15,7 @@ public class TheJobOperatorConfiguration implements JobOperatorConfiguration {
 
     @Override
     public void configureJobOperator(final JobOperatorModel model) throws Exception {
-        model.getProperties().setProperty("foo", "bar");
+        model.setProperty("foo", "bar");
         model.getMBeanServer().setValue(ManagementFactory.getPlatformMBeanServer());
         //This is changing the value set in xml from 'theSecurity' to 'otherSecurity'
         model.getSecurity("security").setRef("otherSecurity");

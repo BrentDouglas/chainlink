@@ -1,6 +1,6 @@
-package io.machinecode.chainlink.core.configuration;
+package io.machinecode.chainlink.core.property;
 
-import io.machinecode.chainlink.spi.configuration.PropertyLookup;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 
 import java.util.Properties;
 
@@ -8,11 +8,11 @@ import java.util.Properties;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class PropertyLookupImpl implements PropertyLookup {
+public class SinglePropertyLookup implements PropertyLookup {
 
     final Properties properties;
 
-    public PropertyLookupImpl(final Properties properties) {
+    public SinglePropertyLookup(final Properties properties) {
         this.properties = properties;
     }
 
