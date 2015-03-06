@@ -15,145 +15,131 @@ import java.util.Set;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class JmxJobOperatorClient implements JmxJobOperatorBeanMBean {
+public class JmxJobOperatorClient {
 
     protected final MBeanServer server;
     protected final ObjectName name;
 
-    final String intc;
-    final String longc;
-    final String stringc;
+    final String intFqcn;
+    final String longFqcn;
+    final String stringFqcn;
 
     public JmxJobOperatorClient(final MBeanServer server, final ObjectName name) {
         this.server = server;
         this.name = name;
 
-        this.intc = int.class.getName();
-        this.longc = long.class.getName();
-        this.stringc = String.class.getName();
+        this.intFqcn = int.class.getName();
+        this.longFqcn = long.class.getName();
+        this.stringFqcn = String.class.getName();
     }
 
-    @Override
     @SuppressWarnings("unchecked")
     public Set<String> getJobNames() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
         return (Set<String>)server.getAttribute(name, "JobNames");
     }
 
-    @Override
     public int getJobInstanceCount(final String jobName) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (int)server.invoke(name,
                 "getJobInstanceCount",
-                new Object[]{ jobName },
-                new String[]{ stringc }
+                new Object[]{jobName},
+                new String[]{stringFqcn }
         );
     }
 
-    @Override
     public TabularData getJobInstances(final String jobName, final int start, final int count)  throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (TabularData)server.invoke(name,
                 "getJobInstances",
-                new Object[]{ jobName, start, count },
-                new String[]{ stringc, intc, intc }
+                new Object[]{jobName, start, count},
+                new String[]{stringFqcn, intFqcn, intFqcn}
         );
     }
 
-    @Override
     @SuppressWarnings("unchecked")
     public List<Long> getRunningExecutions(final String jobName) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (List<Long>)server.invoke(name,
                 "getRunningExecutions",
-                new Object[]{ jobName },
-                new String[]{ stringc }
+                new Object[]{jobName},
+                new String[]{stringFqcn}
         );
     }
 
-    @Override
     public TabularData getParameters(final long jobExecutionId) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (TabularData)server.invoke(name,
                 "getParameters",
-                new Object[]{ jobExecutionId },
-                new String[]{ longc }
+                new Object[]{jobExecutionId},
+                new String[]{longFqcn}
         );
     }
 
-    @Override
     public CompositeData getJobInstance(final long jobExecutionId) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (CompositeData)server.invoke(name,
                 "getJobInstance",
-                new Object[]{ jobExecutionId },
-                new String[]{ longc }
+                new Object[]{jobExecutionId},
+                new String[]{longFqcn}
         );
     }
 
-    @Override
     public CompositeData getJobInstanceById(final long jobInstanceId) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (CompositeData)server.invoke(name,
                 "getJobInstanceById",
-                new Object[]{ jobInstanceId },
-                new String[]{ longc }
+                new Object[]{jobInstanceId},
+                new String[]{longFqcn}
         );
     }
 
-    @Override
     public TabularData getJobExecutions(final long jobInstanceId) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (TabularData)server.invoke(name,
                 "getJobExecutions",
-                new Object[]{ jobInstanceId },
-                new String[]{ longc }
+                new Object[]{jobInstanceId},
+                new String[]{longFqcn}
         );
     }
 
-    @Override
     public CompositeData getJobExecution(final long jobExecutionId) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (CompositeData)server.invoke(name,
                 "getJobExecution",
-                new Object[]{ jobExecutionId },
-                new String[]{ longc }
+                new Object[]{jobExecutionId},
+                new String[]{longFqcn}
         );
     }
 
-    @Override
     public TabularData getStepExecutions(final long jobExecutionId) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (TabularData)server.invoke(name,
                 "getStepExecutions",
-                new Object[]{ jobExecutionId },
-                new String[]{ longc }
+                new Object[]{jobExecutionId},
+                new String[]{longFqcn}
         );
     }
 
-    @Override
     public long start(final String jslName, final String parameters) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (long)server.invoke(name,
                 "start",
-                new Object[]{ jslName, parameters },
-                new String[]{ stringc, stringc }
+                new Object[]{jslName, parameters},
+                new String[]{stringFqcn, stringFqcn}
         );
     }
 
-    @Override
     public long restart(final long jobExecutionId, final String parameters) throws MBeanException, InstanceNotFoundException, ReflectionException {
         return (long)server.invoke(name,
                 "restart",
-                new Object[]{ jobExecutionId, parameters },
-                new String[]{ longc, stringc }
+                new Object[]{jobExecutionId, parameters},
+                new String[]{longFqcn, stringFqcn}
         );
     }
 
-    @Override
     public void stop(final long jobExecutionId) throws MBeanException, InstanceNotFoundException, ReflectionException {
         server.invoke(name,
                 "stop",
-                new Object[]{ jobExecutionId },
-                new String[]{ longc }
+                new Object[]{jobExecutionId},
+                new String[]{longFqcn}
         );
     }
 
-    @Override
     public void abandon(final long jobExecutionId) throws MBeanException, InstanceNotFoundException, ReflectionException {
         server.invoke(name,
                 "abandon",
-                new Object[]{ jobExecutionId },
-                new String[]{ longc }
+                new Object[]{jobExecutionId},
+                new String[]{longFqcn}
         );
     }
 }
