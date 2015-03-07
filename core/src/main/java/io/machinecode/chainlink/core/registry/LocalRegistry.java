@@ -23,7 +23,6 @@ import io.machinecode.then.api.Promise;
 import io.machinecode.then.core.WhenDeferred;
 import org.jboss.logging.Logger;
 
-import javax.batch.operations.JobExecutionNotRunningException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,9 +58,8 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public RepositoryId registerRepository(final RepositoryId id, final Repository repository) {
+    public void registerRepository(final RepositoryId id, final Repository repository) {
         this.repositories.put(id, repository);
-        return id;
     }
 
     @Override
@@ -91,14 +89,10 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public Chain<?> getJob(final long jobExecutionId) throws JobExecutionNotRunningException {
+    public Chain<?> getJob(final long jobExecutionId) {
         jobLock.readLock().lock();
         try {
-            final Chain<?> job = this.jobs.get(jobExecutionId);
-            if (job == null) {
-                throw new JobExecutionNotRunningException(Messages.format("CHAINLINK-005000.registry.no.job", jobExecutionId));
-            }
-            return job;
+            return this.jobs.get(jobExecutionId);
         } finally {
             jobLock.readLock().unlock();
         }

@@ -7,26 +7,23 @@ import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
 
-import javax.batch.operations.JobExecutionIsRunningException;
-import javax.batch.operations.JobExecutionNotRunningException;
-
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
 public interface Registry extends Lifecycle {
 
-    RepositoryId registerRepository(final RepositoryId repositoryId, final Repository repository);
+    void registerRepository(final RepositoryId repositoryId, final Repository repository);
 
     Repository getRepository(final RepositoryId id);
 
     Repository unregisterRepository(final RepositoryId id);
 
-    Promise<?,?,?> registerJob(final long jobExecutionId, final ChainId chainId, final Chain<?> chain) throws JobExecutionIsRunningException;
+    Promise<?,?,?> registerJob(final long jobExecutionId, final ChainId chainId, final Chain<?> chain);
 
     Promise<?,?,?> unregisterJob(long jobExecutionId);
 
-    Chain<?> getJob(long jobExecutionId) throws JobExecutionNotRunningException;
+    Chain<?> getJob(long jobExecutionId);
 
     void registerChain(final long jobExecutionId, final ChainId id, final Chain<?> chain);
 
