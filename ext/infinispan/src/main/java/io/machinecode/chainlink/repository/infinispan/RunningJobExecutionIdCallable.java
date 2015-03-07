@@ -23,7 +23,9 @@ public class RunningJobExecutionIdCallable extends BaseCallable<Long, ExtendedJo
         for (final ExtendedJobExecution jobExecution : cache.values()) {
             if (jobName.equals(jobExecution.getJobName())) {
                 switch (jobExecution.getBatchStatus()) {
+                    case STARTING:
                     case STARTED:
+                    case STOPPING:
                         ids.add(jobExecution.getExecutionId());
                 }
             }

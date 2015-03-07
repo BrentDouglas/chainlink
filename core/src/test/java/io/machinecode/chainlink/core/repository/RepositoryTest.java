@@ -1723,7 +1723,8 @@ public class RepositoryTest extends BaseTest {
         );
         {
             final List<Long> x = repository().getRunningExecutions("job1");
-            assertEquals(0, x.size());
+            assertTrue(x.contains(fje.getExecutionId()));
+            assertEquals(1, x.size());
         }
         final ExtendedJobExecution sje = repository().createJobExecution(
                 second.getInstanceId(),
@@ -1733,7 +1734,9 @@ public class RepositoryTest extends BaseTest {
         );
         {
             final List<Long> x = repository().getRunningExecutions("job1");
-            assertEquals(0, x.size());
+            assertTrue(x.contains(fje.getExecutionId()));
+            assertTrue(x.contains(sje.getExecutionId()));
+            assertEquals(2, x.size());
         }
         {
             repository().updateJobExecution(
@@ -1743,7 +1746,8 @@ public class RepositoryTest extends BaseTest {
             );
             final List<Long> x = repository().getRunningExecutions("job1");
             assertTrue(x.contains(fje.getExecutionId()));
-            assertEquals(1, x.size());
+            assertTrue(x.contains(sje.getExecutionId()));
+            assertEquals(2, x.size());
         }
         {
             repository().updateJobExecution(
@@ -1763,8 +1767,9 @@ public class RepositoryTest extends BaseTest {
                     new Date()
             );
             final List<Long> x = repository().getRunningExecutions("job1");
+            assertTrue(x.contains(fje.getExecutionId()));
             assertTrue(x.contains(sje.getExecutionId()));
-            assertEquals(1, x.size());
+            assertEquals(2, x.size());
         }
         {
             repository().updateJobExecution(

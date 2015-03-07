@@ -19,7 +19,9 @@ public class RunningJobExecutionIdProcessor extends BaseProcessor {
         final ExtendedJobExecution jobExecution = (ExtendedJobExecution) entry.getValue();
         if (jobName.equals(jobExecution.getJobName())) {
             switch (jobExecution.getBatchStatus()) {
+                case STARTING:
                 case STARTED:
+                case STOPPING:
                     return jobExecution.getExecutionId();
             }
         }

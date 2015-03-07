@@ -24,7 +24,9 @@ public class RunningJobExecutionIdProcessor extends AbstractEntryProcessor<Long,
             return null;
         }
         switch (jobExecution.getBatchStatus()) {
+            case STARTING:
             case STARTED:
+            case STOPPING:
                 return jobExecution.getExecutionId();
             default:
                 return null;

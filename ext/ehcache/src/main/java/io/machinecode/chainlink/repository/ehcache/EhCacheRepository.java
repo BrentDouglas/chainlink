@@ -13,11 +13,13 @@ import net.sf.ehcache.search.Results;
 import net.sf.ehcache.search.aggregator.Aggregators;
 import net.sf.ehcache.search.expression.AlwaysMatch;
 import net.sf.ehcache.search.expression.EqualTo;
+import net.sf.ehcache.search.expression.InCollection;
 
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.JobInstance;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -182,7 +184,7 @@ public class EhCacheRepository extends BaseMapRepository {
     protected List<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
         final Results results = this.jobExecutions.cache.createQuery()
                 .addCriteria(new EqualTo("job_name", jobName))
-                .addCriteria(new EqualTo("batch_status", BatchStatus.STARTED))
+                .addCriteria(new InCollection("batch_status", Arrays.asList(BatchStatus.STARTING, BatchStatus.STARTED, BatchStatus.STOPPING)))
                 .includeValues()
                 .execute();
         final List<Long> ret = new ArrayList<>(results.size());

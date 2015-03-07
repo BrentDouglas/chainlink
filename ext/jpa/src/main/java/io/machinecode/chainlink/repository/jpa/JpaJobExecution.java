@@ -38,7 +38,7 @@ import java.util.Properties;
 @Table(name = "job_execution")
 @NamedQueries({
         @NamedQuery(name = "JpaJobExecution.byCreateDate", query = "select j from JpaJobExecution j where j.jobInstance.id=:jobInstanceId order by j.createTime desc"),
-        @NamedQuery(name = "JpaJobExecution.runningJobExecutionIds", query = "select j.id from JpaJobExecution j where j.jobName=:jobName and j.batchStatus='STARTED' order by j.createTime desc"),
+        @NamedQuery(name = "JpaJobExecution.runningJobExecutionIds", query = "select j.id from JpaJobExecution j where j.jobName=:jobName and (j.batchStatus='STARTING' or j.batchStatus='STARTED' or j.batchStatus='STOPPING') order by j.createTime desc"),
         @NamedQuery(name = "JpaJobExecution.withJobName", query = "select j from JpaJobInstance j where j.jobName=:jobName order by j.createTime asc"),
         @NamedQuery(name = "JpaJobExecution.countWithJobName", query = "select count(j) from JpaJobInstance j where j.jobName=:jobName"),
         @NamedQuery(name = "JpaJobExecution.previous", query = "select h.previousJobExecution from JpaJobExecutionHistory h where h.jobExecution.id=:jobExecutionId")

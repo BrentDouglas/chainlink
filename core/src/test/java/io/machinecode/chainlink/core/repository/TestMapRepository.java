@@ -153,7 +153,9 @@ class TestMapRepository extends BaseMapRepository {
             final ExtendedJobExecution value = entry.getValue();
             if (value.getJobName().equals(jobName)) {
                 switch (value.getBatchStatus()) {
+                    case STARTING:
                     case STARTED:
+                    case STOPPING:
                         ret.add(value.getExecutionId());
                 }
             }

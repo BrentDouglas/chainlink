@@ -1412,7 +1412,7 @@ public class JdbcRepository implements Repository {
     }
 
     protected String queryRunningExecutions() {
-        return "select j.id from job_execution j where j.job_name = ? and j.batch_status = 'STARTED' order by j.create_time desc;";
+        return "select j.id from job_execution j where j.job_name = ? and (j.batch_status = 'STARTING' or j.batch_status = 'STARTED' or j.batch_status = 'STOPPING') order by j.create_time desc;";
     }
 
     protected String queryJobNameCount() {

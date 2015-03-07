@@ -583,7 +583,9 @@ public class RedisRepository implements Repository {
             for (final byte[] value : values) {
                 final ExtendedJobExecution jobExecution = _je(jedis, value);
                 switch (jobExecution.getBatchStatus()) {
+                    case STARTING:
                     case STARTED:
+                    case STOPPING:
                         ids.add(jobExecution.getExecutionId());
                 }
             }

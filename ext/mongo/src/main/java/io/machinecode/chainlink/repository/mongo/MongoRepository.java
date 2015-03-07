@@ -432,7 +432,7 @@ public class MongoRepository implements Repository {
     public List<Long> getRunningExecutions(final String jobName) throws NoSuchJobException, IOException {
         final MongoCollection jobExecutions = jongo.getCollection(JOB_EXECUTIONS);
         final List<Long> ret = new ArrayList<>();
-        try (final MongoCursor<Long> cursor = jobExecutions.find("{" + Fields.JOB_NAME + ":#," + Fields.BATCH_STATUS + ":#}", jobName, STARTED)
+        try (final MongoCursor<Long> cursor = jobExecutions.find("{" + Fields.JOB_NAME + ":#," + Fields.BATCH_STATUS + ":{$in:[#,#,#]}}", jobName, STARTING, STARTED, STOPPING)
                 .projection("{" + Fields.JOB_EXECUTION_ID + ":1,_id:0}")
                 .map(new Handler<Long>(Fields.JOB_EXECUTION_ID))) {
             if (!cursor.hasNext()) {

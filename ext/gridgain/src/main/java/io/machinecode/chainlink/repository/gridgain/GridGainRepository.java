@@ -191,8 +191,8 @@ public class GridGainRepository extends BaseMapRepository {
     @Override
     protected List<Long> fetchRunningJobExecutionIds(final String jobName) throws Exception {
         final GridCacheQueryFuture<List<?>> results = this.jobExecutions.cache.queries()
-                .createSqlFieldsQuery("select jobExecutionId from GridGainJobExecution where jobName = ? and batchStatus = ?")
-                .execute(jobName, BatchStatus.STARTED);
+                .createSqlFieldsQuery("select jobExecutionId from GridGainJobExecution where jobName = ? and ( batchStatus = ? or batchStatus = ? or batchStatus = ? )")
+                .execute(jobName, BatchStatus.STARTING, BatchStatus.STARTED, BatchStatus.STOPPING);
         final Collection<List<?>> values = results.get();
         final List<Long> ret = new ArrayList<>(values.size());
         for (final List<?> list : values) {

@@ -480,7 +480,7 @@ public interface Repository {
      * {@link javax.batch.runtime.JobExecution#getJobName()}.
      * The refined list is defined as an operation applied to a list of every match where the result of calling
      * {@link javax.batch.runtime.JobExecution#getBatchStatus()} is either {@link BatchStatus#STARTING} or
-     * {@link BatchStatus#STARTED}. The list may be empty if the refining process excludes all matches.
+     * {@link BatchStatus#STARTED}, {@link BatchStatus#STOPPING}. The list may be empty if the refining process excludes all matches.
      * @throws javax.batch.operations.NoSuchJobException If this repository does not contain any matching {@link JobExecution}'s.
      * from {@link JobExecution#getJobName()}.
      * @throws javax.batch.operations.JobSecurityException For implementation specific security violations.

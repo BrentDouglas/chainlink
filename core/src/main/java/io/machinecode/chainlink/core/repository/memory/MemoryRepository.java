@@ -548,7 +548,9 @@ public class MemoryRepository implements Repository {
             for (final JobExecution jobExecution : jobExecutions.valueCollection()) {
                 if (jobName.equals(jobExecution.getJobName())) {
                     switch (jobExecution.getBatchStatus()) {
+                        case STARTING:
                         case STARTED:
+                        case STOPPING:
                             ids.add(jobExecution.getExecutionId());
                     }
                     found = true;
