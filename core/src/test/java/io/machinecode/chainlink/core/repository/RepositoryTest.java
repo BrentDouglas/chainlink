@@ -2093,24 +2093,6 @@ public class RepositoryTest extends BaseTest {
         assertStepExecutionsEqual(ss2, _ss2);
     }
 
-    private void assertStepExecutionsEqual(final ExtendedStepExecution a, final StepExecution b) {
-        assertEquals(a.getBatchStatus(), b.getBatchStatus());
-        assertEquals(a.getExitStatus(), b.getExitStatus());
-        assertEquals(a.getPersistentUserData(), b.getPersistentUserData());
-        if (b instanceof ExtendedStepExecution) {
-            final ExtendedStepExecution x = (ExtendedStepExecution) b;
-
-            assertEquals(a.getJobExecutionId(), x.getJobExecutionId());
-            assertEquals(a.getJobExecutionId(), x.getJobExecutionId());
-            assertEquals(a.getBatchStatus(), x.getBatchStatus());
-            assertEquals(a.getExitStatus(), x.getExitStatus());
-            assertEquals(a.getPersistentUserData(), x.getPersistentUserData());
-            assertEquals(a.getReaderCheckpoint(), x.getReaderCheckpoint());
-            assertEquals(a.getWriterCheckpoint(), x.getWriterCheckpoint());
-        }
-        //TODO Dates?
-    }
-
     //NoSuchJobExecutionException, JobSecurityException,
     @Test
     public void getStepExecutionsTest() throws Exception {
@@ -2186,8 +2168,6 @@ public class RepositoryTest extends BaseTest {
     //NoSuchJobExecutionException, JobSecurityException,
     @Test
     public void getPartitionExecutionTest() throws Exception {
-        printMethodName();
-
         printMethodName();
         try {
             repository().getPartitionExecution(1);
@@ -2278,7 +2258,25 @@ public class RepositoryTest extends BaseTest {
         assertPartitionExecutionsEqual(spe2, _sp2);
     }
 
-    private void assertPartitionExecutionsEqual(final PartitionExecution a, final PartitionExecution b) {
+    public static void assertStepExecutionsEqual(final ExtendedStepExecution a, final StepExecution b) {
+        assertEquals(a.getBatchStatus(), b.getBatchStatus());
+        assertEquals(a.getExitStatus(), b.getExitStatus());
+        assertEquals(a.getPersistentUserData(), b.getPersistentUserData());
+        if (b instanceof ExtendedStepExecution) {
+            final ExtendedStepExecution x = (ExtendedStepExecution) b;
+
+            assertEquals(a.getJobExecutionId(), x.getJobExecutionId());
+            assertEquals(a.getJobExecutionId(), x.getJobExecutionId());
+            assertEquals(a.getBatchStatus(), x.getBatchStatus());
+            assertEquals(a.getExitStatus(), x.getExitStatus());
+            assertEquals(a.getPersistentUserData(), x.getPersistentUserData());
+            assertEquals(a.getReaderCheckpoint(), x.getReaderCheckpoint());
+            assertEquals(a.getWriterCheckpoint(), x.getWriterCheckpoint());
+        }
+        //TODO Dates?
+    }
+
+    public static void assertPartitionExecutionsEqual(final PartitionExecution a, final PartitionExecution b) {
         assertEquals(a.getBatchStatus(), b.getBatchStatus());
         assertEquals(a.getExitStatus(), b.getExitStatus());
         assertEquals(a.getPersistentUserData(), b.getPersistentUserData());

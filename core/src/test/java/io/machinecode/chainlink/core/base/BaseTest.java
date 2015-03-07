@@ -101,6 +101,11 @@ public abstract class BaseTest extends Assert {
         return _repository;
     }
 
+    public Registry registry() throws Exception {
+        configuration();
+        return _registry;
+    }
+
     protected void printMethodName() {
         log.infof("");
         log.infof("Running test: %s#%s", getClass().getSimpleName(), Thread.currentThread().getStackTrace()[2].getMethodName());

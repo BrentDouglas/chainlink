@@ -32,6 +32,7 @@ import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
+import javax.batch.operations.BatchRuntimeException;
 import javax.batch.operations.JobExecutionAlreadyCompleteException;
 import javax.batch.operations.JobExecutionIsRunningException;
 import javax.batch.operations.JobExecutionNotMostRecentException;
@@ -162,7 +163,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new IllegalStateException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -174,7 +175,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new IllegalStateException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -186,7 +187,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobInstanceException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new IllegalStateException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -205,7 +206,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new IllegalStateException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -223,7 +224,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new IllegalStateException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -235,7 +236,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new IllegalStateException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -325,7 +326,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final JobExecutionNotRunningException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new JobRestartException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -421,7 +422,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobExecutionException | JobExecutionNotRunningException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new JobStartException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -441,7 +442,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobExecutionException | JobExecutionIsRunningException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new JobStartException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -455,7 +456,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new JobStartException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -475,7 +476,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobInstanceException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new JobStartException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -488,7 +489,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new JobStartException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
@@ -508,7 +509,7 @@ public class JobOperatorImpl implements ExtendedJobOperator {
         } catch (final NoSuchJobExecutionException | JobSecurityException e) {
             throw e;
         } catch (final Exception e) {
-            throw new JobStartException(e);
+            throw new BatchRuntimeException(e);
         }
     }
 
