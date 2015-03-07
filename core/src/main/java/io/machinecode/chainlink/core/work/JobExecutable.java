@@ -18,6 +18,8 @@ import io.machinecode.chainlink.spi.transport.Transport;
 import io.machinecode.then.api.Promise;
 import org.jboss.logging.Logger;
 
+import javax.batch.runtime.BatchStatus;
+
 /**
 * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
 */
@@ -39,16 +41,18 @@ public class JobExecutable extends ExecutableImpl<JobImpl> {
         try {
             final ExecutableId callbackId = new UUIDId(transport);
             registry.registerExecutable(context.getJobExecutionId(), new JobCallback(callbackId, this, workerId, chain));
-            final Promise<Chain<?>,Throwable,?> next = work.before(configuration, this.repositoryId, workerId, callbackId, this.context);
+            final Promise<Chain<?>,Throwable,?> next = work.before(configuration, this.repositoryId, callbackId, this.context);
             next.onResolve(new LinkAndResolveChain(chain))
                     .onReject(chain)
                     .onCancel(chain);
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("CHAINLINK-023002.work.job.before.exception", this.context));
-            Repo.failedJob(
+            Repo.finishJob(
                     Repo.getRepository(configuration, repositoryId),
                     this.context.getJobExecutionId(),
-                    this.context.getJobContext().getExitStatus()
+                    BatchStatus.FAILED,
+                    this.context.getJobContext().getExitStatus(),
+                    null
             );
             chain.linkAndReject(e, new ResolvedChain<Void>(null));
             configuration.getRegistry()

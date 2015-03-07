@@ -43,7 +43,7 @@ public class JobCallback extends ExecutableImpl<JobImpl> {
         final JobContextImpl jobContext = context.getJobContext();
         Throwable throwable = null;
         try {
-            work.after(configuration, this.repositoryId, workerId, parentId, this.context);
+            work.after(configuration, this.context);
         } catch (final Throwable e) {
             log.errorf(e, Messages.format("CHAINLINK-023003.work.job.after.exception", context));
             jobContext.setBatchStatus(BatchStatus.FAILED);
@@ -51,10 +51,12 @@ public class JobCallback extends ExecutableImpl<JobImpl> {
         }
         final BatchStatus batchStatus = jobContext.getBatchStatus();
         if (BatchStatus.FAILED.equals(batchStatus)) {
-            Repo.failedJob(
+            Repo.finishJob(
                     Repo.getRepository(configuration, this.repositoryId),
                     context.getJobExecutionId(),
-                    jobContext.getExitStatus()
+                    BatchStatus.FAILED,
+                    jobContext.getExitStatus(),
+                    null
             );
         } else if (BatchStatus.STOPPING.equals(batchStatus)) {
             Repo.finishJob(
@@ -65,10 +67,12 @@ public class JobCallback extends ExecutableImpl<JobImpl> {
                     context.getRestartElementId()
             );
         } else {
-            Repo.completedJob(
+            Repo.finishJob(
                     Repo.getRepository(configuration, this.repositoryId),
                     context.getJobExecutionId(),
-                    jobContext.getExitStatus()
+                    BatchStatus.COMPLETED,
+                    jobContext.getExitStatus(),
+                    null
             );
         }
         final Promise<?,?,?> promise = configuration.getRegistry().unregisterJob(context.getJobExecutionId());

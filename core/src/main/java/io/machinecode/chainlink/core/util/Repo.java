@@ -28,28 +28,20 @@ public class Repo {
         return configuration.getTransport().getRepository(id);
     }
 
-    public static void failedJob(final Repository repository, final long jobExecutionId, final String exitStatus) throws Exception{
-        finishJob(repository, jobExecutionId, BatchStatus.FAILED, exitStatus);
+    public static void startedJob(final Repository repository, final long jobExecutionId) throws Exception {
+        log.debugf(Messages.get("CHAINLINK-017005.repository.start.job"), jobExecutionId);
+        repository.startJobExecution(jobExecutionId, new Date());
     }
 
-    public static void completedJob(final Repository repository, final long jobExecutionId, final String exitStatus) throws Exception {
-        finishJob(repository, jobExecutionId, BatchStatus.COMPLETED, exitStatus);
-    }
-
-    public static void finishJob(final Repository repository, final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus) throws Exception {
-        finishJob(repository, jobExecutionId, batchStatus, exitStatus, null);
+    public static void updateJob(final Repository repository, final long jobExecutionId, final BatchStatus batchStatus) throws Exception {
+        log.debugf(Messages.get("CHAINLINK-017002.repository.update.job.with"), jobExecutionId, batchStatus);
+        repository.updateJobExecution(jobExecutionId, batchStatus, new Date());
     }
 
     public static void finishJob(final Repository repository, final long jobExecutionId, final BatchStatus batchStatus, final String exitStatus, final String restartElementId) throws Exception {
         final String es = exitStatus == null ? batchStatus.name() : exitStatus;
         log.debugf(Messages.get("CHAINLINK-017000.repository.finish.job.with"), jobExecutionId, batchStatus, es, restartElementId);
         repository.finishJobExecution(jobExecutionId, batchStatus, es, restartElementId, new Date());
-    }
-
-    public static void finishStep(final Repository repository, final long jobExecutionId, final long stepExecutionId, final Metric[] metrics, final BatchStatus batchStatus, final String exitStatus) throws Exception {
-        final String es = exitStatus == null ? batchStatus.name() : exitStatus;
-        log.debugf(Messages.get("CHAINLINK-017001.repository.finish.step.with"), jobExecutionId, stepExecutionId, batchStatus, es);
-        repository.finishStepExecution(stepExecutionId, metrics, batchStatus, es, new Date());
     }
 
     public static void updateStep(final Repository repository, final long jobExecutionId, final long stepExecutionId, final Metric[] metrics, final Serializable persistentUserData, final Serializable readerCheckpoint, final Serializable writerCheckpoint) throws Exception {
@@ -62,18 +54,9 @@ public class Repo {
         repository.updateStepExecution(stepExecutionId, metrics, persistentUserData, new Date());
     }
 
-    public static void startedJob(final Repository repository, final long jobExecutionId) throws Exception {
-        log.debugf(Messages.get("CHAINLINK-017005.repository.start.job"), jobExecutionId);
-        repository.startJobExecution(jobExecutionId, new Date());
-    }
-
-    private static void _updateJob(final Repository repository, final long jobExecutionId, final BatchStatus batchStatus) throws Exception {
-        log.debugf(Messages.get("CHAINLINK-017002.repository.update.job.with"), jobExecutionId, batchStatus);
-        repository.updateJobExecution(jobExecutionId, batchStatus, new Date());
-    }
-
-    public static void abandonedJob(final Repository repository, final long jobExecutionId) throws Exception {
-        //Uses update as the job cannot be running when this is called, therefore the exit status will already have been set
-        _updateJob(repository, jobExecutionId, BatchStatus.ABANDONED);
+    public static void finishStep(final Repository repository, final long jobExecutionId, final long stepExecutionId, final Metric[] metrics, final BatchStatus batchStatus, final String exitStatus) throws Exception {
+        final String es = exitStatus == null ? batchStatus.name() : exitStatus;
+        log.debugf(Messages.get("CHAINLINK-017001.repository.finish.step.with"), jobExecutionId, stepExecutionId, batchStatus, es);
+        repository.finishStepExecution(stepExecutionId, metrics, batchStatus, es, new Date());
     }
 }

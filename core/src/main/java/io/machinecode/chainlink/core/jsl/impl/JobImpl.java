@@ -103,7 +103,7 @@ public class JobImpl implements Job, Serializable {
     }
 
     public Promise<Chain<?>,Throwable,?> before(final Configuration configuration, final RepositoryId repositoryId,
-                              final WorkerId workerId, final ExecutableId callbackId, final ExecutionContextImpl context) throws Exception {
+                              final ExecutableId callbackId, final ExecutionContextImpl context) throws Exception {
         final Repository repository = Repo.getRepository(configuration, repositoryId);
         long jobExecutionId = context.getJobExecutionId();
         Repo.startedJob(repository, jobExecutionId);
@@ -144,8 +144,7 @@ public class JobImpl implements Job, Serializable {
         return _runNext(configuration, callbackId, context, repositoryId, traversal.next(restartId));
     }
 
-    public void after(final Configuration configuration, final RepositoryId repositoryId,
-                      final WorkerId workerId, final ExecutableId callbackId, final ExecutionContext context) throws Exception {
+    public void after(final Configuration configuration, final ExecutionContext context) throws Exception {
         Exception exception = null;
         for (final ListenerImpl listener : this._listeners(configuration, context)) {
             try {
