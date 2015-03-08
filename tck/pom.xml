@@ -20,7 +20,7 @@
         <tck.source>${project.build.directory}/tck-source</tck.source>
 
         <container.debug>false</container.debug>
-        <container.opts>-server -Xms512m -Xmx512m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:+ExplicitGCInvokesConcurrent -XX:+UseCompressedOops</container.opts>
+        <container.opts>-server -Xms512m -Xmx512m -XX:MaxPermSize=256m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:+CMSIncrementalMode -XX:+ExplicitGCInvokesConcurrent -XX:+UseCompressedOops</container.opts>
         <wildfly.opts>${container.opts}</wildfly.opts>
         <glassfish.opts>${container.opts}</glassfish.opts>
 
