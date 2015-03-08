@@ -5,6 +5,10 @@ import io.machinecode.chainlink.rt.wildfly.WildFlyConstants;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.PersistentResourceDefinition;
+import org.jboss.as.controller.SimpleAttributeDefinition;
+import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
+import org.jboss.as.controller.registry.AttributeAccess;
+import org.jboss.dmr.ModelType;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +34,12 @@ public class ChainlinkDefinition extends PersistentResourceDefinition {
         );
     }
 
+    protected static final SimpleAttributeDefinition REF = new SimpleAttributeDefinitionBuilder(WildFlyConstants.REF, ModelType.STRING)
+            .setAllowNull(true)
+            .setAllowExpression(true)
+            .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)
+            .build();
+
     @Override
     protected List<? extends PersistentResourceDefinition> getChildren() {
         return Arrays.asList(
@@ -40,7 +50,6 @@ public class ChainlinkDefinition extends PersistentResourceDefinition {
 
     @Override
     public Collection<AttributeDefinition> getAttributes() {
-        return Collections.emptyList();
+        return Collections.<AttributeDefinition>singletonList(REF);
     }
-
 }

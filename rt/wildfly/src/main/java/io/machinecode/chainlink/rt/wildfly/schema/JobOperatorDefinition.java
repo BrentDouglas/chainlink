@@ -7,6 +7,7 @@ import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
+import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.dmr.ModelType;
@@ -50,6 +51,12 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
         ).build();
     }
 
+    protected static final SimpleAttributeDefinition REF = new SimpleAttributeDefinitionBuilder(WildFlyConstants.REF, ModelType.STRING)
+            .setAllowNull(true)
+            .setAllowExpression(true)
+            .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)
+            .build();
+
     protected static final Element CLASS_LOADER = declaration(WildFlyConstants.CLASS_LOADER);
     protected static final Element EXECUTOR = declaration(WildFlyConstants.EXECUTOR);
     protected static final Element TRANSPORT = declaration(WildFlyConstants.TRANSPORT);
@@ -64,7 +71,7 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
 
     @Override
     public Collection<AttributeDefinition> getAttributes() {
-        return Collections.emptyList();
+        return Collections.<AttributeDefinition>singletonList(REF);
     }
 
     @Override
