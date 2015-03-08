@@ -61,25 +61,6 @@ public class DistributedLocalChain extends ChainImpl<Void> {
         return super.cancel(mayInterruptIfRunning) && cancelled;
     }
 
-    /*
-    @Override
-    public void notifyLinked() {
-        try {
-            final DeferredImpl<Boolean, Throwable, Void> promise = new DeferredImpl<>();
-            try {
-                transport.invokeRemote(address, this.<Boolean>command("notifyLinked"), promise);
-            } finally {
-                promise.get(timeout, unit);
-            }
-        } catch (final InterruptedException | ExecutionException | CancellationException | TimeoutException e) {
-            log.warn("", e);
-            // Swallow transmission errors
-        } finally {
-            super.notifyLinked();
-        }
-    }
-    */
-
     @Override
     public void link(final Chain<?> link) {
         super.link(new ResolvedChain<Void>(null));

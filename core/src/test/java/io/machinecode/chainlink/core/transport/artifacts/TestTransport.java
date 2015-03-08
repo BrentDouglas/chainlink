@@ -5,6 +5,8 @@ import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.core.transport.cmd.Command;
 import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.then.api.Promise;
+import io.machinecode.then.core.CallableDeferred;
+import io.machinecode.then.core.DeferredImpl;
 import io.machinecode.then.core.RejectedDeferred;
 import io.machinecode.then.core.ResolvedDeferred;
 import io.machinecode.then.core.SomeDeferred;
@@ -57,26 +59,26 @@ public class TestTransport extends DistributedTransport<String> {
         if (!(address instanceof String)) {
             return new RejectedDeferred<T, Throwable,Object>(new IllegalStateException("Should get a string"));
         }
+        final DeferredImpl<T,Throwable,Object> def = new DeferredImpl<>();
         try {
-            return new ResolvedDeferred<>(
-                    transports.get(address)
-                            .invokeLocal(command, getAddress())
-                            .get(timeout, unit)
-            );
+            transports.get(address)
+                    .invokeLocal(def, command, getAddress())
+                    .get(timeout, unit);
         } catch (final Throwable e) {
-            return new RejectedDeferred<>(e);
+            def.reject(e);
         }
+        return def;
     }
 
-    public <T> Future<T> invokeLocal(final Command<T> command, final String origin) throws Exception {
+    public <T> Future<?> invokeLocal(final DeferredImpl<T,Throwable,Object> def, final Command<T> command, final String origin) throws Exception {
         final TestTransport self = this;
-        return executor.submit(new Callable<T>() {
+        return executor.submit(new Runnable() {
             @Override
-            public T call() throws Exception {
+            public void run() {
                 try {
-                    return command.perform(self.configuration, origin);
+                    def.resolve(command.perform(self.configuration, origin));
                 } catch (final Throwable e) {
-                    throw new Exception(e);
+                    def.reject(e);
                 }
             }
         });
