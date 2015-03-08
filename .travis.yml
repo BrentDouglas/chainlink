@@ -10,7 +10,6 @@ env:
   global:
     - MAVEN_OPTS="-Xms512m -Xmx512m"
     - JAVA_OPTS="-Xms512m -Xmx512m"
-    - JBOSS_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:+CMSClassUnloadingEnabled"
   matrix:
     # Integration tests
     - BUILD_ARGS="-T -l -d h2"

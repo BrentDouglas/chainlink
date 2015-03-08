@@ -20,8 +20,9 @@
         <tck.source>${project.build.directory}/tck-source</tck.source>
 
         <container.debug>false</container.debug>
-        <wildfly.opts>-server</wildfly.opts> <!-- Need to have something here for arquillian to handle it properly -->
-        <glassfish.opts> </glassfish.opts>
+        <container.opts>-server -Xms512m -Xmx512m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:+ExplicitGCInvokesConcurrent -XX:+UseCompressedOops</container.opts>
+        <wildfly.opts>${container.opts}</wildfly.opts>
+        <glassfish.opts>${container.opts}</glassfish.opts>
 
         <repository.factory.class>io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory</repository.factory.class>
         <executor.factory.class>io.machinecode.chainlink.core.execution.JndiEventedExecutorFactory</executor.factory.class>
@@ -236,9 +237,9 @@
             </activation>
             <properties>
                 <container.debug>true</container.debug>
-                <wildfly.opts>-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.opts>
-                <glassfish.opts>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</glassfish.opts>
-                <chainlink.opts>-server -Xms256m -Xmx256m -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:+ExplicitGCInvokesConcurrent -XX:+UseCompressedOops -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</chainlink.opts>
+                <wildfly.opts>${container.opts} -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</wildfly.opts>
+                <glassfish.opts>${container.opts} -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</glassfish.opts>
+                <chainlink.opts>${container.opts} -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=9009</chainlink.opts>
             </properties>
         </profile>
 
