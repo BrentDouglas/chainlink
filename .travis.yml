@@ -43,9 +43,8 @@ env:
     - BUILD_ARGS="-I -t local      -i batch  -r redis      -c se"
     - BUILD_ARGS="-I -t local      -i batch  -r mongo      -c se"
     # TCK EE
-    # These are failing two of the TransactionTests since using managed thread factory. Need to investigate.
-    # - BUILD_ARGS="-I -t local      -i batch  -r memory     -c glassfish"
-    # - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c glassfish"
+    - BUILD_ARGS="-I -t local      -i batch  -r memory     -c glassfish"
+    - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c glassfish"
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c tomee"
     - BUILD_ARGS="-I -t local      -i cdi    -r memory     -c tomee"
     - BUILD_ARGS="-I -t local      -i batch  -r memory     -c wildfly"
