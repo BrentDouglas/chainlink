@@ -4,13 +4,11 @@ import gnu.trove.map.hash.THashMap;
 import io.machinecode.chainlink.core.property.ArrayPropertyLookup;
 import io.machinecode.chainlink.core.property.SinglePropertyLookup;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
-import io.machinecode.chainlink.spi.configuration.Declaration;
-import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.ScopeModel;
 import io.machinecode.chainlink.spi.configuration.factory.ConfigurationLoaderFactory;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 
 import java.lang.ref.WeakReference;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,8 +19,6 @@ import java.util.Set;
 public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
 
     final WeakReference<ClassLoader> loader;
-
-    final LinkedHashMap<String, DeclarationImpl<ConfigurationLoader>> configurationLoaders = new LinkedHashMap<>();
     final Map<String, JobOperatorModelImpl> jobOperators = new THashMap<>();
     final Map<String, ConfigurationImpl> configurations = new THashMap<>();
     final Set<String> names;
@@ -32,6 +28,13 @@ public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
     private transient ConfigurationLoader _configurationLoader;
     private transient ConfigurationLoader[] _configurationLoaders;
     private transient PropertyLookup _lookup;
+
+    final ListModelImpl<ConfigurationLoader> configurationLoaders = new ListModelImpl<ConfigurationLoader>() {
+        @Override
+        protected DeclarationImpl<ConfigurationLoader> create() {
+            return new DeclarationImpl<>(loader, ConfigurationLoader.class, ConfigurationLoaderFactory.class);
+        }
+    };
 
     public ScopeModelImpl(final WeakReference<ClassLoader> loader, final Set<String> names) {
         this(loader, names, null);
@@ -49,19 +52,10 @@ public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
     }
 
     @Override
-    public Declaration<ConfigurationLoader> getConfigurationLoader(final String name) {
-        DeclarationImpl<ConfigurationLoader> configurationLoader = configurationLoaders.get(name);
-        if (configurationLoader != null) {
-            return configurationLoader;
-        }
-        if (names.contains(name)) {
-            throw new IllegalStateException("Resource already declared for name: " + name); //TODO Message and better exception
-        }
-        configurationLoader = new DeclarationImpl<>(loader, names, new THashMap<String, DeclarationImpl<?>>(), ConfigurationLoader.class, ConfigurationLoaderFactory.class, name);
+    public ListModelImpl<ConfigurationLoader> getConfigurationLoaders() {
         _configurationLoader = null;
         _configurationLoaders = null;
-        configurationLoaders.put(name, configurationLoader);
-        return configurationLoader;
+        return configurationLoaders;
     }
 
     @Override
@@ -142,7 +136,7 @@ public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
                 this._lookup = new ArrayPropertyLookup(this.properties, this.parent.properties);
             }
         }
-        for (final DeclarationImpl<ConfigurationLoader> dec : this.configurationLoaders.values()) {
+        for (final DeclarationImpl<ConfigurationLoader> dec : this.configurationLoaders) {
             this._configurationLoaders[i++] = dec.get(_dependencies, this._lookup, init);
         }
         return this._configurationLoaders;

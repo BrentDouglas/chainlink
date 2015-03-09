@@ -38,8 +38,13 @@ public class PropertyDefinition extends PersistentResourceDefinition {
             .setAllowExpression(true)
             .build();
 
+    static final SimpleAttributeDefinition[] ATTRIBUTES = {
+            NAME,
+            VALUE
+    };
+
     @Override
     public Collection<AttributeDefinition> getAttributes() {
-        return Arrays.<AttributeDefinition>asList(NAME, VALUE);
+        return Arrays.<AttributeDefinition>asList(ATTRIBUTES);
     }
 }

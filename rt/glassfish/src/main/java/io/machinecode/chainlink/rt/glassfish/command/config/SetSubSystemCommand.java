@@ -41,27 +41,27 @@ public class SetSubSystemCommand extends SetCommand {
     @Override
     public void exec(final Config config, final AdminCommandContext context) throws Exception {
         final GlassfishSubSystem subSystem = config.getExtensionByType(GlassfishSubSystem.class);
-        final SubSystemSchema<?,?,?,?> that = readSubsystem();
+        final SubSystemSchema<?,?,?> that = readSubsystem();
         if (subSystem == null) {
             locked(config, new CreateSubSystem(that));
         } else {
             final XmlChainlinkSubSystem xml = XmlSchema.xmlSubSystem(subSystem);
-            BaseCommand.<SubSystemSchema<?,?,?,?>,GlassfishSubSystem>lockedUpdate(subSystem, that, Op.values());
+            BaseCommand.<SubSystemSchema<?,?,?>,GlassfishSubSystem>lockedUpdate(subSystem, that, Op.values());
             context.getActionReport().setMessage(XmlSchema.writeSubSystem(xml));
         }
     }
 
     private static class CreateSubSystem extends Code<Config> {
-        private final SubSystemSchema<?,?,?,?> that;
+        private final SubSystemSchema<?,?,?> that;
 
-        public CreateSubSystem(final SubSystemSchema<?,?,?,?> that) {
+        public CreateSubSystem(final SubSystemSchema<?,?,?> that) {
             this.that = that;
         }
 
         @Override
         public Object code(final Config config) throws Exception {
             final GlassfishSubSystem subSystem = config.createChild(GlassfishSubSystem.class);
-            BaseCommand.<SubSystemSchema<?,?,?,?>,GlassfishSubSystem>unlockedUpdate(subSystem, that, Op.ADD);
+            BaseCommand.<SubSystemSchema<?,?,?>,GlassfishSubSystem>unlockedUpdate(subSystem, that, Op.ADD);
             return null;
         }
     }

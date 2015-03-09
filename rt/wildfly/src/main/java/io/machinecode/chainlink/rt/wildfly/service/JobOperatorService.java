@@ -45,7 +45,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
 
     private final boolean global;
     private final String name;
-    private final JobOperatorSchema<?,?> schema;
+    private final JobOperatorSchema<?> schema;
 
     private JobOperatorImpl operator;
 
@@ -54,7 +54,7 @@ public class JobOperatorService implements Service<ExtendedJobOperator> {
     private final InjectedValue<SubSystemModelImpl> scope = new InjectedValue<>();
     private final InjectedValue<BeanManager> beanManager = new InjectedValue<>();
 
-    public JobOperatorService(final ServiceName module, final ClassLoader loader, final String name, final boolean global, final JobOperatorSchema<?,?> schema) {
+    public JobOperatorService(final ServiceName module, final ClassLoader loader, final String name, final boolean global, final JobOperatorSchema<?> schema) {
         this.module = module;
         this.loader = new WeakReference<>(loader);
         this.global = global;

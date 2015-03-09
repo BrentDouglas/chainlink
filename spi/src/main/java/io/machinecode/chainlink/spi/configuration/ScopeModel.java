@@ -6,7 +6,7 @@ package io.machinecode.chainlink.spi.configuration;
  */
 public interface ScopeModel extends PropertyModel {
 
-    Declaration<ConfigurationLoader> getConfigurationLoader(final String name);
+    ListModel<ConfigurationLoader> getConfigurationLoaders();
 
     JobOperatorModel getJobOperator(final String name);
 }

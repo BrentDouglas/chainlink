@@ -30,7 +30,7 @@ public class WeldConfiguration {
 
         final JobOperatorModelImpl op = ManualConfiguration.setDefaults(model, tccl);
 
-        op.getArtifactLoader("weld").setDefaultFactory(new CdiArtifactLoaderFactory(container.getBeanManager()));
+        op.getArtifactLoaders().add().setDefaultFactory(new CdiArtifactLoaderFactory(container.getBeanManager()));
 
         try (final TheEnvironment environment = configureEnvironment(model, op, tccl)) {
             Chainlink.setEnvironment(environment);

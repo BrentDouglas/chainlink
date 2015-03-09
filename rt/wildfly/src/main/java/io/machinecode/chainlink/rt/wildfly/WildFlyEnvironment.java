@@ -40,12 +40,12 @@ public class WildFlyEnvironment implements Environment {
     }
 
     @Override
-    public SubSystemSchema<?,?,?,?> getConfiguration() {
+    public SubSystemSchema<?,?,?> getConfiguration() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
+    public SubSystemSchema<?,?,?> setConfiguration(final Configure configure) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

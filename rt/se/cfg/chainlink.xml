@@ -3,14 +3,13 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd">
 
-    <job-operator name="default">
-        <transaction-manager name="transaction-manager" ref="io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory"/>
-        <marshalling name="marshalling" ref="io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory"/>
-        <mbean-server name="mbean-server" ref="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
-        <repository name="repository" ref="io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory"/>
-        <registry name="registry" ref="io.machinecode.chainlink.core.registry.LocalRegistryFactory"/>
-        <transport name="transport" ref="io.machinecode.chainlink.core.transport.LocalTransportFactory"/>
-        <executor name="executor" ref="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
-    </job-operator>
+    <job-operator name="default"
+                  transaction-manager="io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory"
+                  marshalling="io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory"
+                  mbean-server="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"
+                  repository="io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory"
+                  registry="io.machinecode.chainlink.core.registry.LocalRegistryFactory"
+                  transport="io.machinecode.chainlink.core.transport.LocalTransportFactory"
+                  executor="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
 
 </chainlink>

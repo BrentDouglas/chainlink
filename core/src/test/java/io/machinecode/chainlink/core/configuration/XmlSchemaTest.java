@@ -27,8 +27,7 @@ public class XmlSchemaTest extends Assert {
     private static void compareSubsystems(final XmlChainlinkSubSystem in, final XmlChainlinkSubSystem out) {
         assertEquals(1, in.getConfigurationLoaders().size());
         assertEquals(1, out.getConfigurationLoaders().size());
-        assertEquals(in.getConfigurationLoaders().get(0).getName(), out.getConfigurationLoaders().get(0).getName());
-        assertEquals(in.getConfigurationLoaders().get(0).getRef(), out.getConfigurationLoaders().get(0).getRef());
+        assertEquals(in.getConfigurationLoaders().get(0), out.getConfigurationLoaders().get(0));
 
         assertEquals(2, in.getJobOperators().size());
         assertEquals(2, out.getJobOperators().size());

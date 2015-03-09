@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.rt.glassfish.schema;
 
+import io.machinecode.chainlink.core.schema.xml.XmlSchema;
 import io.machinecode.chainlink.core.util.Creator;
 import io.machinecode.chainlink.core.util.Mutable;
 import io.machinecode.chainlink.core.util.Op;
@@ -11,6 +12,7 @@ import io.machinecode.chainlink.core.schema.MutableSubSystemSchema;
 import io.machinecode.chainlink.core.schema.NoDeploymentWithNameException;
 import io.machinecode.chainlink.core.schema.NoJobOperatorWithNameException;
 import io.machinecode.chainlink.core.schema.SubSystemSchema;
+import io.machinecode.chainlink.core.util.Strings;
 import org.glassfish.api.admin.config.ConfigExtension;
 import org.jvnet.hk2.config.Attribute;
 import org.jvnet.hk2.config.ConfigBeanProxy;
@@ -19,6 +21,7 @@ import org.jvnet.hk2.config.DuckTyped;
 import org.jvnet.hk2.config.Element;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -27,17 +30,18 @@ import java.util.ListIterator;
  * @since 1.0
  */
 @Configured(name = "chainlink")
-public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, MutableSubSystemSchema<GlassfishDeployment, GlassfishDeclaration, GlassfishProperty, GlassfishJobOperator>, Hack<SubSystemSchema<?,?,?,?>> {
+public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, MutableSubSystemSchema<GlassfishDeployment, GlassfishProperty, GlassfishJobOperator>, Hack<SubSystemSchema<?,?,?>> {
 
     @Attribute("ref")
     String getRef();
 
     void setRef(final String ref);
 
-    @Element("configuration-loader")
-    List<GlassfishDeclaration> getConfigurationLoader();
+    @Attribute("configuration-loaders")
+    String getConfigurationLoadersString();
 
-    void setConfigurationLoader(final List<GlassfishDeclaration> configurationLoaders);
+    @Attribute("configuration-loaders")
+    void setConfigurationLoadersString(final String configurationLoaders);
 
     @Element("job-operator")
     List<GlassfishJobOperator> getJobOperator();
@@ -49,11 +53,16 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
 
     void setDeployment(final List<GlassfishDeployment> deployments);
 
-    @DuckTyped
-    List<GlassfishDeclaration> getConfigurationLoaders();
+    @Element("property")
+    List<GlassfishProperty> getProperty();
+
+    void setProperty(final List<GlassfishProperty> properties);
 
     @DuckTyped
-    void setConfigurationLoaders(final List<GlassfishDeclaration> configurationLoaders);
+    List<String> getConfigurationLoaders();
+
+    @DuckTyped
+    void setConfigurationLoaders(final List<String> configurationLoaders);
 
     @DuckTyped
     List<GlassfishJobOperator> getJobOperators();
@@ -62,10 +71,10 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
     void setJobOperators(final List<GlassfishJobOperator> jobOperators);
 
     @DuckTyped
-    void setProperties(final List<GlassfishProperty> properties);
+    List<GlassfishProperty> getProperties();
 
     @DuckTyped
-    List<GlassfishProperty> getProperties();
+    void setProperties(final List<GlassfishProperty> properties);
 
     @DuckTyped
     List<GlassfishDeployment> getDeployments();
@@ -80,7 +89,7 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
     GlassfishJobOperator removeJobOperator(final String name) throws NoJobOperatorWithNameException;
 
     @DuckTyped
-    void addJobOperator(final JobOperatorSchema<?,?> jobOperator) throws Exception;
+    void addJobOperator(final JobOperatorSchema<?> jobOperator) throws Exception;
 
     @DuckTyped
     GlassfishDeployment getDeployment(final String name);
@@ -89,9 +98,9 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
     GlassfishDeployment removeDeployment(final String name) throws NoDeploymentWithNameException;
 
     @DuckTyped
-    void addDeployment(final DeploymentSchema<?,?,?> deployment) throws Exception;
+    void addDeployment(final DeploymentSchema<?,?> deployment) throws Exception;
 
-    class Duck implements Mutable<SubSystemSchema<?,?,?,?>>, MutableSubSystemSchema<GlassfishDeployment, GlassfishDeclaration, GlassfishProperty, GlassfishJobOperator> {
+    class Duck implements Mutable<SubSystemSchema<?,?,?>>, MutableSubSystemSchema<GlassfishDeployment, GlassfishProperty, GlassfishJobOperator> {
 
         private final GlassfishSubSystem to;
 
@@ -99,12 +108,13 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
             this.to = to;
         }
 
-        public static List<GlassfishDeclaration> getConfigurationLoaders(final GlassfishSubSystem that) {
-            return that.getConfigurationLoader();
+        public static List<String> getConfigurationLoaders(final GlassfishSubSystem that) {
+            final String value = that.getConfigurationLoadersString();
+            return value == null || value.isEmpty() ? Collections.<String>emptyList() : Strings.split(XmlSchema.XML_LIST_DELIMITER, value);
         }
 
-        public static void setConfigurationLoaders(final GlassfishSubSystem that, final List<GlassfishDeclaration> configurationLoaders) {
-            that.setConfigurationLoader(configurationLoaders);
+        public static void setConfigurationLoaders(final GlassfishSubSystem that, final List<String> configurationLoaders) {
+            that.setConfigurationLoadersString(configurationLoaders == null || configurationLoaders.isEmpty() ? null : Strings.join(' ', configurationLoaders));
         }
 
         public static List<GlassfishJobOperator> getJobOperators(final GlassfishSubSystem that) {
@@ -116,11 +126,11 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         }
 
         public static void setProperties(final GlassfishSubSystem that, final List<GlassfishProperty> properties) {
-            that.setProperties(properties);
+            that.setProperty(properties);
         }
 
         public static List<GlassfishProperty> getProperties(final GlassfishSubSystem that) {
-            return that.getProperties();
+            return that.getProperty();
         }
 
         public static List<GlassfishDeployment> getDeployments(final GlassfishSubSystem that) {
@@ -177,7 +187,7 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
             throw new NoDeploymentWithNameException("No deployment with name " + name); //TODO Message
         }
 
-        public static void addJobOperator(final GlassfishSubSystem self, final JobOperatorSchema<?,?> jobOperator) throws Exception {
+        public static void addJobOperator(final GlassfishSubSystem self, final JobOperatorSchema<?> jobOperator) throws Exception {
             if (getJobOperator(self, jobOperator.getName()) != null) {
                 throw new JobOperatorWithNameExistsException("A job operator already exists with name " + jobOperator.getName());
             }
@@ -186,7 +196,7 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
             self.getJobOperators().add(op);
         }
 
-        public static void addDeployment(final GlassfishSubSystem self, final DeploymentSchema<?,?,?> deployment) throws Exception {
+        public static void addDeployment(final GlassfishSubSystem self, final DeploymentSchema<?,?> deployment) throws Exception {
             if (getDeployment(self, deployment.getName()) != null) {
                 throw new DeploymentWithNameExistsException("A deployment already exists with name " + deployment.getName());
             }
@@ -196,26 +206,21 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         }
 
         @Override
-        public boolean willAccept(final SubSystemSchema<?,?,?,?> that) {
+        public boolean willAccept(final SubSystemSchema<?,?,?> that) {
             return true;
         }
 
         @Override
-        public void accept(final SubSystemSchema<?,?,?,?> from, final Op... ops) throws Exception {
+        public void accept(final SubSystemSchema<?,?,?> from, final Op... ops) throws Exception {
             to.setRef(from.getRef());
-            to.setConfigurationLoaders(GlassfishTransmute.list(to.getConfigurationLoaders(), from.getConfigurationLoaders(), new Creator<GlassfishDeclaration>() {
-                @Override
-                public GlassfishDeclaration create() throws Exception {
-                    return to.createChild(GlassfishDeclaration.class);
-                }
-            }, ops));
-            to.setDeployments(GlassfishTransmute.<DeploymentSchema<?,?,?>,GlassfishDeployment>list(to.getDeployments(), from.getDeployments(), new Creator<GlassfishDeployment>() {
+            to.setConfigurationLoaders(from.getConfigurationLoaders());
+            to.setDeployments(GlassfishTransmute.<DeploymentSchema<?,?>,GlassfishDeployment>list(to.getDeployments(), from.getDeployments(), new Creator<GlassfishDeployment>() {
                 @Override
                 public GlassfishDeployment create() throws Exception {
                     return to.createChild(GlassfishDeployment.class);
                 }
             }, ops));
-            to.setJobOperators(GlassfishTransmute.<JobOperatorSchema<?,?>,GlassfishJobOperator>list(to.getJobOperators(), from.getJobOperators(), new Creator<GlassfishJobOperator>() {
+            to.setJobOperators(GlassfishTransmute.<JobOperatorSchema<?>,GlassfishJobOperator>list(to.getJobOperators(), from.getJobOperators(), new Creator<GlassfishJobOperator>() {
                 @Override
                 public GlassfishJobOperator create() throws Exception {
                     return to.createChild(GlassfishJobOperator.class);
@@ -234,12 +239,12 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         }
 
         @Override
-        public List<GlassfishDeclaration> getConfigurationLoaders() {
+        public List<String> getConfigurationLoaders() {
             return to.getConfigurationLoaders();
         }
 
         @Override
-        public void setConfigurationLoaders(final List<GlassfishDeclaration> configurationLoaders) {
+        public void setConfigurationLoaders(final List<String> configurationLoaders) {
             to.setConfigurationLoaders(configurationLoaders);
         }
 
@@ -284,7 +289,7 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         }
 
         @Override
-        public void addJobOperator(final JobOperatorSchema<?,?> jobOperator) throws Exception {
+        public void addJobOperator(final JobOperatorSchema<?> jobOperator) throws Exception {
             to.addJobOperator(jobOperator);
         }
 
@@ -299,7 +304,7 @@ public interface GlassfishSubSystem extends ConfigBeanProxy, ConfigExtension, Mu
         }
 
         @Override
-        public void addDeployment(final DeploymentSchema<?,?,?> deployment) throws Exception {
+        public void addDeployment(final DeploymentSchema<?,?> deployment) throws Exception {
             to.addDeployment(deployment);
         }
     }

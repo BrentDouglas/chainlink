@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.schema.xml;
 
-import io.machinecode.chainlink.core.util.Creator;
 import io.machinecode.chainlink.core.util.Transmute;
 import io.machinecode.chainlink.core.util.Mutable;
 import io.machinecode.chainlink.core.util.Op;
@@ -32,7 +31,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlRootElement(namespace = XmlChainlink.NAMESPACE, name = "job-operator")
 @XmlAccessorType(NONE)
-public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, XmlProperty>, Mutable<JobOperatorSchema<?,?>> {
+public class XmlJobOperator implements MutableJobOperatorSchema<XmlProperty>, Mutable<JobOperatorSchema<?>> {
 
     @XmlID
     @XmlAttribute(name = "name", required = true)
@@ -41,38 +40,38 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
     @XmlAttribute(name = "ref", required = false)
     protected String ref;
 
-    @XmlElement(name = "class-loader", namespace = XmlChainlink.NAMESPACE, required = false)
-    private XmlDeclaration classLoader;
+    @XmlAttribute(name = "class-loader", required = false)
+    private String classLoader;
 
-    @XmlElement(name = "transaction-manager", namespace = XmlChainlink.NAMESPACE, required = false)
-    private XmlDeclaration transactionManager;
+    @XmlAttribute(name = "transaction-manager", required = false)
+    private String transactionManager;
 
-    @XmlElement(name = "marshalling", namespace = XmlChainlink.NAMESPACE, required = true)
-    private XmlDeclaration marshalling;
+    @XmlAttribute(name = "marshalling", required = false)
+    private String marshalling;
 
-    @XmlElement(name = "mbean-server", namespace = XmlChainlink.NAMESPACE, required = true)
-    private XmlDeclaration mBeanServer;
+    @XmlAttribute(name = "mbean-server", required = false)
+    private String mBeanServer;
 
-    @XmlElement(name = "job-loader", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> jobLoaders = new ArrayList<>(0);
+    @XmlAttribute(name = "repository", required = false)
+    private String repository;
 
-    @XmlElement(name = "artifact-loader", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> artifactLoaders = new ArrayList<>(0);
+    @XmlAttribute(name = "registry", required = false)
+    private String registry;
 
-    @XmlElement(name = "security", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> securities = new ArrayList<>(0);
+    @XmlAttribute(name = "transport", required = false)
+    private String transport;
 
-    @XmlElement(name = "repository", namespace = XmlChainlink.NAMESPACE, required = true)
-    private XmlDeclaration repository;
+    @XmlAttribute(name = "executor", required = false)
+    private String executor;
 
-    @XmlElement(name = "registry", namespace = XmlChainlink.NAMESPACE, required = true)
-    private XmlDeclaration registry;
+    @XmlAttribute(name = "job-loaders", required = false)
+    private List<String> jobLoaders = new ArrayList<>(0);
 
-    @XmlElement(name = "transport", namespace = XmlChainlink.NAMESPACE, required = true)
-    private XmlDeclaration transport;
+    @XmlAttribute(name = "artifact-loaders", required = false)
+    private List<String> artifactLoaders = new ArrayList<>(0);
 
-    @XmlElement(name = "executor", namespace = XmlChainlink.NAMESPACE)
-    private XmlDeclaration executor;
+    @XmlAttribute(name = "securities", required = false)
+    private List<String> securities = new ArrayList<>(0);
 
     @XmlElement(name = "property", namespace = XmlChainlink.NAMESPACE, required = false)
     private List<XmlProperty> properties = new ArrayList<>(0);
@@ -98,113 +97,113 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
     }
 
     @Override
-    public XmlDeclaration getClassLoader() {
+    public String getClassLoader() {
         return classLoader;
     }
 
     @Override
-    public void setClassLoader(final XmlDeclaration classLoader) {
+    public void setClassLoader(final String classLoader) {
         this.classLoader = classLoader;
     }
 
     @Override
-    public XmlDeclaration getTransactionManager() {
+    public String getTransactionManager() {
         return transactionManager;
     }
 
     @Override
-    public void setTransactionManager(final XmlDeclaration transactionManager) {
+    public void setTransactionManager(final String transactionManager) {
         this.transactionManager = transactionManager;
     }
 
     @Override
-    public XmlDeclaration getMarshalling() {
+    public String getMarshalling() {
         return marshalling;
     }
 
     @Override
-    public void setMarshalling(final XmlDeclaration marshalling) {
+    public void setMarshalling(final String marshalling) {
         this.marshalling = marshalling;
     }
 
     @Override
-    public XmlDeclaration getMBeanServer() {
+    public String getMBeanServer() {
         return mBeanServer;
     }
 
     @Override
-    public void setMBeanServer(final XmlDeclaration mBeanServer) {
+    public void setMBeanServer(final String mBeanServer) {
         this.mBeanServer = mBeanServer;
     }
 
     @Override
-    public List<XmlDeclaration> getJobLoaders() {
-        return jobLoaders;
-    }
-
-    @Override
-    public void setJobLoaders(final List<XmlDeclaration> jobLoaders) {
-        this.jobLoaders = jobLoaders;
-    }
-
-    @Override
-    public List<XmlDeclaration> getArtifactLoaders() {
-        return artifactLoaders;
-    }
-
-    @Override
-    public void setArtifactLoaders(final List<XmlDeclaration> artifactLoaders) {
-        this.artifactLoaders = artifactLoaders;
-    }
-
-    @Override
-    public List<XmlDeclaration> getSecurities() {
-        return securities;
-    }
-
-    @Override
-    public void setSecurities(final List<XmlDeclaration> securities) {
-        this.securities = securities;
-    }
-
-    @Override
-    public XmlDeclaration getRepository() {
+    public String getRepository() {
         return repository;
     }
 
     @Override
-    public void setRepository(final XmlDeclaration repository) {
+    public void setRepository(final String repository) {
         this.repository = repository;
     }
 
     @Override
-    public XmlDeclaration getRegistry() {
+    public String getRegistry() {
         return registry;
     }
 
     @Override
-    public void setRegistry(final XmlDeclaration registry) {
+    public void setRegistry(final String registry) {
         this.registry = registry;
     }
 
     @Override
-    public XmlDeclaration getTransport() {
+    public String getTransport() {
         return transport;
     }
 
     @Override
-    public void setTransport(final XmlDeclaration transport) {
+    public void setTransport(final String transport) {
         this.transport = transport;
     }
 
     @Override
-    public XmlDeclaration getExecutor() {
+    public String getExecutor() {
         return executor;
     }
 
     @Override
-    public void setExecutor(final XmlDeclaration executor) {
+    public void setExecutor(final String executor) {
         this.executor = executor;
+    }
+
+    @Override
+    public List<String> getJobLoaders() {
+        return jobLoaders;
+    }
+
+    @Override
+    public void setJobLoaders(final List<String> jobLoaders) {
+        this.jobLoaders = jobLoaders;
+    }
+
+    @Override
+    public List<String> getArtifactLoaders() {
+        return artifactLoaders;
+    }
+
+    @Override
+    public void setArtifactLoaders(final List<String> artifactLoaders) {
+        this.artifactLoaders = artifactLoaders;
+    }
+
+    @Override
+    public List<String> getSecurities() {
+        return securities;
+    }
+
+    @Override
+    public void setSecurities(final List<String> securities) {
+        this.securities = securities;
     }
 
     @Override
@@ -232,27 +231,26 @@ public class XmlJobOperator implements MutableJobOperatorSchema<XmlDeclaration, 
     }
 
     @Override
-    public boolean willAccept(final JobOperatorSchema<?,?> that) {
+    public boolean willAccept(final JobOperatorSchema<?> that) {
         return name == null || name.equals(that.getName());
     }
 
     @Override
-    public void accept(final JobOperatorSchema<?,?> from, final Op... ops) throws Exception {
+    public void accept(final JobOperatorSchema<?> from, final Op... ops) throws Exception {
         this.setName(from.getName());
         this.setRef(from.getRef());
-        final Creator<XmlDeclaration> creator = new CreateXmlDeclaration();
-        Transmute.list(this.getArtifactLoaders(), from.getArtifactLoaders(), creator, ops);
-        Transmute.list(this.getSecurities(), from.getSecurities(), creator, ops);
-        Transmute.list(this.getJobLoaders(), from.getJobLoaders(), creator, ops);
+        this.setArtifactLoaders(from.getArtifactLoaders());
+        this.setSecurities(from.getSecurities());
+        this.setJobLoaders(from.getJobLoaders());
 
-        this.setClassLoader(Transmute.item(this.getClassLoader(), from.getClassLoader(), creator, ops));
-        this.setTransactionManager(Transmute.item(this.getTransactionManager(), from.getTransactionManager(), creator, ops));
-        this.setMarshalling(Transmute.item(this.getMarshalling(), from.getMarshalling(), creator, ops));
-        this.setMBeanServer(Transmute.item(this.getMBeanServer(), from.getMBeanServer(), creator, ops));
-        this.setRepository(Transmute.item(this.getRepository(), from.getRepository(), creator, ops));
-        this.setRegistry(Transmute.item(this.getRegistry(), from.getRegistry(), creator, ops));
-        this.setTransport(Transmute.item(this.getTransport(), from.getTransport(), creator, ops));
-        this.setExecutor(Transmute.item(this.getExecutor(), from.getExecutor(), creator, ops));
+        this.setClassLoader(from.getClassLoader());
+        this.setTransactionManager(from.getTransactionManager());
+        this.setMarshalling(from.getMarshalling());
+        this.setMBeanServer(from.getMBeanServer());
+        this.setRepository(from.getRepository());
+        this.setRegistry(from.getRegistry());
+        this.setTransport(from.getTransport());
+        this.setExecutor(from.getExecutor());
 
         Transmute.list(this.getProperties(), from.getProperties(), new CreateXmlProperty(), ops);
     }

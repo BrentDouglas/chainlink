@@ -30,10 +30,11 @@ public interface WildFlyConstants {
     String REPOSITORY = "repository";
     String TRANSACTION_MANAGER = "transaction-manager";
     String MBEAN_SERVER = "mbean-server";
-    String JOB_LOADER = "job-loader";
-    String ARTIFACT_LOADER = "artifact-loader";
-    String SECURITY = "security";
+    String JOB_LOADERS = "job-loaders";
+    String ARTIFACT_LOADERS = "artifact-loaders";
+    String SECURITIES = "securities";
 
+    String CONFIGURATION_LOADERS = "configuration-loaders";
     String REF = "ref";
 
     String NAME = "name";

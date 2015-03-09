@@ -9,8 +9,6 @@ import io.machinecode.chainlink.spi.exception.UnresolvableResourceException;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 
 import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -19,11 +17,8 @@ import java.util.Set;
 public class DeclarationImpl<T> implements Declaration<T> {
 
     final WeakReference<ClassLoader> loader;
-    final Set<String> names;
-    final Map<String, DeclarationImpl<?>> owner;
     final Class<? extends T> valueInterface;
     final Class<? extends Factory<? extends T>> factoryInterface;
-    String name;
     T value;
     Factory<? extends T> defaultFactory;
     Factory<? extends T> factory;
@@ -33,24 +28,15 @@ public class DeclarationImpl<T> implements Declaration<T> {
 
     T cache;
 
-    public DeclarationImpl(final WeakReference<ClassLoader> loader, final Set<String> names, final Map<String, DeclarationImpl<?>> owner,
+    public DeclarationImpl(final WeakReference<ClassLoader> loader,
                            final Class<? extends T> valueInterface, final Class<? extends Factory<? extends T>> factoryInterface) {
         this.loader = loader;
-        this.names = names;
-        this.owner = owner;
         this.valueInterface = valueInterface;
         this.factoryInterface = factoryInterface;
     }
 
-    public DeclarationImpl(final WeakReference<ClassLoader> loader, final Set<String> names, final Map<String, DeclarationImpl<?>> owner,
-                           final Class<? extends T> valueInterface, final Class<? extends Factory<? extends T>> factoryInterface, final String name) {
-        this(loader, names, owner, valueInterface, factoryInterface);
-        setName(name);
-    }
-
-    private DeclarationImpl(final DeclarationImpl<T> that, final Set<String> names, final Map<String, DeclarationImpl<?>> owner) {
-        this(that.loader, names, owner, that.valueInterface, that.factoryInterface);
-        this.name = that.name;
+    private DeclarationImpl(final DeclarationImpl<T> that) {
+        this(that.loader, that.valueInterface, that.factoryInterface);
         this.value = that.value;
         this.defaultFactory = that.defaultFactory;
         this.factory = that.factory;
@@ -59,34 +45,12 @@ public class DeclarationImpl<T> implements Declaration<T> {
         this.cache = that.cache;
     }
 
-    public DeclarationImpl<T> copy(final Set<String> names, final Map<String, DeclarationImpl<?>> owner) {
-        return new DeclarationImpl<>(this, names, owner);
+    public DeclarationImpl<T> copy() {
+        return new DeclarationImpl<>(this);
     }
 
     boolean is(final Class<?> type) {
         return valueInterface.isAssignableFrom(type);
-    }
-
-    @Override
-    public DeclarationImpl<T> setName(final String name) {
-        if (name == null) {
-            throw new IllegalStateException(); //TODO Message, should only really be called from xml for XmlJobOperator
-        }
-        if (name.equals(this.name)) {
-            return this;
-        }
-        final String old = this.name;
-        this.name = name;
-        if (!names.add(name)) {
-            throw new IllegalStateException("Resource already declared for name: " + name); //TODO Message and better exception
-        } else {
-            names.remove(old);
-        }
-        if (owner.containsValue(this)) {
-            return this;
-        }
-        owner.put(name, this);
-        return this;
     }
 
     @Override
@@ -153,7 +117,7 @@ public class DeclarationImpl<T> implements Declaration<T> {
                 try {
                     final Factory<? extends T> factory = configurationLoader.load(ref, factoryInterface, classLoader);
                     if (factory == null) {
-                        throw new UnresolvableResourceException("No configuration found for node with name=" + name + ",clazz=" + valueInterface.getSimpleName()); //TODO
+                        throw new UnresolvableResourceException("No configuration found for node with clazz=" + valueInterface.getSimpleName()); //TODO
                     }
                     return cache = factory.produce(dependencies, properties);
                 } catch (final ArtifactOfWrongTypeException e) {
@@ -167,6 +131,6 @@ public class DeclarationImpl<T> implements Declaration<T> {
         } catch (final Exception e) {
             throw new UnresolvableResourceException(e); //TODO Message
         }
-        throw new UnresolvableResourceException("No configuration found for node with name=" + name + ",clazz=" + valueInterface.getSimpleName()); //TODO
+        throw new UnresolvableResourceException("No configuration found for node with clazz=" + valueInterface.getSimpleName()); //TODO
     }
 }

@@ -11,5 +11,5 @@ public interface Configure {
      *                  may not work.
      * @throws Exception On an implementation specific error.
      */
-    void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception;
+    void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception;
 }

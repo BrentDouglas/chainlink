@@ -66,7 +66,7 @@ public class ChainlinkRestAdmin {
     @DELETE
     @Path("subsystem")
     public XmlChainlinkSubSystem deleteSubsystem() throws Exception {
-        final SubSystemSchema<?,?,?,?> that = environment.setConfiguration(new DeleteSubSystem());
+        final SubSystemSchema<?,?,?> that = environment.setConfiguration(new DeleteSubSystem());
         final XmlChainlinkSubSystem xml = new XmlChainlinkSubSystem();
         xml.accept(that, Op.values());
         return xml;
@@ -75,8 +75,8 @@ public class ChainlinkRestAdmin {
     @GET
     @Path("subsystem/job-operator/{jobOperator}")
     public XmlJobOperator getSubsystemJobOperator(@PathParam("jobOperator") final  String jobOperator) throws Exception {
-        final SubSystemSchema<?,?,?,?> subsystem = environment.getConfiguration();
-        final JobOperatorSchema<?,?> op = subsystem.getJobOperator(jobOperator);
+        final SubSystemSchema<?,?,?> subsystem = environment.getConfiguration();
+        final JobOperatorSchema<?> op = subsystem.getJobOperator(jobOperator);
         if (op == null) {
             throw new NoJobOperatorWithNameException("No job-operator with name " + jobOperator);
         }
@@ -90,8 +90,8 @@ public class ChainlinkRestAdmin {
     public void insertSubsystemJobOperator(final XmlJobOperator insert) throws Exception {
         environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
-                final MutableJobOperatorSchema<?,?> operator = subsystem.getJobOperator(insert.getName());
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
+                final MutableJobOperatorSchema<?> operator = subsystem.getJobOperator(insert.getName());
                 if (operator != null) {
                     throw new Exception("job-operator already exists with name " + insert.getName());
                 }
@@ -105,8 +105,8 @@ public class ChainlinkRestAdmin {
     public void updateSubsystemJobOperator(final XmlJobOperator update) throws Exception {
         environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
-                final MutableJobOperatorSchema<?,?> operator = subsystem.getJobOperator(update.getName());
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
+                final MutableJobOperatorSchema<?> operator = subsystem.getJobOperator(update.getName());
                 if (operator == null) {
                     throw new NoJobOperatorWithNameException("No job-operator with name " + update.getName());
                 }
@@ -118,9 +118,9 @@ public class ChainlinkRestAdmin {
     @DELETE
     @Path("subsystem/job-operator/{jobOperator}")
     public XmlJobOperator deleteSubsystemJobOperator(@PathParam("jobOperator") final  String jobOperator) throws Exception {
-        final SubSystemSchema<?,?,?,?> that = environment.setConfiguration(new Configure() {
+        final SubSystemSchema<?,?,?> that = environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
                 subsystem.removeJobOperator(jobOperator);
             }
         });
@@ -132,8 +132,8 @@ public class ChainlinkRestAdmin {
     @GET
     @Path("deployment/{deployment}")
     public XmlDeployment getDeployment(@PathParam("deployment") final  String deployment) throws Exception {
-        final SubSystemSchema<?,?,?,?> subsystem = environment.getConfiguration();
-        final DeploymentSchema<?,?,?> dep = subsystem.getDeployment(deployment);
+        final SubSystemSchema<?,?,?> subsystem = environment.getConfiguration();
+        final DeploymentSchema<?,?> dep = subsystem.getDeployment(deployment);
         if (dep == null) {
             throw new NoDeploymentWithNameException("No deployment with name" + deployment);
         }
@@ -147,8 +147,8 @@ public class ChainlinkRestAdmin {
     public void insertDeployment(final XmlDeployment insert) throws Exception {
         environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
-                final MutableDeploymentSchema<?,?,?> dep = subsystem.getDeployment(insert.getName());
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
+                final MutableDeploymentSchema<?,?> dep = subsystem.getDeployment(insert.getName());
                 if (dep != null) {
                     throw new Exception("Deployment already exists with name " + insert.getName());
                 }
@@ -162,8 +162,8 @@ public class ChainlinkRestAdmin {
     public void updateDeployment(final XmlDeployment update) throws Exception {
         environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
-                final MutableDeploymentSchema<?,?,?> dep = subsystem.getDeployment(update.getName());
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
+                final MutableDeploymentSchema<?,?> dep = subsystem.getDeployment(update.getName());
                 if (dep == null) {
                     throw new Exception("No deployment exists with name " + update.getName());
                 }
@@ -175,9 +175,9 @@ public class ChainlinkRestAdmin {
     @DELETE
     @Path("deployment/{deployment}")
     public XmlDeployment deleteDeployment(@PathParam("deployment") final  String deployment) throws Exception {
-        final SubSystemSchema<?,?,?,?> that = environment.setConfiguration(new Configure() {
+        final SubSystemSchema<?,?,?> that = environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
                 subsystem.removeDeployment(deployment);
             }
         });
@@ -190,12 +190,12 @@ public class ChainlinkRestAdmin {
     @Path("deployment/{deployment}/job-operator/{jobOperator}")
     public XmlJobOperator getDeploymentJobOperator(@PathParam("deployment") final  String deployment,
                                                    @PathParam("jobOperator") final  String jobOperator) throws Exception {
-        final SubSystemSchema<?,?,?,?> subsystem = environment.getConfiguration();
-        final DeploymentSchema<?,?,?> dec = subsystem.getDeployment(deployment);
+        final SubSystemSchema<?,?,?> subsystem = environment.getConfiguration();
+        final DeploymentSchema<?,?> dec = subsystem.getDeployment(deployment);
         if (dec == null) {
             throw new NoDeploymentWithNameException("No deployment with name" + deployment);
         }
-        final JobOperatorSchema<?,?> op = dec.getJobOperator(jobOperator);
+        final JobOperatorSchema<?> op = dec.getJobOperator(jobOperator);
         if (op == null) {
             throw new NoJobOperatorWithNameException("No job-operator with name " + jobOperator);
         }
@@ -210,12 +210,12 @@ public class ChainlinkRestAdmin {
                                          final XmlJobOperator insert) throws Exception {
         environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
-                final MutableDeploymentSchema<?,?,?> dep = subsystem.getDeployment(deployment);
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
+                final MutableDeploymentSchema<?,?> dep = subsystem.getDeployment(deployment);
                 if (dep == null) {
                     throw new Exception("No deployment exists with name " + deployment);
                 }
-                final MutableJobOperatorSchema<?,?> operator = dep.getJobOperator(insert.getName());
+                final MutableJobOperatorSchema<?> operator = dep.getJobOperator(insert.getName());
                 if (operator != null) {
                     throw new Exception("job-operator already exists with name " + insert.getName());
                 }
@@ -230,12 +230,12 @@ public class ChainlinkRestAdmin {
                                             final XmlJobOperator update) throws Exception {
         environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
-                final MutableDeploymentSchema<?,?,?> dep = subsystem.getDeployment(deployment);
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
+                final MutableDeploymentSchema<?,?> dep = subsystem.getDeployment(deployment);
                 if (dep == null) {
                     throw new Exception("No deployment exists with name " + deployment);
                 }
-                final MutableJobOperatorSchema<?,?> operator = dep.getJobOperator(update.getName());
+                final MutableJobOperatorSchema<?> operator = dep.getJobOperator(update.getName());
                 if (operator == null) {
                     throw new NoJobOperatorWithNameException("No job-operator with name " + update.getName());
                 }
@@ -248,10 +248,10 @@ public class ChainlinkRestAdmin {
     @Path("deployment/{deployment}/job-operator/{jobOperator}")
     public XmlJobOperator deleteDeploymentJobOperator(@PathParam("deployment") final String deployment,
                                                       @PathParam("jobOperator") final String jobOperator) throws Exception {
-        final SubSystemSchema<?,?,?,?> that = environment.setConfiguration(new Configure() {
+        final SubSystemSchema<?,?,?> that = environment.setConfiguration(new Configure() {
             @Override
-            public void configure(final MutableSubSystemSchema<?,?,?,?> subsystem) throws Exception {
-                final MutableDeploymentSchema<?,?,?> dep = subsystem.getDeployment(deployment);
+            public void configure(final MutableSubSystemSchema<?,?,?> subsystem) throws Exception {
+                final MutableDeploymentSchema<?,?> dep = subsystem.getDeployment(deployment);
                 if (dep == null) {
                     throw new Exception("No deployment exists with name " + deployment);
                 }
@@ -271,14 +271,14 @@ public class ChainlinkRestAdmin {
         }
 
         @Override
-        public void configure(final MutableSubSystemSchema<?,?,?,?> existing) throws Exception {
+        public void configure(final MutableSubSystemSchema<?,?,?> existing) throws Exception {
             existing.accept(subSystem, Op.values());
         }
     }
 
     private static class DeleteSubSystem implements Configure {
         @Override
-        public void configure(final MutableSubSystemSchema<?,?,?,?> existing) throws Exception {
+        public void configure(final MutableSubSystemSchema<?,?,?> existing) throws Exception {
             existing.accept(new XmlChainlinkSubSystem(), Op.REMOVE);
         }
     }

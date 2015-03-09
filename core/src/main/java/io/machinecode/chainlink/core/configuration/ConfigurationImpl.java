@@ -46,12 +46,12 @@ public class ConfigurationImpl implements Configuration {
     public ConfigurationImpl(final JobOperatorModelImpl model, final ConfigurationLoader loader) throws Exception {
         this.properties = model.getProperties();
         this.classLoader = nn(model.classLoader, loader);
-        this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, _array(ArtifactLoader.class, model.artifactLoaders.values(), loader));
+        this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, _array(ArtifactLoader.class, model.artifactLoaders, loader));
         this.transactionManager = nn(model.transactionManager, loader);
         this.marshalling = nn(model.marshalling, loader);
         this.mBeanServer = n(model.mBeanServer, loader);
-        this.jobLoader = new JobLoaderImpl(this.classLoader, _array(JobLoader.class, model.jobLoaders.values(), loader));
-        this.security = new SecurityImpl(_array(Security.class, model.securities.values(), loader));
+        this.jobLoader = new JobLoaderImpl(this.classLoader, _array(JobLoader.class, model.jobLoaders, loader));
+        this.security = new SecurityImpl(_array(Security.class, model.securities, loader));
         this.injectionContext = new InjectionContextImpl(this.classLoader, this.artifactLoader);
         this.registry = nn(model.registry, loader);
         this.transport = nn(model.transport, loader);

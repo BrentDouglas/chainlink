@@ -79,7 +79,7 @@ public class JmxClientTest extends OperatorTest {
         final FluentStep run = Jsl.step("step").setTask(Jsl.batchlet("runBatchlet"));
         final FluentStep stop = Jsl.step("step").setTask(Jsl.batchlet("stopBatchlet"));
         final FluentStep fail = Jsl.step("step").setTask(Jsl.batchlet("failBatchlet"));
-        model.getJobLoader("test").setValue(new FluentJobLoader(){{
+        model.getJobLoaders().add().setValue(new FluentJobLoader(){{
             add(Jsl.job("first").addExecution(run))
             .add(Jsl.job("second").addExecution(run))
             .add(Jsl.job("restart").addExecution(fail))

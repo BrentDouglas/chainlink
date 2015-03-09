@@ -23,7 +23,7 @@ public interface Environment {
     /**
      * @return An immutable view of current Chainlink configuration.
      */
-    SubSystemSchema<?,?,?,?> getConfiguration();
+    SubSystemSchema<?,?,?> getConfiguration();
 
     /**
      * @param configure Some code to run with a mutable view of the current configuration. Changes
@@ -36,7 +36,7 @@ public interface Environment {
      *                  no changes will be visible to any methods.
      * @return An immutable view of the Chainlink configuration before {@param configure} was applied.
      */
-    SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure);
+    SubSystemSchema<?,?,?> setConfiguration(final Configure configure);
 
     /**
      * Make the currently stored configuration available to

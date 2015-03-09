@@ -33,6 +33,7 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute name="configuration-loaders" type="cl:ListType" use="optional"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

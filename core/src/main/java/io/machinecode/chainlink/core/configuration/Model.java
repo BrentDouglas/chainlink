@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.core.configuration;
 
-import io.machinecode.chainlink.core.schema.DeclarationSchema;
 import io.machinecode.chainlink.core.schema.DeploymentSchema;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.PropertySchema;
@@ -25,9 +24,9 @@ import java.util.List;
  */
 public final class Model {
 
-    public static void configureSubSystem(final SubSystemModelImpl model, final SubSystemSchema<?, ?, ?, ?> subSystem, final ClassLoader classLoader) throws Exception {
+    public static void configureSubSystem(final SubSystemModelImpl model, final SubSystemSchema<?,?,?> subSystem, final ClassLoader classLoader) throws Exception {
         configureScope(model, subSystem, classLoader);
-        for (final DeploymentSchema<?, ?, ?> dec : subSystem.getDeployments()) {
+        for (final DeploymentSchema<?,?> dec : subSystem.getDeployments()) {
             configureDeployment(model.getDeployment(dec.getName()), dec, classLoader);
         }
         if (subSystem.getRef() != null) {
@@ -44,7 +43,7 @@ public final class Model {
         }
     }
 
-    public static void configureDeployment(final DeploymentModelImpl model, final DeploymentSchema<?, ?, ?> deployment, final ClassLoader classLoader) throws Exception {
+    public static void configureDeployment(final DeploymentModelImpl model, final DeploymentSchema<?,?> deployment, final ClassLoader classLoader) throws Exception {
         configureScope(model, deployment, classLoader);
         if (deployment.getRef() != null) {
             final DeploymentConfiguration configuration;
@@ -60,45 +59,33 @@ public final class Model {
         }
     }
 
-    private static void configureScope(final ScopeModelImpl model, final ScopeSchema<?,?,?> schema, final ClassLoader classLoader) throws Exception {
+    private static void configureScope(final ScopeModelImpl model, final ScopeSchema<?,?> schema, final ClassLoader classLoader) throws Exception {
         properties(schema.getProperties(), model);
-        for (final DeclarationSchema dec : schema.getConfigurationLoaders()) {
-            model.getConfigurationLoader(dec.getName()).setRef(dec.getRef());
-        }
-        for (final JobOperatorSchema<?,?> dec : schema.getJobOperators()) {
+        model.getConfigurationLoaders().set(schema.getConfigurationLoaders());
+        for (final JobOperatorSchema<?> dec : schema.getJobOperators()) {
             configureJobOperator(model, dec, classLoader);
         }
     }
 
-    public static void configureJobOperator(final ScopeModelImpl scope, final JobOperatorSchema<?, ?> op, final ClassLoader classLoader) throws Exception {
+    public static void configureJobOperator(final ScopeModelImpl scope, final JobOperatorSchema<?> op, final ClassLoader classLoader) throws Exception {
         final JobOperatorModel model = scope.getJobOperator(op.getName());
 
         properties(op.getProperties(), model);
 
-        set(model.getExecutor(), name(op.getExecutor(), JobOperatorModelImpl.EXECUTOR), ref(op.getExecutor()));
-        set(model.getTransport(), name(op.getTransport(), JobOperatorModelImpl.TRANSPORT), ref(op.getTransport()));
-        set(model.getMarshalling(), name(op.getMarshalling(), JobOperatorModelImpl.MARSHALLING), ref(op.getMarshalling()));
-        set(model.getRegistry(), name(op.getRegistry(), JobOperatorModelImpl.REGISTRY), ref(op.getRegistry()));
+        set(model.getExecutor(), op.getExecutor());
+        set(model.getTransport(), op.getTransport());
+        set(model.getMarshalling(), op.getMarshalling());
+        set(model.getRegistry(), op.getRegistry());
         if (op.getMBeanServer() != null) {
             model.getMBeanServer() //This is nullable, calling getMBeanServer() will add it to the model
-                    .setName(name(op.getMBeanServer(), JobOperatorModelImpl.MBEAN_SERVER))
-                    .setRef(ref(op.getMBeanServer()));
+                    .setRef(op.getMBeanServer());
         }
-        set(model.getRepository(), name(op.getRepository(), JobOperatorModelImpl.EXECUTION_REPOSITORY), ref(op.getRepository()));
-        set(model.getClassLoader(), name(op.getClassLoader(), JobOperatorModelImpl.CLASS_LOADER), ref(op.getClassLoader()));
-        set(model.getTransactionManager(), name(op.getTransactionManager(), JobOperatorModelImpl.TRANSACTION_MANAGER), ref(op.getTransactionManager()));
-        for (final DeclarationSchema resource : op.getJobLoaders()) {
-            model.getJobLoader(resource.getName())
-                    .setRef(ref(resource));
-        }
-        for (final DeclarationSchema resource : op.getArtifactLoaders()) {
-            model.getArtifactLoader(resource.getName())
-                    .setRef(ref(resource));
-        }
-        for (final DeclarationSchema resource : op.getSecurities()) {
-            model.getSecurity(resource.getName())
-                    .setRef(ref(resource));
-        }
+        set(model.getRepository(), op.getRepository());
+        set(model.getClassLoader(), op.getClassLoader());
+        set(model.getTransactionManager(), op.getTransactionManager());
+        model.getJobLoaders().set(op.getJobLoaders());
+        model.getArtifactLoaders().set(op.getArtifactLoaders());
+        model.getSecurities().set(op.getSecurities());
         if (op.getRef() != null) {
             final JobOperatorConfiguration configuration;
             try {
@@ -119,19 +106,10 @@ public final class Model {
         }
     }
 
-    private static String name(final DeclarationSchema dec, final String def) {
-        return dec == null ? def : dec.getName();
-    }
-
-    private static String ref(final DeclarationSchema dec) {
-        return dec == null ? null : dec.getRef();
-    }
-
-    private static void set(final Declaration<?> dec, final String name, final String ref) {
-        if (name == null || name.trim().isEmpty() || ref == null || ref.trim().isEmpty()) {
+    private static void set(final Declaration<?> dec, final String ref) {
+        if (ref == null || ref.trim().isEmpty()) {
             return;
         }
-        dec.setName(name);
         dec.setRef(ref);
     }
 }

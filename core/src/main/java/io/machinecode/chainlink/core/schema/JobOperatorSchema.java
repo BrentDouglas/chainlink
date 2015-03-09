@@ -6,33 +6,33 @@ import java.util.List;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface JobOperatorSchema<Dec extends DeclarationSchema, Prop extends PropertySchema> {
+public interface JobOperatorSchema<Prop extends PropertySchema> {
 
     String getName();
 
     String getRef();
 
-    Dec getClassLoader();
+    String getClassLoader();
 
-    Dec getTransactionManager();
+    String getTransactionManager();
 
-    Dec getMarshalling();
+    String getMarshalling();
 
-    Dec getMBeanServer();
+    String getMBeanServer();
 
-    List<Dec> getJobLoaders();
+    List<String> getJobLoaders();
 
-    List<Dec> getArtifactLoaders();
+    List<String> getArtifactLoaders();
 
-    List<Dec> getSecurities();
+    List<String> getSecurities();
 
-    Dec getRepository();
+    String getRepository();
 
-    Dec getRegistry();
+    String getRegistry();
 
-    Dec getTransport();
+    String getTransport();
 
-    Dec getExecutor();
+    String getExecutor();
 
     List<Prop> getProperties();
 }

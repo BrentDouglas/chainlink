@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chainlink xmlns="http://machinecode.io/xml/ns/chainlink"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd">
+                 xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd"
+                 configuration-loaders="io.machinecode.chainlink.core.configuration.TestConfigurationLoaderFactory">
 
-    <configuration-loader name="test" ref="io.machinecode.chainlink.core.configuration.TestConfigurationLoaderFactory" />
-
-    <job-operator name="default">
-        <artifact-loader name="first" ref="testArtifactLoader"/>
-        <artifact-loader name="other" ref="io.machinecode.chainlink.core.configuration.OtherArtifactLoader" />
-    </job-operator>
+    <job-operator name="default"
+                  artifact-loaders="testArtifactLoader io.machinecode.chainlink.core.configuration.OtherArtifactLoader"/>
 
 </chainlink>

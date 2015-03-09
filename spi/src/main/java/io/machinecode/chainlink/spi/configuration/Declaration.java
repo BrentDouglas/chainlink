@@ -8,8 +8,6 @@ import io.machinecode.chainlink.spi.configuration.factory.Factory;
  */
 public interface Declaration<T> {
 
-    Declaration<T> setName(final String name);
-
     Declaration<T> setValue(final T that);
 
     Declaration<T> setValueClass(final Class<? extends T> that);

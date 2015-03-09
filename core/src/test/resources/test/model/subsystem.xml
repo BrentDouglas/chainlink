@@ -2,49 +2,50 @@
 <subsystem xmlns="http://machinecode.io/xml/ns/chainlink/subsystem"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink/subsystem http://machinecode.io/xml/ns/chainlink/chainlink-subsystem_1_0.xsd"
-           ref="io.machinecode.chainlink.core.configuration.NoopSubSystemConfiguration">
+           ref="io.machinecode.chainlink.core.configuration.NoopSubSystemConfiguration"
+           configuration-loaders="io.machinecode.chainlink.core.configuration.TestConfigurationLoader">
 
-    <configuration-loader name="test" ref="io.machinecode.chainlink.core.configuration.TestConfigurationLoader"/>
+    <job-operator name="other-global"
+                  ref="io.machinecode.chainlink.core.configuration.NoopJobOperatorConfiguration"/>
 
-    <job-operator name="other-global" ref="io.machinecode.chainlink.core.configuration.NoopJobOperatorConfiguration"/>
-
-    <job-operator name="global">
-        <class-loader name="cl" ref="asdf"/>
-        <transaction-manager name="transaction-manager" ref="io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory"/>
-        <marshalling name="marshalling" ref="io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory"/>
-        <mbean-server name="mbean-server" ref="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
-        <repository name="repository" ref="io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory"/>
-        <registry name="registry" ref="io.machinecode.chainlink.core.registry.LocalRegistryFactory"/>
-        <transport name="transport" ref="io.machinecode.chainlink.core.transport.LocalTransportFactory"/>
-        <executor name="executor" ref="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
-        <security name="security" ref="theSecurity"/>
-        <artifact-loader name="al" ref="asdf"/>
-        <job-loader name="jl" ref="asdf"/>
+    <job-operator name="global"
+                  class-loader="asdf"
+                  transaction-manager="io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory"
+                  marshalling="io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory"
+                  mbean-server="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"
+                  repository="io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory"
+                  registry="io.machinecode.chainlink.core.registry.LocalRegistryFactory"
+                  transport="io.machinecode.chainlink.core.transport.LocalTransportFactory"
+                  executor="io.machinecode.chainlink.core.execution.EventedExecutorFactory"
+                  securities="theSecurity"
+                  artifact-loaders="asdf"
+                  job-loaders="asdf">
         <property name="foo" value="bar"/>
     </job-operator>
 
-    <deployment name="default">
-        <configuration-loader name="dep-test" ref="io.machinecode.chainlink.core.configuration.TestConfigurationLoader"/>
+    <deployment name="default"
+                configuration-loaders="io.machinecode.chainlink.core.configuration.TestConfigurationLoader">
 
-        <job-operator name="default" ref="io.machinecode.chainlink.core.configuration.NoopJobOperatorConfiguration">
-            <class-loader name="cl" ref="asdf"/>
-            <transaction-manager name="transaction-manager" ref="io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory"/>
-            <marshalling name="marshalling" ref="io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory"/>
-            <mbean-server name="mbean-server" ref="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"/>
-            <repository name="repository" ref="io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory"/>
-            <registry name="registry" ref="io.machinecode.chainlink.core.registry.LocalRegistryFactory"/>
-            <transport name="transport" ref="io.machinecode.chainlink.core.transport.LocalTransportFactory"/>
-            <executor name="executor" ref="io.machinecode.chainlink.core.execution.EventedExecutorFactory"/>
-            <security name="security" ref="theSecurity"/>
-            <artifact-loader name="al" ref="asdf"/>
-            <job-loader name="jl" ref="asdf"/>
+        <job-operator name="default"
+                      ref="io.machinecode.chainlink.core.configuration.NoopJobOperatorConfiguration"
+                      class-loader="asdf"
+                      transaction-manager="io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory"
+                      marshalling="io.machinecode.chainlink.core.marshalling.JdkMarshallingFactory"
+                      mbean-server="io.machinecode.chainlink.core.management.jmx.PlatformMBeanServerFactory"
+                      repository="io.machinecode.chainlink.core.repository.memory.MemoryRepositoryFactory"
+                      registry="io.machinecode.chainlink.core.registry.LocalRegistryFactory"
+                      transport="io.machinecode.chainlink.core.transport.LocalTransportFactory"
+                      executor="io.machinecode.chainlink.core.execution.EventedExecutorFactory"
+                      securities="theSecurity"
+                      artifact-loaders="asdf"
+                      job-loaders="asdf">
             <property name="foo" value="bar"/>
         </job-operator>
     </deployment>
 
-    <deployment name="someDeploymentName" ref="io.machinecode.chainlink.core.configuration.NoopDeploymentConfiguration">
-        <job-operator name="default">
-            <security name="security" ref="otherSecurity"/>
-        </job-operator>
+    <deployment name="someDeploymentName"
+                ref="io.machinecode.chainlink.core.configuration.NoopDeploymentConfiguration">
+        <job-operator name="default"
+                      securities="otherSecurity"/>
     </deployment>
 </subsystem>

@@ -1,9 +1,8 @@
 package io.machinecode.chainlink.core.schema.xml.subsystem;
 
+import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Transmute;
-import io.machinecode.chainlink.core.schema.xml.CreateXmlDeclaration;
 import io.machinecode.chainlink.core.schema.xml.CreateXmlJobOperator;
-import io.machinecode.chainlink.core.schema.xml.XmlDeclaration;
 import io.machinecode.chainlink.core.schema.xml.XmlDeployment;
 import io.machinecode.chainlink.core.schema.xml.XmlJobOperator;
 import io.machinecode.chainlink.core.schema.xml.XmlProperty;
@@ -21,6 +20,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLOutputFactory;
@@ -39,15 +39,15 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlRootElement(namespace = XmlChainlinkSubSystem.NAMESPACE, name = XmlChainlinkSubSystem.ELEMENT)
 @XmlAccessorType(NONE)
-public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemSchema<XmlDeployment, XmlDeclaration, XmlProperty, XmlJobOperator>, Mutable<SubSystemSchema<?,?,?,?>> {
+public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemSchema<XmlDeployment, XmlProperty, XmlJobOperator>, Mutable<SubSystemSchema<?,?,?>> {
 
     public static final String ELEMENT = "subsystem";
 
     public static final String SCHEMA_URL = "http://machinecode.io/xml/ns/chainlink/subsystem/chainlink-subsystem_1_0.xsd";
     public static final String NAMESPACE = "http://machinecode.io/xml/ns/chainlink/subsystem";
 
-    @XmlElement(name = "configuration-loader", namespace = XmlChainlinkSubSystem.NAMESPACE, required = false)
-    private List<XmlDeclaration> configurationLoaders = new ArrayList<>(0);
+    @XmlAttribute(name = "configuration-loaders", required = false)
+    private List<String> configurationLoaders = new ArrayList<>(0);
 
     @XmlElement(name = "job-operator", namespace = XmlChainlinkSubSystem.NAMESPACE, required = false)
     protected List<XmlJobOperator> jobOperators = new ArrayList<>(0);
@@ -56,12 +56,12 @@ public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemS
     private List<XmlDeployment> deployments = new ArrayList<>(0);
 
     @Override
-    public List<XmlDeclaration> getConfigurationLoaders() {
+    public List<String> getConfigurationLoaders() {
         return configurationLoaders;
     }
 
     @Override
-    public void setConfigurationLoaders(final List<XmlDeclaration> configurationLoaders) {
+    public void setConfigurationLoaders(final List<String> configurationLoaders) {
         this.configurationLoaders = configurationLoaders;
     }
 
@@ -109,7 +109,7 @@ public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemS
     }
 
     @Override
-    public void addDeployment(final DeploymentSchema<?,?,?> deployment) throws Exception {
+    public void addDeployment(final DeploymentSchema<?,?> deployment) throws Exception {
         if (getDeployment(deployment.getName()) != null) {
             throw new DeploymentWithNameExistsException("A deployment already exists with name " + deployment.getName());
         }
@@ -136,15 +136,15 @@ public class XmlChainlinkSubSystem extends XmlScope implements MutableSubSystemS
     }
 
     @Override
-    public boolean willAccept(final SubSystemSchema<?,?,?,?> that) {
+    public boolean willAccept(final SubSystemSchema<?,?,?> that) {
         return true;
     }
 
     @Override
-    public void accept(final SubSystemSchema<?,?,?,?> from, final Op... ops) throws Exception {
+    public void accept(final SubSystemSchema<?,?,?> from, final Op... ops) throws Exception {
         this.setRef(from.getRef());
-        Transmute.list(this.getConfigurationLoaders(), from.getConfigurationLoaders(), new CreateXmlDeclaration(), ops);
-        Transmute.<DeploymentSchema<?,?,?>, XmlDeployment>list(this.getDeployments(), from.getDeployments(), new CreateXmlDeployment(), ops);
-        Transmute.<JobOperatorSchema<?,?>, XmlJobOperator>list(this.getJobOperators(), from.getJobOperators(), new CreateXmlJobOperator(), ops);
+        Transmute.list(this.configurationLoaders, from.getConfigurationLoaders(), Copy.<String>noop(), ops);
+        Transmute.<DeploymentSchema<?,?>, XmlDeployment>list(this.getDeployments(), from.getDeployments(), new CreateXmlDeployment(), ops);
+        Transmute.<JobOperatorSchema<?>, XmlJobOperator>list(this.getJobOperators(), from.getJobOperators(), new CreateXmlJobOperator(), ops);
     }
 }

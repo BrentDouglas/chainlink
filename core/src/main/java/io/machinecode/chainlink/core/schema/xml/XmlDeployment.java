@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.core.schema.xml;
 
+import io.machinecode.chainlink.core.util.Copy;
 import io.machinecode.chainlink.core.util.Transmute;
 import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.core.util.Mutable;
@@ -33,14 +34,14 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  */
 @XmlRootElement(namespace = XmlChainlinkSubSystem.NAMESPACE, name = "deployment")
 @XmlAccessorType(NONE)
-public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<XmlDeclaration, XmlProperty, XmlJobOperator>, Mutable<DeploymentSchema<?,?,?>> {
+public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<XmlProperty, XmlJobOperator>, Mutable<DeploymentSchema<?,?>> {
 
     @XmlID
     @XmlAttribute(name = "name", required = false)
     protected String name;
 
-    @XmlElement(name = "configuration-loader", namespace = XmlChainlink.NAMESPACE, required = false)
-    private List<XmlDeclaration> configurationLoaders = new ArrayList<>(0);
+    @XmlAttribute(name = "configuration-loaders", required = false)
+    private List<String> configurationLoaders = new ArrayList<>(0);
 
     @XmlElement(name = "job-operator", namespace = XmlChainlink.NAMESPACE, required = false)
     protected List<XmlJobOperator> jobOperators = new ArrayList<>(0);
@@ -56,12 +57,12 @@ public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<X
     }
 
     @Override
-    public List<XmlDeclaration> getConfigurationLoaders() {
+    public List<String> getConfigurationLoaders() {
         return configurationLoaders;
     }
 
     @Override
-    public void setConfigurationLoaders(final List<XmlDeclaration> configurationLoaders) {
+    public void setConfigurationLoaders(final List<String> configurationLoaders) {
         this.configurationLoaders = configurationLoaders;
     }
 
@@ -94,15 +95,15 @@ public class XmlDeployment extends XmlScope implements MutableDeploymentSchema<X
     }
 
     @Override
-    public boolean willAccept(final DeploymentSchema<?,?,?> that) {
+    public boolean willAccept(final DeploymentSchema<?,?> that) {
         return name == null || name.equals(that.getName());
     }
 
     @Override
-    public void accept(final DeploymentSchema<?,?,?> from, final Op... ops) throws Exception {
+    public void accept(final DeploymentSchema<?,?> from, final Op... ops) throws Exception {
         this.setName(from.getName());
         this.setRef(from.getRef());
-        Transmute.list(this.getConfigurationLoaders(), from.getConfigurationLoaders(), new CreateXmlDeclaration(), ops);
-        Transmute.<JobOperatorSchema<?,?>, XmlJobOperator>list(this.getJobOperators(), from.getJobOperators(), new CreateXmlJobOperator(), ops);
+        Transmute.list(this.configurationLoaders, from.getConfigurationLoaders(), Copy.<String>noop(), ops);
+        Transmute.<JobOperatorSchema<?>, XmlJobOperator>list(this.getJobOperators(), from.getJobOperators(), new CreateXmlJobOperator(), ops);
     }
 }

@@ -8,14 +8,14 @@ import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.PersistentResourceDefinition;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.SimpleAttributeDefinition;
-import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
-import org.jboss.as.controller.registry.AttributeAccess;
-import org.jboss.dmr.ModelType;
+import org.jboss.as.controller.StringListAttributeDefinition;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+
+import static io.machinecode.chainlink.rt.wildfly.schema.Attributes.list;
+import static io.machinecode.chainlink.rt.wildfly.schema.Attributes.string;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -35,59 +35,42 @@ public class JobOperatorDefinition extends PersistentResourceDefinition {
         );
     }
 
-    private static Element declaration(final String name) {
-        return new ElementBuilder(
-                PathElement.pathElement(name),
-                ChainlinkExtension.getResourceDescriptionResolver(WildFlyConstants.JOB_OPERATOR, name)
-        ).addAttribute(new SimpleAttributeDefinitionBuilder(WildFlyConstants.REF, ModelType.STRING)
-                .setAllowNull(true)
-                .setAllowExpression(true)
-                .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)
-                .build()
-        ).setAddHandler(
-                NoopAddHandler.INSTANCE
-        ).setRemoveHandler(
-                ReloadRequiredRemoveStepHandler.INSTANCE
-        ).build();
-    }
+    protected static final SimpleAttributeDefinition REF = string(WildFlyConstants.REF);
+    protected static final SimpleAttributeDefinition CLASS_LOADER = string(WildFlyConstants.CLASS_LOADER);
+    protected static final SimpleAttributeDefinition EXECUTOR = string(WildFlyConstants.EXECUTOR);
+    protected static final SimpleAttributeDefinition TRANSPORT = string(WildFlyConstants.TRANSPORT);
+    protected static final SimpleAttributeDefinition REGISTRY = string(WildFlyConstants.REGISTRY);
+    protected static final SimpleAttributeDefinition MARSHALLING = string(WildFlyConstants.MARSHALLING);
+    protected static final SimpleAttributeDefinition EXECUTION_REPOSITORY = string(WildFlyConstants.REPOSITORY);
+    protected static final SimpleAttributeDefinition TRANSACTION_MANAGER = string(WildFlyConstants.TRANSACTION_MANAGER);
+    protected static final SimpleAttributeDefinition MBEAN_SERVER = string(WildFlyConstants.MBEAN_SERVER);
+    protected static final StringListAttributeDefinition JOB_LOADERS = list(WildFlyConstants.JOB_LOADERS);
+    protected static final StringListAttributeDefinition ARTIFACT_LOADERS = list(WildFlyConstants.ARTIFACT_LOADERS);
+    protected static final StringListAttributeDefinition SECURITIES = list(WildFlyConstants.SECURITIES);
 
-    protected static final SimpleAttributeDefinition REF = new SimpleAttributeDefinitionBuilder(WildFlyConstants.REF, ModelType.STRING)
-            .setAllowNull(true)
-            .setAllowExpression(true)
-            .setFlags(AttributeAccess.Flag.RESTART_RESOURCE_SERVICES)
-            .build();
-
-    protected static final Element CLASS_LOADER = declaration(WildFlyConstants.CLASS_LOADER);
-    protected static final Element EXECUTOR = declaration(WildFlyConstants.EXECUTOR);
-    protected static final Element TRANSPORT = declaration(WildFlyConstants.TRANSPORT);
-    protected static final Element REGISTRY = declaration(WildFlyConstants.REGISTRY);
-    protected static final Element MARSHALLING = declaration(WildFlyConstants.MARSHALLING);
-    protected static final Element EXECUTION_REPOSITORY = declaration(WildFlyConstants.REPOSITORY);
-    protected static final Element TRANSACTION_MANAGER = declaration(WildFlyConstants.TRANSACTION_MANAGER);
-    protected static final Element MBEAN_SERVER = declaration(WildFlyConstants.MBEAN_SERVER);
-    protected static final Element JOB_LOADER = declaration(WildFlyConstants.JOB_LOADER);
-    protected static final Element ARTIFACT_LOADER = declaration(WildFlyConstants.ARTIFACT_LOADER);
-    protected static final Element SECURITY = declaration(WildFlyConstants.SECURITY);
+    static final AttributeDefinition[] ATTRIBUTES = {
+            REF,
+            CLASS_LOADER,
+            EXECUTOR,
+            TRANSPORT,
+            REGISTRY,
+            MARSHALLING,
+            EXECUTION_REPOSITORY,
+            TRANSACTION_MANAGER,
+            MBEAN_SERVER,
+            JOB_LOADERS,
+            ARTIFACT_LOADERS,
+            SECURITIES
+    };
 
     @Override
     public Collection<AttributeDefinition> getAttributes() {
-        return Collections.<AttributeDefinition>singletonList(REF);
+        return Arrays.asList(ATTRIBUTES);
     }
 
     @Override
     protected List<? extends PersistentResourceDefinition> getChildren() {
         return Arrays.asList(
-                CLASS_LOADER,
-                EXECUTOR,
-                TRANSPORT,
-                REGISTRY,
-                MARSHALLING,
-                EXECUTION_REPOSITORY,
-                TRANSACTION_MANAGER,
-                MBEAN_SERVER,
-                JOB_LOADER,
-                ARTIFACT_LOADER,
-                SECURITY,
                 PropertyDefinition.INSTANCE
         );
     }

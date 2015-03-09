@@ -48,28 +48,28 @@ public class SetDeploymentJobOperatorCommand extends SetCommand {
     public void exec(final Config config, final AdminCommandContext context) throws Exception {
         final GlassfishSubSystem subSystem = requireSubsystem(config);
         final GlassfishDeployment dep = requireDeployment(subSystem, deployment);
-        final JobOperatorSchema<?,?> that = readJobOperator();
+        final JobOperatorSchema<?> that = readJobOperator();
         final GlassfishJobOperator op = dep.getJobOperator(that.getName());
         if (op == null) {
             locked(dep, new CreateDeploymentJobOperator(that));
         } else {
             final XmlJobOperator xml = XmlSchema.xmlJobOperator(op);
-            BaseCommand.<JobOperatorSchema<?,?>,GlassfishJobOperator>lockedUpdate(op, that, Op.values());
+            BaseCommand.<JobOperatorSchema<?>,GlassfishJobOperator>lockedUpdate(op, that, Op.values());
             context.getActionReport().setMessage(XmlSchema.writeJobOperator(xml));
         }
     }
 
     private static class CreateDeploymentJobOperator extends Code<GlassfishDeployment> {
-        private final JobOperatorSchema<?,?> that;
+        private final JobOperatorSchema<?> that;
 
-        public CreateDeploymentJobOperator(final JobOperatorSchema<?,?> that) {
+        public CreateDeploymentJobOperator(final JobOperatorSchema<?> that) {
             this.that = that;
         }
 
         @Override
         public Object code(final GlassfishDeployment dep) throws Exception {
             final GlassfishJobOperator op = dep.createChild(GlassfishJobOperator.class);
-            BaseCommand.<JobOperatorSchema<?,?>,GlassfishJobOperator>unlockedUpdate(op, that, Op.ADD);
+            BaseCommand.<JobOperatorSchema<?>,GlassfishJobOperator>unlockedUpdate(op, that, Op.ADD);
             dep.getJobOperators().add(op);
             return null;
         }

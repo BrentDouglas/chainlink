@@ -2,8 +2,6 @@ package io.machinecode.chainlink.core.configuration;
 
 import io.machinecode.chainlink.spi.configuration.JobOperatorConfiguration;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
-import io.machinecode.chainlink.spi.configuration.SubSystemConfiguration;
-import io.machinecode.chainlink.spi.configuration.SubSystemModel;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>

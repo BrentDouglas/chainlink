@@ -31,9 +31,9 @@ public class JobOperatorProcessor implements DeploymentUnitProcessor {
 
     final boolean global;
     final String name;
-    final JobOperatorSchema<?,?> schema;
+    final JobOperatorSchema<?> schema;
 
-    public JobOperatorProcessor(final boolean global, final String name, final JobOperatorSchema<?,?> schema) {
+    public JobOperatorProcessor(final boolean global, final String name, final JobOperatorSchema<?> schema) {
         this.global = global;
         this.name = name;
         this.schema = schema;

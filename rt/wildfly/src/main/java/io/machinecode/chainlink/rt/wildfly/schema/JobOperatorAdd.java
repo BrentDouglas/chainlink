@@ -1,6 +1,5 @@
 package io.machinecode.chainlink.rt.wildfly.schema;
 
-import io.machinecode.chainlink.core.schema.xml.XmlDeclaration;
 import io.machinecode.chainlink.core.schema.xml.XmlJobOperator;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.MutableJobOperatorSchema;
@@ -17,6 +16,8 @@ import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
@@ -45,20 +46,20 @@ public class JobOperatorAdd extends AbstractAddStepHandler {
         operator.setName(name);
         operator.setRef(nodeToString(model, WildFlyConstants.REF));
 
-        set(model, WildFlyConstants.CLASS_LOADER, new ClassLoaderDec(operator));
-        set(model, WildFlyConstants.EXECUTOR, new ExecutorDec(operator));
-        set(model, WildFlyConstants.TRANSPORT, new TransportDec(operator));
-        set(model, WildFlyConstants.REGISTRY, new RegistryDec(operator));
-        set(model, WildFlyConstants.MARSHALLING, new MarshallingDec(operator));
-        set(model, WildFlyConstants.REPOSITORY, new RepositoryDec(operator));
-        set(model, WildFlyConstants.TRANSACTION_MANAGER, new TransactionManagerDec(operator));
-        final String mBeanServer = nodeToString(model, WildFlyConstants.MBEAN_SERVER, WildFlyConstants.REF);
+        set(model, WildFlyConstants.CLASS_LOADER, new SetClassLoader(operator));
+        set(model, WildFlyConstants.EXECUTOR, new SetExecutor(operator));
+        set(model, WildFlyConstants.TRANSPORT, new SetTransport(operator));
+        set(model, WildFlyConstants.REGISTRY, new SetRegistry(operator));
+        set(model, WildFlyConstants.MARSHALLING, new SetMarshalling(operator));
+        set(model, WildFlyConstants.REPOSITORY, new SetRepository(operator));
+        set(model, WildFlyConstants.TRANSACTION_MANAGER, new SetTransactionManager(operator));
+        final String mBeanServer = nodeToString(model, WildFlyConstants.MBEAN_SERVER);
         if (mBeanServer != null) {
-            operator.getMBeanServer().setRef(mBeanServer);
+            operator.setMBeanServer(mBeanServer);
         }
-        addListNode(model.get(WildFlyConstants.JOB_LOADER), operator.getJobLoaders());
-        addListNode(model.get(WildFlyConstants.ARTIFACT_LOADER), operator.getArtifactLoaders());
-        addListNode(model.get(WildFlyConstants.SECURITY), operator.getSecurities());
+        operator.setJobLoaders(getListNode(model.get(WildFlyConstants.JOB_LOADERS)));
+        operator.setArtifactLoaders(getListNode(model.get(WildFlyConstants.ARTIFACT_LOADERS)));
+        operator.setSecurities(getListNode(model.get(WildFlyConstants.SECURITIES)));
         addProperties(model.get(WildFlyConstants.PROPERTY), operator);
 
         context.addStep(new DeployJobOperator(global, name, operator), OperationContext.Stage.RUNTIME);
@@ -68,9 +69,9 @@ public class JobOperatorAdd extends AbstractAddStepHandler {
 
         private final boolean global;
         final String name;
-        final JobOperatorSchema<?,?> schema;
+        final JobOperatorSchema<?> schema;
 
-        public DeployJobOperator(final boolean global, final String name, final JobOperatorSchema<?,?> schema) {
+        public DeployJobOperator(final boolean global, final String name, final JobOperatorSchema<?> schema) {
             this.global = global;
             this.name = name;
             this.schema = schema;
@@ -83,19 +84,16 @@ public class JobOperatorAdd extends AbstractAddStepHandler {
     }
 
 
-    private static void set(final ModelNode model, final String element, final LazyDec lazy) {
+    private static void set(final ModelNode model, final String element, final Set lazy) {
         final ModelNode child = model.get(element);
         if (!child.isDefined()) {
             return;
         }
-        final String ref = nodeToString(child, WildFlyConstants.REF);
+        final String ref = nodeToString(child);
         if (ref == null || ref.isEmpty()) {
             return;
         }
-        final XmlDeclaration dec = lazy.get();
-        final String name = nodeToString(child, WildFlyConstants.NAME);
-        dec.setName(name);
-        dec.setRef(ref);
+        lazy.set(ref);
     }
 
     static String nodeToString(ModelNode node, final String... path) {
@@ -110,37 +108,26 @@ public class JobOperatorAdd extends AbstractAddStepHandler {
                 : null;
     }
 
-    static void addListNode(final ModelNode root, final List<XmlDeclaration> list) {
+    static List<String> getListNode(final ModelNode root) {
         if (!root.isDefined()) {
-            return;
+            return Collections.emptyList();
         }
         final List<ModelNode> nodes = root.asList();
         if (nodes == null || nodes.isEmpty()) {
-            return;
+            return Collections.emptyList();
         }
+        final List<String> ret = new ArrayList<>(nodes.size());
         for (final ModelNode node : nodes) {
             final ModelNode name = node.get(WildFlyConstants.NAME);
             if (!name.isDefined()) {
                 throw new IllegalStateException(); //TODO Message
             }
-            final String ns = name.asString();
-            XmlDeclaration target = null;
-            for (final XmlDeclaration dec : list) {
-                if (dec.getName().equals(ns)) {
-                    target = dec;
-                    break;
-                }
-            }
-            if (target == null) {
-                target = new XmlDeclaration();
-                target.setName(ns);
-                list.add(target);
-            }
-            target.setRef(nodeToString(node.get(WildFlyConstants.REF)));
+            ret.add(name.asString());
         }
+        return ret;
     }
 
-    static void addProperties(final ModelNode root, final MutableJobOperatorSchema<?,?> operator) {
+    static void addProperties(final ModelNode root, final MutableJobOperatorSchema<?> operator) {
         if (!root.isDefined()) {
             return;
         }
@@ -159,127 +146,99 @@ public class JobOperatorAdd extends AbstractAddStepHandler {
         }
     }
 
-    private interface LazyDec {
+    private interface Set {
 
-        XmlDeclaration get();
+        void set(final String value);
     }
 
-    private static class ClassLoaderDec implements LazyDec {
+    private static class SetClassLoader implements Set {
         private final XmlJobOperator operator;
 
-        public ClassLoaderDec(final XmlJobOperator operator) {
+        public SetClassLoader(final XmlJobOperator operator) {
             this.operator = operator;
         }
 
         @Override
-        public XmlDeclaration get() {
-            XmlDeclaration x = operator.getClassLoader();
-            if (x == null) {
-                operator.setClassLoader(x = new XmlDeclaration());
-            }
-            return x;
+        public void set(final String value) {
+            operator.setClassLoader(value);
         }
     }
 
-    private static class ExecutorDec implements LazyDec {
+    private static class SetExecutor implements Set {
         private final XmlJobOperator operator;
 
-        public ExecutorDec(final XmlJobOperator operator) {
+        public SetExecutor(final XmlJobOperator operator) {
             this.operator = operator;
         }
 
         @Override
-        public XmlDeclaration get() {
-            XmlDeclaration x = operator.getExecutor();
-            if (x == null) {
-                operator.setExecutor(x = new XmlDeclaration());
-            }
-            return x;
+        public void set(final String value) {
+            operator.setExecutor(value);
         }
     }
 
-    private static class TransportDec implements LazyDec {
+    private static class SetTransport implements Set {
         private final XmlJobOperator operator;
 
-        public TransportDec(final XmlJobOperator operator) {
+        public SetTransport(final XmlJobOperator operator) {
             this.operator = operator;
         }
 
         @Override
-        public XmlDeclaration get() {
-            XmlDeclaration x = operator.getTransport();
-            if (x == null) {
-                operator.setTransport(x = new XmlDeclaration());
-            }
-            return x;
+        public void set(final String value) {
+            operator.setTransport(value);
         }
     }
 
-    private static class RegistryDec implements LazyDec {
+    private static class SetRegistry implements Set {
         private final XmlJobOperator operator;
 
-        public RegistryDec(final XmlJobOperator operator) {
+        public SetRegistry(final XmlJobOperator operator) {
             this.operator = operator;
         }
 
         @Override
-        public XmlDeclaration get() {
-            XmlDeclaration x = operator.getRegistry();
-            if (x == null) {
-                operator.setRegistry(x = new XmlDeclaration());
-            }
-            return x;
+        public void set(final String value) {
+            operator.setRegistry(value);
         }
     }
 
-    private static class MarshallingDec implements LazyDec {
+    private static class SetMarshalling implements Set {
         private final XmlJobOperator operator;
 
-        public MarshallingDec(final XmlJobOperator operator) {
+        public SetMarshalling(final XmlJobOperator operator) {
             this.operator = operator;
         }
 
         @Override
-        public XmlDeclaration get() {
-            XmlDeclaration x = operator.getMarshalling();
-            if (x == null) {
-                operator.setMarshalling(x = new XmlDeclaration());
-            }
-            return x;
+        public void set(final String value) {
+            operator.setMarshalling(value);
         }
     }
 
-    private static class RepositoryDec implements LazyDec {
+    private static class SetRepository implements Set {
         private final XmlJobOperator operator;
 
-        public RepositoryDec(final XmlJobOperator operator) {
+        public SetRepository(final XmlJobOperator operator) {
             this.operator = operator;
         }
 
         @Override
-        public XmlDeclaration get() {
-            XmlDeclaration x = operator.getRepository();
-            if (x == null) {
-                operator.setRepository(x = new XmlDeclaration());
-            }
-            return x;
+        public void set(final String value) {
+            operator.setRepository(value);
         }
     }
 
-    private static class TransactionManagerDec implements LazyDec {
+    private static class SetTransactionManager implements Set {
         private final XmlJobOperator operator;
 
-        public TransactionManagerDec(final XmlJobOperator operator) {
+        public SetTransactionManager(final XmlJobOperator operator) {
             this.operator = operator;
         }
 
         @Override
-        public XmlDeclaration get() {
-            XmlDeclaration x = operator.getTransactionManager();
-            if (x == null) {
-                operator.setTransactionManager(x = new XmlDeclaration());
-            }
-            return x;
+        public void set(final String value) {
+            operator.setTransactionManager(value);
         }
     }
 }

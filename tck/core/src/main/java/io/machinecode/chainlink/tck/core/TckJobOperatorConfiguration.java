@@ -64,17 +64,17 @@ public class TckJobOperatorConfiguration implements JobOperatorConfiguration {
         model.getTransactionManager().setFactory(transactionManagers == null || transactionManagers.isEmpty() ? null : transactionManagers.get(0));
         if (artifactLoaders != null) {
             for (final ArtifactLoaderFactory factory : artifactLoaders) {
-                model.getArtifactLoader(factory.getClass().getSimpleName()).setFactory(factory);
+                model.getArtifactLoaders().add().setFactory(factory);
             }
         }
         if (securitys != null) {
             for (final SecurityFactory factory : securitys) {
-                model.getSecurity(factory.getClass().getSimpleName()).setFactory(factory);
+                model.getSecurities().add().setFactory(factory);
             }
         }
         if (jobLoaders != null) {
             for (final JobLoaderFactory factory : jobLoaders) {
-                model.getJobLoader(factory.getClass().getSimpleName()).setFactory(factory);
+                model.getJobLoaders().add().setFactory(factory);
             }
         }
         model.getMBeanServer().setFactory(mBeanServer == null || mBeanServer.isEmpty() ? null : mBeanServer.get(0));

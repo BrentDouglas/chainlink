@@ -42,28 +42,28 @@ public class SetSubSystemJobOperatorCommand extends SetCommand {
     @Override
     public void exec(final Config config, final AdminCommandContext context) throws Exception {
         final GlassfishSubSystem subSystem = requireSubsystem(config);
-        final JobOperatorSchema<?,?> that = readJobOperator();
+        final JobOperatorSchema<?> that = readJobOperator();
         final GlassfishJobOperator op = subSystem.getJobOperator(that.getName());
         if (op == null) {
             locked(subSystem, new CreateSubSystemJobOperator(that));
         } else {
             final XmlJobOperator xml = XmlSchema.xmlJobOperator(op);
-            BaseCommand.<JobOperatorSchema<?,?>,GlassfishJobOperator>lockedUpdate(op, that, Op.values());
+            BaseCommand.<JobOperatorSchema<?>,GlassfishJobOperator>lockedUpdate(op, that, Op.values());
             context.getActionReport().setMessage(XmlSchema.writeJobOperator(xml));
         }
     }
 
     private static class CreateSubSystemJobOperator extends Code<GlassfishSubSystem> {
-        private final JobOperatorSchema<?,?> that;
+        private final JobOperatorSchema<?> that;
 
-        public CreateSubSystemJobOperator(final JobOperatorSchema<?,?> that) {
+        public CreateSubSystemJobOperator(final JobOperatorSchema<?> that) {
             this.that = that;
         }
 
         @Override
         public Object code(final GlassfishSubSystem subSystem) throws Exception {
             final GlassfishJobOperator op = subSystem.createChild(GlassfishJobOperator.class);
-            BaseCommand.<JobOperatorSchema<?,?>,GlassfishJobOperator>unlockedUpdate(op, that, Op.ADD);
+            BaseCommand.<JobOperatorSchema<?>,GlassfishJobOperator>unlockedUpdate(op, that, Op.ADD);
             subSystem.getJobOperators().add(op);
             return null;
         }

@@ -26,7 +26,7 @@ public class ChunkValidator extends ValidatingVisitor<Chunk> {
         }
         if (!CheckpointPolicy.ITEM.equals(that.getCheckpointPolicy())
                 && !CheckpointPolicy.CUSTOM.equals(that.getCheckpointPolicy())) {
-            context.addProblem(Messages.format("CHAINLINK-002104.validation.matches.attribute", "checkpoint-policy", that.getCheckpointPolicy(), Strings.join(CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM)));
+            context.addProblem(Messages.format("CHAINLINK-002104.validation.matches.attribute", "checkpoint-policy", that.getCheckpointPolicy(), Strings.join(',', CheckpointPolicy.ITEM, CheckpointPolicy.CUSTOM)));
         }
 
         //if (that.getItemCount() < 0) {

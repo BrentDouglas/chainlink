@@ -19,7 +19,7 @@ import static javax.xml.bind.annotation.XmlAccessType.NONE;
  * @since 1.0
  */
 @XmlAccessorType(NONE)
-public abstract class XmlScope implements MutableScopeSchema<XmlDeclaration, XmlProperty, XmlJobOperator> {
+public abstract class XmlScope implements MutableScopeSchema<XmlProperty, XmlJobOperator> {
 
     @XmlAttribute(name = "ref", required = false)
     protected String ref;
@@ -71,7 +71,7 @@ public abstract class XmlScope implements MutableScopeSchema<XmlDeclaration, Xml
     }
 
     @Override
-    public void addJobOperator(final JobOperatorSchema<?,?> jobOperator) throws Exception {
+    public void addJobOperator(final JobOperatorSchema<?> jobOperator) throws Exception {
         if (getJobOperator(jobOperator.getName()) != null) {
             throw new JobOperatorWithNameExistsException("A job operator already exists with name " + jobOperator.getName());
         }

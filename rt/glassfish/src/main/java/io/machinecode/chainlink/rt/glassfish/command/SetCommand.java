@@ -40,19 +40,19 @@ public abstract class SetCommand extends BaseCommand {
         throw new Exception("One of the arguments file or base64 must be provided.");
     }
 
-    public SubSystemSchema<?,?,?,?> readSubsystem() throws Exception {
+    public SubSystemSchema<?,?,?> readSubsystem() throws Exception {
         try (final InputStream stream = stream()) {
             return XmlChainlinkSubSystem.read(stream);
         }
     }
 
-    public DeploymentSchema<?,?,?> readDeployment() throws Exception {
+    public DeploymentSchema<?,?> readDeployment() throws Exception {
         try (final InputStream stream = stream()) {
             return XmlDeployment.read(stream);
         }
     }
 
-    public JobOperatorSchema<?,?> readJobOperator() throws Exception {
+    public JobOperatorSchema<?> readJobOperator() throws Exception {
         try (final InputStream stream = stream()) {
             return XmlJobOperator.read(stream);
         }

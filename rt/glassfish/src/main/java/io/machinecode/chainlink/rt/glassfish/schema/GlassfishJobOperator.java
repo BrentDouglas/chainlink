@@ -1,10 +1,12 @@
 package io.machinecode.chainlink.rt.glassfish.schema;
 
+import io.machinecode.chainlink.core.schema.xml.XmlSchema;
 import io.machinecode.chainlink.core.util.Creator;
 import io.machinecode.chainlink.core.util.Mutable;
 import io.machinecode.chainlink.core.util.Op;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.MutableJobOperatorSchema;
+import io.machinecode.chainlink.core.util.Strings;
 import org.jvnet.hk2.config.Attribute;
 import org.jvnet.hk2.config.ConfigBeanProxy;
 import org.jvnet.hk2.config.Configured;
@@ -12,6 +14,7 @@ import org.jvnet.hk2.config.DuckTyped;
 import org.jvnet.hk2.config.Element;
 import org.jvnet.hk2.config.TransactionFailure;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,7 +22,7 @@ import java.util.List;
  * @since 1.0
  */
 @Configured(name = "job-operator")
-public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperatorSchema<GlassfishDeclaration, GlassfishProperty>, Hack<JobOperatorSchema<?,?>> {
+public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperatorSchema<GlassfishProperty>, Hack<JobOperatorSchema<?>> {
 
     @Attribute("name")
     String getName();
@@ -31,60 +34,63 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
 
     void setRef(final String ref);
 
-    @Element("class-loader")
-    GlassfishDeclaration getClassLoader();
+    @Attribute("class-loader")
+    String getClassLoader();
 
-    void setClassLoader(final GlassfishDeclaration classLoader);
+    void setClassLoader(final String classLoader);
 
-    @Element("transaction-manager")
-    GlassfishDeclaration getTransactionManager();
+    @Attribute("transaction-manager")
+    String getTransactionManager();
 
-    void setTransactionManager(final GlassfishDeclaration transactionManager);
+    void setTransactionManager(final String transactionManager);
 
-    @Element("marshalling")
-    GlassfishDeclaration getMarshalling();
+    @Attribute("marshalling")
+    String getMarshalling();
 
-    void setMarshalling(final GlassfishDeclaration marshalling);
+    void setMarshalling(final String marshalling);
 
-    @Element("mbean-server")
-    GlassfishDeclaration getMbeanServer();
+    @Attribute("mbean-server")
+    String getMbeanServer();
 
-    void setMbeanServer(final GlassfishDeclaration mBeanServer);
+    void setMbeanServer(final String mBeanServer);
 
-    @Element("repository")
-    GlassfishDeclaration getRepository();
+    @Attribute("repository")
+    String getRepository();
 
-    void setRepository(final GlassfishDeclaration repository);
+    void setRepository(final String repository);
 
-    @Element("registry")
-    GlassfishDeclaration getRegistry();
+    @Attribute("registry")
+    String getRegistry();
 
-    void setRegistry(final GlassfishDeclaration registry);
+    void setRegistry(final String registry);
 
-    @Element("transport")
-    GlassfishDeclaration getTransport();
+    @Attribute("transport")
+    String getTransport();
 
-    void setTransport(final GlassfishDeclaration transport);
+    void setTransport(final String transport);
 
-    @Element("executor")
-    GlassfishDeclaration getExecutor();
+    @Attribute("executor")
+    String getExecutor();
 
-    void setExecutor(final GlassfishDeclaration executor);
+    void setExecutor(final String executor);
 
-    @Element("artifact-loader")
-    List<GlassfishDeclaration> getArtifactLoader();
+    @Attribute("artifact-loaders")
+    String getArtifactLoadersString();
 
-    void setArtifactLoader(final List<GlassfishDeclaration> artifactLoaders);
+    @Attribute("artifact-loaders")
+    void setArtifactLoadersString(final String artifactLoaders);
 
-    @Element("security")
-    List<GlassfishDeclaration> getSecurity();
+    @Attribute("securities")
+    String getSecuritiesString();
 
-    void setSecurity(final List<GlassfishDeclaration> security);
+    @Attribute("securities")
+    void setSecuritiesString(final String security);
 
-    @Element("job-loader")
-    List<GlassfishDeclaration> getJobLoader();
+    @Attribute("job-loaders")
+    String getJobLoadersString();
 
-    void setJobLoader(final List<GlassfishDeclaration> jobLoaders);
+    @Attribute("job-loaders")
+    void setJobLoadersString(final String jobLoaders);
 
     @Element("property")
     List<GlassfishProperty> getProperty();
@@ -92,31 +98,31 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
     void setProperty(final List<GlassfishProperty> properties);
 
     @DuckTyped
-    GlassfishDeclaration getMBeanServer();
+    String getMBeanServer();
 
     @DuckTyped
-    void setMBeanServer(final GlassfishDeclaration mBeanServer);
-
-    @DuckTyped
-    List<GlassfishDeclaration> getArtifactLoaders();
-
-    @DuckTyped
-    void setArtifactLoaders(final List<GlassfishDeclaration> artifactLoaders);
-
-    @DuckTyped
-    List<GlassfishDeclaration> getSecurities();
-
-    @DuckTyped
-    void setSecurities(final List<GlassfishDeclaration> security);
-
-    @DuckTyped
-    List<GlassfishDeclaration> getJobLoaders();
-
-    @DuckTyped
-    void setJobLoaders(final List<GlassfishDeclaration> jobLoaders);
+    void setMBeanServer(final String mBeanServer);
 
     @DuckTyped
     List<GlassfishProperty> getProperties();
+
+    @DuckTyped
+    List<String> getArtifactLoaders();
+
+    @DuckTyped
+    void setArtifactLoaders(final List<String> artifactLoaders);
+
+    @DuckTyped
+    List<String> getSecurities();
+
+    @DuckTyped
+    void setSecurities(final List<String> security);
+
+    @DuckTyped
+    List<String> getJobLoaders();
+
+    @DuckTyped
+    void setJobLoaders(final List<String> jobLoaders);
 
     @DuckTyped
     void setProperties(final List<GlassfishProperty> properties);
@@ -124,7 +130,7 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
     @DuckTyped
     void setProperty(final String name, final String value);
 
-    class Duck implements Mutable<JobOperatorSchema<?,?>> {
+    class Duck implements Mutable<JobOperatorSchema<?>> {
 
         private final GlassfishJobOperator to;
 
@@ -132,40 +138,43 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
             this.to = to;
         }
 
-        public static GlassfishDeclaration getMBeanServer(final GlassfishJobOperator that) {
+        public static String getMBeanServer(final GlassfishJobOperator that) {
             return that.getMbeanServer();
         }
 
-        public static void setMBeanServer(final GlassfishJobOperator that, final GlassfishDeclaration mBeanServer) {
+        public static void setMBeanServer(final GlassfishJobOperator that, final String mBeanServer) {
             that.setMbeanServer(mBeanServer);
-        }
-
-        public static List<GlassfishDeclaration> getArtifactLoaders(final GlassfishJobOperator that) {
-            return that.getArtifactLoader();
-        }
-
-        public static void setArtifactLoaders(final GlassfishJobOperator that, final List<GlassfishDeclaration> artifactLoaders) {
-            that.setArtifactLoader(artifactLoaders);
-        }
-
-        public static List<GlassfishDeclaration> getSecurities(final GlassfishJobOperator that) {
-            return that.getSecurity();
-        }
-
-        public static void setSecurities(final GlassfishJobOperator that, final List<GlassfishDeclaration> security) {
-            that.setSecurity(security);
-        }
-
-        public static List<GlassfishDeclaration> getJobLoaders(final GlassfishJobOperator that) {
-            return that.getJobLoader();
-        }
-
-        public static void setJobLoaders(final GlassfishJobOperator that, final List<GlassfishDeclaration> jobLoaders) {
-            that.setJobLoader(jobLoaders);
         }
 
         public static List<GlassfishProperty> getProperties(final GlassfishJobOperator that) {
             return that.getProperty();
+        }
+
+        public static List<String> getArtifactLoaders(final GlassfishJobOperator that) {
+            final String value = that.getArtifactLoadersString();
+            return value == null || value.isEmpty() ? Collections.<String>emptyList() : Strings.split(XmlSchema.XML_LIST_DELIMITER, value);
+        }
+
+        public static void setArtifactLoaders(final GlassfishJobOperator that, final List<String> value) {
+            that.setArtifactLoadersString(value == null || value.isEmpty() ? null : Strings.join(' ', value));
+        }
+
+        public static List<String> getSecurities(final GlassfishJobOperator that) {
+            final String value = that.getSecuritiesString();
+            return value == null || value.isEmpty() ? Collections.<String>emptyList() : Strings.split(XmlSchema.XML_LIST_DELIMITER, value);
+        }
+
+        public static void setSecurities(final GlassfishJobOperator that, final List<String> value) {
+            that.setSecuritiesString(value == null || value.isEmpty() ? null : Strings.join(' ', value));
+        }
+
+        public static List<String> getJobLoaders(final GlassfishJobOperator that) {
+            final String value = that.getJobLoadersString();
+            return value == null || value.isEmpty() ? Collections.<String>emptyList() : Strings.split(XmlSchema.XML_LIST_DELIMITER, value);
+        }
+
+        public static void setJobLoaders(final GlassfishJobOperator that, final List<String> value) {
+            that.setJobLoadersString(value == null || value.isEmpty() ? null : Strings.join(' ', value));
         }
 
         public static void setProperties(final GlassfishJobOperator that, final List<GlassfishProperty> properties) {
@@ -191,32 +200,26 @@ public interface GlassfishJobOperator extends ConfigBeanProxy, MutableJobOperato
         }
 
         @Override
-        public boolean willAccept(final JobOperatorSchema<?,?> from) {
+        public boolean willAccept(final JobOperatorSchema<?> from) {
             return to.getName().equals(from.getName());
         }
 
         @Override
-        public void accept(final JobOperatorSchema<?,?> from, final Op... ops) throws Exception {
+        public void accept(final JobOperatorSchema<?> from, final Op... ops) throws Exception {
             to.setName(from.getName());
             to.setRef(from.getRef());
-            final Creator<GlassfishDeclaration> creator = new Creator<GlassfishDeclaration>() {
-                @Override
-                public GlassfishDeclaration create() throws Exception {
-                    return to.createChild(GlassfishDeclaration.class);
-                }
-            };
-            to.setArtifactLoaders(GlassfishTransmute.list(to.getArtifactLoaders(), from.getArtifactLoaders(), creator, ops));
-            to.setSecurities(GlassfishTransmute.list(to.getSecurities(), from.getSecurities(), creator, ops));
-            to.setJobLoaders(GlassfishTransmute.list(to.getJobLoaders(), from.getJobLoaders(), creator, ops));
+            to.setArtifactLoaders(from.getArtifactLoaders());
+            to.setSecurities(from.getSecurities());
+            to.setJobLoaders(from.getJobLoaders());
 
-            to.setClassLoader(GlassfishTransmute.item(to.getClassLoader(), from.getClassLoader(), creator, ops));
-            to.setTransactionManager(GlassfishTransmute.item(to.getTransactionManager(), from.getTransactionManager(), creator, ops));
-            to.setMarshalling(GlassfishTransmute.item(to.getMarshalling(), from.getMarshalling(), creator, ops));
-            to.setMBeanServer(GlassfishTransmute.item(to.getMBeanServer(), from.getMBeanServer(), creator, ops));
-            to.setRepository(GlassfishTransmute.item(to.getRepository(), from.getRepository(), creator, ops));
-            to.setRegistry(GlassfishTransmute.item(to.getRegistry(), from.getRegistry(), creator, ops));
-            to.setTransport(GlassfishTransmute.item(to.getTransport(), from.getTransport(), creator, ops));
-            to.setExecutor(GlassfishTransmute.item(to.getExecutor(), from.getExecutor(), creator, ops));
+            to.setClassLoader(from.getClassLoader());
+            to.setTransactionManager(from.getTransactionManager());
+            to.setMarshalling(from.getMarshalling());
+            to.setMBeanServer(from.getMBeanServer());
+            to.setRepository(from.getRepository());
+            to.setRegistry(from.getRegistry());
+            to.setTransport(from.getTransport());
+            to.setExecutor(from.getExecutor());
 
             to.setProperties(GlassfishTransmute.list(to.getProperties(), from.getProperties(), new Creator<GlassfishProperty>() {
                 @Override

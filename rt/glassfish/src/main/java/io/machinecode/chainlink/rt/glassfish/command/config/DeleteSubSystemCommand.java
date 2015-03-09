@@ -5,7 +5,6 @@ import com.sun.enterprise.config.serverbeans.Domain;
 import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.rt.glassfish.command.BaseCommand;
 import io.machinecode.chainlink.rt.glassfish.command.Code;
-import io.machinecode.chainlink.rt.glassfish.schema.GlassfishDeclaration;
 import io.machinecode.chainlink.rt.glassfish.schema.GlassfishDeployment;
 import io.machinecode.chainlink.rt.glassfish.schema.GlassfishJobOperator;
 import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
@@ -63,7 +62,7 @@ public class DeleteSubSystemCommand extends BaseCommand {
             context.getActionReport().setMessage(XmlSchema.writeSubSystem(xml));
             subSystem.setRef(null);
             subSystem.setDeployments(Collections.<GlassfishDeployment>emptyList());
-            subSystem.setConfigurationLoaders(Collections.<GlassfishDeclaration>emptyList());
+            subSystem.setConfigurationLoaders(Collections.<String>emptyList());
             subSystem.setJobOperators(Collections.<GlassfishJobOperator>emptyList());
             return null;
         }

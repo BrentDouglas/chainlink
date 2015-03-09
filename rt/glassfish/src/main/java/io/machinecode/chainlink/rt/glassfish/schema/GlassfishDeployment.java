@@ -1,5 +1,6 @@
 package io.machinecode.chainlink.rt.glassfish.schema;
 
+import io.machinecode.chainlink.core.schema.xml.XmlSchema;
 import io.machinecode.chainlink.core.util.Creator;
 import io.machinecode.chainlink.core.util.Mutable;
 import io.machinecode.chainlink.core.util.Op;
@@ -8,6 +9,7 @@ import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.JobOperatorWithNameExistsException;
 import io.machinecode.chainlink.core.schema.MutableDeploymentSchema;
 import io.machinecode.chainlink.core.schema.NoJobOperatorWithNameException;
+import io.machinecode.chainlink.core.util.Strings;
 import org.jvnet.hk2.config.Attribute;
 import org.jvnet.hk2.config.ConfigBeanProxy;
 import org.jvnet.hk2.config.Configured;
@@ -15,6 +17,7 @@ import org.jvnet.hk2.config.DuckTyped;
 import org.jvnet.hk2.config.Element;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -23,7 +26,7 @@ import java.util.ListIterator;
  * @since 1.0
  */
 @Configured
-public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentSchema<GlassfishDeclaration, GlassfishProperty, GlassfishJobOperator>, Hack<DeploymentSchema<?,?,?>> {
+public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentSchema<GlassfishProperty, GlassfishJobOperator>, Hack<DeploymentSchema<?,?>> {
 
     @Attribute("name")
     String getName();
@@ -35,21 +38,27 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
 
     void setRef(final String ref);
 
-    @Element("configuration-loader")
-    List<GlassfishDeclaration> getConfigurationLoader();
+    @Attribute("configuration-loaders")
+    String getConfigurationLoadersString();
 
-    void setConfigurationLoader(final List<GlassfishDeclaration> configurationLoader);
+    @Attribute("configuration-loaders")
+    void setConfigurationLoadersString(final String configurationLoader);
 
     @Element("job-operator")
     List<GlassfishJobOperator> getJobOperator();
 
     void setJobOperator(final List<GlassfishJobOperator> jobOperators);
 
-    @DuckTyped
-    List<GlassfishDeclaration> getConfigurationLoaders();
+    @Element("property")
+    List<GlassfishProperty> getProperty();
+
+    void setProperty(final List<GlassfishProperty> properties);
 
     @DuckTyped
-    void setConfigurationLoaders(final List<GlassfishDeclaration> artifactLoaders);
+    List<String> getConfigurationLoaders();
+
+    @DuckTyped
+    void setConfigurationLoaders(final List<String> artifactLoaders);
 
     @DuckTyped
     List<GlassfishJobOperator> getJobOperators();
@@ -64,18 +73,15 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
     List<GlassfishProperty> getProperties();
 
     @DuckTyped
-    GlassfishDeclaration getConfigurationLoader(final String name);
-
-    @DuckTyped
     GlassfishJobOperator getJobOperator(final String name);
 
     @DuckTyped
     GlassfishJobOperator removeJobOperator(final String name) throws NoJobOperatorWithNameException;
 
     @DuckTyped
-    void addJobOperator(final JobOperatorSchema<?,?> jobOperator) throws Exception;
+    void addJobOperator(final JobOperatorSchema<?> jobOperator) throws Exception;
 
-    class Duck implements Mutable<DeploymentSchema<?,?,?>> {
+    class Duck implements Mutable<DeploymentSchema<?,?>> {
 
         private final GlassfishDeployment to;
 
@@ -83,12 +89,13 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
             this.to = to;
         }
 
-        public static List<GlassfishDeclaration> getConfigurationLoaders(final GlassfishDeployment that) {
-            return that.getConfigurationLoader();
+        public static List<String> getConfigurationLoaders(final GlassfishDeployment that) {
+            final String value = that.getConfigurationLoadersString();
+            return value == null || value.isEmpty() ? Collections.<String>emptyList() : Strings.split(XmlSchema.XML_LIST_DELIMITER, value);
         }
 
-        public static void setConfigurationLoaders(final GlassfishDeployment that, final List<GlassfishDeclaration> artifactLoaders) {
-            that.setConfigurationLoader(artifactLoaders);
+        public static void setConfigurationLoaders(final GlassfishDeployment that, final List<String> configurationLoaders) {
+            that.setConfigurationLoadersString(configurationLoaders == null || configurationLoaders.isEmpty() ? null : Strings.join(' ', configurationLoaders));
         }
 
         public static List<GlassfishJobOperator> getJobOperators(final GlassfishDeployment that) {
@@ -99,21 +106,12 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
             that.setJobOperator(jobOperators);
         }
 
-        public static void setProperties(final GlassfishDeployment that, final List<GlassfishProperty> properties) {
-            that.setProperties(properties);
-        }
-
         public static List<GlassfishProperty> getProperties(final GlassfishDeployment that) {
-            return that.getProperties();
+            return that.getProperty();
         }
 
-        public static GlassfishDeclaration getConfigurationLoader(final GlassfishDeployment self, final String name) {
-            for (final GlassfishDeclaration dep : self.getConfigurationLoaders()) {
-                if (name.equals(dep.getName())) {
-                    return dep;
-                }
-            }
-            return null;
+        public static void setProperties(final GlassfishDeployment that, final List<GlassfishProperty> properties) {
+            that.setProperty(properties);
         }
 
         public static GlassfishJobOperator getJobOperator(final GlassfishDeployment self, final String name) {
@@ -139,7 +137,7 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
             throw new NoJobOperatorWithNameException("No job operator with name " + name);
         }
 
-        public static void addJobOperator(final GlassfishDeployment self, final JobOperatorSchema<?,?> jobOperator) throws Exception {
+        public static void addJobOperator(final GlassfishDeployment self, final JobOperatorSchema<?> jobOperator) throws Exception {
             if (getJobOperator(self, jobOperator.getName()) != null) {
                 throw new JobOperatorWithNameExistsException("A job operator already exists with name " + jobOperator.getName());
             }
@@ -149,21 +147,16 @@ public interface GlassfishDeployment extends ConfigBeanProxy, MutableDeploymentS
         }
 
         @Override
-        public boolean willAccept(final DeploymentSchema<?,?,?> that) {
+        public boolean willAccept(final DeploymentSchema<?,?> that) {
             return to.getName().equals(that.getName());
         }
 
         @Override
-        public void accept(final DeploymentSchema<?,?,?> from, final Op... ops) throws Exception {
+        public void accept(final DeploymentSchema<?,?> from, final Op... ops) throws Exception {
             to.setName(from.getName());
             to.setRef(from.getRef());
-            to.setConfigurationLoaders(GlassfishTransmute.list(to.getConfigurationLoaders(), from.getConfigurationLoaders(), new Creator<GlassfishDeclaration>() {
-                @Override
-                public GlassfishDeclaration create() throws Exception {
-                    return to.createChild(GlassfishDeclaration.class);
-                }
-            }, ops));
-            to.setJobOperators(GlassfishTransmute.<JobOperatorSchema<?,?>, GlassfishJobOperator>list(to.getJobOperators(), from.getJobOperators(), new Creator<GlassfishJobOperator>() {
+            to.setConfigurationLoaders(from.getConfigurationLoaders());
+            to.setJobOperators(GlassfishTransmute.<JobOperatorSchema<?>, GlassfishJobOperator>list(to.getJobOperators(), from.getJobOperators(), new Creator<GlassfishJobOperator>() {
                 @Override
                 public GlassfishJobOperator create() throws Exception {
                     return to.createChild(GlassfishJobOperator.class);

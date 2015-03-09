@@ -20,7 +20,7 @@ public class CdiSkipChunkTest extends SkipChunkTest {
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
         super.visitJobOperatorModel(model);
-        model.getArtifactLoader("artifactLoader").setValue(new CdiArtifactLoader(container.getBeanManager()));
+        model.getArtifactLoaders().add().setValue(new CdiArtifactLoader(container.getBeanManager()));
     }
 
     @BeforeClass

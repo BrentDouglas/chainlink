@@ -77,12 +77,12 @@ public class ManualConfiguration {
         }
 
         @Override
-        public SubSystemSchema<?,?,?,?> getConfiguration() {
+        public SubSystemSchema<?,?,?> getConfiguration() {
             throw new UnsupportedOperationException("Not implemented");
         }
 
         @Override
-        public SubSystemSchema<?,?,?,?> setConfiguration(final Configure configure) {
+        public SubSystemSchema<?,?,?> setConfiguration(final Configure configure) {
             throw new UnsupportedOperationException("Not implemented");
         }
 

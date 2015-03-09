@@ -30,11 +30,11 @@ public interface JobOperatorModel extends PropertyModel {
 
     Declaration<TransactionManager> getTransactionManager();
 
-    Declaration<JobLoader> getJobLoader(final String name);
+    ListModel<JobLoader> getJobLoaders();
 
-    Declaration<ArtifactLoader> getArtifactLoader(final String name);
+    ListModel<ArtifactLoader> getArtifactLoaders();
 
-    Declaration<Security> getSecurity(final String name);
+    ListModel<Security> getSecurities();
 
     Declaration<Executor> getExecutor();
 

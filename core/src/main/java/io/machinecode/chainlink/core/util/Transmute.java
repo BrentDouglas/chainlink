@@ -61,4 +61,30 @@ public final class Transmute {
         }
         return to;
     }
+
+    public static <V,X> List<X> list(final List<X> to, final List<? extends V> from, final Copy.Transformer<V,X> transformer, final Op... ops) throws Exception {
+        final ListIterator<X> it = to.listIterator();
+        outer: while (it.hasNext()) {
+            final X t = it.next();
+            for (final V f : from) {
+                if (t.equals(transformer.transform(f))) {
+                    continue outer;
+                }
+            }
+            if (Op.REMOVE.isActive(ops)) {
+                it.remove();
+            }
+        }
+        outer: for (final V f : from) {
+            for (final X t : to) {
+                if (t.equals(transformer.transform(f))) {
+                    continue outer;
+                }
+            }
+            if (Op.ADD.isActive(ops)) {
+                to.add(transformer.transform(f));
+            }
+        }
+        return to;
+    }
 }

@@ -4,11 +4,6 @@ import com.sun.enterprise.config.serverbeans.Config;
 import com.sun.enterprise.config.serverbeans.Domain;
 import io.machinecode.chainlink.rt.glassfish.GlassfishService;
 import io.machinecode.chainlink.rt.glassfish.command.BaseCommand;
-import io.machinecode.chainlink.rt.glassfish.command.Code;
-import io.machinecode.chainlink.rt.glassfish.schema.GlassfishDeployment;
-import io.machinecode.chainlink.rt.glassfish.schema.GlassfishSubSystem;
-import io.machinecode.chainlink.core.util.Op;
-import io.machinecode.chainlink.core.schema.DeploymentSchema;
 import org.glassfish.api.admin.AdminCommandContext;
 import org.glassfish.api.admin.CommandLock;
 import org.glassfish.api.admin.ExecuteOn;
@@ -41,21 +36,5 @@ public class ReloadCommand extends BaseCommand {
     public void exec(final Config config, final AdminCommandContext context) throws Exception {
         final GlassfishService service = locator.getService(GlassfishService.class);
         service.reload();
-    }
-
-    private static class CreateDeployment extends Code<GlassfishSubSystem> {
-        private final DeploymentSchema<?,?,?> that;
-
-        public CreateDeployment(final DeploymentSchema<?,?,?> that) {
-            this.that = that;
-        }
-
-        @Override
-        public Object code(final GlassfishSubSystem subSystem) throws Exception {
-            final GlassfishDeployment dep = subSystem.createChild(GlassfishDeployment.class);
-            BaseCommand.<DeploymentSchema<?,?,?>,GlassfishDeployment>unlockedUpdate(dep, that, Op.ADD);
-            subSystem.getDeployments().add(dep);
-            return null;
-        }
     }
 }

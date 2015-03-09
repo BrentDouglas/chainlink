@@ -6,12 +6,12 @@ import java.util.List;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface MutableScopeSchema<Dec extends MutableDeclarationSchema, Prop extends MutablePropertySchema, Job extends MutableJobOperatorSchema<Dec, Prop>>
-                extends ScopeSchema<Dec,Prop,Job> {
+public interface MutableScopeSchema<Prop extends MutablePropertySchema, Job extends MutableJobOperatorSchema<Prop>>
+                extends ScopeSchema<Prop,Job> {
 
     void setRef(final String ref);
 
-    void setConfigurationLoaders(final List<Dec> artifactLoaders);
+    void setConfigurationLoaders(final List<String> artifactLoaders);
 
     void setJobOperators(final List<Job> jobOperators);
 
@@ -24,5 +24,5 @@ public interface MutableScopeSchema<Dec extends MutableDeclarationSchema, Prop e
      * @throws JobOperatorWithNameExistsException
      * @throws Exception
      */
-    void addJobOperator(final JobOperatorSchema<?,?> jobOperator) throws Exception;
+    void addJobOperator(final JobOperatorSchema<?> jobOperator) throws Exception;
 }

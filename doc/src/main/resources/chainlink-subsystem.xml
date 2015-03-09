@@ -2,25 +2,22 @@
 <subsystem xmlns="http://machinecode.io/xml/ns/chainlink/subsystem"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink/subsystem http://machinecode.io/xml/ns/chainlink/chainlink-subsystem_1_0.xsd"
-           ref="theSubSystemConfiguration">
+           ref="theSubSystemConfiguration"
+           configuration-loaders="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory">
 
-    <configuration-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory"/>
+    <job-operator name="global"
+                  securities="theSecurity"/>
 
-    <job-operator name="global">
-        <security name="security" ref="theSecurity"/>
-    </job-operator>
+    <deployment name="default"
+                configuration-loaders="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory">
 
-    <deployment name="default">
-        <configuration-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory"/>
-
-        <job-operator name="default" ref="theJobOperatorConfiguration">
-            <transaction-manager name="tx" ref="java:appserver/TransactionManager"/>
-        </job-operator>
+        <job-operator name="default"
+                      ref="theJobOperatorConfiguration"
+                      transaction-manager="java:appserver/TransactionManager"/>
     </deployment>
 
     <deployment name="someDeploymentName" ref="theDeploymentConfiguration">
-        <job-operator name="default">
-            <security name="security" ref="otherSecurity"/>
-        </job-operator>
+        <job-operator name="default"
+                      securities="otherSecurity"/>
     </deployment>
 </subsystem>

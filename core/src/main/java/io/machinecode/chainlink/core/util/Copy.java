@@ -12,6 +12,18 @@ import java.util.List;
  */
 public class Copy {
 
+    private static final Transformer<?,?> NOOP = new Transformer<Object, Object>() {
+        @Override
+        public Object transform(final Object that) {
+            return that;
+        }
+    };
+
+    @SuppressWarnings("unchecked")
+    public static <T> Transformer<T,T> noop() {
+        return (Transformer<T,T>)NOOP;
+    }
+
     public static <T, U, V extends PropertyContext> List<U> immutableCopy(final List<? extends T> that, final V context, final ExpressionTransformer<T, U, V> transformer) {
         if (that == null) {
             return Collections.emptyList();
@@ -24,6 +36,24 @@ public class Copy {
             }
         }
         return Collections.unmodifiableList(list);
+    }
+
+    public static <T, U> List<U> copy(final List<? extends T> that, final Transformer<T, U> transformer) {
+        if (that == null) {
+            return Collections.emptyList();
+        }
+        final List<U> list = new ArrayList<>(that.size());
+        for (final T value : that) {
+            final U replaced = transformer.transform(value);
+            if (replaced != null) {
+                list.add(replaced);
+            }
+        }
+        return list;
+    }
+
+    public interface Transformer<T, U> {
+        U transform(final T that);
     }
 
     public interface ExpressionTransformer<T, U, V extends PropertyContext> {

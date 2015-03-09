@@ -25,39 +25,19 @@ public class ChainlinkParser_1_0 implements XMLElementReader<List<ModelNode>>, X
 
     static {
         xmlDescription = builder(ChainlinkDefinition.INSTANCE)
+                .addAttributes(ChainlinkDefinition.ATTRIBUTES)
                 .addChild(jobOperator(JobOperatorDefinition.GLOBAL_INSTANCE))
                 .addChild(builder(DeploymentDefinition.INSTANCE)
+                        .addAttributes(DeploymentDefinition.ATTRIBUTES)
                         .addChild(jobOperator(JobOperatorDefinition.DEPLOYMENT_INSTANCE))
                 ).build();
     }
 
     private static PersistentResourceXMLBuilder jobOperator(final JobOperatorDefinition definition) {
         return builder(definition)
-                .addChild(builder(JobOperatorDefinition.EXECUTOR)
-                        .addAttributes(JobOperatorDefinition.EXECUTOR.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.TRANSPORT)
-                        .addAttributes(JobOperatorDefinition.TRANSPORT.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.REGISTRY)
-                        .addAttributes(JobOperatorDefinition.REGISTRY.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.MARSHALLING)
-                        .addAttributes(JobOperatorDefinition.MARSHALLING.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.MBEAN_SERVER)
-                        .addAttributes(JobOperatorDefinition.MBEAN_SERVER.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.EXECUTION_REPOSITORY)
-                        .addAttributes(JobOperatorDefinition.EXECUTION_REPOSITORY.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.CLASS_LOADER)
-                        .addAttributes(JobOperatorDefinition.CLASS_LOADER.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.TRANSACTION_MANAGER)
-                        .addAttributes(JobOperatorDefinition.TRANSACTION_MANAGER.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.JOB_LOADER)
-                        .addAttributes(JobOperatorDefinition.JOB_LOADER.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.ARTIFACT_LOADER)
-                        .addAttributes(JobOperatorDefinition.ARTIFACT_LOADER.getRawAttributes())
-                ).addChild(builder(JobOperatorDefinition.SECURITY)
-                        .addAttributes(JobOperatorDefinition.SECURITY.getRawAttributes())
-                ).addChild(builder(PropertyDefinition.INSTANCE)
-                        .addAttribute(PropertyDefinition.NAME)
-                        .addAttribute(PropertyDefinition.VALUE)
+                .addAttributes(JobOperatorDefinition.ATTRIBUTES)
+                .addChild(builder(PropertyDefinition.INSTANCE)
+                        .addAttributes(PropertyDefinition.ATTRIBUTES)
                 );
     }
 

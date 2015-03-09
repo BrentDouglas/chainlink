@@ -120,11 +120,11 @@ The first one found is used. Note that in general you should not use
 setDefaultFactory. It is provided to allow each container to specify
 default values.
 
-All the values not specified by name in the JobOperatorConfiguration
-interface are required other than the MBeanServer. Those specified by
-name indicates a collection which is provided to the operator in the
-order they are added. In the example we saw the security defined in
-xml moved after a second security. In this case 'otherSecurity' would
+All individual values other than the MBeanServer in the JobOperatorConfiguration
+interface are required. None of the collections are required. They are
+provided to the operator in the order they are added. In the example
+we saw the security defined in xml removed and readded in the reverse
+order. In this case 'otherSecurity' would
 be called first and 'theSecurity' second. The ordering may or may not
 be important and you should check the javadoc to determine how they
 are called. For example, specified JobLoader's are called one at a time

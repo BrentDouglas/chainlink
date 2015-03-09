@@ -17,7 +17,7 @@ public class SpringBatchletTest extends BatchletTest {
 
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {
-        model.getArtifactLoader("artifactFactory").setValue(context.getBean(SpringArtifactLoader.class));
+        model.getArtifactLoaders().add().setValue(context.getBean(SpringArtifactLoader.class));
     }
 
     @BeforeClass

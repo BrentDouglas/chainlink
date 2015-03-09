@@ -42,28 +42,28 @@ public class SetDeploymentCommand extends SetCommand {
     @Override
     public void exec(final Config config, final AdminCommandContext context) throws Exception {
         final GlassfishSubSystem subSystem = requireSubsystem(config);
-        final DeploymentSchema<?,?,?> that = readDeployment();
+        final DeploymentSchema<?,?> that = readDeployment();
         final GlassfishDeployment dep = subSystem.getDeployment(that.getName());
         if (dep == null) {
             locked(subSystem, new CreateDeployment(that));
         } else {
             final XmlDeployment xml = XmlSchema.xmlDeployment(dep);
-            BaseCommand.<DeploymentSchema<?,?,?>,GlassfishDeployment>lockedUpdate(dep, that, Op.values());
+            BaseCommand.<DeploymentSchema<?,?>,GlassfishDeployment>lockedUpdate(dep, that, Op.values());
             context.getActionReport().setMessage(XmlSchema.writeDeployment(xml));
         }
     }
 
     private static class CreateDeployment extends Code<GlassfishSubSystem> {
-        private final DeploymentSchema<?,?,?> that;
+        private final DeploymentSchema<?,?> that;
 
-        public CreateDeployment(final DeploymentSchema<?,?,?> that) {
+        public CreateDeployment(final DeploymentSchema<?,?> that) {
             this.that = that;
         }
 
         @Override
         public Object code(final GlassfishSubSystem subSystem) throws Exception {
             final GlassfishDeployment dep = subSystem.createChild(GlassfishDeployment.class);
-            BaseCommand.<DeploymentSchema<?,?,?>,GlassfishDeployment>unlockedUpdate(dep, that, Op.ADD);
+            BaseCommand.<DeploymentSchema<?,?>,GlassfishDeployment>unlockedUpdate(dep, that, Op.ADD);
             subSystem.getDeployments().add(dep);
             return null;
         }

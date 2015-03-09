@@ -20,7 +20,6 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="configuration-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="job-operator" type="cl:JobOperatorType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="property" type="cl:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
@@ -35,13 +34,14 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="cl:ScopeType">
-                <xs:attribute name="ref" use="optional" type="xs:string">
+                <xs:attribute name="ref" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
                             An injectable reference for the DeploymentConfiguration to use to configure this deployment.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute name="configuration-loaders" type="cl:ListType" use="optional"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -55,26 +55,26 @@
         <xs:complexContent>
             <xs:extension base="cl:NamedType">
                 <xs:sequence>
-                    <xs:element name="class-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="transaction-manager" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="marshalling" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="mbean-server" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="job-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="artifact-loader" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="security" type="cl:DeclarationType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="repository" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="registry" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="transport" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="executor" type="cl:DeclarationType" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="property" type="cl:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
                 </xs:sequence>
-                <xs:attribute name="ref" use="optional" type="xs:string">
+                <xs:attribute name="ref" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
                             An injectable reference for the JobOperatorConfiguration to use to configure this job operator.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+                <xs:attribute name="class-loader" type="xs:string" use="optional"/>
+                <xs:attribute name="transaction-manager" type="xs:string" use="optional"/>
+                <xs:attribute name="marshalling" type="xs:string" use="optional"/>
+                <xs:attribute name="mbean-server" type="xs:string" use="optional"/>
+                <xs:attribute name="repository" type="xs:string" use="optional"/>
+                <xs:attribute name="registry" type="xs:string" use="optional"/>
+                <xs:attribute name="transport" type="xs:string" use="optional"/>
+                <xs:attribute name="executor" type="xs:string" use="optional"/>
+                <xs:attribute name="job-loaders" type="cl:ListType" use="optional"/>
+                <xs:attribute name="artifact-loaders" type="cl:ListType" use="optional"/>
+                <xs:attribute name="securities" type="cl:ListType" use="optional"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -95,21 +95,21 @@
                 A resource that may be used by a JobOperator.
             </xs:documentation>
         </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="cl:NamedType">
-                <xs:attribute name="ref" use="required" type="xs:string">
-                    <xs:annotation>
-                        <xs:documentation>
-                            An injectable reference for either a factory or an artifact.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+        <xs:attribute name="ref" use="required" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    An injectable reference for either a factory or an artifact.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="PropertyType">
         <xs:attribute name="name" use="required" type="xs:string" />
         <xs:attribute name="value" use="required" type="xs:string" />
     </xs:complexType>
+
+    <xs:simpleType name="ListType">
+        <xs:list itemType="xs:string"/>
+    </xs:simpleType>
 </xs:schema>

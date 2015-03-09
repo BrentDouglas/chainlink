@@ -1,7 +1,6 @@
 package io.machinecode.chainlink.core.schema.xml;
 
 import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
-import io.machinecode.chainlink.core.schema.DeclarationSchema;
 import io.machinecode.chainlink.core.schema.DeploymentSchema;
 import io.machinecode.chainlink.core.schema.JobOperatorSchema;
 import io.machinecode.chainlink.core.schema.PropertySchema;
@@ -20,55 +19,51 @@ import java.util.List;
  */
 public final class XmlSchema {
 
-    public static XmlChainlinkSubSystem xmlSubSystem(final SubSystemSchema<?,?,?,?> subSystem) throws Exception {
+    /**
+     * @see http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#atomic-vs-list
+     * @see http://www.w3.org/TR/2000/WD-xml-2e-20000814#NT-S
+     */
+    public static final String XML_LIST_DELIMITER = "[ \\r\\n\\t]+";
+
+    public static XmlChainlinkSubSystem xmlSubSystem(final SubSystemSchema<?,?,?> subSystem) throws Exception {
         final XmlChainlinkSubSystem model = new XmlChainlinkSubSystem();
-        for (final DeclarationSchema dec : subSystem.getConfigurationLoaders()) {
-            model.getConfigurationLoaders().add(xmlDec(dec));
-        }
-        for (final JobOperatorSchema<?, ?> dec : subSystem.getJobOperators()) {
+        model.setConfigurationLoaders(subSystem.getConfigurationLoaders());
+        for (final JobOperatorSchema<?> dec : subSystem.getJobOperators()) {
             model.getJobOperators().add(xmlJobOperator(dec));
         }
-        for (final DeploymentSchema<?, ?, ?> dec : subSystem.getDeployments()) {
+        for (final DeploymentSchema<?,?> dec : subSystem.getDeployments()) {
             model.getDeployments().add(xmlDeployment(dec));
         }
         model.setRef(subSystem.getRef());
         return model;
     }
 
-    public static XmlDeployment xmlDeployment(final DeploymentSchema<?,?,?> deployment) throws Exception {
+    public static XmlDeployment xmlDeployment(final DeploymentSchema<?,?> deployment) throws Exception {
         final XmlDeployment model = new XmlDeployment();
         model.setName(deployment.getName());
-        for (final DeclarationSchema dec : deployment.getConfigurationLoaders()) {
-            model.getConfigurationLoaders().add(xmlDec(dec));
-        }
-        for (final JobOperatorSchema<?, ?> dec : deployment.getJobOperators()) {
+        model.setConfigurationLoaders(deployment.getConfigurationLoaders());
+        for (final JobOperatorSchema<?> dec : deployment.getJobOperators()) {
             model.getJobOperators().add(xmlJobOperator(dec));
         }
         model.setRef(deployment.getRef());
         return model;
     }
 
-    public static XmlJobOperator xmlJobOperator(final JobOperatorSchema<?, ?> op) throws Exception {
+    public static XmlJobOperator xmlJobOperator(final JobOperatorSchema<?> op) throws Exception {
         final XmlJobOperator model = new XmlJobOperator();
         model.setName(op.getName());
         model.setProperties(xmlProperties(op.getProperties()));
-        model.setExecutor(xmlDec(op.getExecutor()));
-        model.setTransport(xmlDec(op.getTransport()));
-        model.setMarshalling(xmlDec(op.getMarshalling()));
-        model.setRegistry(xmlDec(op.getRegistry()));
-        model.setMBeanServer(xmlDec(op.getMBeanServer()));
-        model.setRepository(xmlDec(op.getRepository()));
-        model.setClassLoader(xmlDec(op.getClassLoader()));
-        model.setTransactionManager(xmlDec(op.getTransactionManager()));
-        for (final DeclarationSchema resource : op.getJobLoaders()) {
-            model.getJobLoaders().add(xmlDec(resource));
-        }
-        for (final DeclarationSchema resource : op.getArtifactLoaders()) {
-            model.getArtifactLoaders().add(xmlDec(resource));
-        }
-        for (final DeclarationSchema resource : op.getSecurities()) {
-            model.getSecurities().add(xmlDec(resource));
-        }
+        model.setExecutor(op.getExecutor());
+        model.setTransport(op.getTransport());
+        model.setMarshalling(op.getMarshalling());
+        model.setRegistry(op.getRegistry());
+        model.setMBeanServer(op.getMBeanServer());
+        model.setRepository(op.getRepository());
+        model.setClassLoader(op.getClassLoader());
+        model.setTransactionManager(op.getTransactionManager());
+        model.setJobLoaders(op.getJobLoaders());
+        model.setArtifactLoaders(op.getArtifactLoaders());
+        model.setSecurities(op.getSecurities());
         model.setRef(op.getRef());
         return model;
     }
@@ -81,16 +76,6 @@ public final class XmlSchema {
             xml.setValue(dec.getValue());
             model.add(xml);
         }
-        return model;
-    }
-
-    private static XmlDeclaration xmlDec(final DeclarationSchema dec) {
-        if (dec == null) {
-            return null;
-        }
-        final XmlDeclaration model = new XmlDeclaration();
-        model.setName(dec.getName());
-        model.setRef(dec.getRef());
         return model;
     }
 

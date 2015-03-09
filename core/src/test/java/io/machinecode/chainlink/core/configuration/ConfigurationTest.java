@@ -8,6 +8,7 @@ import io.machinecode.chainlink.core.transaction.LocalTransactionManagerFactory;
 import io.machinecode.chainlink.core.transport.LocalTransportFactory;
 import io.machinecode.chainlink.core.Constants;
 import io.machinecode.chainlink.core.util.Tccl;
+import io.machinecode.chainlink.spi.configuration.Declaration;
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.spi.property.PropertyLookup;
@@ -52,14 +53,14 @@ public class ConfigurationTest extends Assert {
 
         final AtomicBoolean firstInjected = new AtomicBoolean();
         final AtomicBoolean secondInjected = new AtomicBoolean();
-        op.getArtifactLoader("first-artifact-loader").setValue(new ArtifactLoader() {
+        op.getArtifactLoaders().add().setValue(new ArtifactLoader() {
             @Override
             public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                 firstInjected.set(true);
                 return null;
             }
         });
-        op.getArtifactLoader("second-artifact-loader").setFactory(new ArtifactLoaderFactory() {
+        op.getArtifactLoaders().add().setFactory(new ArtifactLoaderFactory() {
             @Override
             public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return new ArtifactLoader() {
@@ -98,14 +99,15 @@ public class ConfigurationTest extends Assert {
         final JobOperatorModelImpl op = op();
 
         final AtomicBoolean valueInjected = new AtomicBoolean();
-        op.getArtifactLoader("first-artifact-loader").setValue(new ArtifactLoader() {
+        final Declaration<ArtifactLoader> loader = op.getArtifactLoaders().add();
+        loader.setValue(new ArtifactLoader() {
             @Override
             public <T> T load(final String id, final Class<T> as, final ClassLoader loader) throws Exception {
                 valueInjected.set(true);
                 return null;
             }
         });
-        op.getArtifactLoader("first-artifact-loader").setValueClass(ClassArtifactLoader.class);
+        loader.setValueClass(ClassArtifactLoader.class);
         final ConfigurationImpl conf = op.getConfiguration();
 
         conf.getArtifactLoader().load("not-a-thing", Batchlet.class, Tccl.get());
@@ -119,8 +121,9 @@ public class ConfigurationTest extends Assert {
         final JobOperatorModelImpl op = op();
 
         final AtomicBoolean factoryInjected = new AtomicBoolean();
-        op.getArtifactLoader("first-artifact-loader").setValueClass(ClassArtifactLoader.class);
-        op.getArtifactLoader("first-artifact-loader").setFactory(new ArtifactLoaderFactory() {
+        final Declaration<ArtifactLoader> loader = op.getArtifactLoaders().add();
+        loader.setValueClass(ClassArtifactLoader.class);
+        loader.setFactory(new ArtifactLoaderFactory() {
             @Override
             public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return new ArtifactLoader() {
@@ -145,7 +148,8 @@ public class ConfigurationTest extends Assert {
         final JobOperatorModelImpl op = op();
 
         final AtomicBoolean factoryInjected = new AtomicBoolean();
-        op.getArtifactLoader("first-artifact-loader").setFactory(new ArtifactLoaderFactory() {
+        final Declaration<ArtifactLoader> loader = op.getArtifactLoaders().add();
+        loader.setFactory(new ArtifactLoaderFactory() {
             @Override
             public ArtifactLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
                 return new ArtifactLoader() {
@@ -157,7 +161,7 @@ public class ConfigurationTest extends Assert {
                 };
             }
         });
-        op.getArtifactLoader("first-artifact-loader").setFactoryClass(ClassArtifactLoaderFactory.class);
+        loader.setFactoryClass(ClassArtifactLoaderFactory.class);
 
         final ConfigurationImpl conf = op.getConfiguration();
 
@@ -170,8 +174,9 @@ public class ConfigurationTest extends Assert {
     @Test
     public void factoryClassOverRefTest() throws Exception {
         final JobOperatorModelImpl op = op();
-        op.getArtifactLoader("first-artifact-loader").setFactoryClass(ClassArtifactLoaderFactory.class);
-        op.getArtifactLoader("first-artifact-loader").setRef(RefArtifactLoaderFactory.class.getName());
+        final Declaration<ArtifactLoader> loader = op.getArtifactLoaders().add();
+        loader.setFactoryClass(ClassArtifactLoaderFactory.class);
+        loader.setRef(RefArtifactLoaderFactory.class.getName());
 
         final ConfigurationImpl conf = op.getConfiguration();
 

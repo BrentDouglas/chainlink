@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chainlink xmlns="http://machinecode.io/xml/ns/chainlink"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd">
+           xsi:schemaLocation="http://machinecode.io/xml/ns/chainlink http://machinecode.io/xml/ns/chainlink/chainlink_1_0.xsd"
+           configuration-loaders="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory">
 
-    <configuration-loader name="cdi" ref="io.machinecode.chainlink.inject.cdi.CdiConfigurationLoaderFactory"/>
-
-    <job-operator name="default">
-        <security name="security" ref="theSecurity"/>
-    </job-operator>
+    <job-operator name="default"
+                  securities="theSecurity"/>
 </chainlink>

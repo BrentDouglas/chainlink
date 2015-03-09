@@ -8,11 +8,9 @@ import io.machinecode.chainlink.core.property.ArrayPropertyLookup;
 import io.machinecode.chainlink.core.property.SystemPropertyLookup;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
-import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.configuration.factory.ArtifactLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ClassLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.ExecutorFactory;
-import io.machinecode.chainlink.spi.configuration.factory.Factory;
 import io.machinecode.chainlink.spi.configuration.factory.JobLoaderFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MBeanServerFactory;
 import io.machinecode.chainlink.spi.configuration.factory.MarshallingFactory;
@@ -25,6 +23,7 @@ import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
+import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.registry.Registry;
 import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.security.Security;
@@ -33,7 +32,6 @@ import io.machinecode.chainlink.spi.transport.Transport;
 import javax.management.MBeanServer;
 import javax.transaction.TransactionManager;
 import java.lang.ref.WeakReference;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,15 +40,6 @@ import java.util.Set;
  * @since 1.0
  */
 public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperatorModel {
-
-    public static final String CLASS_LOADER = "class-loader";
-    public static final String MARSHALLING = "marshalling";
-    public static final String TRANSPORT = "transport";
-    public static final String REGISTRY = "registry";
-    public static final String EXECUTION_REPOSITORY = "repository";
-    public static final String TRANSACTION_MANAGER = "transaction-manager";
-    public static final String EXECUTOR = "executor";
-    public static final String MBEAN_SERVER = "mbean-server";
 
     final String name;
     final ScopeModelImpl scope;
@@ -63,9 +52,24 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     DeclarationImpl<TransactionManager> transactionManager;
     DeclarationImpl<Executor> executor;
     DeclarationImpl<MBeanServer> mBeanServer;
-    final LinkedHashMap<String, DeclarationImpl<JobLoader>> jobLoaders = new LinkedHashMap<>();
-    final LinkedHashMap<String, DeclarationImpl<ArtifactLoader>> artifactLoaders = new LinkedHashMap<>();
-    final LinkedHashMap<String, DeclarationImpl<Security>> securities = new LinkedHashMap<>();
+    final ListModelImpl<JobLoader> jobLoaders = new ListModelImpl<JobLoader>() {
+        @Override
+        protected DeclarationImpl<JobLoader> create() {
+            return new DeclarationImpl<>(loader, JobLoader.class, JobLoaderFactory.class);
+        }
+    };
+    final ListModelImpl<ArtifactLoader> artifactLoaders = new ListModelImpl<ArtifactLoader>() {
+        @Override
+        protected DeclarationImpl<ArtifactLoader> create() {
+            return new DeclarationImpl<>(loader, ArtifactLoader.class, ArtifactLoaderFactory.class);
+        }
+    };
+    final ListModelImpl<Security> securities = new ListModelImpl<Security>() {
+        @Override
+        protected DeclarationImpl<Security> create() {
+            return new DeclarationImpl<>(loader, Security.class, SecurityFactory.class);
+        }
+    };
 
     final PropertyLookup configuredProperties;
     final SystemPropertyLookup systemProperties;
@@ -107,12 +111,12 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     }
 
     private <T> DeclarationImpl<T> _copyDec(final DeclarationImpl<T> that) {
-        return that == null ? null : that.copy(names, values);
+        return that == null ? null : that.copy();
     }
 
-    private <T> void _copyAllDecs(final Map<String, DeclarationImpl<T>> to, final Map<String, DeclarationImpl<T>> from) {
-        for (final Map.Entry<String, DeclarationImpl<T>> entry : from.entrySet()) {
-            to.put(entry.getKey(), entry.getValue().copy(names, values));
+    private <T> void _copyAllDecs(final ListModelImpl<T> to, final ListModelImpl<T> from) {
+        for (final DeclarationImpl<T> entry : from) {
+            to.add(entry.copy());
         }
     }
 
@@ -128,17 +132,10 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
         return (DeclarationImpl<T>)value;
     }
 
-    protected <T> DeclarationImpl<T> createValue(final String name, final Class<? extends T> clazz, final Class<? extends Factory<? extends T>> interfaz) {
-        if (names.contains(name)) {
-            throw new IllegalStateException("Resource already declared for name: " + name); //TODO Message and better exception
-        }
-        return new DeclarationImpl<>(loader, names, values, clazz, interfaz, name);
-    }
-
     @Override
     public DeclarationImpl<ClassLoader> getClassLoader() {
         if (classLoader == null) {
-            return classLoader = new DeclarationImpl<>(loader, names, values, ClassLoader.class, ClassLoaderFactory.class, CLASS_LOADER);
+            return classLoader = new DeclarationImpl<>(loader, ClassLoader.class, ClassLoaderFactory.class);
         }
         return classLoader;
     }
@@ -146,7 +143,7 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     @Override
     public DeclarationImpl<Marshalling> getMarshalling() {
         if (marshalling == null) {
-            return marshalling = new DeclarationImpl<>(loader, names, values, Marshalling.class, MarshallingFactory.class, MARSHALLING);
+            return marshalling = new DeclarationImpl<>(loader, Marshalling.class, MarshallingFactory.class);
         }
         return marshalling;
     }
@@ -154,7 +151,7 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     @Override
     public DeclarationImpl<Transport> getTransport() {
         if (transport == null) {
-            return transport = new DeclarationImpl<>(loader, names, values, Transport.class, TransportFactory.class, TRANSPORT);
+            return transport = new DeclarationImpl<>(loader, Transport.class, TransportFactory.class);
         }
         return transport;
     }
@@ -162,7 +159,7 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     @Override
     public DeclarationImpl<Registry> getRegistry() {
         if (registry == null) {
-            return registry = new DeclarationImpl<>(loader, names, values, Registry.class, RegistryFactory.class, REGISTRY);
+            return registry = new DeclarationImpl<>(loader, Registry.class, RegistryFactory.class);
         }
         return registry;
     }
@@ -170,7 +167,7 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     @Override
     public DeclarationImpl<Repository> getRepository() {
         if (repository == null) {
-            return repository = new DeclarationImpl<>(loader, names, values, Repository.class, RepositoryFactory.class, EXECUTION_REPOSITORY);
+            return repository = new DeclarationImpl<>(loader, Repository.class, RepositoryFactory.class);
         }
         return repository;
     }
@@ -178,7 +175,7 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     @Override
     public DeclarationImpl<TransactionManager> getTransactionManager() {
         if (transactionManager == null) {
-            return transactionManager = new DeclarationImpl<>(loader, names, values, TransactionManager.class, TransactionManagerFactory.class, TRANSACTION_MANAGER);
+            return transactionManager = new DeclarationImpl<>(loader, TransactionManager.class, TransactionManagerFactory.class);
         }
         return transactionManager;
     }
@@ -186,7 +183,7 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     @Override
     public DeclarationImpl<Executor> getExecutor() {
         if (executor == null) {
-            return executor = new DeclarationImpl<>(loader, names, values, Executor.class, ExecutorFactory.class, EXECUTOR);
+            return executor = new DeclarationImpl<>(loader, Executor.class, ExecutorFactory.class);
         }
         return executor;
     }
@@ -194,39 +191,24 @@ public class JobOperatorModelImpl extends PropertyModelImpl implements JobOperat
     @Override
     public DeclarationImpl<MBeanServer> getMBeanServer() {
         if (mBeanServer == null) {
-            return mBeanServer = new DeclarationImpl<>(loader, names, values, MBeanServer.class, MBeanServerFactory.class, MBEAN_SERVER);
+            return mBeanServer = new DeclarationImpl<>(loader, MBeanServer.class, MBeanServerFactory.class);
         }
         return mBeanServer;
     }
 
     @Override
-    public DeclarationImpl<JobLoader> getJobLoader(final String name) {
-        DeclarationImpl<JobLoader> jobLoader = jobLoaders.get(name);
-        if (jobLoader != null) {
-            return jobLoader;
-        }
-        jobLoaders.put(name, jobLoader = createValue(name, JobLoader.class, JobLoaderFactory.class));
-        return jobLoader;
+    public ListModelImpl<JobLoader> getJobLoaders() {
+        return jobLoaders;
     }
 
     @Override
-    public DeclarationImpl<ArtifactLoader> getArtifactLoader(final String name) {
-        DeclarationImpl<ArtifactLoader> artifactLoader = artifactLoaders.get(name);
-        if (artifactLoader != null) {
-            return artifactLoader;
-        }
-        artifactLoaders.put(name, artifactLoader = createValue(name, ArtifactLoader.class, ArtifactLoaderFactory.class));
-        return artifactLoader;
+    public ListModelImpl<ArtifactLoader> getArtifactLoaders() {
+        return artifactLoaders;
     }
 
     @Override
-    public DeclarationImpl<Security> getSecurity(final String name) {
-        DeclarationImpl<Security> security = securities.get(name);
-        if (security != null) {
-            return security;
-        }
-        securities.put(name, security = createValue(name, Security.class, SecurityFactory.class));
-        return security;
+    public ListModelImpl<Security> getSecurities() {
+        return securities;
     }
 
     public PropertyLookup getProperties() {
