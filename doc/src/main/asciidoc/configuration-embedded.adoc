@@ -11,7 +11,7 @@ can be seen in the following snipped.
 
 [source,java]
 ----
-include::{example}/SeConfiguration.java[]
+include::{example}/SeConfiguration.java[lines=15..-1]
 ----
 
 So what's going on? We're constructing an environment and providing it
@@ -43,7 +43,7 @@ looking up a JobOperator.
 
 [source,java]
 ----
-include::{example}/ManualConfiguration.java[]
+include::{example}/ManualConfiguration.java[lines=15..-1]
 ----
 
 Essentially we go through the same steps as before. Configure the default
@@ -71,7 +71,7 @@ And then adding it to the model:
 
 [source,java]
 ----
-include::{example}/WeldConfiguration.java[]
+include::{example}/WeldConfiguration.java[lines=15..-1]
 ----
 
 Chainlink includes a wide range of extensions that can be installed in
