@@ -1,6 +1,6 @@
 /*
  * Copyright 2015 Brent Douglas and other contributors
- * as indicated by the @authors tag. All rights reserved.
+ * as indicated by the @author tags. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
