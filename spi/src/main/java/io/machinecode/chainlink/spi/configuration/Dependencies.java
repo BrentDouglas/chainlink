@@ -15,6 +15,7 @@
 package io.machinecode.chainlink.spi.configuration;
 
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.inject.ClosableScope;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
@@ -31,6 +32,8 @@ import javax.transaction.TransactionManager;
  * @since 1.0
  */
 public interface Dependencies {
+
+    ClosableScope getScope();
 
     ClassLoader getClassLoader();
 

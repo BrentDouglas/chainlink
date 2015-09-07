@@ -19,6 +19,8 @@ import io.machinecode.chainlink.core.inject.Injector;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.ArtifactOfWrongTypeException;
 import io.machinecode.chainlink.spi.Messages;
+import io.machinecode.chainlink.spi.inject.ClosableScope;
+import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import org.jboss.logging.Logger;
 
@@ -32,7 +34,6 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
-import javax.enterprise.util.AnnotationLiteral;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.Set;
@@ -43,8 +44,6 @@ import java.util.Set;
 public class CdiArtifactLoader implements ArtifactLoader {
 
     private static final Logger log = Logger.getLogger(CdiArtifactLoader.class);
-
-    public static final AnnotationLiteral<Default> DEFAULT_ANNOTATION_LITERAL = new AnnotationLiteral<Default>() {};
 
     private final BeanManagerLookup lookup;
     private BeanManager beanManager;
@@ -74,13 +73,14 @@ public class CdiArtifactLoader implements ArtifactLoader {
         if (this.beanManager == null) {
             this.beanManager = lookup.lookupBeanManager();
         }
-        final T that = _inject(beanManager, as, id, new NamedLiteral(id));
+        final Injectables injectables = provider.getInjectables();
+        final T that = _inject(beanManager, as, id, injectables.getScope(), new NamedLiteral(id));
         if (that == null) {
             return null;
         }
         final String name = that.getClass().getName();
         if (!name.contains("_$$_Weld")) { //TODO Also check OWB
-            Injector.inject(provider, that);
+            Injector.inject(injectables, that);
         }
         return that;
     }
@@ -112,11 +112,7 @@ public class CdiArtifactLoader implements ArtifactLoader {
         return provider.getInjectables().getStepContext();
     }
 
-    public static <T> T inject(final BeanManager beanManager, final Class<T> as) {
-        return _inject(beanManager, as, null, DEFAULT_ANNOTATION_LITERAL);
-    }
-
-    static <T> T _inject(final BeanManager beanManager, final Class<T> as, final String id, final Annotation... annotation) {
+    static <T> T _inject(final BeanManager beanManager, final Class<T> as, final String id, final ClosableScope scope, final Annotation... annotation) {
         final Set<Bean<?>> beans = beanManager.getBeans(as, annotation);
         final Bean<?> bean = beanManager.resolve(beans);
         if (bean == null) {
@@ -127,6 +123,14 @@ public class CdiArtifactLoader implements ArtifactLoader {
             return null;
         }
         final CreationalContext<?> ctx = beanManager.createCreationalContext(bean);
+        if (!beanManager.isNormalScope(bean.getScope())) {
+            scope.onClose(new AutoCloseable() {
+                @Override
+                public void close() throws Exception {
+                    ctx.release();
+                }
+            });
+        }
         return as.cast(beanManager.getReference(bean, as, ctx));
     }
 }

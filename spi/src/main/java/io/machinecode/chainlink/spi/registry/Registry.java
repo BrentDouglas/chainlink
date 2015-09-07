@@ -17,6 +17,7 @@ package io.machinecode.chainlink.spi.registry;
 import io.machinecode.chainlink.spi.Lifecycle;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.inject.InjectionScope;
 import io.machinecode.chainlink.spi.repository.Repository;
 import io.machinecode.chainlink.spi.then.Chain;
 import io.machinecode.then.api.Promise;
@@ -51,9 +52,7 @@ public interface Registry extends Lifecycle {
 
     SplitAccumulator getSplitAccumulator(final long jobExecutionId, final String id);
 
-    <T> T loadArtifact(final Class<T> clazz, final String ref, final ExecutionContext context);
-
-    <T> void storeArtifact(final Class<T> clazz, final String ref, final ExecutionContext context, final T value);
+    InjectionScope getOrCreateScope(final ExecutionContext context);
 
     void registerJobEventListener(final String key, final JobEventListener on);
 

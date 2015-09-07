@@ -160,10 +160,10 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             return load(javax.batch.api.Batchlet.class, configuration, context).process();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -171,10 +171,10 @@ public class BatchletImpl extends PropertyReferenceImpl<javax.batch.api.Batchlet
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(javax.batch.api.Batchlet.class, configuration, context).stop();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

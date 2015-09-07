@@ -42,10 +42,10 @@ public class AnalyserImpl extends PropertyReferenceImpl<PartitionAnalyzer> imple
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(PartitionAnalyzer.class, configuration, context).analyzeCollectorData(data);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -53,10 +53,10 @@ public class AnalyserImpl extends PropertyReferenceImpl<PartitionAnalyzer> imple
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(PartitionAnalyzer.class, configuration, context).analyzeStatus(batchStatus, exitStatus);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

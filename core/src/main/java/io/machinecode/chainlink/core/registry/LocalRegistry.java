@@ -19,10 +19,12 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import io.machinecode.chainlink.core.inject.InjectionScopeImpl;
 import io.machinecode.chainlink.spi.Messages;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.context.ExecutionContext;
 import io.machinecode.chainlink.spi.execution.Executable;
+import io.machinecode.chainlink.spi.inject.InjectionScope;
 import io.machinecode.chainlink.spi.registry.ChainId;
 import io.machinecode.chainlink.spi.registry.ExecutableId;
 import io.machinecode.chainlink.spi.registry.JobEventListener;
@@ -56,7 +58,7 @@ public class LocalRegistry implements Registry {
     protected final TLongObjectMap<LocalJobRegistry> jobRegistries = new TSynchronizedLongObjectMap<>(new TLongObjectHashMap<LocalJobRegistry>());
     protected final TLongObjectMap<Chain<?>> jobs = new TSynchronizedLongObjectMap<>(new TLongObjectHashMap<Chain<?>>());
 
-    protected final TLongObjectMap<TMap<Key, Object>> artifacts = new TSynchronizedLongObjectMap<>(new TLongObjectHashMap<TMap<Key, Object>>());
+    protected final TLongObjectMap<TMap<Key, InjectionScope>> scopes = new TSynchronizedLongObjectMap<>(new TLongObjectHashMap<TMap<Key, InjectionScope>>());
 
     protected final ConcurrentMap<RepositoryId, Repository> repositories = new ConcurrentHashMap<>();
     protected final ConcurrentMap<String, JobEventListener> jobEvents = new ConcurrentHashMap<>();
@@ -97,7 +99,6 @@ public class LocalRegistry implements Registry {
         } finally {
             jobLock.writeLock().unlock();
         }
-        this.artifacts.remove(jobExecutionId);
         log.debugf(Messages.get("CHAINLINK-005100.registry.put.job"), jobExecutionId);
         return this.onRegisterJob(jobExecutionId, chain);
     }
@@ -121,6 +122,7 @@ public class LocalRegistry implements Registry {
         } finally {
             jobLock.writeLock().unlock();
         }
+        this.scopes.remove(jobExecutionId);
         return this.onUnregisterJob(jobExecutionId, job).onComplete(new OnComplete() {
             @Override
             public void complete(final int state) {
@@ -212,24 +214,23 @@ public class LocalRegistry implements Registry {
     }
 
     @Override
-    public <T> T loadArtifact(final Class<T> clazz, final String ref, final ExecutionContext context) {
+    public InjectionScope getOrCreateScope(final ExecutionContext context) {
         final long jobExecutionId = context.getJobExecutionId();
-        final TMap<Key, Object> artifacts = this.artifacts.get(jobExecutionId);
-        if (artifacts == null) {
-            return null;
+        jobLock.writeLock().lock();
+        try {
+            TMap<Key, InjectionScope> scopes = this.scopes.get(jobExecutionId);
+            if (scopes == null) {
+                this.scopes.put(jobExecutionId, scopes = new THashMap<>());
+            }
+            final Key key = new Key(jobExecutionId, context.getStepExecutionId(), context.getPartitionExecutionId());
+            InjectionScope scope = scopes.get(key);
+            if (scope == null) {
+                scopes.put(key, scope = new InjectionScopeImpl());
+            }
+            return scope;
+        } finally {
+            jobLock.writeLock().unlock();
         }
-        return clazz.cast(artifacts.get(new Key(jobExecutionId, context.getStepExecutionId(), context.getPartitionExecutionId(), ref, clazz)));
-    }
-
-    @Override
-    public <T> void storeArtifact(final Class<T> clazz, final String ref, final ExecutionContext context, final T value) {
-        final long jobExecutionId = context.getJobExecutionId();
-        TMap<Key, Object> artifacts = this.artifacts.get(jobExecutionId);
-        if (artifacts == null) {
-            artifacts = new THashMap<>();
-            this.artifacts.put(jobExecutionId, artifacts);
-        }
-        artifacts.put(new Key(jobExecutionId, context.getStepExecutionId(), context.getPartitionExecutionId(), ref, clazz), value);
     }
 
     private LocalJobRegistry _getJobRegistry(final long jobExecutionId) {
@@ -283,15 +284,11 @@ public class LocalRegistry implements Registry {
         final long jobExecutionId;
         final Long stepExecutionId;
         final Long partitionExecutionId;
-        final String ref;
-        final Class<?> clazz;
 
-        private Key(final long jobExecutionId, final Long stepExecutionId, final Long partitionExecutionId, final String ref, final Class<?> clazz) {
+        private Key(final long jobExecutionId, final Long stepExecutionId, final Long partitionExecutionId) {
             this.jobExecutionId = jobExecutionId;
             this.stepExecutionId = stepExecutionId;
             this.partitionExecutionId = partitionExecutionId;
-            this.ref = ref;
-            this.clazz = clazz;
         }
 
         @Override
@@ -302,10 +299,8 @@ public class LocalRegistry implements Registry {
             final Key key = (Key) o;
 
             if (jobExecutionId != key.jobExecutionId) return false;
-            if (!clazz.equals(key.clazz)) return false;
             if (partitionExecutionId != null ? !partitionExecutionId.equals(key.partitionExecutionId) : key.partitionExecutionId != null)
                 return false;
-            if (!ref.equals(key.ref)) return false;
             if (stepExecutionId != null ? !stepExecutionId.equals(key.stepExecutionId) : key.stepExecutionId != null)
                 return false;
 
@@ -317,8 +312,6 @@ public class LocalRegistry implements Registry {
             int result = (int) (jobExecutionId ^ (jobExecutionId >>> 32));
             result = 31 * result + (stepExecutionId != null ? stepExecutionId.hashCode() : 0);
             result = 31 * result + (partitionExecutionId != null ? partitionExecutionId.hashCode() : 0);
-            result = 31 * result + ref.hashCode();
-            result = 31 * result + clazz.hashCode();
             return result;
         }
     }

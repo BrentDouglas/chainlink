@@ -99,7 +99,7 @@ public class BatchArtifactLoader implements ArtifactLoader {
             throw new ArtifactOfWrongTypeException(Messages.format("CHAINLINK-025000.artifact.loader.assignability", id, as.getSimpleName()));
         }
         final T bean = as.cast(that);
-        Injector.inject(provider, bean);
+        Injector.inject(provider.getInjectables(), bean);
         return bean;
     }
 }

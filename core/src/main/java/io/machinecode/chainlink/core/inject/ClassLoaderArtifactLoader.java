@@ -54,7 +54,7 @@ public class ClassLoaderArtifactLoader implements ArtifactLoader {
             log.warnf(Messages.get("CHAINLINK-025003.artifact.loader.access"), id, as.getSimpleName());
             return null;
         }
-        Injector.inject(provider, bean);
+        Injector.inject(provider.getInjectables(), bean);
         return bean;
     }
 }

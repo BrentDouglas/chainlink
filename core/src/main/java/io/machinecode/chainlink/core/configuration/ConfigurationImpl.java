@@ -20,6 +20,8 @@ import io.machinecode.chainlink.core.loader.JobLoaderImpl;
 import io.machinecode.chainlink.core.security.SecurityImpl;
 import io.machinecode.chainlink.spi.configuration.Configuration;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
+import io.machinecode.chainlink.spi.configuration.Dependencies;
+import io.machinecode.chainlink.spi.inject.ClosableScope;
 import io.machinecode.chainlink.spi.property.PropertyLookup;
 import io.machinecode.chainlink.spi.exception.ConfigurationException;
 import io.machinecode.chainlink.spi.execution.Executor;
@@ -41,8 +43,9 @@ import java.util.Collection;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class ConfigurationImpl implements Configuration {
+public class ConfigurationImpl implements Configuration, Dependencies {
 
+    protected final ClosableScope scope;
     protected final ClassLoader classLoader;
     protected final TransactionManager transactionManager;
     protected final Marshalling marshalling;
@@ -57,7 +60,8 @@ public class ConfigurationImpl implements Configuration {
     protected final Executor executor;
     protected final PropertyLookup properties;
 
-    public ConfigurationImpl(final JobOperatorModelImpl model, final ConfigurationLoader loader) throws Exception {
+    public ConfigurationImpl(final JobOperatorModelImpl model, final ConfigurationLoader loader, final ClosableScope scope) throws Exception {
+        this.scope = scope;
         this.properties = model.getProperties();
         this.classLoader = nn(model.classLoader, loader);
         this.artifactLoader = new ArtifactLoaderImpl(this.classLoader, _array(ArtifactLoader.class, model.artifactLoaders, loader));
@@ -102,6 +106,11 @@ public class ConfigurationImpl implements Configuration {
     @Override
     public String getProperty(final String name, final String defaultValue) {
         return this.properties.getProperty(name, defaultValue);
+    }
+
+    @Override
+    public ClosableScope getScope() {
+        return scope;
     }
 
     @Override

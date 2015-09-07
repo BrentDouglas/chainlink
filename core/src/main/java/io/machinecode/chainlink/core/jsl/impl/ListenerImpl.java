@@ -72,12 +72,13 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
     private transient Injectables _injectables;
     protected transient Object _cached;
 
-    protected Injectables _injectables(final ExecutionContext context) {
+    protected Injectables _injectables(final Configuration configuration, final ExecutionContext context) {
         if (this._injectables == null) {
             this._injectables = new InjectablesImpl(
                     context.getJobContext(),
                     context.getStepContext(),
-                    properties.getProperties()
+                    properties.getProperties(),
+                    configuration.getRegistry().getOrCreateScope(context)
             );
         }
         return this._injectables;
@@ -99,10 +100,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ChunkListener.class, injectionContext, context).beforeChunk();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -110,10 +111,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ChunkListener.class, injectionContext, context).onError(exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -121,10 +122,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ChunkListener.class, injectionContext, context).afterChunk();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -132,10 +133,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ItemProcessListener.class, injectionContext, context).beforeProcess(item);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -143,10 +144,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
         load(ItemProcessListener.class, injectionContext, context).afterProcess(item, result);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -154,10 +155,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ItemProcessListener.class, injectionContext, context).onProcessError(item, exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -165,10 +166,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ItemReadListener.class, injectionContext, context).beforeRead();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -176,10 +177,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ItemReadListener.class, injectionContext, context).afterRead(item);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -187,10 +188,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ItemReadListener.class, injectionContext, context).onReadError(exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -198,10 +199,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ItemWriteListener.class, injectionContext, context).beforeWrite(items);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -209,10 +210,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ItemWriteListener.class, injectionContext, context).afterWrite(items);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -220,10 +221,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(ItemWriteListener.class, injectionContext, context).onWriteError(items, exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -231,10 +232,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(JobListener.class, injectionContext, context).beforeJob();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -242,10 +243,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(JobListener.class, injectionContext, context).afterJob();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -253,10 +254,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(RetryProcessListener.class, injectionContext, context).onRetryProcessException(item, exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -264,10 +265,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(RetryReadListener.class, injectionContext, context).onRetryReadException(exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -275,10 +276,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(RetryWriteListener.class, injectionContext, context).onRetryWriteException(items, exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -286,10 +287,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(SkipProcessListener.class, injectionContext, context).onSkipProcessItem(item, exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -297,10 +298,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(SkipReadListener.class, injectionContext, context).onSkipReadItem(exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -308,10 +309,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(SkipWriteListener.class, injectionContext, context).onSkipWriteItem(items, exception);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -319,10 +320,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(StepListener.class, injectionContext, context).beforeStep();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -330,10 +331,10 @@ public class ListenerImpl implements Listener, PropertyReference, Serializable {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(StepListener.class, injectionContext, context).afterStep();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

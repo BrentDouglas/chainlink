@@ -54,7 +54,7 @@ public class SpringArtifactLoader implements ArtifactLoader, ApplicationContextA
             log.tracef(Messages.get("CHAINLINK-025001.artifact.loader.not.found"), id, as.getSimpleName());
             return null;
         }
-        Injector.inject(provider, bean);
+        Injector.inject(provider.getInjectables(), bean);
         return bean;
     }
 

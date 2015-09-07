@@ -38,10 +38,10 @@ public class ItemProcessorImpl extends PropertyReferenceImpl<javax.batch.api.chu
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             return load(javax.batch.api.chunk.ItemProcessor.class, configuration, context).processItem(item);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

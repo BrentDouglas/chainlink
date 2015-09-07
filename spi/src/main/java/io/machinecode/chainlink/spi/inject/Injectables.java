@@ -31,4 +31,6 @@ public interface Injectables {
     StepContext getStepContext();
 
     List<? extends Pair<String, String>> getProperties();
+
+    ClosableScope getScope();
 }

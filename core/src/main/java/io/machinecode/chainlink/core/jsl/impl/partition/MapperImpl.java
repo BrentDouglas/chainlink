@@ -47,10 +47,10 @@ public class MapperImpl extends PropertyReferenceImpl<PartitionMapper> implement
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             return load(PartitionMapper.class, configuration, context).mapPartitions();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

@@ -40,6 +40,6 @@ public class CdiConfigurationLoaderFactory implements ConfigurationLoaderFactory
 
     @Override
     public ConfigurationLoader produce(final Dependencies dependencies, final PropertyLookup properties) throws Exception {
-        return new CdiConfigurationLoader(beanManager);
+        return new CdiConfigurationLoader(beanManager, dependencies.getScope());
     }
 }

@@ -16,6 +16,7 @@ package io.machinecode.chainlink.core.configuration;
 
 import io.machinecode.chainlink.spi.configuration.Dependencies;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
+import io.machinecode.chainlink.spi.inject.ClosableScope;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.loader.JobLoader;
 import io.machinecode.chainlink.spi.marshalling.Marshalling;
@@ -34,10 +35,17 @@ import java.lang.ref.WeakReference;
  */
 public class ClassLoaderDependencies implements Dependencies {
 
+    final ClosableScope scope;
     final WeakReference<ClassLoader> loader;
 
-    public ClassLoaderDependencies(final WeakReference<ClassLoader> loader) {
+    public ClassLoaderDependencies(final ClosableScope scope, final WeakReference<ClassLoader> loader) {
+        this.scope = scope;
         this.loader = loader;
+    }
+
+    @Override
+    public ClosableScope getScope() {
+        return scope;
     }
 
     @Override

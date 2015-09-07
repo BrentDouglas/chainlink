@@ -15,7 +15,6 @@
 package io.machinecode.chainlink.core.inject;
 
 import io.machinecode.chainlink.spi.inject.Injectables;
-import io.machinecode.chainlink.spi.inject.InjectablesProvider;
 import io.machinecode.chainlink.spi.util.Pair;
 
 import javax.batch.api.BatchProperty;
@@ -35,9 +34,8 @@ import java.util.ListIterator;
  */
 public class Injector {
 
-    public static  boolean inject(final InjectablesProvider provider, final Object bean) throws Exception {
+    public static  boolean inject(final Injectables injectables, final Object bean) throws Exception {
         Class<?> clazz = bean.getClass();
-        final Injectables injectables = provider.getInjectables();
         do {
             for (final Field field : clazz.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Inject.class)) {

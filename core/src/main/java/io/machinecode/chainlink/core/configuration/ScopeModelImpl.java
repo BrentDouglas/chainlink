@@ -15,6 +15,7 @@
 package io.machinecode.chainlink.core.configuration;
 
 import gnu.trove.map.hash.THashMap;
+import io.machinecode.chainlink.core.inject.ClosableScopeImpl;
 import io.machinecode.chainlink.core.property.ArrayPropertyLookup;
 import io.machinecode.chainlink.core.property.SinglePropertyLookup;
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
@@ -30,7 +31,7 @@ import java.util.Set;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
+public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel, AutoCloseable {
 
     final WeakReference<ClassLoader> loader;
     final Map<String, JobOperatorModelImpl> jobOperators = new THashMap<>();
@@ -39,6 +40,7 @@ public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
     final ScopeModelImpl parent;
     boolean loadedConfigurations = false;
     final ClassLoaderDependencies _dependencies;
+    final ClosableScopeImpl scope;
     private transient ConfigurationLoader _configurationLoader;
     private transient ConfigurationLoader[] _configurationLoaders;
     private transient PropertyLookup _lookup;
@@ -50,19 +52,20 @@ public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
         }
     };
 
-    public ScopeModelImpl(final WeakReference<ClassLoader> loader, final Set<String> names) {
-        this(loader, names, null);
+    public ScopeModelImpl(final WeakReference<ClassLoader> loader, final Set<String> names, final ClosableScopeImpl scope) {
+        this(loader, names, null, scope);
     }
 
-    public ScopeModelImpl(final ScopeModelImpl parent) {
-        this(parent.loader, parent.names, parent);
+    public ScopeModelImpl(final ScopeModelImpl parent, final ClosableScopeImpl scope) {
+        this(parent.loader, parent.names, parent, scope);
     }
 
-    public ScopeModelImpl(final WeakReference<ClassLoader> loader, final Set<String> names, final ScopeModelImpl parent) {
+    public ScopeModelImpl(final WeakReference<ClassLoader> loader, final Set<String> names, final ScopeModelImpl parent, final ClosableScopeImpl scope) {
         this.loader = loader;
         this.names = names;
         this.parent = parent;
-        this._dependencies = new ClassLoaderDependencies(this.loader);
+        this.scope = scope;
+        this._dependencies = new ClassLoaderDependencies(this.scope, this.loader);
     }
 
     @Override
@@ -105,7 +108,7 @@ public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
                     ? getConfigurationLoader()
                     : getConfigurationLoader(loader);
             for (final Map.Entry<String, JobOperatorModelImpl> entry : jobOperators.entrySet()) {
-                this.configurations.put(entry.getKey(), new ConfigurationImpl(entry.getValue(), configurationLoader));
+                this.configurations.put(entry.getKey(), new ConfigurationImpl(entry.getValue(), configurationLoader, this.scope));
             }
             this.loadedConfigurations = true;
         }
@@ -154,5 +157,10 @@ public class ScopeModelImpl extends PropertyModelImpl implements ScopeModel {
             this._configurationLoaders[i++] = dec.get(_dependencies, this._lookup, init);
         }
         return this._configurationLoaders;
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.scope.close();
     }
 }

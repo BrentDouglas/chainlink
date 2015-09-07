@@ -25,6 +25,7 @@ import io.machinecode.chainlink.spi.jsl.PropertyReference;
 import io.machinecode.chainlink.spi.registry.Registry;
 
 import java.io.Serializable;
+import java.util.concurrent.Callable;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -58,26 +59,27 @@ public class PropertyReferenceImpl<T> implements PropertyReference, Serializable
     public static synchronized <T> T load(final ArtifactReference ref, final Class<T> clazz, final Configuration configuration, final ExecutionContext context) throws Exception {
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final Registry registry = configuration.getRegistry();
-        final T artifact = registry.loadArtifact(clazz, ref.ref(), context);
-        if (artifact != null) {
-            return artifact;
-        }
-        final T that = ref.load(clazz, injectionContext, context);
-        if (that == null) {
-            throw new IllegalStateException(Messages.format("CHAINLINK-025004.artifact.null", context, ref.ref()));
-        }
-        registry.storeArtifact(clazz, ref.ref(), context, that);
-        return that;
+        return registry.getOrCreateScope(context).getArtifact(clazz, ref.ref(), new Callable<T>() {
+            @Override
+            public T call() throws Exception {
+                final T that = ref.load(clazz, injectionContext, context);
+                if (that == null) {
+                    throw new IllegalStateException(Messages.format("CHAINLINK-025004.artifact.null", context, ref.ref()));
+                }
+                return that;
+            }
+        });
     }
 
     private transient Injectables _injectables;
 
-    protected synchronized Injectables _injectables(final ExecutionContext context) {
+    protected synchronized Injectables _injectables(final Configuration configuration, final ExecutionContext context) {
         if (this._injectables == null) {
             this._injectables = new InjectablesImpl(
                     context.getJobContext(),
                     context.getStepContext(),
-                    properties.getProperties()
+                    properties.getProperties(),
+                    configuration.getRegistry().getOrCreateScope(context)
             );
         }
         return this._injectables;

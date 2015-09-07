@@ -18,11 +18,7 @@ package io.machinecode.chainlink.spi.inject;
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface InjectablesProvider {
+public interface ClosableScope {
 
-    void setInjectables(Injectables injectables);
-
-    void releaseInjectables();
-
-    Injectables getInjectables();
+    void onClose(final AutoCloseable close);
 }

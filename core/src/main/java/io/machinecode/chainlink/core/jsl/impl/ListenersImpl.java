@@ -53,12 +53,12 @@ public class ListenersImpl implements Listeners, Serializable {
     }
 
     public List<ListenerImpl> getListenersImplementing(final Configuration configuration, final ExecutionContext context, final Class<?> clazz) throws Exception {
-        final List<ListenerImpl> ret = new ArrayList<ListenerImpl>(this.listeners.size());
+        final List<ListenerImpl> ret = new ArrayList<>(this.listeners.size());
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
             for (final ListenerImpl listener : this.listeners) {
-                provider.setInjectables(listener._injectables(context));
+                provider.setInjectables(listener._injectables(configuration, context));
 
                 final Object that;
                 try {
@@ -74,7 +74,7 @@ public class ListenersImpl implements Listeners, Serializable {
                 }
             }
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
         return ret;
     }

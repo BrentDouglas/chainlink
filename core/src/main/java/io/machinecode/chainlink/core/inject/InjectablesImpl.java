@@ -14,6 +14,7 @@
  */
 package io.machinecode.chainlink.core.inject;
 
+import io.machinecode.chainlink.spi.inject.InjectionScope;
 import io.machinecode.chainlink.spi.inject.Injectables;
 import io.machinecode.chainlink.spi.util.Pair;
 
@@ -30,11 +31,13 @@ public class InjectablesImpl implements Injectables {
     private final JobContext jobContext;
     private final StepContext stepContext;
     private final List<? extends Pair<String, String>> properties;
+    private final InjectionScope context;
 
-    public InjectablesImpl(final JobContext jobContext, final StepContext stepContext, final List<? extends Pair<String, String>> properties) {
+    public InjectablesImpl(final JobContext jobContext, final StepContext stepContext, final List<? extends Pair<String, String>> properties, final InjectionScope context) {
         this.jobContext = jobContext;
         this.stepContext = stepContext;
         this.properties = properties;
+        this.context = context;
     }
 
     @Override
@@ -50,5 +53,10 @@ public class InjectablesImpl implements Injectables {
     @Override
     public List<? extends Pair<String, String>> getProperties() {
         return properties;
+    }
+
+    @Override
+    public InjectionScope getScope() {
+        return context;
     }
 }

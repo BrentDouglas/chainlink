@@ -38,10 +38,10 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             return load(javax.batch.api.chunk.CheckpointAlgorithm.class, configuration, context).checkpointTimeout();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -49,10 +49,10 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(javax.batch.api.chunk.CheckpointAlgorithm.class, configuration, context).beginCheckpoint();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -60,10 +60,10 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             return load(javax.batch.api.chunk.CheckpointAlgorithm.class, configuration, context).isReadyToCheckpoint();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -71,10 +71,10 @@ public class CheckpointAlgorithmImpl extends PropertyReferenceImpl<javax.batch.a
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(javax.batch.api.chunk.CheckpointAlgorithm.class, configuration, context).endCheckpoint();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

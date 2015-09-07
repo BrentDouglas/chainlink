@@ -15,6 +15,7 @@
 package io.machinecode.chainlink.transport.infinispan;
 
 import io.machinecode.chainlink.spi.configuration.Configuration;
+import io.machinecode.chainlink.spi.execution.Executor;
 import io.machinecode.chainlink.spi.inject.ArtifactLoader;
 import io.machinecode.chainlink.spi.inject.InjectionContext;
 import io.machinecode.chainlink.spi.loader.JobLoader;
@@ -33,72 +34,72 @@ import javax.transaction.TransactionManager;
 */
 class DummyConfiguration implements Configuration {
     @Override
-    public io.machinecode.chainlink.spi.execution.Executor getExecutor() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Executor getExecutor() {
+        return null;
     }
 
     @Override
     public ClassLoader getClassLoader() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public TransactionManager getTransactionManager() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public Marshalling getMarshalling() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public MBeanServer getMBeanServer() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public JobLoader getJobLoader() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public ArtifactLoader getArtifactLoader() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public Security getSecurity() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public Repository getRepository() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public Transport getTransport() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public Registry getRegistry() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public InjectionContext getInjectionContext() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public String getProperty(final String name) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public String getProperty(final String name, final String defaultValue) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 }

@@ -14,13 +14,17 @@
  */
 package io.machinecode.chainlink.test.cdi;
 
+import io.machinecode.chainlink.core.inject.ArtifactLoaderImpl;
 import io.machinecode.chainlink.inject.cdi.CdiArtifactLoader;
 import io.machinecode.chainlink.spi.configuration.JobOperatorModel;
 import io.machinecode.chainlink.core.inject.ArtifactLoaderTest;
+import io.machinecode.chainlink.spi.inject.ClosableScope;
+import io.machinecode.chainlink.spi.inject.Injectables;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.mockito.Mockito;
 
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
@@ -30,6 +34,15 @@ public class CdiArtifactLoaderTest extends ArtifactLoaderTest {
 
     private static Weld weld;
     private static WeldContainer container;
+
+    @Override
+    public void testInject() throws Exception {
+        final Injectables injectables = Mockito.mock(Injectables.class);
+        Mockito.when(injectables.getScope()).thenReturn(Mockito.mock(ClosableScope.class));
+        ArtifactLoaderImpl.loadProvider().setInjectables(injectables);
+
+        super.testInject();
+    }
 
     @Override
     protected void visitJobOperatorModel(final JobOperatorModel model) throws Exception {

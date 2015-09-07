@@ -17,6 +17,7 @@ package io.machinecode.chainlink.core.configuration;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.inject.ClosableScopeImpl;
 import io.machinecode.chainlink.core.schema.xml.subsystem.XmlChainlinkSubSystem;
 import io.machinecode.chainlink.spi.configuration.SubSystemModel;
 
@@ -34,18 +35,18 @@ public class SubSystemModelImpl extends ScopeModelImpl implements SubSystemModel
     final DeploymentModelImpl defaultDeployment;
 
     public SubSystemModelImpl(final ClassLoader loader) {
-        super(new WeakReference<>(loader), new THashSet<String>());
+        super(new WeakReference<>(loader), new THashSet<String>(), new ClosableScopeImpl());
         this.deployments = new THashMap<>();
-        this.deployments.put(Constants.DEFAULT, defaultDeployment = new DeploymentModelImpl(this));
+        this.deployments.put(Constants.DEFAULT, defaultDeployment = new DeploymentModelImpl(this, new ClosableScopeImpl()));
     }
 
     @Override
     public DeploymentModelImpl getDeployment(final String name) {
-        DeploymentModelImpl scope = deployments.get(name);
-        if (scope == null) {
-            deployments.put(name, scope = new DeploymentModelImpl(this));
+        DeploymentModelImpl deployment = deployments.get(name);
+        if (deployment == null) {
+            deployments.put(name, deployment = new DeploymentModelImpl(this, new ClosableScopeImpl()));
         }
-        return scope;
+        return deployment;
     }
 
     public DeploymentModelImpl findDeployment(final String name) {
@@ -59,5 +60,33 @@ public class SubSystemModelImpl extends ScopeModelImpl implements SubSystemModel
     public SubSystemModel loadChainlinkSubsystemXml(final InputStream stream) throws Exception {
         Model.configureSubSystem(this, XmlChainlinkSubSystem.read(stream), loader.get());
         return this;
+    }
+
+    @Override
+    public void close() throws Exception {
+        Exception exception = null;
+        for (final DeploymentModelImpl deployment : deployments.values()) {
+            try {
+                deployment.close();
+            } catch (final Exception e) {
+                if (exception == null) {
+                    exception = e;
+                } else {
+                    exception.addSuppressed(e);
+                }
+            }
+        }
+        try {
+            super.close();
+        } catch (final Exception e) {
+            if (exception == null) {
+                exception = e;
+            } else {
+                exception.addSuppressed(e);
+            }
+        }
+        if (exception != null) {
+            throw exception;
+        }
     }
 }

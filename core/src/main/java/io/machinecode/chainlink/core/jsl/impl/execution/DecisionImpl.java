@@ -131,11 +131,12 @@ public class DecisionImpl extends ExecutionImpl implements Decision {
             provider.setInjectables(new InjectablesImpl(
                     context.getJobContext(),
                     context.getStepContext(),
-                    properties.getProperties()
+                    properties.getProperties(),
+                    configuration.getRegistry().getOrCreateScope(context)
             ));
             return PropertyReferenceImpl.load(this.ref, Decider.class, configuration, context).decide(executions);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

@@ -55,7 +55,7 @@ public class SeamInjectionInterceptor extends AbstractInterceptor {
     @AroundInvoke
     public Object aroundInvoke(final InvocationContext invocation) throws Exception {
         final Object bean = invocation.getTarget();
-        Injector.inject(_provider(), bean);
+        Injector.inject(_provider().getInjectables(), bean);
         return invocation.proceed();
     }
 }

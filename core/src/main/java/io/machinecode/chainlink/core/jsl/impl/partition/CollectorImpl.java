@@ -41,10 +41,10 @@ public class CollectorImpl extends PropertyReferenceImpl<PartitionCollector> imp
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             return load(PartitionCollector.class, configuration, context).collectPartitionData();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

@@ -40,10 +40,10 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(PartitionReducer.class, configuration, context).beginPartitionedStep();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -51,10 +51,10 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(PartitionReducer.class, configuration, context).beforePartitionedStepCompletion();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -62,10 +62,10 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(PartitionReducer.class, configuration, context).rollbackPartitionedStep();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -73,10 +73,10 @@ public class ReducerImpl extends PropertyReferenceImpl<PartitionReducer> impleme
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(PartitionReducer.class, configuration, context).afterPartitionedStepCompletion(status);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

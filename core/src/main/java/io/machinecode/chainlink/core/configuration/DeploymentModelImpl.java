@@ -16,6 +16,7 @@ package io.machinecode.chainlink.core.configuration;
 
 import gnu.trove.set.hash.THashSet;
 import io.machinecode.chainlink.core.Constants;
+import io.machinecode.chainlink.core.inject.ClosableScopeImpl;
 import io.machinecode.chainlink.core.schema.xml.XmlChainlink;
 import io.machinecode.chainlink.spi.configuration.DeploymentModel;
 
@@ -29,19 +30,19 @@ import java.util.Map;
  */
 public class DeploymentModelImpl extends ScopeModelImpl implements DeploymentModel {
 
-    public DeploymentModelImpl(final SubSystemModelImpl parent) {
-        super(parent);
+    public DeploymentModelImpl(final SubSystemModelImpl parent, final ClosableScopeImpl scope) {
+        super(parent, scope);
     }
 
-    private DeploymentModelImpl(final DeploymentModelImpl that, final ClassLoader loader) {
-        super(new WeakReference<>(loader), new THashSet<>(that.names), that.parent);
+    private DeploymentModelImpl(final DeploymentModelImpl that, final ClassLoader loader, final ClosableScopeImpl scope) {
+        super(new WeakReference<>(loader), new THashSet<>(that.names), that.parent, scope);
         for (final Map.Entry<String, JobOperatorModelImpl> entry : that.jobOperators.entrySet()) {
             this.jobOperators.put(entry.getKey(), entry.getValue().copy(this));
         }
     }
 
     public DeploymentModelImpl copy(final ClassLoader loader) {
-        return new DeploymentModelImpl(this, loader);
+        return new DeploymentModelImpl(this, loader, new ClosableScopeImpl());
     }
 
     public DeploymentModel loadChainlinkXml() throws Exception {

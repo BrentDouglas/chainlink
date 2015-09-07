@@ -15,6 +15,7 @@
 package io.machinecode.chainlink.inject.cdi;
 
 import io.machinecode.chainlink.spi.configuration.ConfigurationLoader;
+import io.machinecode.chainlink.spi.inject.ClosableScope;
 
 import javax.enterprise.inject.spi.BeanManager;
 
@@ -24,13 +25,15 @@ import javax.enterprise.inject.spi.BeanManager;
 public class CdiConfigurationLoader implements ConfigurationLoader {
 
     private BeanManager beanManager;
+    private ClosableScope scope;
 
-    public CdiConfigurationLoader(final BeanManager beanManager) {
+    public CdiConfigurationLoader(final BeanManager beanManager, final ClosableScope scope) {
         this.beanManager = beanManager;
+        this.scope = scope;
     }
 
     @Override
     public <T> T load(final String id, final Class<T> as, final ClassLoader _loader) throws Exception {
-        return CdiArtifactLoader._inject(beanManager, as, id, new NamedLiteral(id));
+        return CdiArtifactLoader._inject(beanManager, as, id, scope, new NamedLiteral(id));
     }
 }

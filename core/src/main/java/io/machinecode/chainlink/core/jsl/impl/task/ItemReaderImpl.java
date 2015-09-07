@@ -40,10 +40,10 @@ public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(javax.batch.api.chunk.ItemReader.class, configuration, context).open(checkpoint);
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -51,10 +51,10 @@ public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             load(javax.batch.api.chunk.ItemReader.class, configuration, context).close();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -62,10 +62,10 @@ public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             return load(javax.batch.api.chunk.ItemReader.class, configuration, context).readItem();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 
@@ -73,10 +73,10 @@ public class ItemReaderImpl extends PropertyReferenceImpl<javax.batch.api.chunk.
         final InjectionContext injectionContext = configuration.getInjectionContext();
         final InjectablesProvider provider = injectionContext.getProvider();
         try {
-            provider.setInjectables(_injectables(context));
+            provider.setInjectables(_injectables(configuration, context));
             return load(javax.batch.api.chunk.ItemReader.class, configuration, context).checkpointInfo();
         } finally {
-            provider.setInjectables(null);
+            provider.releaseInjectables();
         }
     }
 }

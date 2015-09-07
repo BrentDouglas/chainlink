@@ -14,15 +14,13 @@
  */
 package io.machinecode.chainlink.spi.inject;
 
+import java.util.concurrent.Callable;
+
 /**
  * @author <a href="mailto:brent.n.douglas@gmail.com">Brent Douglas</a>
  * @since 1.0
  */
-public interface InjectablesProvider {
+public interface InjectionScope extends ClosableScope {
 
-    void setInjectables(Injectables injectables);
-
-    void releaseInjectables();
-
-    Injectables getInjectables();
+    <T> T getArtifact(final Class<T>clazz, final String ref, final Callable<T> call) throws Exception;
 }

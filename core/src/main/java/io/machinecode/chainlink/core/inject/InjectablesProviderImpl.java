@@ -34,6 +34,11 @@ public class InjectablesProviderImpl implements InjectablesProvider {
     }
 
     @Override
+    public void releaseInjectables() {
+        InjectablesProviderImpl.injectables.remove();
+    }
+
+    @Override
     public Injectables getInjectables() {
         return injectables.get();
     }
