@@ -44,9 +44,7 @@ public class ChainImpl<T> extends BaseChain<T> {
         synchronized (_linkLock) {
             this.link = that;
             that.previous(this);
-            synchronized (lock) {
-                onLinks = getEvents(ON_LINK);
-            }
+            onLinks = getEvents(ON_LINK);
         }
         RuntimeException exception = null;
 
@@ -73,19 +71,22 @@ public class ChainImpl<T> extends BaseChain<T> {
         if (then == null) {
             throw new IllegalArgumentException(Messages.format("CHAINLINK-004200.chain.argument.required", "onLink"));
         }
+        final Chain<?> link;
         synchronized (_linkLock) {
             if (this.link != null) {
-                try {
-                    then.link(this.link);
-                } catch (final Throwable e) {
-                    final RuntimeException exception = new RuntimeException(Messages.format("CHAINLINK-004004.chain.link.exception"), e);
-                    log().warnf(exception, Messages.format("CHAINLINK-004004.chain.link.exception"));
-                    throw exception;
-                }
+                link = this.link;
             } else {
-                synchronized (lock) {
-                    addEvent(ON_LINK, then);
-                }
+                link = null;
+                addEvent(ON_LINK, then);
+            }
+        }
+        if (link != null) {
+            try {
+                then.link(this.link);
+            } catch (final Throwable e) {
+                final RuntimeException exception = new RuntimeException(Messages.format("CHAINLINK-004004.chain.link.exception"), e);
+                log().warnf(exception, Messages.format("CHAINLINK-004004.chain.link.exception"));
+                throw exception;
             }
         }
         return this;

@@ -98,7 +98,7 @@ public abstract class BaseChain<T> extends DeferredImpl<T,Throwable,Void> implem
         onLink(listener);
         if (listener.exception != null) {
             synchronized (lock) {
-                lock.notifyAll(); //TODO Why?
+                lock.notifyAll();
             }
             throw listener.exception;
         }
