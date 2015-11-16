@@ -41,7 +41,7 @@ public class PostgresJdbcRepository extends JdbcRepository {
             statement.setNull(index, Types.BIGINT);
             return;
         }
-        final LargeObjectManager manager = ((PGConnection)statement.getConnection()).getLargeObjectAPI();
+        final LargeObjectManager manager = statement.getConnection().unwrap(PGConnection.class).getLargeObjectAPI();
         final long oid = manager.createLO(LargeObjectManager.READ | LargeObjectManager.WRITE);
         final LargeObject lob = manager.open(oid, LargeObjectManager.WRITE);
         lob.write(bytes);
@@ -50,7 +50,7 @@ public class PostgresJdbcRepository extends JdbcRepository {
 
     @Override
     protected Serializable getLargeObject(final ResultSet result, final int index) throws Exception {
-        final LargeObjectManager manager = ((PGConnection)result.getStatement().getConnection()).getLargeObjectAPI();
+        final LargeObjectManager manager = result.getStatement().getConnection().unwrap(PGConnection.class).getLargeObjectAPI();
         final long oid = result.getLong(index);
         if (oid == 0) {
             return null;
